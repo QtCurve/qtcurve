@@ -57,7 +57,7 @@
 #include "../style/qtcurve.h"
 #include <QX11Info>
 
-#if KDE_IS_VERSION(4, 3, 85)
+#if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
 #include <KDE/KIconLoader>
 #endif
 
@@ -72,7 +72,7 @@ namespace KWinQtCurve
 
 static const int constTitlePad=4;
 
-#if KDE_IS_VERSION(4, 3, 85)
+#if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
 #define TAB_CLOSE_ICON_SIZE tabCloseIconSize(layoutMetric(LM_TitleHeight))
 
 static const int constInvalidTab=-1;
@@ -231,7 +231,7 @@ static void drawFadedLine(QPainter *painter, const QRect &r, const QColor &col, 
     painter->drawLine(start, end);
 }
 
-#if KDE_IS_VERSION(4, 3, 85)
+#if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
 static void paintTabSeparator(QPainter *painter, const QRect &r)
 {
     drawFadedLine(painter, r, Qt::white);
@@ -270,14 +270,14 @@ QtCurveClient::QtCurveClient(KDecorationBridge *bridge, QtCurveHandler *factory)
              : KCommonDecorationUnstable(bridge, factory)
 #else
              : KCommonDecoration(bridge, factory)
-#endif    
+#endif
              , itsResizeGrip(0L)
              , itsTitleFont(QFont())
              , itsMenuBarSize(-1)
              , itsToggleMenuBarButton(0L)
              , itsToggleStatusBarButton(0L)
 //              , itsHover(false)
-#if KDE_IS_VERSION(4, 3, 85)
+#if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
              , itsClickInProgress(false)
              , itsDragInProgress(false)
              , itsMouseButton(Qt::NoButton)
@@ -472,7 +472,7 @@ void QtCurveClient::init()
     widget()->setAttribute(Qt::WA_OpaquePaintEvent, true);
     widget()->setAttribute(Qt::WA_NoSystemBackground);
 
-#if KDE_IS_VERSION(4, 3, 85)
+#if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
     widget()->setAcceptDrops(true);
 #endif
 
@@ -557,7 +557,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                          // In which case we still have a custom background to draw.
     bool                 customBgnd=APPEARANCE_FLAT!=bgndAppearance,
                          customShadows=
-#if KDE_IS_VERSION(4, 3, 0)             
+#if KDE_IS_VERSION(4, 3, 0)
                             Handler()->customShadows()
 #else
                             false
@@ -568,7 +568,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     if(!preview && compositing && 100==opacity)
         opacity=getOpacityProperty(windowId());
-    
+
 #if KDE_IS_VERSION(4, 3, 0)
     if(customShadows)
     {
@@ -582,7 +582,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                 painter.save();
                 painter.setClipRegion(QRegion(r).subtract(getMask(round, r.adjusted(shadowSize, shadowSize, -shadowSize, -shadowSize))), Qt::IntersectClip);
             }
-            
+
             if(!isMaximized())
                 tileSet->render(r.adjusted(5, 5, -5, -5), &painter, TileSet::Ring);
             else if(isShade())
@@ -610,9 +610,9 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
            wc==QLatin1String("W Mail Thunderbird messageWindow") ||
            wc==QLatin1String("D Calendar Thunderbird EventDialog") ||
            wc==QLatin1String("W Msgcompose Thunderbird Msgcompose") ||
-           wc==QLatin1String("D Msgcompose Thunderbird Msgcompose")) 
+           wc==QLatin1String("D Msgcompose Thunderbird Msgcompose"))
             itsMenuBarSize=QFontMetrics(QApplication::font()).height()+8;
-            
+
         else if(
 #if 0 // Currently LibreOffice does not seem to pain menubar backgrounds for KDE - so disable check here...
                 wc.startsWith(QLatin1String("W VCLSalFrame libreoffice-")) ||
@@ -666,10 +666,10 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     // Fill titlebar and border backgrounds...
     //
     QPainterPath fillPath(maximized || round<=ROUND_SLIGHT
-                                ? QPainterPath() 
-                                : createPath(QRectF(fillRect), 
+                                ? QPainterPath()
+                                : createPath(QRectF(fillRect),
                                              APPEARANCE_NONE==Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarApp,
-                                                                                               &opt, NULL) ? 6.0 : 8.0, 
+                                                                                               &opt, NULL) ? 6.0 : 8.0,
                                              roundBottom ? 6.0 : 1.0));
 
 
@@ -717,7 +717,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     //
     // Titlebar and border backgrounds filled.
     //
-        
+
     if(maximized)
         r.adjust(-3, -border, 3, 0);
     opt.palette.setColor(QPalette::Button, col);
@@ -782,7 +782,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     opt.rect=QRect(r.x(), r.y(), r.width(), titleBarHeight);
     opt.titleBarState=(active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;
-    
+
     if(!preview && !isShade() && blend && -1!=itsMenuBarSize)
         opt.rect.adjust(0, 0, 0, itsMenuBarSize);
 
@@ -809,7 +809,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     else
 #endif
         Handler()->wStyle()->drawComplexControl(QStyle::CC_TitleBar, &opt, &painter, widget());
-    
+
     if(outerBorder && innerBorder)
     {
         QStyleOptionFrame frameOpt;
@@ -839,20 +839,20 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         bool menuIcon=TITLEBAR_ICON_MENU_BUTTON==Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarIcon, 0L, 0L),
              menuOnlyLeft=menuIcon && onlyMenuIcon(true),
              menuOnlyRight=menuIcon && !menuOnlyLeft && onlyMenuIcon(false);
-        
+
         if(!menuOnlyLeft && buttonsLeftWidth()>(titleBarHeight-2*hOffset))
             drawSunkenBevel(&painter, QRect(r.left()+hOffset+posAdjust+edgePad+(compositing ? 0 : -1), r.top()+vOffset+edgePad,
-                                            buttonsLeftWidth()-hOffset+(compositing ? 0 : 2), 
+                                            buttonsLeftWidth()-hOffset+(compositing ? 0 : 2),
                                             titleBarHeight-2*(vOffset+edgePad)), col, buttonFlags&TITLEBAR_BUTTON_ROUND, round);
         if(!menuOnlyRight && buttonsRightWidth()>(titleBarHeight-2*hOffset))
             drawSunkenBevel(&painter, QRect(r.right()-(buttonsRightWidth()+posAdjust+edgePad), r.top()+vOffset+edgePad,
                                             buttonsRightWidth(), titleBarHeight-2*(vOffset+edgePad)), col, buttonFlags&TITLEBAR_BUTTON_ROUND, round);
     }
-    
+
     bool showIcon=TITLEBAR_ICON_NEXT_TO_TITLE==Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarIcon,  0L, 0L);
     int  iconSize=showIcon ? Handler()->wStyle()->pixelMetric(QStyle::PM_SmallIconSize) : 0;
 
-#if KDE_IS_VERSION(4, 3, 85)
+#if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
     QList<ClientGroupItem> tabList  = clientGroupItems();
     const int              tabCount = tabList.count();
 
@@ -922,7 +922,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                                                    rectX2-(titleEdgeRight+rectX+titleEdgeLeft),
                                                    itsCaptionRect.height()),
                    itsCaption, showIcon ? icon().pixmap(iconSize) : QPixmap(), shadowSize);
-#if KDE_IS_VERSION(4, 3, 85)
+#if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
 
         if(constAddToEmpty==itsTargetTab)
         {
@@ -947,7 +947,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     //     if(itsHover)
         {
             if(
-#if KDE_IS_VERSION(4, 3, 85)
+#if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
                 1==tabCount &&
 #endif
                 active && (itsToggleMenuBarButton||itsToggleStatusBarButton))
@@ -1011,7 +1011,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         color.setAlphaF(0.5);
         drawFadedLine(&painter, r, color, true, align&(Qt::AlignHCenter|Qt::AlignRight), align&(Qt::AlignHCenter|Qt::AlignLeft));
     }
-    
+
     painter.end();
 }
 
@@ -1119,7 +1119,7 @@ void QtCurveClient::paintTitle(QPainter *painter, const QRect &capRect, const QR
             painter->setPen(blendColors(WINDOW_SHADOW_COLOR(effect), bgnd, WINDOW_TEXT_SHADOW_ALPHA(effect)));
             painter->drawText(EFFECT_SHADOW==effect
                                 ? textRect.adjusted(1, 1, 1, 1)
-                                : textRect.adjusted(0, 1, 0, 1), 
+                                : textRect.adjusted(0, 1, 0, 1),
                               alignment, str);
 
             if (!isActive() && DARK_WINDOW_TEXT(color))
@@ -1162,7 +1162,7 @@ void QtCurveClient::updateWindowShape()
                     ? widget()->rect().adjusted(layoutMetric(LM_OuterPaddingLeft), layoutMetric(LM_OuterPaddingTop),
                                                -layoutMetric(LM_OuterPaddingRight),
                                                 COMPOSITING_ENABLED ? 0 : -layoutMetric(LM_OuterPaddingBottom))
-                    : 
+                    :
 #endif
                       widget()->rect());
 
@@ -1321,8 +1321,8 @@ bool QtCurveClient::eventFilter(QObject *o, QEvent *e)
 //             }
 //         return true;
 //     }
-    
-#if KDE_IS_VERSION(4, 3, 85)
+
+#if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
     if(Handler()->grouping())
     {
         if(QtCurveButton *btn = dynamic_cast<QtCurveButton *>(o))
@@ -1360,7 +1360,7 @@ bool QtCurveClient::eventFilter(QObject *o, QEvent *e)
     return KCommonDecoration::eventFilter(o, e);
 }
 
-#if KDE_IS_VERSION(4, 3, 85)
+#if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
 bool QtCurveClient::mouseButtonPressEvent(QMouseEvent *e)
 {
     itsClickPoint = widget()->mapToParent(e->pos());
@@ -1406,10 +1406,10 @@ bool QtCurveClient::mouseMoveEvent(QMouseEvent *e)
     {
         itsClickInProgress = false;
         itsDragInProgress = true;
-    
+
         QDrag     *drag      = new QDrag(widget());
         QMimeData *groupData = new QMimeData();
-        
+
         groupData->setData(clientGroupItemDragMimeType(), QString().setNum(itemId(item)).toAscii());
         drag->setMimeData(groupData);
 
@@ -1581,7 +1581,7 @@ int QtCurveClient::itemClicked(const QPoint &point, bool between, bool drag)
 
 void QtCurveClient::reset(unsigned long changed)
 {
-#if KDE_IS_VERSION(4, 3, 85)
+#if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
     if(changed & SettingCompositing)
     {
         updateWindowShape();
@@ -1594,7 +1594,7 @@ void QtCurveClient::reset(unsigned long changed)
         for(int i=0; i<constNumButtonStates; ++i)
            itsButtonBackground[i].pix=QPixmap();
     }
-    
+
     if (changed&SettingBorder)
     {
         if (maximizeMode()==MaximizeFull)
@@ -1708,7 +1708,7 @@ const QString & QtCurveClient::windowClass()
     if(itsWindowClass.isEmpty())
     {
         KWindowInfo info(windowId(), NET::WMWindowType, NET::WM2WindowClass|NET::WM2WindowRole);
-        
+
         switch(info.windowType(NET::AllTypesMask))
         {
             case NET::Dialog:
@@ -1761,7 +1761,7 @@ void QtCurveClient::toggleStatusBar()
 {
     sendToggleToApp(false);
 }
-    
+
 QtCurveToggleButton * QtCurveClient::createToggleButton(bool menubar)
 {
     QtCurveToggleButton *button = new QtCurveToggleButton(menubar, this);

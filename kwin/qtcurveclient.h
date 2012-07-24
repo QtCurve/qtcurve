@@ -53,7 +53,7 @@ class QtCurveClient :
                        public KCommonDecorationUnstable
 #else
                        public KCommonDecoration
-#endif    
+#endif
 {
     Q_OBJECT
 
@@ -95,7 +95,7 @@ class QtCurveClient :
 
     private:
 
-#if KDE_IS_VERSION(4, 3, 85)
+#if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
     bool                      mouseSingleClickEvent(QMouseEvent *e);
     bool                      mouseMoveEvent(QMouseEvent *e);
     bool                      mouseButtonPressEvent(QMouseEvent *e);
@@ -134,7 +134,7 @@ class QtCurveClient :
     QtCurveToggleButton    *itsToggleMenuBarButton,
                            *itsToggleStatusBarButton;
 //     bool                   itsHover;
-#if KDE_IS_VERSION(4, 3, 85)
+#if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
     QList<QtCurveButton *> itsCloseButtons;
     bool                   itsClickInProgress,
                            itsDragInProgress;

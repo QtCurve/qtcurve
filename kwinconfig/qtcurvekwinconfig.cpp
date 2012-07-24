@@ -21,6 +21,7 @@
 #include <kconfig.h>
 #include <klocale.h>
 #include <kglobal.h>
+#include <kdeversion.h>
 #include <QtDBus/QDBusConnection>
 #include "config.h"
 #include "common.h"
@@ -68,7 +69,7 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
 
     KGlobal::locale()->insertCatalog("qtcurve");
     KGlobal::locale()->insertCatalog("kwin_clients");
-    
+
     if(!QDBusConnection::sessionBus().registerService(constDBusService))
     {
         itsOk=false;
@@ -126,7 +127,12 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
                                                 KWinQtCurve::QtCurveShadowConfiguration::MAX_OFFSET);
         setShadows();
 
+#if KDE_IS_VERSION(4, 8, 80)
+        grouping->setVisible(false);
+        groupingLabel->setVisible(false);
+#else
         connect(grouping, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
+#endif
         connect(activeOpacity, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
         connect(inactiveOpacity, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
         connect(opaqueBorder, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
@@ -173,7 +179,7 @@ void QtCurveKWinConfig::save(KConfig *c)
         return;
 
     KConfig *cfg=c ? c : new KConfig("kwinqtcurverc");
-    
+
     KWinQtCurve::QtCurveConfig config;
 
     config.setBorderSize((KWinQtCurve::QtCurveConfig::Size)borderSize->currentIndex());
@@ -210,7 +216,9 @@ void QtCurveKWinConfig::save(KConfig *c)
     }
     itsActiveShadows.save(cfg);
     itsInactiveShadows.save(cfg);
+#if !KDE_IS_VERSION(4, 8, 80)
     config.setGrouping(grouping->isChecked());
+#endif
     config.setOpacity(activeOpacity->value(), true);
     config.setOpacity(inactiveOpacity->value(), false);
     config.setOpaqueBorder(opaqueBorder->isChecked());
@@ -293,7 +301,9 @@ void QtCurveKWinConfig::setWidgets(const KWinQtCurve::QtCurveConfig &cfg)
     titleBarPad->setValue(cfg.titleBarPad());
     edgePad->setValue(cfg.edgePad());
     useShadows->setChecked(cfg.customShadows());
+#if !KDE_IS_VERSION(4, 8, 80)
     grouping->setChecked(cfg.grouping());
+#endif
     activeOpacity->setValue(cfg.opacity(true));
     inactiveOpacity->setValue(cfg.opacity(false));
     opaqueBorder->setChecked(cfg.opaqueBorder());

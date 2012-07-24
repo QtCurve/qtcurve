@@ -1,3 +1,7 @@
+1.8.13
+------
+1. Fix KDE4.9 build - window grouping disabled.
+
 1.8.12
 ------
 1. Dont setup KDE4 fonts/colours in constructor - seems to mess things up when

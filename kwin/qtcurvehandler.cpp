@@ -145,7 +145,7 @@ bool QtCurveHandler::reset(unsigned long changed)
         setStyle();
         styleChanged=true;
     }
-    
+
     // we assume the active font to be the same as the inactive font since the control
     // center doesn't offer different settings anyways.
     itsTitleFont = KDecoration::options()->font(true, false); // not small
@@ -254,7 +254,7 @@ bool QtCurveHandler::supports(Ability ability) const
         case AbilityProvidesShadow:
             return customShadows();
 #endif
-#if KDE_IS_VERSION(4, 3, 85)
+#if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
         case AbilityClientGrouping:
             return grouping();
 #endif
@@ -302,7 +302,7 @@ bool QtCurveHandler::readConfig(bool compositingToggled)
         borderHack=false;
     }
     else if(compositingToggled && !itsConfig.outerBorder() &&
-           (itsConfig.borderSize()<QtCurveConfig::BORDER_TINY || 
+           (itsConfig.borderSize()<QtCurveConfig::BORDER_TINY ||
             (wStyle()->pixelMetric((QStyle::PixelMetric)QtC_WindowBorder, 0L, 0L)&WINDOW_BORDER_COLOR_TITLEBAR_ONLY)))
     {
         QDBusConnection::sessionBus().send(QDBusMessage::createSignal("/KWin", "org.kde.KWin", "reloadConfig"));
@@ -405,7 +405,7 @@ int QtCurveHandler::borderSize(bool bot) const
         else if(QtCurveConfig::BORDER_TINY==itsConfig.borderSize() && itsConfig.roundBottom() && itsConfig.outerBorder())
             return itsBorderSize+1;
     }
-    return itsBorderSize; 
+    return itsBorderSize;
 }
 
 void QtCurveHandler::borderSizeChanged()
@@ -454,7 +454,7 @@ void QtCurveHandler::emitToggleStatusBar(int xid)
 {
     itsDBus->emitSbToggle(xid);
 }
-    
+
 int QtCurveHandler::borderEdgeSize() const
 {
     return itsConfig.edgePad()+
@@ -476,7 +476,7 @@ void QtCurveHandler::removeClient(QtCurveClient *c)
         itsLastStatusXid=0;
     itsClients.removeAll(c);
 }
- 
+
 // make the handler accessible to other classes...
 static QtCurveHandler *handler = 0;
 
