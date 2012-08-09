@@ -85,12 +85,21 @@ static const QString & xdgConfigFolder()
 namespace KWinQtCurve
 {
 
+    // make the handler accessible to other classes...
+static QtCurveHandler *handler = 0;
+
+QtCurveHandler * Handler()
+{
+    return handler;
+}
+
 QtCurveHandler::QtCurveHandler()
               : itsLastMenuXid(0)
               , itsLastStatusXid(0)
               , itsStyle(NULL)
               , itsDBus(NULL)
 {
+    handler=this;
     setStyle();
     reset(0);
 
@@ -100,6 +109,7 @@ QtCurveHandler::QtCurveHandler()
 
 QtCurveHandler::~QtCurveHandler()
 {
+    handler=0;
     delete itsStyle;
 }
 
@@ -477,24 +487,19 @@ void QtCurveHandler::removeClient(QtCurveClient *c)
     itsClients.removeAll(c);
 }
 
-// make the handler accessible to other classes...
-static QtCurveHandler *handler = 0;
-
-QtCurveHandler * Handler()
-{
-    return handler;
 }
 
-}
-
+#if KDE_IS_VERSION(4, 9, 0)
+KWIN_DECORATION(KWinQtCurve::QtCurveHandler)
+#else
 extern "C"
 {
     KDE_EXPORT KDecorationFactory *create_factory()
     {
-        KWinQtCurve::handler = new KWinQtCurve::QtCurveHandler();
-        return KWinQtCurve::handler;
+        return new KWinQtCurve::QtCurveHandler();
     }
 }
+#endif
 
 #include "qtcurvedbus.moc"
 #include "qtcurvehandler.moc"
