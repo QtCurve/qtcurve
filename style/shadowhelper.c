@@ -58,6 +58,7 @@ static Pixmap createPixmap(const guint8 *pix)
         cairo_rectangle(cr, 0, 0, shadowSize, shadowSize);
         cairo_fill(cr);
         cairo_destroy(cr);
+        cairo_surface_destroy(dest);
         g_object_unref(pixbuf);
         return pixmap;
     }
