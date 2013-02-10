@@ -54,14 +54,14 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}"
 #   find_package(KDE4 REQUIRED)
 # endif()
 set(QTC5_LINK_LIBS)
-foreach(QtModule Qt5Core Qt5Gui Qt5Widget)
+foreach(QtModule Qt5Core Qt5Gui Qt5Widgets)
   find_package(${QtModule} REQUIRED)
   set(QTC5_LINK_LIBS ${QTC5_LINK_LIBS} ${${QtModule}_LIBRARIES})
   include_directories(${${QtModule}_INCLUDE_DIRS})
   add_definitions(${${QtModule}_DEFINITIONS})
 endforeach()
 
-configure_file(config.h.cmake config.h @ONLY)
+configure_file(config.h.in config.h @ONLY)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}"
   "${CMAKE_CURRENT_BINARY_DIR}")
 
