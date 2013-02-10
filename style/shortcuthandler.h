@@ -21,9 +21,9 @@
   Boston, MA 02110-1301, USA.
 */
 
-#include <QtCore/QObject>
-#include <QtCore/QSet>
-#include <QtCore/QList>
+#include <QObject>
+#include <QSet>
+#include <QList>
 
 class QWidget;
 
@@ -33,31 +33,30 @@ namespace QtCurve
 class ShortcutHandler : public QObject
 {
     Q_OBJECT
+public:
 
-    public:
-        
     explicit ShortcutHandler(QObject *parent = 0);
     virtual ~ShortcutHandler();
 
-    bool hasSeenAlt(const QWidget *widget) const; 
+    bool hasSeenAlt(const QWidget *widget) const;
     bool isAltDown() const { return itsAltDown; }
     bool showShortcut(const QWidget *widget) const;
 
-    private Q_SLOTS:
+private Q_SLOTS:
 
     void widgetDestroyed(QObject *o);
 
-    protected:
+protected:
 
     void updateWidget(QWidget *w);
     bool eventFilter(QObject *watched, QEvent *event);
 
-    private:
+private:
 
-    bool             itsAltDown;
-    QSet<QWidget *>  itsSeenAlt,
-                     itsUpdated;
-    QList<QWidget *> itsOpenMenus;
+    bool itsAltDown;
+    QSet<QWidget*> itsSeenAlt,
+        itsUpdated;
+    QList<QWidget*> itsOpenMenus;
 };
 
 }

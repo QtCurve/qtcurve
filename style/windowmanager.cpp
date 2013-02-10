@@ -647,7 +647,7 @@ namespace QtCurve
     //____________________________________________________________
     void WindowManager::startDrag( QWidget* widget, const QPoint& position )
     {
-
+        Q_UNUSED(position);
         if( !( enabled() && widget ) ) return;
         if( QWidget::mouseGrabber() ) return;
 
@@ -675,7 +675,7 @@ namespace QtCurve
             XUngrabPointer(QX11Info::display(), QX11Info::appTime());
             XSendEvent(QX11Info::display(), QX11Info::appRootWindow(info.screen()), False,
                        SubstructureRedirectMask | SubstructureNotifyMask, &xev);
-            #else    
+            #else
             XUngrabPointer(QX11Info::display(), QX11Info::appTime());
             NETRootInfo rootInfo(QX11Info::display(), NET::WMMoveResize);
             rootInfo.moveResizeRequest( widget->window()->winId(), position.x(), position.y(), NET::Move);
