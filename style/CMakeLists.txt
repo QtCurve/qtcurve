@@ -13,6 +13,7 @@ set(qtcurve_SRCS
   ${qtcurve_style_common_SRCS})
 set(qtcurve_MOC_HDRS
   qtcurve.h
+  qtcurve_plugin.h
   windowmanager.h
   blurhelper.h
   shortcuthandler.h)

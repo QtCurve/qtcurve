@@ -33,7 +33,6 @@
 #include <QBitmap>
 #include <QFormLayout>
 #include <QtGlobal>
-#include <QStylePlugin>
 typedef qulonglong QtcKey;
 #include "common.h"
 
@@ -430,8 +429,10 @@ private:
     // Required for Q3Header hover...
     // QPoint itsPos;
     // QWidget *itsHoverWidget;
-#ifdef Q_WS_X11
+#ifdef Q_OS_X11
     QDBusInterface *itsDBus;
+#endif
+#ifdef Q_WS_X11
     QtCurve::ShadowHelper *itsShadowHelper;
 #endif
     mutable QScrollBar *itsSViewSBar;
@@ -442,30 +443,7 @@ private:
     QtCurve::WindowManager *itsWindowManager;
     QtCurve::BlurHelper *itsBlurHelper;
     QtCurve::ShortcutHandler *itsShortcutHandler;
-// #ifdef QTC_STYLE_SUPPORT
-//     QString itsName;
-// #endif
 };
-
-class StylePlugin: public QStylePlugin
-{
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QStyleFactoryInterface"
-                      FILE "qtcurvestyle.json")
-public:
-    StylePlugin(QObject *parent=0): QStylePlugin(parent) {}
-    ~StylePlugin() {}
-    QStyle *create(const QString &key) {
-//             return "qtcurve" == key.toLower() ? new Style
-// #ifdef QTC_STYLE_SUPPORT
-//                 : 0 == key.indexOf(THEME_PREFIX)
-//                 ? new Style(key)
-// #endif
-//                 : 0;
-        return "qtcurve" == key.toLower() ? new Style : 0;
-    }
-};
-
 }
 
 #endif

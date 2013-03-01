@@ -19,7 +19,7 @@
 */
 
 #include <QtGui>
-#ifdef Q_WS_X11
+#ifdef Q_OS_X11
 #include <QtDBus>
 #endif
 #include "qtcurve.h"
@@ -1044,25 +1044,30 @@ void Style::init(bool initial)
         qtcReadConfig(QString(), &opts);
 // #endif
 
-#ifdef Q_WS_X11
-        if(initial)
-        {
-            QDBusConnection::sessionBus().connect(QString(), "/KGlobalSettings", "org.kde.KGlobalSettings",
-                                                  "notifyChange", this, SLOT(kdeGlobalSettingsChange(int, int)));
-            QDBusConnection::sessionBus().connect("org.kde.kwin", "/KWin", "org.kde.KWin",
-                                                  "compositingToggled", this, SLOT(compositingToggled()));
+#ifdef Q_OS_X11
+        if (initial) {
+            QDBusConnection::sessionBus().connect(
+                QString(), "/KGlobalSettings", "org.kde.KGlobalSettings",
+                "notifyChange", this, SLOT(kdeGlobalSettingsChange(int, int)));
+            QDBusConnection::sessionBus().connect(
+                "org.kde.kwin", "/KWin", "org.kde.KWin", "compositingToggled",
+                this, SLOT(compositingToggled()));
 
-            if(!qApp || QString(qApp->argv()[0])!="kwin")
-            {
-                QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
-                                                      "borderSizesChanged", this, SLOT(borderSizesChanged()));
-                if(opts.menubarHiding&HIDE_KWIN)
-                    QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
-                                                          "toggleMenuBar", this, SLOT(toggleMenuBar(unsigned int)));
+            if (!qApp || QString(qApp->argv()[0]) != "kwin") {
+                QDBusConnection::sessionBus().connect(
+                    "org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
+                    "borderSizesChanged", this, SLOT(borderSizesChanged()));
+                if (opts.menubarHiding & HIDE_KWIN)
+                    QDBusConnection::sessionBus().connect(
+                        "org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
+                        "toggleMenuBar",
+                        this, SLOT(toggleMenuBar(unsigned int)));
 
-                if(opts.statusbarHiding&HIDE_KWIN)
-                    QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
-                                                          "toggleStatusBar", this, SLOT(toggleStatusBar(unsigned int)));
+                if(opts.statusbarHiding & HIDE_KWIN)
+                    QDBusConnection::sessionBus().connect(
+                        "org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
+                        "toggleStatusBar",
+                        this, SLOT(toggleStatusBar(unsigned int)));
             }
         }
 #endif
@@ -1337,9 +1342,10 @@ void Style::init(bool initial)
 Style::~Style()
 {
     freeColors();
-#ifdef Q_WS_X11
-    if(itsDBus)
+#ifdef Q_OS_X11
+    if(itsDBus) {
         delete itsDBus;
+    }
 #endif
 }
 
@@ -1850,7 +1856,8 @@ void Style::polish(QWidget *widget)
         {
             static_cast<QMainWindow *>(widget)->menuWidget()->setHidden(true);
 #ifdef Q_WS_X11
-            if(BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR)
+            if (BLEND_TITLEBAR || opts.menubarHiding & HIDE_KWIN ||
+                opts.windowBorder & WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR)
                 emitMenuSize(static_cast<QMainWindow *>(widget)->menuWidget(), 0);
 #endif
         }
@@ -13569,12 +13576,10 @@ void Style::emitMenuSize(QWidget *w, unsigned short size, bool force)
 
         unsigned short oldSize=2000;
 
-        if(!force)
-        {
+        if(!force) {
             QVariant prop(w->property(constMenuSizeProperty));
 
-            if(prop.isValid())
-            {
+            if(prop.isValid()) {
                 bool ok;
                 oldSize=prop.toUInt(&ok);
                 if(!ok)
