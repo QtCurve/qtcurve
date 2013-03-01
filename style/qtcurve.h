@@ -346,7 +346,6 @@ private:
     void  unregisterArgbWidget(QWidget *w);
 
 private Q_SLOTS:
-    void widgetDestroyed(QObject *o);
     QIcon standardIcon(StandardPixmap pix, const QStyleOption *option=0,
                        const QWidget *widget=0) const;
     int layoutSpacing(QSizePolicy::ControlType control1,
@@ -361,6 +360,7 @@ private Q_SLOTS:
     void compositingToggled();
 
 private:
+    void widgetDestroyed(QObject *o);
     void toggleMenuBar(QMainWindow *window);
     void toggleStatusBar(QMainWindow *window);
 

@@ -1710,10 +1710,11 @@ void Style::polish(QWidget *widget)
     if(!opts.xbar && APP_KONQUEROR==theThemedApp && widget->parentWidget() && qobject_cast<QToolButton*>(widget) && qobject_cast<QMenuBar*>(widget->parentWidget()))
         widget->parentWidget()->setMaximumSize(32768, konqMenuBarSize((QMenuBar *)widget->parentWidget()));
 
-    if(EFFECT_NONE!=opts.buttonEffect && !USE_CUSTOM_ALPHAS(opts) && isNoEtchWidget(widget))
-    {
-        theNoEtchWidgets.insert(static_cast<const QWidget *>(widget));
-        connect(widget, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
+    if (EFFECT_NONE != opts.buttonEffect &&
+        !USE_CUSTOM_ALPHAS(opts) && isNoEtchWidget(widget)) {
+        theNoEtchWidgets.insert(static_cast<const QWidget*>(widget));
+        connect(widget, &QWidget::destroyed,
+                this, &Style::widgetDestroyed);
     }
 
     itsWindowManager->registerWidget(widget);
@@ -1800,7 +1801,8 @@ void Style::polish(QWidget *widget)
             // PE_Widget is not called for transparent widgets, so need event filter here...
             Utils::addEventFilter(widget, this);
             itsTransparentWidgets.insert(widget);
-            connect(widget, SIGNAL(destroyed(QObject *)), SLOT(widgetDestroyed(QObject *)));
+            connect(widget, &QWidget::destroyed,
+                    this, &Style::widgetDestroyed);
             break;
         }
         case Qt::Popup: // we currently don't want that kind of gradient on menus etc
@@ -1992,20 +1994,22 @@ void Style::polish(QWidget *widget)
             {
                 Utils::addEventFilter(frame, this);
                 itsSViewContainers[frame].insert(widget);
-                connect(widget, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
-                connect(frame, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
+                connect(widget, &QWidget::destroyed,
+                        this, &Style::widgetDestroyed);
+                connect(frame, &QWidget::destroyed,
+                        this, &Style::widgetDestroyed);
             }
         }
-    }
-    else if(qobject_cast<QDialog*>(widget) && widget->inherits("QPrintPropertiesDialog") &&
-            widget->parentWidget() && widget->parentWidget()->topLevelWidget() &&
-            widget->topLevelWidget() && widget->topLevelWidget()->windowTitle().isEmpty() &&
-            !widget->parentWidget()->topLevelWidget()->windowTitle().isEmpty())
-    {
-        widget->topLevelWidget()->setWindowTitle(widget->parentWidget()->topLevelWidget()->windowTitle());
-    }
-    else if(widget->inherits("QWhatsThat"))
-    {
+    } else if(qobject_cast<QDialog*>(widget) &&
+              widget->inherits("QPrintPropertiesDialog") &&
+              widget->parentWidget() &&
+              widget->parentWidget()->topLevelWidget() &&
+              widget->topLevelWidget() &&
+              widget->topLevelWidget()->windowTitle().isEmpty() &&
+              !widget->parentWidget()->topLevelWidget()->windowTitle().isEmpty()) {
+        widget->topLevelWidget()->setWindowTitle(
+            widget->parentWidget()->topLevelWidget()->windowTitle());
+    } else if(widget->inherits("QWhatsThat")) {
         QPalette pal(widget->palette());
         QColor   shadow(pal.shadow().color());
 
@@ -2378,10 +2382,10 @@ void Style::unpolish(QWidget *widget)
     if(!widget)
         return;
 
-    if(EFFECT_NONE!=opts.buttonEffect && theNoEtchWidgets.contains(widget))
-    {
-        theNoEtchWidgets.remove(static_cast<const QWidget *>(widget));
-        disconnect(widget, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
+    if (EFFECT_NONE!=opts.buttonEffect && theNoEtchWidgets.contains(widget)) {
+        theNoEtchWidgets.remove(static_cast<const QWidget*>(widget));
+        disconnect(widget, &QWidget::destroyed,
+                   this, &Style::widgetDestroyed);
     }
 
     itsWindowManager->unregisterWidget(widget);
@@ -2494,30 +2498,25 @@ void Style::unpolish(QWidget *widget)
     }
     else if(qobject_cast<QLabel*>(widget))
         widget->removeEventFilter(this);
-    else if(/*!opts.gtkScrollViews && */qobject_cast<QAbstractScrollArea *>(widget))
-    {
-        if(!opts.gtkScrollViews && (((QFrame *)widget)->frameWidth()>0))
+    else if(/*!opts.gtkScrollViews && */
+        qobject_cast<QAbstractScrollArea*>(widget)) {
+        if (!opts.gtkScrollViews && (((QFrame *)widget)->frameWidth() > 0))
             widget->removeEventFilter(this);
-        if(APP_KONTACT==theThemedApp && widget->parentWidget())
-        {
-            QWidget *frame=scrollViewFrame(widget->parentWidget());
-
-            if(frame)
-            {
-                if(itsSViewContainers.contains(frame))
-                {
+        if (APP_KONTACT==theThemedApp && widget->parentWidget()) {
+            QWidget *frame = scrollViewFrame(widget->parentWidget());
+            if (frame) {
+                if (itsSViewContainers.contains(frame)) {
                     itsSViewContainers[frame].remove(widget);
-                    if(0==itsSViewContainers[frame].count())
-                    {
+                    if (0 == itsSViewContainers[frame].count()) {
                         frame->removeEventFilter(this);
                         itsSViewContainers.remove(frame);
-                        disconnect(frame, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
+                        disconnect(frame, &QWidget::destroyed,
+                                   this, &Style::widgetDestroyed);
                     }
                 }
             }
         }
-    }
-    else if(qobject_cast<QDockWidget *>(widget) &&
+    } else if(qobject_cast<QDockWidget *>(widget) &&
             ((QDockWidget *)widget)->titleBarWidget() &&
             dynamic_cast<QtCurveDockWidgetTitleBar *>(((QDockWidget *)widget)->titleBarWidget()) &&
             widget->parentWidget() &&
@@ -13282,27 +13281,26 @@ void Style::unregisterArgbWidget(QWidget *w)
 
 void Style::widgetDestroyed(QObject *o)
 {
-    QWidget *w=static_cast<QWidget *>(o);
+    QWidget *w = static_cast<QWidget*>(o);
     theNoEtchWidgets.remove(w);
-    if(APP_KONTACT==theThemedApp)
-    {
+    if (APP_KONTACT == theThemedApp) {
         itsSViewContainers.remove(w);
-        QMap<QWidget *, QSet<QWidget *> >::Iterator it(itsSViewContainers.begin()),
-            end(itsSViewContainers.end());
-        QSet<QWidget *>                             rem;
+        QMap<QWidget*, QSet<QWidget*> >::Iterator it(itsSViewContainers.begin());
+        QMap<QWidget*, QSet<QWidget*> >::Iterator end(itsSViewContainers.end());
+        QSet<QWidget*> rem;
 
-        for(; it!=end; ++it)
-        {
+        for (;it != end;++it) {
             (*it).remove(w);
-            if((*it).isEmpty())
+            if ((*it).isEmpty()) {
                 rem.insert(it.key());
+            }
         }
 
-        QSet<QWidget *>::ConstIterator r(rem.begin()),
-            remEnd(rem.end());
+        QSet<QWidget*>::ConstIterator r(rem.begin()), remEnd(rem.end());
 
-        for(; r!=remEnd; ++r)
+        for(;r != remEnd;++r) {
             itsSViewContainers.remove(*r);
+        }
     }
     unregisterArgbWidget(w);
 }
