@@ -32,16 +32,16 @@
 
 #include "utils.h"
 
-#include <QtCore/QObject>
-#include <QtCore/QPointer>
-#include <QtCore/QHash>
-#include <QtCore/QBasicTimer>
-#include <QtCore/QTimerEvent>
-#include <QtGui/QDockWidget>
-#include <QtGui/QMenu>
-#include <QtGui/QRegion>
-#include <QtGui/QToolBar>
-// 
+#include <QObject>
+#include <QPointer>
+#include <QHash>
+#include <QBasicTimer>
+#include <QTimerEvent>
+#include <QDockWidget>
+#include <QMenu>
+#include <QRegion>
+#include <QToolBar>
+//
 #ifdef Q_WS_X11
 #include <X11/Xdefs.h>
 #endif

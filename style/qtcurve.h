@@ -87,7 +87,7 @@ public:
     };
 
     enum CustomElements {
-        CE_QtC_KCapacityBar = CE_CustomBase+0x00FFFF00,
+        CE_QtC_KCapacityBar = CE_CustomBase + 0x00FFFF00,
         CE_QtC_Preview,
         CE_QtC_SetOptions
     };
@@ -109,7 +109,7 @@ public:
     public:
         EAppearance  app;
         QPainterPath path;
-        QRect        widgetRect;
+        QRect widgetRect;
     };
 
     enum Icon {
@@ -349,11 +349,11 @@ private Q_SLOTS:
     void widgetDestroyed(QObject *o);
     QIcon standardIcon(StandardPixmap pix, const QStyleOption *option=0,
                        const QWidget *widget=0) const;
-    int layoutSpacingImplementation(QSizePolicy::ControlType control1,
-                                    QSizePolicy::ControlType control2,
-                                    Qt::Orientation orientation,
-                                    const QStyleOption *option,
-                                    const QWidget *widget) const;
+    int layoutSpacing(QSizePolicy::ControlType control1,
+                      QSizePolicy::ControlType control2,
+                      Qt::Orientation orientation,
+                      const QStyleOption *option = 0,
+                      const QWidget *widget = 0) const;
     void kdeGlobalSettingsChange(int type, int);
     void borderSizesChanged();
     void toggleMenuBar(unsigned int xid);
@@ -422,8 +422,8 @@ private:
     mutable int itsTitlebarHeight;
 
     // Required for Q3Header hover...
-    QPoint itsPos;
-    QWidget *itsHoverWidget;
+    // QPoint itsPos;
+    // QWidget *itsHoverWidget;
 #ifdef Q_WS_X11
     QDBusInterface *itsDBus;
     QtCurve::ShadowHelper *itsShadowHelper;
@@ -449,32 +449,16 @@ class StylePlugin: public QStylePlugin
 public:
     StylePlugin(QObject *parent=0): QStylePlugin(parent) {}
     ~StylePlugin() {}
-
-    QStringList keys() const
+    QStyle *create(const QString &key)
         {
-            QSet<QString> styles;
-            styles.insert("QtCurve");
-
+            return "qtcurve" == key.toLower() ? new Style
 #ifdef QTC_STYLE_SUPPORT
-            // getStyles(kdeHome(), styles);
-            // getStyles(KDE_PREFIX(useQt3Settings() ? 3 : 4), styles);
-            // getStyles(KDE_PREFIX(useQt3Settings() ? 4 : 3), styles);
-#endif
-            return styles.toList();
-        }
-
-    QStyle * create(const QString &key)
-        {
-            return "qtcurve"==key.toLower()
-                ? new Style
-#ifdef QTC_STYLE_SUPPORT
-                : 0==key.indexOf(THEME_PREFIX)
+                : 0 == key.indexOf(THEME_PREFIX)
                 ? new Style(key)
 #endif
                 : 0;
         }
 };
-
 
 }
 
