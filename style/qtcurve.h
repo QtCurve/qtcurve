@@ -65,12 +65,11 @@ class ShortcutHandler;
 class ShadowHelper;
 #endif
 
-class Style : public QCommonStyle {
+class Style : public BASE_STYLE {
     Q_OBJECT
-    // Q_CLASSINFO("X-KDE-CustomElements", "true")
+    Q_CLASSINFO("X-KDE-CustomElements", "true")
 
 public:
-
     enum BackgroundType {
         BGND_WINDOW,
         BGND_DIALOG,
@@ -120,31 +119,15 @@ public:
         ICN_UNSHADE
     };
 
-// #ifdef QTC_STYLE_SUPPORT
-//     Style(const QString &name=QString());
-// #else
     Style();
-// #endif
-
     ~Style();
-
-    void init(bool initial);
-    void freeColor(QSet<QColor*> &freedColors, QColor **cols);
-    void freeColors();
-
-    Options &options() { return opts; }
 
     virtual void polish(QPalette &palette) override;
     virtual void polish(QApplication *app) override;
     virtual void polish(QWidget *widget) override;
-
-    void polishFormLayout(QFormLayout *layout);
-    void polishLayout(QLayout *layout);
-    void polishScrollArea(QAbstractScrollArea *scrollArea,
-                          bool isKFilePlacesView=false) const;
-
     virtual void unpolish(QApplication *app) override;
     virtual void unpolish(QWidget *widget) override;
+
     virtual bool eventFilter(QObject *object, QEvent *event) override;
     virtual void timerEvent(QTimerEvent *event) override;
     virtual int pixelMetric(PixelMetric metric, const QStyleOption *option=0,
@@ -164,10 +147,6 @@ public:
                                     const QStyleOptionComplex *option,
                                     QPainter *painter,
                                     const QWidget *widget) const override;
-    void drawItemTextWithRole(QPainter *painter, const QRect &rect, int flags,
-                              const QPalette &pal, bool enabled,
-                              const QString &text,
-                              QPalette::ColorRole textRole) const;
     virtual void drawItemText(QPainter *painter, const QRect &rect, int flags,
                               const QPalette &pal, bool enabled,
                               const QString &text,
@@ -188,7 +167,23 @@ public:
                                              const QPoint &pos,
                                              const QWidget *widget) const override;
 
+    Options &options() {
+        return opts;
+    }
+
 private:
+    void init(bool initial);
+    void freeColor(QSet<QColor*> &freedColors, QColor **cols);
+    void freeColors();
+    void polishFormLayout(QFormLayout *layout);
+    void polishLayout(QLayout *layout);
+    void polishScrollArea(QAbstractScrollArea *scrollArea,
+                          bool isKFilePlacesView=false) const;
+
+    void drawItemTextWithRole(QPainter *painter, const QRect &rect, int flags,
+                              const QPalette &pal, bool enabled,
+                              const QString &text,
+                              QPalette::ColorRole textRole) const;
     void drawSideBarButton(QPainter *painter, const QRect &r,
                            const QStyleOption *option,
                            const QWidget *widget) const;
@@ -215,16 +210,16 @@ private:
 
     void drawBevelGradient(const QColor &base, QPainter *p, QRect const &r,
                            bool horiz, bool sel, EAppearance bevApp,
-                           EWidget w=WIDGET_OTHER, bool useCache=true) const
-        {
-            drawBevelGradient(base, p, r, QPainterPath(), horiz, sel, bevApp, w, useCache);
-        }
+                           EWidget w=WIDGET_OTHER, bool useCache=true) const {
+        drawBevelGradient(base, p, r, QPainterPath(), horiz, sel, bevApp, w,
+                          useCache);
+    }
     void drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &r,
                                bool horiz, bool sel, EAppearance bevApp,
-                               EWidget w) const
-        {
-            drawBevelGradientReal(base, p, r, QPainterPath(), horiz, sel, bevApp, w);
-        }
+                               EWidget w) const {
+        drawBevelGradientReal(base, p, r, QPainterPath(), horiz,
+                              sel, bevApp, w);
+    }
 
     void drawSunkenBevel(QPainter *p, const QRect &r, const QColor &col) const;
     void drawLightBevel(QPainter *p, const QRect &r,
@@ -313,20 +308,20 @@ private:
     const QColor * checkRadioColors(const QStyleOption *option) const;
     const QColor * sliderColors(const QStyleOption *option) const;
     const QColor * backgroundColors(const QColor &col) const;
-    const QColor * backgroundColors(const QStyleOption *option) const
-        {
-            return option ? backgroundColors(option->palette.background().color()) : itsBackgroundCols;
-        }
+    const QColor * backgroundColors(const QStyleOption *option) const {
+        return (option ?
+                backgroundColors(option->palette.background().color()) :
+                itsBackgroundCols);
+    }
     const QColor * highlightColors(const QColor &col) const;
     const QColor * highlightColors(const QStyleOption *option,
-                                   bool useActive) const
-        {
-            return highlightColors(option->palette.brush(
-                                       useActive ?
-                                       QPalette::Active :
-                                       QPalette::Current,
-                                       QPalette::Highlight).color());
-        }
+                                   bool useActive) const {
+        return highlightColors(option->palette.brush(
+                                   useActive ?
+                                   QPalette::Active :
+                                   QPalette::Current,
+                                   QPalette::Highlight).color());
+    }
     const QColor *borderColors(const QStyleOption *option,
                                const QColor *use) const;
     const QColor *getSidebarButtons() const;
@@ -426,9 +421,6 @@ private:
     mutable QList<int> itsMdiButtons[2]; // 0=left, 1=right
     mutable int itsTitlebarHeight;
 
-    // Required for Q3Header hover...
-    // QPoint itsPos;
-    // QWidget *itsHoverWidget;
 #ifdef Q_OS_X11
     QDBusInterface *itsDBus;
 #endif

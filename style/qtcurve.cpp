@@ -640,12 +640,12 @@ void setSbProp(QWidget *w)
 #if defined QTC_QT_ONLY
 static void setRgb(QColor *col, const QStringList &rgb)
 {
-    if(3==rgb.size())
-        *col=QColor(rgb[0].toInt(), rgb[1].toInt(), rgb[2].toInt());
+    if (3 == rgb.size()) {
+        *col = QColor(rgb[0].toInt(), rgb[1].toInt(), rgb[2].toInt());
+    }
 }
 #endif
 
-// #if defined QTC_STYLE_SUPPORT || defined QTC_QT_ONLY
 #if defined QTC_QT_ONLY
 
 static QString kdeHome()
@@ -938,12 +938,8 @@ inline bool isMultiTabBarTab(const QAbstractButton *button)
                         button->inherits("Sublime::IdealToolButton")) );
 }
 
-// #ifdef QTC_STYLE_SUPPORT
-// Style::Style(const QString &name)
-// #else
-Style::Style()
-// #endif
-: itsPopupMenuCols(0L),
+Style::Style() :
+    itsPopupMenuCols(0L),
     itsSliderCols(0L),
     itsDefBtnCols(0L),
     itsComboBtnCols(0L),
@@ -967,17 +963,16 @@ Style::Style()
     itsTitlebarHeight(0),
     // itsPos(-1, -1),
     // itsHoverWidget(0L),
-#ifdef Q_WS_X11
+#ifdef Q_OS_X11
     itsDBus(0),
+#endif
+#ifdef Q_WS_X11
     itsShadowHelper(new ShadowHelper(this)),
 #endif
     itsSViewSBar(0L),
     itsWindowManager(new WindowManager(this)),
     itsBlurHelper(new BlurHelper(this)),
     itsShortcutHandler(new ShortcutHandler(this))
-// #ifdef QTC_STYLE_SUPPORT
-//     , itsName(name)
-// #endif
 {
     const char *env=getenv(QTCURVE_PREVIEW_CONFIG);
     if(env && 0==strcmp(env, QTCURVE_PREVIEW_CONFIG))
@@ -1023,26 +1018,11 @@ void Style::init(bool initial)
     }
 #endif
 
-    if(itsIsPreview)
-    {
+    if (itsIsPreview) {
         if(PREVIEW_WINDOW!=itsIsPreview)
             opts.bgndOpacity=opts.dlgOpacity=opts.menuBgndOpacity=100;
-    }
-    else
-    {
-// #ifdef QTC_STYLE_SUPPORT
-//         QString rcFile;
-//         if(!itsName.isEmpty()) {
-//             rcFile=themeFile(kdeHome(), itsName);
-
-//             // if(rcFile.isEmpty()) {
-//             //     rcFile=themeFile(KDE_PREFIX(4), itsName, false);
-//             // }
-//         }
-//         qtcReadConfig(rcFile, &opts);
-// #else
+    } else {
         qtcReadConfig(QString(), &opts);
-// #endif
 
 #ifdef Q_OS_X11
         if (initial) {
@@ -1505,8 +1485,7 @@ void Style::polish(QApplication *app)
     }
 
 #ifndef QTC_QT_ONLY
-    if(opts.useQtFileDialogApps.contains(appName))
-    {
+    if(opts.useQtFileDialogApps.contains(appName)) {
         qt_filedialog_existing_directory_hook=0L;
         qt_filedialog_open_filename_hook=0L;
         qt_filedialog_open_filenames_hook=0L;
@@ -13428,16 +13407,16 @@ void Style::borderSizesChanged()
 }
 
 #ifdef Q_WS_X11
-static QMainWindow * getWindow(unsigned int xid)
+static QMainWindow *getWindow(unsigned int xid)
 {
-    QWidgetList                tlw=QApplication::topLevelWidgets();
+    QWidgetList tlw = QApplication::topLevelWidgets();
     QWidgetList::ConstIterator it(tlw.begin()),
         end(tlw.end());
 
-    for(; it!=end; ++it)
-    {
-        if(qobject_cast<QMainWindow *>(*it) && (*it)->winId()==xid)
+    for (;it != end;++it) {
+        if (qobject_cast<QMainWindow *>(*it) && (*it)->winId() == xid) {
             return static_cast<QMainWindow*>(*it);
+        }
     }
     return 0L;
 }
@@ -13492,7 +13471,7 @@ void Style::toggleStatusBar(unsigned int xid)
 void Style::compositingToggled()
 {
 #ifdef Q_WS_X11
-    QWidgetList                tlw=QApplication::topLevelWidgets();
+    QWidgetList tlw = QApplication::topLevelWidgets();
     QWidgetList::ConstIterator it(tlw.begin()),
         end(tlw.end());
 
