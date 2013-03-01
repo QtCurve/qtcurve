@@ -121,11 +121,11 @@ public:
         ICN_UNSHADE
     };
 
-#ifdef QTC_STYLE_SUPPORT
-    Style(const QString &name=QString());
-#else
+// #ifdef QTC_STYLE_SUPPORT
+//     Style(const QString &name=QString());
+// #else
     Style();
-#endif
+// #endif
 
     ~Style();
 
@@ -442,9 +442,9 @@ private:
     QtCurve::WindowManager *itsWindowManager;
     QtCurve::BlurHelper *itsBlurHelper;
     QtCurve::ShortcutHandler *itsShortcutHandler;
-#ifdef QTC_STYLE_SUPPORT
-    QString itsName;
-#endif
+// #ifdef QTC_STYLE_SUPPORT
+//     QString itsName;
+// #endif
 };
 
 class StylePlugin: public QStylePlugin
@@ -455,15 +455,15 @@ class StylePlugin: public QStylePlugin
 public:
     StylePlugin(QObject *parent=0): QStylePlugin(parent) {}
     ~StylePlugin() {}
-    QStyle *create(const QString &key)
-        {
-            return "qtcurve" == key.toLower() ? new Style
-#ifdef QTC_STYLE_SUPPORT
-                : 0 == key.indexOf(THEME_PREFIX)
-                ? new Style(key)
-#endif
-                : 0;
-        }
+    QStyle *create(const QString &key) {
+//             return "qtcurve" == key.toLower() ? new Style
+// #ifdef QTC_STYLE_SUPPORT
+//                 : 0 == key.indexOf(THEME_PREFIX)
+//                 ? new Style(key)
+// #endif
+//                 : 0;
+        return "qtcurve" == key.toLower() ? new Style : 0;
+    }
 };
 
 }

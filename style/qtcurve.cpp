@@ -645,7 +645,8 @@ static void setRgb(QColor *col, const QStringList &rgb)
 }
 #endif
 
-#if defined QTC_STYLE_SUPPORT || defined QTC_QT_ONLY
+// #if defined QTC_STYLE_SUPPORT || defined QTC_QT_ONLY
+#if defined QTC_QT_ONLY
 
 static QString kdeHome()
 {
@@ -666,54 +667,49 @@ static QString kdeHome()
 }
 #endif
 
-#ifdef QTC_STYLE_SUPPORT
-static void getStyles(const QString &dir, const char *sub, QSet<QString> &styles)
-{
-    QDir d(dir+sub);
+// #ifdef QTC_STYLE_SUPPORT
+// static void getStyles(const QString &dir, const char *sub, QSet<QString> &styles)
+// {
+//     QDir d(dir + sub);
 
-    if(d.exists())
-    {
-        QStringList filters;
+//     if(d.exists()) {
+//         QStringList filters;
 
-        filters << QString(THEME_PREFIX"*"THEME_SUFFIX);
-        d.setNameFilters(filters);
+//         filters << QString(THEME_PREFIX "*" THEME_SUFFIX);
+//         d.setNameFilters(filters);
 
-        QStringList                entries(d.entryList());
-        QStringList::ConstIterator it(entries.begin()),
-            end(entries.end());
+//         QStringList entries(d.entryList());
+//         QStringList::ConstIterator it(entries.begin()),
+//             end(entries.end());
 
-        for(; it!=end; ++it)
-        {
-            QString style((*it).left((*it).lastIndexOf(THEME_SUFFIX)));
+//         for(;it != end;++it) {
+//             QString style((*it).left((*it).lastIndexOf(THEME_SUFFIX)));
 
-            if(!styles.contains(style))
-                styles.insert(style);
-        }
-    }
-}
+//             if(!styles.contains(style)) {
+//                 styles.insert(style);
+//             }
+//         }
+//     }
+// }
 
-static void getStyles(const QString &dir, QSet<QString> &styles)
-{
-    getStyles(dir, THEME_DIR, styles);
-    getStyles(dir, THEME_DIR4, styles);
-}
+// static void getStyles(const QString &dir, QSet<QString> &styles)
+// {
+//     getStyles(dir, THEME_DIR, styles);
+//     getStyles(dir, THEME_DIR4, styles);
+// }
 
-static QString themeFile(const QString &dir, const QString &n, const char *sub)
-{
-    QString name(dir+sub+n+THEME_SUFFIX);
+// static QString themeFile(const QString &dir, const QString &n, const char *sub)
+// {
+//     QString name(dir+sub+n+THEME_SUFFIX);
 
-    return QFile(name).exists() ? name : QString();
-}
+//     return QFile(name).exists() ? name : QString();
+// }
 
-static QString themeFile(const QString &dir, const QString &n, bool kde3=false)
-{
-    QString name(themeFile(dir, n, kde3 ? THEME_DIR : THEME_DIR4));
-
-    if(name.isEmpty())
-        name=themeFile(dir, n, kde3 ? THEME_DIR4 : THEME_DIR);
-    return name;
-}
-#endif
+// static QString themeFile(const QString &dir, const QString &n)
+// {
+//     return themeFile(dir, n, THEME_DIR4);
+// }
+// #endif
 
 class QtCurveDockWidgetTitleBar : public QWidget
 {
@@ -942,11 +938,11 @@ inline bool isMultiTabBarTab(const QAbstractButton *button)
                         button->inherits("Sublime::IdealToolButton")) );
 }
 
-#ifdef QTC_STYLE_SUPPORT
-Style::Style(const QString &name)
-#else
+// #ifdef QTC_STYLE_SUPPORT
+// Style::Style(const QString &name)
+// #else
 Style::Style()
-#endif
+// #endif
 : itsPopupMenuCols(0L),
     itsSliderCols(0L),
     itsDefBtnCols(0L),
@@ -979,9 +975,9 @@ Style::Style()
     itsWindowManager(new WindowManager(this)),
     itsBlurHelper(new BlurHelper(this)),
     itsShortcutHandler(new ShortcutHandler(this))
-#ifdef QTC_STYLE_SUPPORT
-    , itsName(name)
-#endif
+// #ifdef QTC_STYLE_SUPPORT
+//     , itsName(name)
+// #endif
 {
     const char *env=getenv(QTCURVE_PREVIEW_CONFIG);
     if(env && 0==strcmp(env, QTCURVE_PREVIEW_CONFIG))
@@ -1034,19 +1030,19 @@ void Style::init(bool initial)
     }
     else
     {
-#ifdef QTC_STYLE_SUPPORT
-        QString rcFile;
-        if(!itsName.isEmpty()) {
-            rcFile=themeFile(kdeHome(), itsName);
+// #ifdef QTC_STYLE_SUPPORT
+//         QString rcFile;
+//         if(!itsName.isEmpty()) {
+//             rcFile=themeFile(kdeHome(), itsName);
 
-            if(rcFile.isEmpty()) {
-                rcFile=themeFile(KDE_PREFIX(4), itsName, false);
-            }
-        }
-        qtcReadConfig(rcFile, &opts);
-#else
+//             // if(rcFile.isEmpty()) {
+//             //     rcFile=themeFile(KDE_PREFIX(4), itsName, false);
+//             // }
+//         }
+//         qtcReadConfig(rcFile, &opts);
+// #else
         qtcReadConfig(QString(), &opts);
-#endif
+// #endif
 
 #ifdef Q_WS_X11
         if(initial)
