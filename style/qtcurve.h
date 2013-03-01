@@ -58,8 +58,7 @@ class QMainWindow;
 class QStatusBar;
 class QAbstractScrollArea;
 
-namespace QtCurve
-{
+namespace QtCurve {
 class WindowManager;
 class BlurHelper;
 class ShortcutHandler;
@@ -67,8 +66,7 @@ class ShortcutHandler;
 class ShadowHelper;
 #endif
 
-class Style : public QCommonStyle
-{
+class Style : public QCommonStyle {
     Q_OBJECT
     // Q_CLASSINFO("X-KDE-CustomElements", "true")
 
@@ -98,14 +96,12 @@ public:
         PREVIEW_WINDOW
     };
 
-    class PreviewOption : public QStyleOption
-    {
+    class PreviewOption : public QStyleOption {
     public:
         Options opts;
     };
 
-    class BgndOption : public QStyleOption
-    {
+    class BgndOption : public QStyleOption {
     public:
         EAppearance  app;
         QPainterPath path;
@@ -139,49 +135,59 @@ public:
 
     Options &options() { return opts; }
 
-    void polish(QApplication *app);
-    void polish(QPalette &palette);
-    void polish(QWidget *widget);
+    virtual void polish(QPalette &palette) override;
+    virtual void polish(QApplication *app) override;
+    virtual void polish(QWidget *widget) override;
 
     void polishFormLayout(QFormLayout *layout);
     void polishLayout(QLayout *layout);
     void polishScrollArea(QAbstractScrollArea *scrollArea,
                           bool isKFilePlacesView=false) const;
 
-    void unpolish(QApplication *app);
-    void unpolish(QWidget *widget);
-    bool eventFilter(QObject *object, QEvent *event);
-    void timerEvent(QTimerEvent *event);
-    int pixelMetric(PixelMetric metric, const QStyleOption *option=0,
-                    const QWidget *widget=0) const;
-    int styleHint(StyleHint hint, const QStyleOption *option,
-                  const QWidget *widget, QStyleHintReturn *returnData=0) const;
-    QPalette standardPalette() const;
-    void drawPrimitive(PrimitiveElement element, const QStyleOption *option,
-                       QPainter *painter, const QWidget *widget) const;
-    void drawControl(ControlElement control, const QStyleOption *option,
-                     QPainter *painter, const QWidget *widget) const;
-    void drawComplexControl(ComplexControl control,
-                            const QStyleOptionComplex *option,
-                            QPainter *painter, const QWidget *widget) const;
+    virtual void unpolish(QApplication *app) override;
+    virtual void unpolish(QWidget *widget) override;
+    virtual bool eventFilter(QObject *object, QEvent *event) override;
+    virtual void timerEvent(QTimerEvent *event) override;
+    virtual int pixelMetric(PixelMetric metric, const QStyleOption *option=0,
+                            const QWidget *widget=0) const override;
+    virtual int styleHint(StyleHint hint, const QStyleOption *option,
+                          const QWidget *widget,
+                          QStyleHintReturn *returnData=0) const override;
+    virtual QPalette standardPalette() const override;
+    virtual void drawPrimitive(PrimitiveElement element,
+                               const QStyleOption *option,
+                               QPainter *painter,
+                               const QWidget *widget) const override;
+    virtual void drawControl(ControlElement control, const QStyleOption *option,
+                             QPainter *painter,
+                             const QWidget *widget) const override;
+    virtual void drawComplexControl(ComplexControl control,
+                                    const QStyleOptionComplex *option,
+                                    QPainter *painter,
+                                    const QWidget *widget) const override;
     void drawItemTextWithRole(QPainter *painter, const QRect &rect, int flags,
                               const QPalette &pal, bool enabled,
                               const QString &text,
                               QPalette::ColorRole textRole) const;
-    void drawItemText(QPainter *painter, const QRect &rect, int flags,
-                      const QPalette &pal, bool enabled, const QString &text,
-                      QPalette::ColorRole textRole = QPalette::NoRole) const;
-    QSize sizeFromContents(ContentsType type, const QStyleOption *option,
-                           const QSize &size, const QWidget *widget) const;
-    QRect subElementRect(SubElement element, const QStyleOption *option,
-                         const QWidget *widget) const;
-    QRect subControlRect(ComplexControl control,
-                         const QStyleOptionComplex *option,
-                         SubControl subControl, const QWidget *widget) const;
-    SubControl hitTestComplexControl(ComplexControl control,
-                                     const QStyleOptionComplex *option,
-                                     const QPoint &pos,
-                                     const QWidget *widget) const;
+    virtual void drawItemText(QPainter *painter, const QRect &rect, int flags,
+                              const QPalette &pal, bool enabled,
+                              const QString &text,
+                              QPalette::ColorRole textRole =
+                              QPalette::NoRole) const override;
+    virtual QSize sizeFromContents(ContentsType type,
+                                   const QStyleOption *option,
+                                   const QSize &size,
+                                   const QWidget *widget) const override;
+    virtual QRect subElementRect(SubElement element, const QStyleOption *option,
+                                 const QWidget *widget) const override;
+    virtual QRect subControlRect(ComplexControl control,
+                                 const QStyleOptionComplex *option,
+                                 SubControl subControl,
+                                 const QWidget *widget) const override;
+    virtual SubControl hitTestComplexControl(ComplexControl control,
+                                             const QStyleOptionComplex *option,
+                                             const QPoint &pos,
+                                             const QWidget *widget) const override;
 
 private:
     void drawSideBarButton(QPainter *painter, const QRect &r,

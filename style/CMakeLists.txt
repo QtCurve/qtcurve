@@ -1,7 +1,7 @@
 set(qtcurve_style_common_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/../common/common.c
   ${CMAKE_CURRENT_SOURCE_DIR}/../common/config_file.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/../common/colorutils.c )
+  ${CMAKE_CURRENT_SOURCE_DIR}/../common/colorutils.c)
 set_source_files_properties(${qtcurve_style_common_SRCS} PROPERTIES LANGUAGE CXX)
 
 set(qtcurve_SRCS

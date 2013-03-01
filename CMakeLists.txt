@@ -65,7 +65,7 @@ configure_file(config.h.in config.h @ONLY)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}"
   "${CMAKE_CURRENT_BINARY_DIR}")
 
-add_definitions(${QT_DEFINITIONS})
+add_definitions(${QT_DEFINITIONS} "-std=c++0x")
 
 # if(NOT QTC_QT_ONLY)
 #   find_package(KDE4 REQUIRED)

@@ -1709,12 +1709,11 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
         {
             const char *cfgDir=qtcConfDir();
 
-            if(cfgDir)
-            {
-                QString filename(QFile::decodeName(cfgDir)+CONFIG_FILE);
+            if(cfgDir) {
+                QString filename(QFile::decodeName(cfgDir) + CONFIG_FILE);
 
                 if(!QFile::exists(filename))
-                    filename=QFile::decodeName(cfgDir)+"../"OLD_CONFIG_FILE;
+                    filename = QFile::decodeName(cfgDir) + "../" OLD_CONFIG_FILE;
                 return qtcReadConfig(filename, opts, defOpts);
             }
         }
@@ -2438,7 +2437,13 @@ static bool fileExists(const char *path)
 
 static const char * getSystemConfigFile()
 {
-    static const char * constFiles[]={ /*"/etc/qt4/"OLD_CONFIG_FILE, "/etc/qt3/"OLD_CONFIG_FILE, "/etc/qt/"OLD_CONFIG_FILE,*/ "/etc/"OLD_CONFIG_FILE, NULL };
+    static const char * constFiles[]={
+        /*"/etc/qt4/" OLD_CONFIG_FILE,
+          "/etc/qt/" OLD_CONFIG_FILE,
+        */
+        "/etc/" OLD_CONFIG_FILE,
+        NULL
+    };
 
     int i;
 
