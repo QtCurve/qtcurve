@@ -74,11 +74,11 @@ void ShortcutHandler::widgetDestroyed(QObject *o)
 
 void ShortcutHandler::updateWidget(QWidget *w)
 {
-    if(!itsUpdated.contains(w))
-    {
+    if (!itsUpdated.contains(w)) {
         itsUpdated.insert(w);
         w->update();
-        connect(w, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
+        connect(w, &QWidget::destroyed,
+                this, &ShortcutHandler::widgetDestroyed);
     }
 }
 
@@ -142,7 +142,8 @@ bool ShortcutHandler::eventFilter(QObject *o, QEvent *e)
             itsOpenMenus.append(widget);
             if(itsAltDown && prev)
                 prev->update();
-            connect(widget, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
+            connect(widget, &QWidget::destroyed,
+                    this, &ShortcutHandler::widgetDestroyed);
         }
         break;
     case QEvent::Hide:

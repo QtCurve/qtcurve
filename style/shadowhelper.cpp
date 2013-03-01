@@ -86,13 +86,14 @@ namespace QtCurve
         need to install shadow directly when widget "created" state is already set
         since WinID changed is never called when this is the case
         */
-        if( widget->testAttribute(Qt::WA_WState_Created) && installX11Shadows( widget ) )
-        {  _widgets.insert( widget, widget->winId() ); }
+        if (widget->testAttribute(Qt::WA_WState_Created) &&
+            installX11Shadows(widget)) {
+            _widgets.insert(widget, widget->winId());
+        }
 
-        connect( widget, SIGNAL( destroyed( QObject* ) ), SLOT( objectDeleted( QObject* ) ) );
-
+        connect(widget, &QWidget::destroyed,
+                this, &ShadowHelper::objectDeleted);
         return true;
-
     }
 
     //_______________________________________________________
