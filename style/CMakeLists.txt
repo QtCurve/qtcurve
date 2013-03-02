@@ -49,7 +49,4 @@ set_target_properties(qtcurve PROPERTIES PREFIX "")
 # endif()
 
 target_link_libraries(qtcurve ${QTC5_LINK_LIBS})
-if(Q_WS_X11)
-  target_link_libraries(qtcurve ${X11_X11_LIB})
-endif()
 install(TARGETS qtcurve LIBRARY DESTINATION ${QTCURVE_STYLE_DIR})
