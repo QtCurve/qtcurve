@@ -22,14 +22,31 @@
 #define _XCB_UTILS_H_
 
 #include <xcb/xcb.h>
+#include <QApplication>
+#include <QDesktopWidget>
+#include <QWindow>
 
 namespace QtCurve
 {
 namespace XcbUtils
 {
 xcb_connection_t *getConnection();
+
+static inline WId rootWindow() {
+    return QApplication::desktop()->windowHandle()->winId();
+}
+
+static inline void flush() {
+    xcb_flush(getConnection());
+}
+
+static inline uint32_t generateId() {
+    return xcb_generate_id(getConnection());
+};
+
 void getAtoms(size_t n, xcb_atom_t *atoms, const char *const names[],
               bool create=false);
+
 static inline xcb_atom_t getAtom(const char *name, bool create=false) {
     xcb_atom_t atom;
     XcbUtils::getAtoms(1, &atom, &name, create);

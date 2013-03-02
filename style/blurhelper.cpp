@@ -37,191 +37,177 @@
 #include <QPushButton>
 #include <QToolBar>
 
-#ifdef Q_WS_X11
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#include "fixx11h.h"
-#include <QX11Info>
+#ifdef QTC_X11
+#  include "xcb_utils.h"
 #endif
 
-namespace QtCurve
+namespace QtCurve {
+//___________________________________________________________
+BlurHelper::BlurHelper(QObject *parent):
+    QObject(parent),
+    _enabled(false)
+{
+#ifdef QTC_X11
+    // create atom
+    _atom = XcbUtils::getAtom("_KDE_NET_WM_BLUR_BEHIND_REGION");
+#endif
+}
+
+//___________________________________________________________
+void BlurHelper::registerWidget( QWidget* widget )
+{ Utils::addEventFilter(widget, this); }
+
+//___________________________________________________________
+void BlurHelper::unregisterWidget( QWidget* widget )
+{
+    widget->removeEventFilter( this );
+    if( isTransparent( widget ) ) clear( widget );
+}
+
+//___________________________________________________________
+bool BlurHelper::eventFilter( QObject* object, QEvent* event )
 {
 
-    //___________________________________________________________
-    BlurHelper::BlurHelper( QObject* parent ):
-        QObject( parent ),
-        _enabled( false )
+    // do nothing if not enabled
+    if( !enabled() ) return false;
+
+    switch( event->type() )
     {
 
-        #ifdef Q_WS_X11
-
-        // create atom
-        _atom = XInternAtom( QX11Info::display(), "_KDE_NET_WM_BLUR_BEHIND_REGION", False);
-
-        #endif
+    case QEvent::Hide:
+    {
+        QWidget* widget( qobject_cast<QWidget*>( object ) );
+        if( widget && isOpaque( widget ) )
+        {
+            QWidget* window( widget->window() );
+            if (window && isTransparent(window) && !_pendingWidgets.contains(window) )
+            {
+                _pendingWidgets.insert( window, window );
+                delayedUpdate();
+            }
+        }
+        break;
 
     }
 
-    //___________________________________________________________
-    void BlurHelper::registerWidget( QWidget* widget )
-    { Utils::addEventFilter(widget, this); }
-
-    //___________________________________________________________
-    void BlurHelper::unregisterWidget( QWidget* widget )
-    {
-        widget->removeEventFilter( this );
-        if( isTransparent( widget ) ) clear( widget );
-    }
-
-    //___________________________________________________________
-    bool BlurHelper::eventFilter( QObject* object, QEvent* event )
+    case QEvent::Show:
+    case QEvent::Resize:
     {
 
-        // do nothing if not enabled
-        if( !enabled() ) return false;
-
-        switch( event->type() )
+        // cast to widget and check
+        QWidget* widget( qobject_cast<QWidget*>( object ) );
+        if( !widget ) break;
+        if( isTransparent( widget ) )
         {
 
-            case QEvent::Hide:
+            _pendingWidgets.insert( widget, widget );
+            delayedUpdate();
+
+        } else if( isOpaque( widget ) ) {
+
+            QWidget* window( widget->window() );
+            if( isTransparent( window ) )
             {
-                QWidget* widget( qobject_cast<QWidget*>( object ) );
-                if( widget && isOpaque( widget ) )
-                {
-                    QWidget* window( widget->window() );
-                    if (window && isTransparent(window) && !_pendingWidgets.contains(window) )
-                    {
-                        _pendingWidgets.insert( window, window );
-                        delayedUpdate();
-                    }
-                }
-                break;
-
+                _pendingWidgets.insert( window, window );
+                delayedUpdate();
             }
-
-            case QEvent::Show:
-            case QEvent::Resize:
-            {
-
-                // cast to widget and check
-                QWidget* widget( qobject_cast<QWidget*>( object ) );
-                if( !widget ) break;
-                if( isTransparent( widget ) )
-                {
-
-                    _pendingWidgets.insert( widget, widget );
-                    delayedUpdate();
-
-                } else if( isOpaque( widget ) ) {
-
-                    QWidget* window( widget->window() );
-                    if( isTransparent( window ) )
-                    {
-                        _pendingWidgets.insert( window, window );
-                        delayedUpdate();
-                    }
-
-                }
-
-                break;
-            }
-
-            default: break;
 
         }
 
-        // never eat events
-        return false;
+        break;
+    }
+
+    default: break;
 
     }
 
-    //___________________________________________________________
-    QRegion BlurHelper::blurRegion( QWidget* widget ) const
+    // never eat events
+    return false;
+
+}
+
+//___________________________________________________________
+QRegion BlurHelper::blurRegion( QWidget* widget ) const
+{
+    if( !widget->isVisible() ) return QRegion();
+
+    // get main region
+    QRegion region = widget->mask().isEmpty() ? widget->rect():widget->mask();
+
+
+    // trim blur region to remove unnecessary areas
+    trimBlurRegion( widget, widget, region );
+    return region;
+
+}
+
+//___________________________________________________________
+void BlurHelper::trimBlurRegion( QWidget* parent, QWidget* widget, QRegion& region ) const
+{
+
+
+    // loop over children
+    foreach( QObject* childObject, widget->children() )
     {
-        if( !widget->isVisible() ) return QRegion();
+        QWidget* child( qobject_cast<QWidget*>( childObject ) );
+        if( !(child && child->isVisible()) ) continue;
 
-        // get main region
-        QRegion region = widget->mask().isEmpty() ? widget->rect():widget->mask();
-
-
-        // trim blur region to remove unnecessary areas
-        trimBlurRegion( widget, widget, region );
-        return region;
-
-    }
-
-    //___________________________________________________________
-    void BlurHelper::trimBlurRegion( QWidget* parent, QWidget* widget, QRegion& region ) const
-    {
-
-
-        // loop over children
-        foreach( QObject* childObject, widget->children() )
+        if( isOpaque( child ) )
         {
-            QWidget* child( qobject_cast<QWidget*>( childObject ) );
-            if( !(child && child->isVisible()) ) continue;
 
-            if( isOpaque( child ) )
-            {
+            const QPoint offset( child->mapTo( parent, QPoint( 0, 0 ) ) );
+            if( child->mask().isEmpty() ) region -= child->rect().translated( offset );
+            else region -= child->mask().translated( offset );
 
-                const QPoint offset( child->mapTo( parent, QPoint( 0, 0 ) ) );
-                if( child->mask().isEmpty() ) region -= child->rect().translated( offset );
-                else region -= child->mask().translated( offset );
+        } else { trimBlurRegion( parent, child, region ); }
 
-            } else { trimBlurRegion( parent, child, region ); }
+    }
 
-        }
+    return;
 
+}
+
+//___________________________________________________________
+void BlurHelper::update( QWidget* widget ) const
+{
+#ifdef QTC_X11
+    /*
+      directly from bespin code. Supposibly prevent playing with some 'pseudo-widgets'
+      that have winId matching some other -random- window
+    */
+    if (!(widget->testAttribute(Qt::WA_WState_Created) ||
+          widget->internalWinId()))
         return;
 
-    }
-
-    //___________________________________________________________
-    void BlurHelper::update( QWidget* widget ) const
-    {
-
-        #ifdef Q_WS_X11
-
-        /*
-        directly from bespin code. Supposibly prevent playing with some 'pseudo-widgets'
-        that have winId matching some other -random- window
-        */
-        if( !(widget->testAttribute(Qt::WA_WState_Created) || widget->internalWinId() ))
-        { return; }
-
-        const QRegion region( blurRegion( widget ) );
-        if( region.isEmpty() ) {
-
-            clear( widget );
-
-        } else {
-
-            QVector<unsigned long> data;
-            foreach( const QRect& rect, region.rects() )
-            { data << rect.x() << rect.y() << rect.width() << rect.height(); }
-
-            XChangeProperty(
-                QX11Info::display(), widget->winId(), _atom, XA_CARDINAL, 32, PropModeReplace,
-                reinterpret_cast<const unsigned char *>(data.constData()), data.size() );
-
+    const QRegion region( blurRegion( widget ) );
+    if (region.isEmpty()) {
+        clear(widget);
+    } else {
+        QVector<unsigned long> data;
+        foreach (const QRect& rect, region.rects()) {
+            data << rect.x() << rect.y() << rect.width() << rect.height();
         }
 
-        // force update
-        if( widget->isVisible() )
-        { widget->update(); }
-
-        #endif
-
+        XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
+                    widget->winId(), _atom, XCB_ATOM_CARDINAL,
+                    32, data.size(), data.constData());
     }
 
-
-    //___________________________________________________________
-    void BlurHelper::clear( QWidget* widget ) const
-    {
-        #ifdef Q_WS_X11
-        XChangeProperty( QX11Info::display(), widget->winId(), _atom, XA_CARDINAL, 32, PropModeReplace, 0, 0 );
-        #endif
-
+    // force update
+    if (widget->isVisible()) {
+        widget->update();
     }
+#endif
+}
+
+//___________________________________________________________
+void BlurHelper::clear( QWidget* widget ) const
+{
+#ifdef QTC_X11
+    XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
+                widget->winId(), _atom, XCB_ATOM_CARDINAL,
+                32, 0, (const void*)0);
+#endif
+}
 
 }

@@ -5,7 +5,6 @@ set(qtcurve_style_common_SRCS
 set_source_files_properties(${qtcurve_style_common_SRCS} PROPERTIES LANGUAGE CXX)
 
 set(qtcurve_SRCS
-  xcb_utils.cpp
   qtcurve.cpp
   windowmanager.cpp
   blurhelper.cpp
@@ -23,6 +22,7 @@ if(QTC_X11)
   set(qtcurve_SRCS
     macmenu.cpp
     shadowhelper.cpp
+    xcb_utils.cpp
     ${qtcurve_SRCS})
   set(qtcurve_MOC_HDRS
     macmenu.h

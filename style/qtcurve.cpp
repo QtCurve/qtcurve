@@ -595,6 +595,7 @@ static bool canAccessId(const QWidget *w)
 {
     return w && w->testAttribute(Qt::WA_WState_Created) && w->internalWinId();
 }
+
 static void setOpacityProp(QWidget *w, unsigned short opacity)
 {
     if (w && canAccessId(w)) {
@@ -602,6 +603,7 @@ static void setOpacityProp(QWidget *w, unsigned short opacity)
         XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
                     w->window()->winId(), opacityAtom, XCB_ATOM_CARDINAL,
                     16, 1, &opacity);
+        XcbUtils::flush();
     }
 }
 
@@ -619,6 +621,7 @@ static void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
         XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
                     w->window()->winId(), bgndAtom, XCB_ATOM_CARDINAL,
                     332, 1, &prop);
+        XcbUtils::flush();
     }
 }
 
@@ -635,6 +638,7 @@ static void setSbProp(QWidget *w)
             XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
                         w->window()->winId(), sbAtom, XCB_ATOM_CARDINAL,
                         16, 1, &s);
+            XcbUtils::flush();
         }
     }
 }
@@ -13454,17 +13458,17 @@ void Style::toggleMenuBar(unsigned int xid)
 
 void Style::toggleStatusBar(unsigned int xid)
 {
-#ifdef Q_WS_X11
-    static unsigned int   lastXid  = 0;
+#ifdef QTC_X11
+    static unsigned int lastXid  = 0;
     static struct timeval lastTime = {0, 0};
 
-    if(diffTime(&lastTime) || lastXid!=xid)
-    {
-        QMainWindow *win=getWindow(xid);
-        if(win)
+    if (diffTime(&lastTime) || lastXid != xid) {
+        QMainWindow *win = getWindow(xid);
+        if (win) {
             toggleStatusBar(win);
+        }
     }
-    lastXid=xid;
+    lastXid = xid;
 #else
     Q_UNUSED(xid);
 #endif
@@ -13574,6 +13578,7 @@ void Style::emitMenuSize(QWidget *w, unsigned short size, bool force)
             XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
                         w->window()->winId(), menuAtom, XCB_ATOM_CARDINAL,
                         16, 1, &size);
+            XcbUtils::flush();
             if(!itsDBus)
                 itsDBus = new QDBusInterface("org.kde.kwin", "/QtCurve",
                                              "org.kde.QtCurve");

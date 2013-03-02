@@ -34,11 +34,8 @@
 #include <QToolBar>
 #include <QEvent>
 
-#ifdef Q_WS_X11
-#include <QX11Info>
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#endif
+#include "xcb_utils.h"
+#include <xcb/xcb_image.h>
 
 namespace QtCurve
 {
@@ -52,10 +49,8 @@ const char *const ShadowHelper::netWMSkipShadowPropertyName =
 
 //_____________________________________________________
 ShadowHelper::ShadowHelper(QObject *parent):
-    QObject(parent)
-#ifdef Q_WS_X11
-    , _atom(None)
-#endif
+    QObject(parent),
+    _atom(0)
 {
     createPixmapHandles();
 }
@@ -63,26 +58,26 @@ ShadowHelper::ShadowHelper(QObject *parent):
 //_______________________________________________________
 ShadowHelper::~ShadowHelper( void )
 {
-#ifdef Q_WS_X11
-    for(int i=0; i<numPixmaps; ++i)
-        XFreePixmap( QX11Info::display(), _pixmaps[i] );
-#endif
+    for (int i = 0;i < numPixmaps;++i) {
+        XcbCallVoid(free_pixmap, _pixmaps[i]);
+    }
+    XcbUtils::flush();
 }
 
 //_______________________________________________________
 bool ShadowHelper::registerWidget( QWidget* widget, bool force )
 {
-
     // make sure widget is not already registered
-    if( _widgets.contains( widget ) ) return false;
+    if (_widgets.contains(widget))
+        return false;
 
     // check if widget qualifies
-    if( !( force || acceptWidget( widget ) ) )
-    { return false; }
+    if(!( force || acceptWidget(widget)))
+        return false;
 
     // store in map and add destroy signal connection
     Utils::addEventFilter(widget, this);
-    _widgets.insert( widget, 0 );
+    _widgets.insert(widget, 0);
 
     /*
       need to install shadow directly when widget "created" state is already set
@@ -101,96 +96,106 @@ bool ShadowHelper::registerWidget( QWidget* widget, bool force )
 //_______________________________________________________
 void ShadowHelper::unregisterWidget( QWidget* widget )
 {
-    if( _widgets.remove( widget ) )
-    { uninstallX11Shadows( widget ); }
+    if (_widgets.remove(widget)) {
+        uninstallX11Shadows(widget);
+    }
 }
 
 //_______________________________________________________
-bool ShadowHelper::eventFilter( QObject* object, QEvent* event )
+bool ShadowHelper::eventFilter(QObject *object, QEvent *event)
 {
-
     // check event type
-    if( event->type() != QEvent::WinIdChange ) return false;
+    if (event->type() != QEvent::WinIdChange)
+        return false;
 
     // cast widget
-    QWidget* widget( static_cast<QWidget*>( object ) );
+    QWidget *widget(static_cast<QWidget*>(object));
 
     // install shadows and update winId
-    if( installX11Shadows( widget ) )
-    { _widgets.insert( widget, widget->winId() ); }
+    if (installX11Shadows(widget)) {
+        _widgets.insert(widget, widget->winId());
+    }
 
     return false;
-
 }
 
 //_______________________________________________________
-void ShadowHelper::objectDeleted( QObject* object )
-{ _widgets.remove( static_cast<QWidget*>( object ) ); }
-
-//_______________________________________________________
-bool ShadowHelper::isMenu( QWidget* widget ) const
-{ return qobject_cast<QMenu*>( widget ); }
-
-//_______________________________________________________
-bool ShadowHelper::acceptWidget( QWidget* widget ) const
+void ShadowHelper::objectDeleted(QObject* object)
 {
+    _widgets.remove(static_cast<QWidget*>(object));
+}
 
-    if( widget->property( netWMSkipShadowPropertyName ).toBool() ) return false;
-    if( widget->property( netWMForceShadowPropertyName ).toBool() ) return true;
+//_______________________________________________________
+bool ShadowHelper::isMenu(QWidget* widget) const
+{
+    return qobject_cast<QMenu*>(widget);
+}
+
+//_______________________________________________________
+bool ShadowHelper::acceptWidget(QWidget* widget) const
+{
+    if (widget->property(netWMSkipShadowPropertyName).toBool())
+        return false;
+    if (widget->property(netWMForceShadowPropertyName).toBool())
+        return true;
 
     // menus
-    if( qobject_cast<QMenu*>( widget ) ) return true;
+    if (qobject_cast<QMenu*>(widget))
+        return true;
 
     // combobox dropdown lists
-    if( widget->inherits( "QComboBoxPrivateContainer" ) ) return true;
+    if (widget->inherits("QComboBoxPrivateContainer"))
+        return true;
 
     // tooltips
-    if( (widget->inherits( "QTipLabel" ) || (widget->windowFlags() & Qt::WindowType_Mask) == Qt::ToolTip ) &&
-        !widget->inherits( "Plasma::ToolTip" ) )
-    { return true; }
+    if ((widget->inherits("QTipLabel") ||
+         (widget->windowFlags() & Qt::WindowType_Mask) == Qt::ToolTip) &&
+        !widget->inherits("Plasma::ToolTip"))
+        return true;
 
     // detached widgets
-    if( qobject_cast<QToolBar*>( widget ) || qobject_cast<QDockWidget*>( widget ) )
-    { return true; }
+    if (qobject_cast<QToolBar*>(widget) || qobject_cast<QDockWidget*>(widget))
+        return true;
 
     // reject
     return false;
 }
 
 //______________________________________________
-void ShadowHelper::createPixmapHandles(  )
+void ShadowHelper::createPixmapHandles()
 {
-
     /*!
       shadow atom and property specification available at
       http://community.kde.org/KWin/Shadow
     */
 
     // create atom
-#ifdef Q_WS_X11
-    if( !_atom ) _atom = XInternAtom( QX11Info::display(), netWMShadowAtomName, False);
-#endif
+    if (!_atom)
+        _atom = XcbUtils::getAtom(netWMShadowAtomName);
+    for (int i = 0;i < numPixmaps;i++)
+        _pixmaps[i] = XcbUtils::generateId();
 
-    _pixmaps[0]=createPixmap(shadow0_png_data, shadow0_png_len);
-    _pixmaps[1]=createPixmap(shadow1_png_data, shadow1_png_len);
-    _pixmaps[2]=createPixmap(shadow2_png_data, shadow2_png_len);
-    _pixmaps[3]=createPixmap(shadow3_png_data, shadow3_png_len);
-    _pixmaps[4]=createPixmap(shadow4_png_data, shadow4_png_len);
-    _pixmaps[5]=createPixmap(shadow5_png_data, shadow5_png_len);
-    _pixmaps[6]=createPixmap(shadow6_png_data, shadow6_png_len);
-    _pixmaps[7]=createPixmap(shadow7_png_data, shadow7_png_len);
+    createPixmap(_pixmaps[0], shadow0_png_data, shadow0_png_len);
+    createPixmap(_pixmaps[1], shadow1_png_data, shadow1_png_len);
+    createPixmap(_pixmaps[2], shadow2_png_data, shadow2_png_len);
+    createPixmap(_pixmaps[3], shadow3_png_data, shadow3_png_len);
+    createPixmap(_pixmaps[4], shadow4_png_data, shadow4_png_len);
+    createPixmap(_pixmaps[5], shadow5_png_data, shadow5_png_len);
+    createPixmap(_pixmaps[6], shadow6_png_data, shadow6_png_len);
+    createPixmap(_pixmaps[7], shadow7_png_data, shadow7_png_len);
 }
 
 //______________________________________________
-Qt::HANDLE ShadowHelper::createPixmap( const uchar *buf, int len )
+void ShadowHelper::createPixmap(xcb_pixmap_t pixmap, const uchar *buf, int len)
 {
     QImage source;
     source.loadFromData(buf, len);
 
     // do nothing for invalid _pixmaps
-    if( source.isNull() ) return 0;
+    if (source.isNull())
+        return;
 
-    _size=source.width();
+    _size = source.width();
 
     /*
       in some cases, pixmap handle is invalid. This is the case notably
@@ -198,40 +203,27 @@ Qt::HANDLE ShadowHelper::createPixmap( const uchar *buf, int len )
       explicitly and draw the source pixmap on it.
     */
 
-#ifdef Q_WS_X11
-    const int width( source.width() );
-    const int height( source.height() );
-
+    const int width(source.width());
+    const int height(source.height());
+    const int depth(source.depth());
     // create X11 pixmap
-    Pixmap pixmap = XCreatePixmap( QX11Info::display(), QX11Info::appRootWindow(), width, height, 32 );
-
-    // create explicitly shared QPixmap from it
-    QPixmap dest( QPixmap::fromX11Pixmap( pixmap, QPixmap::ExplicitlyShared ) );
-
-    // create surface for pixmap
-    {
-        QPainter painter( &dest );
-        painter.setCompositionMode( QPainter::CompositionMode_Source );
-        painter.drawImage( 0, 0, source );
-    }
-
-
-    return pixmap;
-#else
-    return 0;
-#endif
-
+    XcbCallVoid(create_pixmap, 32, pixmap, XcbUtils::rootWindow(),
+                width, height);
+    xcb_gcontext_t cid = XcbUtils::generateId();
+    XcbCallVoid(create_gc, cid, pixmap, 0, (const uint32_t*)0);
+    XcbCallVoid(put_image, XCB_IMAGE_FORMAT_Z_PIXMAP, pixmap, cid,
+                width, height, 0, 0, 0, depth, source.byteCount(),
+                source.constBits());
+    XcbCallVoid(free_gc, cid);
+    XcbUtils::flush();
 }
 
 //_______________________________________________________
 bool ShadowHelper::installX11Shadows( QWidget* widget )
 {
-
     // check widget and shadow
-    if( !widget ) return false;
-
-#ifdef Q_WS_X11
-#ifndef QT_NO_XRENDER
+    if (!widget)
+        return false;
 
     // TODO: also check for NET_WM_SUPPORTED atom, before installing shadow
 
@@ -239,49 +231,39 @@ bool ShadowHelper::installX11Shadows( QWidget* widget )
       From bespin code. Supposibly prevent playing with some 'pseudo-widgets'
       that have winId matching some other -random- window
     */
-    if( !(widget->testAttribute(Qt::WA_WState_Created) || widget->internalWinId() ))
-    { return false; }
+    if (!(widget->testAttribute(Qt::WA_WState_Created) ||
+          widget->internalWinId()))
+        return false;
 
     // create data
     // add pixmap handles
     QVector<unsigned long> data;
-    for(int i=0; i<numPixmaps; ++i)
-    { data.push_back( _pixmaps[i] ); }
+    for (int i = 0;i < numPixmaps;++i) {
+        data.push_back(_pixmaps[i]);
+    }
 
     // add padding
-    data << _size -4 << _size -4 << _size -4 << _size -4;
+    data << _size - 4 << _size - 4 << _size - 4 << _size - 4;
 
-    XChangeProperty(
-        QX11Info::display(), widget->winId(), _atom, XA_CARDINAL, 32, PropModeReplace,
-        reinterpret_cast<const unsigned char *>(data.constData()), data.size() );
-
+    XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE, widget->winId(),
+                _atom, XCB_ATOM_CARDINAL, 32, data.size(), data.constData());
+    XcbUtils::flush();
     return true;
-
-#endif
-#endif
-
-    return false;
-
 }
 
 //_______________________________________________________
-void ShadowHelper::uninstallX11Shadows( QWidget* widget ) const
+void ShadowHelper::uninstallX11Shadows(QWidget *widget) const
 {
-
-#ifdef Q_WS_X11
-    if( !( widget && widget->testAttribute(Qt::WA_WState_Created) ) ) return;
-    XDeleteProperty(QX11Info::display(), widget->winId(), _atom);
-#endif
-
+    if (!(widget && widget->testAttribute(Qt::WA_WState_Created)))
+        return;
+    uninstallX11Shadows(widget->winId());
 }
 
 //_______________________________________________________
-void ShadowHelper::uninstallX11Shadows( WId id ) const
+void ShadowHelper::uninstallX11Shadows(WId id) const
 {
-
-#ifdef Q_WS_X11
-    XDeleteProperty(QX11Info::display(), id, _atom);
-#endif
-
+    XcbCallVoid(delete_property, id, _atom);
+    XcbUtils::flush();
 }
+
 }
