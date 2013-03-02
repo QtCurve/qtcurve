@@ -5,6 +5,7 @@ set(qtcurve_style_common_SRCS
 set_source_files_properties(${qtcurve_style_common_SRCS} PROPERTIES LANGUAGE CXX)
 
 set(qtcurve_SRCS
+  xcb_utils.cpp
   qtcurve.cpp
   windowmanager.cpp
   blurhelper.cpp
@@ -38,6 +39,8 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}"
 # qt5_automoc(${qtcurve_SRCS})
 qt5_wrap_cpp(qtcurve_MOC_SRCS ${qtcurve_MOC_HDRS})
 add_library(qtcurve MODULE ${qtcurve_SRCS} ${qtcurve_MOC_SRCS})
+set_target_properties(qtcurve PROPERTIES
+  LINK_FLAGS "-Wl,--no-undefined")
 set_target_properties(qtcurve PROPERTIES PREFIX "")
 
 # if(NOT QTC_QT_ONLY)
@@ -48,5 +51,5 @@ set_target_properties(qtcurve PROPERTIES PREFIX "")
 #   endif()
 # endif()
 
-target_link_libraries(qtcurve ${QTC5_LINK_LIBS})
+target_link_libraries(qtcurve ${QTC5_LINK_LIBS} ${QTC5_XCB_LINK_LIBS})
 install(TARGETS qtcurve LIBRARY DESTINATION ${QTCURVE_STYLE_DIR})

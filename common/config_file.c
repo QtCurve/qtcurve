@@ -897,8 +897,8 @@ void qtcSetBarHidden(const char *app, bool hidden, const char *prefix)
 #endif // __cplusplus
 
 #ifdef __cplusplus
-#include <QtSvg/QSvgRenderer>
-#include <QtGui/QPainter>
+#include <QSvgRenderer>
+#include <QPainter>
 #endif // __cplusplus
 
 void qtcLoadBgndImage(QtCImage *img)

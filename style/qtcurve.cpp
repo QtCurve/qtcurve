@@ -66,13 +66,10 @@
 // in CT_PushButton and CT_ComboBox
 #define MAX_ROUND_BTN_PAD (ROUND_MAX==opts.round ? 3 : 0)
 
-#ifdef Q_WS_X11
+#ifdef QTC_X11
 #include "macmenu.h"
 #include "shadowhelper.h"
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#include "fixx11h.h"
-#include <QX11Info>
+#include <xcb_utils.h>
 #include <sys/time.h>
 #endif
 
@@ -134,9 +131,8 @@ QPixmap getIconPixmap(const QIcon &icon, const QSize &size,
 {
     QPixmap pix=icon.pixmap(size, QIcon::Normal);
 
-    if(QIcon::Disabled==mode)
-    {
-        QImage img=pix.toImage();
+    if (QIcon::Disabled == mode) {
+        QImage img = pix.toImage();
         KIconEffect::toGray(img, 1.0);
         KIconEffect::semiTransparent(img);
         pix=QPixmap::fromImage(img);
@@ -146,24 +142,25 @@ QPixmap getIconPixmap(const QIcon &icon, const QSize &size,
 }
 
 #else
-inline QPixmap getIconPixmap(const QIcon &icon, const QSize &size,
+static inline QPixmap getIconPixmap(const QIcon &icon, const QSize &size,
                              QIcon::Mode mode, QIcon::State state=QIcon::Off)
 {
     return icon.pixmap(size, mode, state);
 }
 #endif
 
-inline QPixmap getIconPixmap(const QIcon &icon, int size, QIcon::Mode mode, QIcon::State state=QIcon::Off)
+static inline QPixmap getIconPixmap(const QIcon &icon, int size, QIcon::Mode mode,
+                             QIcon::State state=QIcon::Off)
 {
     return getIconPixmap(icon, QSize(size, size), mode, state);
 }
 
-inline QPixmap getIconPixmap(const QIcon &icon, int size, int flags, QIcon::State state=QIcon::Off)
+static inline QPixmap getIconPixmap(const QIcon &icon, int size, int flags, QIcon::State state=QIcon::Off)
 {
     return getIconPixmap(icon, QSize(size, size), flags&QStyle::State_Enabled ? QIcon::Normal : QIcon::Disabled, state);
 }
 
-inline QPixmap getIconPixmap(const QIcon &icon, const QSize &size, int flags, QIcon::State state=QIcon::Off)
+static inline QPixmap getIconPixmap(const QIcon &icon, const QSize &size, int flags, QIcon::State state=QIcon::Off)
 {
     return getIconPixmap(icon, size, flags&QStyle::State_Enabled ? QIcon::Normal : QIcon::Disabled, state);
 }
@@ -593,30 +590,35 @@ static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
 
 #define SB_SUB2 ((QStyle::SubControl)(QStyle::SC_ScrollBarGroove << 1))
 
-#ifdef Q_WS_X11
+#ifdef QTC_X11
 static bool canAccessId(const QWidget *w)
 {
     return w && w->testAttribute(Qt::WA_WState_Created) && w->internalWinId();
 }
-
 static void setOpacityProp(QWidget *w, unsigned short opacity)
 {
-    if(w && canAccessId(w))
-    {
-        static const Atom constAtom = XInternAtom(QX11Info::display(), OPACITY_ATOM, False);
-        XChangeProperty(QX11Info::display(), w->window()->winId(), constAtom, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&opacity, 1);
+    if (w && canAccessId(w)) {
+        static const auto opacityAtom = XcbUtils::getAtom(OPACITY_ATOM);
+        XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
+                    w->window()->winId(), opacityAtom, XCB_ATOM_CARDINAL,
+                    16, 1, &opacity);
     }
 }
 
 static void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
 {
-    if(w && canAccessId(w))
-    {
-        static const Atom constAtom = XInternAtom(QX11Info::display(), BGND_ATOM, False);
-        unsigned long prop=((IS_FLAT_BGND(app) ? (unsigned short)(haveBgndImage ? APPEARANCE_RAISED : APPEARANCE_FLAT) : app)&0xFF) |
-            (w->palette().background().color().rgb()&0x00FFFFFF)<<8;
-
-        XChangeProperty(QX11Info::display(), w->window()->winId(), constAtom, XA_CARDINAL, 32, PropModeReplace, (unsigned char *)&prop, 1);
+    if (w && canAccessId(w)) {
+        static const auto bgndAtom = XcbUtils::getAtom(BGND_ATOM);
+        unsigned long prop = (((IS_FLAT_BGND(app) ?
+                                (unsigned short)(haveBgndImage ?
+                                                 APPEARANCE_RAISED :
+                                                 APPEARANCE_FLAT) :
+                                app) & 0xFF) |
+                              (w->palette().background().color().rgb() &
+                               0x00FFFFFF) << 8);
+        XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
+                    w->window()->winId(), bgndAtom, XCB_ATOM_CARDINAL,
+                    332, 1, &prop);
     }
 }
 
@@ -627,14 +629,12 @@ static void setSbProp(QWidget *w)
         QVariant prop(w->property(constStatusBarProperty));
 
         if (!prop.isValid() || !prop.toBool()) {
-            static const Atom constAtom =
-                XInternAtom(QX11Info::display(), STATUSBAR_ATOM, False);
-
+            static const auto sbAtom = XcbUtils::getAtom(STATUSBAR_ATOM);
             unsigned short s = 1;
             w->setProperty(constStatusBarProperty, true);
-            XChangeProperty(QX11Info::display(), w->window()->winId(),
-                            constAtom, XA_CARDINAL, 16, PropModeReplace,
-                            (unsigned char*)&s, 1);
+            XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
+                        w->window()->winId(), sbAtom, XCB_ATOM_CARDINAL,
+                        16, 1, &s);
         }
     }
 }
@@ -647,10 +647,6 @@ static void setRgb(QColor *col, const QStringList &rgb)
         *col = QColor(rgb[0].toInt(), rgb[1].toInt(), rgb[2].toInt());
     }
 }
-#endif
-
-#if defined QTC_QT_ONLY
-
 static QString kdeHome()
 {
     static QString kdeHomePath;
@@ -723,7 +719,7 @@ public:
     QSize sizeHint() const { return QSize(0, 0); }
 };
 
-inline int numButtons(EScrollbar type)
+static inline int numButtons(EScrollbar type)
 {
     switch(type)
     {
@@ -932,7 +928,7 @@ static const QAbstractButton * getButton(const QWidget *w, const QPainter *p)
     return widget ? ::qobject_cast<const QAbstractButton *>(widget) : 0L;
 }
 
-inline bool isMultiTabBarTab(const QAbstractButton *button)
+static inline bool isMultiTabBarTab(const QAbstractButton *button)
 {
     // Check for isFlat fails in KDE SC4.5
     return button && ( (::qobject_cast<const QPushButton *>(button) && // ((QPushButton *)button)->isFlat() &&
@@ -968,8 +964,6 @@ Style::Style() :
     // itsHoverWidget(0L),
 #ifdef QTC_X11
     itsDBus(0),
-#endif
-#ifdef Q_WS_X11
     itsShadowHelper(new ShadowHelper(this)),
 #endif
     itsSViewSBar(0L),
@@ -1718,7 +1712,7 @@ void Style::polish(QWidget *widget)
     }
 
     itsWindowManager->registerWidget(widget);
-#ifdef Q_WS_X11
+#ifdef QTC_X11
     itsShadowHelper->registerWidget(widget);
 #endif
 
@@ -1756,7 +1750,7 @@ void Style::polish(QWidget *widget)
                                          Qt::WindowType_Mask) ?
                 opts.dlgOpacity : opts.bgndOpacity;
 
-#ifdef Q_WS_X11
+#ifdef QTC_X11
             if (APP_KONSOLE == theThemedApp &&
                 100 != opacity &&
                 widget->testAttribute(Qt::WA_TranslucentBackground) &&
@@ -1830,18 +1824,18 @@ void Style::polish(QWidget *widget)
     if(itsIsPreview && qobject_cast<QMdiSubWindow *>(widget))
         widget->setAttribute(Qt::WA_StyledBackground);
 
-    if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuWidget())
-    {
+    if (opts.menubarHiding && qobject_cast<QMainWindow *>(widget) &&
+        static_cast<QMainWindow *>(widget)->menuWidget()) {
         Utils::addEventFilter(widget, this);
         if(itsSaveMenuBarStatus)
-            Utils::addEventFilter(static_cast<QMainWindow *>(widget)->menuWidget(), this);
-        if(itsSaveMenuBarStatus && qtcMenuBarHidden(appName))
-        {
-            static_cast<QMainWindow *>(widget)->menuWidget()->setHidden(true);
-#ifdef Q_WS_X11
+            Utils::addEventFilter(
+                static_cast<QMainWindow*>(widget)->menuWidget(), this);
+        if (itsSaveMenuBarStatus && qtcMenuBarHidden(appName)) {
+            static_cast<QMainWindow*>(widget)->menuWidget()->setHidden(true);
+#ifdef QTC_X11
             if (BLEND_TITLEBAR || opts.menubarHiding & HIDE_KWIN ||
                 opts.windowBorder & WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR)
-                emitMenuSize(static_cast<QMainWindow *>(widget)->menuWidget(), 0);
+                emitMenuSize(static_cast<QMainWindow*>(widget)->menuWidget(), 0);
 #endif
         }
     }
@@ -1862,7 +1856,7 @@ void Style::polish(QWidget *widget)
                 if(itsSaveStatusBarStatus && qtcStatusBarHidden(appName))
                     (*it)->setHidden(true);
             }
-#ifdef Q_WS_X11
+#ifdef QTC_X11
             setSbProp(widget);
             emitStatusBarState(sb.first());
 #endif
@@ -1946,18 +1940,20 @@ void Style::polish(QWidget *widget)
         if(opts.boldProgress)
             setBold(widget);
         Utils::addEventFilter(widget, this);
-    }
-    else if(qobject_cast<QMenuBar*>(widget))
-    {
-#ifdef Q_WS_X11
+    } else if(qobject_cast<QMenuBar*>(widget)) {
+#ifdef QTC_X11
         if (opts.xbar &&
-            (!((APP_QTDESIGNER==theThemedApp || APP_KDEVELOP==theThemedApp) && widget->inherits("QDesignerMenuBar"))))
+            (!((APP_QTDESIGNER==theThemedApp ||
+                APP_KDEVELOP==theThemedApp) &&
+               widget->inherits("QDesignerMenuBar"))))
             Bespin::MacMenu::manage((QMenuBar *)widget);
 
-        if(BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR)
-            emitMenuSize(widget, PREVIEW_MDI==itsIsPreview || !widget->isVisible() ? 0 : widget->rect().height());
+        if (BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN ||
+            opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR)
+            emitMenuSize(widget, PREVIEW_MDI==itsIsPreview ||
+                         !widget->isVisible() ? 0 : widget->rect().height());
 #endif
-        if(CUSTOM_BGND)
+        if (CUSTOM_BGND)
             widget->setBackgroundRole(QPalette::NoRole);
 
         widget->setAttribute(Qt::WA_Hover, true);
@@ -1966,9 +1962,7 @@ void Style::polish(QWidget *widget)
         Utils::addEventFilter(widget, this);
 
         setMenuTextColors(widget, true);
-    }
-    else if(qobject_cast<QLabel*>(widget))
-    {
+    } else if(qobject_cast<QLabel*>(widget)) {
         Utils::addEventFilter(widget, this);
         if(WM_DRAG_ALL==opts.windowDrag &&
            ((QLabel *)widget)->textInteractionFlags().testFlag(Qt::TextSelectableByMouse) &&
@@ -2214,17 +2208,17 @@ void Style::polish(QWidget *widget)
         widget->layout()->setMargin(0);
     }
 
-#ifdef Q_WS_X11
+#ifdef QTC_X11
     QWidget *window=widget->window();
 
-    if((100!=opts.bgndOpacity && Qt::Window==(window->windowFlags() & Qt::WindowType_Mask)) ||
-       (100!=opts.dlgOpacity && Qt::Dialog==(window->windowFlags() & Qt::WindowType_Mask)) )
-    {
+    if ((100!=opts.bgndOpacity &&
+         Qt::Window==(window->windowFlags() & Qt::WindowType_Mask)) ||
+        (100!=opts.dlgOpacity &&
+         Qt::Dialog==(window->windowFlags() & Qt::WindowType_Mask))) {
         widget->removeEventFilter(this);
         Utils::addEventFilter(widget, this);
 
-        if(widget->inherits("KFilePlacesView"))
-        {
+        if (widget->inherits("KFilePlacesView")) {
             widget->setAutoFillBackground(false);
             widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
         }
@@ -2233,19 +2227,18 @@ void Style::polish(QWidget *widget)
 
 #if !defined QTC_QT_ONLY
     // Make file selection button in QPrintDialog appear more KUrlRequester like...
-    if(qobject_cast<QToolButton *>(widget) &&
-       widget->parentWidget() && widget->parentWidget()->parentWidget() && widget->parentWidget()->parentWidget()->parentWidget() &&
-       qobject_cast<QGroupBox *>(widget->parentWidget()) &&
-       qobject_cast<QPrintDialog *>(widget->parentWidget()->parentWidget()->parentWidget()) &&
-       static_cast<QToolButton *>(widget)->text()==QLatin1String("..."))
-    {
-        static_cast<QToolButton *>(widget)->setIcon(KIcon("document-open"));
-        static_cast<QToolButton *>(widget)->setAutoRaise(false);
+    if (qobject_cast<QToolButton*>(widget) &&
+        widget->parentWidget() && widget->parentWidget()->parentWidget() && widget->parentWidget()->parentWidget()->parentWidget() &&
+       qobject_cast<QGroupBox*>(widget->parentWidget()) &&
+       qobject_cast<QPrintDialog*>(widget->parentWidget()->parentWidget()->parentWidget()) &&
+       static_cast<QToolButton*>(widget)->text() == QLatin1String("...")) {
+        static_cast<QToolButton*>(widget)->setIcon(KIcon("document-open"));
+        static_cast<QToolButton*>(widget)->setAutoRaise(false);
     }
 #endif
 }
 
-#if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
+#if 1
 static QFontMetrics styledFontMetrics(const QStyleOption *option, const QWidget *widget)
 {
     return option
@@ -2294,14 +2287,6 @@ void Style::polishFormLayout(QFormLayout *layout)
             continue;
 
         int fieldHeight = fieldItem->sizeHint().height();
-#if 0 // QT_VERSION < 0x040600
-        // work around KIntNumInput::sizeHint() bug
-        if (fieldItem->widget() && fieldItem->widget()->inherits("KIntNumInput"))
-        {
-            fieldHeight -= 2;
-            fieldItem->widget()->setMaximumHeight(fieldHeight);
-        }
-#endif
         /* for large fields, we don't center */
         if (fieldHeight <= 2 * fontHeight(0, label) + addedHeight)
         {
@@ -2391,7 +2376,7 @@ void Style::unpolish(QWidget *widget)
     }
 
     itsWindowManager->unregisterWidget(widget);
-#ifdef Q_WS_X11
+#ifdef QTC_X11
     itsShadowHelper->unregisterWidget(widget);
 #endif
     itsBlurHelper->unregisterWidget(widget);
@@ -2479,11 +2464,10 @@ void Style::unpolish(QWidget *widget)
             unSetBold(widget);
         itsProgressBars.remove((QProgressBar *)widget);
     }
-    else if(qobject_cast<QMenuBar *>(widget))
-    {
-#ifdef Q_WS_X11
-        if(opts.xbar)
-            Bespin::MacMenu::release((QMenuBar *)widget);
+    else if (qobject_cast<QMenuBar*>(widget)) {
+#ifdef QTC_X11
+        if (opts.xbar)
+            Bespin::MacMenu::release((QMenuBar*)widget);
 #endif
 
         widget->setAttribute(Qt::WA_Hover, false);
@@ -2601,12 +2585,13 @@ void Style::unpolish(QWidget *widget)
         qobject_cast<QToolBar *>(widget) ||
         (widget && qobject_cast<QToolBar *>(widget->parent())))
         widget->setBackgroundRole(QPalette::Button);
-#ifdef Q_WS_X11
-    QWidget *window=widget->window();
+#ifdef QTC_X11
+    QWidget *window = widget->window();
 
-    if((100!=opts.bgndOpacity && Qt::Window==(window->windowFlags() & Qt::WindowType_Mask)) ||
-       (100!=opts.dlgOpacity && Qt::Dialog==(window->windowFlags() & Qt::WindowType_Mask)) )
-    {
+    if ((100 != opts.bgndOpacity &&
+         Qt::Window == (window->windowFlags() & Qt::WindowType_Mask)) ||
+        (100 != opts.dlgOpacity && Qt::Dialog == (window->windowFlags() &
+                                                  Qt::WindowType_Mask))) {
         widget->removeEventFilter(this);
     }
 #endif
@@ -2764,15 +2749,20 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 widget->setMask(windowMask(widget->rect(), opts.round>ROUND_SLIGHT));
             return false;
         }
-#ifdef Q_WS_X11
-        else if((BLEND_TITLEBAR || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR || opts.menubarHiding&HIDE_KWIN) &&
-                qobject_cast<QMenuBar *>(object))
-        {
-            QResizeEvent *re = static_cast<QResizeEvent *>(event);
+#ifdef QTC_X11
+        else if((BLEND_TITLEBAR ||
+                 opts.windowBorder &
+                 WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR ||
+                 opts.menubarHiding & HIDE_KWIN) &&
+                qobject_cast<QMenuBar*>(object)) {
+            QResizeEvent *re = static_cast<QResizeEvent*>(event);
 
-            if (re->size().height() != re->oldSize().height())
-                emitMenuSize((QMenuBar *)object, PREVIEW_MDI==itsIsPreview || !((QMenuBar *)object)->isVisible()
-                             ? 0 : re->size().height());
+            if (re->size().height() != re->oldSize().height()) {
+                emitMenuSize((QMenuBar *)object,
+                             PREVIEW_MDI == itsIsPreview ||
+                             !((QMenuBar*)object)->isVisible() ? 0 :
+                             re->size().height());
+            }
         }
 #endif
         break;
@@ -2808,21 +2798,23 @@ bool Style::eventFilter(QObject *object, QEvent *event)
            qtcStatusBarHidden(appName))
             static_cast<QStatusBar *>(object)->setHidden(true);
         break;
-#ifdef Q_WS_X11
+#ifdef QTC_X11
     case QEvent::PaletteChange:
     {
-        QWidget *widget=qobject_cast<QWidget *>(object);
+        QWidget *widget = qobject_cast<QWidget*>(object);
 
-        if(widget && widget->isWindow() && ((widget->windowFlags()&Qt::WindowType_Mask) & (Qt::Window|Qt::Dialog)))
-            setBgndProp(widget, opts.bgndAppearance, IMG_NONE!=opts.bgndImage.type);
+        if (widget && widget->isWindow() &&
+            ((widget->windowFlags() & Qt::WindowType_Mask) &
+             (Qt::Window | Qt::Dialog)))
+            setBgndProp(widget, opts.bgndAppearance,
+                        IMG_NONE != opts.bgndImage.type);
         break;
     }
 #endif
     case QEvent::Paint:
     {
-        if(CUSTOM_BGND)
-        {
-            QWidget *widget=qobject_cast<QWidget *>(object);
+        if (CUSTOM_BGND) {
+            QWidget *widget = qobject_cast<QWidget*>(object);
 
             if(widget && widget->testAttribute(Qt::WA_StyledBackground) &&
                (widget->isWindow() && ((widget->windowFlags()&Qt::WindowType_Mask) & (Qt::Window|Qt::Dialog)) &&
@@ -3007,22 +2999,26 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 widget->setMask(windowMask(widget->rect(), opts.round>ROUND_SLIGHT));
             return false;
         }
-#ifdef Q_WS_X11
-        else if((BLEND_TITLEBAR || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR || opts.menubarHiding&HIDE_KWIN) &&
-                qobject_cast<QMenuBar *>(object))
-        {
-            QMenuBar *mb=(QMenuBar *)object;
-            emitMenuSize((QMenuBar *)mb, PREVIEW_MDI==itsIsPreview || !((QMenuBar *)mb)->isVisible() ? 0 : mb->size().height(), true);
-        }
-        else if(QEvent::Show==event->type())
-        {
-            QWidget *widget=qobject_cast<QWidget *>(object);
+#ifdef QTC_X11
+        else if ((BLEND_TITLEBAR ||
+                  opts.windowBorder &
+                  WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR ||
+                  opts.menubarHiding & HIDE_KWIN) &&
+                 qobject_cast<QMenuBar*>(object)) {
+            QMenuBar *mb=(QMenuBar*)object;
+            emitMenuSize((QMenuBar*)mb, PREVIEW_MDI==itsIsPreview ||
+                         !((QMenuBar *)mb)->isVisible() ? 0 :
+                         mb->size().height(), true);
+        } else if (QEvent::Show==event->type()) {
+            QWidget *widget = qobject_cast<QWidget*>(object);
 
             if(widget && widget->isWindow() && ((widget->windowFlags()&Qt::WindowType_Mask) & (Qt::Window|Qt::Dialog)))
             {
                 setBgndProp(widget, opts.bgndAppearance, IMG_NONE!=opts.bgndImage.type);
 
-                int opacity=Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask) ? opts.dlgOpacity : opts.bgndOpacity;
+                int opacity = Qt::Dialog == (widget->windowFlags() &
+                                             Qt::WindowType_Mask) ?
+                    opts.dlgOpacity : opts.bgndOpacity;
                 setOpacityProp(widget, (unsigned short)opacity);
             }
         }
@@ -3032,12 +3028,14 @@ bool Style::eventFilter(QObject *object, QEvent *event)
     case QEvent::Destroy:
     case QEvent::Hide:
     {
-#ifdef Q_WS_X11
-        if((BLEND_TITLEBAR || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR || opts.menubarHiding&HIDE_KWIN) &&
-           qobject_cast<QMenuBar *>(object))
-        {
-            QMenuBar *mb=(QMenuBar *)object;
-            emitMenuSize((QMenuBar *)mb, 0);
+#ifdef QTC_X11
+        if ((BLEND_TITLEBAR ||
+             opts.windowBorder &
+             WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR ||
+             opts.menubarHiding & HIDE_KWIN) &&
+           qobject_cast<QMenuBar *>(object)) {
+            QMenuBar *mb = (QMenuBar*)object;
+            emitMenuSize((QMenuBar*)mb, 0);
         }
 #endif
         // if(itsHoverWidget && object==itsHoverWidget) {
@@ -3048,11 +3046,9 @@ bool Style::eventFilter(QObject *object, QEvent *event)
 
         // The Destroy event is sent from ~QWidget, which happens after ~QProgressBar - therefore, we can't cast to a QProgressBar.
         // So we have to check on object.
-        if(object && !itsProgressBars.isEmpty())
-        {
+        if (object && !itsProgressBars.isEmpty()) {
             itsProgressBars.remove(reinterpret_cast<QProgressBar*>(object));
-            if (itsProgressBars.isEmpty())
-            {
+            if (itsProgressBars.isEmpty()) {
                 killTimer(itsProgressBarAnimateTimer);
                 itsProgressBarAnimateTimer = 0;
             }
@@ -3527,33 +3523,39 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
     case SH_TitleBar_AutoRaise:
         return 1;
     case SH_MainWindow_SpaceBelowMenuBar:
-#ifdef Q_WS_X11
-        if(opts.xbar)
-            if (const QMenuBar *menubar = qobject_cast<const QMenuBar*>(widget))
-                if (0==menubar->height() && !menubar->actions().isEmpty())
-                {   // we trick menubars if we use macmenus - hehehe...
+#ifdef QTC_X11
+        if (opts.xbar) {
+            if (const QMenuBar *menubar = qobject_cast<const QMenuBar*>(widget)) {
+                if (0 == menubar->height() && !menubar->actions().isEmpty()) {
+                    // we trick menubars if we use macmenus - hehehe...
                     // NOTICE the final result NEEDS to be > "0" (i.e. "1") to avoid side effects...
-                    return -menubar->actionGeometry(menubar->actions().first()).height() + 1;
+                    return -menubar->actionGeometry(
+                        menubar->actions().first()).height() + 1;
                 }
+            }
+        }
 #endif
         return 0;
     case SH_DialogButtonLayout:
-        return opts.gtkButtonOrder ? QDialogButtonBox::GnomeLayout : QDialogButtonBox::KdeLayout;
+        return opts.gtkButtonOrder ? QDialogButtonBox::GnomeLayout :
+        QDialogButtonBox::KdeLayout;
     case SH_MessageBox_TextInteractionFlags:
         return Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse;
     case SH_LineEdit_PasswordCharacter:
-        if(opts.passwordChar)
-        {
-            int                chars[4]={opts.passwordChar, 0x25CF, 0x2022, 0};
-            const QFontMetrics &fm(option ? option->fontMetrics
-                                   : (widget ? widget->fontMetrics() : QFontMetrics(QFont())));
-            for(int i=0; chars[i]; ++i)
-                if (fm.inFont(QChar(chars[i])))
+        if (opts.passwordChar) {
+            int chars[4]={opts.passwordChar, 0x25CF, 0x2022, 0};
+            const QFontMetrics &fm(option ? option->fontMetrics :
+                                   (widget ? widget->fontMetrics() :
+                                    QFontMetrics(QFont())));
+            for (int i = 0;chars[i];++i) {
+                if (fm.inFont(QChar(chars[i]))) {
                     return chars[i];
+                }
+            }
             return '*';
-        }
-        else
+        } else {
             return '\0';
+        }
     case SH_MenuBar_MouseTracking:
         // Always return 1, as setting to 0 dissables the effect when a menu is shown.
         return 1; // opts.menubarMouseOver ? 1 : 0;
@@ -5445,9 +5447,10 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
         QPainterPath path=rounded ? buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, MENU_AND_TOOLTIP_RADIUS) : QPainterPath();
         QColor       col=palette.toolTipBase().color();
 
-#ifdef Q_WS_X11
-        if(widget && widget->window())
+#ifdef QTC_X11
+        if (widget && widget->window()) {
             itsShadowHelper->registerWidget(widget->window());
+        }
 #endif
         painter->save();
         if(rounded)
@@ -13405,19 +13408,19 @@ void Style::borderSizesChanged()
 #endif
 }
 
-#ifdef Q_WS_X11
+#ifdef QTC_X11
 static QMainWindow *getWindow(unsigned int xid)
 {
     QWidgetList tlw = QApplication::topLevelWidgets();
-    QWidgetList::ConstIterator it(tlw.begin()),
-        end(tlw.end());
+    QWidgetList::ConstIterator it(tlw.begin());
+    QWidgetList::ConstIterator end(tlw.end());
 
     for (;it != end;++it) {
         if (qobject_cast<QMainWindow *>(*it) && (*it)->winId() == xid) {
             return static_cast<QMainWindow*>(*it);
         }
     }
-    return 0L;
+    return NULL;
 }
 
 static bool diffTime(struct timeval *lastTime)
@@ -13426,14 +13429,14 @@ static bool diffTime(struct timeval *lastTime)
 
     gettimeofday(&now, NULL);
     timersub(&now, lastTime, &diff);
-    *lastTime=now;
-    return diff.tv_sec>0 || diff.tv_usec>500000;
+    *lastTime = now;
+    return diff.tv_sec > 0 || diff.tv_usec > 500000;
 }
 #endif
 
 void Style::toggleMenuBar(unsigned int xid)
 {
-#ifdef Q_WS_X11
+#ifdef QTC_X11
     static unsigned int   lastXid  = 0;
     static struct timeval lastTime = {0, 0};
 
@@ -13469,7 +13472,7 @@ void Style::toggleStatusBar(unsigned int xid)
 
 void Style::compositingToggled()
 {
-#ifdef Q_WS_X11
+#ifdef QTC_X11
     QWidgetList tlw = QApplication::topLevelWidgets();
     QWidgetList::ConstIterator it(tlw.begin()),
         end(tlw.end());
@@ -13518,7 +13521,7 @@ void Style::toggleStatusBar(QMainWindow *window)
         {
             act->trigger();
             triggeredAction=true;
-#ifdef Q_WS_X11
+#ifdef QTC_X11
             //emitStatusBarState(true); // TODO: ???
 #endif
         }
@@ -13538,57 +13541,58 @@ void Style::toggleStatusBar(QMainWindow *window)
             for(; it!=end; ++it)
                 (*it)->setHidden((*it)->isVisible());
 
-#ifdef Q_WS_X11
+#ifdef QTC_X11
             emitStatusBarState(sb.first());
 #endif
         }
     }
 }
 
-#ifdef Q_WS_X11
+#ifdef QTC_X11
 void Style::emitMenuSize(QWidget *w, unsigned short size, bool force)
 {
-    if(w && canAccessId(w->window()))
-    {
-        static const char * constMenuSizeProperty="qtcMenuSize";
+    if (w && canAccessId(w->window())) {
+        static const char *constMenuSizeProperty = "qtcMenuSize";
 
         unsigned short oldSize=2000;
 
-        if(!force) {
+        if (!force) {
             QVariant prop(w->property(constMenuSizeProperty));
 
-            if(prop.isValid()) {
+            if (prop.isValid()) {
                 bool ok;
-                oldSize=prop.toUInt(&ok);
-                if(!ok)
+                oldSize = prop.toUInt(&ok);
+                if (!ok) {
                     oldSize=2000;
+                }
             }
         }
 
-        if(oldSize!=size)
-        {
-            static const Atom constQtCMenuSize = XInternAtom(QX11Info::display(), MENU_SIZE_ATOM, False);
-
+        if (oldSize != size) {
+            static const auto menuAtom = XcbUtils::getAtom(MENU_SIZE_ATOM);
             w->setProperty(constMenuSizeProperty, size);
-            XChangeProperty(QX11Info::display(), w->window()->winId(),
-                            constQtCMenuSize, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&size, 1);
+            XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
+                        w->window()->winId(), menuAtom, XCB_ATOM_CARDINAL,
+                        16, 1, &size);
             if(!itsDBus)
-                itsDBus=new QDBusInterface("org.kde.kwin", "/QtCurve", "org.kde.QtCurve");
-            itsDBus->call(QDBus::NoBlock, "menuBarSize", (unsigned int)w->window()->winId(), (int)size);
+                itsDBus = new QDBusInterface("org.kde.kwin", "/QtCurve",
+                                             "org.kde.QtCurve");
+            itsDBus->call(QDBus::NoBlock, "menuBarSize",
+                          (unsigned int)w->window()->winId(), (int)size);
         }
     }
 }
 
 void Style::emitStatusBarState(QStatusBar *sb)
 {
-    if(opts.statusbarHiding&HIDE_KWIN)
-    {
-        if(!itsDBus)
-            itsDBus=new QDBusInterface("org.kde.kwin", "/QtCurve", "org.kde.QtCurve");
-        itsDBus->call(QDBus::NoBlock, "statusBarState", (unsigned int)sb->window()->winId(), sb->isVisible());
+    if (opts.statusbarHiding & HIDE_KWIN) {
+        if (!itsDBus)
+            itsDBus = new QDBusInterface("org.kde.kwin", "/QtCurve",
+                                         "org.kde.QtCurve");
+        itsDBus->call(QDBus::NoBlock, "statusBarState",
+                      (unsigned int)sb->window()->winId(), sb->isVisible());
     }
 }
 
 #endif
-
 }

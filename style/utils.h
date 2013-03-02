@@ -21,6 +21,7 @@
   Boston, MA 02110-1301, USA.
 */
 
+#include "config.h"
 #include <QWidget>
 
 namespace QtCurve
@@ -32,9 +33,8 @@ static inline void addEventFilter(QObject *object, QObject *filter)
     object->removeEventFilter(filter);
     object->installEventFilter(filter);
 }
-
-extern bool compositingActive();
-extern bool hasAlphaChannel(const QWidget *widget);
+bool compositingActive();
+bool hasAlphaChannel(const QWidget *widget);
 }
 }
 
