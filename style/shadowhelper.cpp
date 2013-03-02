@@ -33,6 +33,7 @@
 #include <QPainter>
 #include <QToolBar>
 #include <QEvent>
+#include <QDebug>
 
 #include "xcb_utils.h"
 #include <xcb/xcb_image.h>
@@ -194,7 +195,7 @@ void ShadowHelper::createPixmap(xcb_pixmap_t pixmap, const uchar *buf, int len)
     // do nothing for invalid _pixmaps
     if (source.isNull())
         return;
-
+    source = source.convertToFormat(QImage::Format_ARGB32);
     _size = source.width();
 
     /*
@@ -206,8 +207,10 @@ void ShadowHelper::createPixmap(xcb_pixmap_t pixmap, const uchar *buf, int len)
     const int width(source.width());
     const int height(source.height());
     const int depth(source.depth());
+    // qDebug() << depth;
+
     // create X11 pixmap
-    XcbCallVoid(create_pixmap, 32, pixmap, XcbUtils::rootWindow(),
+    XcbCallVoid(create_pixmap, depth, pixmap, XcbUtils::rootWindow(),
                 width, height);
     xcb_gcontext_t cid = XcbUtils::generateId();
     XcbCallVoid(create_gc, cid, pixmap, 0, (const uint32_t*)0);
@@ -237,7 +240,7 @@ bool ShadowHelper::installX11Shadows( QWidget* widget )
 
     // create data
     // add pixmap handles
-    QVector<unsigned long> data;
+    QVector<xcb_pixmap_t> data;
     for (int i = 0;i < numPixmaps;++i) {
         data.push_back(_pixmaps[i]);
     }
