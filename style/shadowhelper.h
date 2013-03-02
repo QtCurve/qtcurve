@@ -39,87 +39,84 @@ class QPixmap;
 
 namespace QtCurve
 {
-    //! handle shadow pixmaps passed to window manager via X property
-    class ShadowHelper: public QObject
-    {
-        Q_OBJECT
+//! handle shadow pixmaps passed to window manager via X property
+class ShadowHelper: public QObject
+{
+    Q_OBJECT
+public:
+    //!@name property names
+    static const char* const netWMShadowAtomName;
+    static const char* const netWMForceShadowPropertyName;
+    static const char* const netWMSkipShadowPropertyName;
 
-        public:
+    //! constructor
+    ShadowHelper( QObject* );
 
-        //!@name property names
-        static const char* const netWMShadowAtomName;
-        static const char* const netWMForceShadowPropertyName;
-        static const char* const netWMSkipShadowPropertyName;
+    //! destructor
+    virtual ~ShadowHelper( void );
 
-        //! constructor
-        ShadowHelper( QObject* );
+    //! register widget
+    bool registerWidget( QWidget*, bool force = false );
 
-        //! destructor
-        virtual ~ShadowHelper( void );
+    //! unregister widget
+    void unregisterWidget( QWidget* );
 
-        //! register widget
-        bool registerWidget( QWidget*, bool force = false );
+    //! event filter
+    virtual bool eventFilter( QObject*, QEvent* );
 
-        //! unregister widget
-        void unregisterWidget( QWidget* );
+protected Q_SLOTS:
+    //! unregister widget
+    void objectDeleted( QObject* );
 
-        //! event filter
-        virtual bool eventFilter( QObject*, QEvent* );
+protected:
 
-        protected Q_SLOTS:
+    //! true if widget is a menu
+    bool isMenu( QWidget* ) const;
 
-        //! unregister widget
-        void objectDeleted( QObject* );
+    //! accept widget
+    bool acceptWidget( QWidget* ) const;
 
-        protected:
+    // create pixmap handles from tileset
+    void createPixmapHandles(  );
 
-        //! true if widget is a menu
-        bool isMenu( QWidget* ) const;
+    // create pixmap handle from pixmap
+    Qt::HANDLE createPixmap( const uchar *buf, int len );
 
-        //! accept widget
-        bool acceptWidget( QWidget* ) const;
+    //! install shadow X11 property on given widget
+    /*!
+      shadow atom and property specification available at
+      http://community.kde.org/KWin/Shadow
+    */
+    bool installX11Shadows( QWidget* );
 
-        // create pixmap handles from tileset
-        void createPixmapHandles(  );
+    //! uninstall shadow X11 property on given widget
+    void uninstallX11Shadows( QWidget* ) const;
 
-        // create pixmap handle from pixmap
-        Qt::HANDLE createPixmap( const uchar *buf, int len );
+    //! uninstall shadow X11 property on given window
+    void uninstallX11Shadows( WId ) const;
 
-        //! install shadow X11 property on given widget
-        /*!
-        shadow atom and property specification available at
-        http://community.kde.org/KWin/Shadow
-        */
-        bool installX11Shadows( QWidget* );
+private:
 
-        //! uninstall shadow X11 property on given widget
-        void uninstallX11Shadows( QWidget* ) const;
+    //! set of registered widgets
+    QMap<QWidget*, WId> _widgets;
 
-        //! uninstall shadow X11 property on given window
-        void uninstallX11Shadows( WId ) const;
+    //! number of pixmaps
+    enum { numPixmaps = 8 };
 
-        private:
+    //!@name pixmaps
+    //@{
+    Qt::HANDLE _pixmaps[numPixmaps];
+    //@}
 
-        //! set of registered widgets
-        QMap<QWidget*, WId> _widgets;
+    //! shadow size
+    int _size;
 
-        //! number of pixmaps
-        enum { numPixmaps = 8 };
+#ifdef Q_WS_X11
+    //! shadow atom
+    Atom _atom;
+#endif
 
-        //!@name pixmaps
-        //@{
-        Qt::HANDLE _pixmaps[numPixmaps];
-        //@}
-
-        //! shadow size
-        int _size;
-
-        #ifdef Q_WS_X11
-        //! shadow atom
-        Atom _atom;
-        #endif
-
-    };
+};
 
 }
 

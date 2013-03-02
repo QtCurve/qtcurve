@@ -599,7 +599,7 @@ static bool canAccessId(const QWidget *w)
     return w && w->testAttribute(Qt::WA_WState_Created) && w->internalWinId();
 }
 
-void setOpacityProp(QWidget *w, unsigned short opacity)
+static void setOpacityProp(QWidget *w, unsigned short opacity)
 {
     if(w && canAccessId(w))
     {
@@ -608,7 +608,7 @@ void setOpacityProp(QWidget *w, unsigned short opacity)
     }
 }
 
-void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
+static void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
 {
     if(w && canAccessId(w))
     {
@@ -620,20 +620,21 @@ void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
     }
 }
 
-void setSbProp(QWidget *w)
+static void setSbProp(QWidget *w)
 {
-    if(w && canAccessId(w->window()))
-    {
-        static const char * constStatusBarProperty="qtcStatusBar";
-        QVariant            prop(w->property(constStatusBarProperty));
+    if (w && canAccessId(w->window())) {
+        static const char *constStatusBarProperty="qtcStatusBar";
+        QVariant prop(w->property(constStatusBarProperty));
 
-        if(!prop.isValid() || !prop.toBool())
-        {
-            static const Atom constAtom = XInternAtom(QX11Info::display(), STATUSBAR_ATOM, False);
+        if (!prop.isValid() || !prop.toBool()) {
+            static const Atom constAtom =
+                XInternAtom(QX11Info::display(), STATUSBAR_ATOM, False);
 
-            unsigned short s=1;
+            unsigned short s = 1;
             w->setProperty(constStatusBarProperty, true);
-            XChangeProperty(QX11Info::display(), w->window()->winId(), constAtom, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&s, 1);
+            XChangeProperty(QX11Info::display(), w->window()->winId(),
+                            constAtom, XA_CARDINAL, 16, PropModeReplace,
+                            (unsigned char*)&s, 1);
         }
     }
 }
