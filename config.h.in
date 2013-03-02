@@ -5,6 +5,7 @@
 #define KDE4PREFIX "@KDE4PREFIX@"
 
 #define QTC_QT_ONLY
+#cmakedefine QTC_X11
 #cmakedefine QTC_OLD_NVIDIA_ARROW_FIX
 // #cmakedefine QTC_STYLE_SUPPORT
 // #cmakedefine QTC_KWIN_MAX_BUTTON_HACK

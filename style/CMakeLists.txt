@@ -18,7 +18,7 @@ set(qtcurve_MOC_HDRS
   blurhelper.h
   shortcuthandler.h)
 
-if(Q_WS_X11)
+if(NOT QTC_X11)
   set(qtcurve_SRCS
     macmenu.cpp
     shadowhelper.cpp

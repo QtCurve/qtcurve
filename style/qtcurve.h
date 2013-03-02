@@ -421,7 +421,7 @@ private:
     mutable QList<int> itsMdiButtons[2]; // 0=left, 1=right
     mutable int itsTitlebarHeight;
 
-#ifdef Q_OS_X11
+#ifdef QTC_X11
     QDBusInterface *itsDBus;
 #endif
 #ifdef Q_WS_X11

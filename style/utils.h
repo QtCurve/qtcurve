@@ -25,17 +25,17 @@
 
 namespace QtCurve
 {
-    namespace Utils
-    {
-        inline void addEventFilter(QObject *object, QObject *filter)
-        {
-            object->removeEventFilter(filter);
-            object->installEventFilter(filter);
-        }
+namespace Utils
+{
+static inline void addEventFilter(QObject *object, QObject *filter)
+{
+    object->removeEventFilter(filter);
+    object->installEventFilter(filter);
+}
 
-        extern bool compositingActive();
-        extern bool hasAlphaChannel(const QWidget *widget);
-    }
+extern bool compositingActive();
+extern bool hasAlphaChannel(const QWidget *widget);
+}
 }
 
 #endif

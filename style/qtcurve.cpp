@@ -18,11 +18,13 @@
   Boston, MA 02110-1301, USA.
 */
 
-#include <QtGui>
-#ifdef Q_OS_X11
-#include <QtDBus>
-#endif
 #include "qtcurve.h"
+
+#include <QtGui>
+#ifdef QTC_X11
+#include <QDBusConnection>
+#include <QDBusInterface>
+#endif
 #include "windowmanager.h"
 #include "blurhelper.h"
 #include "shortcuthandler.h"
@@ -963,7 +965,7 @@ Style::Style() :
     itsTitlebarHeight(0),
     // itsPos(-1, -1),
     // itsHoverWidget(0L),
-#ifdef Q_OS_X11
+#ifdef QTC_X11
     itsDBus(0),
 #endif
 #ifdef Q_WS_X11
@@ -974,23 +976,20 @@ Style::Style() :
     itsBlurHelper(new BlurHelper(this)),
     itsShortcutHandler(new ShortcutHandler(this))
 {
-    const char *env=getenv(QTCURVE_PREVIEW_CONFIG);
-    if(env && 0==strcmp(env, QTCURVE_PREVIEW_CONFIG))
-    {
+    const char *env = getenv(QTCURVE_PREVIEW_CONFIG);
+    if (env && 0 == strcmp(env, QTCURVE_PREVIEW_CONFIG)) {
         // To enable preview of QtCurve settings, the style config module will set QTCURVE_PREVIEW_CONFIG
         // and use CE_QtC_SetOptions to set options. If this is set, we do not use the QPixmapCache as it
         // will interfere with that of the kcm's widgets!
         itsIsPreview=PREVIEW_MDI;
         itsUsePixmapCache=false;
-    }
-    else if(env && 0==strcmp(env, QTCURVE_PREVIEW_CONFIG_FULL))
-    {
+    } else if(env && 0==strcmp(env, QTCURVE_PREVIEW_CONFIG_FULL)) {
         // As above, but preview is in window - so can use opacity settings!
         itsIsPreview=PREVIEW_WINDOW;
         itsUsePixmapCache=false;
-    }
-    else
+    } else {
         init(true);
+    }
 }
 
 void Style::init(bool initial)
@@ -1024,7 +1023,7 @@ void Style::init(bool initial)
     } else {
         qtcReadConfig(QString(), &opts);
 
-#ifdef Q_OS_X11
+#ifdef QTC_X11
         if (initial) {
             QDBusConnection::sessionBus().connect(
                 QString(), "/KGlobalSettings", "org.kde.KGlobalSettings",
@@ -1033,7 +1032,7 @@ void Style::init(bool initial)
                 "org.kde.kwin", "/KWin", "org.kde.KWin", "compositingToggled",
                 this, SLOT(compositingToggled()));
 
-            if (!qApp || QString(qApp->argv()[0]) != "kwin") {
+            if (!qApp || qApp->arguments()[0] != "kwin") {
                 QDBusConnection::sessionBus().connect(
                     "org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
                     "borderSizesChanged", this, SLOT(borderSizesChanged()));
@@ -1322,8 +1321,8 @@ void Style::init(bool initial)
 Style::~Style()
 {
     freeColors();
-#ifdef Q_OS_X11
-    if(itsDBus) {
+#ifdef QTC_X11
+    if (itsDBus) {
         delete itsDBus;
     }
 #endif
@@ -1749,21 +1748,23 @@ void Style::polish(QWidget *widget)
             if(APP_PLASMA==theThemedApp && !widget->inherits("QDialog"))
                 break;
 
-#ifdef Q_WS_X11
+#ifdef QTC_X11
             Utils::addEventFilter(widget, this);
 #endif
-            int  opacity=Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask) ? opts.dlgOpacity : opts.bgndOpacity;
+            int opacity = Qt::Dialog == (widget->windowFlags() &
+                                         Qt::WindowType_Mask) ?
+                opts.dlgOpacity : opts.bgndOpacity;
 
 #ifdef Q_WS_X11
-            if(APP_KONSOLE==theThemedApp && 100!=opacity && widget->testAttribute(Qt::WA_TranslucentBackground) &&
-               widget->inherits("Konsole::MainWindow"))
-            {
+            if (APP_KONSOLE == theThemedApp &&
+                100 != opacity &&
+                widget->testAttribute(Qt::WA_TranslucentBackground) &&
+                widget->inherits("Konsole::MainWindow")) {
                 // Background translucency does not work for konsole :-(
                 // So, just set titlebar opacity...
                 setOpacityProp(widget, (unsigned short)opacity);
                 break;
-            }
-            else
+            } else
 #endif
                 if(100==opacity || !widget->isWindow() || Qt::Desktop==widget->windowType() || widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
                    widget->testAttribute(Qt::WA_TranslucentBackground) || widget->testAttribute(Qt::WA_NoSystemBackground) ||
@@ -13308,10 +13309,9 @@ void Style::widgetDestroyed(QObject *o)
 #if !defined QTC_QT_ONLY
 void Style::setupKde4()
 {
-    if(kapp)
+    if(kapp) {
         setDecorationColors();
-    else
-    {
+    } else {
         applyKdeSettings(true);
         applyKdeSettings(false);
     }

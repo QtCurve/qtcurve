@@ -18,6 +18,8 @@ set(QTCURVE_VERSION_FULL "${QTCURVE_VERSION}.${CPACK_PACKAGE_VERSION_PATCH}")
 # set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${QTCURVE_VERSION_FULL}")
 # include(CPack)
 
+option(QTC_X11 "Enable X11" On)
+
 set(OLD_CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
 
 # # Try to find kde4-config...
@@ -54,7 +56,11 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}"
 #   find_package(KDE4 REQUIRED)
 # endif()
 set(QTC5_LINK_LIBS)
-foreach(QtModule Qt5Core Qt5Gui Qt5Widgets)
+set(QTC_QT_MODULES Qt5Core Qt5Gui Qt5Widgets)
+if(QTC_X11)
+  set(QTC_QT_MODULES ${QTC_QT_MODULES} Qt5DBus)
+endif()
+foreach(QtModule ${QTC_QT_MODULES})
   find_package(${QtModule} REQUIRED)
   set(QTC5_LINK_LIBS ${QTC5_LINK_LIBS} ${${QtModule}_LIBRARIES})
   include_directories(${${QtModule}_INCLUDE_DIRS})
