@@ -21,13 +21,10 @@ set(qtcurve_MOC_HDRS
 
 if(QTC_X11)
   set(qtcurve_SRCS
-    macmenu.cpp
     shadowhelper.cpp
     xcb_utils.cpp
     ${qtcurve_SRCS})
   set(qtcurve_MOC_HDRS
-    macmenu.h
-    macmenu-dbus.h
     shadowhelper.h
     ${qtcurve_MOC_HDRS})
 endif()

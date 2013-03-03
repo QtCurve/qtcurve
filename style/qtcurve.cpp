@@ -71,7 +71,6 @@
 #define MAX_ROUND_BTN_PAD (ROUND_MAX==opts.round ? 3 : 0)
 
 #ifdef QTC_X11
-#include "macmenu.h"
 #include "shadowhelper.h"
 #include "xcb_utils.h"
 #include <sys/time.h>
@@ -1747,8 +1746,11 @@ void Style::polish(QWidget *widget)
     */
 
     // 'Fix' konqueror's large menubar...
-    if(!opts.xbar && APP_KONQUEROR==theThemedApp && widget->parentWidget() && qobject_cast<QToolButton*>(widget) && qobject_cast<QMenuBar*>(widget->parentWidget()))
-        widget->parentWidget()->setMaximumSize(32768, konqMenuBarSize((QMenuBar *)widget->parentWidget()));
+    if(APP_KONQUEROR==theThemedApp && widget->parentWidget() &&
+       qobject_cast<QToolButton*>(widget) &&
+       qobject_cast<QMenuBar*>(widget->parentWidget()))
+        widget->parentWidget()->setMaximumSize(
+            32768, konqMenuBarSize((QMenuBar*)widget->parentWidget()));
 
     if (EFFECT_NONE != opts.buttonEffect &&
         !USE_CUSTOM_ALPHAS(opts) && isNoEtchWidget(widget)) {
@@ -1988,12 +1990,6 @@ void Style::polish(QWidget *widget)
         Utils::addEventFilter(widget, this);
     } else if(qobject_cast<QMenuBar*>(widget)) {
 #ifdef QTC_X11
-        if (opts.xbar &&
-            (!((APP_QTDESIGNER==theThemedApp ||
-                APP_KDEVELOP==theThemedApp) &&
-               widget->inherits("QDesignerMenuBar"))))
-            Bespin::MacMenu::manage((QMenuBar *)widget);
-
         if (BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN ||
             opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR)
             emitMenuSize(widget, PREVIEW_MDI==itsIsPreview ||
@@ -2511,11 +2507,6 @@ void Style::unpolish(QWidget *widget)
         itsProgressBars.remove((QProgressBar *)widget);
     }
     else if (qobject_cast<QMenuBar*>(widget)) {
-#ifdef QTC_X11
-        if (opts.xbar)
-            Bespin::MacMenu::release((QMenuBar*)widget);
-#endif
-
         widget->setAttribute(Qt::WA_Hover, false);
 
         if(CUSTOM_BGND)
@@ -3569,18 +3560,6 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
     case SH_TitleBar_AutoRaise:
         return 1;
     case SH_MainWindow_SpaceBelowMenuBar:
-#ifdef QTC_X11
-        if (opts.xbar) {
-            if (const QMenuBar *menubar = qobject_cast<const QMenuBar*>(widget)) {
-                if (0 == menubar->height() && !menubar->actions().isEmpty()) {
-                    // we trick menubars if we use macmenus - hehehe...
-                    // NOTICE the final result NEEDS to be > "0" (i.e. "1") to avoid side effects...
-                    return -menubar->actionGeometry(
-                        menubar->actions().first()).height() + 1;
-                }
-            }
-        }
-#endif
         return 0;
     case SH_DialogButtonLayout:
         return opts.gtkButtonOrder ? QDialogButtonBox::GnomeLayout :
@@ -4387,8 +4366,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
         if (widget && widget->parentWidget() && (qobject_cast<const QMainWindow *>(widget->parentWidget())))
         {
             painter->save();
-            if(!opts.xbar || (!widget || 0!=strcmp("QWidget", widget->metaObject()->className())))
-                drawMenuOrToolBarBackground(widget, painter, r, option);
+            drawMenuOrToolBarBackground(widget, painter, r, option);
             if(TB_NONE!=opts.toolbarBorders)
             {
                 const QColor *use=itsActive
@@ -6285,10 +6263,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                 alignment|=Qt::TextHideMnemonic;
 
             painter->save();
-
-            if(!opts.xbar || (!widget || 0!=strcmp("QWidget", widget->metaObject()->className())))
-                drawMenuOrToolBarBackground(widget, painter, mbi->menuRect, option);
-
+            drawMenuOrToolBarBackground(widget, painter, mbi->menuRect, option);
             if(active)
                 drawMenuItem(painter, !opts.roundMbTopOnly && !(opts.square&SQUARE_POPUP_MENUS) ? r.adjusted(1, 1, -1, -1) : r,
                              option, MENU_BAR,
@@ -6755,8 +6730,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
     {
         painter->save();
 
-        if(!opts.xbar || (!widget || 0!=strcmp("QWidget", widget->metaObject()->className())))
-            drawMenuOrToolBarBackground(widget, painter, r, option);
+        drawMenuOrToolBarBackground(widget, painter, r, option);
         if (TB_NONE!=opts.toolbarBorders && widget && widget->parentWidget() &&
             (qobject_cast<const QMainWindow *>(widget->parentWidget())))
         {
@@ -9642,8 +9616,7 @@ QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, con
         if(APP_KONQUEROR==theThemedApp && widget && qobject_cast<const QMenuBar *>(widget))
         {
             int height=konqMenuBarSize((const QMenuBar *)widget);
-            if(!opts.xbar || (size.height()>height))
-                newSize.setHeight(height);
+            newSize.setHeight(height);
         }
         break;
     default:

@@ -2101,7 +2101,6 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_TB_ICON(titlebarIcon)
 #endif
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
-            CFG_READ_BOOL(xbar)
             CFG_READ_INT(dwtSettings)
 #endif
             CFG_READ_INT(bgndOpacity)
@@ -2151,10 +2150,6 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                 opts->inactiveTitlebarAppearance=APPEARANCE_FLAT;
 #ifdef __cplusplus
             CFG_READ_APPEARANCE(titlebarButtonAppearance, APP_ALLOW_BASIC)
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
-            if(opts->xbar && opts->menubarHiding)
-                opts->xbar=false;
-#endif
 #endif
             CFG_READ_SHADING(shading)
             CFG_READ_IMAGE(bgndImage)
@@ -2643,7 +2638,6 @@ void qtcDefaultSettings(Options *opts)
     opts->titlebarEffect=EFFECT_SHADOW;
     opts->centerTabText=false;
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
-    opts->xbar=false;
     opts->dwtSettings=DWT_BUTTONS_AS_PER_TITLEBAR|DWT_ROUND_TOP_ONLY;
     opts->menubarApps << "amarok" << "arora" << "kaffeine" << "kcalc" << "smplayer" << "VirtualBox";
     opts->statusbarApps << "kde";
@@ -3387,7 +3381,6 @@ bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool 
         CFG_WRITE_ENTRY_NUM(windowBorder)
         CFG_WRITE_ENTRY(tbarBtns)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
-        CFG_WRITE_ENTRY(xbar)
         CFG_WRITE_ENTRY_NUM(dwtSettings)
 #endif
         CFG_WRITE_ENTRY_NUM(bgndOpacity)

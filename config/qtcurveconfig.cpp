@@ -1115,7 +1115,6 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(dwtTextAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(dwtEffectAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(dwtRoundTopOnly, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-    connect(xbar, SIGNAL(toggled(bool)), SLOT(xbarChanged()));
     connect(crColor, SIGNAL(currentIndexChanged(int)), SLOT(crColorChanged()));
     connect(customCrBgndColor, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
     connect(smallRadio, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -1556,21 +1555,9 @@ void QtCurveConfig::sliderWidthChanged()
 
 void QtCurveConfig::menubarHidingChanged()
 {
-    if(menubarHiding_keyboard->isChecked() || menubarHiding_kwin->isChecked())
-        xbar->setChecked(false);
     updateChanged();
 }
 
-void QtCurveConfig::xbarChanged()
-{
-    if(xbar->isChecked())
-    {
-        menubarHiding_keyboard->setChecked(false);
-        menubarHiding_kwin->setChecked(false);
-    }
-    updateChanged();
-}
- 
 void QtCurveConfig::windowBorder_colorTitlebarOnlyChanged()
 {
     if(!windowBorder_colorTitlebarOnly->isChecked())
@@ -3085,7 +3072,6 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.menuBgndOpacity=menuBgndOpacity->value();
     opts.dwtAppearance=(EAppearance)dwtAppearance->currentIndex();
     opts.tooltipAppearance=(EAppearance)tooltipAppearance->currentIndex();
-    opts.xbar=xbar->isChecked();
     opts.crColor=(EShade)crColor->currentIndex();
     opts.customCrBgndColor=customCrBgndColor->color();
     opts.smallRadio=smallRadio->isChecked();
@@ -3407,7 +3393,6 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     dwtTextAsPerTitleBar->setChecked(opts.dwtSettings&DWT_TEXT_ALIGN_AS_PER_TITLEBAR);
     dwtEffectAsPerTitleBar->setChecked(opts.dwtSettings&DWT_EFFECT_AS_PER_TITLEBAR);
     dwtRoundTopOnly->setChecked(opts.dwtSettings&DWT_ROUND_TOP_ONLY);
-    xbar->setChecked(opts.xbar);
     crColor->setCurrentIndex(opts.crColor);
     customCrBgndColor->setColor(opts.customCrBgndColor);
     smallRadio->setChecked(opts.smallRadio);
@@ -3793,7 +3778,6 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          menuBgndOpacity->value()!=opts.menuBgndOpacity ||
          dwtAppearance->currentIndex()!=opts.dwtAppearance ||
          tooltipAppearance->currentIndex()!=opts.tooltipAppearance ||
-         xbar->isChecked()!=opts.xbar ||
          crColor->currentIndex()!=opts.crColor ||
          smallRadio->isChecked()!=opts.smallRadio ||
          splitterHighlight->value()!=opts.splitterHighlight ||
