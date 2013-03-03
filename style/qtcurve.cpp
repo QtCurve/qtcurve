@@ -297,7 +297,8 @@ static enum {
     APP_OTHER
 } theThemedApp = APP_OTHER;
 
-static QString appName;
+static QString getFile(const QString &f);
+static QString appName = getFile(qApp->arguments()[0]);
 
 static inline bool
 isOOWidget(const QWidget *widget)
@@ -1042,21 +1043,21 @@ void Style::init(bool initial)
         freeColors();
 
 #if !defined QTC_QT_ONLY
-    if(initial)
-    {
-        if(KGlobal::hasMainComponent())
-            itsComponentData=KGlobal::mainComponent();
-        else
-        {
+    if (initial) {
+        if (KGlobal::hasMainComponent()) {
+            itsComponentData = KGlobal::mainComponent();
+        } else {
             QString name(QApplication::applicationName());
 
             if(name.isEmpty())
-                name=qAppName();
+                name = qAppName();
 
             if(name.isEmpty())
-                name="QtApp";
+                name = "QtApp";
 
-            itsComponentData=KComponentData(name.toLatin1(), name.toLatin1(), KComponentData::SkipMainComponentRegistration);
+            itsComponentData =
+                KComponentData(name.toLatin1(), name.toLatin1(),
+                               KComponentData::SkipMainComponentRegistration);
         }
     }
 #endif
@@ -1436,7 +1437,7 @@ static QString getFile(const QString &f)
 
 void Style::polish(QApplication *app)
 {
-    appName = getFile(app->arguments()[0]);
+    // appName = getFile(app->arguments()[0]);
 
     if("kwin"==appName)
         theThemedApp=APP_KWIN;
@@ -1473,7 +1474,7 @@ void Style::polish(QApplication *app)
     else if("Kde4ToolkitLibrary"==appName)
         theThemedApp=APP_OPERA;
 
-    qtcDebug() << "QtCurve: Application name: \"" << appName << "\"\n";
+    qtcDebug() << "QtCurve: Application name:" << appName;
 
     if(APP_REKONQ==theThemedApp)
         opts.statusbarHiding=0;
@@ -13479,19 +13480,20 @@ static bool diffTime(struct timeval *lastTime)
 }
 #endif
 
-void Style::toggleMenuBar(unsigned int xid)
+void
+Style::toggleMenuBar(unsigned int xid)
 {
 #ifdef QTC_X11
     static unsigned int   lastXid  = 0;
     static struct timeval lastTime = {0, 0};
 
-    if(diffTime(&lastTime) || lastXid!=xid)
-    {
+    if (diffTime(&lastTime) || lastXid != xid) {
         QMainWindow *win=getWindow(xid);
-        if(win)
+        if(win) {
             toggleMenuBar(win);
+        }
     }
-    lastXid=xid;
+    lastXid = xid;
 #else
     Q_UNUSED(xid);
 #endif

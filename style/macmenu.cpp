@@ -58,7 +58,8 @@ MacMenu::MacMenu() : QObject()
     QDBusConnection::sessionBus().registerService(service);
     QDBusConnection::sessionBus().registerObject("/XBarClient", this);
 
-    connect (qApp, SIGNAL(aboutToQuit()), this, SLOT(deactivate()));
+    connect(qApp, &QApplication::aboutToQuit,
+            this, static_cast<void (MacMenu::*)()>(&MacMenu::deactivate));
 }
 
 
@@ -67,7 +68,7 @@ MacMenu::manage(QMenuBar *menu)
 {
     if (!menu) // ...
         return;
-    
+
     // we only accept menus that are placed on a QMainWindow - for the moment, and probably ever
     QWidget *dad = menu->parentWidget();
     if (!(dad && dad->isWindow() && dad->inherits("QMainWindow") && dad->layout() && dad->layout()->menuBar() == menu))
@@ -75,10 +76,8 @@ MacMenu::manage(QMenuBar *menu)
 
 //     if ((dad = dad->parentWidget()) && dad->inherits("QMdiSubWindow"))
 //         return;
-    
 
-    if (!instance)
-    {
+    if (!instance) {
         instance = new MacMenu;
         /*MacMenuAdaptor *adapt = */new MacMenuAdaptor(instance);
         fullscreenWatcher = new FullscreenWatcher;
@@ -89,8 +88,7 @@ MacMenu::manage(QMenuBar *menu)
     if (instance->usingMacMenu)
         instance->activate(menu);
 
-    connect (menu, SIGNAL(destroyed(QObject *)), instance, SLOT(_release(QObject *)));
-
+    connect(menu, &QMenuBar::destroyed, instance, &MacMenu::_release);
     instance->items.append(menu);
 }
 
@@ -295,20 +293,17 @@ MacMenu::popup(qlonglong key, int idx, int x, int y)
     if (!menu) return;
 
     QMenu *pop;
-    for (int i = 0; i < menu->actions().count(); ++i)
-    {
+    for (int i = 0;i < menu->actions().count();++i) {
         if (!(pop = menu->actions().at(i)->menu()))
             continue;
 
         if (i == idx) {
-            if (!pop->isVisible())
-            {
-                connect (pop, SIGNAL(aboutToHide()), this, SLOT(menuClosed()));
+            if (!pop->isVisible()) {
+                connect(pop, &QMenu::aboutToHide,
+                        this, &MacMenu::menuClosed);
                 XBAR_SEND( MSG("setOpenPopup") << idx );
                 pop->popup(QPoint(x,y));
-            }
-            else
-            {
+            } else {
                 XBAR_SEND( MSG("setOpenPopup") << -1000 );
                 pop->hide();
             }
@@ -324,14 +319,13 @@ MacMenu::popDown(qlonglong key)
     QMenuBar *menu = menuBar(key);
     if (!menu) return;
 
-    QWidget *pop;
-    for (int i = 0; i < menu->actions().count(); ++i)
-    {
+    QMenu *pop;
+    for (int i = 0;i < menu->actions().count();++i) {
         if (!(pop = menu->actions().at(i)->menu()))
             continue;
-        disconnect (pop, SIGNAL(aboutToHide()), this, SLOT(menuClosed()));
+        disconnect(pop, &QMenu::aboutToHide, this, &MacMenu::menuClosed);
         pop->hide();
-//         menu->activateWindow();
+        // menu->activateWindow();
         break;
     }
 }
@@ -374,19 +368,16 @@ static QMenuBar *bar4menu(QMenu *menu)
 void
 MacMenu::menuClosed()
 {
-    QObject * _sender = sender();
-    
-    if (!_sender)
+    QMenu *menu = qobject_cast<QMenu*>(sender());
+    if (!menu)
         return;
 
-    disconnect (sender(), SIGNAL(aboutToHide()), this, SLOT(menuClosed()));
-    if (!inHover)
-    {
-        XBAR_SEND( MSG("setOpenPopup") << -500 );
-
-        if (QMenu *menu = qobject_cast<QMenu*>(_sender))
-        if (QMenuBar *bar = bar4menu(menu))
+    disconnect(menu, &QMenu::aboutToHide, this, &MacMenu::menuClosed);
+    if (!inHover) {
+        XBAR_SEND(MSG("setOpenPopup") << -500);
+        if (QMenuBar *bar = bar4menu(menu)) {
             bar->activateWindow();
+        }
     }
 }
 
