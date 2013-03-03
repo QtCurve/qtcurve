@@ -26,28 +26,34 @@
 #include <QDesktopWidget>
 #include <QWindow>
 
-namespace QtCurve
-{
-namespace XcbUtils
-{
+namespace QtCurve {
+namespace XcbUtils {
+
 xcb_connection_t *getConnection();
 
-static inline WId rootWindow() {
+static inline WId
+rootWindow()
+{
     return QApplication::desktop()->windowHandle()->winId();
 }
 
-static inline void flush() {
+static inline void
+flush()
+{
     xcb_flush(getConnection());
 }
 
-static inline uint32_t generateId() {
+static inline uint32_t
+generateId()
+{
     return xcb_generate_id(getConnection());
 };
 
 void getAtoms(size_t n, xcb_atom_t *atoms, const char *const names[],
               bool create=false);
 
-static inline xcb_atom_t getAtom(const char *name, bool create=false) {
+static inline xcb_atom_t
+getAtom(const char *name, bool create=false) {
     xcb_atom_t atom;
     XcbUtils::getAtoms(1, &atom, &name, create);
     return atom;
@@ -55,12 +61,12 @@ static inline xcb_atom_t getAtom(const char *name, bool create=false) {
 
 template<typename RetType, typename CookieType, typename... ArgTypes,
          typename... ArgTypes2>
-static inline RetType *XcbCall(CookieType (*func)(xcb_connection_t*,
-                                                  ArgTypes...),
-                               RetType *(reply_func)(xcb_connection_t*,
-                                                     CookieType,
-                                                     xcb_generic_error_t**),
-                               ArgTypes2... args...) {
+static inline RetType*
+XcbCall(CookieType (*func)(xcb_connection_t*, ArgTypes...),
+        RetType *(reply_func)(xcb_connection_t*, CookieType,
+                              xcb_generic_error_t**),
+        ArgTypes2... args...)
+{
     xcb_connection_t *conn = getConnection();
     CookieType cookie = func(conn, args...);
     return reply_func(conn, cookie, 0);
@@ -70,9 +76,10 @@ static inline RetType *XcbCall(CookieType (*func)(xcb_connection_t*,
     XcbUtils::XcbCall(xcb_##name, xcb_##name##_reply, args)
 
 template<typename... ArgTypes, typename... ArgTypes2>
-static inline void XcbCallVoid(xcb_void_cookie_t (*func)(xcb_connection_t*,
-                                                         ArgTypes...),
-                               ArgTypes2... args...) {
+static inline void
+XcbCallVoid(xcb_void_cookie_t (*func)(xcb_connection_t*, ArgTypes...),
+            ArgTypes2... args...)
+{
     xcb_connection_t *conn = getConnection();
     func(conn, args...);
 }

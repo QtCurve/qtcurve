@@ -6,6 +6,7 @@ set_source_files_properties(${qtcurve_style_common_SRCS} PROPERTIES LANGUAGE CXX
 
 set(qtcurve_SRCS
   qtcurve.cpp
+  debug.cpp
   windowmanager.cpp
   blurhelper.cpp
   utils.cpp

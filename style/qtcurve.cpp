@@ -20,7 +20,6 @@
 
 #include "qtcurve.h"
 
-#include <QtGui>
 #ifdef QTC_X11
 #include <QDBusConnection>
 #include <QDBusInterface>
@@ -29,8 +28,8 @@
 #include "blurhelper.h"
 #include "shortcuthandler.h"
 #include "pixmaps.h"
-#include <iostream>
 #include "config_file.h"
+#include "debug.h"
 
 #include <QToolButton>
 #include <QAbstractItemView>
@@ -58,6 +57,11 @@
 #include <QHeaderView>
 #include <QLineEdit>
 #include <QSpinBox>
+#include <QPainter>
+#include <QDir>
+#include <QSettings>
+#include <QPixmapCache>
+#include <QTextStream>
 
 // WebKit seems to just use the values from ::pixelMetric to get button sizes.
 // So, in pixelMetric we add some extra padding to PM_ButtonMargin
@@ -69,7 +73,7 @@
 #ifdef QTC_X11
 #include "macmenu.h"
 #include "shadowhelper.h"
-#include <xcb_utils.h>
+#include "xcb_utils.h"
 #include <sys/time.h>
 #endif
 
@@ -101,33 +105,46 @@
 // TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
 #define FIX_DISABLED_ICONS
 
-#define MO_ARROW_X(MO, COL) (state&State_Enabled                        \
-                             ? (MO_NONE!=opts.coloredMouseOver && (MO)  \
-                                ? itsMouseOverCols[ARROW_MO_SHADE]      \
-                                : palette.color(COL))                   \
-                             : palette.color(QPalette::Disabled, COL))
-#define MO_ARROW(COL) MO_ARROW_X(state&State_MouseOver, COL)
+#define MO_ARROW_X(MO, COL) (state & State_Enabled ?                    \
+                             (MO_NONE != opts.coloredMouseOver && (MO) ? \
+                              itsMouseOverCols[ARROW_MO_SHADE] :        \
+                              palette.color(COL)) :                     \
+                             palette.color(QPalette::Disabled, COL))
+
+#define MO_ARROW(COL) MO_ARROW_X(state & State_MouseOver, COL)
 
 #ifndef QTC_QT_ONLY
-typedef QString (*_qt_filedialog_existing_directory_hook)(QWidget *parent, const QString &caption, const QString &dir, QFileDialog::Options options);
+typedef QString (*_qt_filedialog_existing_directory_hook)(
+    QWidget *parent, const QString &caption, const QString &dir,
+    QFileDialog::Options options);
 extern _qt_filedialog_existing_directory_hook qt_filedialog_existing_directory_hook;
 
-typedef QString (*_qt_filedialog_open_filename_hook)(QWidget * parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options);
+typedef QString (*_qt_filedialog_open_filename_hook)(
+    QWidget *parent, const QString &caption, const QString &dir,
+    const QString &filter, QString *selectedFilter,
+    QFileDialog::Options options);
 extern _qt_filedialog_open_filename_hook qt_filedialog_open_filename_hook;
 
-typedef QStringList (*_qt_filedialog_open_filenames_hook)(QWidget * parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options);
+typedef QStringList (*_qt_filedialog_open_filenames_hook)(
+    QWidget * parent, const QString &caption, const QString &dir,
+    const QString &filter, QString *selectedFilter,
+    QFileDialog::Options options);
 extern _qt_filedialog_open_filenames_hook qt_filedialog_open_filenames_hook;
 
-typedef QString (*_qt_filedialog_save_filename_hook)(QWidget * parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options);
+typedef QString (*_qt_filedialog_save_filename_hook)(
+    QWidget *parent, const QString &caption, const QString &dir,
+    const QString &filter, QString *selectedFilter,
+    QFileDialog::Options options);
 extern _qt_filedialog_save_filename_hook qt_filedialog_save_filename_hook;
+
 #endif
 
-namespace QtCurve
-{
+namespace QtCurve {
 
 #if defined FIX_DISABLED_ICONS && !defined QTC_QT_ONLY
-QPixmap getIconPixmap(const QIcon &icon, const QSize &size,
-                      QIcon::Mode mode, QIcon::State)
+static inline QPixmap
+getIconPixmap(const QIcon &icon, const QSize &size,
+              QIcon::Mode mode, QIcon::State)
 {
     QPixmap pix=icon.pixmap(size, QIcon::Normal);
 
@@ -135,40 +152,48 @@ QPixmap getIconPixmap(const QIcon &icon, const QSize &size,
         QImage img = pix.toImage();
         KIconEffect::toGray(img, 1.0);
         KIconEffect::semiTransparent(img);
-        pix=QPixmap::fromImage(img);
+        pix = QPixmap::fromImage(img);
     }
-
     return pix;
 }
 
 #else
-static inline QPixmap getIconPixmap(const QIcon &icon, const QSize &size,
-                             QIcon::Mode mode, QIcon::State state=QIcon::Off)
+static inline QPixmap
+getIconPixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode,
+              QIcon::State state=QIcon::Off)
 {
     return icon.pixmap(size, mode, state);
 }
 #endif
 
-static inline QPixmap getIconPixmap(const QIcon &icon, int size, QIcon::Mode mode,
-                             QIcon::State state=QIcon::Off)
+static inline QPixmap
+getIconPixmap(const QIcon &icon, int size, QIcon::Mode mode,
+              QIcon::State state=QIcon::Off)
 {
     return getIconPixmap(icon, QSize(size, size), mode, state);
 }
 
-static inline QPixmap getIconPixmap(const QIcon &icon, int size, int flags, QIcon::State state=QIcon::Off)
+static inline QPixmap
+getIconPixmap(const QIcon &icon, int size, int flags,
+              QIcon::State state=QIcon::Off)
 {
-    return getIconPixmap(icon, QSize(size, size), flags&QStyle::State_Enabled ? QIcon::Normal : QIcon::Disabled, state);
+    return getIconPixmap(icon, QSize(size, size),
+                         flags & QStyle::State_Enabled ? QIcon::Normal :
+                         QIcon::Disabled, state);
 }
 
-static inline QPixmap getIconPixmap(const QIcon &icon, const QSize &size, int flags, QIcon::State state=QIcon::Off)
+static inline QPixmap
+getIconPixmap(const QIcon &icon, const QSize &size, int flags,
+              QIcon::State state=QIcon::Off)
 {
-    return getIconPixmap(icon, size, flags&QStyle::State_Enabled ? QIcon::Normal : QIcon::Disabled, state);
+    return getIconPixmap(icon, size, flags & QStyle::State_Enabled ?
+                         QIcon::Normal : QIcon::Disabled, state);
 }
 
-static Style::Icon pix2Icon(QStyle::StandardPixmap pix)
+static Style::Icon
+pix2Icon(QStyle::StandardPixmap pix)
 {
-    switch(pix)
-    {
+    switch (pix) {
     case QStyle::SP_TitleBarNormalButton:
         return Style::ICN_RESTORE;
     case QStyle::SP_TitleBarShadeButton:
@@ -186,10 +211,10 @@ static Style::Icon pix2Icon(QStyle::StandardPixmap pix)
     }
 }
 
-static Style::Icon subControlToIcon(QStyle::SubControl sc)
+static Style::Icon
+subControlToIcon(QStyle::SubControl sc)
 {
-    switch(sc)
-    {
+    switch (sc) {
     case QStyle::SC_TitleBarMinButton:
         return Style::ICN_MIN;
     case QStyle::SC_TitleBarMaxButton:
@@ -208,14 +233,12 @@ static Style::Icon subControlToIcon(QStyle::SubControl sc)
     }
 }
 
-static void drawTbArrow(const QStyle *style,
-                        const QStyleOptionToolButton *toolbutton,
-                        const QRect &rect, QPainter *painter,
-                        const QWidget *widget = 0)
+static void
+drawTbArrow(const QStyle *style, const QStyleOptionToolButton *toolbutton,
+            const QRect &rect, QPainter *painter, const QWidget *widget=0)
 {
     QStyle::PrimitiveElement pe;
-    switch (toolbutton->arrowType)
-    {
+    switch (toolbutton->arrowType) {
     case Qt::LeftArrow:
         pe = QStyle::PE_IndicatorArrowLeft;
         break;
@@ -239,23 +262,22 @@ static void drawTbArrow(const QStyle *style,
     style->drawPrimitive(pe, &arrowOpt, painter, widget);
 }
 
-#define WINDOWTITLE_SPACER    0x10000000
-#define STATE_REVERSE       (QStyle::StateFlag)0x10000000
-#define STATE_MENU          (QStyle::StateFlag)0x20000000
-#define STATE_VIEW          (QStyle::StateFlag)0x40000000
-#define STATE_KWIN_BUTTON   (QStyle::StateFlag)0x40000000
-#define STATE_TBAR_BUTTON   (QStyle::StateFlag)0x80000000
-#define STATE_DWT_BUTTON    (QStyle::StateFlag)0x20000000
-#define STATE_TOGGLE_BUTTON (QStyle::StateFlag)0x10000000
+#define WINDOWTITLE_SPACER 0x10000000
+#define STATE_REVERSE QStyle::StateFlag(0x10000000)
+#define STATE_MENU QStyle::StateFlag(0x20000000)
+#define STATE_VIEW QStyle::StateFlag(0x40000000)
+#define STATE_KWIN_BUTTON QStyle::StateFlag(0x40000000)
+#define STATE_TBAR_BUTTON QStyle::StateFlag(0x80000000)
+#define STATE_DWT_BUTTON QStyle::StateFlag(0x20000000)
+#define STATE_TOGGLE_BUTTON QStyle::StateFlag(0x10000000)
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
 
-static const int constMenuPixmapWidth=22;
+static const int constMenuPixmapWidth = 22;
 
-static enum
-{
+static enum {
     APP_PLASMA,
     APP_KRUNNER,
     APP_KWIN,
@@ -273,29 +295,31 @@ static enum
     APP_OPENOFFICE,
     APP_KONSOLE,
     APP_OTHER
-} theThemedApp=APP_OTHER;
+} theThemedApp = APP_OTHER;
 
 static QString appName;
 
-static inline bool isOOWidget(const QWidget *widget)
+static inline bool
+isOOWidget(const QWidget *widget)
 {
-    return APP_OPENOFFICE==theThemedApp && !widget;
+    return APP_OPENOFFICE == theThemedApp && !widget;
 }
 
-static bool blendOOMenuHighlight(const QPalette &pal, const QColor &highlight)
+static bool
+blendOOMenuHighlight(const QPalette &pal, const QColor &highlight)
 {
-    QColor text(pal.text().color()),
-        hl(pal.highlightedText().color());
+    QColor text(pal.text().color());
+    QColor hl(pal.highlightedText().color());
 
-    return (text.red()<50) && (text.green()<50) && (text.blue()<50) &&
-        (hl.red()>127) && (hl.green()>127) && (hl.blue()>127) &&
-        TOO_DARK(highlight);
+    return ((text.red() < 50) && (text.green() < 50) && (text.blue() < 50) &&
+            (hl.red() > 127) && (hl.green() > 127) && (hl.blue() > 127) &&
+            TOO_DARK(highlight));
 }
 
-int static toHint(int sc)
+static int
+toHint(int sc)
 {
-    switch(sc)
-    {
+    switch (sc) {
     case QStyle::SC_TitleBarSysMenu:
         return Qt::WindowSystemMenuHint;
     case QStyle::SC_TitleBarMinButton:
@@ -318,15 +342,13 @@ int static toHint(int sc)
 
 static const char *constBoldProperty="qtc-set-bold";
 
-static void setBold(QWidget *widget)
+static void
+setBold(QWidget *widget)
 {
     QVariant prop(widget->property(constBoldProperty));
-    if(!prop.isValid() || !prop.toBool())
-    {
+    if (!prop.isValid() || !prop.toBool()) {
         QFont font(widget->font());
-
-        if(!font.bold())
-        {
+        if (!font.bold()) {
             font.setBold(true);
             widget->setFont(font);
             widget->setProperty(constBoldProperty, true);
@@ -334,14 +356,12 @@ static void setBold(QWidget *widget)
     }
 }
 
-static void unSetBold(QWidget *widget)
+static void
+unSetBold(QWidget *widget)
 {
     QVariant prop(widget->property(constBoldProperty));
-
-    if(prop.isValid() && prop.toBool())
-    {
+    if (prop.isValid() && prop.toBool()) {
         QFont font(widget->font());
-
         font.setBold(false);
         widget->setFont(font);
         widget->setProperty(constBoldProperty, false);
@@ -349,92 +369,107 @@ static void unSetBold(QWidget *widget)
 }
 
 #ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-static QWidget * getActiveWindow(QWidget *widget)
+static QWidget*
+getActiveWindow(QWidget *widget)
 {
-    QWidget *activeWindow=QApplication::activeWindow();
-
+    QWidget *activeWindow = QApplication::activeWindow();
     return activeWindow && activeWindow!=widget ? activeWindow : 0L;
 }
 #endif
 
-static void adjustToolbarButtons(const QWidget *widget, const QToolBar *toolbar, int &leftAdjust, int &topAdjust,
-                                 int &rightAdjust, int &bottomAdjust, int &round)
+static void
+adjustToolbarButtons(const QWidget *widget, const QToolBar *toolbar,
+                     int &leftAdjust, int &topAdjust, int &rightAdjust,
+                     int &bottomAdjust, int &round)
 {
     const int constAdjust=6;
     const int d = 1;
     QRect geo(widget->geometry());
+    if (Qt::Horizontal == toolbar->orientation()) {
+        bool haveLeft =
+            qobject_cast<QToolButton*>(toolbar->childAt(geo.x() -
+                                                        d, geo.y()));
+        bool haveRight =
+            qobject_cast<QToolButton*>(toolbar->childAt(geo.right() +
+                                                        d, geo.y()));
 
-    if (Qt::Horizontal==toolbar->orientation())
-    {
-        bool haveLeft=qobject_cast<QToolButton*>(toolbar->childAt(geo.x()-d, geo.y())),
-            haveRight=qobject_cast<QToolButton*>(toolbar->childAt(geo.right()+d, geo.y()));
-
-        if(haveLeft && haveRight)
-            leftAdjust=-constAdjust, rightAdjust=constAdjust, round=ROUNDED_NONE;
-        else if(haveLeft)
-            leftAdjust=-constAdjust, round=ROUNDED_RIGHT;
-        else if(haveRight)
-            rightAdjust=constAdjust, round=ROUNDED_LEFT;
+        if (haveLeft && haveRight) {
+            leftAdjust =- constAdjust;
+            rightAdjust = constAdjust;
+            round = ROUNDED_NONE;
+        } else if (haveLeft) {
+            leftAdjust =- constAdjust;
+            round = ROUNDED_RIGHT;
+        } else if (haveRight) {
+            rightAdjust = constAdjust;
+            round = ROUNDED_LEFT;
+        }
+    } else {
+        bool haveTop =
+            qobject_cast<QToolButton*>(toolbar->childAt(geo.x(), geo.y() - d));
+        bool haveBot =
+            qobject_cast<QToolButton*>(toolbar->childAt(geo.x(),
+                                                        geo.bottom() + d));
+        if (haveTop && haveBot) {
+            topAdjust =- constAdjust;
+            bottomAdjust = constAdjust;
+            round = ROUNDED_NONE;
+        } else if (haveTop) {
+            topAdjust =- constAdjust;
+            round = ROUNDED_BOTTOM;
+        } else if(haveBot) {
+            bottomAdjust = constAdjust;
+            round = ROUNDED_TOP;
+        }
     }
-    else
-    {
-        bool haveTop=qobject_cast<QToolButton*>(toolbar->childAt(geo.x(), geo.y()-d)),
-            haveBot=qobject_cast<QToolButton*>(toolbar->childAt(geo.x(), geo.bottom()+d));
-
-        if(haveTop && haveBot)
-            topAdjust=-constAdjust, bottomAdjust=constAdjust, round=ROUNDED_NONE;
-        else if(haveTop)
-            topAdjust=-constAdjust, round=ROUNDED_BOTTOM;
-        else if(haveBot)
-            bottomAdjust=constAdjust, round=ROUNDED_TOP;
-    }
 }
 
-static const QToolBar * getToolBar(const QWidget *w)
+static const QToolBar*
+getToolBar(const QWidget *w)
 {
-    return w
-        ? qobject_cast<const QToolBar *>(w)
-        ? static_cast<const QToolBar *>(w)
-        : getToolBar(w->parentWidget())
-        : 0L;
+    return (w ?
+            qobject_cast<const QToolBar*>(w) ?
+            static_cast<const QToolBar*>(w) :
+            getToolBar(w->parentWidget()) : 0L);
 }
 
-static inline QList<QStatusBar *> getStatusBars(QWidget *w)
+static inline QList<QStatusBar*>
+getStatusBars(QWidget *w)
 {
-    return w ? w->findChildren<QStatusBar *>() : QList<QStatusBar *>();
+    return w ? w->findChildren<QStatusBar*>() : QList<QStatusBar*>();
 }
 
-static QToolBar * getToolBarChild(QWidget *w)
+static QToolBar*
+getToolBarChild(QWidget *w)
 {
     const QObjectList children = w->children();
 
-    foreach (QObject* child, children)
-    {
-        if (child->isWidgetType())
-        {
-            if(qobject_cast<QToolBar *>(child))
-                return static_cast<QToolBar *>(child);
-            QToolBar *tb=getToolBarChild((QWidget *) child);
-            if(tb)
+    foreach (QObject *child, children) {
+        if (child->isWidgetType()) {
+            if (qobject_cast<QToolBar*>(child))
+                return static_cast<QToolBar*>(child);
+            QToolBar *tb = getToolBarChild((QWidget*)child);
+            if (tb) {
                 return tb;
+            }
         }
     }
 
     return 0L;
 }
 
-static void setStyleRecursive(QWidget *w, QStyle *s, int minSize)
+static void
+setStyleRecursive(QWidget *w, QStyle *s, int minSize)
 {
     w->setStyle(s);
-    if(qobject_cast<QToolButton *>(w))
+    if (qobject_cast<QToolButton*>(w))
         w->setMinimumSize(1, minSize);
 
     const QObjectList children = w->children();
-
-    foreach (QObject *child, children)
-    {
-        if (child->isWidgetType())
-            setStyleRecursive((QWidget *) child, s, minSize);
+    foreach (QObject *child, children) {
+        if (child->isWidgetType()) {
+            setStyleRecursive((QWidget*)child, s, minSize);
+        }
     }
 }
 
@@ -443,37 +478,47 @@ static void setStyleRecursive(QWidget *w, QStyle *s, int minSize)
 // CPD:TODO WebKit?
 static QSet<const QWidget*> theNoEtchWidgets;
 
-static bool isA(const QObject *w, const char *type)
+static bool
+isA(const QObject *w, const char *type)
 {
-    return w && (0==strcmp(w->metaObject()->className(), type) || (w->parent() && 0==strcmp(w->parent()->metaObject()->className(), type)));
+    return (w && (0 == strcmp(w->metaObject()->className(), type) ||
+                  (w->parent() &&
+                   0 == strcmp(w->parent()->metaObject()->className(),
+                               type))));
 }
 
-static bool isInQAbstractItemView(const QObject *w)
+static bool
+isInQAbstractItemView(const QObject *w)
 {
-    int level=8;
-
-    while(w && --level>0)
-    {
-        if(qobject_cast<const QAbstractItemView*>(w))
+    int level = 8;
+    while (w && --level > 0) {
+        if (qobject_cast<const QAbstractItemView*>(w))
             return true;
-        if(qobject_cast<const QDialog*>(w)/* || qobject_cast<const QMainWindow *>(w)*/)
+        if (qobject_cast<const QDialog*>(w)
+            /* || qobject_cast<const QMainWindow *>(w)*/)
             return false;
-        w=w->parent();
+        w = w->parent();
     }
-
     return false;
 }
 
-static bool isKontactPreviewPane(const QWidget *widget)
+static bool
+isKontactPreviewPane(const QWidget *widget)
 {
-    return APP_KONTACT==theThemedApp && widget && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
-        widget->inherits("KHBox") && ::qobject_cast<const QSplitter*>(widget->parentWidget()) &&
-        widget->parentWidget()->parentWidget()->inherits("KMReaderWin");
+    return (APP_KONTACT == theThemedApp &&
+            widget && widget->parentWidget() &&
+            widget->parentWidget()->parentWidget() &&
+            widget->inherits("KHBox") &&
+            ::qobject_cast<const QSplitter*>(widget->parentWidget()) &&
+            widget->parentWidget()->parentWidget()->inherits("KMReaderWin"));
 }
 
-static bool isKateView(const QWidget *widget)
+static bool
+isKateView(const QWidget *widget)
 {
-    return widget && widget->parentWidget() && ::qobject_cast<const QFrame *>(widget) && widget->parentWidget()->inherits("KateView");
+    return (widget && widget->parentWidget() &&
+            ::qobject_cast<const QFrame*>(widget) &&
+            widget->parentWidget()->inherits("KateView"));
 }
 
 static bool isNoEtchWidget(const QWidget *widget)
@@ -1351,7 +1396,7 @@ void Style::freeColors()
     if(0!=itsProgressBarAnimateTimer)
         killTimer(itsProgressBarAnimateTimer);
 
-    QSet<QColor *> freedColors;
+    QSet<QColor*> freedColors;
 
     freeColor(freedColors, &itsSidebarButtonsCols);
     freeColor(freedColors, &itsPopupMenuCols);
@@ -1391,7 +1436,7 @@ static QString getFile(const QString &f)
 
 void Style::polish(QApplication *app)
 {
-    appName=getFile(app->arguments()[0]);
+    appName = getFile(app->arguments()[0]);
 
     if("kwin"==appName)
         theThemedApp=APP_KWIN;
@@ -1428,11 +1473,7 @@ void Style::polish(QApplication *app)
     else if("Kde4ToolkitLibrary"==appName)
         theThemedApp=APP_OPERA;
 
-    if(NULL!=getenv("QTCURVE_DEBUG"))
-    {
-        QByteArray l1(appName.toLatin1());
-        std::cout << "QtCurve: Application name: \"" << l1.constData() << "\"\n";
-    }
+    qtcDebug() << "QtCurve: Application name: \"" << appName << "\"\n";
 
     if(APP_REKONQ==theThemedApp)
         opts.statusbarHiding=0;
