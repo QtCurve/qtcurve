@@ -28,11 +28,9 @@ class QAction;
 class QActionEvent;
 
 
-namespace Bespin
-{
+namespace Bespin {
 
-class FullscreenWatcher : public QObject
-{
+class FullscreenWatcher : public QObject {
 public:
     FullscreenWatcher() : QObject() {};
 protected:

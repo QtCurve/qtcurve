@@ -386,20 +386,16 @@ MacMenu::changeAction(QMenuBar *menu, QActionEvent *ev)
 {
     int idx;
     const QString title = ev->action()->isSeparator() ? "<XBAR_SEPARATOR/>" : ev->action()->text();
-    if (ev->type() == QEvent::ActionAdded)
-    {
+    if (ev->type() == QEvent::ActionAdded) {
         idx = ev->before() ? menu->actions().indexOf(ev->before())-1 : -1;
         XBAR_SEND( MSG("addEntry") << (qlonglong)menu << idx << title );
         actions[menu].insert(idx, ev->action());
         return;
     }
-    if (ev->type() == QEvent::ActionChanged)
-    {
+    if (ev->type() == QEvent::ActionChanged) {
         idx = menu->actions().indexOf(ev->action());
         XBAR_SEND( MSG("changeEntry") << (qlonglong)menu << idx << title );
-    }
-    else
-    { // remove
+    } else { // remove
         idx = actions[menu].indexOf(ev->action());
         actions[menu].removeAt(idx);
         XBAR_SEND( MSG("removeEntry") << (qlonglong)menu << idx );
@@ -409,10 +405,8 @@ MacMenu::changeAction(QMenuBar *menu, QActionEvent *ev)
 void
 MacMenu::raise(qlonglong key)
 {
-    if (QMenuBar *menu = menuBar(key))
-    {
-        if (QWidget *win = menu->window())
-        {
+    if (QMenuBar *menu = menuBar(key)) {
+        if (QWidget *win = menu->window()) {
             win->showNormal();
             win->activateWindow();
             win->raise();
@@ -431,12 +425,11 @@ MacMenu::eventFilter(QObject *o, QEvent *ev)
         return false;
 
     QString func;
-    switch (ev->type())
-    {
+    switch (ev->type()) {
     case QEvent::Resize:
-//         menu->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored));
-        if (menu->size() != QSize(0,0))
-        {
+        // menu->setSizePolicy(QSizePolicy(QSizePolicy::Ignored,
+        //                                 QSizePolicy::Ignored));
+        if (menu->size() != QSize(0,0)) {
             menu->setFixedSize(0,0);
             menu->updateGeometry();
         }
@@ -446,9 +439,9 @@ MacMenu::eventFilter(QObject *o, QEvent *ev)
     case QEvent::ActionRemoved:
         changeAction(menu, static_cast<QActionEvent*>(ev));
         break;
-//     case QEvent::ParentChange:
-//         qDebug() << o << ev;
-//         return false;
+    // case QEvent::ParentChange:
+    //     qDebug() << o << ev;
+    //     return false;
     case QEvent::EnabledChange:
         if (static_cast<QWidget*>(o)->isEnabled())
             XBAR_SEND( MSG("requestFocus") << (qlonglong)menu );
