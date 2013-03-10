@@ -76,7 +76,8 @@ protected:
     void createPixmapHandles();
 
     // create pixmap handle from pixmap
-    void createPixmap(xcb_pixmap_t pixmap, const uchar *buf, int len);
+    void createPixmap(xcb_pixmap_t pixmap, const uchar *buf, size_t len,
+                      size_t width, size_t height);
 
     //! install shadow X11 property on given widget
     /*!

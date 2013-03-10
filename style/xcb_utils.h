@@ -53,7 +53,8 @@ void getAtoms(size_t n, xcb_atom_t *atoms, const char *const names[],
               bool create=false);
 
 static inline xcb_atom_t
-getAtom(const char *name, bool create=false) {
+getAtom(const char *name, bool create=false)
+{
     xcb_atom_t atom;
     XcbUtils::getAtoms(1, &atom, &name, create);
     return atom;

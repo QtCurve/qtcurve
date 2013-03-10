@@ -124,7 +124,6 @@ static inline bool canAccessId(const QWidget *w)
     return w && w->testAttribute(Qt::WA_WState_Created) && w->internalWinId();
 }
 void setOpacityProp(QWidget *w, unsigned short opacity);
-void setOpacityProp(QWidget *w, unsigned short opacity);
 void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage);
 void setSbProp(QWidget *w);
 

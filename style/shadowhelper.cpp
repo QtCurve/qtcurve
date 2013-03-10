@@ -27,13 +27,13 @@
 #include "shadowhelper.h"
 #include "shadow.h"
 #include "utils.h"
+#include "debug.h"
 
 #include <QDockWidget>
 #include <QMenu>
 #include <QPainter>
 #include <QToolBar>
 #include <QEvent>
-#include <QDebug>
 
 #include "xcb_utils.h"
 #include <xcb/xcb_image.h>
@@ -173,50 +173,51 @@ void ShadowHelper::createPixmapHandles()
     // create atom
     if (!_atom)
         _atom = XcbUtils::getAtom(netWMShadowAtomName);
-    for (int i = 0;i < numPixmaps;i++)
+    for (int i = 0;i < numPixmaps;i++) {
         _pixmaps[i] = XcbUtils::generateId();
-
-    createPixmap(_pixmaps[0], shadow0_png_data, shadow0_png_len);
-    createPixmap(_pixmaps[1], shadow1_png_data, shadow1_png_len);
-    createPixmap(_pixmaps[2], shadow2_png_data, shadow2_png_len);
-    createPixmap(_pixmaps[3], shadow3_png_data, shadow3_png_len);
-    createPixmap(_pixmaps[4], shadow4_png_data, shadow4_png_len);
-    createPixmap(_pixmaps[5], shadow5_png_data, shadow5_png_len);
-    createPixmap(_pixmaps[6], shadow6_png_data, shadow6_png_len);
-    createPixmap(_pixmaps[7], shadow7_png_data, shadow7_png_len);
+        createPixmap(_pixmaps[i], shadow_img_data[i], shadow_img_len[i],
+                     shadow_img_width[i], shadow_img_height[i]);
+    }
 }
 
 //______________________________________________
-void ShadowHelper::createPixmap(xcb_pixmap_t pixmap, const uchar *buf, int len)
+void ShadowHelper::createPixmap(xcb_pixmap_t pixmap, const uchar *buf, size_t len,
+                                size_t width, size_t height)
 {
-    QImage source;
-    source.loadFromData(buf, len);
+    _size = width;
 
-    // do nothing for invalid _pixmaps
-    if (source.isNull())
-        return;
-    source = source.convertToFormat(QImage::Format_ARGB32);
-    _size = source.width();
-
-    /*
-      in some cases, pixmap handle is invalid. This is the case notably
-      when Qt uses to RasterEngine. In this case, we create an X11 Pixmap
-      explicitly and draw the source pixmap on it.
-    */
-
-    const int width(source.width());
-    const int height(source.height());
-    const int depth(source.depth());
-    // qDebug() << depth;
+    // uchar buff[height][width][4];
+    // static int ccc = 0;
+    // ccc++;
+    // for (size_t i = 0;i < width;i++) {
+    //     for (size_t j = 0;j < height;j++) {
+    //         buff[j][i][0] = 0xa0;
+    //         buff[j][i][1] = 0xa0;
+    //         buff[j][i][2] = 0xa0;
+    //         switch (ccc % 4) {
+    //         case 0:
+    //             buff[j][i][3] = 0x80 + 0x80 * i / width;
+    //             break;
+    //         case 1:
+    //             buff[j][i][3] = 0x80 + 0x80 * (width - 1 - i) / width;
+    //             break;
+    //         case 2:
+    //             buff[j][i][3] = 0x80 + 0x80 * j / height;
+    //             break;
+    //         case 3:
+    //             buff[j][i][3] = 0x80 + 0x80 * (height - 1 - j) / height;
+    //             break;
+    //         }
+    //     }
+    // }
 
     // create X11 pixmap
-    XcbCallVoid(create_pixmap, depth, pixmap, XcbUtils::rootWindow(),
+    XcbCallVoid(create_pixmap, 32, pixmap, XcbUtils::rootWindow(),
                 width, height);
     xcb_gcontext_t cid = XcbUtils::generateId();
     XcbCallVoid(create_gc, cid, pixmap, 0, (const uint32_t*)0);
     XcbCallVoid(put_image, XCB_IMAGE_FORMAT_Z_PIXMAP, pixmap, cid,
-                width, height, 0, 0, 0, depth, source.byteCount(),
-                source.constBits());
+                width, height, 0, 0, 0, 32, len, (uchar*)buf);
     XcbCallVoid(free_gc, cid);
     XcbUtils::flush();
 }
@@ -240,7 +241,7 @@ bool ShadowHelper::installX11Shadows( QWidget* widget )
 
     // create data
     // add pixmap handles
-    QVector<xcb_pixmap_t> data;
+    QVector<uint32_t> data;
     for (int i = 0;i < numPixmaps;++i) {
         data.push_back(_pixmaps[i]);
     }
