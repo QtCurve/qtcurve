@@ -186,31 +186,6 @@ void ShadowHelper::createPixmap(xcb_pixmap_t pixmap, const uchar *buf, size_t le
 {
     _size = width;
 
-    // uchar buff[height][width][4];
-    // static int ccc = 0;
-    // ccc++;
-    // for (size_t i = 0;i < width;i++) {
-    //     for (size_t j = 0;j < height;j++) {
-    //         buff[j][i][0] = 0xa0;
-    //         buff[j][i][1] = 0xa0;
-    //         buff[j][i][2] = 0xa0;
-    //         switch (ccc % 4) {
-    //         case 0:
-    //             buff[j][i][3] = 0x80 + 0x80 * i / width;
-    //             break;
-    //         case 1:
-    //             buff[j][i][3] = 0x80 + 0x80 * (width - 1 - i) / width;
-    //             break;
-    //         case 2:
-    //             buff[j][i][3] = 0x80 + 0x80 * j / height;
-    //             break;
-    //         case 3:
-    //             buff[j][i][3] = 0x80 + 0x80 * (height - 1 - j) / height;
-    //             break;
-    //         }
-    //     }
-    // }
-
     // create X11 pixmap
     XcbCallVoid(create_pixmap, 32, pixmap, XcbUtils::rootWindow(),
                 width, height);
