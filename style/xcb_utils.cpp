@@ -29,7 +29,7 @@ namespace XcbUtils
 {
 
 xcb_connection_t*
-getConnection()
+_getConnection()
 {
     static xcb_connection_t *connection = NULL;
     if (Q_UNLIKELY(!connection)) {

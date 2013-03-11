@@ -178,6 +178,7 @@ void ShadowHelper::createPixmapHandles()
         createPixmap(_pixmaps[i], shadow_img_data[i], shadow_img_len[i],
                      shadow_img_width[i], shadow_img_height[i]);
     }
+    XcbUtils::flush();
 }
 
 //______________________________________________
@@ -194,7 +195,6 @@ void ShadowHelper::createPixmap(xcb_pixmap_t pixmap, const uchar *buf, size_t le
     XcbCallVoid(put_image, XCB_IMAGE_FORMAT_Z_PIXMAP, pixmap, cid,
                 width, height, 0, 0, 0, 32, len, (uchar*)buf);
     XcbCallVoid(free_gc, cid);
-    XcbUtils::flush();
 }
 
 //_______________________________________________________
@@ -224,8 +224,9 @@ bool ShadowHelper::installX11Shadows( QWidget* widget )
     // add padding
     data << _size - 4 << _size - 4 << _size - 4 << _size - 4;
 
-    XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE, widget->winId(),
-                _atom, XCB_ATOM_CARDINAL, 32, data.size(), data.constData());
+    XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
+                widget->winId(), _atom, XCB_ATOM_CARDINAL,
+                32, data.size(), data.constData());
     XcbUtils::flush();
     return true;
 }

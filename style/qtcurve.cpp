@@ -4432,8 +4432,8 @@ void Style::emitMenuSize(QWidget *w, unsigned short size, bool force)
             static const auto menuAtom = XcbUtils::getAtom(MENU_SIZE_ATOM);
             w->setProperty(constMenuSizeProperty, size);
             XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
-                        w->window()->winId(), menuAtom, XCB_ATOM_CARDINAL,
-                        16, 1, &size);
+                        w->window()->winId(), menuAtom,
+                        XCB_ATOM_CARDINAL, 16, 1, &size);
             XcbUtils::flush();
             if(!itsDBus)
                 itsDBus = new QDBusInterface("org.kde.kwin", "/QtCurve",

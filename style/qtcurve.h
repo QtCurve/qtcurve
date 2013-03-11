@@ -346,13 +346,13 @@ private:
     void  unregisterArgbWidget(QWidget *w);
 
 private Q_SLOTS:
-    QIcon standardIcon(StandardPixmap pix, const QStyleOption *option=0,
-                       const QWidget *widget=0) const;
-    int layoutSpacing(QSizePolicy::ControlType control1,
-                      QSizePolicy::ControlType control2,
-                      Qt::Orientation orientation,
-                      const QStyleOption *option = 0,
-                      const QWidget *widget = 0) const;
+    virtual QIcon standardIcon(StandardPixmap pix, const QStyleOption *option=0,
+                               const QWidget *widget=0) const override;
+    virtual int layoutSpacing(QSizePolicy::ControlType control1,
+                              QSizePolicy::ControlType control2,
+                              Qt::Orientation orientation,
+                              const QStyleOption *option = 0,
+                              const QWidget *widget = 0) const override;
     void kdeGlobalSettingsChange(int type, int);
     void borderSizesChanged();
     void toggleMenuBar(unsigned int xid);

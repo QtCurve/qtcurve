@@ -70,9 +70,9 @@ void Style::polish(QApplication *app)
     qtcDebug() << __func__;
     // appName = getFile(app->arguments()[0]);
 
-    if("kwin"==appName)
-        theThemedApp=APP_KWIN;
-    else if("systemsettings"==appName)
+    if ("kwin" == appName) {
+        theThemedApp = APP_KWIN;
+    } else if("systemsettings"==appName)
         theThemedApp=APP_SYSTEMSETTINGS;
     else if("plasma"==appName || appName.startsWith("plasma-"))
         theThemedApp=APP_PLASMA;

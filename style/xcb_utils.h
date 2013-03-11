@@ -29,7 +29,13 @@
 namespace QtCurve {
 namespace XcbUtils {
 
-xcb_connection_t *getConnection();
+xcb_connection_t *_getConnection();
+static inline xcb_connection_t*
+getConnection()
+{
+    xcb_connection_t *conn = _getConnection();
+    return conn;
+}
 
 static inline WId
 rootWindow()
@@ -77,12 +83,12 @@ XcbCall(CookieType (*func)(xcb_connection_t*, ArgTypes...),
     XcbUtils::XcbCall(xcb_##name, xcb_##name##_reply, args)
 
 template<typename... ArgTypes, typename... ArgTypes2>
-static inline void
+static inline unsigned int
 XcbCallVoid(xcb_void_cookie_t (*func)(xcb_connection_t*, ArgTypes...),
             ArgTypes2... args...)
 {
     xcb_connection_t *conn = getConnection();
-    func(conn, args...);
+    return func(conn, args...).sequence;
 }
 
 #define XcbCallVoid(name, args...)              \

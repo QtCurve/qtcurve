@@ -103,8 +103,8 @@ void setOpacityProp(QWidget *w, unsigned short opacity)
     if (w && canAccessId(w)) {
         static const auto opacityAtom = XcbUtils::getAtom(OPACITY_ATOM);
         XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
-                    w->window()->winId(), opacityAtom, XCB_ATOM_CARDINAL,
-                    16, 1, &opacity);
+                    w->window()->winId(), opacityAtom,
+                    XCB_ATOM_CARDINAL, 16, 1, &opacity);
         XcbUtils::flush();
     }
 }
@@ -113,16 +113,16 @@ void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
 {
     if (w && canAccessId(w)) {
         static const auto bgndAtom = XcbUtils::getAtom(BGND_ATOM);
-        unsigned long prop = (((IS_FLAT_BGND(app) ?
-                                (unsigned short)(haveBgndImage ?
-                                                 APPEARANCE_RAISED :
-                                                 APPEARANCE_FLAT) :
-                                app) & 0xFF) |
-                              (w->palette().background().color().rgb() &
-                               0x00FFFFFF) << 8);
+        uint32_t prop = (((IS_FLAT_BGND(app) ?
+                           (unsigned short)(haveBgndImage ?
+                                            APPEARANCE_RAISED :
+                                            APPEARANCE_FLAT) :
+                           app) & 0xFF) |
+                         (w->palette().background().color().rgb() &
+                          0x00FFFFFF) << 8);
         XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
-                    w->window()->winId(), bgndAtom, XCB_ATOM_CARDINAL,
-                    332, 1, &prop);
+                    w->window()->winId(), bgndAtom,
+                    XCB_ATOM_CARDINAL, 32, 1, &prop);
         XcbUtils::flush();
     }
 }
@@ -138,8 +138,8 @@ void setSbProp(QWidget *w)
             unsigned short s = 1;
             w->setProperty(constStatusBarProperty, true);
             XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
-                        w->window()->winId(), sbAtom, XCB_ATOM_CARDINAL,
-                        16, 1, &s);
+                        w->window()->winId(), sbAtom,
+                        XCB_ATOM_CARDINAL, 16, 1, &s);
             XcbUtils::flush();
         }
     }
