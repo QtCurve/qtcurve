@@ -184,5 +184,6 @@ extern void qtSettingsSetColors(GtkStyle *style, GtkRcStyle *rc_style);
 extern char * getAppName();
 extern bool haveAlternateListViewCol();
 extern gboolean isMozilla();
+extern bool runCommand(const char* cmd, char** result);
 
 #endif

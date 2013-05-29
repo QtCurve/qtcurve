@@ -61,8 +61,8 @@ static char * getKdeHome()
     static char *kdeHome=NULL;
 
     if(!kdeHome)
-        if(g_spawn_command_line_sync(qtSettings.qt4 ? "kde4-config --expandvars --localprefix"
-                                                    : "kde-config --expandvars --localprefix", &kdeHome, NULL, NULL, NULL))
+        if(runCommand(qtSettings.qt4 ? "kde4-config --expandvars --localprefix"
+                                     : "kde-config --expandvars --localprefix", &kdeHome))
         {
             int len=strlen(kdeHome);
 
@@ -337,7 +337,7 @@ static int getMozillaVersion(int pid)
         {
             char *version=0L;
             strcat(cmdline, " --version");
-            if(g_spawn_command_line_sync(cmdline, &version, NULL, NULL, NULL))
+            if(runCommand(cmdline, &version))
             {
                 char *dot=strchr(version, '.');
 
@@ -1324,8 +1324,8 @@ static const char * kdeIconsPrefix()
     static char *kdeIcons=NULL;
 
     if(!kdeIcons)
-        if(g_spawn_command_line_sync(qtSettings.qt4 ? "kde4-config --expandvars --install icon"
-                                                    : "kde-config --expandvars --install icon", &kdeIcons, NULL, NULL, NULL))
+        if(runCommand(qtSettings.qt4 ? "kde4-config --expandvars --install icon"
+                                     : "kde-config --expandvars --install icon", &kdeIcons))
         {
             int len=strlen(kdeIcons);
 
@@ -2990,4 +2990,24 @@ void qtSettingsSetColors(GtkStyle *style, GtkRcStyle *rc_style)
 //         SET_COLOR(style, rc_style, fg, GTK_RC_FG, GTK_STATE_INSENSITIVE, COLOR_MID)
     SET_COLOR(style, rc_style, fg, GTK_RC_FG, GTK_STATE_ACTIVE, COLOR_WINDOW_TEXT)
     SET_COLOR(style, rc_style, fg, GTK_RC_FG, GTK_STATE_PRELIGHT, COLOR_WINDOW_TEXT)
+}
+
+bool runCommand(const char* cmd, char** result)
+{
+    FILE* fp = popen(cmd, "r");
+    if(fp)
+    {
+        gulong bufSize=512;
+        size_t currentOffset=0;
+        *result=(char*)(g_malloc(bufSize));
+        while(fgets(*result+currentOffset, bufSize-currentOffset, fp) && result[strlen(*result)-1] != '\n')
+        {
+            currentOffset = bufSize-1;
+            bufSize *= 2;
+            *result = (char*)(g_realloc(*result, bufSize));
+        }
+        pclose(fp);
+        return true;
+    }
+    return false;
 }
