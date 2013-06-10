@@ -104,7 +104,7 @@ else (NOT QTC_QT_ONLY)
     set(QTCURVE_STYLE_DIR ${QT_PLUGINS_DIR}/styles/)
 endif (NOT QTC_QT_ONLY)
 
-add_subdirectory(style)
+add_subdirectory(qt3)
 
 message("** PREFIX=${CMAKE_INSTALL_PREFIX}\n")
 
