@@ -19,26 +19,14 @@
  ***************************************************************************/
 
 #include "xcb_utils.h"
-#include <qpa/qplatformnativeinterface.h>
-#include <qpa/qplatformwindow.h>
+// #include <qpa/qplatformnativeinterface.h>
+// #include <qpa/qplatformwindow.h>
 #include <QApplication>
 
 namespace QtCurve
 {
 namespace XcbUtils
 {
-
-xcb_connection_t*
-_getConnection()
-{
-    static xcb_connection_t *connection = NULL;
-    if (Q_UNLIKELY(!connection)) {
-        QPlatformNativeInterface *native = qApp->platformNativeInterface();
-        connection = reinterpret_cast<xcb_connection_t*>(
-            native->nativeResourceForWindow("connection", 0));
-    }
-    return connection;
-}
 
 void
 getAtoms(size_t n, xcb_atom_t *atoms, const char *const names[], bool create)

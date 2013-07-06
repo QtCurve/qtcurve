@@ -25,15 +25,15 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QWindow>
+#include <QX11Info>
 
 namespace QtCurve {
 namespace XcbUtils {
 
-xcb_connection_t *_getConnection();
 static inline xcb_connection_t*
 getConnection()
 {
-    xcb_connection_t *conn = _getConnection();
+    static xcb_connection_t *conn = QX11Info::connection();
     return conn;
 }
 
