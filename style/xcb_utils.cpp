@@ -19,9 +19,7 @@
  ***************************************************************************/
 
 #include "xcb_utils.h"
-// #include <qpa/qplatformnativeinterface.h>
-// #include <qpa/qplatformwindow.h>
-#include <QApplication>
+#include "qtcurve_p.h"
 
 namespace QtCurve
 {
@@ -47,6 +45,24 @@ getAtoms(size_t n, xcb_atom_t *atoms, const char *const names[], bool create)
         }
     }
     free(cookies);
+}
+
+static QByteArray
+getWMClass()
+{
+    QByteArray appname = appName.toLocal8Bit();
+    return (appname + '\0' +
+            QCoreApplication::instance()->applicationName().toLocal8Bit());
+}
+
+void
+setWindowWMClass(WId wid)
+{
+    static const auto wmclassAtom = XcbUtils::getAtom("WM_CLASS");
+    static QByteArray wmclass = getWMClass();
+    XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
+                wid, wmclassAtom, XCB_ATOM_STRING, 8, wmclass.count(),
+                wmclass.constData());
 }
 
 }

@@ -38,7 +38,6 @@
 #include <QSplitter>
 #include <QMdiSubWindow>
 #include <QMainWindow>
-#include <QStatusBar>
 #include <QComboBox>
 #include <QTreeView>
 #include <QGroupBox>
@@ -345,13 +344,11 @@ void Style::polish(QWidget *widget)
 
     bool enableMouseOver(opts.highlightFactor || opts.coloredMouseOver);
 
-    /*
-      {
-      for(QWidget *w=widget; w; w=w->parentWidget())
-      printf("%s ", w->metaObject()->className());
-      printf("\n");
-      }
-    */
+    // {
+    //     for(QWidget *w=widget; w; w=w->parentWidget())
+    //         printf("%s ", w->metaObject()->className());
+    //     printf("\n");
+    // }
 
     // 'Fix' konqueror's large menubar...
     if(APP_KONQUEROR==theThemedApp && widget->parentWidget() &&
@@ -370,6 +367,9 @@ void Style::polish(QWidget *widget)
     itsWindowManager->registerWidget(widget);
 #ifdef QTC_X11
     itsShadowHelper->registerWidget(widget);
+    if (widget->isWindow()) {
+        XcbUtils::setWindowWMClass(widget->winId());
+    }
 #endif
 
     // Need to register all widgets to blur helper, in order to have proper blur_behind region set have proper regions removed for opaque widgets.

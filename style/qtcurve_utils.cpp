@@ -29,7 +29,6 @@
 #include <QSplitter>
 #include <QMdiSubWindow>
 #include <QMainWindow>
-#include <QStatusBar>
 #include <QComboBox>
 #include <QTreeView>
 #include <QGroupBox>

@@ -27,6 +27,7 @@
 #include <QToolButton>
 #include <QWidget>
 #include <QSplitter>
+#include <QStatusBar>
 
 class QToolBar;
 

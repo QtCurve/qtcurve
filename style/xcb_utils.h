@@ -66,6 +66,8 @@ getAtom(const char *name, bool create=false)
     return atom;
 }
 
+void setWindowWMClass(WId id);
+
 template<typename RetType, typename CookieType, typename... ArgTypes,
          typename... ArgTypes2>
 static inline RetType*
