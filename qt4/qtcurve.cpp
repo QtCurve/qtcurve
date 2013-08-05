@@ -1451,8 +1451,7 @@ void Style::polish(QApplication *app)
     else if("Kde4ToolkitLibrary"==appName)
         theThemedApp=APP_OPERA;
 
-    if(NULL!=getenv("QTCURVE_DEBUG"))
-    {
+    if (NULL != getenv("QTCURVE_DEBUG")) {
         QByteArray l1(appName.toLatin1());
         std::cout << "QtCurve: Application name: \"" << l1.constData() << "\"\n";
     }
@@ -12464,12 +12463,16 @@ void Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe,
     int m = !small && kwin ? ((r.height() - 7) / 2) : 0;
 
     if (small) {
-        a.setPoints(opts.vArrows ? 6 : 3, 2, 0, 0, -2,
-                    -2, 0, -2, 1, 0, -1, 2, 1);
+        a.setPoints(opts.vArrows ? 6 : 3,
+                    2, 0, 0, -2,
+                    -2, 0, -2, 1,
+                    0, -1, 2, 1);
     } else {
-        a.setPoints(opts.vArrows ? 8 : 3, 3 + m, 1 + m, 0, -2, -(3 + m), 1 + m,
-                    -(3 + m), 2 + m, -(2 + m), 2 + m, 0, 0, 2 + m, 2 + m, 3 + m,
-                    2 + m);
+        a.setPoints(opts.vArrows ? 8 : 3,
+                    3 + m, 1 + m, 0, -2,
+                    -(3 + m), 1 + m, -(3 + m), 2 + m,
+                    -(2 + m), 2 + m, 0, 0,
+                    2 + m, 2 + m, 3 + m, 2 + m);
     }
 
     switch (pe) {
@@ -12503,6 +12506,7 @@ void Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe,
     // This all looks like overkill - but seems to fix issues with plasma and
     // nvidia. Just using 'aa' and drawing the arrows would be fine -
     // but this makes them look slightly blurry, and I dont like that.
+    //   -- Craig
     p->save();
     col.setAlpha(255);
 #ifdef QTC_OLD_NVIDIA_ARROW_FIX
@@ -12513,7 +12517,12 @@ void Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe,
 #ifdef QTC_OLD_NVIDIA_ARROW_FIX
     p->fillPath(path, col);
 #endif
-    p->setRenderHint(QPainter::Antialiasing, false);
+    // Disabling antialiasing here seems to cause weird looking up arrow here,
+    // and I personally don't see a blurry arrow with antialiasing enabled.
+    // See https://github.com/QtCurve/qtcurve-qt4/issues/3.
+    //   -- Yichao Yu
+    // p->setRenderHint(QPainter::Antialiasing, false);
+    p->setRenderHint(QPainter::Antialiasing, true);
     p->drawPolygon(a);
     p->restore();
 }
