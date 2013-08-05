@@ -3906,188 +3906,207 @@ int Style::layoutSpacingImplementation(QSizePolicy::ControlType control1, QSizeP
 
 void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
-    QRect          r(option->rect);
-    QFlags<State>  state(option->state);
+    QRect r(option->rect);
+    QFlags<State> state(option->state);
     const QPalette &palette(option->palette);
-    bool           reverse(Qt::RightToLeft==option->direction);
+    bool reverse(Qt::RightToLeft==option->direction);
 
-    switch ((int)element)
-    {
+    switch ((int)element) {
 #if (QT_VERSION >= 0x040500) && !defined QTC_QT_ONLY
-        case PE_IndicatorTabClose:
-        {
-            int         size(pixelMetric(QStyle::PM_SmallIconSize));
-            QIcon::Mode mode(state&State_Enabled
-                                ? state& State_Raised
-                                    ? QIcon::Active
-                                    : QIcon::Normal
-                                : QIcon::Disabled);
+    case PE_IndicatorTabClose: {
+        int size(pixelMetric(QStyle::PM_SmallIconSize));
+        QIcon::Mode mode(state&State_Enabled ? state& State_Raised ?
+                         QIcon::Active : QIcon::Normal : QIcon::Disabled);
 
-            if (!(state&State_Raised) && !(state&State_Sunken) && !(state&QStyle::State_Selected))
-                mode = QIcon::Disabled;
+        if (!(state & State_Raised) && !(state & State_Sunken) &&
+            !(state & QStyle::State_Selected))
+            mode = QIcon::Disabled;
 
-            drawItemPixmap(painter, r, Qt::AlignCenter, KIcon("dialog-close").pixmap(size, mode, state&State_Sunken
-                                                                                        ? QIcon::On : QIcon::Off));
-            break;
+        drawItemPixmap(painter, r, Qt::AlignCenter,
+                       KIcon("dialog-close").pixmap(size, mode,
+                                                    state & State_Sunken ?
+                                                    QIcon::On : QIcon::Off));
+        break;
+    }
+#endif
+    case PE_Widget:
+        if(widget && widget->testAttribute(Qt::WA_StyledBackground) &&
+           ((!widget->testAttribute(Qt::WA_NoSystemBackground) &&
+             ((widget->windowFlags() & Qt::WindowType_Mask) &
+              (Qt::Window|Qt::Dialog)) && widget->isWindow()) ||
+            (itsIsPreview && qobject_cast<const QMdiSubWindow*>(widget)))) {
+            bool isDialog = qobject_cast<const QDialog*>(widget);
+
+            if (CUSTOM_BGND || itsIsPreview ||
+                (isDialog && opts.dlgOpacity != 100) ||
+                (!isDialog && opts.bgndOpacity != 100))
+                drawBackground(painter, widget,
+                               isDialog ? BGND_DIALOG : BGND_WINDOW);
         }
-#endif
-        case PE_Widget:
-            if(widget && widget->testAttribute(Qt::WA_StyledBackground) &&
-                ( (!widget->testAttribute(Qt::WA_NoSystemBackground) &&
-                  ((widget->windowFlags()&Qt::WindowType_Mask) & (Qt::Window|Qt::Dialog)) && widget->isWindow()) ||
-                  (itsIsPreview && qobject_cast<const QMdiSubWindow *>(widget)) ) )
-            {
-                bool isDialog=qobject_cast<const QDialog *>(widget);
-
-                if(CUSTOM_BGND || itsIsPreview || (isDialog && opts.dlgOpacity!=100) || (!isDialog && opts.bgndOpacity!=100))
-                    drawBackground(painter, widget, isDialog ? BGND_DIALOG : BGND_WINDOW);
-            }
-            break;
-        case PE_PanelScrollAreaCorner:
-            // disable painting of PE_PanelScrollAreaCorner
-            // the default implementation fills the rect with the window background color which does not work for windows that have gradients.
-            // ...but need to for WebView!!!
-            if(!opts.gtkScrollViews || !CUSTOM_BGND || (widget && widget->inherits("WebView")))
-                painter->fillRect(r, palette.brush(QPalette::Window));
-            break;
-        case PE_IndicatorBranch:
-        {
-            int middleH((r.x() + r.width() / 2)-1),
-                middleV(r.y() + r.height() / 2),
+        break;
+    case PE_PanelScrollAreaCorner:
+        // disable painting of PE_PanelScrollAreaCorner
+        // the default implementation fills the rect with the window background color which does not work for windows that have gradients.
+        // ...but need to for WebView!!!
+        if (!opts.gtkScrollViews || !CUSTOM_BGND ||
+            (widget && widget->inherits("WebView")))
+            painter->fillRect(r, palette.brush(QPalette::Window));
+        break;
+    case PE_IndicatorBranch: {
+        int middleH((r.x() + r.width() / 2) - 1);
+        int middleV(r.y() + r.height() / 2);
 #if 0
-                beforeH(middleH),
+        int beforeH(middleH);
 #endif
-                beforeV(middleV),
-                afterH(middleH),
-                afterV(middleV);
+        int beforeV(middleV);
+        int afterH(middleH);
+        int afterV(middleV);
 
-            painter->save();
+        painter->save();
 
-            if (state&State_Children)
-            {
-                QRect ar(r.x()+((r.width()-(LV_SIZE+4))>>1), r.y()+((r.height()-(LV_SIZE+4))>>1), LV_SIZE+4,
-                         LV_SIZE+4);
-                if(/*LV_OLD==*/opts.lvLines)
-                {
-                    beforeV=ar.y()-1;
-                    afterH=ar.x()+LV_SIZE+4;
-                    afterV=ar.y()+LV_SIZE+4;
+        if (state & State_Children) {
+            QRect ar(r.x() + ((r.width() - (LV_SIZE + 4)) >> 1),
+                     r.y() + ((r.height() - (LV_SIZE + 4)) >> 1),
+                     LV_SIZE + 4, LV_SIZE + 4);
+            if (/*LV_OLD == */opts.lvLines) {
+                beforeV = ar.y()-1;
+                afterH = ar.x() + LV_SIZE + 4;
+                afterV = ar.y() + LV_SIZE + 4;
 #if 0
-                    beforeH=ar.x();
-                    int lo(ROUNDED ? 2 : 0);
+                beforeH = ar.x();
+                int lo(ROUNDED ? 2 : 0);
 
-                    painter->setPen(palette.mid().color());
-                    painter->drawLine(ar.x()+lo, ar.y(), (ar.x()+ar.width()-1)-lo, ar.y());
-                    painter->drawLine(ar.x()+lo, ar.y()+ar.height()-1, (ar.x()+ar.width()-1)-lo, ar.y()+ar.height()-1);
-                    painter->drawLine(ar.x(), ar.y()+lo, ar.x(), (ar.y()+ar.height()-1)-lo);
-                    painter->drawLine(ar.x()+ar.width()-1, ar.y()+lo, ar.x()+ar.width()-1, (ar.y()+ar.height()-1)-lo);
-
-                    if(ROUNDED)
-                    {
-                        painter->drawPoint(ar.x()+1, ar.y()+1);
-                        painter->drawPoint(ar.x()+1, ar.y()+ar.height()-2);
-                        painter->drawPoint(ar.x()+ar.width()-2, ar.y()+1);
-                        painter->drawPoint(ar.x()+ar.width()-2, ar.y()+ar.height()-2);
-
-                        QColor col(palette.mid().color());
-
-                        col.setAlphaF(0.5);
-                        painter->setPen(col);
-                        painter->drawLine(ar.x()+1, ar.y()+1, ar.x()+2, ar.y());
-                        painter->drawLine(ar.x()+ar.width()-2, ar.y(), ar.x()+ar.width()-1, ar.y()+1);
-                        painter->drawLine(ar.x()+1, ar.y()+ar.height()-2, ar.x()+2, ar.y()+ar.height()-1);
-                        painter->drawLine(ar.x()+ar.width()-2, ar.y()+ar.height()-1, ar.x()+ar.width()-1, ar.y()+ar.height()-2);
-                    }
-#endif
-                }
-                drawArrow(painter, ar, state&State_Open
-                                                ? PE_IndicatorArrowDown
-                                                : reverse
-                                                    ? PE_IndicatorArrowLeft
-                                                    : PE_IndicatorArrowRight, MO_ARROW(QPalette::ButtonText));
-            }
-
-            const int constStep=/*LV_OLD==*/opts.lvLines
-                                    ? 0
-                                    : widget && qobject_cast<const QTreeView *>(widget)
-                                        ? ((QTreeView *)widget)->indentation() : 20;
-
-            if(opts.lvLines /*&& (LV_OLD==opts.lvLines || (r.x()>=constStep && constStep>0))*/)
-            {
                 painter->setPen(palette.mid().color());
-                if (state&State_Item)
-                {
-                    if (reverse)
-                        painter->drawLine(r.left(), middleV, afterH, middleV);
-                    else
-                    {
-#if 0
-                        if(LV_NEW==opts.lvLines)
-                        {
-                            if(state&State_Children)
-                                painter->drawLine(middleH-constStep, middleV, r.right()-constStep, middleV);
-                            else
-                                drawFadedLine(painter, QRect(middleH-constStep, middleV, r.right()-(middleH-constStep), middleV), palette.mid().color(),
-                                              false, true, true);
-                        }
-                        else
-#endif
-                            painter->drawLine(afterH, middleV, r.right(), middleV);
-                    }
+                painter->drawLine(ar.x() + lo, ar.y(),
+                                  (ar.x() + ar.width() - 1) - lo, ar.y());
+                painter->drawLine(ar.x() + lo, ar.y() + ar.height() - 1,
+                                  (ar.x() + ar.width() - 1) - lo,
+                                  ar.y() + ar.height() - 1);
+                painter->drawLine(ar.x(), ar.y() + lo, ar.x(),
+                                  (ar.y() + ar.height() - 1) - lo);
+                painter->drawLine(ar.x() + ar.width() - 1,
+                                  ar.y() + lo, ar.x() + ar.width() - 1,
+                                  (ar.y() + ar.height() - 1) - lo);
+
+                if (ROUNDED) {
+                    painter->drawPoint(ar.x() + 1, ar.y() + 1);
+                    painter->drawPoint(ar.x() + 1, ar.y() + ar.height() - 2);
+                    painter->drawPoint(ar.x() + ar.width() - 2, ar.y() + 1);
+                    painter->drawPoint(ar.x() + ar.width() - 2,
+                                       ar.y() + ar.height() - 2);
+
+                    QColor col(palette.mid().color());
+
+                    col.setAlphaF(0.5);
+                    painter->setPen(col);
+                    painter->drawLine(ar.x() + 1, ar.y() + 1,
+                                      ar.x() + 2, ar.y());
+                    painter->drawLine(ar.x() + ar.width() - 2,
+                                      ar.y(), ar.x() + ar.width() - 1,
+                                      ar.y() + 1);
+                    painter->drawLine(ar.x() + 1, ar.y() + ar.height() - 2,
+                                      ar.x() + 2, ar.y() + ar.height() - 1);
+                    painter->drawLine(ar.x() + ar.width() - 2,
+                                      ar.y() + ar.height() - 1,
+                                      ar.x() + ar.width() - 1,
+                                      ar.y() + ar.height() - 2);
                 }
-                if (state&State_Sibling && afterV<r.bottom())
-                    painter->drawLine(middleH-constStep, afterV, middleH-constStep, r.bottom());
-                if (state & (State_Open | State_Children | State_Item | State_Sibling) && (/*LV_NEW==opts.lvLines || */beforeV>r.y()))
-                    painter->drawLine(middleH-constStep, r.y(), middleH-constStep, beforeV);
+#endif
             }
-            painter->restore();
-            break;
+            drawArrow(painter, ar, state&State_Open ?
+                      PE_IndicatorArrowDown : reverse ?
+                      PE_IndicatorArrowLeft : PE_IndicatorArrowRight,
+                      MO_ARROW(QPalette::ButtonText));
         }
-        case PE_IndicatorViewItemCheck:
-        {
-            QStyleOption opt(*option);
 
-            opt.state &= ~State_MouseOver;
-            opt.state |= STATE_VIEW;
-            drawPrimitive(PE_IndicatorCheckBox, &opt, painter, widget);
-            break;
-        }
-        case PE_IndicatorHeaderArrow:
-            if (const QStyleOptionHeader *header = qstyleoption_cast<const QStyleOptionHeader *>(option))
-                drawArrow(painter, r, header->sortIndicator & QStyleOptionHeader::SortUp ? PE_IndicatorArrowUp : PE_IndicatorArrowDown,
-                          MO_ARROW(QPalette::ButtonText));
-            break;
-        case PE_IndicatorArrowUp:
-        case PE_IndicatorArrowDown:
-        case PE_IndicatorArrowLeft:
-        case PE_IndicatorArrowRight:
-            if(State_None==state)
-                state|=State_Enabled;
-            if((QStyle::State_Enabled|QtC_StateKWin)==state)
-                drawArrow(painter, r, element, Qt::color1, false, true);
-            else
-            {
-                QColor col(MO_ARROW(QPalette::Text));
-                if(state&(State_Sunken|State_On) &&
-                   !(widget && ( (opts.unifySpin && qobject_cast<const QSpinBox *>(widget)) ||
-                                (opts.unifyCombo && qobject_cast<const QComboBox *>(widget) &&
-                                ((const QComboBox *)widget)->isEditable()))))
-                    r.adjust(1, 1, 1, 1);
-                if(col.alpha()<255 && PE_IndicatorArrowRight==element && widget && widget->inherits("KUrlButton"))
-                    col=blendColors(col, palette.background().color(), col.alphaF());
+        const int constStep = /*LV_OLD == */opts.lvLines ? 0
+            : widget && qobject_cast<const QTreeView *>(widget) ?
+            ((QTreeView *)widget)->indentation() : 20;
 
-                drawArrow(painter, r, element, col, false, false);
+        if (opts.lvLines /*&& (LV_OLD == opts.lvLines ||
+                           (r.x() >= constStep && constStep > 0))*/) {
+            painter->setPen(palette.mid().color());
+            if (state & State_Item) {
+                if (reverse) {
+                        painter->drawLine(r.left(), middleV, afterH, middleV);
+                } else {
+#if 0
+                    if (LV_NEW == opts.lvLines) {
+                        if(state & State_Children) {
+                            painter->drawLine(middleH - constStep, middleV,
+                                              r.right() - constStep, middleV);
+                        } else {
+                            drawFadedLine(painter,
+                                          QRect(middleH - constStep, middleV,
+                                                r.right() - (middleH - constStep),
+                                                middleV), palette.mid().color(),
+                                          false, true, true);
+                        }
+                    } else
+#endif
+                        painter->drawLine(afterH, middleV, r.right(), middleV);
+                }
             }
-            break;
-        case PE_IndicatorSpinMinus:
-        case PE_IndicatorSpinPlus:
-        case PE_IndicatorSpinUp:
-        case PE_IndicatorSpinDown:
-        {
-            QRect        sr(r);
-            const QColor *use(buttonColors(option)),
-                         col(MO_ARROW(QPalette::ButtonText));
-            bool         down(PE_IndicatorSpinDown==element || PE_IndicatorSpinMinus==element);
+            if (state & State_Sibling && afterV < r.bottom())
+                painter->drawLine(middleH - constStep, afterV,
+                                  middleH - constStep, r.bottom());
+            if (state & (State_Open | State_Children | State_Item | State_Sibling) && (/*LV_NEW==opts.lvLines || */beforeV>r.y()))
+                painter->drawLine(middleH-constStep, r.y(), middleH-constStep, beforeV);
+        }
+        painter->restore();
+        break;
+    }
+    case PE_IndicatorViewItemCheck: {
+        QStyleOption opt(*option);
+
+        opt.state &= ~State_MouseOver;
+        opt.state |= STATE_VIEW;
+        drawPrimitive(PE_IndicatorCheckBox, &opt, painter, widget);
+        break;
+    }
+    case PE_IndicatorHeaderArrow:
+        if (const QStyleOptionHeader *header =
+            qstyleoption_cast<const QStyleOptionHeader*>(option)) {
+            drawArrow(painter, r,
+                      header->sortIndicator & QStyleOptionHeader::SortUp ?
+                      PE_IndicatorArrowUp : PE_IndicatorArrowDown,
+                      MO_ARROW(QPalette::ButtonText));
+        }
+        break;
+    case PE_IndicatorArrowUp:
+    case PE_IndicatorArrowDown:
+    case PE_IndicatorArrowLeft:
+    case PE_IndicatorArrowRight:
+        if (State_None==state)
+            state|=State_Enabled;
+        if((QStyle::State_Enabled|QtC_StateKWin)==state) {
+            drawArrow(painter, r, element, Qt::color1, false, true);
+        } else {
+            QColor col(MO_ARROW(QPalette::Text));
+            if (state & (State_Sunken | State_On) &&
+               !(widget &&
+                 ((opts.unifySpin && qobject_cast<const QSpinBox*>(widget)) ||
+                  (opts.unifyCombo && qobject_cast<const QComboBox*>(widget) &&
+                   ((const QComboBox*)widget)->isEditable())))) {
+                r.adjust(1, 1, 1, 1);
+            }
+            if (col.alpha() < 255 &&
+                PE_IndicatorArrowRight == element &&
+                widget && widget->inherits("KUrlButton"))
+                col = blendColors(col, palette.background().color(),
+                                  col.alphaF());
+
+            drawArrow(painter, r, element, col, false, false);
+        }
+        break;
+    case PE_IndicatorSpinMinus:
+    case PE_IndicatorSpinPlus:
+    case PE_IndicatorSpinUp:
+    case PE_IndicatorSpinDown: {
+            QRect sr(r);
+            const QColor *use(buttonColors(option));
+            const QColor col(MO_ARROW(QPalette::ButtonText));
+            bool down(PE_IndicatorSpinDown==element || PE_IndicatorSpinMinus==element);
 
             if((!opts.unifySpinBtns || state&State_Sunken) && !opts.unifySpin)
                 drawLightBevel(painter, sr, option, widget, down
@@ -4103,14 +4122,14 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             {
                 sr.setY(sr.y()+(down ? -2 : 1));
 
-                if(opts.unifySpin)
-                {
+                if (opts.unifySpin) {
                     sr.adjust(reverse ? 1 : -1, 0, reverse ? 1 : -1, 0);
-                    if(!opts.vArrows)
+                    if (!opts.vArrows) {
                         sr.setY(sr.y()+(down ? -2 : 2));
-                }
-                else if(state&State_Sunken)
+                    }
+                } else if(state&State_Sunken) {
                     sr.adjust(1, 1, 1, 1);
+                }
 
                 drawArrow(painter, sr, PE_IndicatorSpinUp==element ? PE_IndicatorArrowUp : PE_IndicatorArrowDown,
                           col, !opts.unifySpin);
@@ -7457,67 +7476,61 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
             switch(opts.scrollbarType)
             {
-                default:
-                case SCROLLBAR_WINDOWS:
-                    break;
-                case SCROLLBAR_KDE:
-                case SCROLLBAR_PLATINUM:
-                    if(!reverse && PE_IndicatorArrowLeft==pe && r.x()>3)
-                    {
-                        round=ROUNDED_NONE;
+            default:
+            case SCROLLBAR_WINDOWS:
+                break;
+            case SCROLLBAR_KDE:
+            case SCROLLBAR_PLATINUM:
+                if (!reverse && PE_IndicatorArrowLeft == pe && r.x() > 3) {
+                    round = ROUNDED_NONE;
+                    br.adjust(0, 0, 1, 0);
+                    if (opts.flatSbarButtons || !opts.vArrows) {
+                        ar.adjust(1, 0, 1, 0);
+                    }
+                } else if(reverse && PE_IndicatorArrowRight == pe && r.x() > 3) {
+                    if (SCROLLBAR_PLATINUM == opts.scrollbarType) {
+                        round = ROUNDED_NONE;
+                        br.adjust(-1, 0, 0, 0);
+                        if (opts.flatSbarButtons || !opts.vArrows) {
+                            ar.adjust(-1, 0, -1, 0);
+                        }
+                    } else {
+                        if(r.x() < pixelMetric(PM_ScrollBarExtent, option, widget)+2)
+                            round = ROUNDED_NONE;
                         br.adjust(0, 0, 1, 0);
-                        if(opts.flatSbarButtons || !opts.vArrows)
+                        if (opts.flatSbarButtons || !opts.vArrows) {
                             ar.adjust(1, 0, 1, 0);
-                    }
-                    else if(reverse && PE_IndicatorArrowRight==pe && r.x()>3)
-                    {
-                        if(SCROLLBAR_PLATINUM==opts.scrollbarType)
-                        {
-                            round=ROUNDED_NONE;
-                            br.adjust(-1, 0, 0, 0);
-                            if(opts.flatSbarButtons || !opts.vArrows)
-                                ar.adjust(-1, 0, -1, 0);
-                        }
-                        else
-                        {
-                            if(r.x()<pixelMetric(PM_ScrollBarExtent, option, widget)+2)
-                                round=ROUNDED_NONE;
-                            br.adjust(0, 0, 1, 0);
-                            if(opts.flatSbarButtons || !opts.vArrows)
-                                ar.adjust(1, 0, 1, 0);
                         }
                     }
-                    else if(PE_IndicatorArrowUp==pe && r.y()>3)
-                    {
-                        round=ROUNDED_NONE;
-                        br.adjust(0, 0, 0, 1);
-                        if(opts.flatSbarButtons || !opts.vArrows)
+                } else if (PE_IndicatorArrowUp == pe && r.y() > 3) {
+                    round = ROUNDED_NONE;
+                    br.adjust(0, 0, 0, 1);
+                    if (opts.flatSbarButtons || !opts.vArrows) {
                             ar.adjust(0, 1, 0, 1);
                     }
-                    break;
-                case SCROLLBAR_NEXT:
-                    if(!reverse && PE_IndicatorArrowRight==pe)
-                    {
-                        round=ROUNDED_NONE;
-                        br.adjust(-1, 0, 0, 0);
-                        if(opts.flatSbarButtons || !opts.vArrows)
-                            ar.adjust(-1, 0, 0, -1);
+                }
+                break;
+            case SCROLLBAR_NEXT:
+                if (!reverse && PE_IndicatorArrowRight == pe) {
+                    round = ROUNDED_NONE;
+                    br.adjust(-1, 0, 0, 0);
+                    if (opts.flatSbarButtons || !opts.vArrows) {
+                        ar.adjust(-1, 0, 0, -1);
                     }
-                    else if(reverse && PE_IndicatorArrowLeft==pe)
-                    {
-                        round=ROUNDED_NONE;
-                        br.adjust(0, 0, 1, 0);
-                        if(opts.flatSbarButtons || !opts.vArrows)
-                            ar.adjust(-1, 0, 0, 1);
+                } else if (reverse && PE_IndicatorArrowLeft == pe) {
+                    round = ROUNDED_NONE;
+                    br.adjust(0, 0, 1, 0);
+                    if (opts.flatSbarButtons || !opts.vArrows) {
+                        ar.adjust(-1, 0, 0, 1);
                     }
-                    else if(PE_IndicatorArrowDown==pe)
-                    {
-                        round=ROUNDED_NONE;
-                        br.adjust(0, -1, 0, 0);
-                        if(opts.flatSbarButtons || !opts.vArrows)
-                            ar.adjust(0, -1, 0, -1);
+                } else if (PE_IndicatorArrowDown == pe) {
+                    round = ROUNDED_NONE;
+                    br.adjust(0, -1, 0, 0);
+                    if (opts.flatSbarButtons || !opts.vArrows) {
+                        ar.adjust(0, -1, 0, -1);
                     }
-                    break;
+                }
+                break;
             }
 
             painter->save();
@@ -8060,23 +8073,23 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                         if(!(btn.state&State_Enabled))
                             btn.state&=~State_MouseOver;
                         drawPrimitive(PE_PanelButtonTool, &btn, painter, widget);
-                        if(opts.vArrows)
-                            switch(toolbutton->arrowType)
-                            {
-                                case Qt::LeftArrow:
-                                    btn.rect.adjust(-1, 0, -1, 0);
-                                    break;
-                                case Qt::RightArrow:
-                                    btn.rect.adjust(1, 0, 1, 0);
-                                    break;
-                                case Qt::UpArrow:
-                                    btn.rect.adjust(0, -1, 0, -1);
-                                    break;
-                                case Qt::DownArrow:
-                                    btn.rect.adjust(0, 1, 0, 1);
-                                default:
-                                    break;
+                        if (opts.vArrows) {
+                            switch (toolbutton->arrowType) {
+                            case Qt::LeftArrow:
+                                btn.rect.adjust(-1, 0, -1, 0);
+                                break;
+                            case Qt::RightArrow:
+                                btn.rect.adjust(1, 0, 1, 0);
+                                break;
+                            case Qt::UpArrow:
+                                btn.rect.adjust(0, -1, 0, -1);
+                                break;
+                            case Qt::DownArrow:
+                                btn.rect.adjust(0, 1, 0, 1);
+                            default:
+                                break;
                             }
+                        }
                         drawTbArrow(this, &btn, btn.rect, painter, widget);
                         break;
                     }
@@ -9567,16 +9580,16 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                         arrow.adjust(1, 1, 1, 1);
 
                     QColor arrowColor(MO_ARROW_X(mouseOver, QPalette::ButtonText));
-                    if(comboBox->editable || !(opts.gtkComboMenus && opts.doubleGtkComboArrow))
+                    if(comboBox->editable || !(opts.gtkComboMenus && opts.doubleGtkComboArrow)) {
                         drawArrow(painter, arrow, PE_IndicatorArrowDown, arrowColor, false);
-                    else
-                    {
-                        int middle=arrow.y()+(arrow.height()>>1),
-                            gap=(opts.vArrows ? 2 : 1);
+                    } else {
+                        int middle = arrow.y() + (arrow.height() >> 1);
+                        int gap = (opts.vArrows ? 2 : 1);
 
-                        QRect ar=QRect(arrow.x(), middle-(LARGE_ARR_HEIGHT+gap), arrow.width(), LARGE_ARR_HEIGHT);
+                        QRect ar = QRect(arrow.x(), middle - (LARGE_ARR_HEIGHT + gap),
+                                         arrow.width(), LARGE_ARR_HEIGHT);
                         drawArrow(painter, ar, PE_IndicatorArrowUp, arrowColor, false);
-                        ar=QRect(arrow.x(), middle+gap, arrow.width(), LARGE_ARR_HEIGHT);
+                        ar = QRect(arrow.x(), middle + gap, arrow.width(), LARGE_ARR_HEIGHT);
                         drawArrow(painter, ar, PE_IndicatorArrowDown, arrowColor, false);
                     }
                 }
@@ -12442,50 +12455,54 @@ static QPolygon rotate(const QPolygon &p, double angle)
     return matrix.map(p);
 }
 
-void Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe, QColor col, bool small, bool kwin) const
+void Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe,
+                      QColor col, bool small, bool kwin) const
 {
-    QPolygon     a;
+    QPolygon a;
     QPainterPath path;
-    QRect        r(rx);
-    int          m=!small && kwin ? ((r.height()-7)/2) : 0;
+    QRect r(rx);
+    int m = !small && kwin ? ((r.height() - 7) / 2) : 0;
 
-    if(small)
-        a.setPoints(opts.vArrows ? 6 : 3,  2,0,  0,-2,  -2,0,   -2,1, 0,-1, 2,1);
-    else
-        a.setPoints(opts.vArrows ? 8 : 3,  3+m,1+m,  0,-2,  -(3+m),1+m,    -(3+m),2+m,  -(2+m),2+m, 0,0,  2+m,2+m, 3+m,2+m);
-
-    switch(pe)
-    {
-        case PE_IndicatorArrowUp:
-            if(m)
-                r.adjust(0, -m, 0, -m);
-            break;
-        case PE_IndicatorArrowDown:
-            if(m)
-                r.adjust(0, m, 0, m);
-            a=rotate(a, 180);
-            break;
-        case PE_IndicatorArrowRight:
-            a=rotate(a, 90);
-            break;
-        case PE_IndicatorArrowLeft:
-            a=rotate(a, 270);
-            break;
-        default:
-            return;
+    if (small) {
+        a.setPoints(opts.vArrows ? 6 : 3, 2, 0, 0, -2,
+                    -2, 0, -2, 1, 0, -1, 2, 1);
+    } else {
+        a.setPoints(opts.vArrows ? 8 : 3, 3 + m, 1 + m, 0, -2, -(3 + m), 1 + m,
+                    -(3 + m), 2 + m, -(2 + m), 2 + m, 0, 0, 2 + m, 2 + m, 3 + m,
+                    2 + m);
     }
 
-    a.translate((r.x()+(r.width()>>1)), (r.y()+(r.height()>>1)));
+    switch (pe) {
+    case PE_IndicatorArrowUp:
+        if (m)
+            r.adjust(0, -m, 0, -m);
+        break;
+    case PE_IndicatorArrowDown:
+        if (m)
+            r.adjust(0, m, 0, m);
+        a = rotate(a, 180);
+        break;
+    case PE_IndicatorArrowRight:
+        a = rotate(a, 90);
+        break;
+    case PE_IndicatorArrowLeft:
+        a = rotate(a, 270);
+        break;
+    default:
+        return;
+    }
+
+    a.translate((r.x() + (r.width() >> 1)), (r.y() + (r.height() >> 1)));
 
 #ifdef QTC_OLD_NVIDIA_ARROW_FIX
-    path.moveTo(a[0].x()+0.5, a[0].y()+0.5);
-    for(int i=1; i<a.size(); ++i)
-        path.lineTo(a[i].x()+0.5, a[i].y()+0.5);
-    path.lineTo(a[0].x()+0.5, a[0].y()+0.5);
+    path.moveTo(a[0].x() + 0.5, a[0].y() + 0.5);
+    for(int i = 1;i < a.size();i++)
+        path.lineTo(a[i].x() + 0.5, a[i].y() + 0.5);
+    path.lineTo(a[0].x() + 0.5, a[0].y() + 0.5);
 #endif
-    // This all looks like overkill - but seems to fix issues with plasma and nvidia
-    // Just using 'aa' and drawing the arrows would be fine - but this makes them look
-    // slightly blurry, and I dont like that.
+    // This all looks like overkill - but seems to fix issues with plasma and
+    // nvidia. Just using 'aa' and drawing the arrows would be fine -
+    // but this makes them look slightly blurry, and I dont like that.
     p->save();
     col.setAlpha(255);
 #ifdef QTC_OLD_NVIDIA_ARROW_FIX
