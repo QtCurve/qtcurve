@@ -69,7 +69,7 @@
 #include <KDE/KStandardDirs>
 #include <unistd.h>
 #include "config.h"
-#include "../style/qtcurve.h"
+#include "../qt4/qtcurve.h"
 #include "config_file.h"
 
 #define EXTENSION                  ".qtcurve"
