@@ -90,7 +90,7 @@ typedef gchar ** Strings;
 #define KWIN_GROUP            "KWin"
 
 /* qtc_<theme name>.themerc support */
-#define KDE_PREFIX(V) ((4==(V)) ? KDE4PREFIX : KDE3PREFIX)
+#define KDE_PREFIX(V) (KDE4PREFIX)
 #define THEME_DIR    "/share/apps/kstyle/themes/"
 #define THEME_DIR4   "/share/kde4/apps/kstyle/themes/"
 #define THEME_PREFIX "qtc_"

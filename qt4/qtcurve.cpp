@@ -615,15 +615,6 @@ static void setRgb(QColor *col, const QStringList &rgb)
 #endif
 
 #if defined QTC_STYLE_SUPPORT || defined QTC_QT_ONLY
-static bool useQt3Settings()
-{
-    static const char *full = getenv("KDE_FULL_SESSION");
-    static const char *vers = full ? getenv("KDE_SESSION_VERSION") : 0;
-    static bool       use   = full && (!vers || atoi(vers)<4);
-
-    return use;
-}
-
 static QString kdeHome()
 {
     static QString kdeHomePath;
@@ -634,7 +625,7 @@ static QString kdeHome()
         {
             QDir    homeDir(QDir::homePath());
             QString kdeConfDir(QLatin1String("/.kde"));
-            if (!useQt3Settings() && homeDir.exists(QLatin1String(".kde4")))
+            if (homeDir.exists(QLatin1String(".kde4")))
                 kdeConfDir = QLatin1String("/.kde4");
             kdeHomePath = QDir::homePath() + kdeConfDir;
         }
@@ -715,8 +706,7 @@ class StylePlugin : public QStylePlugin
 
 #ifdef QTC_STYLE_SUPPORT
         getStyles(kdeHome(), styles);
-        getStyles(KDE_PREFIX(useQt3Settings() ? 3 : 4), styles);
-        getStyles(KDE_PREFIX(useQt3Settings() ? 4 : 3), styles);
+        getStyles(KDE_PREFIX(4), styles);
 #endif
         return styles.toList();
     }
@@ -1052,12 +1042,8 @@ void Style::init(bool initial)
         if(!itsName.isEmpty())
         {
             rcFile=themeFile(kdeHome(), itsName);
-
-            if(rcFile.isEmpty())
-            {
-                rcFile=themeFile(KDE_PREFIX(useQt3Settings() ? 3 : 4), itsName, useQt3Settings());
-                if(rcFile.isEmpty())
-                    rcFile=themeFile(KDE_PREFIX(useQt3Settings() ? 4 : 3), itsName, !useQt3Settings());
+            if(rcFile.isEmpty()) {
+                rcFile=themeFile(KDE_PREFIX(4), itsName, false);
             }
         }
         qtcReadConfig(rcFile, &opts);
