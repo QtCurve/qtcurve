@@ -61,14 +61,18 @@ if(NOT QTC_QT_ONLY)
   add_subdirectory(colors)
   add_subdirectory(po)
 
-  find_file(KWINGLOBALS_H
-    kwinglobals.h ${KDE4_INCLUDES}) # kwinglobals.h is new for KDE4
+  if("x${ENABLE_KWIN}" STREQUAL "x")
+    find_file(KWINGLOBALS_H kwinglobals.h ${KDE4_INCLUDES})
+    if(KWINGLOBALS_H)
+      set(ENABLE_KWIN On)
+    else()
+      set(ENABLE_KWIN Off)
+    endif()
+  endif()
 
-  if(KWINGLOBALS_H)
+  if(ENABLE_KWIN)
     add_subdirectory(kwin)
     add_subdirectory(kwinconfig)
-  else()
-    message("** KWin headers not found - KWin decoration will not be built")
   endif()
 else()
   set(CMAKE_INSTALL_PREFIX ${OLD_CMAKE_INSTALL_PREFIX})
