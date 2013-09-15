@@ -58,6 +58,8 @@ foreach(QtModule ${QTC_QT_MODULES})
   add_definitions(${${QtModule}_DEFINITIONS})
 endforeach()
 
+add_definitions("-DQT_DISABLE_DEPRECATED_BEFORE=0x050100")
+
 set(QTC5_XCB_LINK_LIBS)
 find_package(PkgConfig)
 if(QTC_X11)

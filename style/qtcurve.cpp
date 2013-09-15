@@ -2992,9 +2992,9 @@ void Style::drawProgress(QPainter *p, const QRect &r, const QStyleOption *option
 
 static QPolygon rotate(const QPolygon &p, double angle)
 {
-    QMatrix matrix;
-    matrix.rotate(angle);
-    return matrix.map(p);
+    QTransform transform;
+    transform.rotate(angle);
+    return transform.map(p);
 }
 
 void Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe, QColor col, bool small, bool kwin) const

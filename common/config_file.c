@@ -818,7 +818,7 @@ WindowBorders qtcGetWindowBorderSize(bool force)
         char *filename=(char *)malloc(strlen(qtcConfDir())+strlen(BORDER_SIZE_FILE)+1);
         FILE *f=NULL;
 
-        sprintf(filename, "%s"BORDER_SIZE_FILE, qtcConfDir());
+        sprintf(filename, "%s" BORDER_SIZE_FILE, qtcConfDir());
         if((f=fopen(filename, "r")))
         {
             char *line=NULL;
@@ -1735,9 +1735,9 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                 char *filename=(char *)malloc(strlen(cfgDir)+strlen(OLD_CONFIG_FILE)+4);
                 bool rv=false;
 
-                sprintf(filename, "%s"CONFIG_FILE, cfgDir);
+                sprintf(filename, "%s" CONFIG_FILE, cfgDir);
                 if(!qtcFileExists(filename))
-                    sprintf(filename, "%s../"OLD_CONFIG_FILE, cfgDir);
+                    sprintf(filename, "%s../" OLD_CONFIG_FILE, cfgDir);
                 rv=qtcReadConfig(filename, opts, defOpts);
                 free(filename);
                 return rv;
