@@ -123,25 +123,28 @@ static void installX11Shadows(GtkWidget* widget)
     }
 }
 
-static gboolean acceptWidget(GtkWidget* widget)
+static gboolean
+acceptWidget(GtkWidget* widget)
 {
-    if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %X\n", __FUNCTION__, (int)widget);
+    if (DEBUG_ALL == qtSettings.debug)
+        printf(DEBUG_PREFIX "%s %p\n", __FUNCTION__, widget);
 
-    if(widget && GTK_IS_WINDOW(widget))
-    {
-        if(GTK_APP_OPEN_OFFICE==qtSettings.app)
+    if (widget && GTK_IS_WINDOW(widget)) {
+        if (GTK_APP_OPEN_OFFICE == qtSettings.app) {
             return TRUE;
-        else
-        {
-            GdkWindowTypeHint hint=gtk_window_get_type_hint(GTK_WINDOW(widget));
-            if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d\n", __FUNCTION__, (int)hint);
+        } else {
+            GdkWindowTypeHint hint =
+                gtk_window_get_type_hint(GTK_WINDOW(widget));
+            if (DEBUG_ALL == qtSettings.debug)
+                printf(DEBUG_PREFIX "%s %d\n", __FUNCTION__, (int)hint);
             return
                 hint == GDK_WINDOW_TYPE_HINT_MENU ||
                 hint == GDK_WINDOW_TYPE_HINT_DROPDOWN_MENU ||
                 hint == GDK_WINDOW_TYPE_HINT_POPUP_MENU ||
                 hint == GDK_WINDOW_TYPE_HINT_COMBO ||
-                hint == GDK_WINDOW_TYPE_HINT_TOOLTIP ||
-                (hint == GDK_WINDOW_TYPE_HINT_UTILITY && !qtcWidgetGetParent(widget) && isMozilla()) ; // Firefox URL combo
+                hint == GDK_WINDOW_TYPE_HINT_TOOLTIP /* || */
+                /* (hint == GDK_WINDOW_TYPE_HINT_UTILITY && !qtcWidgetGetParent(widget) && isMozilla()) */ // Firefox URL combo
+                ;
         }
     }
     return FALSE;
@@ -149,10 +152,10 @@ static gboolean acceptWidget(GtkWidget* widget)
 
 static gboolean shadowDestroy(GtkWidget* widget, gpointer data)
 {
-    if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %X\n", __FUNCTION__, (int)widget);
-    
-    if (g_object_get_data(G_OBJECT(widget), "QTC_SHADOW_SET"))
-    {
+    if (DEBUG_ALL == qtSettings.debug)
+        printf(DEBUG_PREFIX "%s %p\n", __FUNCTION__, widget);
+
+    if (g_object_get_data(G_OBJECT(widget), "QTC_SHADOW_SET")) {
         g_signal_handler_disconnect(G_OBJECT(widget),
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_SHADOW_DESTROY_ID"));
         g_object_steal_data(G_OBJECT(widget), "QTC_SHADOW_SET");

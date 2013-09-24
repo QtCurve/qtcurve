@@ -1,6 +1,8 @@
 #ifndef __QTC_ANIMATION_H__
 #define __QTC_ANIMATION_H__
 
+#include <gtk/gtk.h>
+
 /*
   QtCurve (C) Craig Drummond, 2003 - 2010 craig.p.drummond@gmail.com
 
@@ -21,8 +23,8 @@
   Boston, MA 02110-1301, USA.
  */
 
-extern void qtcAnimationAddProgressBar();
-extern void qtcAnimationCleanup();
-extern gdouble qtcAnimationElapsed(gpointer data);
+void qtcAnimationAddProgressBar();
+void qtcAnimationCleanup();
+gdouble qtcAnimationElapsed(gpointer data);
 
 #endif

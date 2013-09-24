@@ -61,8 +61,7 @@ static char * getKdeHome()
     static char *kdeHome=NULL;
 
     if(!kdeHome)
-        if(runCommand(qtSettings.qt4 ? "kde4-config --expandvars --localprefix"
-                                     : "kde-config --expandvars --localprefix", &kdeHome))
+        if(runCommand("kde4-config --expandvars --localprefix", &kdeHome))
         {
             int len=strlen(kdeHome);
 
@@ -183,37 +182,9 @@ static int strncmp_i(const char *s1, const char *s2, int num)
 
 QtData qtSettings;
 
-static gboolean useQt3Settings()
-{
-    static int ver=0;
+#define defaultIcons() ("oxygen")
 
-    if(0==ver)
-    {
-        const char *sessionVersion=getenv("KDE_SESSION_VERSION");
-
-        ver=sessionVersion
-                ? atoi(sessionVersion)<4
-                    ? 3
-                    : 4
-#ifdef QTC_DEFAULT_TO_KDE3
-                : 3;
-#else
-                : getenv("KDE_FULL_SESSION")
-                    ? 3
-                    : 4;
-#endif
-    }
-
-    return 3==ver;
-}
-
-static const char * defaultIcons()
-{
-    return qtSettings.qt4 ? "oxygen" : "crystalsvg";
-}
-
-enum
-{
+enum {
     SECT_NONE                 =0x000001,
     SECT_PALETTE              =0x000002,
     SECT_GENERAL              =0x000004,
@@ -1324,8 +1295,7 @@ static const char * kdeIconsPrefix()
     static char *kdeIcons=NULL;
 
     if(!kdeIcons)
-        if(runCommand(qtSettings.qt4 ? "kde4-config --expandvars --install icon"
-                                     : "kde-config --expandvars --install icon", &kdeIcons))
+        if(runCommand("kde4-config --expandvars --install icon", &kdeIcons))
         {
             int len=strlen(kdeIcons);
 
@@ -1336,16 +1306,13 @@ static const char * kdeIconsPrefix()
             kdeIcons=0L;
 
     if(!kdeIcons)
-        kdeIcons=!qtSettings.qt4 && KDE3_ICONS_PREFIX && strlen(KDE3_ICONS_PREFIX)>2
-                    ? KDE3_ICONS_PREFIX
-                    : qtSettings.qt4 && KDE4_ICONS_PREFIX && strlen(KDE4_ICONS_PREFIX)>2
-                        ? KDE4_ICONS_PREFIX
-                        : DEFAULT_ICON_PREFIX;
+        kdeIcons = (KDE4_ICONS_PREFIX && strlen(KDE4_ICONS_PREFIX) > 2 ?
+                    KDE4_ICONS_PREFIX : DEFAULT_ICON_PREFIX);
 
     return kdeIcons;
 }
 
-static char * getIconPath()
+static char *getIconPath()
 {
     static char *path=NULL;
     char        *kdeHome=getKdeHome();
@@ -2005,40 +1972,28 @@ gboolean qtSettingsInit()
             for(i=0; i<FONT_NUM_TOTAL; ++i)
                 qtSettings.fonts[i]=NULL;
 
-            qtSettings.qt4=!useQt3Settings();
+            qtSettings.qt4 = FALSE;
             qtSettings.useAlpha=opts.bgndOpacity<100 || opts.dlgOpacity<100 || opts.menuBgndOpacity<100 ||
                                 !(opts.square&SQUARE_POPUP_MENUS) || !(opts.square&SQUARE_TOOLTIPS);
 
             lastRead=now;
 
-            if(!qtSettings.qt4)
-            {
-                qtSettings.qt4=FALSE;
-                readQtRc("/etc/qt/qtrc", RD_ACT_PALETTE|RD_DIS_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST|RD_STYLE,
-                         TRUE, FALSE);
-                readQtRc("/etc/qt3/qtrc", RD_ACT_PALETTE|RD_DIS_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST|RD_STYLE,
-                         TRUE, FALSE);
-                readQtRc(".qt/qtrc", RD_ACT_PALETTE|RD_DIS_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST|RD_STYLE,
-                         FALSE, TRUE);
-            }
-
             {
             int        f=0;
             const char *files[]={GTK_THEME_DIR"/kdeglobals", /* QtCurve supplied kdeglobals file */
                                  "/etc/kderc",
-                                 qtSettings.qt4 ? "/etc/kde4/kdeglobals" : "/etc/kde3/kdeglobals",
-                                 qtSettings.qt4 ? "/etc/kde4rc" : "/etc/kde3rc",
-                                 qtSettings.qt4 ? KDE4PREFIX KDE4_SYS_CFG_DIR KDEGLOBALS_FILE : KDE3PREFIX KDE_CFG_DIR KDEGLOBALS_FILE,
-                                 qtSettings.qt4 ? KDE4PREFIX KDE4_SYS_CFG_DIR KDEGLOBALS_SYS_FILE : KDE3PREFIX KDE_CFG_DIR KDEGLOBALS_SYS_FILE,
+                                 "/etc/kde4/kdeglobals",
+                                 "/etc/kde4rc",
+                                 KDE4PREFIX KDE4_SYS_CFG_DIR KDEGLOBALS_FILE,
+                                 KDE4PREFIX KDE4_SYS_CFG_DIR KDEGLOBALS_SYS_FILE,
                                  kdeGlobals(),
                                  0L};
 
             for(f=0; 0!=files[f]; ++f)
                 readKdeGlobals(files[f], RD_ICONS|RD_SMALL_ICON_SIZE|RD_TOOLBAR_STYLE|RD_MENU_FONT|RD_TB_FONT|
-                                         RD_TOOLBAR_ICON_SIZE|RD_BUTTON_ICONS|RD_LIST_SHADE|
-                                         (qtSettings.qt4 || 0==f ? RD_KDE4_PAL|RD_FONT|RD_CONTRAST|RD_STYLE|RD_DRAG_DIST|RD_DRAG_TIME
-                                                                 : RD_LIST_COLOR),
-                               0==f, qtSettings.qt4 || 0==f);
+                               RD_TOOLBAR_ICON_SIZE|RD_BUTTON_ICONS|RD_LIST_SHADE|
+                               (RD_KDE4_PAL|RD_FONT|RD_CONTRAST|RD_STYLE|RD_DRAG_DIST|RD_DRAG_TIME),
+                               0==f, TRUE);
             }
 
 #ifdef QTC_STYLE_SUPPORT
@@ -2063,11 +2018,8 @@ gboolean qtSettingsInit()
                     printf(DEBUG_PREFIX"Look for themerc file for %s\n", qtSettings.styleName);
                 rcFile=themeFile(getKdeHome(), qtSettings.styleName, &tmpStr);
 
-                if(!rcFile)
-                {
-                    rcFile=themeFile(KDE_PREFIX(qtSettings.qt4 ? 4 : 3), qtSettings.styleName, &tmpStr);
-                    if(!rcFile)
-                        rcFile=themeFile(KDE_PREFIX(qtSettings.qt4 ? 3 : 4), qtSettings.styleName, &tmpStr);
+                if (!rcFile) {
+                    rcFile = themeFile(KDE4PREFIX, qtSettings.styleName, &tmpStr);
                 }
             }
 
@@ -2398,7 +2350,7 @@ gboolean qtSettingsInit()
                 sprintf(version, "#%s %s %02X%02X%02X%02X%02X%02X%02X",
                                  VERSION,
                                  iconTheme,
-                                 qtSettings.qt4 ? 4 : 3,
+                                 4,
                                  qtSettings.iconSizes.smlTbSize,
                                  qtSettings.iconSizes.tbSize,
                                  qtSettings.iconSizes.dndSize,
@@ -2418,9 +2370,9 @@ gboolean qtSettingsInit()
                                                       (kdeprefix ? strlen(kdeprefix) : DEFAULT_ICON_PREFIX_LEN)+(fileNameLen*3)+64+1);
 
                     sprintf(cmdStr, constCmdStrFmt,
-                                    qtSettings.qt4 ? 4 : 3,
+                                    4,
                                     kdeprefix ? kdeprefix : DEFAULT_ICON_PREFIX,
-                                    qtSettings.qt4 ? 4 : 3,
+                                    4,
                                     qtSettings.iconSizes.smlTbSize,
                                     qtSettings.iconSizes.tbSize,
                                     qtSettings.iconSizes.dndSize,

@@ -1,10 +1,10 @@
-#ifndef __QTC_COMBOBOX_H__
-#define __QTC_COMBOBOX_H__
+#ifndef __QTC_GTK_COMMON_H__
+#define __QTC_GTK_COMMON_H__
 
 #include <gtk/gtk.h>
 
 /*
-  QtCurve (C) Craig Drummond, 2003 - 2010 craig.p.drummond@gmail.com
+  QtCurve (C) Yichao Yu, 2013-2013 yyc1992@gmail.com
 
   ----
 
@@ -23,10 +23,21 @@
   Boston, MA 02110-1301, USA.
  */
 
-gboolean qtcComboBoxIsFocusChanged(GtkWidget *widget);
-gboolean qtcComboBoxIsHovered(GtkWidget *widget);
-gboolean qtcComboBoxHasFocus(GtkWidget *widget, GtkWidget *mapped);
-void qtcComboBoxSetup(GtkWidget *frame, GtkWidget *combo);
-gboolean qtcComboHasFrame(GtkWidget *widget);
+static inline void
+qtcConnectToData(GObject *obj, const char *name, const char *sig_name,
+                 GCallback cb, gpointer data)
+{
+    g_object_set_data(obj, name, GINT_TO_POINTER(g_signal_connect(obj, sig_name,
+                                                                  cb, data)));
+}
+#define qtcConnectToData(obj, name, sig_name, cb, data) \
+    ((qtcConnectToData)(obj, name, sig_name, G_CALLBACK(cb), data))
+
+static inline void
+qtcDisconnectFromData(GObject *obj, const char *name)
+{
+    g_signal_handler_disconnect(
+        obj, GPOINTER_TO_INT(g_object_steal_data(obj, name)));
+}
 
 #endif

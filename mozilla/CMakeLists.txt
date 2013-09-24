@@ -1,5 +1,6 @@
-configure_file(QtCurve.css.cmake ${CMAKE_BINARY_DIR}/QtCurve.css)
-configure_file(QtCurve-KDEButtonOrder.css.cmake ${CMAKE_BINARY_DIR}/QtCurve-KDEButtonOrder.css)
+configure_file(QtCurve.css.in QtCurve.css)
+configure_file(QtCurve-KDEButtonOrder.css.in QtCurve-KDEButtonOrder.css)
 
-install(FILES ${CMAKE_BINARY_DIR}/QtCurve.css ${CMAKE_BINARY_DIR}/QtCurve-KDEButtonOrder.css preferences-rev.xml
-        DESTINATION ${GTK_THEME_DIR}/mozilla)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/QtCurve.css" preferences-rev.xml
+  "${CMAKE_CURRENT_BINARY_DIR}/QtCurve-KDEButtonOrder.css"
+  DESTINATION "${GTK2_THEME_DIR}/mozilla")

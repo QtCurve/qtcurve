@@ -1,0 +1,7 @@
+version=`grep "#define VERSION" config.h  | awk -F\" '{print $2}'`
+packageName=`grep CPACK_PACKAGE_NAME CPackSourceConfig.cmake | grep -v "Package project name" | awk -F\" '{print $2}' | sed y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/`
+maintainer=`grep $USER /etc/passwd | awk -F: '{print $5}'`
+
+checkinstall --nodoc --pkgname="$packageName" --pkgversion="$version" \
+             --pkgrelease="0" --exclude="/" --include=install_manifest.txt \
+             --pakdir="/tmp/checkinstall-$packageName" sleep 1

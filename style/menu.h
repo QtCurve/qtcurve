@@ -21,9 +21,8 @@
   Boston, MA 02110-1301, USA.
  */
 
-extern gboolean qtcMenuEmitSize(GtkWidget *w, unsigned int size);
-extern qtcMenuShellSetup(GtkWidget *widget);
-
-extern gboolean objectIsA(const GObject * object, const gchar * type_name);
+gboolean qtcMenuEmitSize(GtkWidget *w, unsigned int size);
+void qtcMenuShellSetup(GtkWidget *widget);
+gboolean objectIsA(const GObject *object, const gchar *type_name);
 
 #endif
