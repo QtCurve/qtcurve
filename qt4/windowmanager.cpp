@@ -59,19 +59,19 @@
 #include <QtCore/QTextStream>
 #include <QtGui/QTextDocument>
 
-#ifndef QTC_QT_ONLY
-#include <KGlobalSettings>
+#ifdef QTC_QT4_ENABLE_KDE4
+#  include <KGlobalSettings>
 #endif
 
 #ifdef Q_WS_X11
-#include <QX11Info>
-#ifdef QTC_QT_ONLY
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#include "fixx11h.h"
-#else
-#include <NETRootInfo>
-#endif
+#  include <QX11Info>
+#  ifndef QTC_QT4_ENABLE_KDE4
+#    include <X11/Xlib.h>
+#    include <X11/Xatom.h>
+#    include "fixx11h.h"
+#  else
+#    include <NETRootInfo>
+#  endif
 #endif
 
 namespace QtCurve
@@ -111,10 +111,10 @@ namespace QtCurve
         _useWMMoveResize( false ),
 #endif
         _dragMode( WM_DRAG_NONE ),
-#ifdef QTC_QT_ONLY
-        _dragDistance( QApplication::startDragDistance() ),
+#ifdef QTC_QT4_ENABLE_KDE4
+        _dragDistance(KGlobalSettings::dndEventDelay()),
 #else
-        _dragDistance( KGlobalSettings::dndEventDelay() ),
+        _dragDistance(QApplication::startDragDistance()),
 #endif
         _dragDelay( QApplication::startDragTime() ),
         _dragAboutToStart( false ),
@@ -137,7 +137,7 @@ namespace QtCurve
         setDragMode( windowDrag );
 //CPD: Why???        setUseWMMoveResize( OxygenStyleConfigData::useWMMoveResize() );
 
-#ifndef QTC_QT_ONLY
+#ifdef QTC_QT4_ENABLE_KDE4
         setDragDistance( KGlobalSettings::dndEventDelay() );
 #endif
         setDragDelay( QApplication::startDragTime() );
@@ -656,7 +656,7 @@ namespace QtCurve
         {
 
             #ifdef Q_WS_X11
-            #ifdef QTC_QT_ONLY
+            #ifndef QTC_QT4_ENABLE_KDE4
             static const Atom constNetMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE", False);
             //...Taken from bespin...
             // stolen... errr "adapted!" from QSizeGrip
@@ -675,11 +675,11 @@ namespace QtCurve
             XUngrabPointer(QX11Info::display(), QX11Info::appTime());
             XSendEvent(QX11Info::display(), QX11Info::appRootWindow(info.screen()), False,
                        SubstructureRedirectMask | SubstructureNotifyMask, &xev);
-            #else    
+            #else
             XUngrabPointer(QX11Info::display(), QX11Info::appTime());
             NETRootInfo rootInfo(QX11Info::display(), NET::WMMoveResize);
             rootInfo.moveResizeRequest( widget->window()->winId(), position.x(), position.y(), NET::Move);
-            #endif // QTC_QT_ONLY
+            #endif // QTC_QT4_ENABLE_KDE4
             #endif
 
         }

@@ -28,12 +28,12 @@
 #include <QX11Info>
 #endif
 
-#if defined QTC_QT_ONLY
-#undef KDE_IS_VERSION
-#define KDE_IS_VERSION(A, B, C) 0
+#ifndef QTC_QT4_ENABLE_KDE4
+#  undef KDE_IS_VERSION
+#  define KDE_IS_VERSION(A, B, C) 0
 #else
-#include <kdeversion.h>
-#include <KDE/KWindowSystem>
+#  include <kdeversion.h>
+#  include <KDE/KWindowSystem>
 #endif
 
 namespace QtCurve
@@ -42,7 +42,7 @@ namespace QtCurve
     {
         bool compositingActive()
         {
-            #if defined QTC_QT_ONLY || !KDE_IS_VERSION(4, 4, 0)
+            #if !defined QTC_QT4_ENABLE_KDE4 || !KDE_IS_VERSION(4, 4, 0)
             #ifdef Q_WS_X11
             static bool haveAtom=false;
             static Atom atom;
@@ -61,11 +61,11 @@ namespace QtCurve
             #else // Q_WS_X11
             return false;
             #endif // Q_WS_X11
-            #else // QTC_QT_ONLY
+            #else // QTC_QT4_ENABLE_KDE4
             return KWindowSystem::compositingActive();
-            #endif // QTC_QT_ONLY
+            #endif // QTC_QT4_ENABLE_KDE4
         }
-        
+
         bool hasAlphaChannel(const QWidget *widget)
         {
             #ifdef Q_WS_X11

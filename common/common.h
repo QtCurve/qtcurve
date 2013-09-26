@@ -90,7 +90,7 @@ typedef gchar ** Strings;
 #define KWIN_GROUP            "KWin"
 
 /* qtc_<theme name>.themerc support */
-#define KDE_PREFIX(V) (KDE4PREFIX)
+#define KDE_PREFIX(V) (QTC_KDE4_PREFIX)
 #define THEME_DIR    "/share/apps/kstyle/themes/"
 #define THEME_DIR4   "/share/kde4/apps/kstyle/themes/"
 #define THEME_PREFIX "qtc_"
@@ -1274,11 +1274,11 @@ typedef struct
 #define MAX(a, b) ((b) < (a) ? (a) : (b))
 #endif
 
-#if defined QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY
+#if defined QT_VERSION && (QT_VERSION >= 0x040000) && defined QTC_QT4_ENABLE_KDE4
 #include <KDE/KColorUtils>
 #define tint(COLA, COLB, FACTOR) KColorUtils::tint((COLA), (COLB), (FACTOR))
 #define midColor(COLA, COLB) KColorUtils::mix((COLA), (COLB), 0.5)
-#else // QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY
+#else // QT_VERSION && (QT_VERSION >= 0x040000) && defined QTC_QT4_ENABLE_KDE4
 #include "colorutils.h"
 #ifdef __cplusplus
 #define tint(COLA, COLB, FACTOR) ColorUtils_tint(&(COLA), &(COLB), (FACTOR))
@@ -1288,7 +1288,7 @@ typedef struct
 #define tint(COLA, COLB, FACTOR) ColorUtils_tint((COLA), (COLB), (FACTOR))
 #define midColor(COLA, COLB) ColorUtils_mix((COLA), (COLB), 0.5)
 #endif // __cplusplus
-#endif // QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY
+#endif // QT_VERSION && (QT_VERSION >= 0x040000) && defined QTC_QT4_ENABLE_KDE4
 
 extern void qtcRgbToHsv(double r, double g, double b, double *h, double *s, double *v);
 extern void qtcRgbToHsv(double r, double g, double b, double *h, double *s, double *v);

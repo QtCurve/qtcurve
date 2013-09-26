@@ -38,7 +38,7 @@
 typedef qulonglong QtcKey;
 #include "common.h"
 
-#if !defined QTC_QT_ONLY
+#ifdef QTC_QT4_ENABLE_KDE4
 #include <KDE/KComponentData>
 #endif
 
@@ -294,7 +294,7 @@ class Style : public QCommonStyle
     void           toggleMenuBar(QMainWindow *window);
     void           toggleStatusBar(QMainWindow *window);
 
-#if !defined QTC_QT_ONLY
+#ifdef QTC_QT4_ENABLE_KDE4
     void           setupKde4();
 
 
@@ -363,7 +363,7 @@ class Style : public QCommonStyle
 #endif
     mutable QScrollBar                 *itsSViewSBar;
     mutable QMap<QWidget *, QSet<QWidget *> > itsSViewContainers;
-#if !defined QTC_QT_ONLY
+#ifdef QTC_QT4_ENABLE_KDE4
     KComponentData                     itsComponentData;
 #endif
     QtCurve::WindowManager             *itsWindowManager;

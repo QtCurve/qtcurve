@@ -282,7 +282,7 @@ void qtcShade(const Options *opts, const color *ca, color *cb, double k)
             case SHADING_HCY:
             {
     #define HCY_FACTOR 0.15
-    #if defined QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY
+    #if defined QT_VERSION && (QT_VERSION >= 0x040000) && defined QTC_QT4_ENABLE_KDE4
                 if(k>1.0)
                     *cb=KColorUtils::lighten(ca, (k*(1+HCY_FACTOR))-1.0, 1.0);
                 else
