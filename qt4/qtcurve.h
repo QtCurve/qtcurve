@@ -50,6 +50,28 @@ typedef qulonglong QtcKey;
 #define BASE_STYLE QCommonStyle
 // #endif
 
+#define qtcCheckKDEType(obj, type) (qtcCheckKDETypeFull(obj, type, #type))
+#define qtcCheckKDEType0(obj, type) (qtcCheckKDETypeFull0(obj, type, #type))
+
+template <class T, class T2> static inline bool
+qtcCheckType0(T2 *obj)
+{
+    return obj && qobject_cast<const T*>(obj);
+}
+template <class T2> static inline bool
+qtcCheckType0(T2 *obj, const char *name)
+{
+    return obj && obj->inherits(name);
+}
+
+#ifdef QTC_QT4_ENABLE_KDE4
+#define qtcCheckKDETypeFull(obj, type, name) (qobject_cast<const type*>(obj))
+#define qtcCheckKDETypeFull0(obj, type, name) (qtcCheckType0<type>(obj))
+#else
+#define qtcCheckKDETypeFull(obj, type, name) (obj->inherits(name))
+#define qtcCheckKDETypeFull0(obj, type, name) (qtcCheckType0(obj, name))
+#endif
+
 class QStyleOptionSlider;
 class QLabel;
 class QMenuBar;
@@ -59,68 +81,58 @@ class QMainWindow;
 class QStatusBar;
 class QAbstractScrollArea;
 
-namespace QtCurve
-{
-    class WindowManager;
-    class BlurHelper;
-    class ShortcutHandler;
+namespace QtCurve {
+
+class WindowManager;
+class BlurHelper;
+class ShortcutHandler;
 #ifdef Q_WS_X11
-    class ShadowHelper;
+class ShadowHelper;
 #endif
 
-class Style : public QCommonStyle
-{
+class Style : public QCommonStyle {
     Q_OBJECT
     Q_CLASSINFO("X-KDE-CustomElements", "true")
 
     public:
 
-    enum BackgroundType
-    {
+    enum BackgroundType {
         BGND_WINDOW,
         BGND_DIALOG,
         BGND_MENU
     };
 
-    enum MenuItemType
-    {
+    enum MenuItemType {
         MENU_POPUP,
         MENU_BAR,
         MENU_COMBO
     };
-    
-    enum CustomElements
-    {
+
+    enum CustomElements {
         CE_QtC_KCapacityBar = CE_CustomBase+0x00FFFF00,
         CE_QtC_Preview,
         CE_QtC_SetOptions
     };
 
-    enum PreviewType
-    {
+    enum PreviewType {
         PREVIEW_FALSE,
         PREVIEW_MDI,
         PREVIEW_WINDOW
     };
-    
-    class PreviewOption : public QStyleOption
-    {
-        public:
 
+    class PreviewOption : public QStyleOption {
+    public:
         Options opts;
     };
 
-    class BgndOption : public QStyleOption
-    {
-        public:
-
+    class BgndOption : public QStyleOption {
+    public:
         EAppearance  app;
         QPainterPath path;
         QRect        widgetRect;
     };
 
-    enum Icon
-    {
+    enum Icon {
         ICN_MIN,
         ICN_MAX,
         ICN_MENU,
@@ -140,7 +152,7 @@ class Style : public QCommonStyle
 #endif
 
     ~Style();
-    
+
     void init(bool initial);
     void freeColor(QSet<QColor *> &freedColors, QColor **cols);
     void freeColors();
@@ -177,7 +189,7 @@ class Style : public QCommonStyle
     SubControl hitTestComplexControl(ComplexControl control, const QStyleOptionComplex *option,
                                      const QPoint &pos, const QWidget *widget) const;
 
-    private:
+private:
 
     void drawSideBarButton(QPainter *painter, const QRect &r, const QStyleOption *option, const QWidget *widget) const;
     void drawHighlight(QPainter *p, const QRect &r, bool horiz, bool inc) const;
@@ -194,14 +206,14 @@ class Style : public QCommonStyle
 
     void drawBevelGradient(const QColor &base, QPainter *p, QRect const &r,
                            bool horiz, bool sel, EAppearance bevApp, EWidget w=WIDGET_OTHER, bool useCache=true) const
-    {
-        drawBevelGradient(base, p, r, QPainterPath(), horiz, sel, bevApp, w, useCache);
-    }
+        {
+            drawBevelGradient(base, p, r, QPainterPath(), horiz, sel, bevApp, w, useCache);
+        }
     void drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &r, bool horiz, bool sel,
                                EAppearance bevApp, EWidget w) const
-    {
-        drawBevelGradientReal(base, p, r, QPainterPath(), horiz, sel, bevApp, w);
-    }
+        {
+            drawBevelGradientReal(base, p, r, QPainterPath(), horiz, sel, bevApp, w);
+        }
 
     void drawSunkenBevel(QPainter *p, const QRect &r, const QColor &col) const;
     void drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *option, const QWidget *widget, int round, const QColor &fill,
@@ -259,7 +271,7 @@ class Style : public QCommonStyle
     const QColor * borderColors(const QStyleOption *option, const QColor *use) const;
     const QColor * getSidebarButtons() const;
     void           setMenuColors(const QColor &bgnd);
-   void            setMenuTextColors(QWidget *widget, bool isMenuBar) const;
+    void            setMenuTextColors(QWidget *widget, bool isMenuBar) const;
     const QColor * menuColors(const QStyleOption *option, bool active) const;
     bool           coloredMdiButtons(bool active, bool mouseOver) const;
     const QColor * getMdiColors(const QStyleOption *option, bool active) const;
@@ -276,7 +288,7 @@ class Style : public QCommonStyle
     int            getFrameRound(const QWidget *widget) const;
     void           unregisterArgbWidget(QWidget *w);
 
-    private Q_SLOTS:
+private Q_SLOTS:
 
     void           widgetDestroyed(QObject *o);
     QIcon          standardIconImplementation(StandardPixmap pix, const QStyleOption *option=0, const QWidget *widget=0) const;
@@ -289,7 +301,7 @@ class Style : public QCommonStyle
     void           toggleStatusBar(unsigned int xid);
     void           compositingToggled();
 
-    private:
+private:
 
     void           toggleMenuBar(QMainWindow *window);
     void           toggleStatusBar(QMainWindow *window);
@@ -307,28 +319,28 @@ class Style : public QCommonStyle
     void           emitStatusBarState(QStatusBar *sb);
 #endif
 
-    private:
+private:
 
     mutable Options                    opts;
     QColor                             itsHighlightCols[TOTAL_SHADES+1],
-                                       itsBackgroundCols[TOTAL_SHADES+1],
-                                       itsMenubarCols[TOTAL_SHADES+1],
-                                       itsFocusCols[TOTAL_SHADES+1],
-                                       itsMouseOverCols[TOTAL_SHADES+1],
-                                       *itsPopupMenuCols,
-                                       *itsSliderCols,
-                                       *itsDefBtnCols,
-                                       *itsComboBtnCols,
-                                       *itsCheckRadioSelCols,
-                                       *itsSortedLvColors,
-                                       *itsOOMenuCols,
-                                       *itsProgressCols,
-                                       itsButtonCols[TOTAL_SHADES+1],
-                                       itsCheckRadioCol;
+        itsBackgroundCols[TOTAL_SHADES+1],
+        itsMenubarCols[TOTAL_SHADES+1],
+        itsFocusCols[TOTAL_SHADES+1],
+        itsMouseOverCols[TOTAL_SHADES+1],
+        *itsPopupMenuCols,
+        *itsSliderCols,
+        *itsDefBtnCols,
+        *itsComboBtnCols,
+        *itsCheckRadioSelCols,
+        *itsSortedLvColors,
+        *itsOOMenuCols,
+        *itsProgressCols,
+        itsButtonCols[TOTAL_SHADES+1],
+        itsCheckRadioCol;
     bool                               itsSaveMenuBarStatus,
-                                       itsSaveStatusBarStatus,
-                                       itsUsePixmapCache,
-                                       itsInactiveChangeSelectionColor;
+        itsSaveStatusBarStatus,
+        itsUsePixmapCache,
+        itsInactiveChangeSelectionColor;
     PreviewType                        itsIsPreview;
     mutable QColor                     *itsSidebarButtonsCols;
     mutable QColor                     *itsActiveMdiColors;
@@ -345,7 +357,7 @@ class Style : public QCommonStyle
     QSet<QProgressBar *>               itsProgressBars;
     QSet<QWidget *>                    itsTransparentWidgets;
     int                                itsProgressBarAnimateTimer,
-                                       itsAnimateStep;
+        itsAnimateStep;
     QTime                              itsTimer;
     mutable QMap<int, QColor *>        itsTitleBarButtonsCols;
 #ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
