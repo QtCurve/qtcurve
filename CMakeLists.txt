@@ -65,6 +65,8 @@ find_package(Qt4 REQUIRED)
 
 configure_file(config.h.in config.h @ONLY)
 
+add_subdirectory(common)
+
 # search packages used by KDE
 if(QTC_QT4_ENABLE_KDE4)
   find_package(KDE4 REQUIRED)
@@ -89,7 +91,8 @@ if(QTC_QT4_ENABLE_KDE4)
       set(QTC_QT4_ENABLE_KWIN Off)
     endif()
   endif()
-  option(QTC_QT4_ENABLE_KWIN "Qt4 kwin theme support." Off)
+  option(QTC_QT4_ENABLE_KWIN "Qt4 kwin theme support."
+    "${QTC_QT4_ENABLE_KWIN}")
 
   if(QTC_QT4_ENABLE_KWIN)
     add_subdirectory(kwin)

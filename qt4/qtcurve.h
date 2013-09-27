@@ -36,7 +36,7 @@
 #endif
 #include <Q_UINT64>
 typedef qulonglong QtcKey;
-#include "common.h"
+#include <common/common.h>
 
 #ifdef QTC_QT4_ENABLE_KDE4
 #include <KDE/KComponentData>

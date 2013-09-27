@@ -28,7 +28,7 @@
 #include "shortcuthandler.h"
 #include "pixmaps.h"
 #include <iostream>
-#include "config_file.h"
+#include <common/config_file.h>
 
 // WebKit seems to just use the values from ::pixelMetric to get button sizes. So, in pixelMetric we add some extra padding to PM_ButtonMargin
 // if we're max rounding - this gives a nicer border. However, dont want this on real buttons - so in sizeFromContents we remove this padding
@@ -13379,11 +13379,10 @@ const QColor & Style::getFill(const QStyleOption *option, const QColor *use, boo
 
 QPixmap * Style::getPixmap(const QColor col, EPixmap p, double shade) const
 {
-    QtcKey  key(createKey(col, p));
-    QPixmap *pix=itsPixmapCache.object(key);
+    QtcKey key(createKey(col, p));
+    QPixmap *pix = itsPixmapCache.object(key);
 
-    if(!pix)
-    {
+    if (!pix) {
         if(PIX_DOT==p)
         {
             pix=new QPixmap(5, 5);
@@ -13409,23 +13408,18 @@ QPixmap * Style::getPixmap(const QColor col, EPixmap p, double shade) const
             p.setBrush(g2);
             p.drawEllipse(1, 1, 4, 4);
             p.end();
-        }
-        else
-        {
-            pix=new QPixmap();
-
+        } else {
+            pix = new QPixmap();
             QImage img;
-
-            switch(p)
-            {
-                case PIX_CHECK:
-                    if(opts.xCheck)
-                        img.loadFromData(check_x_on_png_data, check_x_on_png_len);
-                    else
-                        img.loadFromData(check_on_png_data, check_on_png_len);
-                    break;
-                default:
-                    break;
+            switch (p) {
+            case PIX_CHECK:
+                if(opts.xCheck)
+                    img.loadFromData(check_x_on_png_data, check_x_on_png_len);
+                else
+                    img.loadFromData(check_on_png_data, check_on_png_len);
+                break;
+            default:
+                break;
             }
 
             if (img.depth()<32)

@@ -30,10 +30,9 @@
 #include <QtCore/QObject>
 #include <QtCore/QMap>
 #include <QtGui/qwindowdefs.h>
-
-#ifdef Q_WS_X11
 #include <X11/Xdefs.h>
-#endif
+
+#include <common/common.h>
 
 class QPixmap;
 
@@ -83,7 +82,7 @@ namespace QtCurve
         void createPixmapHandles(  );
 
         // create pixmap handle from pixmap
-        Qt::HANDLE createPixmap( const uchar *buf, int len );
+        Qt::HANDLE createPixmap(const QtcPixmap *data);
 
         //! install shadow X11 property on given widget
         /*!

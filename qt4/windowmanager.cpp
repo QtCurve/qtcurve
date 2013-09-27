@@ -33,7 +33,7 @@
 
 #include "windowmanager.h"
 #include "qtcurve.h"
-#include "common.h"
+#include <common/common.h>
 #include "utils.h"
 
 #include <QtGui/QApplication>

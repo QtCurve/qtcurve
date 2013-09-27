@@ -25,7 +25,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "shadowhelper.h"
-#include "shadow.h"
 #include "utils.h"
 
 #include <QtGui/QDockWidget>
@@ -34,18 +33,28 @@
 #include <QtGui/QToolBar>
 #include <QtCore/QEvent>
 
-#ifdef Q_WS_X11
 #include <QtGui/QX11Info>
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
 #include <X11/Xatom.h>
-#endif
 
-namespace QtCurve
-{
+#include <common/common.h>
+#include <common/shadow0-png.h>
+#include <common/shadow1-png.h>
+#include <common/shadow2-png.h>
+#include <common/shadow3-png.h>
+#include <common/shadow4-png.h>
+#include <common/shadow5-png.h>
+#include <common/shadow6-png.h>
+#include <common/shadow7-png.h>
 
-    const char* const ShadowHelper::netWMShadowAtomName( "_KDE_NET_WM_SHADOW" );
-    const char* const ShadowHelper::netWMForceShadowPropertyName( "_KDE_NET_WM_FORCE_SHADOW" );
-    const char* const ShadowHelper::netWMSkipShadowPropertyName( "_KDE_NET_WM_SKIP_SHADOW" );
+namespace QtCurve {
+
+const char *const ShadowHelper::netWMShadowAtomName = "_KDE_NET_WM_SHADOW";
+const char *const ShadowHelper::netWMForceShadowPropertyName =
+    "_KDE_NET_WM_FORCE_SHADOW";
+const char *const ShadowHelper::netWMSkipShadowPropertyName =
+    "_KDE_NET_WM_SKIP_SHADOW";
 
     //_____________________________________________________
     ShadowHelper::ShadowHelper( QObject* parent ):
@@ -155,7 +164,7 @@ namespace QtCurve
     }
 
     //______________________________________________
-    void ShadowHelper::createPixmapHandles(  )
+    void ShadowHelper::createPixmapHandles()
     {
 
         /*!
@@ -164,61 +173,42 @@ namespace QtCurve
         */
 
         // create atom
-        #ifdef Q_WS_X11
-        if( !_atom ) _atom = XInternAtom( QX11Info::display(), netWMShadowAtomName, False);
-        #endif
+        if (!_atom)
+            _atom = XInternAtom(QX11Info::display(),
+                                netWMShadowAtomName, False);
 
-        _pixmaps[0]=createPixmap(shadow0_png_data, shadow0_png_len);
-        _pixmaps[1]=createPixmap(shadow1_png_data, shadow1_png_len);
-        _pixmaps[2]=createPixmap(shadow2_png_data, shadow2_png_len);
-        _pixmaps[3]=createPixmap(shadow3_png_data, shadow3_png_len);
-        _pixmaps[4]=createPixmap(shadow4_png_data, shadow4_png_len);
-        _pixmaps[5]=createPixmap(shadow5_png_data, shadow5_png_len);
-        _pixmaps[6]=createPixmap(shadow6_png_data, shadow6_png_len);
-        _pixmaps[7]=createPixmap(shadow7_png_data, shadow7_png_len);
+        _pixmaps[0] = createPixmap(&qtc_shadow0);
+        _pixmaps[1] = createPixmap(&qtc_shadow1);
+        _pixmaps[2] = createPixmap(&qtc_shadow2);
+        _pixmaps[3] = createPixmap(&qtc_shadow3);
+        _pixmaps[4] = createPixmap(&qtc_shadow4);
+        _pixmaps[5] = createPixmap(&qtc_shadow5);
+        _pixmaps[6] = createPixmap(&qtc_shadow6);
+        _pixmaps[7] = createPixmap(&qtc_shadow7);
     }
 
-    //______________________________________________
-    Qt::HANDLE ShadowHelper::createPixmap( const uchar *buf, int len )
-    {
-        QImage source;
-        source.loadFromData(buf, len);
-
-        // do nothing for invalid _pixmaps
-        if( source.isNull() ) return 0;
-
-        _size=source.width();
-
-        /*
-        in some cases, pixmap handle is invalid. This is the case notably
-        when Qt uses to RasterEngine. In this case, we create an X11 Pixmap
-        explicitly and draw the source pixmap on it.
-        */
-
-        #ifdef Q_WS_X11
-        const int width( source.width() );
-        const int height( source.height() );
-
-        // create X11 pixmap
-        Pixmap pixmap = XCreatePixmap( QX11Info::display(), QX11Info::appRootWindow(), width, height, 32 );
-
-        // create explicitly shared QPixmap from it
-        QPixmap dest( QPixmap::fromX11Pixmap( pixmap, QPixmap::ExplicitlyShared ) );
-
-        // create surface for pixmap
-        {
-            QPainter painter( &dest );
-            painter.setCompositionMode( QPainter::CompositionMode_Source );
-            painter.drawImage( 0, 0, source );
-        }
-
-
-        return pixmap;
-        #else
-        return 0;
-        #endif
-
-    }
+//______________________________________________
+Qt::HANDLE
+ShadowHelper::createPixmap(const QtcPixmap *data)
+{
+    int width = data->width;
+    int height = data->height;
+    _size = width;
+    Display *disp = QX11Info::display();
+    // create X11 pixmap
+    Pixmap pixmap = XCreatePixmap(disp, QX11Info::appRootWindow(), width,
+                                  height, 32);
+    GC cid = XCreateGC(disp, pixmap, 0, NULL);
+    XImage *image = XCreateImage(disp, CopyFromParent, 32, ZPixmap, 0,
+                                 (char*)data->data, width, height, 32, 0);
+    XPutImage(disp, pixmap, cid, image, 0, 0, 0, 0, width, height);
+    // By checking XLib source code not sure if this will work for all versions.
+    // This part should move to xlib-xcb once there is a utils library.
+    image->data = NULL;
+    XDestroyImage(image);
+    XFreeGC(disp, cid);
+    return pixmap;
+}
 
 //_______________________________________________________
     bool ShadowHelper::installX11Shadows( QWidget* widget )
