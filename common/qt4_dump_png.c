@@ -20,52 +20,33 @@
 
 #include "stdio.h"
 
-#include <QImage>
-#include <QApplication>
-
 int
 main(int argc, char **argv)
 {
-    QApplication app(argc, argv);
     if (argc < 4)
         return 1;
     const char *filename = argv[1];
     const char *varname = argv[2];
     const char *outputname = argv[3];
-
-    QImage image(QString::fromLocal8Bit(filename));
-    if (image.isNull())
-        return 1;
-    int height = image.height();
-    int width = image.width();
-    int size = height * width;
-
+    FILE *inputfile = fopen(filename, "r");
     FILE *outputfile = fopen(outputname, "w");
+
     fprintf(outputfile,
             "#ifndef __QTC_IMAGE_HDR_%s__\n", varname);
     fprintf(outputfile,
             "#define __QTC_IMAGE_HDR_%s__\n", varname);
 
     fprintf(outputfile, "static const unsigned char _%s_data[] = {", varname);
-    for (int j = 0;j < height;j++) {
-        for (int i = 0;i < width;i++) {
-            QRgb pixel = image.pixel(i, j);
-            unsigned int alpha = qAlpha(pixel);
-            unsigned int red = qRed(pixel) * alpha / 256;
-            unsigned int blue = qBlue(pixel) * alpha / 256;
-            unsigned int green = qGreen(pixel) * alpha / 256;
-            fprintf(outputfile, "%u,%u,%u,%u,", blue, green, red, alpha);
-        }
+    int size = 0;
+    unsigned char buff;
+    while (fread(&buff, 1, 1, inputfile)) {
+        fprintf(outputfile, "%u,", (unsigned int)buff);
+        size++;
     }
     fprintf(outputfile, "};\n");
     fprintf(outputfile,
-            "static const QtcPixmap %s __attribute__((unused)) = {\n"
-            "    %d,\n"
-            "    %d,\n"
-            "    %d,\n"
-            "    %d,\n"
-            "    _%s_data\n"
-            "};\n", varname, size * 4, width, height, image.depth(), varname);
+            "static const QImage %s __attribute__((unused)) = "
+            "QImage::fromData(_%s_data, %d);\n", varname, varname, size);
     fprintf(outputfile, "#endif\n");
     fclose(outputfile);
     return 0;

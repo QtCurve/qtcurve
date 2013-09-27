@@ -26,9 +26,14 @@
 #include "windowmanager.h"
 #include "blurhelper.h"
 #include "shortcuthandler.h"
-#include "pixmaps.h"
 #include <iostream>
+
 #include <common/config_file.h>
+#include <common/check_on-png.h>
+#include <common/check_x_on-png.h>
+#include <common/dialog_error-png.h>
+#include <common/dialog_warning-png.h>
+#include <common/dialog_information-png.h>
 
 // WebKit seems to just use the values from ::pixelMetric to get button sizes. So, in pixelMetric we add some extra padding to PM_ButtonMargin
 // if we're max rounding - this gives a nicer border. However, dont want this on real buttons - so in sizeFromContents we remove this padding
@@ -3642,18 +3647,6 @@ QPalette Style::standardPalette() const
 #endif
 }
 
-#ifndef QTC_QT4_ENABLE_KDE4
-#include "dialogpixmaps.h"
-
-static QIcon load(const unsigned int len, const unsigned char *data)
-{
-    QImage img;
-    img.loadFromData(data, len);
-
-    return QIcon(QPixmap::fromImage(img));
-}
-#endif
-
 QIcon Style::standardIconImplementation(StandardPixmap pix, const QStyleOption *option, const QWidget *widget) const
 {
     switch(pix)
@@ -3692,19 +3685,16 @@ QIcon Style::standardIconImplementation(StandardPixmap pix, const QStyleOption *
         }
 #ifndef QTC_QT4_ENABLE_KDE4
         case SP_MessageBoxQuestion:
-        case SP_MessageBoxInformation:
-        {
-            static QIcon icn(load(dialog_information_png_len, dialog_information_png_data));
+        case SP_MessageBoxInformation: {
+            static QIcon icn(QPixmap::fromImage(qtc_dialog_information));
             return icn;
         }
-        case SP_MessageBoxWarning:
-        {
-            static QIcon icn(load(dialog_warning_png_len, dialog_warning_png_data));
+        case SP_MessageBoxWarning: {
+            static QIcon icn(QPixmap::fromImage(qtc_dialog_warning));
             return icn;
         }
-        case SP_MessageBoxCritical:
-        {
-            static QIcon icn(load(dialog_error_png_len, dialog_error_png_data));
+        case SP_MessageBoxCritical: {
+            static QIcon icn(QPixmap::fromImage(qtc_dialog_error));
             return icn;
         }
 /*
@@ -13414,19 +13404,18 @@ QPixmap * Style::getPixmap(const QColor col, EPixmap p, double shade) const
             switch (p) {
             case PIX_CHECK:
                 if(opts.xCheck)
-                    img.loadFromData(check_x_on_png_data, check_x_on_png_len);
+                    img = qtc_check_x_on;
                 else
-                    img.loadFromData(check_on_png_data, check_on_png_len);
+                    img = qtc_check_on;
                 break;
             default:
                 break;
             }
 
-            if (img.depth()<32)
-                img=img.convertToFormat(QImage::Format_ARGB32);
-
-            qtcAdjustPix(img.bits(), 4, img.width(), img.height(), img.bytesPerLine(), col.red(), col.green(), col.blue(), shade);
-            *pix=QPixmap::fromImage(img);
+            qtcAdjustPix(img.bits(), 4, img.width(), img.height(),
+                         img.bytesPerLine(), col.red(), col.green(),
+                         col.blue(), shade);
+            *pix = QPixmap::fromImage(img);
         }
         itsPixmapCache.insert(key, pix, pix->depth()/8);
     }
