@@ -2,6 +2,7 @@
 build*/
 .*
 !.git*
+!.mailmap
 .git/
 *.tar.*
 *.kdev4
