@@ -37,8 +37,6 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}"
   "${QT_QTCORE_INCLUDE_DIR}"
   "${QT_QTDBUS_INCLUDE_DIR}"
   "${QT_QTSVG_INCLUDE_DIR}")
-# kde4_add_plugin(qtcurve ${qtcurve_SRCS})
-# qt4_automoc(${qtcurve_SRCS})
 qt4_wrap_cpp(qtcurve_MOC_SRCS ${qtcurve_MOC_HDRS})
 add_library(qtcurve MODULE ${qtcurve_SRCS} ${qtcurve_MOC_SRCS})
 add_dependencies(qtcurve qtc_shadow0_hdr qtc_shadow1_hdr qtc_shadow2_hdr
