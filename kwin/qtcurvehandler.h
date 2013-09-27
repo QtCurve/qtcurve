@@ -27,9 +27,9 @@
 #ifndef KWIN_QTCURVE_H
 #define KWIN_QTCURVE_H
 
-#include <QtGui/QFont>
-#include <QtGui/QApplication>
-#include <QtGui/QBitmap>
+#include <QFont>
+#include <QApplication>
+#include <QBitmap>
 #include <kdeversion.h>
 #include <kdecoration.h>
 #include <kdecorationfactory.h>

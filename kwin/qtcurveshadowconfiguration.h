@@ -21,7 +21,7 @@
   Boston, MA 02110-1301, USA.
  */
 
-#include <QtGui/QPalette>
+#include <QPalette>
 #ifdef midColor
 #undef midColor
 #endif

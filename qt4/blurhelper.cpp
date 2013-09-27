@@ -29,13 +29,13 @@
 
 #include "blurhelper.h"
 
-#include <QtCore/QEvent>
-#include <QtCore/QVector>
-#include <QtGui/QDockWidget>
-#include <QtGui/QMenu>
-#include <QtGui/QProgressBar>
-#include <QtGui/QPushButton>
-#include <QtGui/QToolBar>
+#include <QEvent>
+#include <QVector>
+#include <QDockWidget>
+#include <QMenu>
+#include <QProgressBar>
+#include <QPushButton>
+#include <QToolBar>
 
 #ifdef Q_WS_X11
 #include <X11/Xlib.h>

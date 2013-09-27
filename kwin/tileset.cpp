@@ -22,7 +22,7 @@
 
 #include "tileset.h"
 
-#include <QtGui/QPainter>
+#include <QPainter>
 
 //______________________________________________________________
 void TileSet::initPixmap( int s, const QPixmap &pix, int w, int h, const QRect &region)

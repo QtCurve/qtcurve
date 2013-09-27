@@ -32,11 +32,11 @@
 #include "qtcurveclient.h"
 
 #include <cassert>
-#include <QtGui/QPainter>
-#include <QtGui/QPolygon>
-#include <QtCore/QTimer>
+#include <QPainter>
+#include <QPolygon>
+#include <QTimer>
 
-#include <QtGui/QX11Info>
+#include <QX11Info>
 #include <X11/Xlib.h>
 
 namespace KWinQtCurve

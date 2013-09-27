@@ -19,7 +19,7 @@ This library is distributed in the hope that it will be useful,
 #ifndef MAC_MENU_ADAPTOR_H
 #define MAC_MENU_ADAPTOR_H
 
-#include <QtDBus/QDBusAbstractAdaptor>
+#include <QDBusAbstractAdaptor>
 #include "macmenu.h"
 
 namespace Bespin

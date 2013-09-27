@@ -22,7 +22,7 @@
 #include <klocale.h>
 #include <kglobal.h>
 #include <kdeversion.h>
-#include <QtDBus/QDBusConnection>
+#include <QDBusConnection>
 #include "config.h"
 #include "common.h"
 #include "qtcurvekwinconfig.h"

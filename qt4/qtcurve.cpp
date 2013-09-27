@@ -20,7 +20,7 @@
 
 #include <QtGui>
 #ifdef Q_WS_X11
-#include <QtDBus/QtDBus>
+#include <QtDBus>
 #endif
 #include "qtcurve.h"
 #include "windowmanager.h"

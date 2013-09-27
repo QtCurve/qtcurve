@@ -34,8 +34,8 @@
 
 //#define NEW_SHADOWS
 
-#include <QtCore/QCache>
-#include <QtGui/QRadialGradient>
+#include <QCache>
+#include <QRadialGradient>
 
 #include "qtcurveshadowconfiguration.h"
 #include "tileset.h"

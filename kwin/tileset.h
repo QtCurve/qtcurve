@@ -19,9 +19,9 @@
 #ifndef TILESET_H
 #define TILESET_H
 
-#include <QtGui/QPixmap>
-#include <QtCore/QRect>
-#include <QtCore/QVector>
+#include <QPixmap>
+#include <QRect>
+#include <QVector>
 
 //! handles proper scaling of pixmap to match widget rect.
 /*!

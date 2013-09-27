@@ -32,18 +32,15 @@
 // IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
 
-#include <QtCore/QEvent>
+#include <QEvent>
+#include <QBasicTimer>
+#include <QObject>
+#include <QSet>
+#include <QString>
+#include <QWeakPointer>
+#include <QWidget>
 
-#include <QtCore/QBasicTimer>
-#include <QtCore/QObject>
-#include <QtCore/QSet>
-#include <QtCore/QString>
-#include <QtCore/QWeakPointer>
-
-#include <QtGui/QWidget>
-
-namespace QtCurve
-{
+namespace QtCurve {
 #if QT_VERSION < 0x040600
     class QtCPointer : public QObject
 {

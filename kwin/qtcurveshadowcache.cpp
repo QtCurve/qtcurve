@@ -40,7 +40,7 @@
 #include <cassert>
 #include <KColorUtils>
 #include <KColorScheme>
-#include <QtGui/QPainter>
+#include <QPainter>
 
 namespace KWinQtCurve
 {

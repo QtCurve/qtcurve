@@ -37,8 +37,8 @@
 #ifdef QTC_QT4_KWIN_MAX_BUTTON_HACK
 #undef private
 #endif
-#include <QtGui/QPixmap>
-#include <QtGui/QColor>
+#include <QPixmap>
+#include <QColor>
 #include "qtcurvehandler.h"
 
 namespace KWinQtCurve {

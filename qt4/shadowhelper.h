@@ -27,9 +27,9 @@
 // IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
 
-#include <QtCore/QObject>
-#include <QtCore/QMap>
-#include <QtGui/qwindowdefs.h>
+#include <QObject>
+#include <QMap>
+#include <qwindowdefs.h>
 #include <X11/Xdefs.h>
 
 #include <common/common.h>

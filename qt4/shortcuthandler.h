@@ -21,9 +21,9 @@
   Boston, MA 02110-1301, USA.
 */
 
-#include <QtCore/QObject>
-#include <QtCore/QSet>
-#include <QtCore/QList>
+#include <QObject>
+#include <QSet>
+#include <QList>
 
 class QWidget;
 

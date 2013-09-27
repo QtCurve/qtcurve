@@ -18,8 +18,8 @@ This library is distributed in the hope that it will be useful,
 
 #include <QActionEvent>
 #include <QApplication>
-#include <QtDBus/QDBusConnectionInterface>
-#include <QtDBus/QDBusMessage>
+#include <QDBusConnectionInterface>
+#include <QDBusMessage>
 #include <QLayout>
 #include <QMenuBar>
 #include <QWindowStateChangeEvent>

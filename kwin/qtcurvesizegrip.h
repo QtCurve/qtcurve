@@ -29,9 +29,9 @@
 // IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
 
-#include <QtGui/QWidget>
-#include <QtGui/QPaintEvent>
-#include <QtGui/QMouseEvent>
+#include <QWidget>
+#include <QPaintEvent>
+#include <QMouseEvent>
 
 namespace KWinQtCurve
 {

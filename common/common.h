@@ -60,7 +60,7 @@ typedef enum
 #include <map>
 #include <set>
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
-#include <QtCore/QString>
+#include <QString>
 #endif // defined QT_VERSION && (QT_VERSION >= 0x040000)
 #else // __cplusplus
 #include <glib.h>
@@ -78,7 +78,7 @@ class QColor;
 typedef QColor color;
 
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
-#include <QtCore/QSet>
+#include <QSet>
 typedef QSet<QString> Strings;
 #else // QT_VERSION && (QT_VERSION >= 0x040000)
 typedef QStringList Strings;
