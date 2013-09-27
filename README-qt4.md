@@ -10,12 +10,14 @@
 ## CMake configure options
 1. `QTC_QT4_ENABLE_KDE4`
     Compile QtCurve qt4 style with KDE support and dependencies.
+
     (Default: `On`)
 
 2. `QTC_QT4_ENABLE_KWIN`
     Compile QtCurve qt4 kwin style. This will only have effect when KDE support
     is turned on.
-    (Default: `On` is kwin header is found and KDE support is on,
+
+    (Default: `On` if kwin header is found and KDE support is on,
     `Off` otherwise)
 
 3. `QTC_QT4_OLD_NVIDIA_ARROW_FIX`
@@ -24,6 +26,7 @@
     work-around this, QtCurve filled the arrows using AA-ed drawing, and used
     non-AA drawing for the edges. As of 0.69.0 this code is no longer enabled
     by default - use this config option to re-enable the code.
+
     (Default: `Off`)
 
 4. `QTC_QT4_STYLE_SUPPORT`
@@ -31,15 +34,19 @@
     `<kde prefix>/share/apps/kstyle/themes/qtc_<stylename>.themerc`
     Note that this is not supported in Qt5.
 
+    (Default: `Off`)
+
 5. `QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT`
     Enable support for the 'fixParentlessDialogs' config option. NOTE: This is
     known to break some applications - hence is disabled by default!
+
     (Default: `Off`)
 
 6. `QTC_QT4_KWIN_MAX_BUTTON_HACK`
     Hack to force kwin drawing maximize buttons for windows that can be
     minimised. This is a 100% hack, that may not work or compile, and may even
     crash kwin.
+
     (Default `Off`)
 
 ## Creating Distribution Packages
