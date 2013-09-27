@@ -20,7 +20,7 @@
 
 #include "qtcurveconfig.h"
 #include "../kwinconfig/qtcurvekwinconfig.h"
-#ifdef QTC_STYLE_SUPPORT
+#ifdef QTC_QT4_STYLE_SUPPORT
 #include "exportthemedialog.h"
 #endif
 #include "imagepropertiesdialog.h"
@@ -225,7 +225,7 @@ static QSet<QString> toSet(const QString &str)
 CStylePreview::CStylePreview(QWidget *parent)
              : KXmlGuiWindow(parent)
 {
-    aboutData = new KAboutData("QtCurve", 0, ki18n("QtCurve"), VERSION,
+    aboutData = new KAboutData("QtCurve", 0, ki18n("QtCurve"), QTC_VERSION,
                                ki18n("Unified widget style."),
                                KAboutData::License_GPL,
                                ki18n("(C) Craig Drummond, 2003-2011"),
@@ -848,7 +848,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
                workSpace(NULL),
                stylePreview(NULL),
                mdiWindow(NULL),
-#ifdef QTC_STYLE_SUPPORT
+#ifdef QTC_QT4_STYLE_SUPPORT
                exportDialog(NULL),
 #endif
                gradPreview(NULL),
@@ -856,7 +856,8 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
 {
     setupUi(this);
     setObjectName("QtCurveConfigDialog");
-    titleLabel->setText("QtCurve " VERSION " - (C) Craig Drummond, 2003-2010");
+    titleLabel->setText("QtCurve " QTC_VERSION
+                        " - (C) Craig Drummond, 2003-2010");
     insertShadeEntries(shadeSliders, SW_SLIDER);
     insertShadeEntries(shadeMenubars, SW_MENUBAR);
     insertShadeEntries(shadeCheckRadio, SW_CHECK_RADIO);
@@ -1003,7 +1004,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(toolbarSeparators, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(splitters, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(fillSlider, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     connect(noDlgFixApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
     connect(fixParentlessDialogs, SIGNAL(toggled(bool)), SLOT(updateChanged()));
 #else
@@ -2788,7 +2789,7 @@ void QtCurveConfig::importPreset()
 
 void QtCurveConfig::exportPreset()
 {
-#ifdef QTC_STYLE_SUPPORT
+#ifdef QTC_QT4_STYLE_SUPPORT
     switch(KMessageBox::questionYesNoCancel(this, i18n("<p>In which format would you like to export the QtCurve "
                                                        "settings?<ul><li><i>QtCurve settings file</i> -"
                                                        " a file to be imported via this config dialog.</li>"
@@ -2895,7 +2896,7 @@ void QtCurveConfig::exportPreset()
 
 void QtCurveConfig::exportTheme()
 {
-#ifdef QTC_STYLE_SUPPORT
+#ifdef QTC_QT4_STYLE_SUPPORT
     if(!exportDialog)
         exportDialog=new CExportThemeDialog(this);
 
@@ -2977,7 +2978,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.menubarMouseOver=menubarMouseOver->isChecked();
     opts.shadeMenubarOnlyWhenActive=shadeMenubarOnlyWhenActive->isChecked();
     opts.thin=getThinFlags();
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     opts.fixParentlessDialogs=fixParentlessDialogs->isChecked();
     opts.noDlgFixApps=toSet(noDlgFixApps->text());
 #endif
@@ -3253,7 +3254,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     thin_menuitems->setChecked(opts.thin&THIN_MENU_ITEMS);
     thin_buttons->setChecked(opts.thin&THIN_BUTTONS);
     thin_frames->setChecked(opts.thin&THIN_FRAMES);
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     fixParentlessDialogs->setChecked(opts.fixParentlessDialogs);
     noDlgFixApps->setText(toString(opts.noDlgFixApps));
 #endif
@@ -3678,7 +3679,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          menubarMouseOver->isChecked()!=opts.menubarMouseOver ||
          shadeMenubarOnlyWhenActive->isChecked()!=opts.shadeMenubarOnlyWhenActive ||
          getThinFlags()!=opts.thin ||
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
          fixParentlessDialogs->isChecked()!=opts.fixParentlessDialogs ||
          toSet(noDlgFixApps->text())!=opts.noDlgFixApps ||
 #endif

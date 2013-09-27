@@ -30,7 +30,7 @@
 
 class QComboBox;
 class KDoubleNumInput;
-#ifdef QTC_STYLE_SUPPORT
+#ifdef QTC_QT4_STYLE_SUPPORT
 class CExportThemeDialog;
 #endif
 class QtCurveConfig;
@@ -230,7 +230,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     CStylePreview          *stylePreview;
     QMdiSubWindow          *mdiWindow;
     QMap<QString, Preset>  presets;
-#ifdef QTC_STYLE_SUPPORT
+#ifdef QTC_QT4_STYLE_SUPPORT
     CExportThemeDialog     *exportDialog;
 #endif
     CGradientPreview       *gradPreview;

@@ -30,19 +30,18 @@
 #include "config.h"
 
 #include <kdeversion.h>
-#ifdef QTC_KWIN_MAX_BUTTON_HACK
+#ifdef QTC_QT4_KWIN4_MAX_BUTTON_HACK
 #define private public
 #endif
 #include <kcommondecoration.h>
-#ifdef QTC_KWIN_MAX_BUTTON_HACK
+#ifdef QTC_QT4_KWIN4_MAX_BUTTON_HACK
 #undef private
 #endif
 #include <QtGui/QPixmap>
 #include <QtGui/QColor>
 #include "qtcurvehandler.h"
 
-namespace KWinQtCurve
-{
+namespace KWinQtCurve {
 
 class QtCurveSizeGrip;
 class QtCurveButton;

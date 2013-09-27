@@ -13,7 +13,7 @@ set(kstyle_qtcurve_config_PART_SRCS
   ../kwin/qtcurveshadowconfiguration.cpp
   ${kstyle_qtcurve_config_common_SRCS})
 
-if(QTC_STYLE_SUPPORT)
+if(QTC_QT4_STYLE_SUPPORT)
   set(kstyle_qtcurve_config_PART_SRCS
     ${kstyle_qtcurve_config_PART_SRCS}
     exportthemedialog.cpp)

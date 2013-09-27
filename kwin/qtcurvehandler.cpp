@@ -136,7 +136,7 @@ void QtCurveHandler::setStyle()
         QString      styleName=general.readEntry("widgetStyle", QString()).toLower();
 
         itsStyle=QStyleFactory::create(styleName.isEmpty() || (styleName!="qtcurve"
-#ifdef QTC_STYLE_SUPPORT
+#ifdef QTC_QT4_STYLE_SUPPORT
                                                                 && !styleName.startsWith(THEME_PREFIX)
 #endif
                                                                )

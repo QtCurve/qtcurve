@@ -145,7 +145,7 @@ class Style : public QCommonStyle {
         ICN_UNSHADE
     };
 
-#ifdef QTC_STYLE_SUPPORT
+#ifdef QTC_QT4_STYLE_SUPPORT
     Style(const QString &name=QString());
 #else
     Style();
@@ -360,7 +360,7 @@ private:
         itsAnimateStep;
     QTime                              itsTimer;
     mutable QMap<int, QColor *>        itsTitleBarButtonsCols;
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     mutable QMap<QWidget *, QWidget *> itsReparentedDialogs;
 #endif
     mutable QList<int>                 itsMdiButtons[2]; // 0=left, 1=right
@@ -381,7 +381,7 @@ private:
     QtCurve::WindowManager             *itsWindowManager;
     QtCurve::BlurHelper                *itsBlurHelper;
     QtCurve::ShortcutHandler           *itsShortcutHandler;
-#ifdef QTC_STYLE_SUPPORT
+#ifdef QTC_QT4_STYLE_SUPPORT
     QString                            itsName;
 #endif
 };

@@ -318,7 +318,7 @@ static void unSetBold(QWidget *widget)
     }
 }
 
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
 static QWidget * getActiveWindow(QWidget *widget)
 {
     QWidget *activeWindow=QApplication::activeWindow();
@@ -617,7 +617,7 @@ static void setRgb(QColor *col, const QStringList &rgb)
 }
 #endif
 
-#if defined QTC_STYLE_SUPPORT || !defined QTC_QT4_ENABLE_KDE4
+#if defined QTC_QT4_STYLE_SUPPORT || !defined QTC_QT4_ENABLE_KDE4
 static QString kdeHome()
 {
     static QString kdeHomePath;
@@ -637,7 +637,7 @@ static QString kdeHome()
 }
 #endif
 
-#ifdef QTC_STYLE_SUPPORT
+#ifdef QTC_QT4_STYLE_SUPPORT
 static void getStyles(const QString &dir, const char *sub, QSet<QString> &styles)
 {
     QDir d(dir+sub);
@@ -707,7 +707,7 @@ class StylePlugin : public QStylePlugin
         QSet<QString> styles;
         styles.insert("QtCurve");
 
-#ifdef QTC_STYLE_SUPPORT
+#ifdef QTC_QT4_STYLE_SUPPORT
         getStyles(kdeHome(), styles);
         getStyles(KDE_PREFIX(4), styles);
 #endif
@@ -718,7 +718,7 @@ class StylePlugin : public QStylePlugin
     {
         return "qtcurve"==key.toLower()
                     ? new Style
-#ifdef QTC_STYLE_SUPPORT
+#ifdef QTC_QT4_STYLE_SUPPORT
                     : 0==key.indexOf(THEME_PREFIX)
                         ? new Style(key)
 #endif
@@ -948,7 +948,7 @@ inline bool isMultiTabBarTab(const QAbstractButton *button)
                             button->inherits("Sublime::IdealToolButton")) );
 }
 
-#ifdef QTC_STYLE_SUPPORT
+#ifdef QTC_QT4_STYLE_SUPPORT
 Style::Style(const QString &name)
 #else
 Style::Style()
@@ -985,7 +985,7 @@ Style::Style()
         itsWindowManager(new WindowManager(this)),
         itsBlurHelper(new BlurHelper(this)),
         itsShortcutHandler(new ShortcutHandler(this))
-#ifdef QTC_STYLE_SUPPORT
+#ifdef QTC_QT4_STYLE_SUPPORT
         , itsName(name)
 #endif
 {
@@ -1040,7 +1040,7 @@ void Style::init(bool initial)
     }
     else
     {
-#ifdef QTC_STYLE_SUPPORT
+#ifdef QTC_QT4_STYLE_SUPPORT
         QString rcFile;
         if(!itsName.isEmpty())
         {
@@ -1473,7 +1473,7 @@ void Style::polish(QApplication *app)
     if(SHADE_NONE!=opts.menuStripe && opts.noMenuStripeApps.contains(appName))
         opts.menuStripe=SHADE_NONE;
 
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     // Plasma and Kate do not like the 'Fix parentless dialogs' option...
     if(opts.fixParentlessDialogs && (APP_PLASMA==theThemedApp || opts.noDlgFixApps.contains(appName) || opts.noDlgFixApps.contains("kde")))
         opts.fixParentlessDialogs=false;
@@ -2045,7 +2045,7 @@ void Style::polish(QWidget *widget)
         ((QDockWidget *)widget)
             ->setTitleBarWidget(new QtCurveDockWidgetTitleBar(widget));
     }
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     else if(opts.fixParentlessDialogs && qobject_cast<QDialog *>(widget) && widget->windowFlags()&Qt::WindowType_Mask &&
            (!widget->parentWidget()) /*|| widget->parentWidget()->isHidden())*/)
     {
@@ -2548,7 +2548,7 @@ void Style::unpolish(QWidget *widget)
         delete ((QDockWidget*)widget)->titleBarWidget();
         ((QDockWidget*)widget)->setTitleBarWidget(0L);
     }
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     else if(opts.fixParentlessDialogs && qobject_cast<QDialog *>(widget))
         widget->removeEventFilter(this);
 #endif
@@ -3068,7 +3068,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                     itsProgressBarAnimateTimer = 0;
                 }
             }
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
             if(opts.fixParentlessDialogs && qobject_cast<QDialog *>(object) && itsReparentedDialogs.contains((QWidget*)object))
             {
                 QWidget *widget=(QWidget*)object;
@@ -3139,7 +3139,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 return false;
             }
             break;
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
         case 70: // QEvent::ChildInserted - QT3_SUPPORT
             if(opts.fixParentlessDialogs && qobject_cast<QDialog *>(object))
             {
@@ -12456,7 +12456,7 @@ void Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe,
 
     a.translate((r.x() + (r.width() >> 1)), (r.y() + (r.height() >> 1)));
 
-#ifdef QTC_OLD_NVIDIA_ARROW_FIX
+#ifdef QTC_QT4_OLD_NVIDIA_ARROW_FIX
     path.moveTo(a[0].x() + 0.5, a[0].y() + 0.5);
     for(int i = 1;i < a.size();i++)
         path.lineTo(a[i].x() + 0.5, a[i].y() + 0.5);
@@ -12468,12 +12468,12 @@ void Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe,
     //   -- Craig
     p->save();
     col.setAlpha(255);
-#ifdef QTC_OLD_NVIDIA_ARROW_FIX
+#ifdef QTC_QT4_OLD_NVIDIA_ARROW_FIX
     p->setRenderHint(QPainter::Antialiasing, true);
 #endif
     p->setPen(col);
     p->setBrush(col);
-#ifdef QTC_OLD_NVIDIA_ARROW_FIX
+#ifdef QTC_QT4_OLD_NVIDIA_ARROW_FIX
     p->fillPath(path, col);
 #endif
     // Disabling antialiasing here seems to cause weird looking up arrow here,

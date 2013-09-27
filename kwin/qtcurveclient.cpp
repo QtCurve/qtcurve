@@ -355,7 +355,7 @@ int QtCurveClient::layoutMetric(LayoutMetric lm, bool respectWindowState,
     }
 }
 
-#ifdef QTC_KWIN_MAX_BUTTON_HACK
+#ifdef QTC_QT4_KWIN4_MAX_BUTTON_HACK
 static char typeToChar(ButtonType t)
 {
     switch(t)
@@ -386,7 +386,7 @@ static char typeToChar(ButtonType t)
 
 KCommonDecorationButton *QtCurveClient::createButton(ButtonType type)
 {
-#ifdef QTC_KWIN_MAX_BUTTON_HACK
+#ifdef QTC_QT4_KWIN4_MAX_BUTTON_HACK
     // If we're beng asked for a minimize button - then need to create a max button as well
     // - otherwise position changes!
     if(isMinimizable() && !isMaximizable())
