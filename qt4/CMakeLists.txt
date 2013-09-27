@@ -43,8 +43,7 @@ qt4_wrap_cpp(qtcurve_MOC_SRCS ${qtcurve_MOC_HDRS})
 add_library(qtcurve MODULE ${qtcurve_SRCS} ${qtcurve_MOC_SRCS})
 add_dependencies(qtcurve qtc_shadow0_hdr qtc_shadow1_hdr qtc_shadow2_hdr
   qtc_shadow3_hdr qtc_shadow4_hdr qtc_shadow5_hdr qtc_shadow6_hdr
-  qtc_shadow7_hdr qtc_check_on_hdr qtc_check_x_on_hdr qtc_dialog_error_hdr
-  qtc_dialog_information_hdr qtc_dialog_warning_hdr)
+  qtc_shadow7_hdr qtc_check_on_hdr qtc_check_x_on_hdr)
 set_target_properties(qtcurve PROPERTIES PREFIX "")
 
 if(QTC_QT4_ENABLE_KDE4)
@@ -53,6 +52,9 @@ if(QTC_QT4_ENABLE_KDE4)
   if (NOT QTC_DISABLE_KDEFILEDIALOG_CALLS)
     set(QTC_KFILEDIALOG_LIBS ${KDE4_KIO_LIBS} ${KDE4_KDECORE_LIBS})
   endif (NOT QTC_DISABLE_KDEFILEDIALOG_CALLS)
+else()
+  add_dependencies(qtcurve qtc_dialog_error_hdr qtc_dialog_information_hdr
+    qtc_dialog_warning_hdr)
 endif()
 
 target_link_libraries(qtcurve
