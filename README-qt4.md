@@ -42,10 +42,15 @@
     crash kwin.
     (Default `Off`)
 
+## Creating Distribution Packages
+Support for creating `deb` or `rpm` package have been removed. Please make
+package in the same way with any other cmake packages.
+
 # XBar/MacMenu
 The XBar support was copied directly from Bespin. The relevant files are named
 `macmenu.*`. These were taken from revision 652.
-Deprecated in favor of appmenu since KWin has builtin support for that
+
+**Deprecated** in favor of appmenu since KWin has builtin support for that
 after `4.10` and `appmenu-qt` does not depend on a certain theme.
 
 # Themes
@@ -83,9 +88,7 @@ As of v1.2.1, QtCurve can be forced to read its settings from an alternate
 config file via the `QTCURVE_CONFIG_FILE` environment variable. This is only
 really useful for testing alternate config settings without changing the users
 current settings.
+
 Usage:
 
     QTCURVE_CONFIG_FILE=~/testfile kcalc
-
-# Creating Distribution Packages
-Package as any other cmake projects.
