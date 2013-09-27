@@ -81,7 +81,6 @@ if(QTC_QT4_ENABLE_KDE4)
   add_subdirectory(colors)
   add_subdirectory(po)
 
-  def_compat_option(QTC_QT4_ENABLE_KWIN ENABLE_KWIN)
   if(NOT DEFINED QTC_QT4_ENABLE_KWIN)
     find_file(KWINGLOBALS_H kwinglobals.h ${KDE4_INCLUDES})
     if(KWINGLOBALS_H)
