@@ -32,7 +32,7 @@
 #include "check_on-png.h"
 #include "check_x_on-png.h"
 
-#ifndef QTC_QT4_ENABLE_KDE4
+#ifndef QTC_QT4_ENABLE_KDE
 #include "dialog_error-png.h"
 #include "dialog_warning-png.h"
 #include "dialog_information-png.h"
@@ -53,7 +53,7 @@
 #include <sys/time.h>
 #endif
 
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
 #include <KDE/KApplication>
 #include <KDE/KAboutData>
 #include <KDE/KGlobalSettings>
@@ -79,7 +79,7 @@
 #include <KDE/KIcon>
 #endif
 
-#endif // QTC_QT4_ENABLE_KDE4
+#endif // QTC_QT4_ENABLE_KDE
 
 // TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
 #define FIX_DISABLED_ICONS
@@ -91,7 +91,7 @@
                                     : palette.color(QPalette::Disabled, COL))
 #define MO_ARROW(COL)       MO_ARROW_X(state&State_MouseOver, COL)
 
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
 typedef QString (*_qt_filedialog_existing_directory_hook)(QWidget *parent, const QString &caption, const QString &dir, QFileDialog::Options options);
 extern _qt_filedialog_existing_directory_hook qt_filedialog_existing_directory_hook;
 
@@ -108,7 +108,7 @@ extern _qt_filedialog_save_filename_hook qt_filedialog_save_filename_hook;
 namespace QtCurve
 {
 
-#if defined FIX_DISABLED_ICONS && defined QTC_QT4_ENABLE_KDE4
+#if defined FIX_DISABLED_ICONS && defined QTC_QT4_ENABLE_KDE
 QPixmap getIconPixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode, QIcon::State)
 {
     QPixmap pix=icon.pixmap(size, QIcon::Normal);
@@ -501,7 +501,7 @@ static QColor checkColour(const QStyleOption *option, QPalette::ColorRole role)
 
 static QColor blendColors(const QColor &foreground, const QColor &background, double alpha)
 {
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
     return KColorUtils::mix(background, foreground, alpha);
 #else
     return ColorUtils_mix(&background, &foreground, alpha);
@@ -617,7 +617,7 @@ void setSbProp(QWidget *w)
 }
 #endif
 
-#ifndef QTC_QT4_ENABLE_KDE4
+#ifndef QTC_QT4_ENABLE_KDE
 static void setRgb(QColor *col, const QStringList &rgb)
 {
     if(3==rgb.size())
@@ -625,7 +625,7 @@ static void setRgb(QColor *col, const QStringList &rgb)
 }
 #endif
 
-#if defined QTC_QT4_STYLE_SUPPORT || !defined QTC_QT4_ENABLE_KDE4
+#if defined QTC_QT4_STYLE_SUPPORT || !defined QTC_QT4_ENABLE_KDE
 static QString kdeHome()
 {
     static QString kdeHomePath;
@@ -886,7 +886,7 @@ static QtcKey createKey(const QColor &color, EPixmap p)
            (((qulonglong)1)<<38);
 }
 
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
 static void parseWindowLine(const QString &line, QList<int> &data)
 {
     int len(line.length());
@@ -1021,7 +1021,7 @@ void Style::init(bool initial)
     if(!initial)
         freeColors();
 
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
     if(initial)
     {
         if(KGlobal::hasMainComponent())
@@ -1099,7 +1099,7 @@ void Style::init(bool initial)
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Highlight), itsMouseOverCols);
 // Dont setup KDE4 fonts/colours here - seems to mess things up when using proxy styles.
 // See http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=638629
-//#ifdef QTC_QT4_ENABLE_KDE4
+//#ifdef QTC_QT4_ENABLE_KDE
 //    setupKde4();
 //#endif
 
@@ -1338,7 +1338,7 @@ void Style::init(bool initial)
 
     itsBlurHelper->setEnabled(100!=opts.bgndOpacity || 100!=opts.dlgOpacity || 100!=opts.menuBgndOpacity);
 
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
     // Ensure the link to libkio is not stripped, by placing a call to a kio function.
     // NOTE: This call will never actually happen, its only here so that the qtcurve.so
     // contains a kio link so that this is not removed by some 'optimisation' of the
@@ -1515,7 +1515,7 @@ void Style::polish(QApplication *app)
         opts.menuBgndAppearance=APPEARANCE_FLAT;
     }
 
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
     if(opts.useQtFileDialogApps.contains(appName))
     {
         qt_filedialog_existing_directory_hook=0L;
@@ -1690,7 +1690,7 @@ void Style::polish(QPalette &palette)
     // Force this to be re-generated!
     if(SHADE_BLEND_SELECTED==opts.menuStripe)
         opts.customMenuStripeColor=Qt::black;
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
     // Only set palette here...
     if(kapp)
         setDecorationColors();
@@ -2245,7 +2245,7 @@ void Style::polish(QWidget *widget)
     }
 #endif
 
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
     // Make file selection button in QPrintDialog appear more KUrlRequester like.
     if (qobject_cast<QToolButton*>(widget) &&
         qtcCheckType0<QGroupBox>(widget->parentWidget()) &&
@@ -3207,7 +3207,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
             return 2;
         case PM_ToolBarExtensionExtent:
             return 15;
-#ifndef QTC_QT4_ENABLE_KDE4
+#ifndef QTC_QT4_ENABLE_KDE
         case PM_SmallIconSize:
             return 16;
         case PM_ToolBarIconSize:
@@ -3620,14 +3620,14 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
         case SH_FormLayoutWrapPolicy:
             return QFormLayout::DontWrapRows;
 #endif
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
         case SH_DialogButtonBox_ButtonsHaveIcons:
             return KGlobalSettings::showIconsOnPushButtons();
         case SH_ItemView_ActivateItemOnSingleClick:
             return KGlobalSettings::singleClick();
 #endif
         default:
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
             // Tell the calling app that we can handle certain custom widgets...
             if(hint>=SH_CustomBase && widget)
                 if("CE_CapacityBar"==widget->objectName())
@@ -3643,7 +3643,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
 
 QPalette Style::standardPalette() const
 {
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
     return KGlobalSettings::createApplicationPalette(KSharedConfig::openConfig(itsComponentData));
 #else
     return BASE_STYLE::standardPalette();
@@ -3686,7 +3686,7 @@ QIcon Style::standardIconImplementation(StandardPixmap pix, const QStyleOption *
             drawIcon(&painter, Qt::color1, QRect(0, 0, pm.width(), pm.height()), false, pix2Icon(pix), true);
             return QIcon(pm);
         }
-#ifndef QTC_QT4_ENABLE_KDE4
+#ifndef QTC_QT4_ENABLE_KDE
         case SP_MessageBoxQuestion:
         case SP_MessageBoxInformation: {
             static QIcon icn(QPixmap::fromImage(qtc_dialog_information));
@@ -3868,7 +3868,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
     bool reverse(Qt::RightToLeft==option->direction);
 
     switch ((int)element) {
-#if (QT_VERSION >= 0x040500) && defined QTC_QT4_ENABLE_KDE4
+#if (QT_VERSION >= 0x040500) && defined QTC_QT4_ENABLE_KDE
     case PE_IndicatorTabClose: {
         int size(pixelMetric(QStyle::PM_SmallIconSize));
         QIcon::Mode mode(state&State_Enabled ? state& State_Raised ?
@@ -5891,7 +5891,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     const int margin(4);
                     QRect titleRect(visualRect(dwOpt->direction, r, r.adjusted(margin, 0, -margin * 2 - 26, 0)));
 #endif
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
                     if(opts.dwtSettings&DWT_FONT_AS_PER_TITLEBAR)
                         painter->setFont(KGlobalSettings::windowTitleFont());
 #endif
@@ -8807,7 +8807,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 
                 opt.state=State_Horizontal|State_Enabled|State_Raised|(active ? State_Active : State_None);
 
-#ifndef QTC_QT4_ENABLE_KDE4
+#ifndef QTC_QT4_ENABLE_KDE
                 QPainterPath path;
 #else
 #if KDE_IS_VERSION(4, 3, 0)
@@ -8974,7 +8974,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                                             ? QRect(r.x(), captionRect.y(), r.width(), captionRect.height())
                                             : captionRect);
 
-#ifndef QTC_QT4_ENABLE_KDE4
+#ifndef QTC_QT4_ENABLE_KDE
                     QFont         font(painter->font());
                     font.setBold(true);
                     painter->setFont(font);
@@ -13210,7 +13210,7 @@ const QColor * Style::getMdiColors(const QStyleOption *option, bool active) cons
 {
     if(!itsActiveMdiColors)
     {
-#ifndef QTC_QT4_ENABLE_KDE4
+#ifndef QTC_QT4_ENABLE_KDE
         itsActiveMdiTextColor=option ? option->palette.text().color() : QApplication::palette().text().color();
         itsMdiTextColor=option ? option->palette.text().color() : QApplication::palette().text().color();
 
@@ -13311,7 +13311,7 @@ void Style::readMdiPositions() const
         itsMdiButtons[1].append(WINDOWTITLE_SPACER);
         itsMdiButtons[1].append(SC_TitleBarCloseButton);
 
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
         KConfig      cfg("kwinrc");
         KConfigGroup grp(&cfg, "Style");
 
@@ -13585,7 +13585,7 @@ void Style::widgetDestroyed(QObject *o)
     unregisterArgbWidget(w);
 }
 
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
 void Style::setupKde4()
 {
     if(kapp)
@@ -13629,7 +13629,7 @@ void Style::applyKdeSettings(bool pal)
 
 void Style::kdeGlobalSettingsChange(int type, int)
 {
-#ifndef QTC_QT4_ENABLE_KDE4
+#ifndef QTC_QT4_ENABLE_KDE
     Q_UNUSED(type)
 #else
     switch(type)
@@ -13668,7 +13668,7 @@ void Style::kdeGlobalSettingsChange(int type, int)
 
 void Style::borderSizesChanged()
 {
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
     int old=qtcGetWindowBorderSize().titleHeight;
 
     if(old!=qtcGetWindowBorderSize(true).titleHeight)
@@ -13762,7 +13762,7 @@ void Style::toggleMenuBar(QMainWindow *window)
 {
     bool triggeredAction(false);
 
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
     if(qobject_cast<KXmlGuiWindow *>(window))
     {
         KActionCollection *collection=static_cast<KXmlGuiWindow *>(window)->actionCollection();
@@ -13788,7 +13788,7 @@ void Style::toggleStatusBar(QMainWindow *window)
 {
     bool triggeredAction(false);
 
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
     if(qobject_cast<KXmlGuiWindow *>(window))
     {
         KActionCollection *collection=static_cast<KXmlGuiWindow *>(window)->actionCollection();

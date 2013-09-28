@@ -57,13 +57,13 @@
 #include <QTextStream>
 #include <QTextDocument>
 
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
 #  include <KGlobalSettings>
 #endif
 
 #ifdef Q_WS_X11
 #  include <QX11Info>
-#  ifndef QTC_QT4_ENABLE_KDE4
+#  ifndef QTC_QT4_ENABLE_KDE
 #    include <X11/Xlib.h>
 #    include <X11/Xatom.h>
 #    include "fixx11h.h"
@@ -109,7 +109,7 @@ namespace QtCurve
         _useWMMoveResize( false ),
 #endif
         _dragMode( WM_DRAG_NONE ),
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
         _dragDistance(KGlobalSettings::dndEventDelay()),
 #else
         _dragDistance(QApplication::startDragDistance()),
@@ -135,7 +135,7 @@ namespace QtCurve
         setDragMode( windowDrag );
 //CPD: Why???        setUseWMMoveResize( OxygenStyleConfigData::useWMMoveResize() );
 
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
         setDragDistance( KGlobalSettings::dndEventDelay() );
 #endif
         setDragDelay( QApplication::startDragTime() );
@@ -654,7 +654,7 @@ namespace QtCurve
         {
 
             #ifdef Q_WS_X11
-            #ifndef QTC_QT4_ENABLE_KDE4
+            #ifndef QTC_QT4_ENABLE_KDE
             static const Atom constNetMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE", False);
             //...Taken from bespin...
             // stolen... errr "adapted!" from QSizeGrip
@@ -677,7 +677,7 @@ namespace QtCurve
             XUngrabPointer(QX11Info::display(), QX11Info::appTime());
             NETRootInfo rootInfo(QX11Info::display(), NET::WMMoveResize);
             rootInfo.moveResizeRequest( widget->window()->winId(), position.x(), position.y(), NET::Move);
-            #endif // QTC_QT4_ENABLE_KDE4
+            #endif // QTC_QT4_ENABLE_KDE
             #endif
 
         }

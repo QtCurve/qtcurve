@@ -29,7 +29,7 @@ The code has been modified to work with QColor (Qt3 &Qt4) and GdkColor
 #include <qglobal.h>
 #endif
 
-#if !(defined QT_VERSION && (QT_VERSION >= 0x040000) && defined QTC_QT4_ENABLE_KDE4)
+#if !(defined QT_VERSION && (QT_VERSION >= 0x040000) && defined QTC_QT4_ENABLE_KDE)
 
 #include <math.h>
 
@@ -339,4 +339,4 @@ color ColorUtils_mix(const color *c1, const color *c2, double bias)
 //     return ColorUtils_HCY_toColor(&c);
 // }
 
-#endif // !(defined QT_VERSION && (QT_VERSION >= 0x040000) && defined QTC_QT4_ENABLE_KDE4)
+#endif // !(defined QT_VERSION && (QT_VERSION >= 0x040000) && defined QTC_QT4_ENABLE_KDE)

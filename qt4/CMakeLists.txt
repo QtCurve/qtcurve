@@ -6,7 +6,7 @@ include_directories(
   ${QT_INCLUDE_DIR})
 
 # search packages used by KDE
-if(QTC_QT4_ENABLE_KDE4)
+if(QTC_QT4_ENABLE_KDE)
   find_package(KDE4 REQUIRED)
   include(KDE4Defaults)
 

@@ -639,7 +639,7 @@ const char * qtcGetHome()
 
 #ifdef __cplusplus
 
-#if !defined QTC_QT4_ENABLE_KDE4 || QT_VERSION < 0x040000
+#if !defined QTC_QT4_ENABLE_KDE || QT_VERSION < 0x040000
 #if QT_VERSION < 0x040000
 #include <qdir.h>
 #include <qfile.h>
@@ -769,7 +769,7 @@ const char *qtcConfDir()
         if(0!=lstat(cfgDir, &info))
         {
 #ifdef __cplusplus
-#if !defined QTC_QT4_ENABLE_KDE4 || QT_VERSION < 0x040000
+#if !defined QTC_QT4_ENABLE_KDE || QT_VERSION < 0x040000
             makeDir(cfgDir, 0755);
 #else
             KStandardDirs::makeDir(cfgDir, 0755);

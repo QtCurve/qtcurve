@@ -1282,11 +1282,11 @@ typedef struct
 #define MAX(a, b) ((b) < (a) ? (a) : (b))
 #endif
 
-#if defined QT_VERSION && (QT_VERSION >= 0x040000) && defined QTC_QT4_ENABLE_KDE4
+#if defined QT_VERSION && (QT_VERSION >= 0x040000) && defined QTC_QT4_ENABLE_KDE
 #include <KDE/KColorUtils>
 #define tint(COLA, COLB, FACTOR) KColorUtils::tint((COLA), (COLB), (FACTOR))
 #define midColor(COLA, COLB) KColorUtils::mix((COLA), (COLB), 0.5)
-#else // QT_VERSION && (QT_VERSION >= 0x040000) && defined QTC_QT4_ENABLE_KDE4
+#else // QT_VERSION && (QT_VERSION >= 0x040000) && defined QTC_QT4_ENABLE_KDE
 #include "colorutils.h"
 #ifdef __cplusplus
 #define tint(COLA, COLB, FACTOR) ColorUtils_tint(&(COLA), &(COLB), (FACTOR))
@@ -1296,7 +1296,7 @@ typedef struct
 #define tint(COLA, COLB, FACTOR) ColorUtils_tint((COLA), (COLB), (FACTOR))
 #define midColor(COLA, COLB) ColorUtils_mix((COLA), (COLB), 0.5)
 #endif // __cplusplus
-#endif // QT_VERSION && (QT_VERSION >= 0x040000) && defined QTC_QT4_ENABLE_KDE4
+#endif // QT_VERSION && (QT_VERSION >= 0x040000) && defined QTC_QT4_ENABLE_KDE
 
 extern void qtcRgbToHsv(double r, double g, double b, double *h, double *s, double *v);
 extern void qtcRgbToHsv(double r, double g, double b, double *h, double *s, double *v);

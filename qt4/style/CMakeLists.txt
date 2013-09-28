@@ -54,7 +54,7 @@ add_dependencies(qtcurve qtc_shadow0_hdr qtc_shadow1_hdr qtc_shadow2_hdr
   qtc_shadow7_hdr qtc_check_on_hdr qtc_check_x_on_hdr)
 set_target_properties(qtcurve PROPERTIES PREFIX "")
 
-if(QTC_QT4_ENABLE_KDE4)
+if(QTC_QT4_ENABLE_KDE)
   install(FILES qtcurve.themerc DESTINATION ${DATA_INSTALL_DIR}/kstyle/themes)
   set(QTC_KDE_LIBS ${KDE4_KDEUI_LIBS})
   if (NOT QTC_DISABLE_KDEFILEDIALOG_CALLS)
@@ -78,7 +78,7 @@ if(Q_WS_X11)
     ${X11_X11_LIB})
 endif()
 
-if(QTC_QT4_ENABLE_KDE4)
+if(QTC_QT4_ENABLE_KDE)
   install(TARGETS qtcurve DESTINATION ${QTCURVE_STYLE_DIR})
 else()
   install(TARGETS qtcurve LIBRARY DESTINATION ${QTCURVE_STYLE_DIR})

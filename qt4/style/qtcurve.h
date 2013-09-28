@@ -38,7 +38,7 @@
 typedef qulonglong QtcKey;
 #include <common/common.h>
 
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
 #include <KDE/KComponentData>
 #endif
 
@@ -64,7 +64,7 @@ qtcCheckType0(T2 *obj, const char *name)
     return obj && obj->inherits(name);
 }
 
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
 #define qtcCheckKDETypeFull(obj, type, name) (qobject_cast<const type*>(obj))
 #define qtcCheckKDETypeFull0(obj, type, name) (qtcCheckType0<type>(obj))
 #else
@@ -306,7 +306,7 @@ private:
     void           toggleMenuBar(QMainWindow *window);
     void           toggleStatusBar(QMainWindow *window);
 
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
     void           setupKde4();
 
 
@@ -375,7 +375,7 @@ private:
 #endif
     mutable QScrollBar                 *itsSViewSBar;
     mutable QMap<QWidget *, QSet<QWidget *> > itsSViewContainers;
-#ifdef QTC_QT4_ENABLE_KDE4
+#ifdef QTC_QT4_ENABLE_KDE
     KComponentData                     itsComponentData;
 #endif
     QtCurve::WindowManager             *itsWindowManager;

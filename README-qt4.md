@@ -8,7 +8,7 @@
     make install
 
 ## CMake configure options
-1. `QTC_QT4_ENABLE_KDE4`:
+1. `QTC_QT4_ENABLE_KDE`:
 
     Compile QtCurve qt4 style with KDE support and dependencies.
 

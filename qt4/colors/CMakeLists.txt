@@ -1,4 +1,4 @@
-if(NOT QTC_QT4_ENABLE_KDE4)
+if(NOT QTC_QT4_ENABLE_KDE)
   return()
 endif()
 
