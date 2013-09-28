@@ -1,3 +1,7 @@
+if(NOT QTC_QT4_ENABLE_KDE4 OR NOT QTC_QT4_ENABLE_KWIN)
+  return()
+endif()
+
 set(kwin_qtcurve_config_PART_SRCS
   qtcurvekwinconfig.cpp
   ../kwin/qtcurveconfig.cpp

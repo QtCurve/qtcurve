@@ -1,3 +1,7 @@
+if(NOT QTC_QT4_ENABLE_KDE4)
+  return()
+endif()
+
 set(kstyle_qtcurve_config_common_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/../common/common.c
   ${CMAKE_CURRENT_SOURCE_DIR}/../common/config_file.c )

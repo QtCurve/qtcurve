@@ -1,3 +1,7 @@
+if(NOT QTC_QT4_ENABLE_KDE4 OR NOT QTC_QT4_ENABLE_KWIN)
+  return()
+endif()
+
 # add_subdirectory(config)
 set(kwin3_qtcurve_PART_SRCS
   qtcurvehandler.cpp
