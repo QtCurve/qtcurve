@@ -1,6 +1,6 @@
 set(kstyle_qtcurve_config_common_SRCS
-  ${CMAKE_CURRENT_SOURCE_DIR}/../common/common.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/../common/config_file.c )
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../common/common.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../common/config_file.c )
 
 set_source_files_properties(${kstyle_qtcurve_config_common_SRCS}
   PROPERTIES LANGUAGE CXX)
@@ -21,13 +21,7 @@ endif()
 
 add_definitions(-DCONFIG_WRITE -DCONFIG_DIALOG)
 
-include_directories(
-  "${CMAKE_CURRENT_BINARY_DIR}"
-  "${CMAKE_CURRENT_SOURCE_DIR}/../common"
-  "${CMAKE_CURRENT_SOURCE_DIR}/../qt4/style"
-  "${CMAKE_CURRENT_SOURCE_DIR}/../kwinconfig"
-  ${KDE4_INCLUDE_DIR}
-  ${QT_INCLUDE_DIR})
+include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 kde4_add_ui_files(kstyle_qtcurve_config_PART_SRCS
   qtcurveconfigbase.ui
   stylepreview.ui

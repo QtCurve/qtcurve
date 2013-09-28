@@ -50,7 +50,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <kde_file.h>
-#include "common.h"
+#include <common/common.h>
 
 static time_t getTimeStamp(const QString &item)
 {

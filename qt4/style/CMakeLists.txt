@@ -32,7 +32,6 @@ endif()
 
 add_definitions(-DQT_PLUGIN)
 include_directories("${CMAKE_CURRENT_BINARY_DIR}"
-  "${QT_INCLUDE_DIR}"
   "${QT_QTGUI_INCLUDE_DIR}"
   "${QT_QTCORE_INCLUDE_DIR}"
   "${QT_QTDBUS_INCLUDE_DIR}"

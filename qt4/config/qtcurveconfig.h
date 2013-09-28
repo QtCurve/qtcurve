@@ -26,7 +26,8 @@
 #include <QMap>
 #include <QComboBox>
 #include <KDE/KXmlGuiWindow>
-#include "common.h"
+
+#include <common/common.h>
 
 class QComboBox;
 class KDoubleNumInput;

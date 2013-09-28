@@ -26,7 +26,7 @@
 #include <QFileInfo>
 #include <QGridLayout>
 #include <QLabel>
-#include "common.h"
+#include <common/common.h>
 
 #define MIN_SIZE 16
 #define MAX_SIZE 1024

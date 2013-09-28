@@ -29,7 +29,7 @@
 #include <QX11Info>
 #include <KDE/KLocale>
 #include "qtcurveclient.h"
-#include "common.h"
+#include <common/common.h>
 
 #include <stdio.h>
 namespace KWinQtCurve

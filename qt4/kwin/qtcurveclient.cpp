@@ -46,7 +46,7 @@
 #include "qtcurvebutton.h"
 #include "qtcurvetogglebutton.h"
 #include "qtcurvesizegrip.h"
-#include "common.h"
+#include <common/common.h>
 #if KDE_IS_VERSION(4, 3, 0)
 #include "tileset.h"
 #endif
@@ -55,7 +55,7 @@
 #include <X11/Xatom.h>
 
 #include <fixx11h.h>
-#include <qtcurve.h>
+#include <style/qtcurve.h>
 #include <QX11Info>
 
 #if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)

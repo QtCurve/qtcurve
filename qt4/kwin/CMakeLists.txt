@@ -11,9 +11,6 @@ set(kwin3_qtcurve_PART_SRCS
   qtcurvetogglebutton.cpp)
 include_directories(
   "${CMAKE_CURRENT_BINARY_DIR}"
-  "${CMAKE_CURRENT_SOURCE_DIR}/../common"
-  "${CMAKE_CURRENT_SOURCE_DIR}/../qt4/style"
-  ${QT_INCLUDE_DIR}
   ${QT_QTGUI_INCLUDE_DIR}
   ${QT_QTCORE_INCLUDE_DIR})
 kde4_add_plugin(kwin3_qtcurve ${kwin3_qtcurve_PART_SRCS})

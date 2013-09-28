@@ -27,6 +27,7 @@ function(def_compat_option new_opt old_opt)
   endif()
 endfunction()
 
+option(QTC_ENABLE_QT4 "Building Qt4 theme." On)
 def_compat_option(QTC_QT4_ENABLE_KDE4 QTC_QT_ONLY True)
 option(QTC_QT4_ENABLE_KDE4 "Building Qt4 style with KDE4 support." On)
 def_compat_option(QTC_QT4_OLD_NVIDIA_ARROW_FIX QTC_OLD_NVIDIA_ARROW_FIX)
@@ -61,49 +62,15 @@ if(NOT DEFINED QTC_KDE4_PREFIX)
   endif()
 endif()
 
-find_package(Qt4 REQUIRED)
-
 configure_file(config.h.in config.h @ONLY)
 
 include_directories(
   "${CMAKE_CURRENT_SOURCE_DIR}"
   "${CMAKE_CURRENT_BINARY_DIR}")
-add_definitions(${QT_DEFINITIONS})
-add_subdirectory(common)
 
-# search packages used by KDE
-if(QTC_QT4_ENABLE_KDE4)
-  find_package(KDE4 REQUIRED)
-  include(KDE4Defaults)
-
-  add_definitions(${KDE4_DEFINITIONS})
-  include_directories(${KDE4_INCLUDES})
-  set(QTCURVE_STYLE_DIR "${PLUGIN_INSTALL_DIR}/plugins/styles/")
-  add_subdirectory(config-qt4)
-  add_subdirectory(themes)
-  add_subdirectory(colors)
-  add_subdirectory(po)
-
-  if(NOT DEFINED QTC_QT4_ENABLE_KWIN)
-    find_file(KWINGLOBALS_H kwinglobals.h ${KDE4_INCLUDES})
-    if(KWINGLOBALS_H)
-      set(QTC_QT4_ENABLE_KWIN On)
-    else()
-      set(QTC_QT4_ENABLE_KWIN Off)
-    endif()
-  endif()
-  option(QTC_QT4_ENABLE_KWIN "Qt4 kwin theme support."
-    "${QTC_QT4_ENABLE_KWIN}")
-
-  if(QTC_QT4_ENABLE_KWIN)
-    add_subdirectory(kwin)
-    add_subdirectory(kwinconfig)
-  endif()
-else()
-  set(QTCURVE_STYLE_DIR "${QT_PLUGINS_DIR}/styles/")
-endif()
-
+add_subdirectory(po)
 add_subdirectory(qt4)
+add_subdirectory(common)
 
 if(QTC_QT4_KWIN_MAX_BUTTON_HACK)
   message(WARNING

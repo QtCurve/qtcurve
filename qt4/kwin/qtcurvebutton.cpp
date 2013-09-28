@@ -33,7 +33,7 @@
 #include <QPixmap>
 #include <QTimer>
 #include "qtcurveclient.h"
-#include "common.h"
+#include <common/common.h>
 #include <stdio.h>
 namespace KWinQtCurve
 {

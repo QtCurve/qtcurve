@@ -37,7 +37,7 @@
 #include <KColorScheme>
 #include <QPainter>
 
-#include <qtcurve.h>
+#include <style/qtcurve.h>
 
 #include "qtcurveshadowcache.h"
 #include "qtcurveclient.h"
