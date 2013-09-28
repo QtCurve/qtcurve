@@ -65,6 +65,10 @@ find_package(Qt4 REQUIRED)
 
 configure_file(config.h.in config.h @ONLY)
 
+include_directories(
+  "${CMAKE_CURRENT_SOURCE_DIR}"
+  "${CMAKE_CURRENT_BINARY_DIR}")
+add_definitions(${QT_DEFINITIONS})
 add_subdirectory(common)
 
 # search packages used by KDE
@@ -72,11 +76,8 @@ if(QTC_QT4_ENABLE_KDE4)
   find_package(KDE4 REQUIRED)
   include(KDE4Defaults)
 
-  add_definitions(${QT_DEFINITIONS} ${KDE4_DEFINITIONS})
-  include_directories(
-    "${CMAKE_CURRENT_SOURCE_DIR}"
-    "${CMAKE_CURRENT_BINARY_DIR}"
-    ${KDE4_INCLUDES})
+  add_definitions(${KDE4_DEFINITIONS})
+  include_directories(${KDE4_INCLUDES})
   set(QTCURVE_STYLE_DIR "${PLUGIN_INSTALL_DIR}/plugins/styles/")
   add_subdirectory(config-qt4)
   add_subdirectory(themes)
@@ -99,10 +100,6 @@ if(QTC_QT4_ENABLE_KDE4)
     add_subdirectory(kwinconfig)
   endif()
 else()
-  add_definitions(${QT_DEFINITIONS})
-  include_directories(
-    "${CMAKE_CURRENT_SOURCE_DIR}"
-    "${CMAKE_CURRENT_BINARY_DIR}")
   set(QTCURVE_STYLE_DIR "${QT_PLUGINS_DIR}/styles/")
 endif()
 
