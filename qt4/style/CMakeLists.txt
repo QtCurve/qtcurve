@@ -1,9 +1,20 @@
 set(qtcurve_style_common_SRCS
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../common/common.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../common/config_file.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../common/colorutils.c )
+  ${CMAKE_CURRENT_SOURCE_DIR}/../common/common.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/../common/config_file.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/../common/colorutils.c )
 set_source_files_properties(${qtcurve_style_common_SRCS}
   PROPERTIES LANGUAGE CXX)
+
+foreach(pngname check_on check_x_on dialog_error dialog_information
+    dialog_warning)
+  add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${pngname}-png.h"
+    COMMAND "${PROJECT_BINARY_DIR}/tools/qt4-dump-png"
+    "${PROJECT_SOURCE_DIR}/data/${pngname}.png" "qtc_${pngname}"
+    "${CMAKE_CURRENT_BINARY_DIR}/${pngname}-png.h"
+    DEPENDS qt4-dump-png "${PROJECT_SOURCE_DIR}/data/${pngname}.png")
+  add_custom_target(qtc_${pngname}_hdr
+    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/${pngname}-png.h")
+endforeach()
 
 set(qtcurve_SRCS
   qtcurve.cpp

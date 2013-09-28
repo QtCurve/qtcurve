@@ -27,7 +27,7 @@ function(def_compat_option new_opt old_opt)
   endif()
 endfunction()
 
-option(QTC_ENABLE_QT4 "Building Qt4 theme." On)
+option(ENABLE_QT4 "Building Qt4 theme." On)
 def_compat_option(QTC_QT4_ENABLE_KDE4 QTC_QT_ONLY True)
 option(QTC_QT4_ENABLE_KDE4 "Building Qt4 style with KDE4 support." On)
 def_compat_option(QTC_QT4_OLD_NVIDIA_ARROW_FIX QTC_OLD_NVIDIA_ARROW_FIX)
@@ -68,9 +68,10 @@ include_directories(
   "${CMAKE_CURRENT_SOURCE_DIR}"
   "${CMAKE_CURRENT_BINARY_DIR}")
 
+add_subdirectory(tools)
 add_subdirectory(po)
 add_subdirectory(qt4)
-add_subdirectory(common)
+add_subdirectory(data)
 
 if(QTC_QT4_KWIN_MAX_BUTTON_HACK)
   message(WARNING

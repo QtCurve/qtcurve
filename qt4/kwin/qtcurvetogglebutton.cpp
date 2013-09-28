@@ -32,8 +32,7 @@
 #include <common/common.h>
 
 #include <stdio.h>
-namespace KWinQtCurve
-{
+namespace KWinQtCurve {
 
 static int point2Pixel(double point)
 {

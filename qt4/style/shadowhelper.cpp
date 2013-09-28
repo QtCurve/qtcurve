@@ -39,14 +39,14 @@
 #include <X11/Xatom.h>
 
 #include <common/common.h>
-#include <common/shadow0-png.h>
-#include <common/shadow1-png.h>
-#include <common/shadow2-png.h>
-#include <common/shadow3-png.h>
-#include <common/shadow4-png.h>
-#include <common/shadow5-png.h>
-#include <common/shadow6-png.h>
-#include <common/shadow7-png.h>
+#include <data/shadow0-png.h>
+#include <data/shadow1-png.h>
+#include <data/shadow2-png.h>
+#include <data/shadow3-png.h>
+#include <data/shadow4-png.h>
+#include <data/shadow5-png.h>
+#include <data/shadow6-png.h>
+#include <data/shadow7-png.h>
 
 namespace QtCurve {
 

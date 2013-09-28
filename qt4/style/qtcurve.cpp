@@ -29,13 +29,13 @@
 #include <iostream>
 
 #include <common/config_file.h>
-#include <common/check_on-png.h>
-#include <common/check_x_on-png.h>
+#include "check_on-png.h"
+#include "check_x_on-png.h"
 
 #ifndef QTC_QT4_ENABLE_KDE4
-#include <common/dialog_error-png.h>
-#include <common/dialog_warning-png.h>
-#include <common/dialog_information-png.h>
+#include "dialog_error-png.h"
+#include "dialog_warning-png.h"
+#include "dialog_information-png.h"
 #endif
 
 // WebKit seems to just use the values from ::pixelMetric to get button sizes. So, in pixelMetric we add some extra padding to PM_ButtonMargin
