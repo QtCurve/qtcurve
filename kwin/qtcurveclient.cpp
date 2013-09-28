@@ -53,8 +53,9 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
-#include "../qt4/fixx11h.h"
-#include "../qt4/qtcurve.h"
+
+#include <fixx11h.h>
+#include <qtcurve.h>
 #include <QX11Info>
 
 #if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)

@@ -19,7 +19,7 @@
 */
 
 #include "qtcurveconfig.h"
-#include "../kwinconfig/qtcurvekwinconfig.h"
+#include <qtcurvekwinconfig.h>
 #ifdef QTC_QT4_STYLE_SUPPORT
 #include "exportthemedialog.h"
 #endif
@@ -68,8 +68,10 @@
 #include <KDE/KMimeType>
 #include <KDE/KStandardDirs>
 #include <unistd.h>
+
+#include <qtcurve.h>
+
 #include "config.h"
-#include "../qt4/qtcurve.h"
 #include "config_file.h"
 
 #define EXTENSION                  ".qtcurve"

@@ -24,6 +24,8 @@ add_definitions(-DCONFIG_WRITE -DCONFIG_DIALOG)
 include_directories(
   "${CMAKE_CURRENT_BINARY_DIR}"
   "${CMAKE_CURRENT_SOURCE_DIR}/../common"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../qt4/style"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../kwinconfig"
   ${KDE4_INCLUDE_DIR}
   ${QT_INCLUDE_DIR})
 kde4_add_ui_files(kstyle_qtcurve_config_PART_SRCS

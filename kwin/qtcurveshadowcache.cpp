@@ -32,18 +32,18 @@
 #include <kdeversion.h>
 #if KDE_IS_VERSION(4, 3, 0)
 
-#include "qtcurveshadowcache.h"
-#include "qtcurveclient.h"
-#include "qtcurvehandler.h"
-#include "qtcurve.h"
-
 #include <cassert>
 #include <KColorUtils>
 #include <KColorScheme>
 #include <QPainter>
 
-namespace KWinQtCurve
-{
+#include <qtcurve.h>
+
+#include "qtcurveshadowcache.h"
+#include "qtcurveclient.h"
+#include "qtcurvehandler.h"
+
+namespace KWinQtCurve {
 
 static bool lowThreshold(const QColor &color)
 {
