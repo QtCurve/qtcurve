@@ -639,7 +639,7 @@ const char * qtcGetHome()
 
 #ifdef __cplusplus
 
-#if defined QTC_QT_ONLY || QT_VERSION < 0x040000
+#if !defined QTC_QT5_ENABLE_KDE || QT_VERSION < 0x040000
 #if QT_VERSION < 0x040000
 #include <qdir.h>
 #include <qfile.h>
@@ -769,7 +769,7 @@ const char *qtcConfDir()
         if(0!=lstat(cfgDir, &info))
         {
 #ifdef __cplusplus
-#if defined QTC_QT_ONLY || QT_VERSION < 0x040000
+#if !defined QTC_QT5_ENABLE_KDE || QT_VERSION < 0x040000
             makeDir(cfgDir, 0755);
 #else
             KStandardDirs::makeDir(cfgDir, 0755);
@@ -1418,7 +1418,7 @@ static void copyOpts(Options *src, Options *dest)
         dest->noBgndOpacityApps=src->noBgndOpacityApps;
         dest->noMenuBgndOpacityApps=src->noMenuBgndOpacityApps;
         dest->noBgndImageApps=src->noBgndImageApps;
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
         dest->noDlgFixApps=src->noDlgFixApps;
         src->noDlgFixApps=NULL;
 #endif
@@ -1444,7 +1444,7 @@ static void freeOpts(Options *opts)
             g_strfreev(opts->noMenuBgndOpacityApps);
         if(opts->noBgndImageApps)
             g_strfreev(opts->noBgndImageApps);
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
         if(opts->noDlgFixApps)
             g_strfreev(opts->noDlgFixApps);
         opts->noDlgFixApps=NULL
@@ -1778,7 +1778,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
 #else
             Options newOpts;
             Options *def=&newOpts;
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
             opts->noDlgFixApps=NULL;
 #endif
             opts->noBgndGradientApps=opts->noBgndOpacityApps=opts->noMenuBgndOpacityApps=opts->noBgndImageApps=opts->noMenuStripeApps=NULL;
@@ -1977,7 +1977,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             if(APPEARANCE_FLAT==opts->menuBgndAppearance && 0==opts->lighterPopupMenuBgnd && opts->version<MAKE_VERSION(1, 7))
                 opts->menuBgndAppearance=APPEARANCE_RAISED;
 
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
             CFG_READ_BOOL(fixParentlessDialogs)
             CFG_READ_STRING_LIST(noDlgFixApps)
 #endif
@@ -2546,7 +2546,7 @@ void qtcDefaultSettings(Options *opts)
     opts->toolbarBorders=TB_NONE;
     opts->toolbarSeparators=LINE_SUNKEN;
     opts->splitters=LINE_1DOT;
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     opts->fixParentlessDialogs=false;
 #ifdef __cplusplus
     opts->noDlgFixApps << "kate" << "plasma" << "plasma-desktop" << "plasma-netbook";
@@ -3254,7 +3254,7 @@ bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool 
 #else
         cfg->setGroup(SETTINGS_GROUP);
 #endif
-        CFG.writeEntry(VERSION_KEY, VERSION);
+        CFG.writeEntry(VERSION_KEY, QTC_VERSION);
         CFG_WRITE_ENTRY_NUM(passwordChar)
         CFG_WRITE_ENTRY_NUM(gbFactor)
         CFG_WRITE_ENTRY(round)
@@ -3269,7 +3269,7 @@ bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool 
         CFG_WRITE_ENTRY(bgndGrad)
         CFG_WRITE_ENTRY(menuBgndGrad)
         CFG_WRITE_APPEARANCE_ENTRY_PIXMAP(menuBgndAppearance, APP_ALLOW_STRIPED, menuBgndPixmap)
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
         CFG_WRITE_ENTRY(fixParentlessDialogs)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
         CFG_WRITE_STRING_LIST_ENTRY(noDlgFixApps)

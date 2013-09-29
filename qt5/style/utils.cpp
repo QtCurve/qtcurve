@@ -19,19 +19,19 @@
 */
 
 #include "utils.h"
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
 #  include "xcb_utils.h"
-#include <QApplication>
-#include <QDesktopWidget>
+#  include <QApplication>
+#  include <QDesktopWidget>
 #endif
 #include <stdio.h>
 
-#if defined QTC_QT_ONLY
-#undef KDE_IS_VERSION
-#define KDE_IS_VERSION(A, B, C) 0
+#ifndef QTC_QT5_ENABLE_KDE
+#  undef KDE_IS_VERSION
+#  define KDE_IS_VERSION(A, B, C) 0
 #else
-#include <kdeversion.h>
-#include <KDE/KWindowSystem>
+#  include <kdeversion.h>
+#  include <KDE/KWindowSystem>
 #endif
 
 namespace QtCurve
@@ -41,8 +41,8 @@ namespace Utils
 
 bool compositingActive()
 {
-#if defined QTC_QT_ONLY
-#ifdef QTC_X11
+#ifndef QTC_QT5_ENABLE_KDE
+#ifdef QTC_ENABLE_X11
     static xcb_atom_t atom;
     if (!atom) {
         char atomName[100] = "_NET_WM_CM_S";
@@ -61,9 +61,9 @@ bool compositingActive()
         free(reply);
     }
     return res;
-#else // QTC_X11
+#else // QTC_ENABLE_X11
     return false;
-#endif // QTC_X11
+#endif // QTC_ENABLE_X11
 #else // QTC_QT_ONLY
     return KWindowSystem::compositingActive();
 #endif // QTC_QT_ONLY
@@ -71,7 +71,7 @@ bool compositingActive()
 
 bool hasAlphaChannel(const QWidget *widget)
 {
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
     if (compositingActive()) {
         WId wid = widget ? widget->window()->winId() : 0;
         if (wid) {

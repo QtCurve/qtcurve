@@ -119,7 +119,7 @@ isOOWidget(const QWidget *widget)
 bool blendOOMenuHighlight(const QPalette &pal, const QColor &highlight);
 bool isNoEtchWidget(const QWidget *widget);
 
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
 static inline bool canAccessId(const QWidget *w)
 {
     return w && w->testAttribute(Qt::WA_WState_Created) && w->internalWinId();
@@ -146,7 +146,7 @@ getStatusBars(QWidget *w)
 {
     return w ? w->findChildren<QStatusBar*>() : QList<QStatusBar*>();
 }
-#if defined FIX_DISABLED_ICONS && !defined QTC_QT_ONLY
+#if defined FIX_DISABLED_ICONS && defined QTC_QT5_ENABLE_KDE
 static inline QPixmap
 getIconPixmap(const QIcon &icon, const QSize &size,
               QIcon::Mode mode, QIcon::State)
@@ -244,7 +244,7 @@ static inline bool isMultiTabBarTab(const QAbstractButton *button)
 }
 
 QWidget *getParent(QWidget *w, int level);
-#ifdef QTC_QT_ONLY
+#ifndef QTC_QT5_ENABLE_KDE
 bool parentIs(QWidget *w, int level, const char *className);
 #endif
 
@@ -315,7 +315,7 @@ isKontactPreviewPane(const QWidget *widget)
 static inline QColor
 blendColors(const QColor &foreground, const QColor &background, double alpha)
 {
-#if defined QTC_QT_ONLY
+#ifndef QTC_QT5_ENABLE_KDE
     return ColorUtils_mix(&background, &foreground, alpha);
 #else
     return KColorUtils::mix(background, foreground, alpha);

@@ -36,7 +36,7 @@
 typedef qulonglong QtcKey;
 #include <common/common.h>
 
-#if !defined QTC_QT_ONLY
+#ifdef QTC_QT5_ENABLE_KDE
 #include <KDE/KComponentData>
 #endif
 
@@ -61,7 +61,7 @@ namespace QtCurve {
 class WindowManager;
 class BlurHelper;
 class ShortcutHandler;
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
 class ShadowHelper;
 #endif
 
@@ -364,12 +364,12 @@ private:
     void toggleMenuBar(QMainWindow *window);
     void toggleStatusBar(QMainWindow *window);
 
-#if !defined QTC_QT_ONLY
+#ifdef QTC_QT5_ENABLE_KDE
     void setupKde4();
     void setDecorationColors();
     void applyKdeSettings(bool pal);
 #endif
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
     bool isWindowDragWidget(QObject *o);
     void emitMenuSize(QWidget *w, unsigned short size, bool force=false);
     void emitStatusBarState(QStatusBar *sb);
@@ -415,19 +415,19 @@ private:
         itsAnimateStep;
     QTime itsTimer;
     mutable QMap<int, QColor*> itsTitleBarButtonsCols;
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     mutable QMap<QWidget*, QWidget*> itsReparentedDialogs;
 #endif
     mutable QList<int> itsMdiButtons[2]; // 0=left, 1=right
     mutable int itsTitlebarHeight;
 
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
     QDBusInterface *itsDBus;
     QtCurve::ShadowHelper *itsShadowHelper;
 #endif
     mutable QScrollBar *itsSViewSBar;
     mutable QMap<QWidget*, QSet<QWidget*> > itsSViewContainers;
-#if !defined QTC_QT_ONLY
+#ifdef QTC_QT5_ENABLE_KDE
     KComponentData itsComponentData;
 #endif
     QtCurve::WindowManager *itsWindowManager;

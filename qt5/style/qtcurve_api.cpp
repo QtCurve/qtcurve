@@ -26,7 +26,7 @@
 #include "blurhelper.h"
 #include <common/config_file.h>
 
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
 #include "shadowhelper.h"
 #include "xcb_utils.h"
 #include <sys/time.h>
@@ -120,7 +120,7 @@ void Style::polish(QApplication *app)
     if(SHADE_NONE!=opts.menuStripe && opts.noMenuStripeApps.contains(appName))
         opts.menuStripe=SHADE_NONE;
 
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     // Plasma and Kate do not like the 'Fix parentless dialogs' option...
     if(opts.fixParentlessDialogs && (APP_PLASMA==theThemedApp || opts.noDlgFixApps.contains(appName) || opts.noDlgFixApps.contains("kde")))
         opts.fixParentlessDialogs=false;
@@ -154,7 +154,7 @@ void Style::polish(QApplication *app)
         opts.menuBgndAppearance=APPEARANCE_FLAT;
     }
 
-#ifndef QTC_QT_ONLY
+#ifdef QTC_QT5_ENABLE_KDE
     if(opts.useQtFileDialogApps.contains(appName)) {
         qt_filedialog_existing_directory_hook=0L;
         qt_filedialog_open_filename_hook=0L;
@@ -329,7 +329,7 @@ void Style::polish(QPalette &palette)
     // Force this to be re-generated!
     if(SHADE_BLEND_SELECTED==opts.menuStripe)
         opts.customMenuStripeColor=Qt::black;
-#if !defined QTC_QT_ONLY
+#ifdef QTC_QT5_ENABLE_KDE
     // Only set palette here...
     if(kapp)
         setDecorationColors();
@@ -365,7 +365,7 @@ void Style::polish(QWidget *widget)
     }
 
     itsWindowManager->registerWidget(widget);
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
     itsShadowHelper->registerWidget(widget);
     if (widget->isWindow()) {
         XcbUtils::setWindowWMClass(widget->winId());
@@ -399,14 +399,14 @@ void Style::polish(QWidget *widget)
             if(APP_PLASMA==theThemedApp && !widget->inherits("QDialog"))
                 break;
 
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
             Utils::addEventFilter(widget, this);
 #endif
             int opacity = Qt::Dialog == (widget->windowFlags() &
                                          Qt::WindowType_Mask) ?
                 opts.dlgOpacity : opts.bgndOpacity;
 
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
             if (APP_KONSOLE == theThemedApp &&
                 100 != opacity &&
                 widget->testAttribute(Qt::WA_TranslucentBackground) &&
@@ -488,7 +488,7 @@ void Style::polish(QWidget *widget)
                 static_cast<QMainWindow*>(widget)->menuWidget(), this);
         if (itsSaveMenuBarStatus && qtcMenuBarHidden(appName)) {
             static_cast<QMainWindow*>(widget)->menuWidget()->setHidden(true);
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
             if (BLEND_TITLEBAR || opts.menubarHiding & HIDE_KWIN ||
                 opts.windowBorder & WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR)
                 emitMenuSize(static_cast<QMainWindow*>(widget)->menuWidget(), 0);
@@ -512,7 +512,7 @@ void Style::polish(QWidget *widget)
                 if(itsSaveStatusBarStatus && qtcStatusBarHidden(appName))
                     (*it)->setHidden(true);
             }
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
             setSbProp(widget);
             emitStatusBarState(sb.first());
 #endif
@@ -534,7 +534,7 @@ void Style::polish(QWidget *widget)
              qobject_cast<QComboBox *>(widget->parentWidget()->parentWidget()) &&
              !static_cast<QComboBox *>(widget->parentWidget()->parentWidget())->isEditable()) &&
            // Exclude KAboutDialog...
-#ifdef QTC_QT_ONLY
+#ifndef QTC_QT5_ENABLE_KDE
            !parentIs(widget, 5, "KAboutApplicationDialog") &&
 #else
            !qobject_cast<KAboutApplicationDialog *>(getParent(widget, 5)) &&
@@ -597,7 +597,7 @@ void Style::polish(QWidget *widget)
             setBold(widget);
         Utils::addEventFilter(widget, this);
     } else if(qobject_cast<QMenuBar*>(widget)) {
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
         if (BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN ||
             opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR)
             emitMenuSize(widget, PREVIEW_MDI==itsIsPreview ||
@@ -617,7 +617,7 @@ void Style::polish(QWidget *widget)
         if(WM_DRAG_ALL==opts.windowDrag &&
            ((QLabel *)widget)->textInteractionFlags().testFlag(Qt::TextSelectableByMouse) &&
            widget->parentWidget() && widget->parentWidget()->parentWidget() && ::qobject_cast<QFrame *>(widget->parentWidget()) &&
-#ifdef QTC_QT_ONLY
+#ifndef QTC_QT5_ENABLE_KDE
            widget->parentWidget()->parentWidget()->inherits("KTitleWidget")
 #else
            ::qobject_cast<KTitleWidget *>(widget->parentWidget()->parentWidget())
@@ -672,7 +672,7 @@ void Style::polish(QWidget *widget)
             widget->parentWidget()->parentWidget()->inherits("KFileWidget") /*&&
                                                                               widget->parentWidget()->parentWidget()->parentWidget()->inherits("KFileDialog")*/)
         ((QDockWidget*)widget)->setTitleBarWidget(new QtCurveDockWidgetTitleBar(widget));
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     else if(opts.fixParentlessDialogs && qobject_cast<QDialog*>(widget) &&
             widget->windowFlags()&Qt::WindowType_Mask &&
             (!widget->parentWidget()) /*|| widget->parentWidget()->isHidden())*/)
@@ -706,7 +706,7 @@ void Style::polish(QWidget *widget)
             //else if (QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
             Utils::addEventFilter(widget, this);
 
-#ifdef QTC_QT_ONLY
+#ifndef QTC_QT5_ENABLE_KDE
             if(widget->parent() && widget->parent()->inherits("KTitleWidget"))
 #else
                 if(widget->parent() && qobject_cast<KTitleWidget *>(widget->parent()))
@@ -799,7 +799,7 @@ void Style::polish(QWidget *widget)
         static_cast<QMainWindow *>(widget)->menuWidget()->setStyle(this);
 
     if(APP_QTCREATOR==theThemedApp && qobject_cast<QDialog *>(widget) &&
-#ifdef QTC_QT_ONLY
+#ifndef QTC_QT5_ENABLE_KDE
        widget->inherits("KFileDialog")
 #else
        qobject_cast<KFileDialog *>(widget)
@@ -859,7 +859,7 @@ void Style::polish(QWidget *widget)
         widget->layout()->setMargin(0);
     }
 
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
     QWidget *window=widget->window();
 
     if ((100!=opts.bgndOpacity &&
@@ -876,7 +876,7 @@ void Style::polish(QWidget *widget)
     }
 #endif
 
-#if !defined QTC_QT_ONLY
+#ifdef QTC_QT5_ENABLE_KDE
     // Make file selection button in QPrintDialog appear more KUrlRequester like...
     if (qobject_cast<QToolButton*>(widget) &&
         widget->parentWidget() && widget->parentWidget()->parentWidget() && widget->parentWidget()->parentWidget()->parentWidget() &&
@@ -910,7 +910,7 @@ void Style::unpolish(QWidget *widget)
     }
 
     itsWindowManager->unregisterWidget(widget);
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
     itsShadowHelper->unregisterWidget(widget);
 #endif
     itsBlurHelper->unregisterWidget(widget);
@@ -1044,7 +1044,7 @@ void Style::unpolish(QWidget *widget)
         delete ((QDockWidget *)widget)->titleBarWidget();
         ((QDockWidget *)widget)->setTitleBarWidget(0L);
     }
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     else if(opts.fixParentlessDialogs && qobject_cast<QDialog *>(widget))
         widget->removeEventFilter(this);
 #endif
@@ -1064,7 +1064,7 @@ void Style::unpolish(QWidget *widget)
 //             if (QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
             widget->removeEventFilter(this);
 
-#ifdef QTC_QT_ONLY
+#ifndef QTC_QT5_ENABLE_KDE
             if(widget->parent() && widget->parent()->inherits("KTitleWidget"))
 #else
                 if(widget->parent() && qobject_cast<KTitleWidget *>(widget->parent()))
@@ -1114,7 +1114,7 @@ void Style::unpolish(QWidget *widget)
         qobject_cast<QToolBar *>(widget) ||
         (widget && qobject_cast<QToolBar *>(widget->parent())))
         widget->setBackgroundRole(QPalette::Button);
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
     QWidget *window = widget->window();
 
     if ((100 != opts.bgndOpacity &&
@@ -1245,7 +1245,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 widget->setMask(windowMask(widget->rect(), opts.round>ROUND_SLIGHT));
             return false;
         }
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
         else if((BLEND_TITLEBAR ||
                  opts.windowBorder &
                  WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR ||
@@ -1294,7 +1294,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
            qtcStatusBarHidden(appName))
             static_cast<QStatusBar *>(object)->setHidden(true);
         break;
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
     case QEvent::PaletteChange:
     {
         QWidget *widget = qobject_cast<QWidget*>(object);
@@ -1495,7 +1495,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 widget->setMask(windowMask(widget->rect(), opts.round>ROUND_SLIGHT));
             return false;
         }
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
         else if ((BLEND_TITLEBAR ||
                   opts.windowBorder &
                   WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR ||
@@ -1524,7 +1524,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
     case QEvent::Destroy:
     case QEvent::Hide:
     {
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
         if ((BLEND_TITLEBAR ||
              opts.windowBorder &
              WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR ||
@@ -1549,7 +1549,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 itsProgressBarAnimateTimer = 0;
             }
         }
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
         if(opts.fixParentlessDialogs && qobject_cast<QDialog *>(object) && itsReparentedDialogs.contains((QWidget*)object))
         {
             QWidget *widget=(QWidget*)object;
@@ -1598,7 +1598,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
             return false;
         }
         break;
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     case 70: // QEvent::ChildInserted - QT3_SUPPORT
         if(opts.fixParentlessDialogs && qobject_cast<QDialog *>(object))
         {
@@ -1660,7 +1660,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
         return 2;
     case PM_ToolBarExtensionExtent:
         return 15;
-#ifdef QTC_QT_ONLY
+#ifndef QTC_QT5_ENABLE_KDE
     case PM_SmallIconSize:
         return 16;
     case PM_ToolBarIconSize:
@@ -1895,7 +1895,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
 // asks for these options, it only passes in a QStyleOption  not a QStyleOptionTab
 //.........
     case PM_TabBarBaseHeight:
-#ifdef QTC_QT_ONLY
+#ifndef QTC_QT5_ENABLE_KDE
         if(widget && widget->inherits("KTabBar") && !qstyleoption_cast<const QStyleOptionTab *>(option))
 #else
             if(widget && qobject_cast<const KTabBar*>(widget) && !qstyleoption_cast<const QStyleOptionTab *>(option))
@@ -1903,7 +1903,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
                 return 10;
         return BASE_STYLE::pixelMetric(metric, option, widget);
     case PM_TabBarBaseOverlap:
-#ifdef QTC_QT_ONLY
+#ifndef QTC_QT5_ENABLE_KDE
         if(widget && widget->inherits("KTabBar") && !qstyleoption_cast<const QStyleOptionTab *>(option))
 #else
             if(widget && qobject_cast<const KTabBar*>(widget) && !qstyleoption_cast<const QStyleOptionTab *>(option))
@@ -2065,14 +2065,14 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
         return QFormLayout::ExpandingFieldsGrow;
     case SH_FormLayoutWrapPolicy:
         return QFormLayout::DontWrapRows;
-#if !defined QTC_QT_ONLY
+#ifdef QTC_QT5_ENABLE_KDE
     case SH_DialogButtonBox_ButtonsHaveIcons:
         return KGlobalSettings::showIconsOnPushButtons();
     case SH_ItemView_ActivateItemOnSingleClick:
         return KGlobalSettings::singleClick();
 #endif
     default:
-#if !defined QTC_QT_ONLY
+#ifdef QTC_QT5_ENABLE_KDE
         // Tell the calling app that we can handle certain custom widgets...
         if(hint>=SH_CustomBase && widget)
             if("CE_CapacityBar"==widget->objectName())
@@ -2089,7 +2089,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
 QPalette Style::standardPalette() const
 {
     qtcDebug() << __func__;
-#if defined QTC_QT_ONLY
+#ifndef QTC_QT5_ENABLE_KDE
     return BASE_STYLE::standardPalette();
 #else
     return KGlobalSettings::createApplicationPalette(KSharedConfig::openConfig(itsComponentData));
@@ -2106,7 +2106,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
     bool reverse(Qt::RightToLeft==option->direction);
 
     switch ((int)element) {
-#if !defined QTC_QT_ONLY
+#ifdef QTC_QT5_ENABLE_KDE
     case PE_IndicatorTabClose: {
         int         size(pixelMetric(QStyle::PM_SmallIconSize));
         QIcon::Mode mode(state & State_Enabled
@@ -2449,7 +2449,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
         if(isOOWidget(widget) && r.height()<22)
             break;
 
-#ifdef QTC_QT_ONLY
+#ifndef QTC_QT5_ENABLE_KDE
         if(widget && widget->parent() && widget->parent()->inherits("KTitleWidget"))
             break;
 #else
@@ -3705,7 +3705,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
         QPainterPath path=rounded ? buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, MENU_AND_TOOLTIP_RADIUS) : QPainterPath();
         QColor       col=palette.toolTipBase().color();
 
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
         if (widget && widget->window()) {
             itsShadowHelper->registerWidget(widget->window());
         }
@@ -4067,7 +4067,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     painter->rotate(-90);
                     painter->translate(-rVert.left(), -rVert.top());
                 }
-#if !defined QTC_QT_ONLY
+#ifdef QTC_QT5_ENABLE_KDE
                 if(opts.dwtSettings&DWT_FONT_AS_PER_TITLEBAR)
                     painter->setFont(KGlobalSettings::windowTitleFont());
 #endif
@@ -6791,7 +6791,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 
             opt.state=State_Horizontal|State_Enabled|State_Raised|(active ? State_Active : State_None);
 
-#ifdef QTC_QT_ONLY
+#ifndef QTC_QT5_ENABLE_KDE
             QPainterPath path;
 #else
 #if KDE_IS_VERSION(4, 3, 0)
@@ -6958,7 +6958,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                                        ? QRect(r.x(), captionRect.y(), r.width(), captionRect.height())
                                        : captionRect);
 
-#ifdef QTC_QT_ONLY
+#ifndef QTC_QT5_ENABLE_KDE
                 QFont         font(painter->font());
                 font.setBold(true);
                 painter->setFont(font);

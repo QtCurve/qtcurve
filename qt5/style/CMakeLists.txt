@@ -21,7 +21,7 @@ set(qtcurve_MOC_HDRS
   blurhelper.h
   shortcuthandler.h)
 
-if(QTC_X11)
+if(QTC_ENABLE_X11)
   set(qtcurve_SRCS
     shadowhelper.cpp
     xcb_utils.cpp

@@ -90,7 +90,7 @@ typedef gchar ** Strings;
 #define KWIN_GROUP            "KWin"
 
 /* qtc_<theme name>.themerc support */
-#define KDE_PREFIX(V) ((4==(V)) ? KDE4PREFIX : KDE3PREFIX)
+#define KDE_PREFIX(V) (QTC_KDE4_PREFIX)
 #define THEME_DIR    "/share/apps/kstyle/themes/"
 #define THEME_DIR4   "/share/kde4/apps/kstyle/themes/"
 #define THEME_PREFIX "qtc_"
@@ -1090,7 +1090,7 @@ typedef struct
                      highlightTab,
                      roundAllTabs,
                      animatedProgress,
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
                      fixParentlessDialogs,
 #endif
                      customMenuTextColor,
@@ -1248,7 +1248,7 @@ typedef struct
                      noMenuBgndOpacityApps,
                      noBgndImageApps;
 #endif
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     Strings          noDlgFixApps;
 #endif
     Strings          noMenuStripeApps;
@@ -1273,7 +1273,7 @@ typedef struct
 #define MAX(a, b) ((b) < (a) ? (a) : (b))
 #endif
 
-#if defined QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY
+#if defined QT_VERSION && (QT_VERSION >= 0x040000) && defined QTC_QT5_ENABLE_KDE
 #include <KDE/KColorUtils>
 #define tint(COLA, COLB, FACTOR) KColorUtils::tint((COLA), (COLB), (FACTOR))
 #define midColor(COLA, COLB) KColorUtils::mix((COLA), (COLB), 0.5)

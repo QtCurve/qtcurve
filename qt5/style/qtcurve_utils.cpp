@@ -53,7 +53,7 @@
 #include <QPixmapCache>
 #include <QTextStream>
 
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
 #include "shadowhelper.h"
 #include "xcb_utils.h"
 #include <sys/time.h>
@@ -95,7 +95,7 @@ bool isNoEtchWidget(const QWidget *widget)
     return (w && isA(w, "KHTMLView")) || (widget && isInQAbstractItemView(widget->parentWidget()));
 }
 
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
 
 void setOpacityProp(QWidget *w, unsigned short opacity)
 {
@@ -155,7 +155,7 @@ getParent(QWidget *w, int level)
     return wid;
 }
 
-#ifdef QTC_QT_ONLY
+#ifndef QTC_QT5_ENABLE_KDE
 bool
 parentIs(QWidget *w, int level, const char *className)
 {

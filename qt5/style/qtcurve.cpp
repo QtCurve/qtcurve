@@ -20,7 +20,7 @@
 
 #include "qtcurve_p.h"
 
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
 #include <QDBusConnection>
 #include <QDBusInterface>
 #endif
@@ -59,13 +59,13 @@
 #include <QPixmapCache>
 #include <QTextStream>
 
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
 #include "shadowhelper.h"
 #include "xcb_utils.h"
 #include <sys/time.h>
 #endif
 
-#ifndef QTC_QT_ONLY
+#ifdef QTC_QT5_ENABLE_KDE
 #include <KDE/KApplication>
 #include <KDE/KAboutData>
 #include <KDE/KGlobalSettings>
@@ -90,7 +90,7 @@
 
 #endif // QTC_QT_ONLY
 
-#ifndef QTC_QT_ONLY
+#ifdef QTC_QT5_ENABLE_KDE
 typedef QString (*_qt_filedialog_existing_directory_hook)(
     QWidget *parent, const QString &caption, const QString &dir,
     QFileDialog::Options options);
@@ -166,7 +166,7 @@ QtcThemedApp theThemedApp = APP_OTHER;
 static QString getFile(const QString &f);
 QString appName = getFile(qApp->arguments()[0]);
 
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
 static QWidget*
 getActiveWindow(QWidget *widget)
 {
@@ -210,7 +210,7 @@ static void addStripes(QPainter *p, const QPainterPath &path, const QRect &rect,
     }
 }
 
-#if defined QTC_QT_ONLY
+#ifndef QTC_QT5_ENABLE_KDE
 static void setRgb(QColor *col, const QStringList &rgb)
 {
     if (3 == rgb.size()) {
@@ -346,7 +346,7 @@ static QtcKey createKey(const QColor &color, EPixmap p)
         (((qulonglong)1)<<38);
 }
 
-#if !defined QTC_QT_ONLY
+#ifdef QTC_QT5_ENABLE_KDE
 static void parseWindowLine(const QString &line, QList<int> &data)
 {
     int len(line.length());
@@ -405,7 +405,7 @@ Style::Style() :
     itsTitlebarHeight(0),
     // itsPos(-1, -1),
     // itsHoverWidget(0L),
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
     itsDBus(0),
     itsShadowHelper(new ShadowHelper(this)),
 #endif
@@ -435,7 +435,7 @@ void Style::init(bool initial)
     if(!initial)
         freeColors();
 
-#if !defined QTC_QT_ONLY
+#ifdef QTC_QT5_ENABLE_KDE
     if (initial) {
         if (KGlobal::hasMainComponent()) {
             itsComponentData = KGlobal::mainComponent();
@@ -461,7 +461,7 @@ void Style::init(bool initial)
     } else {
         qtcReadConfig(QString(), &opts);
 
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
         if (initial) {
             QDBusConnection::sessionBus().connect(
                 QString(), "/KGlobalSettings", "org.kde.KGlobalSettings",
@@ -742,7 +742,7 @@ void Style::init(bool initial)
 
     itsBlurHelper->setEnabled(100!=opts.bgndOpacity || 100!=opts.dlgOpacity || 100!=opts.menuBgndOpacity);
 
-#if !defined QTC_QT_ONLY
+#ifdef QTC_QT5_ENABLE_KDE
     // Ensure the link to libkio is not stripped, by placing a call to a kio function.
     // NOTE: This call will never actually happen, its only here so that the qtcurve.so
     // contains a kio link so that this is not removed by some 'optimisation' of the
@@ -759,7 +759,7 @@ void Style::init(bool initial)
 Style::~Style()
 {
     freeColors();
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
     if (itsDBus) {
         delete itsDBus;
     }
@@ -947,7 +947,7 @@ void Style::polishScrollArea(QAbstractScrollArea *scrollArea, bool isKFilePlaces
     }
 }
 
-#if defined QTC_QT_ONLY
+#ifndef QTC_QT5_ENABLE_KDE
 #include "dialogpixmaps.h"
 
 static QIcon load(const unsigned int len, const unsigned char *data)
@@ -996,7 +996,7 @@ QIcon Style::standardIcon(StandardPixmap pix, const QStyleOption *option,
         drawIcon(&painter, Qt::color1, QRect(0, 0, pm.width(), pm.height()), false, pix2Icon(pix), true);
         return QIcon(pm);
     }
-#if defined QTC_QT_ONLY
+#ifndef QTC_QT5_ENABLE_KDE
     case SP_MessageBoxQuestion:
     case SP_MessageBoxInformation:
     {
@@ -3032,7 +3032,7 @@ void Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe, QColor 
 
     a.translate((r.x()+(r.width()>>1)), (r.y()+(r.height()>>1)));
 
-#ifdef QTC_OLD_NVIDIA_ARROW_FIX
+#ifdef QTC_QT5_OLD_NVIDIA_ARROW_FIX
     path.moveTo(a[0].x()+0.5, a[0].y()+0.5);
     for(int i=1; i<a.size(); ++i)
         path.lineTo(a[i].x()+0.5, a[i].y()+0.5);
@@ -3043,12 +3043,12 @@ void Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe, QColor 
     // slightly blurry, and I dont like that.
     p->save();
     col.setAlpha(255);
-#ifdef QTC_OLD_NVIDIA_ARROW_FIX
+#ifdef QTC_QT5_OLD_NVIDIA_ARROW_FIX
     p->setRenderHint(QPainter::Antialiasing, true);
 #endif
     p->setPen(col);
     p->setBrush(col);
-#ifdef QTC_OLD_NVIDIA_ARROW_FIX
+#ifdef QTC_QT5_OLD_NVIDIA_ARROW_FIX
     p->fillPath(path, col);
 #endif
     // Qt >= 4.8.5 has problem drawing polygons correctly. Enabling
@@ -3794,7 +3794,7 @@ const QColor * Style::getMdiColors(const QStyleOption *option, bool active) cons
 {
     if(!itsActiveMdiColors)
     {
-#if defined QTC_QT_ONLY
+#ifndef QTC_QT5_ENABLE_KDE
         itsActiveMdiTextColor=option ? option->palette.text().color() : QApplication::palette().text().color();
         itsMdiTextColor=option ? option->palette.text().color() : QApplication::palette().text().color();
 
@@ -3895,7 +3895,7 @@ void Style::readMdiPositions() const
         itsMdiButtons[1].append(WINDOWTITLE_SPACER);
         itsMdiButtons[1].append(SC_TitleBarCloseButton);
 
-#if !defined QTC_QT_ONLY
+#ifdef QTC_QT5_ENABLE_KDE
         KConfig      cfg("kwinrc");
         KConfigGroup grp(&cfg, "Style");
 
@@ -4175,7 +4175,7 @@ void Style::widgetDestroyed(QObject *o)
     unregisterArgbWidget(w);
 }
 
-#if !defined QTC_QT_ONLY
+#ifdef QTC_QT5_ENABLE_KDE
 void Style::setupKde4()
 {
     if(kapp) {
@@ -4218,7 +4218,7 @@ void Style::applyKdeSettings(bool pal)
 
 void Style::kdeGlobalSettingsChange(int type, int)
 {
-#if defined QTC_QT_ONLY
+#ifndef QTC_QT5_ENABLE_KDE
     Q_UNUSED(type)
 #else
         switch(type)
@@ -4257,7 +4257,7 @@ void Style::kdeGlobalSettingsChange(int type, int)
 
 void Style::borderSizesChanged()
 {
-#if !defined QTC_QT_ONLY
+#ifdef QTC_QT5_ENABLE_KDE
     int old=qtcGetWindowBorderSize().titleHeight;
 
     if(old!=qtcGetWindowBorderSize(true).titleHeight)
@@ -4273,7 +4273,7 @@ void Style::borderSizesChanged()
 #endif
 }
 
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
 static QMainWindow *getWindow(unsigned int xid)
 {
     QWidgetList tlw = QApplication::topLevelWidgets();
@@ -4302,7 +4302,7 @@ static bool diffTime(struct timeval *lastTime)
 void
 Style::toggleMenuBar(unsigned int xid)
 {
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
     static unsigned int   lastXid  = 0;
     static struct timeval lastTime = {0, 0};
 
@@ -4320,7 +4320,7 @@ Style::toggleMenuBar(unsigned int xid)
 
 void Style::toggleStatusBar(unsigned int xid)
 {
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
     static unsigned int lastXid  = 0;
     static struct timeval lastTime = {0, 0};
 
@@ -4338,7 +4338,7 @@ void Style::toggleStatusBar(unsigned int xid)
 
 void Style::compositingToggled()
 {
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
     QWidgetList tlw = QApplication::topLevelWidgets();
     QWidgetList::ConstIterator it(tlw.begin()),
         end(tlw.end());
@@ -4352,7 +4352,7 @@ void Style::toggleMenuBar(QMainWindow *window)
 {
     bool triggeredAction(false);
 
-#ifndef QTC_QT_ONLY
+#ifdef QTC_QT5_ENABLE_KDE
     if(qobject_cast<KXmlGuiWindow *>(window))
     {
         KActionCollection *collection=static_cast<KXmlGuiWindow *>(window)->actionCollection();
@@ -4378,7 +4378,7 @@ void Style::toggleStatusBar(QMainWindow *window)
 {
     bool triggeredAction(false);
 
-#ifndef QTC_QT_ONLY
+#ifdef QTC_QT5_ENABLE_KDE
     if(qobject_cast<KXmlGuiWindow *>(window))
     {
         KActionCollection *collection=static_cast<KXmlGuiWindow *>(window)->actionCollection();
@@ -4387,7 +4387,7 @@ void Style::toggleStatusBar(QMainWindow *window)
         {
             act->trigger();
             triggeredAction=true;
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
             //emitStatusBarState(true); // TODO: ???
 #endif
         }
@@ -4407,14 +4407,14 @@ void Style::toggleStatusBar(QMainWindow *window)
             for(; it!=end; ++it)
                 (*it)->setHidden((*it)->isVisible());
 
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
             emitStatusBarState(sb.first());
 #endif
         }
     }
 }
 
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
 void Style::emitMenuSize(QWidget *w, unsigned short size, bool force)
 {
     if (w && canAccessId(w->window())) {

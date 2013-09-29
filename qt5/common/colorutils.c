@@ -29,7 +29,8 @@ The code has been modified to work with QColor (Qt3 &Qt4) and GdkColor
 #include <qglobal.h>
 #endif
 
-#if !(defined QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY)
+#if !(defined QT_VERSION && (QT_VERSION >= 0x040000) && \
+      defined QTC_QT5_ENABLE_KDE)
 
 #include <math.h>
 

@@ -59,12 +59,12 @@
 #include <QTextStream>
 #include <QTextDocument>
 
-#ifndef QTC_QT_ONLY
-#include <KGlobalSettings>
+#ifdef QTC_QT5_ENABLE_KDE
+#  include <KGlobalSettings>
 #endif
 
-#ifdef QTC_X11
-#  ifdef QTC_QT_ONLY
+#ifdef QTC_ENABLE_X11
+#  ifndef QTC_QT5_ENABLE_KDE
 #    include "xcb_utils.h"
 #  else
 #    include <NETRootInfo>
@@ -101,13 +101,13 @@ bool QtCPointer::eventFilter(QObject *o, QEvent *e)
 WindowManager::WindowManager( QObject* parent ):
     QObject( parent ),
     _enabled( true ),
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
     _useWMMoveResize(true),
 #else
     _useWMMoveResize(false),
 #endif
     _dragMode( WM_DRAG_NONE ),
-#ifdef QTC_QT_ONLY
+#ifndef QTC_QT5_ENABLE_KDE
     _dragDistance( QApplication::startDragDistance() ),
 #else
     _dragDistance( KGlobalSettings::dndEventDelay() ),
@@ -133,7 +133,7 @@ void WindowManager::initialize( int windowDrag, const QStringList &whiteList, co
     setDragMode( windowDrag );
 //CPD: Why???        setUseWMMoveResize( OxygenStyleConfigData::useWMMoveResize() );
 
-#ifndef QTC_QT_ONLY
+#ifdef QTC_QT5_ENABLE_KDE
     setDragDistance( KGlobalSettings::dndEventDelay() );
 #endif
     setDragDelay( QApplication::startDragTime() );
@@ -649,9 +649,9 @@ void WindowManager::startDrag( QWidget* widget, const QPoint& position )
 
     // ungrab pointer
     if (useWMMoveResize()) {
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
         XcbCallVoid(ungrab_pointer, 0L);
-#ifdef QTC_QT_ONLY
+#ifndef QTC_QT5_ENABLE_KDE
         static const auto moveResizeAtom =
             XcbUtils::getAtom("_NET_WM_MOVERESIZE");
         union {
@@ -702,7 +702,7 @@ void WindowManager::startDrag( QWidget* widget, const QPoint& position )
 bool WindowManager::supportWMMoveResize( void ) const
 {
 
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
     return true;
 #else
     return false;

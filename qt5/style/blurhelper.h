@@ -42,7 +42,7 @@
 #include <QRegion>
 #include <QToolBar>
 
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
 #include <xcb/xcb.h>
 #endif
 
@@ -142,7 +142,7 @@ private:
     //! delayed update timer
     QBasicTimer _timer;
 
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
     //! blur atom
     xcb_atom_t _atom;
 #endif

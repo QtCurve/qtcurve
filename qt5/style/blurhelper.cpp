@@ -38,7 +38,7 @@
 #include <QPushButton>
 #include <QToolBar>
 
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
 #  include "xcb_utils.h"
 #endif
 
@@ -48,7 +48,7 @@ BlurHelper::BlurHelper(QObject *parent):
     QObject(parent),
     _enabled(false)
 {
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
     // create atom
     _atom = XcbUtils::getAtom("_KDE_NET_WM_BLUR_BEHIND_REGION");
 #endif
@@ -171,7 +171,7 @@ void BlurHelper::trimBlurRegion( QWidget* parent, QWidget* widget, QRegion& regi
 //___________________________________________________________
 void BlurHelper::update( QWidget* widget ) const
 {
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
     /*
       directly from bespin code. Supposibly prevent playing with some 'pseudo-widgets'
       that have winId matching some other -random- window
@@ -204,7 +204,7 @@ void BlurHelper::update( QWidget* widget ) const
 //___________________________________________________________
 void BlurHelper::clear( QWidget* widget ) const
 {
-#ifdef QTC_X11
+#ifdef QTC_ENABLE_X11
     XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
                 widget->winId(), _atom, XCB_ATOM_CARDINAL,
                 32, 0, (const void*)0);
