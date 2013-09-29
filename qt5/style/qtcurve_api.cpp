@@ -24,7 +24,7 @@
 #include "shortcuthandler.h"
 #include "windowmanager.h"
 #include "blurhelper.h"
-#include "config_file.h"
+#include <common/config_file.h>
 
 #ifdef QTC_X11
 #include "shadowhelper.h"

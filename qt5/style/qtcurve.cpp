@@ -28,7 +28,7 @@
 #include "blurhelper.h"
 #include "shortcuthandler.h"
 #include "pixmaps.h"
-#include "config_file.h"
+#include <common/config_file.h>
 #include "debug.h"
 
 #include <QAbstractItemView>

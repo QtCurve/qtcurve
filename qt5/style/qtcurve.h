@@ -34,7 +34,7 @@
 #include <QFormLayout>
 #include <QtGlobal>
 typedef qulonglong QtcKey;
-#include "common.h"
+#include <common/common.h>
 
 #if !defined QTC_QT_ONLY
 #include <KDE/KComponentData>

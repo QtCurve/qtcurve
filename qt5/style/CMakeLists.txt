@@ -32,24 +32,13 @@ if(QTC_X11)
 endif()
 
 add_definitions(-DQT_PLUGIN)
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}"
-  "${CMAKE_CURRENT_BINARY_DIR}"
-  "${PROJECT_SOURCE_DIR}/common")
-# kde4_add_plugin(qtcurve ${qtcurve_SRCS})
-# qt5_automoc(${qtcurve_SRCS})
+include_directories(
+  "${CMAKE_CURRENT_SOURCE_DIR}"
+  "${CMAKE_CURRENT_BINARY_DIR}")
 qt5_wrap_cpp(qtcurve_MOC_SRCS ${qtcurve_MOC_HDRS})
 add_library(qtcurve MODULE ${qtcurve_SRCS} ${qtcurve_MOC_SRCS})
 set_target_properties(qtcurve PROPERTIES
   LINK_FLAGS "-Wl,--no-undefined")
 set_target_properties(qtcurve PROPERTIES PREFIX "")
-
-# if(NOT QTC_QT_ONLY)
-#   install(FILES qtcurve.themerc DESTINATION ${DATA_INSTALL_DIR}/kstyle/themes)
-#   set(QTC_KDE_LIBS ${KDE4_KDEUI_LIBS})
-#   if(NOT QTC_DISABLE_KDEFILEDIALOG_CALLS)
-#     set(QTC_KFILEDIALOG_LIBS ${KDE4_KIO_LIBS} ${KDE4_KDECORE_LIBS})
-#   endif()
-# endif()
-
 target_link_libraries(qtcurve ${QTC5_LINK_LIBS} ${QTC5_XCB_LINK_LIBS})
 install(TARGETS qtcurve LIBRARY DESTINATION ${QTCURVE_STYLE_DIR})
