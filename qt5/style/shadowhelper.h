@@ -32,14 +32,11 @@
 #include <QMap>
 #include <qwindowdefs.h>
 #include <xcb/xcb.h>
+#include <common/common.h>
 
-class QPixmap;
-
-namespace QtCurve
-{
+namespace QtCurve {
 //! handle shadow pixmaps passed to window manager via X property
-class ShadowHelper: public QObject
-{
+class ShadowHelper: public QObject {
     Q_OBJECT
 public:
     //!@name property names
@@ -76,8 +73,7 @@ protected:
     void createPixmapHandles();
 
     // create pixmap handle from pixmap
-    void createPixmap(xcb_pixmap_t pixmap, const uchar *buf, size_t len,
-                      size_t width, size_t height);
+    xcb_pixmap_t createPixmap(const QtcPixmap *data);
 
     //! install shadow X11 property on given widget
     /*!

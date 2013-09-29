@@ -4,6 +4,17 @@ set(qtcurve_style_common_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/../common/colorutils.c)
 set_source_files_properties(${qtcurve_style_common_SRCS} PROPERTIES LANGUAGE CXX)
 
+foreach(pngname check_on check_x_on dialog_error dialog_information
+    dialog_warning)
+  add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${pngname}-png.h"
+    COMMAND "${PROJECT_BINARY_DIR}/tools/qt-dump-png"
+    "${PROJECT_SOURCE_DIR}/data/${pngname}.png" "qtc_${pngname}"
+    "${CMAKE_CURRENT_BINARY_DIR}/${pngname}-png.h"
+    DEPENDS qt-dump-png "${PROJECT_SOURCE_DIR}/data/${pngname}.png")
+  add_custom_target(qtc_qt5_${pngname}_hdr
+    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/${pngname}-png.h")
+endforeach()
+
 set(qtcurve_SRCS
   qtcurve.cpp
   qtcurve_api.cpp
@@ -42,5 +53,10 @@ set_target_properties(qtcurve-qt5 PROPERTIES
   OUTPUT_NAME "qtcurve"
   LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   PREFIX "")
+add_dependencies(qtcurve-qt5 qtc_shadow0_hdr qtc_shadow1_hdr qtc_shadow2_hdr
+  qtc_shadow3_hdr qtc_shadow4_hdr qtc_shadow5_hdr qtc_shadow6_hdr
+  qtc_shadow7_hdr qtc_qt5_check_on_hdr qtc_qt5_check_x_on_hdr
+  qtc_qt5_dialog_error_hdr qtc_qt5_dialog_information_hdr
+  qtc_qt5_dialog_warning_hdr)
 target_link_libraries(qtcurve-qt5 ${QTC5_LINK_LIBS} ${QTC5_XCB_LINK_LIBS})
 install(TARGETS qtcurve-qt5 LIBRARY DESTINATION ${QTCURVE_STYLE_DIR})

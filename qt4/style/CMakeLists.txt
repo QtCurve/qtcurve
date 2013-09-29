@@ -12,7 +12,7 @@ foreach(pngname check_on check_x_on dialog_error dialog_information
     "${PROJECT_SOURCE_DIR}/data/${pngname}.png" "qtc_${pngname}"
     "${CMAKE_CURRENT_BINARY_DIR}/${pngname}-png.h"
     DEPENDS qt-dump-png "${PROJECT_SOURCE_DIR}/data/${pngname}.png")
-  add_custom_target(qtc_${pngname}_hdr
+  add_custom_target(qtc_qt4_${pngname}_hdr
     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/${pngname}-png.h")
 endforeach()
 
@@ -51,7 +51,7 @@ qt4_wrap_cpp(qtcurve_MOC_SRCS ${qtcurve_MOC_HDRS})
 add_library(qtcurve-qt4 MODULE ${qtcurve_SRCS} ${qtcurve_MOC_SRCS})
 add_dependencies(qtcurve-qt4 qtc_shadow0_hdr qtc_shadow1_hdr qtc_shadow2_hdr
   qtc_shadow3_hdr qtc_shadow4_hdr qtc_shadow5_hdr qtc_shadow6_hdr
-  qtc_shadow7_hdr qtc_check_on_hdr qtc_check_x_on_hdr)
+  qtc_shadow7_hdr qtc_qt4_check_on_hdr qtc_qt4_check_x_on_hdr)
 set_target_properties(qtcurve-qt4 PROPERTIES
   LINK_FLAGS "-Wl,--no-undefined"
   LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
@@ -65,8 +65,9 @@ if(QTC_QT4_ENABLE_KDE)
     set(QTC_KFILEDIALOG_LIBS ${KDE4_KIO_LIBS} ${KDE4_KDECORE_LIBS})
   endif (NOT QTC_DISABLE_KDEFILEDIALOG_CALLS)
 else()
-  add_dependencies(qtcurve-qt4 qtc_dialog_error_hdr qtc_dialog_information_hdr
-    qtc_dialog_warning_hdr)
+  add_dependencies(qtcurve-qt4 qtc_qt4_dialog_error_hdr
+    qtc_qt4_dialog_information_hdr
+    qtc_qt4_dialog_warning_hdr)
 endif()
 
 target_link_libraries(qtcurve-qt4

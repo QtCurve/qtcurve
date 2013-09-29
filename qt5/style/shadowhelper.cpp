@@ -25,7 +25,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "shadowhelper.h"
-#include "shadow.h"
 #include "utils.h"
 #include "debug.h"
 
@@ -37,9 +36,16 @@
 
 #include "xcb_utils.h"
 #include <xcb/xcb_image.h>
+#include <data/shadow0-png.h>
+#include <data/shadow1-png.h>
+#include <data/shadow2-png.h>
+#include <data/shadow3-png.h>
+#include <data/shadow4-png.h>
+#include <data/shadow5-png.h>
+#include <data/shadow6-png.h>
+#include <data/shadow7-png.h>
 
-namespace QtCurve
-{
+namespace QtCurve {
 
 const char *const ShadowHelper::netWMShadowAtomName =
     "_KDE_NET_WM_SHADOW";
@@ -173,28 +179,34 @@ void ShadowHelper::createPixmapHandles()
     // create atom
     if (!_atom)
         _atom = XcbUtils::getAtom(netWMShadowAtomName);
-    for (int i = 0;i < numPixmaps;i++) {
-        _pixmaps[i] = XcbUtils::generateId();
-        createPixmap(_pixmaps[i], shadow_img_data[i], shadow_img_len[i],
-                     shadow_img_width[i], shadow_img_height[i]);
-    }
+    _pixmaps[0] = createPixmap(&qtc_shadow0);
+    _pixmaps[1] = createPixmap(&qtc_shadow1);
+    _pixmaps[2] = createPixmap(&qtc_shadow2);
+    _pixmaps[3] = createPixmap(&qtc_shadow3);
+    _pixmaps[4] = createPixmap(&qtc_shadow4);
+    _pixmaps[5] = createPixmap(&qtc_shadow5);
+    _pixmaps[6] = createPixmap(&qtc_shadow6);
+    _pixmaps[7] = createPixmap(&qtc_shadow7);
     XcbUtils::flush();
 }
 
 //______________________________________________
-void ShadowHelper::createPixmap(xcb_pixmap_t pixmap, const uchar *buf, size_t len,
-                                size_t width, size_t height)
+xcb_pixmap_t
+ShadowHelper::createPixmap(const QtcPixmap *data)
 {
-    _size = width;
+    xcb_pixmap_t pixmap = XcbUtils::generateId();
+    _size = data->width;
 
     // create X11 pixmap
     XcbCallVoid(create_pixmap, 32, pixmap, XcbUtils::rootWindow(),
-                width, height);
+                data->width, data->height);
     xcb_gcontext_t cid = XcbUtils::generateId();
     XcbCallVoid(create_gc, cid, pixmap, 0, (const uint32_t*)0);
     XcbCallVoid(put_image, XCB_IMAGE_FORMAT_Z_PIXMAP, pixmap, cid,
-                width, height, 0, 0, 0, 32, len, (uchar*)buf);
+                data->width, data->height, 0, 0, 0, 32, data->len,
+                (uchar*)data->data);
     XcbCallVoid(free_gc, cid);
+    return pixmap;
 }
 
 //_______________________________________________________

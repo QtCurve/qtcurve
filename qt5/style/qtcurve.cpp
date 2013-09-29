@@ -27,9 +27,16 @@
 #include "windowmanager.h"
 #include "blurhelper.h"
 #include "shortcuthandler.h"
-#include "pixmaps.h"
 #include <common/config_file.h>
+#include "check_on-png.h"
+#include "check_x_on-png.h"
 #include "debug.h"
+
+#ifndef QTC_QT5_ENABLE_KDE
+#include "dialog_error-png.h"
+#include "dialog_warning-png.h"
+#include "dialog_information-png.h"
+#endif
 
 #include <QAbstractItemView>
 #include <QDialog>
@@ -947,18 +954,6 @@ void Style::polishScrollArea(QAbstractScrollArea *scrollArea, bool isKFilePlaces
     }
 }
 
-#ifndef QTC_QT5_ENABLE_KDE
-#include "dialogpixmaps.h"
-
-static QIcon load(const unsigned int len, const unsigned char *data)
-{
-    QImage img;
-    img.loadFromData(data, len);
-
-    return QIcon(QPixmap::fromImage(img));
-}
-#endif
-
 QIcon Style::standardIcon(StandardPixmap pix, const QStyleOption *option,
                           const QWidget *widget) const
 {
@@ -998,19 +993,16 @@ QIcon Style::standardIcon(StandardPixmap pix, const QStyleOption *option,
     }
 #ifndef QTC_QT5_ENABLE_KDE
     case SP_MessageBoxQuestion:
-    case SP_MessageBoxInformation:
-    {
-        static QIcon icn(load(dialog_information_png_len, dialog_information_png_data));
+    case SP_MessageBoxInformation: {
+        static QIcon icn(QPixmap::fromImage(qtc_dialog_information));
         return icn;
     }
-    case SP_MessageBoxWarning:
-    {
-        static QIcon icn(load(dialog_warning_png_len, dialog_warning_png_data));
+    case SP_MessageBoxWarning: {
+        static QIcon icn(QPixmap::fromImage(qtc_dialog_warning));
         return icn;
     }
-    case SP_MessageBoxCritical:
-    {
-        static QIcon icn(load(dialog_error_png_len, dialog_error_png_data));
+    case SP_MessageBoxCritical: {
+        static QIcon icn(QPixmap::fromImage(qtc_dialog_error));
         return icn;
     }
 /*
@@ -3996,10 +3988,11 @@ QPixmap * Style::getPixmap(const QColor col, EPixmap p, double shade) const
             switch(p)
             {
             case PIX_CHECK:
-                if(opts.xCheck)
-                    img.loadFromData(check_x_on_png_data, check_x_on_png_len);
-                else
-                    img.loadFromData(check_on_png_data, check_on_png_len);
+                if(opts.xCheck) {
+                    img = qtc_check_x_on;
+                } else {
+                    img = qtc_check_on;
+                }
                 break;
             default:
                 break;
