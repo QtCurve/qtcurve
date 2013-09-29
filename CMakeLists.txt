@@ -1,6 +1,7 @@
 project(QtCurve)
 cmake_minimum_required(VERSION 2.8)
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}"
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
 set(QTCURVE_VERSION_MAJOR "1")
 set(QTCURVE_VERSION_MINOR "8")
@@ -82,7 +83,7 @@ endif()
 
 if(QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT)
   message(WARNING
-    "You have enabled support for the 'fix parentless dialogs' option. "
+    "You have enabled support for the 'fix parentless dialogs' option for Qt4. "
     "This is known to BREAK some applications. Please "
     "DO NOT report errors to application authors when you have "
     "this enabled. Please reconsider DISABLING this option.")
