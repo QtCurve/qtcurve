@@ -1,7 +1,7 @@
 project(QtCurve)
 cmake_minimum_required(VERSION 2.8)
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}"
-  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(QTCURVE_VERSION_MAJOR "1")
 set(QTCURVE_VERSION_MINOR "8")

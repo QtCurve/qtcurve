@@ -1,7 +1,16 @@
-if(ENABLE_QT4)
+if(ENABLE_QT5)
+  set(gen_image_header_SRCS
+    gen_image_header_qt.cpp)
+  find_package(Qt5Core REQUIRED)
+  find_package(Qt5Gui REQUIRED)
+  set(gen_image_header_LINKS ${Qt5Core_LIBRARIES} ${Qt5Gui_LIBRARIES})
+  set(gen_image_header_INCLUDES ${Qt5Core_INCLUDE_DIRS}
+    ${Qt5Gui_INCLUDE_DIRS})
+  set(gen_image_header_DEFS ${Qt5Core_DEFINITIONS} ${Qt5Gui_DEFINITIONS})
+elseif(ENABLE_QT4)
   find_package(Qt4 REQUIRED)
   set(gen_image_header_SRCS
-    gen_image_header_qt4.cpp)
+    gen_image_header_qt.cpp)
   set(gen_image_header_INCLUDES
     "${QT_INCLUDE_DIR}"
     "${QT_QTGUI_INCLUDE_DIR}"
@@ -9,14 +18,19 @@ if(ENABLE_QT4)
   set(gen_image_header_LINKS
     ${QT_QTGUI_LIBRARY}
     ${QT_QTCORE_LIBRARY})
+  set(gen_image_header_DEFS)
 endif()
 
-include_directories(${gen_image_header_INCLUDES})
+string(REPLACE ";" " " gen_image_header_DEFS "${gen_image_header_DEFS}")
+
 add_executable(gen-image-header ${gen_image_header_SRCS})
+set_target_properties(gen-image-header PROPERTIES
+  INCLUDE_DIRECTORIES "${gen_image_header_INCLUDES}"
+  COMPILE_FLAGS "${gen_image_header_DEFS}")
 target_link_libraries(gen-image-header ${gen_image_header_LINKS})
 
-if(ENABLE_QT4)
-  set(qt4_dump_png_SRCS
-    qt4_dump_png.c)
-  add_executable(qt4-dump-png ${qt4_dump_png_SRCS})
+if(ENABLE_QT4 OR ENABLE_QT5)
+  set(qt_dump_png_SRCS
+    qt_dump_png.c)
+  add_executable(qt-dump-png ${qt_dump_png_SRCS})
 endif()

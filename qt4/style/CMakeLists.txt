@@ -8,10 +8,10 @@ set_source_files_properties(${qtcurve_style_common_SRCS}
 foreach(pngname check_on check_x_on dialog_error dialog_information
     dialog_warning)
   add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${pngname}-png.h"
-    COMMAND "${PROJECT_BINARY_DIR}/tools/qt4-dump-png"
+    COMMAND "${PROJECT_BINARY_DIR}/tools/qt-dump-png"
     "${PROJECT_SOURCE_DIR}/data/${pngname}.png" "qtc_${pngname}"
     "${CMAKE_CURRENT_BINARY_DIR}/${pngname}-png.h"
-    DEPENDS qt4-dump-png "${PROJECT_SOURCE_DIR}/data/${pngname}.png")
+    DEPENDS qt-dump-png "${PROJECT_SOURCE_DIR}/data/${pngname}.png")
   add_custom_target(qtc_${pngname}_hdr
     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/${pngname}-png.h")
 endforeach()
