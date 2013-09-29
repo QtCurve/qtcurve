@@ -31,13 +31,35 @@
 
 class QToolBar;
 
+#define qtcCheckKDEType(obj, type) (qtcCheckKDETypeFull(obj, type, #type))
+#define qtcCheckKDEType0(obj, type) (qtcCheckKDETypeFull0(obj, type, #type))
+
+template <class T, class T2> static inline bool
+qtcCheckType0(T2 *obj)
+{
+    return obj && qobject_cast<const T*>(obj);
+}
+template <class T2> static inline bool
+qtcCheckType0(T2 *obj, const char *name)
+{
+    return obj && obj->inherits(name);
+}
+
+#ifdef QTC_QT5_ENABLE_KDE
+#define qtcCheckKDETypeFull(obj, type, name) (qobject_cast<const type*>(obj))
+#define qtcCheckKDETypeFull0(obj, type, name) (qtcCheckType0<type>(obj))
+#else
+#define qtcCheckKDETypeFull(obj, type, name) (obj->inherits(name))
+#define qtcCheckKDETypeFull0(obj, type, name) (qtcCheckType0(obj, name))
+#endif
+
 namespace QtCurve {
 
 extern QString appName;
 static const int constMenuPixmapWidth = 22;
-static const int constWindowMargin   =  2;
+static const int constWindowMargin = 2;
 static const int constProgressBarFps = 20;
-static const int constTabPad         =  6;
+static const int constTabPad = 6;
 
 static const QLatin1String constDwtClose("qt_dockwidget_closebutton");
 static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
@@ -120,7 +142,8 @@ bool blendOOMenuHighlight(const QPalette &pal, const QColor &highlight);
 bool isNoEtchWidget(const QWidget *widget);
 
 #ifdef QTC_ENABLE_X11
-static inline bool canAccessId(const QWidget *w)
+static inline bool
+canAccessId(const QWidget *w)
 {
     return w && w->testAttribute(Qt::WA_WState_Created) && w->internalWinId();
 }
@@ -194,10 +217,10 @@ getIconPixmap(const QIcon &icon, const QSize &size, int flags,
                          QIcon::Normal : QIcon::Disabled, state);
 }
 
-static inline int numButtons(EScrollbar type)
+static inline int
+numButtons(EScrollbar type)
 {
-    switch(type)
-    {
+    switch (type) {
     default:
     case SCROLLBAR_KDE:
         return 3;
@@ -212,27 +235,32 @@ static inline int numButtons(EScrollbar type)
     }
 }
 
-static inline void drawRect(QPainter *p, const QRect &r)
+static inline void
+drawRect(QPainter *p, const QRect &r)
 {
     p->drawRect(r.x(), r.y(), r.width()-1, r.height()-1);
 }
 
-static inline void drawAaLine(QPainter *p, int x1, int y1, int x2, int y2)
+static inline void
+drawAaLine(QPainter *p, int x1, int y1, int x2, int y2)
 {
     p->drawLine(QLineF(x1+0.5, y1+0.5, x2+0.5, y2+0.5));
 }
 
-static inline void drawAaPoint(QPainter *p, int x, int y)
+static inline void
+drawAaPoint(QPainter *p, int x, int y)
 {
     p->drawPoint(QPointF(x+0.5, y+0.5));
 }
 
-static inline void drawAaRect(QPainter *p, const QRect &r)
+static inline void
+drawAaRect(QPainter *p, const QRect &r)
 {
     p->drawRect(QRectF(r.x()+0.5, r.y()+0.5, r.width()-1, r.height()-1));
 }
 
-static inline bool isMultiTabBarTab(const QAbstractButton *button)
+static inline bool
+isMultiTabBarTab(const QAbstractButton *button)
 {
     // Check for isFlat fails in KDE SC4.5
     return button && ((::qobject_cast<const QPushButton*>(button) &&
@@ -243,10 +271,13 @@ static inline bool isMultiTabBarTab(const QAbstractButton *button)
                        button->inherits("Sublime::IdealToolButton")));
 }
 
-QWidget *getParent(QWidget *w, int level);
-#ifndef QTC_QT5_ENABLE_KDE
-bool parentIs(QWidget *w, int level, const char *className);
-#endif
+static inline QWidget*
+getParent(QWidget *w, int level)
+{
+    for (int i = 0;i < level && w;++i)
+        w = w->parentWidget();
+    return w;
+}
 
 static inline int
 toHint(int sc)

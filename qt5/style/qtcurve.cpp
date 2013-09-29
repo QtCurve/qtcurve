@@ -4212,10 +4212,9 @@ void Style::applyKdeSettings(bool pal)
 void Style::kdeGlobalSettingsChange(int type, int)
 {
 #ifndef QTC_QT5_ENABLE_KDE
-    Q_UNUSED(type)
+    Q_UNUSED(type);
 #else
-        switch(type)
-        {
+    switch(type) {
         case KGlobalSettings::StyleChanged:
         {
             KGlobal::config()->reparseConfiguration();
@@ -4346,8 +4345,7 @@ void Style::toggleMenuBar(QMainWindow *window)
     bool triggeredAction(false);
 
 #ifdef QTC_QT5_ENABLE_KDE
-    if(qobject_cast<KXmlGuiWindow *>(window))
-    {
+    if (qobject_cast<KXmlGuiWindow*>(window)) {
         KActionCollection *collection=static_cast<KXmlGuiWindow *>(window)->actionCollection();
         QAction           *act=collection ? collection->action(KStandardAction::name(KStandardAction::ShowMenubar)) : 0L;
         if(act)
@@ -4372,8 +4370,7 @@ void Style::toggleStatusBar(QMainWindow *window)
     bool triggeredAction(false);
 
 #ifdef QTC_QT5_ENABLE_KDE
-    if(qobject_cast<KXmlGuiWindow *>(window))
-    {
+    if (qobject_cast<KXmlGuiWindow*>(window)) {
         KActionCollection *collection=static_cast<KXmlGuiWindow *>(window)->actionCollection();
         QAction           *act=collection ? collection->action(KStandardAction::name(KStandardAction::ShowStatusbar)) : 0L;
         if(act)

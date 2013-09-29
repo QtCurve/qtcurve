@@ -530,16 +530,17 @@ void Style::polish(QWidget *widget)
            //255==viewport->palette().color(itemView->viewport()->backgroundRole()).alpha() && // KFilePlacesView
            !widget->inherits("KFilePlacesView") &&
            // Exclude non-editable combo popup...
-           !(opts.gtkComboMenus && widget->inherits("QComboBoxListView") && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
-             qobject_cast<QComboBox *>(widget->parentWidget()->parentWidget()) &&
-             !static_cast<QComboBox *>(widget->parentWidget()->parentWidget())->isEditable()) &&
+           !(opts.gtkComboMenus &&
+             widget->inherits("QComboBoxListView") &&
+             widget->parentWidget() &&
+             qtcCheckType0<QComboBox>(widget->parentWidget()->parentWidget()) &&
+             !static_cast<QComboBox*>(widget->parentWidget()
+                                      ->parentWidget())->isEditable()) &&
            // Exclude KAboutDialog...
-#ifndef QTC_QT5_ENABLE_KDE
-           !parentIs(widget, 5, "KAboutApplicationDialog") &&
-#else
-           !qobject_cast<KAboutApplicationDialog *>(getParent(widget, 5)) &&
-#endif
-           (qobject_cast<QTreeView *>(widget) || (qobject_cast<QListView *>(widget) && QListView::IconMode!=((QListView *)widget)->viewMode())))
+           !qtcCheckKDEType0(getParent(widget, 5), KAboutApplicationDialog) &&
+           (qobject_cast<QTreeView*>(widget) ||
+            (qobject_cast<QListView*>(widget) &&
+             QListView::IconMode != ((QListView*)widget)->viewMode())))
             itemView->setAlternatingRowColors(true);
     }
 
@@ -614,20 +615,16 @@ void Style::polish(QWidget *widget)
         setMenuTextColors(widget, true);
     } else if(qobject_cast<QLabel*>(widget)) {
         Utils::addEventFilter(widget, this);
-        if(WM_DRAG_ALL==opts.windowDrag &&
-           ((QLabel *)widget)->textInteractionFlags().testFlag(Qt::TextSelectableByMouse) &&
-           widget->parentWidget() && widget->parentWidget()->parentWidget() && ::qobject_cast<QFrame *>(widget->parentWidget()) &&
-#ifndef QTC_QT5_ENABLE_KDE
-           widget->parentWidget()->parentWidget()->inherits("KTitleWidget")
-#else
-           ::qobject_cast<KTitleWidget *>(widget->parentWidget()->parentWidget())
-#endif
-            )
-            ((QLabel *)widget)->setTextInteractionFlags(((QLabel *)widget)->textInteractionFlags()&~Qt::TextSelectableByMouse);
-
-    }
-    else if(/*!opts.gtkScrollViews && */qobject_cast<QAbstractScrollArea *>(widget))
-    {
+        if (WM_DRAG_ALL == opts.windowDrag &&
+            ((QLabel*)widget)->textInteractionFlags()
+            .testFlag(Qt::TextSelectableByMouse) &&
+            qtcCheckType0<QFrame>(widget->parentWidget()) &&
+            qtcCheckKDEType0(widget->parentWidget()->parentWidget(),
+                             KTitleWidget))
+            ((QLabel*)widget)->setTextInteractionFlags(
+                ((QLabel*)widget)->textInteractionFlags() &
+                ~Qt::TextSelectableByMouse);
+    } else if(/*!opts.gtkScrollViews && */qobject_cast<QAbstractScrollArea*>(widget)) {
         if(CUSTOM_BGND)
             polishScrollArea(static_cast<QAbstractScrollArea *>(widget));
         if(!opts.gtkScrollViews && (((QFrame *)widget)->frameWidth()>0))
@@ -706,22 +703,17 @@ void Style::polish(QWidget *widget)
             //else if (QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
             Utils::addEventFilter(widget, this);
 
-#ifndef QTC_QT5_ENABLE_KDE
-            if(widget->parent() && widget->parent()->inherits("KTitleWidget"))
-#else
-                if(widget->parent() && qobject_cast<KTitleWidget *>(widget->parent()))
-#endif
-                {
-                    if(CUSTOM_BGND)
-                        frame->setAutoFillBackground(false);
-                    else
-                        frame->setBackgroundRole(QPalette::Window);
-
-                    QLayout *layout(frame->layout());
-
-                    if(layout)
-                        layout->setMargin(0);
+            if (qtcCheckKDEType0(widget->parent(), KTitleWidget)) {
+                if (CUSTOM_BGND) {
+                    frame->setAutoFillBackground(false);
+                } else {
+                    frame->setBackgroundRole(QPalette::Window);
                 }
+                QLayout *layout(frame->layout());
+                if (layout) {
+                    layout->setMargin(0);
+                }
+            }
 
             QWidget *p=0L;
 
@@ -798,14 +790,8 @@ void Style::polish(QWidget *widget)
     if(APP_QTCREATOR==theThemedApp && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuWidget())
         static_cast<QMainWindow *>(widget)->menuWidget()->setStyle(this);
 
-    if(APP_QTCREATOR==theThemedApp && qobject_cast<QDialog *>(widget) &&
-#ifndef QTC_QT5_ENABLE_KDE
-       widget->inherits("KFileDialog")
-#else
-       qobject_cast<KFileDialog *>(widget)
-#endif
-        )
-    {
+    if (APP_QTCREATOR == theThemedApp && qobject_cast<QDialog*>(widget) &&
+        qtcCheckKDEType(widget, KFileDialog)) {
         QToolBar *tb=getToolBarChild(widget);
 
         if(tb)
@@ -1064,22 +1050,18 @@ void Style::unpolish(QWidget *widget)
 //             if (QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
             widget->removeEventFilter(this);
 
-#ifndef QTC_QT5_ENABLE_KDE
-            if(widget->parent() && widget->parent()->inherits("KTitleWidget"))
-#else
-                if(widget->parent() && qobject_cast<KTitleWidget *>(widget->parent()))
-#endif
-                {
-                    if(CUSTOM_BGND)
-                        frame->setAutoFillBackground(true);
-                    else
-                        frame->setBackgroundRole(QPalette::Base);
-
-                    QLayout *layout(frame->layout());
-
-                    if(layout)
-                        layout->setMargin(6);
+            if (qtcCheckKDEType0(widget->parent(), KTitleWidget)) {
+                if(CUSTOM_BGND) {
+                    frame->setAutoFillBackground(true);
+                } else {
+                    frame->setBackgroundRole(QPalette::Base);
                 }
+                QLayout *layout(frame->layout());
+
+                if(layout) {
+                    layout->setMargin(6);
+                }
+            }
 
             QWidget *p=0L;
 
@@ -1895,22 +1877,15 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
 // asks for these options, it only passes in a QStyleOption  not a QStyleOptionTab
 //.........
     case PM_TabBarBaseHeight:
-#ifndef QTC_QT5_ENABLE_KDE
-        if(widget && widget->inherits("KTabBar") && !qstyleoption_cast<const QStyleOptionTab *>(option))
-#else
-            if(widget && qobject_cast<const KTabBar*>(widget) && !qstyleoption_cast<const QStyleOptionTab *>(option))
-#endif
-                return 10;
+        if (qtcCheckKDEType0(widget, KTabBar) &&
+            !qstyleoption_cast<const QStyleOptionTab*>(option))
+            return 10;
         return BASE_STYLE::pixelMetric(metric, option, widget);
     case PM_TabBarBaseOverlap:
-#ifndef QTC_QT5_ENABLE_KDE
-        if(widget && widget->inherits("KTabBar") && !qstyleoption_cast<const QStyleOptionTab *>(option))
-#else
-            if(widget && qobject_cast<const KTabBar*>(widget) && !qstyleoption_cast<const QStyleOptionTab *>(option))
-#endif
-                return 0;
+        if (qtcCheckKDEType0(widget, KTabBar) &&
+            !qstyleoption_cast<const QStyleOptionTab*>(option))
+            return 0;
         // Fall through!
-//.........
     default:
         return BASE_STYLE::pixelMetric(metric, option, widget);
     }
@@ -2446,19 +2421,12 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
     case PE_Frame:
     {
         // Dont draw OO.o status bar frames...
-        if(isOOWidget(widget) && r.height()<22)
+        if (isOOWidget(widget) && r.height() < 22)
             break;
-
-#ifndef QTC_QT5_ENABLE_KDE
-        if(widget && widget->parent() && widget->parent()->inherits("KTitleWidget"))
+        if (widget && qtcCheckKDEType0(widget->parent(), KTitleWidget)) {
             break;
-#else
-        if(widget && widget->parent() && qobject_cast<const KTitleWidget *>(widget->parent()))
-            break;
-#endif
-        else if(widget && widget->parent() && qobject_cast<const QComboBox *>(widget->parent()))
-        {
-            if(opts.gtkComboMenus && !((QComboBox *)(widget->parent()))->isEditable())
+        } else if (widget && qtcCheckType0<QComboBox>(widget->parent())) {
+            if(opts.gtkComboMenus && !((QComboBox*)(widget->parent()))->isEditable())
                 drawPrimitive(PE_FrameMenu, option, painter, widget);
             else if(opts.square&SQUARE_POPUP_MENUS)
             {

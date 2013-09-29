@@ -146,24 +146,6 @@ void setSbProp(QWidget *w)
 
 #endif
 
-QWidget *
-getParent(QWidget *w, int level)
-{
-    QWidget *wid = w;
-    for(int i=0; i<level && wid; ++i)
-        wid=wid->parentWidget();
-    return wid;
-}
-
-#ifndef QTC_QT5_ENABLE_KDE
-bool
-parentIs(QWidget *w, int level, const char *className)
-{
-    QWidget *wid = getParent(w, level);
-    return wid && wid->inherits(className);
-}
-#endif
-
 void
 setBold(QWidget *widget)
 {
