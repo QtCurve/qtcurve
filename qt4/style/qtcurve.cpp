@@ -12473,12 +12473,18 @@ void Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe,
 #ifdef QTC_QT4_OLD_NVIDIA_ARROW_FIX
     p->fillPath(path, col);
 #endif
-    // Disabling antialiasing here seems to cause weird looking up arrow here,
-    // and I personally don't see a blurry arrow with antialiasing enabled.
-    // See https://github.com/QtCurve/qtcurve-qt4/issues/3.
-    //   -- Yichao Yu
-    // p->setRenderHint(QPainter::Antialiasing, false);
-    p->setRenderHint(QPainter::Antialiasing, true);
+#if (QT_VERSION >= QT_VERSION_CHECK(4, 8, 5))
+    // Qt >= 4.8.5 has problem drawing polygons correctly. Enabling
+    // antialiasing can work arround the problem although it will also make
+    // the arrow blurry.
+    // QtCurve issue:
+    // https://github.com/QtCurve/qtcurve-qt4/issues/3.
+    // Upstream bug report:
+    // https://bugreports.qt-project.org/browse/QTBUG-33512
+    p->setRenderHint(QPainter::Antialiasing, opts.vArrows);
+#else
+    p->setRenderHint(QPainter::Antialiasing, false);
+#endif
     p->drawPolygon(a);
     p->restore();
 }
