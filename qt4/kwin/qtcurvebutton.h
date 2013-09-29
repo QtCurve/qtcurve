@@ -34,37 +34,31 @@
 class QTimer;
 class QStyle;
 
-namespace KWinQtCurve
-{
+namespace KWinQtCurve {
 
 class QtCurveClient;
 
-class QtCurveButton : public KCommonDecorationButton
-{
-    public:
-
+class QtCurveButton: public KCommonDecorationButton {
+public:
     QtCurveButton(ButtonType type, QtCurveClient *parent);
-    ~QtCurveButton() { }
+    ~QtCurveButton() {}
 
     void reset(unsigned long changed);
-    QtCurveClient * client() { return itsClient; }
+    QtCurveClient *client() { return itsClient; }
 
-    protected:
-
+protected:
     void paintEvent(QPaintEvent *);
 
-    private:
-
+private:
     void enterEvent(QEvent *e);
     void leaveEvent(QEvent *e);
     void drawButton(QPainter *painter);
     void updateMask();
 
-    private:
-
+private:
     QtCurveClient *itsClient;
-    ButtonIcon    itsIconType;
-    bool          itsHover;
+    ButtonIcon itsIconType;
+    bool itsHover;
 
     friend class IconEngine;
 };

@@ -3321,8 +3321,12 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
                 return (opts.square&SQUARE_SCROLLVIEW) ? 1 : 0;
 
             if ((opts.square&SQUARE_SCROLLVIEW) && widget && !opts.etchEntry &&
-                (::qobject_cast<const QAbstractScrollArea *>(widget) || isKontactPreviewPane(widget) || widget->inherits("Q3ScrollView")))
-                return (opts.gtkScrollViews || opts.thinSbarGroove || !opts.borderSbarGroove) && (!opts.highlightScrollViews) ? 1 : 2;
+                (::qobject_cast<const QAbstractScrollArea *>(widget) ||
+                 isKontactPreviewPane(widget) ||
+                 widget->inherits("Q3ScrollView")))
+                return (opts.gtkScrollViews || opts.thinSbarGroove ||
+                        !opts.borderSbarGroove) &&
+                    (!opts.highlightScrollViews) ? 1 : 2;
 
             if (!DRAW_MENU_BORDER && !opts.borderMenuitems && opts.square&SQUARE_POPUP_MENUS && qobject_cast<const QMenu *>(widget))
                 return 1;
