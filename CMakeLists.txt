@@ -29,10 +29,17 @@ function(def_compat_option new_opt old_opt)
 endfunction()
 
 option(ENABLE_QT4 "Building Qt4 theme." On)
+option(ENABLE_QT5 "Building Qt5 theme." On)
+option(QTC_ENABLE_X11 "Enable X11" On)
+
 def_compat_option(QTC_QT4_ENABLE_KDE QTC_QT_ONLY True)
 option(QTC_QT4_ENABLE_KDE "Building Qt4 style with KDE4 support." On)
+# option(QTC_QT5_ENABLE_KDE "Building Qt5 style with KDE5 support." Off)
+
 def_compat_option(QTC_QT4_OLD_NVIDIA_ARROW_FIX QTC_OLD_NVIDIA_ARROW_FIX)
 option(QTC_QT4_OLD_NVIDIA_ARROW_FIX "Qt4 old nvidia arrow fix." Off)
+option(QTC_QT5_OLD_NVIDIA_ARROW_FIX "Qt5 old nvidia arrow fix." Off)
+
 def_compat_option(QTC_QT4_STYLE_SUPPORT QTC_STYLE_SUPPORT)
 option(QTC_QT4_STYLE_SUPPORT
   "Qt4 support for creating a style for each QtCurve theme." Off)
@@ -44,6 +51,8 @@ def_compat_option(QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
   QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT)
 option(QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
   "Qt4 support for the 'fix parentless dialogs'." Off)
+option(QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+  "Qt5 support for the 'fix parentless dialogs'." Off)
 
 # Only try to figure out what kde prefix is if not specified at command line.
 if(NOT DEFINED QTC_KDE4_PREFIX)
@@ -72,6 +81,7 @@ include_directories(
 add_subdirectory(tools)
 add_subdirectory(po)
 add_subdirectory(qt4)
+add_subdirectory(qt5)
 add_subdirectory(data)
 
 if(QTC_QT4_KWIN_MAX_BUTTON_HACK)
@@ -81,9 +91,10 @@ if(QTC_QT4_KWIN_MAX_BUTTON_HACK)
     "hack, that may not work or compile, and may even crash kwin.")
 endif()
 
-if(QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT)
+if(QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT OR
+    QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT)
   message(WARNING
-    "You have enabled support for the 'fix parentless dialogs' option for Qt4. "
+    "You have enabled support for the 'fix parentless dialogs' option. "
     "This is known to BREAK some applications. Please "
     "DO NOT report errors to application authors when you have "
     "this enabled. Please reconsider DISABLING this option.")
