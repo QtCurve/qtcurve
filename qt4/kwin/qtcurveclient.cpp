@@ -447,20 +447,22 @@ KCommonDecorationButton *QtCurveClient::createButton(ButtonType type)
     }
 #endif
 
-    switch (type)
-    {
-        case MenuButton:
-        case OnAllDesktopsButton:
-        case HelpButton:
-        case MinButton:
-        case MaxButton:
-        case CloseButton:
-        case AboveButton:
-        case BelowButton:
-        case ShadeButton:
-            return new QtCurveButton(type, this);
-        default:
-            return 0;
+    switch (type) {
+    case MenuButton:
+    case OnAllDesktopsButton:
+    case HelpButton:
+    case MinButton:
+    case MaxButton:
+    case CloseButton:
+    case AboveButton:
+    case BelowButton:
+    case ShadeButton:
+#if KDE_IS_VERSION(4, 9, 85)
+    case AppMenuButton:
+#endif
+        return new QtCurveButton(type, this);
+    default:
+        return 0;
     }
 }
 

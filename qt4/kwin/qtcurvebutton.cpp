@@ -60,6 +60,11 @@ void QtCurveButton::reset(unsigned long changed)
     {
         switch (type())
         {
+#if KDE_IS_VERSION(4, 9, 85)
+        case AppMenuButton:
+            itsIconType = MenuIcon;
+            break;
+#endif
 #if KDE_IS_VERSION(4, 3, 85)
             case ItemCloseButton:
                 itsIconType = CloseTabIcon;
