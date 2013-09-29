@@ -5,6 +5,8 @@ include_directories(
   "${CMAKE_CURRENT_SOURCE_DIR}"
   ${QT_INCLUDE_DIR})
 
+add_definitions("-DQT_DISABLE_DEPRECATED_BEFORE=0x050000")
+
 # search packages used by KDE
 if(QTC_QT4_ENABLE_KDE)
   find_package(KDE4 REQUIRED)
