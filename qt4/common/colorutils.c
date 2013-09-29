@@ -29,11 +29,11 @@ The code has been modified to work with QColor (Qt3 &Qt4) and GdkColor
 #include <qglobal.h>
 #endif
 
-#if !(defined QT_VERSION && (QT_VERSION >= 0x040000) && defined QTC_QT4_ENABLE_KDE)
+#ifndef QTC_QT4_ENABLE_KDE
 
 #include <math.h>
 
-#if defined _WIN32 && defined QT_VERSION && (QT_VERSION >= 0x040000)
+#if defined _WIN32
 #include <sys/stat.h>
 #include <float.h>
 #include <direct.h>
@@ -61,13 +61,8 @@ static inline int qtcLimit(double c)
 #endif
 
 #ifdef __cplusplus
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
 #define FLOAT_COLOR(VAL, COL) (VAL).COL##F()
 #define TO_COLOR(R, G, B) QColor::fromRgbF(R, G, B)
-#else
-#define FLOAT_COLOR(VAL, COL) ((double)(((VAL).COL()*1.0)/255.0))
-#define TO_COLOR(R, G, B) QColor(qtcLimit(R*255.0), qtcLimit(G*255.0), qtcLimit(B*255.0))
-#endif
 #else
 #define inline
 #define FLOAT_COLOR(VAL, COL) ((double)(((VAL).COL*1.0)/65535.0))

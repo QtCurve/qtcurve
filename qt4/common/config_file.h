@@ -6,8 +6,6 @@
 #define MAX_CONFIG_FILENAME_LEN   1024
 #define MAX_CONFIG_INPUT_LINE_LEN 256
 
-#if !defined QT_VERSION || QT_VERSION >= 0x040000
-
 #define QTC_MENU_FILE_PREFIX   "menubar-"
 #define QTC_STATUS_FILE_PREFIX "statusbar-"
 
@@ -25,8 +23,6 @@ extern void qtcSetBarHidden(const char *app, bool hidden, const char *prefix);
 #endif // __cplusplus
 
 extern void qtcLoadBgndImage(QtCImage *img);
-
-#endif // !defined QT_VERSION || QT_VERSION >= 0x040000)
 
 extern const char * qtcGetHome();
 extern const char *qtcConfDir();

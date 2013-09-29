@@ -37,7 +37,7 @@
 #include <pwd.h>
 #endif
 
-#if defined _WIN32 && defined QT_VERSION && (QT_VERSION >= 0x040000)
+#if defined _WIN32
 #include <sys/stat.h>
 #include <float.h>
 #include <direct.h>
@@ -54,18 +54,10 @@ static int lstat(const char* fileName, struct stat* s)
 
 #ifdef __cplusplus
 
-#if QT_VERSION >= 0x040000
 #include <QMap>
 #include <QFile>
 #include <QTextStream>
 #define TO_LATIN1(A) A.toLatin1().constData()
-#else
-#define TO_LATIN1(A) A.latin1()
-
-#include <qmap.h>
-#include <qfile.h>
-#include <qtextstream.h>
-#endif
 
 #endif // __cplusplus
 
@@ -232,11 +224,7 @@ static EAppearance toAppearance(const char *str, EAppearance def, EAppAllow allo
         if(0==memcmp(str, "glass", 5) || 0==memcmp(str, "shinyglass", 10))
             return APPEARANCE_SHINY_GLASS;
         if(0==memcmp(str, "agua", 4))
-#if defined __cplusplus && !defined CONFIG_DIALOG  && defined QT_VERSION && QT_VERSION < 0x040000
-            return APPEARANCE_AGUA_MOD;
-#else
             return APPEARANCE_AGUA;
-#endif
         if(0==memcmp(str, "soft", 4))
             return APPEARANCE_SOFT_GRADIENT;
         if(0==memcmp(str, "gradient", 8) || 0==memcmp(str, "lightgradient", 13))
@@ -545,7 +533,6 @@ static EAlign toAlign(const char *str, EAlign def)
 }
 #endif
 
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 static ETitleBarIcon toTitlebarIcon(const char *str, ETitleBarIcon def)
 {
     if(str && 0!=str[0])
@@ -559,7 +546,6 @@ static ETitleBarIcon toTitlebarIcon(const char *str, ETitleBarIcon def)
     }
     return def;
 }
-#endif
 
 static EImageType toImageType(const char *str, EImageType def)
 {
@@ -639,13 +625,8 @@ const char * qtcGetHome()
 
 #ifdef __cplusplus
 
-#if !defined QTC_QT4_ENABLE_KDE || QT_VERSION < 0x040000
-#if QT_VERSION < 0x040000
-#include <qdir.h>
-#include <qfile.h>
-#else
+#if !defined QTC_QT4_ENABLE_KDE
 #include <QDir>
-#endif
 // Take from KStandardDirs::makeDir
 static bool makeDir(const QString& dir, int mode)
 {
@@ -669,11 +650,7 @@ static bool makeDir(const QString& dir, int mode)
     while( i < len )
     {
         struct stat st;
-#if QT_VERSION >= 0x040000
         int pos = target.indexOf('/', i);
-#else
-        int pos = target.find('/', i);
-#endif
         base += target.mid(i - 1, pos - i + 1);
         QByteArray baseEncoded = QFile::encodeName(base);
         // bail out if we encountered a problem
@@ -684,14 +661,9 @@ static bool makeDir(const QString& dir, int mode)
             if (lstat(baseEncoded, &st) == 0)
                 (void)unlink(baseEncoded); // try removing
 
-            if (mkdir(baseEncoded, static_cast<mode_t>(mode)) != 0)
-            {
-#if QT_VERSION >= 0x040000
+            if (mkdir(baseEncoded, static_cast<mode_t>(mode)) != 0) {
                 baseEncoded.prepend("trying to create local folder ");
                 perror(baseEncoded.constData());
-#else
-                perror("trying to create QtCurve config folder ");
-#endif
                 return false; // Couldn't create it :-(
             }
         }
@@ -769,7 +741,7 @@ const char *qtcConfDir()
         if(0!=lstat(cfgDir, &info))
         {
 #ifdef __cplusplus
-#if !defined QTC_QT4_ENABLE_KDE || QT_VERSION < 0x040000
+#if !defined QTC_QT4_ENABLE_KDE
             makeDir(cfgDir, 0755);
 #else
             KStandardDirs::makeDir(cfgDir, 0755);
@@ -799,12 +771,7 @@ WindowBorders qtcGetWindowBorderSize(bool force)
 #ifdef __cplusplus
         QFile f(qtcConfDir()+QString(BORDER_SIZE_FILE));
 
-#if QT_VERSION >= 0x040000
-        if(f.open(QIODevice::ReadOnly))
-#else
-        if(f.open(IO_ReadOnly))
-#endif
-        {
+        if (f.open(QIODevice::ReadOnly)) {
             QTextStream stream(&f);
             QString     line;
 
@@ -842,7 +809,7 @@ WindowBorders qtcGetWindowBorderSize(bool force)
     return sizes.titleHeight<12 ? def : sizes;
 }
 
-#if (!defined QT_VERSION || QT_VERSION >= 0x040000) && !defined CONFIG_DIALOG
+#ifndef CONFIG_DIALOG
 
 #ifdef __cplusplus
 bool qtcBarHidden(const QString &app, const char *prefix)
@@ -978,23 +945,14 @@ QtCConfig::QtCConfig(const QString &filename)
 {
     QFile f(filename);
 
-#if QT_VERSION >= 0x040000
-    if(f.open(QIODevice::ReadOnly))
-#else
-    if(f.open(IO_ReadOnly))
-#endif
-    {
+    if (f.open(QIODevice::ReadOnly)) {
         QTextStream stream(&f);
         QString     line;
 
         while(!stream.atEnd())
         {
             line = stream.readLine();
-#if QT_VERSION >= 0x040000
             int pos=line.indexOf('=');
-#else
-            int pos=line.find('=');
-#endif
             if(-1!=pos)
                 values[line.left(pos)]=line.mid(pos+1);
         }
@@ -1038,11 +996,7 @@ static bool readBoolEntry(QtCConfig &cfg, const QString &key, bool def)
 
 static void readDoubleList(QtCConfig &cfg, const char *key, double *list, int count)
 {
-#if (defined QT_VERSION && (QT_VERSION >= 0x040000))
     QStringList strings(readStringEntry(cfg, key).split(',', QString::SkipEmptyParts));
-#else
-    QStringList strings(QStringList::split(',', readStringEntry(cfg, key)));
-#endif
     bool ok(count==strings.size());
 
     if(ok)
@@ -1090,21 +1044,12 @@ static void readDoubleList(QtCConfig &cfg, const char *key, double *list, int co
         } \
     }
 
-#if QT_VERSION >= 0x040000
-    #define CFG_READ_STRING_LIST(ENTRY) \
-        { \
-            QString val=readStringEntry(cfg, #ENTRY); \
-            Strings set=val.isEmpty() ? Strings() : Strings::fromList(val.split(",", QString::SkipEmptyParts)); \
-            opts->ENTRY=set.count() || cfg.hasKey(#ENTRY) ? set : def->ENTRY; \
-        }
-#else
-    #define CFG_READ_STRING_LIST(ENTRY) \
-        { \
-            QString val=readStringEntry(cfg, #ENTRY); \
-            Strings list=val.isEmpty() ? Strings() : Strings::split(",", val, false); \
-            opts->ENTRY=list.count() || cfg.hasKey(#ENTRY) ? list : def->ENTRY; \
-        }
-#endif
+#define CFG_READ_STRING_LIST(ENTRY)             \
+    {                                                 \
+        QString val=readStringEntry(cfg, #ENTRY);                       \
+        Strings set=val.isEmpty() ? Strings() : Strings::fromList(val.split(",", QString::SkipEmptyParts)); \
+        opts->ENTRY=set.count() || cfg.hasKey(#ENTRY) ? set : def->ENTRY; \
+    }
 
 #else
 
@@ -1356,10 +1301,8 @@ static void readDoubleList(GHashTable *cfg, char *key, double *list, int count)
     opts->ENTRY=toAlign(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 #endif
 
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 #define CFG_READ_TB_ICON(ENTRY) \
     opts->ENTRY=toTitlebarIcon(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
-#endif
 
 #define CFG_READ_GLOW(ENTRY) \
     opts->ENTRY=toGlow(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
@@ -1584,13 +1527,6 @@ void qtcCheckConfig(Options *opts)
     if(!opts->gtkComboMenus)
         opts->doubleGtkComboArrow=false;
 
-#if defined __cplusplus && defined QT_VERSION && QT_VERSION < 0x040000 && !defined CONFIG_DIALOG
-    opts->crSize=CR_SMALL_SIZE;
-    if(SLIDER_CIRCULAR==opts->sliderStyle)
-        opts->sliderStyle=SLIDER_ROUND;
-    if(STRIPE_FADE==opts->stripedProgress)
-        opts->stripedProgress=STRIPE_PLAIN;
-#endif
     /* For now, only 2 sizes... */
     if(opts->crSize!=CR_SMALL_SIZE && opts->crSize!=CR_LARGE_SIZE)
         opts->crSize=CR_SMALL_SIZE;
@@ -1601,10 +1537,6 @@ void qtcCheckConfig(Options *opts)
         opts->colorMenubarMouseOver=true;
 */
 
-#if defined __cplusplus && defined QT_VERSION && QT_VERSION < 0x040000 && !defined CONFIG_DIALOG
-    if(opts->round>ROUND_FULL)
-        opts->round=ROUND_FULL;
-#endif
 #ifndef CONFIG_DIALOG
     if(MO_GLOW==opts->coloredMouseOver && EFFECT_NONE==opts->buttonEffect)
         opts->coloredMouseOver=MO_COLORED_THICK;
@@ -1669,9 +1601,7 @@ void qtcCheckConfig(Options *opts)
 
 #ifdef __cplusplus
 
-#if defined QT_VERSION && QT_VERSION >= 0x040000
-    if(!(opts->titlebarButtons&TITLEBAR_BUTTON_ROUND))
-#endif
+    if(!(opts->titlebarButtons & TITLEBAR_BUTTON_ROUND))
         opts->titlebarButtonAppearance=MODIFY_AGUA(opts->titlebarButtonAppearance);
     opts->dwtAppearance=MODIFY_AGUA(opts->dwtAppearance);
 #endif
@@ -1865,9 +1795,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                 def->crHighlight=0;
 #ifdef __cplusplus
                 def->dwtAppearance=APPEARANCE_FLAT;
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
                 def->dwtSettings=0;
-#endif
 #endif
                 def->inactiveTitlebarAppearance=APPEARANCE_CUSTOM2;
             }
@@ -1879,10 +1807,8 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                 def->etchEntry=true;
                 def->gtkScrollViews=false;
                 def->thinSbarGroove=false;
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
                 def->titlebarButtons=TITLEBAR_BUTTON_HOVER_FRAME;
                 def->titlebarIcon=TITLEBAR_ICON_MENU_BUTTON;
-#endif
             }
             if(opts->version<MAKE_VERSION(0, 65))
             {
@@ -2096,15 +2022,11 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_BOOL(shadePopupMenu)
             CFG_READ_BOOL(hideShortcutUnderline)
 
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
             CFG_READ_BOOL(stdBtnSizes)
             CFG_READ_INT(titlebarButtons)
             CFG_READ_TB_ICON(titlebarIcon)
-#endif
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
             CFG_READ_BOOL(xbar)
             CFG_READ_INT(dwtSettings)
-#endif
             CFG_READ_INT(bgndOpacity)
             CFG_READ_INT(menuBgndOpacity)
             CFG_READ_INT(dlgOpacity)
@@ -2131,10 +2053,8 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_INT(expanderHighlight)
             CFG_READ_BOOL(mapKdeIcons)
 #endif
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             CFG_READ_BOOL(gtkButtonOrder)
-#endif
-#if !defined __cplusplus || (defined CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000))
+#if !defined __cplusplus || defined CONFIG_DIALOG
             CFG_READ_BOOL(reorderGtkButtons)
 #endif
             CFG_READ_APPEARANCE(titlebarAppearance, APP_ALLOW_NONE)
@@ -2152,16 +2072,13 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                 opts->inactiveTitlebarAppearance=APPEARANCE_FLAT;
 #ifdef __cplusplus
             CFG_READ_APPEARANCE(titlebarButtonAppearance, APP_ALLOW_BASIC)
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
             if(opts->xbar && opts->menubarHiding)
                 opts->xbar=false;
-#endif
 #endif
             CFG_READ_SHADING(shading)
             CFG_READ_IMAGE(bgndImage)
             CFG_READ_IMAGE(menuBgndImage)
             CFG_READ_STRING_LIST(noMenuStripeApps)
-#if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
             CFG_READ_STRING_LIST(noBgndGradientApps)
             CFG_READ_STRING_LIST(noBgndOpacityApps)
             CFG_READ_STRING_LIST(noMenuBgndOpacityApps)
@@ -2170,26 +2087,18 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             if(opts->version<MAKE_VERSION3(1, 7, 2))
                 opts->noMenuBgndOpacityApps << "gtk";
 #endif
-#endif
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
             CFG_READ_STRING_LIST(menubarApps)
             CFG_READ_STRING_LIST(statusbarApps)
             CFG_READ_STRING_LIST(useQtFileDialogApps)
             CFG_READ_STRING_LIST(windowDragWhiteList)
             CFG_READ_STRING_LIST(windowDragBlackList)
-#endif
             readDoubleList(cfg, "customShades", opts->customShades, NUM_STD_SHADES);
             readDoubleList(cfg, "customAlphas", opts->customAlphas, NUM_STD_ALPHAS);
 
 #ifdef __cplusplus
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
-            if(opts->titlebarButtons&TITLEBAR_BUTTON_COLOR || opts->titlebarButtons&TITLEBAR_BUTTON_ICON_COLOR)
-            {
-#if (defined QT_VERSION && (QT_VERSION >= 0x040000))
+            if (opts->titlebarButtons & TITLEBAR_BUTTON_COLOR ||
+                opts->titlebarButtons & TITLEBAR_BUTTON_ICON_COLOR) {
                 QStringList cols(readStringEntry(cfg, "titlebarButtonColors").split(',', QString::SkipEmptyParts));
-#else
-                QStringList cols(QStringList::split(',', readStringEntry(cfg, "titlebarButtonColors")));
-#endif
                 if(cols.count() && 0==(cols.count()%NUM_TITLEBAR_BUTTONS) && cols.count()<=(NUM_TITLEBAR_BUTTONS*3))
                 {
                     QStringList::ConstIterator it(cols.begin()),
@@ -2210,7 +2119,6 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                     opts->titlebarButtons&=~TITLEBAR_BUTTON_ICON_COLOR;
                 }
             }
-#endif
 
             for(i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+NUM_CUSTOM_GRAD); ++i)
             {
@@ -2218,11 +2126,8 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
 
                 gradKey.sprintf("customgradient%d", (i-APPEARANCE_CUSTOM1)+1);
 
-#if (defined QT_VERSION && (QT_VERSION >= 0x040000))
-                QStringList vals(readStringEntry(cfg, gradKey).split(',', QString::SkipEmptyParts));
-#else
-                QStringList vals(QStringList::split(',', readStringEntry(cfg, gradKey)));
-#endif
+                QStringList vals(readStringEntry(cfg, gradKey)
+                                 .split(',', QString::SkipEmptyParts));
 
                 if(vals.size())
                     opts->customGradient.erase((EAppearance)i);
@@ -2484,16 +2389,12 @@ void qtcDefaultSettings(Options *opts)
     opts->selectionAppearance=APPEARANCE_HARSH_GRADIENT;
     opts->fadeLines=true;
     opts->glowProgress=GLOW_NONE;
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
     opts->round=ROUND_EXTRA;
     opts->gtkButtonOrder=false;
-#else
-    opts->round=ROUND_FULL;
-#endif
 #ifdef __cplusplus
     opts->dwtAppearance=APPEARANCE_CUSTOM1;
 #endif
-#if !defined __cplusplus || (defined CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000))
+#if !defined __cplusplus || defined CONFIG_DIALOG
     opts->reorderGtkButtons=false;
 #endif
     opts->bgndImage.type=IMG_NONE;
@@ -2610,11 +2511,9 @@ void qtcDefaultSettings(Options *opts)
     opts->groupBox=FRAME_FADED;
     opts->gbFactor=DEF_GB_FACTOR;
     opts->gbLabel=GB_LBL_BOLD|GB_LBL_OUTSIDE;
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     opts->stdBtnSizes=false;
     opts->titlebarButtons=TITLEBAR_BUTTON_ROUND|TITLEBAR_BUTTON_HOVER_SYMBOL;
     opts->titlebarIcon=TITLEBAR_ICON_NEXT_TO_TITLE;
-#endif
     opts->menuStripe=SHADE_NONE;
     opts->menuStripeAppearance=APPEARANCE_DARK_INVERTED;
     opts->shading=SHADING_HSL;
@@ -2637,7 +2536,6 @@ void qtcDefaultSettings(Options *opts)
     opts->titlebarAlignment=ALIGN_FULL_CENTER;
     opts->titlebarEffect=EFFECT_SHADOW;
     opts->centerTabText=false;
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
     opts->xbar=false;
     opts->dwtSettings=DWT_BUTTONS_AS_PER_TITLEBAR|DWT_ROUND_TOP_ONLY;
     opts->menubarApps << "amarok" << "arora" << "kaffeine" << "kcalc" << "smplayer" << "VirtualBox";
@@ -2645,7 +2543,6 @@ void qtcDefaultSettings(Options *opts)
     opts->useQtFileDialogApps << "googleearth-bin";
     opts->noMenuBgndOpacityApps << "inkscape" << "sonata" << "totem" << "vmware" << "vmplayer" << "gtk";
     opts->noBgndOpacityApps << "smplayer" << "kaffeine" << "dragon" << "kscreenlocker" << "inkscape" << "sonata" << "totem" << "vmware" << "vmplayer";
-#endif
     opts->noMenuStripeApps << "gtk" << "soffice.bin";
 #else
     opts->noBgndGradientApps=NULL;
@@ -2685,11 +2582,6 @@ void qtcDefaultSettings(Options *opts)
     if(systemFilename)
         qtcReadConfig(systemFilename, opts, opts);
     }
-
-#if !defined CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION < 0x040000)
-    if(FOCUS_FILLED==opts->focus)
-        opts->focus=FOCUS_FULL;
-#endif
 }
 
 #ifdef CONFIG_WRITE
@@ -3149,12 +3041,8 @@ static const char * toStr(ETBarBtn tb)
     }
 }
 
-#if QT_VERSION >= 0x040000
 #include <QTextStream>
 #define CFG config
-#else
-#define CFG (*cfg)
-#endif
 
 #define CFG_WRITE_ENTRY(ENTRY) \
     if (!exportingStyle && def.ENTRY==opts.ENTRY) \
@@ -3222,17 +3110,12 @@ static const char * toStr(ETBarBtn tb)
 
 bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool exportingStyle)
 {
-    if(!cfg)
-    {
+    if (!cfg) {
         const char *cfgDir=qtcConfDir();
 
-        if(cfgDir)
-        {
-#if QT_VERSION >= 0x040000
-            KConfig defCfg(QFile::decodeName(cfgDir)+CONFIG_FILE, KConfig::SimpleConfig);
-#else
-            KConfig defCfg(QFile::decodeName(cfgDir)+CONFIG_FILE, false, false);
-#endif
+        if (cfgDir) {
+            KConfig defCfg(QFile::decodeName(cfgDir) + CONFIG_FILE,
+                           KConfig::SimpleConfig);
 
             if(qtcWriteConfig(&defCfg, opts, def, exportingStyle))
             {
@@ -3250,11 +3133,7 @@ bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool 
     }
     else
     {
-#if QT_VERSION >= 0x040000
         KConfigGroup config(cfg, SETTINGS_GROUP);
-#else
-        cfg->setGroup(SETTINGS_GROUP);
-#endif
         CFG.writeEntry(VERSION_KEY, QTC_VERSION);
         CFG_WRITE_ENTRY_NUM(passwordChar)
         CFG_WRITE_ENTRY_NUM(gbFactor)
@@ -3272,9 +3151,7 @@ bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool 
         CFG_WRITE_APPEARANCE_ENTRY_PIXMAP(menuBgndAppearance, APP_ALLOW_STRIPED, menuBgndPixmap)
 #ifdef QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
         CFG_WRITE_ENTRY(fixParentlessDialogs)
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
         CFG_WRITE_STRING_LIST_ENTRY(noDlgFixApps)
-#endif
 #endif
         CFG_WRITE_ENTRY(stripedProgress)
         CFG_WRITE_ENTRY(sliderStyle)
@@ -3381,14 +3258,11 @@ bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool 
         CFG_WRITE_ENTRY(hideShortcutUnderline)
         CFG_WRITE_ENTRY_NUM(windowBorder)
         CFG_WRITE_ENTRY(tbarBtns)
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
         CFG_WRITE_ENTRY(xbar)
         CFG_WRITE_ENTRY_NUM(dwtSettings)
-#endif
         CFG_WRITE_ENTRY_NUM(bgndOpacity)
         CFG_WRITE_ENTRY_NUM(menuBgndOpacity)
         CFG_WRITE_ENTRY_NUM(dlgOpacity)
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
         CFG_WRITE_ENTRY(stdBtnSizes)
         CFG_WRITE_ENTRY_NUM(titlebarButtons)
         CFG_WRITE_ENTRY(titlebarIcon)
@@ -3397,11 +3271,7 @@ bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool 
             opts.titlebarButtonColors.size() && 0==(opts.titlebarButtonColors.size()%NUM_TITLEBAR_BUTTONS))
         {
             QString     val;
-#if QT_VERSION >= 0x040000
             QTextStream str(&val);
-#else
-            QTextStream str(&val, IO_WriteOnly);
-#endif
             for(unsigned int i=0; i<opts.titlebarButtonColors.size(); ++i)
             {
                 TBCols::const_iterator c(opts.titlebarButtonColors.find((ETitleBarButtons)i));
@@ -3417,7 +3287,6 @@ bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool 
         }
         else
             CFG.deleteEntry("titlebarButtonColors");
-#endif
         CFG_WRITE_SHADE_ENTRY(menuStripe, customMenuStripeColor)
         CFG_WRITE_SHADE_ENTRY(comboBtn, customComboBtnColor)
         CFG_WRITE_ENTRY(stdSidebarButtons)
@@ -3429,14 +3298,13 @@ bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool 
         CFG_WRITE_ENTRY(gtkComboMenus)
         CFG_WRITE_ENTRY(doubleGtkComboArrow)
         CFG_WRITE_ENTRY(gtkButtonOrder)
-#if !defined __cplusplus || (defined CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000))
+#if !defined __cplusplus || defined CONFIG_DIALOG
         CFG_WRITE_ENTRY(reorderGtkButtons)
 #endif
         CFG_WRITE_ENTRY(mapKdeIcons)
         CFG_WRITE_ENTRY(shading)
         CFG_WRITE_ENTRY(titlebarAlignment)
         CFG_WRITE_ENTRY(centerTabText)
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
         CFG_WRITE_STRING_LIST_ENTRY(noBgndGradientApps)
         CFG_WRITE_STRING_LIST_ENTRY(noBgndOpacityApps)
         CFG_WRITE_STRING_LIST_ENTRY(noMenuBgndOpacityApps)
@@ -3445,7 +3313,6 @@ bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool 
         CFG_WRITE_STRING_LIST_ENTRY(menubarApps)
         CFG_WRITE_STRING_LIST_ENTRY(statusbarApps)
         CFG_WRITE_STRING_LIST_ENTRY(useQtFileDialogApps)
-#endif
 
         for(int i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+NUM_CUSTOM_GRAD); ++i)
         {
@@ -3463,11 +3330,7 @@ bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool 
                 if(exportingStyle || (d=def.customGradient.find((EAppearance)i))==def.customGradient.end() || !((*d)==(*cg)))
                 {
                     QString     gradVal;
-#if QT_VERSION >= 0x040000
                     QTextStream str(&gradVal);
-#else
-                    QTextStream str(&gradVal, IO_WriteOnly);
-#endif
                     GradientStopCont                 stops((*cg).second.stops.fix());
                     GradientStopCont::const_iterator it(stops.begin()),
                                                      end(stops.end());
@@ -3503,11 +3366,7 @@ bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool 
            opts.customShades[5]!=def.customShades[5])
         {
             QString     shadeVal;
-#if QT_VERSION >= 0x040000
             QTextStream str(&shadeVal);
-#else
-            QTextStream str(&shadeVal, IO_WriteOnly);
-#endif
             if(0==opts.customShades[0])
                  str << 0;
             else
@@ -3524,14 +3383,9 @@ bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool 
         if(opts.customAlphas[0]==0 ||
            exportingStyle ||
            opts.customAlphas[0]!=def.customAlphas[0] ||
-           opts.customAlphas[1]!=def.customAlphas[1])
-        {
+           opts.customAlphas[1]!=def.customAlphas[1]) {
             QString     shadeVal;
-#if QT_VERSION >= 0x040000
             QTextStream str(&shadeVal);
-#else
-            QTextStream str(&shadeVal, IO_WriteOnly);
-#endif
             if(0==opts.customAlphas[0])
                  str << 0;
             else

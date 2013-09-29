@@ -59,9 +59,7 @@ typedef enum
 #include <qapplication.h>
 #include <map>
 #include <set>
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
-#include <QtCore/QString>
-#endif // defined QT_VERSION && (QT_VERSION >= 0x040000)
+#include <QString>
 #else // __cplusplus
 #include <glib.h>
 #endif // __cplusplus
@@ -77,12 +75,8 @@ typedef enum
 class QColor;
 typedef QColor color;
 
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
-#include <QtCore/QSet>
+#include <QSet>
 typedef QSet<QString> Strings;
-#else // QT_VERSION && (QT_VERSION >= 0x040000)
-typedef QStringList Strings;
-#endif // QT_VERSION && (QT_VERSION >= 0x040000)
 
 #else // __cplusplus
 #include <gtk/gtk.h>
@@ -373,13 +367,10 @@ enum
 
 #define FULLLY_ROUNDED     (opts.round>=ROUND_FULL)
 #define DO_EFFECT          (EFFECT_NONE!=opts.buttonEffect)
-#if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 #define SLIDER_GLOW        (DO_EFFECT && MO_GLOW==opts.coloredMouseOver /*&& SLIDER_TRIANGULAR!=opts.sliderStyle*/ ? 2 : 0)
-#endif
 
 #define ENTRY_MO (opts.unifyCombo && opts.unifySpin)
 
-#if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 #define FOCUS_ALPHA              0.08
 #define FOCUS_GLOW_LINE_ALPHA    0.5
 #if !defined __cplusplus
@@ -390,13 +381,10 @@ enum
 
 #define ETCH_TOP_ALPHA           0.055
 #define ETCH_BOTTOM_ALPHA        0.1
-// #if defined QT_VERSION && (QT_VERSION >= 0x040000)
 // #define ETCH_RADIO_TOP_ALPHA     0.055
 // #define ETCH_RADIO_BOTTOM_ALPHA  0.80
-// #else
 #define ETCH_RADIO_TOP_ALPHA     0.09
 #define ETCH_RADIO_BOTTOM_ALPHA  1.0
-// #endif
 
 #define RINGS_INNER_ALPHA(T) qtcRingAlpha[IMG_PLAIN_RINGS==(T) ? 1 : 0] //(IMG_PLAIN_RINGS==opts.bgndImage.type ? 0.25 :  0.125)
 #define RINGS_OUTER_ALPHA    qtcRingAlpha[2] //0.5
@@ -420,9 +408,7 @@ enum
 
 #define GLOW_PROG_ALPHA 0.55
 
-#endif // !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
-
-#if defined __cplusplus && defined QT_VERSION && (QT_VERSION >= 0x040000)
+#ifdef __cplusplus
 
 #include <qstyle.h>
 typedef enum
@@ -462,12 +448,10 @@ typedef enum
 
 #endif //defined __cplusplus && defined QT_VERSION && (QT_VERSION >= 0x040000)
 
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
 #define QTCURVE_PREVIEW_CONFIG      "QTCURVE_PREVIEW_CONFIG"
 #define QTCURVE_PREVIEW_CONFIG_FULL "QTCURVE_PREVIEW_CONFIG_FULL"
 
-typedef enum
-{
+typedef enum {
     DWT_BUTTONS_AS_PER_TITLEBAR    = 0x0001,
     DWT_COLOR_AS_PER_TITLEBAR      = 0x0002,
     DWT_FONT_AS_PER_TITLEBAR       = 0x0004,
@@ -477,8 +461,7 @@ typedef enum
     DWT_ICON_COLOR_AS_PER_TITLEBAR = 0x0040
 } EDwtSettingsFlags;
 
-typedef enum
-{
+typedef enum {
     TITLEBAR_BUTTON_ROUND                   = 0x0001,
     TITLEBAR_BUTTON_HOVER_FRAME             = 0x0002,
     TITLEBAR_BUTTON_HOVER_SYMBOL            = 0x0004,
@@ -496,15 +479,13 @@ typedef enum
     TITLEBAR_BUTTON_USE_HOVER_COLOR         = 0x4000
 } ETitleBarButtonFlags;
 
-typedef enum
-{
+typedef enum {
     TITLEBAR_ICON_NONE,
     TITLEBAR_ICON_MENU_BUTTON,
     TITLEBAR_ICON_NEXT_TO_TITLE
 } ETitleBarIcon;
 
-typedef enum
-{
+typedef enum {
     TITLEBAR_CLOSE,
     TITLEBAR_MIN,
     TITLEBAR_MAX,
@@ -521,7 +502,6 @@ typedef enum
 #define TBAR_BORDER_VERSION_HACK (TBAR_VERSION_HACK+1000)
 
 typedef std::map<int, QColor> TBCols;
-#endif // defined QT_VERSION && (QT_VERSION >= 0x040000)
 
 typedef enum
 {
@@ -623,16 +603,6 @@ typedef enum
 {
     PIX_CHECK,
 #ifdef __cplusplus
-#if defined QT_VERSION && (QT_VERSION < 0x040000)
-    PIX_RADIO_ON,
-    PIX_RADIO_BORDER,
-    PIX_RADIO_INNER,
-    PIX_RADIO_LIGHT,
-    PIX_SLIDER,
-    PIX_SLIDER_LIGHT,
-    PIX_SLIDER_V,
-    PIX_SLIDER_LIGHT_V,
-#endif // defined QT_VERSION && (QT_VERSION < 0x040000)
     PIX_DOT
 #else // __cplusplus
     PIX_BLANK
@@ -1141,9 +1111,7 @@ typedef struct
                      borderInactiveTab,
                      doubleGtkComboArrow,
                      menuIcons,
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
                      stdBtnSizes,
-#endif // defined QT_VERSION && (QT_VERSION >= 0x040000)
                      forceAlternateLvCols,
                      invertBotTab,
                      boldProgress,
@@ -1165,12 +1133,10 @@ typedef struct
                      bgndOpacity,
                      menuBgndOpacity,
                      dlgOpacity;
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
     int              dwtSettings;
     int              titlebarButtons;
     TBCols           titlebarButtonColors;
     ETitleBarIcon    titlebarIcon;
-#endif // defined QT_VERSION && (QT_VERSION >= 0x040000)
     EStripe          stripedProgress;
     ESliderStyle     sliderStyle;
     EMouseOver       coloredMouseOver;
@@ -1249,24 +1215,20 @@ typedef struct
     QtCPixmap        menuBgndPixmap;
     QtCImage         bgndImage,
                      menuBgndImage;
-#if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     /* NOTE: If add any more settings here, need to alter copyOpts/freeOpts/defaultSettings in config_file.c */
     Strings          noBgndGradientApps,
                      noBgndOpacityApps,
                      noMenuBgndOpacityApps,
                      noBgndImageApps;
-#endif
 #ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     Strings          noDlgFixApps;
 #endif
     Strings          noMenuStripeApps;
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
     Strings          menubarApps,
                      statusbarApps,
                      useQtFileDialogApps,
                      windowDragWhiteList,
                      windowDragBlackList;
-#endif // defined QT_VERSION && (QT_VERSION >= 0x040000)
 
 #ifndef __cplusplus
 } Options;
@@ -1281,7 +1243,7 @@ typedef struct
 #define MAX(a, b) ((b) < (a) ? (a) : (b))
 #endif
 
-#if defined QT_VERSION && (QT_VERSION >= 0x040000) && defined QTC_QT5_ENABLE_KDE
+#ifdef QTC_QT5_ENABLE_KDE
 #include <KDE/KColorUtils>
 #define tint(COLA, COLB, FACTOR) KColorUtils::tint((COLA), (COLB), (FACTOR))
 #define midColor(COLA, COLB) KColorUtils::mix((COLA), (COLB), 0.5)
@@ -1349,15 +1311,9 @@ typedef enum
 #define FULL_OUTER_RADIUS    2.5
 #define FULL_ETCH_RADIUS     3.5
 
-#if defined QT_VERSION && (QT_VERSION < 0x040600)
-#define SLIGHT_INNER_RADIUS  0.5
-#define SLIGHT_OUTER_RADIUS  1.5
-#define SLIGHT_ETCH_RADIUS   2.5
-#else // QT_VERSION && (QT_VERSION < 0x040600)
 #define SLIGHT_INNER_RADIUS  0.75
 #define SLIGHT_OUTER_RADIUS  1.75
 #define SLIGHT_ETCH_RADIUS   2.75
-#endif //QT_VERSION && (QT_VERSION < 0x040600)
 
 #else // __cplusplus
 

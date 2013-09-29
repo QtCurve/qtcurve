@@ -282,8 +282,7 @@ void qtcShade(const Options *opts, const color *ca, color *cb, double k)
             case SHADING_HCY:
             {
     #define HCY_FACTOR 0.15
-    #if defined QT_VERSION && (QT_VERSION >= 0x040000) && \
-        defined QTC_QT5_ENABLE_KDE
+    #ifdef QTC_QT5_ENABLE_KDE
                 if(k>1.0)
                     *cb=KColorUtils::lighten(ca, (k*(1+HCY_FACTOR))-1.0, 1.0);
                 else
@@ -301,7 +300,7 @@ void qtcShade(const Options *opts, const color *ca, color *cb, double k)
     #endif
             }
         }
-#if defined __cplusplus && defined QT_VERSION && (QT_VERSION >= 0x040000)
+#ifdef __cplusplus
     cb->setAlpha(ca.alpha());
 #endif
 #ifndef __cplusplus
@@ -492,8 +491,6 @@ EAppearance qtcWidgetApp(EWidget w, const Options *opts)
     return opts->appearance;
 };
 
-#if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
-
 #define CAN_EXTRA_ROUND(MOD) \
             (IS_EXTRA_ROUND_WIDGET(widget) && \
             (IS_SLIDER(widget) || WIDGET_TROUGH==widget || \
@@ -514,7 +511,7 @@ ERound qtcGetWidgetRound(const Options *opts, int w, int h, EWidget widget)
     if((WIDGET_CHECKBOX==widget || WIDGET_FOCUS==widget) && ROUND_NONE!=r)
         r=ROUND_SLIGHT;
 
-#if defined __cplusplus && (defined QT_VERSION && (QT_VERSION >= 0x040000))
+#ifdef __cplusplus
     if((WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&TITLEBAR_BUTTON_ROUND)) ||
        WIDGET_RADIO_BUTTON==widget || WIDGET_DIAL==widget)
        return ROUND_MAX;
@@ -524,11 +521,9 @@ ERound qtcGetWidgetRound(const Options *opts, int w, int h, EWidget widget)
        return ROUND_MAX;
 #endif
 
-#if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     if(WIDGET_SLIDER==widget &&
        (SLIDER_ROUND==opts->sliderStyle || SLIDER_ROUND_ROTATED==opts->sliderStyle || SLIDER_CIRCULAR==opts->sliderStyle))
         return ROUND_MAX;
-#endif
 
     switch(r)
     {
@@ -547,7 +542,6 @@ ERound qtcGetWidgetRound(const Options *opts, int w, int h, EWidget widget)
         case ROUND_NONE:
             return ROUND_NONE;
     }
-    
     return ROUND_NONE;
 }
 
@@ -563,7 +557,7 @@ double qtcGetRadius(const Options *opts, int w, int h, EWidget widget, ERadius r
         (WIDGET_SCROLLVIEW==widget && (opts->square&SQUARE_SCROLLVIEW)) )
         return 0.0;
 
-#if defined __cplusplus && (defined QT_VERSION && (QT_VERSION >= 0x040000))
+#ifdef __cplusplus
     if((WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&TITLEBAR_BUTTON_ROUND)) ||
        WIDGET_RADIO_BUTTON==widget || WIDGET_DIAL==widget) 
         return (w>h ? h : w)/2.0;
@@ -573,11 +567,9 @@ double qtcGetRadius(const Options *opts, int w, int h, EWidget widget, ERadius r
         return (w>h ? h : w)/2.0;
 #endif
 
-#if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     if(WIDGET_SLIDER==widget &&
        (SLIDER_ROUND==opts->sliderStyle || SLIDER_ROUND_ROTATED==opts->sliderStyle || SLIDER_CIRCULAR==opts->sliderStyle))
         return (w>h ? h : w)/2.0;
-#endif
 
     if(RADIUS_EXTERNAL==rad && !opts->fillProgress && (WIDGET_PROGRESSBAR==widget
 #ifndef __cplusplus
@@ -725,5 +717,3 @@ double qtcShineAlpha(const color *bgnd)
     qtcRgbToHsv(r, g, b, &h, &s, &v);
     return v*0.8;
 }
-
-#endif // !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
