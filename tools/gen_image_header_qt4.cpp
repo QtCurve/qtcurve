@@ -21,12 +21,12 @@
 #include "stdio.h"
 
 #include <QImage>
-#include <QApplication>
+#include <QCoreApplication>
 
 int
 main(int argc, char **argv)
 {
-    QApplication app(argc, argv);
+    QCoreApplication app(argc, argv);
     if (argc < 4)
         return 1;
     const char *filename = argv[1];
