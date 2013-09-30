@@ -333,9 +333,9 @@ class CGradItem : public QTreeWidgetItem
     bool operator<(const QTreeWidgetItem &i) const
     {
         return text(0).toDouble()<i.text(0).toDouble() ||
-               (qtcEqual(text(0).toDouble(), i.text(0).toDouble()) &&
+               (qtc_equal(text(0).toDouble(), i.text(0).toDouble()) &&
                (text(1).toDouble()<i.text(1).toDouble() ||
-               (qtcEqual(text(1).toDouble(), i.text(1).toDouble()) &&
+               (qtc_equal(text(1).toDouble(), i.text(1).toDouble()) &&
                (text(2).toDouble()<i.text(2).toDouble()))));
     }
 };
@@ -1912,7 +1912,7 @@ void QtCurveConfig::itemChanged(QTreeWidgetItem *i, int col)
     bool   ok;
     double val=i->text(col).toDouble(&ok)/100.0;
 
-    if(prev<0 || (ok && qtcEqual(val, prev)))
+    if(prev<0 || (ok && qtc_equal(val, prev)))
         return;
 
     if(!ok || ((0==col || 2==col) && (val<0.0 || val>1.0)) || (1==col && (val<0.0 || val>2.0)))
@@ -1957,9 +1957,9 @@ void QtCurveConfig::addGradStop()
                                          alpha(stopAlpha->value()/100.0);
 
         for(; it!=end; ++it)
-            if(qtcEqual(pos, (*it).pos))
+            if(qtc_equal(pos, (*it).pos))
             {
-                if(qtcEqual(val, (*it).val) && qtcEqual(alpha, (*it).alpha))
+                if(qtc_equal(val, (*it).val) && qtc_equal(alpha, (*it).alpha))
                     return;
                 else
                 {
@@ -2034,7 +2034,7 @@ void QtCurveConfig::updateGradStop()
                newVal(stopValue->value()/100.0),
                newAlpha(stopAlpha->value()/100.0);
 
-        if(!qtcEqual(newPos, curPos) || !qtcEqual(newVal, curVal) || !qtcEqual(newAlpha, curAlpha))
+        if(!qtc_equal(newPos, curPos) || !qtc_equal(newVal, curVal) || !qtc_equal(newAlpha, curAlpha))
         {
             (*cg).second.stops.erase(GradientStop(curPos, curVal, curAlpha));
             (*cg).second.stops.insert(GradientStop(newPos, newVal, newAlpha));
@@ -2378,7 +2378,7 @@ bool QtCurveConfig::diffShades(const Options &opts)
     if(customShading->isChecked())
     {
         for(int i=0; i<NUM_STD_SHADES; ++i)
-            if(!qtcEqual(shadeVals[i]->value(), opts.customShades[i]))
+            if(!qtc_equal(shadeVals[i]->value(), opts.customShades[i]))
                 return true;
     }
 
@@ -2389,7 +2389,7 @@ bool QtCurveConfig::diffShades(const Options &opts)
     if(customAlphas->isChecked())
     {
         for(int i=0; i<NUM_STD_ALPHAS; ++i)
-            if(!qtcEqual(alphaVals[i]->value(), opts.customAlphas[i]))
+            if(!qtc_equal(alphaVals[i]->value(), opts.customAlphas[i]))
                 return true;
     }
     return false;

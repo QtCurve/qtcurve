@@ -23,6 +23,7 @@ set_target_properties(kwin3_qtcurve_kde4 PROPERTIES
   LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   OUTPUT_NAME "kwin3_qtcurve")
 target_link_libraries(kwin3_qtcurve_kde4 kdecorations
-  ${KDE4_KDEUI_LIBS} ${X11_LIBRARIES})
+  ${KDE4_KDEUI_LIBS} ${X11_LIBRARIES}
+  qtcurve-utils)
 install(TARGETS kwin3_qtcurve_kde4 DESTINATION "${PLUGIN_INSTALL_DIR}")
 install(FILES qtcurve.desktop DESTINATION "${DATA_INSTALL_DIR}/kwin/")

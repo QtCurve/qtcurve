@@ -77,7 +77,17 @@ configure_file(config.h.in config.h @ONLY)
 include_directories(
   "${CMAKE_CURRENT_SOURCE_DIR}"
   "${CMAKE_CURRENT_BINARY_DIR}")
+set(CMAKE_C_FLAGS "-Wall -Wextra ${CMAKE_C_FLAGS} -std=gnu99")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra ${CMAKE_CXX_FLAGS} -std=gnu++0x")
+set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed ${CMAKE_SHARED_LINKER_FLAGS}")
+set(CMAKE_MODULE_LINKER_FLAGS "-Wl,--as-needed ${CMAKE_MODULE_LINKER_FLAGS}")
+add_definitions("-D_GNU_SOURCE")
 
+if(NOT DEFINED LIB_INSTALL_DIR)
+  set(LIB_INSTALL_DIR lib)
+endif()
+
+add_subdirectory(qtcurve-utils)
 add_subdirectory(tools)
 add_subdirectory(po)
 add_subdirectory(qt4)

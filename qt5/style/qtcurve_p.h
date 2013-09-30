@@ -347,7 +347,7 @@ static inline QColor
 blendColors(const QColor &foreground, const QColor &background, double alpha)
 {
 #ifndef QTC_QT5_ENABLE_KDE
-    return ColorUtils_mix(&background, &foreground, alpha);
+    return qtc_color_mix(&background, &foreground, alpha);
 #else
     return KColorUtils::mix(background, foreground, alpha);
 #endif

@@ -1,7 +1,6 @@
 set(qtcurve_style_common_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/../common/common.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/../common/config_file.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/../common/colorutils.c)
+  ${CMAKE_CURRENT_SOURCE_DIR}/../common/config_file.c)
 set_source_files_properties(${qtcurve_style_common_SRCS} PROPERTIES LANGUAGE CXX)
 
 foreach(pngname check_on check_x_on dialog_error dialog_information
@@ -58,5 +57,6 @@ add_dependencies(qtcurve-qt5 qtc_shadow0_hdr qtc_shadow1_hdr qtc_shadow2_hdr
   qtc_shadow7_hdr qtc_qt5_check_on_hdr qtc_qt5_check_x_on_hdr
   qtc_qt5_dialog_error_hdr qtc_qt5_dialog_information_hdr
   qtc_qt5_dialog_warning_hdr)
-target_link_libraries(qtcurve-qt5 ${QTC5_LINK_LIBS} ${QTC5_XCB_LINK_LIBS})
+target_link_libraries(qtcurve-qt5 ${QTC5_LINK_LIBS} ${QTC5_XCB_LINK_LIBS}
+  qtcurve-utils)
 install(TARGETS qtcurve-qt5 LIBRARY DESTINATION ${QTCURVE_STYLE_DIR})

@@ -28,7 +28,7 @@ if(QTC_ENABLE_X11)
   add_definitions(${XCB_CFLAGS})
 endif()
 
-add_definitions(${QT_DEFINITIONS} "-std=c++0x")
+add_definitions(${QT_DEFINITIONS})
 
 get_target_property(REAL_QMAKE_EXECUTABLE ${Qt5Core_QMAKE_EXECUTABLE}
   IMPORTED_LOCATION)

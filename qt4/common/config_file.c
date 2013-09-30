@@ -785,7 +785,7 @@ WindowBorders qtcGetWindowBorderSize(bool force)
         char *filename=(char *)malloc(strlen(qtcConfDir())+strlen(BORDER_SIZE_FILE)+1);
         FILE *f=NULL;
 
-        sprintf(filename, "%s"BORDER_SIZE_FILE, qtcConfDir());
+        sprintf(filename, "%s" BORDER_SIZE_FILE, qtcConfDir());
         if((f=fopen(filename, "r")))
         {
             char *line=NULL;
@@ -1644,7 +1644,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                 QString filename(QFile::decodeName(cfgDir)+CONFIG_FILE);
 
                 if(!QFile::exists(filename))
-                    filename=QFile::decodeName(cfgDir)+"../"OLD_CONFIG_FILE;
+                    filename=QFile::decodeName(cfgDir) + "../" OLD_CONFIG_FILE;
                 return qtcReadConfig(filename, opts, defOpts);
             }
         }
@@ -1666,9 +1666,9 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                 char *filename=(char *)malloc(strlen(cfgDir)+strlen(OLD_CONFIG_FILE)+4);
                 bool rv=false;
 
-                sprintf(filename, "%s"CONFIG_FILE, cfgDir);
+                sprintf(filename, "%s" CONFIG_FILE, cfgDir);
                 if(!qtcFileExists(filename))
-                    sprintf(filename, "%s../"OLD_CONFIG_FILE, cfgDir);
+                    sprintf(filename, "%s../" OLD_CONFIG_FILE, cfgDir);
                 rv=qtcReadConfig(filename, opts, defOpts);
                 free(filename);
                 return rv;
@@ -2343,7 +2343,7 @@ static bool fileExists(const char *path)
 
 static const char * getSystemConfigFile()
 {
-    static const char * constFiles[]={ /*"/etc/qt4/"OLD_CONFIG_FILE, "/etc/qt3/"OLD_CONFIG_FILE, "/etc/qt/"OLD_CONFIG_FILE,*/ "/etc/"OLD_CONFIG_FILE, NULL };
+    static const char * constFiles[]={ /*"/etc/qt4/" OLD_CONFIG_FILE, "/etc/qt3/" OLD_CONFIG_FILE, "/etc/qt/" OLD_CONFIG_FILE,*/ "/etc/" OLD_CONFIG_FILE, NULL };
 
     int i;
 

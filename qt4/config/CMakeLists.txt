@@ -4,7 +4,7 @@ endif()
 
 set(kstyle_qtcurve_config_common_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/../common/common.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/../common/config_file.c )
+  ${CMAKE_CURRENT_SOURCE_DIR}/../common/config_file.c)
 
 set_source_files_properties(${kstyle_qtcurve_config_common_SRCS}
   PROPERTIES LANGUAGE CXX)
@@ -39,7 +39,8 @@ set_target_properties(kstyle_qtcurve_config_kde4 PROPERTIES
   OUTPUT_NAME "kstyle_qtcurve_config")
 target_link_libraries(kstyle_qtcurve_config_kde4
   ${KDE4_KDEUI_LIBS} ${KDE4_KIO_LIBS}
-  ${KDE4_KDECORE_LIBS} ${QT_QTGUI_LIBRARY})
+  ${KDE4_KDECORE_LIBS} ${QT_QTGUI_LIBRARY}
+  qtcurve-utils)
 install(TARGETS kstyle_qtcurve_config_kde4
   DESTINATION "${PLUGIN_INSTALL_DIR}")
 install(FILES QtCurveui.rc DESTINATION "${DATA_INSTALL_DIR}/QtCurve")

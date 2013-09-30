@@ -97,6 +97,8 @@
 
 #endif // QTC_QT_ONLY
 
+#include <qtcurve-utils/color.h>
+
 #ifdef QTC_QT5_ENABLE_KDE
 typedef QString (*_qt_filedialog_existing_directory_hook)(
     QWidget *parent, const QString &caption, const QString &dir,
@@ -745,7 +747,7 @@ void Style::init(bool initial)
        IMG_SQUARE_RINGS==opts.bgndImage.type ||
        IMG_PLAIN_RINGS==opts.menuBgndImage.type || IMG_BORDERED_RINGS==opts.menuBgndImage.type ||
        IMG_SQUARE_RINGS==opts.menuBgndImage.type)
-        qtcCalcRingAlphas(&itsBackgroundCols[ORIGINAL_SHADE]);
+        qtc_calc_ring_alphas(&itsBackgroundCols[ORIGINAL_SHADE]);
 
     itsBlurHelper->setEnabled(100!=opts.bgndOpacity || 100!=opts.dlgOpacity || 100!=opts.menuBgndOpacity);
 
@@ -1883,7 +1885,7 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
             else
             {
                 QRectF ra(r.x()+0.5, r.y()+0.5, r.width(), r.height());
-                double size=(MIN((horiz ? ra.height() : ra.width())/2.0, 16)),
+                double size=(QtcMin((horiz ? ra.height() : ra.width())/2.0, 16)),
                     rad=size/2.0;
                 int    mod=4;
 
@@ -2202,7 +2204,7 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
                 pix.fill(Qt::transparent);
                 QRadialGradient gradient(QPointF(pix.width()/2.0, 0), pix.width()/2.0, QPointF(pix.width()/2.0, 0));
                 QColor          c(Qt::white);
-                double          alpha(qtcShineAlpha(&col));
+                double          alpha(qtc_shine_alpha(&col));
 
                 c.setAlphaF(alpha);
                 gradient.setColorAt(0, c);
@@ -4066,14 +4068,13 @@ const QColor & Style::checkRadioCol(const QStyleOption *opt) const
 QColor Style::shade(const QColor &a, double k) const
 {
     QColor mod;
-
-    ::qtcShade(&opts, a, &mod, k);
+    qtc_shade(&a, &mod, k, opts.shading);
     return mod;
 }
 
 void Style::shade(const color &ca, color *cb, double k) const
 {
-    ::qtcShade(&opts, ca, cb, k);
+    qtc_shade(&ca, cb, k, opts.shading);
 }
 
 QColor Style::getLowerEtchCol(const QWidget *widget) const

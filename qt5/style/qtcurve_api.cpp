@@ -218,7 +218,7 @@ void Style::polish(QPalette &palette)
            IMG_PLAIN_RINGS==opts.menuBgndImage.type || IMG_BORDERED_RINGS==opts.menuBgndImage.type ||
            IMG_SQUARE_RINGS==opts.menuBgndImage.type)
         {
-            qtcCalcRingAlphas(&itsBackgroundCols[ORIGINAL_SHADE]);
+            qtc_calc_ring_alphas(&itsBackgroundCols[ORIGINAL_SHADE]);
             if(itsUsePixmapCache)
                 QPixmapCache::clear();
         }

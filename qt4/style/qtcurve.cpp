@@ -79,6 +79,8 @@
 #include <KDE/KIcon>
 #endif
 
+#include <qtcurve-utils/color.h>
+
 #endif // QTC_QT4_ENABLE_KDE
 
 // TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
@@ -504,7 +506,7 @@ static QColor blendColors(const QColor &foreground, const QColor &background, do
 #ifdef QTC_QT4_ENABLE_KDE
     return KColorUtils::mix(background, foreground, alpha);
 #else
-    return ColorUtils_mix(&background, &foreground, alpha);
+    return qtc_color_mix(&background, &foreground, alpha);
 #endif
 }
 
@@ -654,7 +656,7 @@ static void getStyles(const QString &dir, const char *sub, QSet<QString> &styles
     {
         QStringList filters;
 
-        filters << QString(THEME_PREFIX"*"THEME_SUFFIX);
+        filters << QString(THEME_PREFIX "*" THEME_SUFFIX);
         d.setNameFilters(filters);
 
         QStringList                entries(d.entryList());
@@ -1334,7 +1336,7 @@ void Style::init(bool initial)
        IMG_SQUARE_RINGS==opts.bgndImage.type ||
        IMG_PLAIN_RINGS==opts.menuBgndImage.type || IMG_BORDERED_RINGS==opts.menuBgndImage.type ||
        IMG_SQUARE_RINGS==opts.menuBgndImage.type)
-        qtcCalcRingAlphas(&itsBackgroundCols[ORIGINAL_SHADE]);
+        qtc_calc_ring_alphas(&itsBackgroundCols[ORIGINAL_SHADE]);
 
     itsBlurHelper->setEnabled(100!=opts.bgndOpacity || 100!=opts.dlgOpacity || 100!=opts.menuBgndOpacity);
 
@@ -1579,7 +1581,7 @@ void Style::polish(QPalette &palette)
            IMG_PLAIN_RINGS==opts.menuBgndImage.type || IMG_BORDERED_RINGS==opts.menuBgndImage.type ||
            IMG_SQUARE_RINGS==opts.menuBgndImage.type)
         {
-            qtcCalcRingAlphas(&itsBackgroundCols[ORIGINAL_SHADE]);
+            qtc_calc_ring_alphas(&itsBackgroundCols[ORIGINAL_SHADE]);
             if(itsUsePixmapCache)
                 QPixmapCache::clear();
         }
@@ -11304,7 +11306,7 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
             else
             {
                 QRectF ra(r.x()+0.5, r.y()+0.5, r.width(), r.height());
-                double size=(MIN((horiz ? ra.height() : ra.width())/2.0, 16)),
+                double size=(QtcMin((horiz ? ra.height() : ra.width())/2.0, 16)),
                        rad=size/2.0;
                 int    mod=4;
 
@@ -11623,7 +11625,7 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
                 pix.fill(Qt::transparent);
                 QRadialGradient gradient(QPointF(pix.width()/2.0, 0), pix.width()/2.0, QPointF(pix.width()/2.0, 0));
                 QColor          c(Qt::white);
-                double          alpha(qtcShineAlpha(&col));
+                double          alpha(qtc_shine_alpha(&col));
 
                 c.setAlphaF(alpha);
                 gradient.setColorAt(0, c);
@@ -13492,14 +13494,13 @@ const QColor & Style::checkRadioCol(const QStyleOption *opt) const
 QColor Style::shade(const QColor &a, double k) const
 {
     QColor mod;
-
-    ::qtcShade(&opts, a, &mod, k);
+    qtc_shade(&a, &mod, k, opts.shading);
     return mod;
 }
 
-void Style::shade(const color &ca, color *cb, double k) const
+void Style::shade(const QColor &ca, QColor *cb, double k) const
 {
-    ::qtcShade(&opts, ca, cb, k);
+    qtc_shade(&ca, cb, k, opts.shading);
 }
 
 QColor Style::getLowerEtchCol(const QWidget *widget) const
