@@ -67,9 +67,17 @@ if(NOT DEFINED QTC_KDE4_PREFIX)
     execute_process(COMMAND "${KDE4_KDECONFIG_EXECUTABLE}" --prefix
       OUTPUT_VARIABLE QTC_KDE4_PREFIX)
     string(STRIP "${QTC_KDE4_PREFIX}" QTC_KDE4_PREFIX)
+    execute_process(COMMAND "${KDE4_KDECONFIG_EXECUTABLE}" --expandvars
+      --install icon
+      OUTPUT_VARIABLE QTC_KDE4_ICONS_PREFIX)
+    string(STRIP "${QTC_KDE4_ICONS_PREFIX}" QTC_KDE4_ICONS_PREFIX)
   else()
     set(QTC_KDE4_PREFIX "${CMAKE_INSTALL_PREFIX}")
   endif()
+endif()
+
+if(NOT DEFINED QTC_KDE4_ICONS_PREFIX)
+  set(QTC_KDE4_ICONS_PREFIX "${QTC_KDE4_PREFIX}/share/icons")
 endif()
 
 configure_file(config.h.in config.h @ONLY)
