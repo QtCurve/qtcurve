@@ -47,8 +47,6 @@
 
 namespace QtCurve {
 
-const char *const ShadowHelper::netWMShadowAtomName =
-    "_KDE_NET_WM_SHADOW";
 const char *const ShadowHelper::netWMForceShadowPropertyName =
     "_KDE_NET_WM_FORCE_SHADOW";
 const char *const ShadowHelper::netWMSkipShadowPropertyName =
@@ -66,9 +64,9 @@ ShadowHelper::ShadowHelper(QObject *parent):
 ShadowHelper::~ShadowHelper( void )
 {
     for (int i = 0;i < numPixmaps;++i) {
-        XcbCallVoid(free_pixmap, _pixmaps[i]);
+        qtc_x11_call_void(free_pixmap, _pixmaps[i]);
     }
-    XcbUtils::flush();
+    qtc_x11_flush();
 }
 
 //_______________________________________________________
@@ -178,7 +176,7 @@ void ShadowHelper::createPixmapHandles()
 
     // create atom
     if (!_atom)
-        _atom = XcbUtils::getAtom(netWMShadowAtomName);
+        _atom = qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_SHADOW];
     _pixmaps[0] = createPixmap(&qtc_shadow0);
     _pixmaps[1] = createPixmap(&qtc_shadow1);
     _pixmaps[2] = createPixmap(&qtc_shadow2);
@@ -187,25 +185,25 @@ void ShadowHelper::createPixmapHandles()
     _pixmaps[5] = createPixmap(&qtc_shadow5);
     _pixmaps[6] = createPixmap(&qtc_shadow6);
     _pixmaps[7] = createPixmap(&qtc_shadow7);
-    XcbUtils::flush();
+    qtc_x11_flush();
 }
 
 //______________________________________________
 xcb_pixmap_t
 ShadowHelper::createPixmap(const QtcPixmap *data)
 {
-    xcb_pixmap_t pixmap = XcbUtils::generateId();
+    xcb_pixmap_t pixmap = qtc_x11_generate_id();
     _size = data->width;
 
     // create X11 pixmap
-    XcbCallVoid(create_pixmap, 32, pixmap, XcbUtils::rootWindow(),
-                data->width, data->height);
-    xcb_gcontext_t cid = XcbUtils::generateId();
-    XcbCallVoid(create_gc, cid, pixmap, 0, (const uint32_t*)0);
-    XcbCallVoid(put_image, XCB_IMAGE_FORMAT_Z_PIXMAP, pixmap, cid,
-                data->width, data->height, 0, 0, 0, 32, data->len,
-                (uchar*)data->data);
-    XcbCallVoid(free_gc, cid);
+    qtc_x11_call_void(create_pixmap, 32, pixmap, qtc_x11_root_window(),
+                      data->width, data->height);
+    xcb_gcontext_t cid = qtc_x11_generate_id();
+    qtc_x11_call_void(create_gc, cid, pixmap, 0, (const uint32_t*)0);
+    qtc_x11_call_void(put_image, XCB_IMAGE_FORMAT_Z_PIXMAP, pixmap, cid,
+                      data->width, data->height, 0, 0, 0, 32, data->len,
+                      (uchar*)data->data);
+    qtc_x11_call_void(free_gc, cid);
     return pixmap;
 }
 
@@ -236,10 +234,10 @@ bool ShadowHelper::installX11Shadows( QWidget* widget )
     // add padding
     data << _size - 4 << _size - 4 << _size - 4 << _size - 4;
 
-    XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
-                widget->winId(), _atom, XCB_ATOM_CARDINAL,
-                32, data.size(), data.constData());
-    XcbUtils::flush();
+    qtc_x11_call_void(change_property, XCB_PROP_MODE_REPLACE,
+                      widget->winId(), _atom, XCB_ATOM_CARDINAL,
+                      32, data.size(), data.constData());
+    qtc_x11_flush();
     return true;
 }
 
@@ -254,8 +252,8 @@ void ShadowHelper::uninstallX11Shadows(QWidget *widget) const
 //_______________________________________________________
 void ShadowHelper::uninstallX11Shadows(WId id) const
 {
-    XcbCallVoid(delete_property, id, _atom);
-    XcbUtils::flush();
+    qtc_x11_call_void(delete_property, id, _atom);
+    qtc_x11_flush();
 }
 
 }

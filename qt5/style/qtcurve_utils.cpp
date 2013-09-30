@@ -100,18 +100,18 @@ bool isNoEtchWidget(const QWidget *widget)
 void setOpacityProp(QWidget *w, unsigned short opacity)
 {
     if (w && canAccessId(w)) {
-        static const auto opacityAtom = XcbUtils::getAtom(OPACITY_ATOM);
-        XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
-                    w->window()->winId(), opacityAtom,
-                    XCB_ATOM_CARDINAL, 16, 1, &opacity);
-        XcbUtils::flush();
+        static const auto opacityAtom = qtc_x11_atoms[QTC_X11_ATOM_QTC_OPACITY];
+        qtc_x11_call_void(change_property, XCB_PROP_MODE_REPLACE,
+                          w->window()->winId(), opacityAtom,
+                          XCB_ATOM_CARDINAL, 16, 1, &opacity);
+        qtc_x11_flush();
     }
 }
 
 void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
 {
     if (w && canAccessId(w)) {
-        static const auto bgndAtom = XcbUtils::getAtom(BGND_ATOM);
+        static const auto bgndAtom = qtc_x11_atoms[QTC_X11_ATOM_QTC_BGND];
         uint32_t prop = (((IS_FLAT_BGND(app) ?
                            (unsigned short)(haveBgndImage ?
                                             APPEARANCE_RAISED :
@@ -119,10 +119,10 @@ void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
                            app) & 0xFF) |
                          (w->palette().background().color().rgb() &
                           0x00FFFFFF) << 8);
-        XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
-                    w->window()->winId(), bgndAtom,
-                    XCB_ATOM_CARDINAL, 32, 1, &prop);
-        XcbUtils::flush();
+        qtc_x11_call_void(change_property, XCB_PROP_MODE_REPLACE,
+                          w->window()->winId(), bgndAtom,
+                          XCB_ATOM_CARDINAL, 32, 1, &prop);
+        qtc_x11_flush();
     }
 }
 
@@ -133,13 +133,14 @@ void setSbProp(QWidget *w)
         QVariant prop(w->property(constStatusBarProperty));
 
         if (!prop.isValid() || !prop.toBool()) {
-            static const auto sbAtom = XcbUtils::getAtom(STATUSBAR_ATOM);
+            static const auto sbAtom =
+                qtc_x11_atoms[QTC_X11_ATOM_QTC_STATUSBAR];
             unsigned short s = 1;
             w->setProperty(constStatusBarProperty, true);
-            XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
-                        w->window()->winId(), sbAtom,
-                        XCB_ATOM_CARDINAL, 16, 1, &s);
-            XcbUtils::flush();
+            qtc_x11_call_void(change_property, XCB_PROP_MODE_REPLACE,
+                              w->window()->winId(), sbAtom,
+                              XCB_ATOM_CARDINAL, 16, 1, &s);
+            qtc_x11_flush();
         }
     }
 }

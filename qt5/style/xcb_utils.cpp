@@ -26,28 +26,7 @@ namespace QtCurve
 namespace XcbUtils
 {
 
-void
-getAtoms(size_t n, xcb_atom_t *atoms, const char *const names[], bool create)
-{
-    xcb_connection_t *conn = getConnection();
-    xcb_intern_atom_cookie_t *cookies =
-        (xcb_intern_atom_cookie_t*)malloc(sizeof(xcb_intern_atom_cookie_t) * n);
-    for (size_t i = 0;i < n;i++) {
-        cookies[i] = xcb_intern_atom(conn, create, strlen(names[i]), names[i]);
-    }
-    memset(atoms, 0, sizeof(xcb_atom_t) * n);
-    for (size_t i = 0;i < n;i++) {
-        xcb_intern_atom_reply_t *r =
-            xcb_intern_atom_reply(conn, cookies[i], 0);
-        if (r) {
-            atoms[i] = r->atom;
-            free(r);
-        }
-    }
-    free(cookies);
-}
-
-static QByteArray
+static inline QByteArray
 getWMClass()
 {
     QByteArray appname = appName.toLocal8Bit();
@@ -58,11 +37,8 @@ getWMClass()
 void
 setWindowWMClass(WId wid)
 {
-    static const auto wmclassAtom = XcbUtils::getAtom("WM_CLASS");
     static QByteArray wmclass = getWMClass();
-    XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
-                wid, wmclassAtom, XCB_ATOM_STRING, 8, wmclass.count(),
-                wmclass.constData());
+    qtc_x11_set_wmclass(wid, wmclass.constData(), wmclass.count());
 }
 
 }

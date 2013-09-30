@@ -165,14 +165,6 @@ enum
 #define SUNKEN_BEVEL_DARK_ALPHA(X)  (X.value()/800.0) // 0.25
 #define SUNKEN_BEVEL_LIGHT_ALPHA(X) (X.value()/500.0) // 0.40
 
-#define MENU_SIZE_ATOM        "_QTCURVE_MENUBAR_SIZE_"
-#define STATUSBAR_ATOM        "_QTCURVE_STATUSBAR_"
-#define TITLEBAR_SIZE_ATOM    "_QTCURVE_TITLEBAR_SIZE_"
-#define ACTIVE_WINDOW_ATOM    "_QTCURVE_ACTIVE_WINDOW_"
-#define TOGGLE_MENUBAR_ATOM   "_QTCURVE_TOGGLE_MENUBAR_"
-#define TOGGLE_STATUSBAR_ATOM "_QTCURVE_TOGGLE_STATUSBAR_"
-#define OPACITY_ATOM          "_QTCURVE_OPACITY_"
-#define BGND_ATOM             "_QTCURVE_BGND_"
 #define BLEND_TITLEBAR     (opts.menubarAppearance==opts.titlebarAppearance && opts.menubarAppearance==opts.inactiveTitlebarAppearance && \
                            !(opts.windowBorder&WINDOW_BORDER_BLEND_TITLEBAR) && SHADE_WINDOW_BORDER==opts.shadeMenubars && opts.windowDrag)
 

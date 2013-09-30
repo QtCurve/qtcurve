@@ -45,16 +45,12 @@ bool compositingActive()
 #ifdef QTC_ENABLE_X11
     static xcb_atom_t atom;
     if (!atom) {
-        char atomName[100] = "_NET_WM_CM_S";
-        size_t len = strlen("_NET_WM_CM_S");
-        len += sprintf(atomName + len, "%d",
-                       QApplication::desktop()->primaryScreen());
-        atom = XcbUtils::getAtom(atomName);
+        atom = qtc_x11_atoms[QTC_X11_ATOM_NET_WM_CM_S_DEFAULT];
         if (!atom) {
             return false;
         }
     }
-    auto reply = XcbCall(get_selection_owner, atom);
+    auto reply = qtc_x11_call(get_selection_owner, atom);
     bool res = false;
     if (reply) {
         res = reply->owner != 0;
@@ -75,7 +71,7 @@ bool hasAlphaChannel(const QWidget *widget)
     if (compositingActive()) {
         WId wid = widget ? widget->window()->winId() : 0;
         if (wid) {
-            auto reply = XcbCall(get_geometry, wid);
+            auto reply = qtc_x11_call(get_geometry, wid);
             bool res = false;
             if (reply) {
                 res = reply->depth == 32;

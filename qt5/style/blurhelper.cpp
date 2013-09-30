@@ -50,7 +50,7 @@ BlurHelper::BlurHelper(QObject *parent):
 {
 #ifdef QTC_ENABLE_X11
     // create atom
-    _atom = XcbUtils::getAtom("_KDE_NET_WM_BLUR_BEHIND_REGION");
+    _atom = qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_BLUR_BEHIND_REGION];
 #endif
 }
 
@@ -189,9 +189,9 @@ void BlurHelper::update( QWidget* widget ) const
             data << rect.x() << rect.y() << rect.width() << rect.height();
         }
 
-        XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
-                    widget->winId(), _atom, XCB_ATOM_CARDINAL,
-                    32, data.size(), data.constData());
+        qtc_x11_call_void(change_property, XCB_PROP_MODE_REPLACE,
+                          widget->winId(), _atom, XCB_ATOM_CARDINAL,
+                          32, data.size(), data.constData());
     }
 
     // force update
@@ -205,9 +205,9 @@ void BlurHelper::update( QWidget* widget ) const
 void BlurHelper::clear( QWidget* widget ) const
 {
 #ifdef QTC_ENABLE_X11
-    XcbCallVoid(change_property, XCB_PROP_MODE_REPLACE,
-                widget->winId(), _atom, XCB_ATOM_CARDINAL,
-                32, 0, (const void*)0);
+    qtc_x11_call_void(change_property, XCB_PROP_MODE_REPLACE,
+                      widget->winId(), _atom, XCB_ATOM_CARDINAL,
+                      32, 0, (const void*)0);
 #endif
 }
 

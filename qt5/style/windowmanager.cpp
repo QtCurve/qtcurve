@@ -650,10 +650,10 @@ void WindowManager::startDrag( QWidget* widget, const QPoint& position )
     // ungrab pointer
     if (useWMMoveResize()) {
 #ifdef QTC_ENABLE_X11
-        XcbCallVoid(ungrab_pointer, 0L);
+        qtc_x11_call_void(ungrab_pointer, 0L);
 #ifndef QTC_QT5_ENABLE_KDE
         static const auto moveResizeAtom =
-            XcbUtils::getAtom("_NET_WM_MOVERESIZE");
+            qtc_x11_atoms[QTC_X11_ATOM_NET_WM_MOVERESIZE];
         union {
             char _buff[32];
             xcb_client_message_event_t ev;
@@ -670,13 +670,13 @@ void WindowManager::startDrag( QWidget* widget, const QPoint& position )
         xev->data.data32[1] = position.y();
         xev->data.data32[2] = 8; // NET::Move
         xev->data.data32[3] = XCB_KEY_BUT_MASK_BUTTON_1;
-        XcbCallVoid(send_event, false, XcbUtils::rootWindow(),
-                    XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY |
-                    XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT,
-                    (const char*)xev);
-        XcbUtils::flush();
+        qtc_x11_call_void(send_event, false, qtc_x11_root_window(),
+                          XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY |
+                          XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT,
+                          (const char*)xev);
+        qtc_x11_flush();
 #else
-        XcbUtils::flush();
+        qtc_x11_flush();
         NETRootInfo rootInfo(QX11Info::display(), NET::WMMoveResize);
         rootInfo.moveResizeRequest(widget->window()->winId(),
                                    position.x(), position.y(), NET::Move);
