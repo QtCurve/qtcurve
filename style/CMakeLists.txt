@@ -31,37 +31,23 @@ set(qtcurve_SRCS
   wmmove.c
   shadowhelper.c
   ${qtcurve_style_common_SRCS})
-add_library(qtcurve MODULE ${qtcurve_SRCS})
+add_library(qtcurve-gtk2 MODULE ${qtcurve_SRCS})
+
+set_target_properties(qtcurve-gtk2 PROPERTIES
+  LINK_FLAGS "-Wl,--no-undefined"
+  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+  OUTPUT_NAME "qtcurve")
 
 # The following fixes odd segfaults with evolution under Fedora 14.
 # See https://bugzilla.redhat.com/show_bug.cgi?id=676837
 add_definitions(-Dopts=qtcurve_gtk2_opts)
 
-target_link_libraries(qtcurve
+target_link_libraries(qtcurve-gtk2
   ${GTK2_LDFLAGS}
   ${GTK2_LIBRARIES}
   m X11)
 
-if(CMAKE_SYSTEM_NAME MATCHES Linux OR CMAKE_SYSTEM_NAME STREQUAL GNU)
-  if(CMAKE_COMPILER_IS_GNUCXX)
-    set(CMAKE_SHARED_LINKER_FLAGS
-      "-Wl,--fatal-warnings -Wl,--no-undefined -lc ${CMAKE_SHARED_LINKER_FLAGS}")
-    set(CMAKE_MODULE_LINKER_FLAGS
-      "-Wl,--fatal-warnings -Wl,--no-undefined -lc ${CMAKE_MODULE_LINKER_FLAGS}")
-    set(CMAKE_SHARED_LINKER_FLAGS
-      "-Wl,--enable-new-dtags ${CMAKE_SHARED_LINKER_FLAGS}")
-    set(CMAKE_MODULE_LINKER_FLAGS
-      "-Wl,--enable-new-dtags ${CMAKE_MODULE_LINKER_FLAGS}")
-  endif()
-  if(CMAKE_C_COMPILER MATCHES "icc")
-    set(CMAKE_SHARED_LINKER_FLAGS
-      "-Wl,--fatal-warnings -Wl,--no-undefined -lc ${CMAKE_SHARED_LINKER_FLAGS}")
-    set(CMAKE_MODULE_LINKER_FLAGS
-      "-Wl,--fatal-warnings -Wl,--no-undefined -lc ${CMAKE_MODULE_LINKER_FLAGS}")
-  endif()
-endif()
-
-install(TARGETS qtcurve LIBRARY DESTINATION
+install(TARGETS qtcurve-gtk2 LIBRARY DESTINATION
   ${GTK2_LIBDIR}/gtk-2.0/${GTK2_BIN_VERSION}/engines)
 install(FILES gtkrc icons3 icons4 map_kde_icons.pl kdeglobals
   DESTINATION ${GTK2_THEME_DIR}/gtk-2.0)

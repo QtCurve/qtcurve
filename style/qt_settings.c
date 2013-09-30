@@ -1306,8 +1306,8 @@ static const char * kdeIconsPrefix()
     }
 
     if(!kdeIcons)
-        kdeIcons = (KDE4_ICONS_PREFIX && strlen(KDE4_ICONS_PREFIX) > 2 ?
-                    KDE4_ICONS_PREFIX : DEFAULT_ICON_PREFIX);
+        kdeIcons = (QTC_KDE4_ICONS_PREFIX && strlen(QTC_KDE4_ICONS_PREFIX) > 2 ?
+                    QTC_KDE4_ICONS_PREFIX : DEFAULT_ICON_PREFIX);
 
     return kdeIcons;
 }
