@@ -1055,12 +1055,8 @@ Gradient
 
 #ifdef __cplusplus
 typedef std::map<EAppearance, Gradient> GradientCont;
-struct Options
-#else // __cplusplus
-typedef struct
-#endif // __cplusplus
-{
-
+#endif
+typedef struct {
     int              version,
                      contrast,
                      passwordChar,
@@ -1253,11 +1249,7 @@ typedef struct
                      windowDragBlackList;
 #endif // defined QT_VERSION && (QT_VERSION >= 0x040000)
 
-#ifndef __cplusplus
 } Options;
-#else // __cplusplus
-};
-#endif // __cplusplus
 
 #if defined QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY
 #include <KDE/KColorUtils>
