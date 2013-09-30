@@ -48,9 +48,7 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}"
   "${QT_QTSVG_INCLUDE_DIR}")
 qt4_wrap_cpp(qtcurve_MOC_SRCS ${qtcurve_MOC_HDRS})
 add_library(qtcurve-qt4 MODULE ${qtcurve_SRCS} ${qtcurve_MOC_SRCS})
-add_dependencies(qtcurve-qt4 qtc_shadow0_hdr qtc_shadow1_hdr qtc_shadow2_hdr
-  qtc_shadow3_hdr qtc_shadow4_hdr qtc_shadow5_hdr qtc_shadow6_hdr
-  qtc_shadow7_hdr qtc_qt4_check_on_hdr qtc_qt4_check_x_on_hdr)
+add_dependencies(qtcurve-qt4 qtc_qt4_check_on_hdr qtc_qt4_check_x_on_hdr)
 set_target_properties(qtcurve-qt4 PROPERTIES
   LINK_FLAGS "-Wl,--no-undefined"
   LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"

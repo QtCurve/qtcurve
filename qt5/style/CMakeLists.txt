@@ -52,9 +52,7 @@ set_target_properties(qtcurve-qt5 PROPERTIES
   OUTPUT_NAME "qtcurve"
   LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   PREFIX "")
-add_dependencies(qtcurve-qt5 qtc_shadow0_hdr qtc_shadow1_hdr qtc_shadow2_hdr
-  qtc_shadow3_hdr qtc_shadow4_hdr qtc_shadow5_hdr qtc_shadow6_hdr
-  qtc_shadow7_hdr qtc_qt5_check_on_hdr qtc_qt5_check_x_on_hdr
+add_dependencies(qtcurve-qt5 qtc_qt5_check_on_hdr qtc_qt5_check_x_on_hdr
   qtc_qt5_dialog_error_hdr qtc_qt5_dialog_information_hdr
   qtc_qt5_dialog_warning_hdr)
 target_link_libraries(qtcurve-qt5 ${QTC5_LINK_LIBS} ${QTC5_XCB_LINK_LIBS}

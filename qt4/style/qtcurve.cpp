@@ -53,6 +53,11 @@
 #include <sys/time.h>
 #endif
 
+#ifdef QTC_ENABLE_X11
+#include <QX11Info>
+#include <qtcurve-utils/x11utils.h>
+#endif
+
 #ifdef QTC_QT4_ENABLE_KDE
 #include <KDE/KApplication>
 #include <KDE/KAboutData>
@@ -726,6 +731,9 @@ class StylePlugin : public QStylePlugin
 
     QStyle * create(const QString &key)
     {
+#ifdef QTC_ENABLE_X11
+        qtc_x11_init_xlib(QX11Info::display());
+#endif
         return "qtcurve"==key.toLower()
                     ? new Style
 #ifdef QTC_QT4_STYLE_SUPPORT

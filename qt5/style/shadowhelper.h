@@ -31,8 +31,6 @@
 #include <QObject>
 #include <QMap>
 #include <qwindowdefs.h>
-#include <xcb/xcb.h>
-#include <common/common.h>
 
 namespace QtCurve {
 //! handle shadow pixmaps passed to window manager via X property
@@ -44,13 +42,13 @@ public:
     static const char *const netWMSkipShadowPropertyName;
 
     //! constructor
-    ShadowHelper(QObject*);
+    ShadowHelper(QObject *parent): QObject(parent) {};
 
     //! destructor
-    virtual ~ShadowHelper();
+    virtual ~ShadowHelper() {};
 
     //! register widget
-    bool registerWidget(QWidget*, bool force = false);
+    bool registerWidget(QWidget*, bool force=false);
 
     //! unregister widget
     void unregisterWidget(QWidget*);

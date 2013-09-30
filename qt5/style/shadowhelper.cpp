@@ -35,33 +35,12 @@
 #include <QEvent>
 
 #include <qtcurve-utils/kdex11shadow.h>
-#include <xcb/xcb_image.h>
-#include <data/shadow0-png.h>
-#include <data/shadow1-png.h>
-#include <data/shadow2-png.h>
-#include <data/shadow3-png.h>
-#include <data/shadow4-png.h>
-#include <data/shadow5-png.h>
-#include <data/shadow6-png.h>
-#include <data/shadow7-png.h>
 
 namespace QtCurve {
-
 const char *const ShadowHelper::netWMForceShadowPropertyName =
     "_KDE_NET_WM_FORCE_SHADOW";
 const char *const ShadowHelper::netWMSkipShadowPropertyName =
     "_KDE_NET_WM_SKIP_SHADOW";
-
-//_____________________________________________________
-ShadowHelper::ShadowHelper(QObject *parent):
-    QObject(parent)
-{
-}
-
-//_______________________________________________________
-ShadowHelper::~ShadowHelper()
-{
-}
 
 //_______________________________________________________
 bool ShadowHelper::registerWidget(QWidget* widget, bool force)
@@ -186,6 +165,6 @@ void ShadowHelper::uninstallX11Shadows(QWidget *widget) const
 {
     if (!(widget && widget->testAttribute(Qt::WA_WState_Created)))
         return;
-    qtc_kde_x11_shadow_install(widget->winId());
+    qtc_kde_x11_shadow_uninstall(widget->winId());
 }
 }
