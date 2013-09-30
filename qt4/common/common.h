@@ -28,14 +28,6 @@
 #define MAKE_VERSION(a, b) (((a) << 16) | ((b) << 8))
 #define MAKE_VERSION3(a, b, c) (((a) << 16) | ((b) << 8) | (c))
 
-typedef struct {
-    int len;
-    int width;
-    int height;
-    int depth;
-    const unsigned char *data;
-} QtcPixmap;
-
 /*
     The following #define disables the rounding when scrollbar type==none.
 #define SIMPLE_SCROLLBARS

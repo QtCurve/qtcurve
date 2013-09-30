@@ -34,7 +34,7 @@
 #include <QToolBar>
 #include <QEvent>
 
-#include <qtcurve-utils/x11utils.h>
+#include <qtcurve-utils/kdex11shadow.h>
 #include <xcb/xcb_image.h>
 #include <data/shadow0-png.h>
 #include <data/shadow1-png.h>
@@ -54,23 +54,17 @@ const char *const ShadowHelper::netWMSkipShadowPropertyName =
 
 //_____________________________________________________
 ShadowHelper::ShadowHelper(QObject *parent):
-    QObject(parent),
-    _atom(0)
+    QObject(parent)
 {
-    createPixmapHandles();
 }
 
 //_______________________________________________________
-ShadowHelper::~ShadowHelper( void )
+ShadowHelper::~ShadowHelper()
 {
-    for (int i = 0;i < numPixmaps;++i) {
-        qtc_x11_call_void(free_pixmap, _pixmaps[i]);
-    }
-    qtc_x11_flush();
 }
 
 //_______________________________________________________
-bool ShadowHelper::registerWidget( QWidget* widget, bool force )
+bool ShadowHelper::registerWidget(QWidget* widget, bool force)
 {
     // make sure widget is not already registered
     if (_widgets.contains(widget))
@@ -99,7 +93,7 @@ bool ShadowHelper::registerWidget( QWidget* widget, bool force )
 }
 
 //_______________________________________________________
-void ShadowHelper::unregisterWidget( QWidget* widget )
+void ShadowHelper::unregisterWidget(QWidget* widget)
 {
     if (_widgets.remove(widget)) {
         uninstallX11Shadows(widget);
@@ -166,47 +160,6 @@ bool ShadowHelper::acceptWidget(QWidget* widget) const
     return false;
 }
 
-//______________________________________________
-void ShadowHelper::createPixmapHandles()
-{
-    /*!
-      shadow atom and property specification available at
-      http://community.kde.org/KWin/Shadow
-    */
-
-    // create atom
-    if (!_atom)
-        _atom = qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_SHADOW];
-    _pixmaps[0] = createPixmap(&qtc_shadow0);
-    _pixmaps[1] = createPixmap(&qtc_shadow1);
-    _pixmaps[2] = createPixmap(&qtc_shadow2);
-    _pixmaps[3] = createPixmap(&qtc_shadow3);
-    _pixmaps[4] = createPixmap(&qtc_shadow4);
-    _pixmaps[5] = createPixmap(&qtc_shadow5);
-    _pixmaps[6] = createPixmap(&qtc_shadow6);
-    _pixmaps[7] = createPixmap(&qtc_shadow7);
-    qtc_x11_flush();
-}
-
-//______________________________________________
-xcb_pixmap_t
-ShadowHelper::createPixmap(const QtcPixmap *data)
-{
-    xcb_pixmap_t pixmap = qtc_x11_generate_id();
-    _size = data->width;
-
-    // create X11 pixmap
-    qtc_x11_call_void(create_pixmap, 32, pixmap, qtc_x11_root_window(),
-                      data->width, data->height);
-    xcb_gcontext_t cid = qtc_x11_generate_id();
-    qtc_x11_call_void(create_gc, cid, pixmap, 0, (const uint32_t*)0);
-    qtc_x11_call_void(put_image, XCB_IMAGE_FORMAT_Z_PIXMAP, pixmap, cid,
-                      data->width, data->height, 0, 0, 0, 32, data->len,
-                      (uchar*)data->data);
-    qtc_x11_call_void(free_gc, cid);
-    return pixmap;
-}
-
 //_______________________________________________________
 bool ShadowHelper::installX11Shadows( QWidget* widget )
 {
@@ -224,20 +177,7 @@ bool ShadowHelper::installX11Shadows( QWidget* widget )
           widget->internalWinId()))
         return false;
 
-    // create data
-    // add pixmap handles
-    QVector<uint32_t> data;
-    for (int i = 0;i < numPixmaps;++i) {
-        data.push_back(_pixmaps[i]);
-    }
-
-    // add padding
-    data << _size - 4 << _size - 4 << _size - 4 << _size - 4;
-
-    qtc_x11_call_void(change_property, XCB_PROP_MODE_REPLACE,
-                      widget->winId(), _atom, XCB_ATOM_CARDINAL,
-                      32, data.size(), data.constData());
-    qtc_x11_flush();
+    qtc_kde_x11_shadow_install(widget->winId());
     return true;
 }
 
@@ -246,14 +186,6 @@ void ShadowHelper::uninstallX11Shadows(QWidget *widget) const
 {
     if (!(widget && widget->testAttribute(Qt::WA_WState_Created)))
         return;
-    uninstallX11Shadows(widget->winId());
+    qtc_kde_x11_shadow_install(widget->winId());
 }
-
-//_______________________________________________________
-void ShadowHelper::uninstallX11Shadows(WId id) const
-{
-    qtc_x11_call_void(delete_property, id, _atom);
-    qtc_x11_flush();
-}
-
 }

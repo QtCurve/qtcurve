@@ -37,6 +37,14 @@ typedef int32_t boolean;
 #  endif
 #endif
 
+typedef struct {
+    int len;
+    int width;
+    int height;
+    int depth;
+    const unsigned char *data;
+} QtcPixmap;
+
 #define qtc_container_of(ptr, type, member)             \
     ((type*)(((void*)(ptr)) - offsetof(type, member)))
 

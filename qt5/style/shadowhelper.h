@@ -68,44 +68,15 @@ protected:
     //! accept widget
     bool acceptWidget(QWidget*) const;
 
-    // create pixmap handles from tileset
-    void createPixmapHandles();
-
-    // create pixmap handle from pixmap
-    xcb_pixmap_t createPixmap(const QtcPixmap *data);
-
     //! install shadow X11 property on given widget
-    /*!
-      shadow atom and property specification available at
-      http://community.kde.org/KWin/Shadow
-    */
     bool installX11Shadows(QWidget*);
 
     //! uninstall shadow X11 property on given widget
     void uninstallX11Shadows(QWidget*) const;
 
-    //! uninstall shadow X11 property on given window
-    void uninstallX11Shadows(WId) const;
-
 private:
     //! set of registered widgets
     QMap<QWidget*, WId> _widgets;
-
-    //! number of pixmaps
-    enum {
-        numPixmaps = 8
-    };
-
-    //!@name pixmaps
-    //@{
-    xcb_pixmap_t _pixmaps[numPixmaps];
-    //@}
-
-    //! shadow size
-    int _size;
-
-    //! shadow atom
-    xcb_atom_t _atom;
 };
 
 }

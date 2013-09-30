@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "x11utils.h"
+#include "kdex11shadow_p.h"
 
 #include <xcb/xcb_image.h>
 #include <X11/Xlib-xcb.h>
@@ -109,6 +110,7 @@ qtc_x11_init_xcb(xcb_connection_t *conn, int screen_no)
     sprintf(wm_cm_s_atom_name + base_len, "%d", screen_no);
     qtc_x11_get_atoms(_QTC_X11_ATOM_NUMBER, qtc_x11_atoms,
                       qtc_x11_atom_names, true);
+    qtc_kde_x11_shadow_init();
 }
 
 QTC_EXPORT void
