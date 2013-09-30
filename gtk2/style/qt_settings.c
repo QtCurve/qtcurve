@@ -1863,7 +1863,7 @@ static gboolean checkFileVersion(const char *fname, const char *versionStr, int 
             static const int constVLen=32;
 
             char line[constVLen+1];
-            int  numChars=MIN(constVLen, versionStrLen-1);
+            int  numChars=QtcMin(constVLen, versionStrLen-1);
 
             diff=NULL==fgets(line, numChars+1, f) || memcmp(versionStr, line, numChars);
         }

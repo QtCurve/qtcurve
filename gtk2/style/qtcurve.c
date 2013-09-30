@@ -2036,14 +2036,15 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         {
             int diff=qtcWidgetGetAllocation(widget).x-qtcWidgetGetAllocation(parent).x;
 
-            if(NO_FRAME(opts.groupBox))
-                x-=MAX(0, MIN(diff, 8));
-            else if(opts.gbLabel&GB_LBL_OUTSIDE)
-                x-=MAX(0, MIN(diff, 4));
-            else if(opts.gbLabel&GB_LBL_INSIDE)
-                x-=MAX(0, MIN(diff, 2));
-            else
-                x+=5;
+            if (NO_FRAME(opts.groupBox)) {
+                x -= QtcMax(0, QtcMin(diff, 8));
+            } else if (opts.gbLabel&GB_LBL_OUTSIDE) {
+                x -= QtcMax(0, QtcMin(diff, 4));
+            } else if(opts.gbLabel&GB_LBL_INSIDE) {
+                x -= QtcMax(0, QtcMin(diff, 2));
+            } else {
+                x += 5;
+            }
 #if GTK_CHECK_VERSION(2, 90, 0)
             cairo_reset_clip(cr);
 #else

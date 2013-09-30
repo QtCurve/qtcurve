@@ -1259,13 +1259,6 @@ typedef struct
 };
 #endif // __cplusplus
 
-#ifndef MIN
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-#endif
-#ifndef MAX
-#define MAX(a, b) ((b) < (a) ? (a) : (b))
-#endif
-
 #if defined QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY
 #include <KDE/KColorUtils>
 #define tint(COLA, COLB, FACTOR) KColorUtils::tint((COLA), (COLB), (FACTOR))

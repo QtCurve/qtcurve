@@ -710,7 +710,7 @@ void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectang
             }
             else
             {
-                double          size=(MIN((horiz ? ha : wa)/2.0, 16)),
+                double          size=(QtcMin((horiz ? ha : wa)/2.0, 16)),
                                 rad=size/2.0;
                 cairo_pattern_t *pt=NULL;
                 int             mod=4;
@@ -1418,7 +1418,7 @@ gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, GdkWin
 
                 if(GT_HORIZ==opts.bgndGrad && GB_SHINE==qtcGetGradient(opts.bgndAppearance, &opts)->border)
                 {
-                    int             size=MIN(BGND_SHINE_SIZE, MIN(wh*2, ww));
+                    int             size=QtcMin(BGND_SHINE_SIZE, QtcMin(wh*2, ww));
                     double alpha = qtc_shine_alpha(col);
                     cairo_pattern_t *pat=NULL;
 
@@ -3354,7 +3354,7 @@ void drawShadowGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow, GtkStateT
                     if(style && label)
                     {
                         gtk_widget_get_child_requisition(label, &child_requisition);
-                        height_extra = (MAX(0, child_requisition.height - style->ythickness)
+                        height_extra = (QtcMax(0, child_requisition.height - style->ythickness)
                                         - qtcFrameGetLabelYAlign(frame) * child_requisition.height) + 2;
 
                         if(opts.gbLabel&GB_LBL_INSIDE)
