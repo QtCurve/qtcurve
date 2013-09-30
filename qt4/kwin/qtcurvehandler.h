@@ -42,11 +42,9 @@
 
 class QStyle;
 
-namespace KWinQtCurve
-{
+namespace KWinQtCurve {
 
-enum ButtonIcon
-{
+enum ButtonIcon {
     CloseIcon = 0,
 #if KDE_IS_VERSION(4, 3, 85)
     CloseTabIcon,
@@ -70,34 +68,35 @@ enum ButtonIcon
 class QtCurveClient;
 class QtCurveDBus;
 
-class QtCurveHandler : public QObject,
-#if KDE_IS_VERSION(4, 3, 0)
-                       public KDecorationFactoryUnstable
+#if KDE_IS_VERSION(4, 3, 0) && !KDE_IS_VERSION(4, 11, 0)
+// KDecorationFactoryUnstable already does nothing before 4.11 and
+// is removed in kde5.
+#define _KDecorationFactoryBase KDecorationFactoryUnstable
 #else
-                       public KDecorationFactory
+#define _KDecorationFactoryBase KDecorationFactory
 #endif
-{
+
+class QtCurveHandler : public QObject, public _KDecorationFactoryBase {
     Q_OBJECT
-
-    public:
-
+public:
     QtCurveHandler();
     ~QtCurveHandler();
     void setStyle();
-    virtual bool reset(unsigned long changed);
+    virtual bool reset(unsigned long changed) override;
     void setBorderSize();
 
-    virtual KDecoration * createDecoration(KDecorationBridge *);
-    virtual bool supports(Ability ability) const;
+    virtual KDecoration *createDecoration(KDecorationBridge*) override;
+    virtual bool supports(Ability ability) const override;
 
-    const QBitmap &       buttonBitmap(ButtonIcon type, const QSize &size, bool toolWindow);
-    int                   titleHeight() const        { return itsTitleHeight; }
-    int                   titleHeightTool() const    { return itsTitleHeightTool; }
-    const QFont &         titleFont()                { return itsTitleFont; }
-    const QFont &         titleFontTool()            { return itsTitleFontTool; }
-    int                   borderSize(bool bot=false) const;
-    bool                  showResizeGrip() const     { return QtCurveConfig::BORDER_NONE==itsConfig.borderSize(); }
-    bool                  haveBottomBorder() const   { return QtCurveConfig::BORDER_NONE!=itsConfig.borderSize(); }
+    const QBitmap &buttonBitmap(ButtonIcon type, const QSize &size, bool toolWindow);
+    int titleHeight() const {return itsTitleHeight;}
+    int titleHeightTool() const {return itsTitleHeightTool;}
+    const QFont &titleFont() {return itsTitleFont;}
+    const QFont &titleFontTool() {return itsTitleFontTool;}
+    int borderSize(bool bot=false) const;
+    bool showResizeGrip() const
+        {return QtCurveConfig::BORDER_NONE == itsConfig.borderSize();}
+    bool haveBottomBorder() const { return QtCurveConfig::BORDER_NONE!=itsConfig.borderSize(); }
     bool                  roundBottom() const        { return itsConfig.roundBottom() && itsConfig.borderSize()>QtCurveConfig::BORDER_NONE; }
     QtCurveConfig::Shade  outerBorder() const        { return itsConfig.outerBorder(); }
     QtCurveConfig::Shade  innerBorder() const        { return itsConfig.innerBorder(); }
@@ -126,12 +125,10 @@ class QtCurveHandler : public QObject,
     bool                  wasLastStatus(unsigned int id) { return id==itsLastStatusXid; }
     const QColor &        hoverCol(bool active)          { return itsHoverCols[active ? 1 : 0]; }
 
-    private:
-
+private:
     bool readConfig(bool compositingToggled=false);
 
-    private:
-
+private:
     int                    itsBorderSize,
                            itsBotBorderSize,
                            itsTitleHeight,
@@ -152,9 +149,8 @@ class QtCurveHandler : public QObject,
 #endif
 };
 
-QtCurveHandler * Handler();
+QtCurveHandler *Handler();
 
 }
 
 #endif
-

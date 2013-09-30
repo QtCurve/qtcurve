@@ -60,7 +60,7 @@ typedef int32_t boolean;
 #endif
 
 #define QTC_ALWAYS_INLINE __attribute__((always_inline))
-#define QTC_UNUSED(x) (void)(x)
+#define QTC_UNUSED(x) ((void)(x))
 
 QTC_BEGIN_DECLS
 
