@@ -16,9 +16,8 @@
   along with this program; see the file COPYING.  If not, write to
   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
   Boston, MA 02110-1301, USA.
- */
+*/
 
-#include <gtk/gtk.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <gdk/gdkx.h>
@@ -30,25 +29,32 @@
 #include "menu.h"
 #include "tab.h"
 #include <string.h>
+#include "qtcurve-gtk-common.h"
 
 extern Options opts;
 
-static int       qtcWMMoveLastX=-1;
-static int       qtcWMMoveLastY=-1;
-static int       qtcWMMoveTimer=0;
-static GtkWidget *qtcWMMoveDragWidget=NULL;
+static int qtcWMMoveLastX = -1;
+static int qtcWMMoveLastY = -1;
+static int qtcWMMoveTimer = 0;
+static GtkWidget *qtcWMMoveDragWidget = NULL;
 //! keep track of the last rejected button event to reject it again if passed to some parent widget
 /*! this spares some time (by not processing the same event twice), and prevents some bugs */
- GdkEventButton *qtcWMMoveLastRejectedEvent=NULL;
+GdkEventButton *qtcWMMoveLastRejectedEvent=NULL;
 
 static int       qtcWMMoveBtnReleaseSignalId=0;
 static int       qtcWMMoveBtnReleaseHookId=0;
 
 static gboolean qtcWMMoveDragEnd();
 
-static gboolean qtcWMMoveBtnReleaseHook(GSignalInvocationHint *a, guint b, const GValue *c, gpointer d)
+static gboolean
+qtcWMMoveBtnReleaseHook(GSignalInvocationHint *a, guint b,
+                        const GValue *c, gpointer d)
 {
-    if(qtcWMMoveDragWidget)
+    QTC_UNUSED(a);
+    QTC_UNUSED(b);
+    QTC_UNUSED(c);
+    QTC_UNUSED(d);
+    if (qtcWMMoveDragWidget)
         qtcWMMoveDragEnd();
     return TRUE;
 }
@@ -156,7 +162,7 @@ static gboolean qtcWMMoveWithinWidget(GtkWidget *widget, GdkEventButton *event)
         }
 
         return allocation.x<=event->x_root && allocation.y<=event->y_root &&
-               (allocation.x+allocation.width)>event->x_root &&(allocation.y+allocation.height)>event->y_root;
+            (allocation.x+allocation.width)>event->x_root &&(allocation.y+allocation.height)>event->y_root;
     }
     return TRUE;
 }
@@ -164,9 +170,9 @@ static gboolean qtcWMMoveWithinWidget(GtkWidget *widget, GdkEventButton *event)
 static gboolean qtcWMMoveIsBlackListed(GObject *object)
 {
     static const char *widgets[]={ "GtkPizza", "GladeDesignLayout", "MetaFrames", "SPHRuler", "SPVRuler", 0 };
-    
+
     int i;
-    
+
     for(i=0; widgets[i]; ++i)
         if(objectIsA(object, widgets[i]))
             return TRUE;
@@ -180,7 +186,7 @@ static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *eve
 
     // get children and check
     GList *children = gtk_container_get_children(GTK_CONTAINER(widget)),
-          *child;
+        *child;
 
     for(child = g_list_first(children); child && usable; child = g_list_next(child))
     {
@@ -240,7 +246,7 @@ static gboolean qtcWMMoveUseEvent(GtkWidget *widget, GdkEventButton *event)
 
     if(!GTK_IS_CONTAINER(widget))
         return TRUE;
-    
+
     // if widget is a notebook, accept if there is no hovered tab
     if(GTK_IS_NOTEBOOK(widget))
         return !qtcTabHasVisibleArrows(GTK_NOTEBOOK(widget)) && -1==qtcTabCurrentHoveredIndex(widget) && qtcWMMoveChildrenUseEvent(widget, event, FALSE);
@@ -248,17 +254,20 @@ static gboolean qtcWMMoveUseEvent(GtkWidget *widget, GdkEventButton *event)
         return qtcWMMoveChildrenUseEvent(widget, event, FALSE);
 }
 
-static gboolean qtcWWMoveStartDelayedDrag(gpointer data)
+static gboolean
+qtcWWMoveStartDelayedDrag(gpointer data)
 {
-    if(qtcWMMoveDragWidget)
-    {
+    QTC_UNUSED(data);
+    if (qtcWMMoveDragWidget) {
         gdk_threads_enter();
         qtcWMMoveTrigger(qtcWMMoveDragWidget, qtcWMMoveLastX, qtcWMMoveLastY);
         gdk_threads_leave();
     }
+    return FALSE;
 }
 
-static gboolean qtcWMMoveIsWindowDragWidget(GtkWidget *widget, GdkEventButton *event)
+static gboolean
+qtcWMMoveIsWindowDragWidget(GtkWidget *widget, GdkEventButton *event)
 {
     if(opts.windowDrag && (!event || (qtcWMMoveWithinWidget(widget, event) && qtcWMMoveUseEvent(widget, event))))
     {
@@ -272,14 +281,15 @@ static gboolean qtcWMMoveIsWindowDragWidget(GtkWidget *widget, GdkEventButton *e
     return FALSE;
 }
 
-static gboolean qtcWMMoveButtonPress(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+static gboolean
+qtcWMMoveButtonPress(GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
-    if (GDK_BUTTON_PRESS==event->type && 1==event->button && qtcWMMoveIsWindowDragWidget(widget, event))
-    {
-        qtcWMMoveDragWidget=widget;
+    QTC_UNUSED(data);
+    if (GDK_BUTTON_PRESS == event->type && 1 == event->button &&
+        qtcWMMoveIsWindowDragWidget(widget, event)) {
+        qtcWMMoveDragWidget = widget;
         return TRUE;
     }
-
     return FALSE;
 }
 
@@ -298,100 +308,113 @@ static gboolean qtcWMMoveDragEnd()
 
 static void qtcWMMoveCleanup(GtkWidget *widget)
 {
-    if (g_object_get_data(G_OBJECT(widget), "QTC_WM_MOVE_HACK_SET"))
-    {
-        if(widget==qtcWMMoveDragWidget)
+    GObject *obj = G_OBJECT(widget);
+    if (g_object_get_data(obj, "QTC_WM_MOVE_HACK_SET")) {
+        if (widget == qtcWMMoveDragWidget)
             qtcWMMoveReset();
-        g_signal_handler_disconnect(G_OBJECT(widget),
-                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WM_MOVE_MOTION_ID"));
-        g_signal_handler_disconnect(G_OBJECT(widget),
-                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WM_MOVE_LEAVE_ID"));
-        g_signal_handler_disconnect(G_OBJECT(widget),
-                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WM_MOVE_DESTROY_ID"));
-        g_signal_handler_disconnect(G_OBJECT(widget),
-                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WM_MOVE_STYLE_SET_ID"));
-        g_signal_handler_disconnect(G_OBJECT(widget),
-                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WM_MOVE_BUTTON_PRESS_ID"));
-        g_object_steal_data(G_OBJECT(widget), "QTC_WM_MOVE_HACK_SET");
+        qtcDisconnectFromData(obj, "QTC_WM_MOVE_MOTION_ID");
+        qtcDisconnectFromData(obj, "QTC_WM_MOVE_LEAVE_ID");
+        qtcDisconnectFromData(obj, "QTC_WM_MOVE_DESTROY_ID");
+        qtcDisconnectFromData(obj, "QTC_WM_MOVE_STYLE_SET_ID");
+        qtcDisconnectFromData(obj, "QTC_WM_MOVE_BUTTON_PRESS_ID");
+        g_object_steal_data(obj, "QTC_WM_MOVE_HACK_SET");
     }
 }
 
-static gboolean qtcWMMoveStyleSet(GtkWidget *widget, GtkStyle *previous_style, gpointer user_data)
+static gboolean
+qtcWMMoveStyleSet(GtkWidget *widget, GtkStyle *previous_style, gpointer data)
 {
-    qtcWMMoveCleanup(widget);
-    return FALSE;
-}
- 
-static gboolean qtcWMMoveDestroy(GtkWidget *widget, GdkEvent *event, gpointer user_data)
-{
+    QTC_UNUSED(previous_style);
+    QTC_UNUSED(data);
     qtcWMMoveCleanup(widget);
     return FALSE;
 }
 
-static gboolean qtcWMMoveMotion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
+static gboolean
+qtcWMMoveDestroy(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
-    if (qtcWMMoveDragWidget==widget)
-    {
+    QTC_UNUSED(event);
+    QTC_UNUSED(data);
+    qtcWMMoveCleanup(widget);
+    return FALSE;
+}
+
+static gboolean
+qtcWMMoveMotion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
+{
+    QTC_UNUSED(data);
+    if (qtcWMMoveDragWidget == widget) {
         // check displacement with respect to drag start
-        const int distance=abs(qtcWMMoveLastX - event->x_root) + abs(qtcWMMoveLastY - event->y_root);
+        const int distance = (abs(qtcWMMoveLastX - event->x_root) +
+                              abs(qtcWMMoveLastY - event->y_root));
 
-        if(distance > 0)
+        if (distance > 0)
             qtcWMMoveStopTimer();
 
-//         if(distance < qtSettings.startDragDist)
-//             return FALSE;
+        /* if (distance < qtSettings.startDragDist) */
+        /*     return FALSE; */
         qtcWMMoveTrigger(widget, event->x_root, event->y_root);
         return TRUE;
     }
-
     return FALSE;
 }
 
-static gboolean qtcWMMoveLeave(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
+static gboolean
+qtcWMMoveLeave(GtkWidget *widget, GdkEventMotion *event, gpointer data)
 {
+    QTC_UNUSED(widget);
+    QTC_UNUSED(event);
+    QTC_UNUSED(data);
     return qtcWMMoveDragEnd();
 }
 
 void qtcWMMoveSetup(GtkWidget *widget)
 {
-    GtkWidget *parent=NULL;
+    GtkWidget *parent = NULL;
 
-    if(widget && GTK_IS_WINDOW(widget) && !gtk_window_get_decorated(GTK_WINDOW(widget)))
+    if (widget && GTK_IS_WINDOW(widget) &&
+        !gtk_window_get_decorated(GTK_WINDOW(widget)))
         return;
 
-    if(GTK_IS_EVENT_BOX(widget) && gtk_event_box_get_above_child(GTK_EVENT_BOX(widget)))
+    if (GTK_IS_EVENT_BOX(widget) &&
+        gtk_event_box_get_above_child(GTK_EVENT_BOX(widget)))
         return;
 
-    parent=qtcWidgetGetParent(widget);
-    
+    parent = qtcWidgetGetParent(widget);
+
     // widgets used in tabs also must be ignored (happens, unfortunately)
-    if(GTK_IS_NOTEBOOK(parent) && qtcTabIsLabel(GTK_NOTEBOOK(parent), widget))
+    if (GTK_IS_NOTEBOOK(parent) && qtcTabIsLabel(GTK_NOTEBOOK(parent), widget))
         return;
 
     /*
-    check event mask (for now we only need to do that for GtkWindow)
-    The idea is that if the window has been set to recieve button_press and button_release events
-    (which is not done by default), it likely means that it does something with such events,
-    in which case we should not use them for grabbing
+      check event mask (for now we only need to do that for GtkWindow)
+      The idea is that if the window has been set to recieve button_press
+      and button_release events (which is not done by default), it likely
+      means that it does something with such events, in which case we should
+      not use them for grabbing
     */
-    if(0==strcmp(g_type_name(qtcWidgetType(widget)), "GtkWindow") &&
-       (gtk_widget_get_events(widget) & (GDK_BUTTON_PRESS_MASK|GDK_BUTTON_RELEASE_MASK) ) )
+    if (0 == strcmp(g_type_name(qtcWidgetType(widget)), "GtkWindow") &&
+       (gtk_widget_get_events(widget) &
+        (GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK)))
         return;
-        
-    if (widget && !isFakeGtk() && !g_object_get_data(G_OBJECT(widget), "QTC_WM_MOVE_HACK_SET"))
-    {
-        gtk_widget_add_events(widget, GDK_BUTTON_RELEASE_MASK|GDK_BUTTON_PRESS_MASK|GDK_LEAVE_NOTIFY_MASK|GDK_BUTTON1_MOTION_MASK);
+
+    GObject *obj = NULL;
+    if (widget && !isFakeGtk() && (obj = G_OBJECT(widget)) &&
+        !g_object_get_data(obj, "QTC_WM_MOVE_HACK_SET")) {
+        gtk_widget_add_events(widget, GDK_BUTTON_RELEASE_MASK |
+                              GDK_BUTTON_PRESS_MASK | GDK_LEAVE_NOTIFY_MASK |
+                              GDK_BUTTON1_MOTION_MASK);
         qtcWMMoveRegisterBtnReleaseHook();
         g_object_set_data(G_OBJECT(widget), "QTC_WM_MOVE_HACK_SET", (gpointer)1);
-        g_object_set_data(G_OBJECT(widget), "QTC_WM_MOVE_MOTION_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "motion-notify-event", G_CALLBACK(qtcWMMoveMotion), NULL));
-        g_object_set_data(G_OBJECT(widget), "QTC_WM_MOVE_LEAVE_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "leave-notify-event", G_CALLBACK(qtcWMMoveLeave), NULL));
-        g_object_set_data(G_OBJECT(widget), "QTC_WM_MOVE_DESTROY_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "destroy-event", G_CALLBACK(qtcWMMoveDestroy), NULL));
-        g_object_set_data(G_OBJECT(widget), "QTC_WM_MOVE_STYLE_SET_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "style-set", G_CALLBACK(qtcWMMoveStyleSet), NULL));
-        g_object_set_data(G_OBJECT(widget), "QTC_WM_MOVE_BUTTON_PRESS_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "button-press-event", G_CALLBACK(qtcWMMoveButtonPress), widget));
-    }  
+        qtcConnectToData(obj, "QTC_WM_MOVE_MOTION_ID", "motion-notify-event",
+                         qtcWMMoveMotion, NULL);
+        qtcConnectToData(obj, "QTC_WM_MOVE_LEAVE_ID", "leave-notify-event",
+                         qtcWMMoveLeave, NULL);
+        qtcConnectToData(obj, "QTC_WM_MOVE_DESTROY_ID", "destroy-event",
+                         qtcWMMoveDestroy, NULL);
+        qtcConnectToData(obj, "QTC_WM_MOVE_STYLE_SET_ID", "style-set",
+                         qtcWMMoveStyleSet, NULL);
+        qtcConnectToData(obj, "QTC_WM_MOVE_BUTTON_PRESS_ID",
+                         "button-press-event", qtcWMMoveButtonPress, NULL);
+    }
 }

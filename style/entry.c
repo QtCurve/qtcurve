@@ -18,89 +18,91 @@
   Boston, MA 02110-1301, USA.
  */
 
-#include <gtk/gtk.h>
+#include "common.h"
+#include "qtcurve-gtk-common.h"
 #include "compatability.h"
 
-static GtkWidget *qtcEntryLastMo=NULL;
+static GtkWidget *qtcEntryLastMo = NULL;
 
-gboolean qtcEntryIsLastMo(GtkWidget *widget)
+gboolean
+qtcEntryIsLastMo(GtkWidget *widget)
 {
-    return qtcEntryLastMo && widget==qtcEntryLastMo;
+    return qtcEntryLastMo && widget == qtcEntryLastMo;
 }
 
-static void qtcEntryCleanup(GtkWidget *widget)
+static void
+qtcEntryCleanup(GtkWidget *widget)
 {
-    if(qtcEntryLastMo==widget)
-        qtcEntryLastMo=NULL;
-    if (GTK_IS_ENTRY(widget))
-    {
-        g_signal_handler_disconnect(G_OBJECT(widget),
-                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_ENTRY_ENTER_ID"));
-        g_signal_handler_disconnect(G_OBJECT(widget),
-                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_ENTRY_LEAVE_ID"));
-        g_signal_handler_disconnect(G_OBJECT(widget),
-                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_ENTRY_DESTROY_ID"));
-        g_signal_handler_disconnect(G_OBJECT(widget),
-                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_ENTRY_UNREALIZE_ID"));
-        g_signal_handler_disconnect(G_OBJECT(widget),
-                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_ENTRY_STYLE_SET_ID"));
-        g_object_steal_data(G_OBJECT(widget), "QTC_ENTRY_HACK_SET");
+    if (qtcEntryLastMo == widget)
+        qtcEntryLastMo = NULL;
+    if (GTK_IS_ENTRY(widget)) {
+        GObject *obj = G_OBJECT(widget);
+        qtcDisconnectFromData(obj, "QTC_ENTRY_ENTER_ID");
+        qtcDisconnectFromData(obj, "QTC_ENTRY_LEAVE_ID");
+        qtcDisconnectFromData(obj, "QTC_ENTRY_DESTROY_ID");
+        qtcDisconnectFromData(obj, "QTC_ENTRY_UNREALIZE_ID");
+        qtcDisconnectFromData(obj, "QTC_ENTRY_STYLE_SET_ID");
+        g_object_steal_data(obj, "QTC_ENTRY_HACK_SET");
     }
 }
 
-static gboolean qtcEntryStyleSet(GtkWidget *widget, GtkStyle *previous_style, gpointer user_data)
+static gboolean
+qtcEntryStyleSet(GtkWidget *widget, GtkStyle *previous_style, gpointer data)
 {
+    QTC_UNUSED(previous_style);
+    QTC_UNUSED(data);
     qtcEntryCleanup(widget);
     return FALSE;
 }
 
-static gboolean qtcEntryDestroy(GtkWidget *widget, GdkEvent *event, gpointer user_data)
+static gboolean
+qtcEntryDestroy(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
+    QTC_UNUSED(event);
+    QTC_UNUSED(data);
     qtcEntryCleanup(widget);
     return FALSE;
 }
 
-static gboolean qtcEntryEnter(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data)
+static gboolean
+qtcEntryEnter(GtkWidget *widget, GdkEventCrossing *event, gpointer data)
 {
-    if (GTK_IS_ENTRY(widget))
-    {
-        qtcEntryLastMo=widget;
+    QTC_UNUSED(event);
+    QTC_UNUSED(data);
+    if (GTK_IS_ENTRY(widget)) {
+        qtcEntryLastMo = widget;
         gtk_widget_queue_draw(widget);
     }
- 
     return FALSE;
 }
 
-static gboolean qtcEntryLeave(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data)
+static gboolean
+qtcEntryLeave(GtkWidget *widget, GdkEventCrossing *event, gpointer data)
 {
-    if (GTK_IS_ENTRY(widget))
-    {
-        qtcEntryLastMo=NULL;
+    QTC_UNUSED(event);
+    QTC_UNUSED(data);
+    if (GTK_IS_ENTRY(widget)) {
+        qtcEntryLastMo = NULL;
         gtk_widget_queue_draw(widget);
     }
- 
     return FALSE;
 }
 
 void qtcEntrySetup(GtkWidget *widget)
 {
-    if (GTK_IS_ENTRY(widget) && !g_object_get_data(G_OBJECT(widget), "QTC_ENTRY_HACK_SET"))
-    {
+    GObject *obj = NULL;
+    if (GTK_IS_ENTRY(widget) && (obj = G_OBJECT(widget)) &&
+        !g_object_get_data(obj, "QTC_ENTRY_HACK_SET")) {
         g_object_set_data(G_OBJECT(widget), "QTC_ENTRY_HACK_SET", (gpointer)1);
-        g_object_set_data(G_OBJECT(widget), "QTC_ENTRY_ENTER_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "enter-notify-event",
-                                                     G_CALLBACK(qtcEntryEnter), NULL));
-        g_object_set_data(G_OBJECT(widget), "QTC_ENTRY_LEAVE_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "leave-notify-event",
-                                                     G_CALLBACK(qtcEntryLeave), NULL));
-        g_object_set_data(G_OBJECT(widget), "QTC_ENTRY_DESTROY_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "destroy-event",
-                                                     G_CALLBACK(qtcEntryDestroy), NULL));
-        g_object_set_data(G_OBJECT(widget), "QTC_ENTRY_UNREALIZE_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "unrealize",
-                                                     G_CALLBACK(qtcEntryDestroy), NULL));
-        g_object_set_data(G_OBJECT(widget), "QTC_ENTRY_STYLE_SET_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "style-set",
-                                                     G_CALLBACK(qtcEntryStyleSet), NULL));
-    }  
+        qtcConnectToData(obj, "QTC_ENTRY_ENTER_ID", "enter-notify-event",
+                         qtcEntryEnter, NULL);
+        qtcConnectToData(obj, "QTC_ENTRY_LEAVE_ID", "leave-notify-event",
+                         qtcEntryLeave, NULL);
+        qtcConnectToData(obj, "QTC_ENTRY_DESTROY_ID", "destroy-event",
+                         qtcEntryDestroy, NULL);
+        qtcConnectToData(obj, "QTC_ENTRY_UNREALIZE_ID", "unrealize",
+                         qtcEntryDestroy, NULL);
+        qtcConnectToData(obj, "QTC_ENTRY_STYLE_SET_ID", "style-set",
+                         qtcEntryStyleSet, NULL);
+    }
 }
