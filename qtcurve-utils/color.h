@@ -116,6 +116,87 @@ qtc_color_mixQreal(double a, double b, double bias)
     return a + (b - a) * bias;
 }
 
+static inline void
+qtc_hsv_to_rgb(double *r, double *g, double *b, double h, double s, double v)
+{
+    if (0 == s) {
+        *r = *g = *b = v;
+    } else {
+        int i;
+        double f;
+        double p;
+
+        h /= 60; /* sector 0 to 5 */
+        i = (int)floor(h);
+        f = h - i; /* factorial part of h */
+        p = v * (1 - s);
+        switch (i) {
+        case 0:
+            *r = v;
+            *g = v * (1 - s * (1 - f));
+            *b = p;
+            break;
+        case 1:
+            *r = v * (1 - s * f);
+            *g = v;
+            *b = p;
+            break;
+        case 2:
+            *r = p;
+            *g = v;
+            *b = v * (1 - s * (1 - f));
+            break;
+        case 3:
+            *r = p;
+            *g = v * (1 - s * f);
+            *b = v;
+            break;
+        case 4:
+            *r = v * (1 - s * (1 - f));
+            *g = p;
+            *b = v;
+            break;
+        case 5:
+        default:
+            *r = v;
+            *g = p;
+            *b = v * (1 - s * f);
+            break;
+        }
+    }
+}
+
+static inline void
+qtc_rgb_to_hsv(double r, double g, double b, double *h, double *s, double *v)
+{
+    double min = QtcMin(QtcMin(r, g), b);
+    double max = QtcMax(QtcMax(r, g), b);
+    double delta = max - min;
+
+    *v = max;
+    if (max != 0) {
+        *s = delta / max;
+    } else {
+        *s = 0;
+    }
+
+    if (*s == 0.0) {
+        *h = 0.0;
+    } else {
+        if (r == max) {
+            *h = (g - b) / delta; /* between yellow & magenta */
+        } else if (g == max) {
+            *h = 2 + (b - r) / delta; /* between cyan & yellow */
+        } else {
+            *h = 4 + (r - g) / delta; /* between magenta & cyan */
+        }
+        *h *= 60; /* degrees */
+        if (*h < 0) {
+            *h += 360;
+        }
+    }
+}
+
 void _qtc_color_lighten(QtcColor *color, double ky, double kc);
 void _qtc_color_darken(QtcColor *color, double ky, double kc);
 void _qtc_color_shade(QtcColor *color, double ky, double kc);

@@ -2,41 +2,12 @@
 #include <stdarg.h>
 #include <math.h>
 #include "common.h"
-#include <qtcurve-utils/color.h>
 
 #ifdef __cplusplus
 #include <qglobal.h>
 #else
 #include <stdlib.h>
 #endif
-
-void qtcRgbToHsv(double r, double g, double b, double *h, double *s, double *v)
-{
-    double min = QtcMin(QtcMin(r, g), b),
-           max = QtcMax(QtcMax(r, g), b),
-           delta = max - min;
-
-    *v=max;
-    if(max != 0)
-        *s=delta / max;
-    else
-        *s=0;
-
-    if (*s==0.0)
-        *h = 0.0;
-    else
-    {
-        if(r == max)
-            *h=(g - b) / delta;         /* between yellow & magenta */
-        else if(g == max)
-            *h=2 + (b - r) / delta;     /* between cyan & yellow */
-        else if(b == max)
-            *h=4 + (r - g) / delta;     /* between magenta & cyan */
-        *h *= 60;                       /* degrees */
-        if(*h < 0)
-            *h += 360;
-    }
-}
 
 static unsigned char checkBounds(int num)
 {
@@ -62,7 +33,7 @@ void qtcAdjustPix(unsigned char *data, int numChannels, int w, int h, int stride
         {
             unsigned char source=data[offset+column+1];
 
-#if defined  __cplusplus
+#ifdef  __cplusplus
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN
             /* ARGB */
             data[offset+column+1] = checkBounds(r-source);
@@ -255,8 +226,7 @@ ERound qtcGetWidgetRound(const Options *opts, int w, int h, EWidget widget)
        (SLIDER_ROUND==opts->sliderStyle || SLIDER_ROUND_ROTATED==opts->sliderStyle || SLIDER_CIRCULAR==opts->sliderStyle))
         return ROUND_MAX;
 
-    switch(r)
-    {
+    switch(r) {
         case ROUND_MAX:
             if(IS_SLIDER(widget) || WIDGET_TROUGH==widget ||
                (w>(MIN_ROUND_MAX_WIDTH+2) && h>(MIN_ROUND_MAX_HEIGHT+2) && IS_MAX_ROUND_WIDGET(widget)))
@@ -289,7 +259,7 @@ double qtcGetRadius(const Options *opts, int w, int h, EWidget widget, ERadius r
 
 #ifdef __cplusplus
     if((WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&TITLEBAR_BUTTON_ROUND)) ||
-       WIDGET_RADIO_BUTTON==widget || WIDGET_DIAL==widget) 
+       WIDGET_RADIO_BUTTON==widget || WIDGET_DIAL==widget)
         return (w>h ? h : w)/2.0;
 #endif
 #ifndef __cplusplus
@@ -311,8 +281,7 @@ double qtcGetRadius(const Options *opts, int w, int h, EWidget widget, ERadius r
     switch(rad)
     {
         case RADIUS_SELECTION:
-            switch(r)
-            {
+            switch(r) {
                 case ROUND_MAX:
                 case ROUND_EXTRA:
                     if(/* (WIDGET_RUBBER_BAND==widget && w>14 && h>14) || */(w>48 && h>48))
@@ -328,8 +297,7 @@ double qtcGetRadius(const Options *opts, int w, int h, EWidget widget, ERadius r
                     return 0;
             }
         case RADIUS_INTERNAL:
-            switch(r)
-            {
+            switch(r) {
                 case ROUND_MAX:
                     if(IS_SLIDER(widget) || WIDGET_TROUGH==widget)
                     {
@@ -353,8 +321,7 @@ double qtcGetRadius(const Options *opts, int w, int h, EWidget widget, ERadius r
                     return 0;
             }
         case RADIUS_EXTERNAL:
-            switch(r)
-            {
+            switch(r) {
                 case ROUND_MAX:
                     if(IS_SLIDER(widget) || WIDGET_TROUGH==widget)
                     {
@@ -379,8 +346,7 @@ double qtcGetRadius(const Options *opts, int w, int h, EWidget widget, ERadius r
             }
         case RADIUS_ETCH:
             // **NOTE** MUST KEEP IN SYNC WITH getWidgetRound !!!
-            switch(r)
-            {
+            switch(r) {
                 case ROUND_MAX:
                     if(IS_SLIDER(widget) || WIDGET_TROUGH==widget)
                     {

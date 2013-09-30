@@ -288,87 +288,6 @@ hslToRgb(double h, double s, double l, double *r, double *g, double *b)
     *b = h2c(h - 2.0, m1, m2);
 }
 
-static void
-qtcRgbToHsv(double r, double g, double b, double *h, double *s, double *v)
-{
-    double min = QtcMin(QtcMin(r, g), b);
-    double max = QtcMax(QtcMax(r, g), b);
-    double delta = max - min;
-
-    *v = max;
-    if (max != 0) {
-        *s = delta / max;
-    } else {
-        *s = 0;
-    }
-
-    if (*s == 0.0) {
-        *h = 0.0;
-    } else {
-        if (r == max) {
-            *h = (g - b) / delta; /* between yellow & magenta */
-        } else if (g == max) {
-            *h = 2 + (b - r) / delta; /* between cyan & yellow */
-        } else {
-            *h = 4 + (r - g) / delta; /* between magenta & cyan */
-        }
-        *h *= 60; /* degrees */
-        if (*h < 0) {
-            *h += 360;
-        }
-    }
-}
-
-static void
-qtcHsvToRgb(double *r, double *g, double *b, double h, double s, double v)
-{
-    if (0 == s) {
-        *r = *g = *b = v;
-    } else {
-        int i;
-        double f;
-        double p;
-
-        h /= 60; /* sector 0 to 5 */
-        i = (int)floor(h);
-        f = h - i; /* factorial part of h */
-        p = v * (1 - s);
-        switch (i) {
-        case 0:
-            *r = v;
-            *g = v * (1 - s * (1 - f));
-            *b = p;
-            break;
-        case 1:
-            *r = v * (1 - s * f);
-            *g = v;
-            *b = p;
-            break;
-        case 2:
-            *r = p;
-            *g = v;
-            *b = v * (1 - s * (1 - f));
-            break;
-        case 3:
-            *r = p;
-            *g = v * (1 - s * f);
-            *b = v;
-            break;
-        case 4:
-            *r = v * (1 - s * (1 - f));
-            *g = p;
-            *b = v;
-            break;
-        case 5:
-        default:
-            *r = v;
-            *g = p;
-            *b = v * (1 - s * f);
-            break;
-        }
-    }
-}
-
 QTC_EXPORT void
 _qtc_shade(const QtcColor *ca, QtcColor *cb, double k, EShading shading)
 {
@@ -404,7 +323,7 @@ _qtc_shade(const QtcColor *ca, QtcColor *cb, double k, EShading shading)
         double b = ca->blue;
         double h, s, v;
 
-        qtcRgbToHsv(r, g, b, &h, &s, &v);
+        qtc_rgb_to_hsv(r, g, b, &h, &s, &v);
 
         v *= k;
         if (v > 1.0) {
@@ -413,7 +332,7 @@ _qtc_shade(const QtcColor *ca, QtcColor *cb, double k, EShading shading)
                 s = 0;
             v = 1.0;
         }
-        qtcHsvToRgb(&r, &g, &b, h, s, v);
+        qtc_hsv_to_rgb(&r, &g, &b, h, s, v);
         qtc_color_fill(cb, qtc_limit(r, 1.0), qtc_limit(g, 1.0),
                        qtc_limit(b, 1.0));
         break;
@@ -436,7 +355,7 @@ _qtc_shine_alpha(const QtcColor *bgnd)
     double g = bgnd->green;
     double b = bgnd->blue;
     double h = 0, s = 0, v = 0;
-    qtcRgbToHsv(r, g, b, &h, &s, &v);
+    qtc_rgb_to_hsv(r, g, b, &h, &s, &v);
     return v * 0.8;
 }
 
@@ -449,7 +368,7 @@ _qtc_calc_ring_alphas(const QtcColor *bgnd)
     double g = bgnd->green;
     double b = bgnd->blue;
     double h = 0, s = 0, v = 0;
-    qtcRgbToHsv(r, g, b, &h, &s, &v);
+    qtc_rgb_to_hsv(r, g, b, &h, &s, &v);
     qtc_ring_alpha[0] = v * 0.26;
     qtc_ring_alpha[1] = v * 0.14;
     qtc_ring_alpha[2] = v * 0.55;

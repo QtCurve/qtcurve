@@ -210,16 +210,15 @@ GdkColor * getCellCol(GdkColor *std, const gchar *detail)
 
     shaded=*std;
 
-    if(IS_BLACK(shaded))
+    if (IS_BLACK(shaded)) {
         shaded.red=shaded.green=shaded.blue=55<<8;
-    else
-    {
+    } else {
         double r=shaded.red/65535.0,
                g=shaded.green/65535.0,
                b=shaded.blue/65535.0;
         double h, s, v;
 
-        qtcRgbToHsv(r, g, b, &h, &s, &v);
+        qtc_rgb_to_hsv(r, g, b, &h, &s, &v);
 
         if (v > 175.0/255.0)
             v*=100.0/104.0;
@@ -234,10 +233,10 @@ GdkColor * getCellCol(GdkColor *std, const gchar *detail)
             v = 1.0;
         }
 
-        qtcHsvToRgb(&r, &g, &b, h, s, v);
-        shaded.red=r*65535.0;
-        shaded.green=g*65535.0;
-        shaded.blue=b*65535.0;
+        qtc_hsv_to_rgb(&r, &g, &b, h, s, v);
+        shaded.red = r * 65535.0;
+        shaded.green = g * 65535.0;
+        shaded.blue = b * 65535.0;
     }
     return &shaded;
 }

@@ -1235,8 +1235,6 @@ typedef struct
 #endif // __cplusplus
 #endif
 
-extern void qtcRgbToHsv(double r, double g, double b, double *h, double *s, double *v);
-
 extern void qtcAdjustPix(unsigned char *data, int numChannels, int w, int h, int stride, int ro, int go, int bo, double shade);
 extern void qtcSetupGradient(Gradient *grad, EGradientBorder border, int numStops, ...);
 extern const Gradient * qtcGetGradient(EAppearance app, const Options *opts);

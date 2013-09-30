@@ -1282,9 +1282,6 @@ typedef struct
 #endif // __cplusplus
 #endif // QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY
 
-extern void qtcRgbToHsv(double r, double g, double b, double *h, double *s, double *v);
-extern void qtcRgbToHsv(double r, double g, double b, double *h, double *s, double *v);
-
 extern void qtcAdjustPix(unsigned char *data, int numChannels, int w, int h, int stride, int ro, int go, int bo, double shade);
 extern void qtcSetupGradient(Gradient *grad, EGradientBorder border, int numStops, ...);
 extern const Gradient * qtcGetGradient(EAppearance app, const Options *opts);
@@ -1363,6 +1360,5 @@ typedef enum
 
 ERound qtcGetWidgetRound(const Options *opts, int w, int h, EWidget widget);
 double qtcGetRadius(const Options *opts, int w, int h, EWidget widget, ERadius rad);
-void qtcHsvToRgb(double *r, double *g, double *b, double h, double s, double v);
 
 #endif // __COMMON_H__
