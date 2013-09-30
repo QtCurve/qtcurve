@@ -18,6 +18,9 @@
  *   51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.              *
  ***************************************************************************/
 
+#ifndef _QTC_UTILS_X11UTILS_H_
+#define _QTC_UTILS_X11UTILS_H_
+
 #include <xcb/xcb.h>
 #include "utils.h"
 
@@ -80,3 +83,5 @@ qtc_x11_get_atom(const char *name, boolean create)
 void qtc_x11_set_wmclass(xcb_window_t win, const char *wmclass, size_t len);
 
 QTC_END_DECLS
+
+#endif

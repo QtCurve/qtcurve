@@ -68,7 +68,7 @@
 
 #ifdef QTC_ENABLE_X11
 #include "shadowhelper.h"
-#include "xcb_utils.h"
+#include <qtcurve-utils/x11utils.h>
 #include <sys/time.h>
 #endif
 

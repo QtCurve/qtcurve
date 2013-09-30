@@ -34,7 +34,7 @@
 #include <QToolBar>
 #include <QEvent>
 
-#include "xcb_utils.h"
+#include <qtcurve-utils/x11utils.h>
 #include <xcb/xcb_image.h>
 #include <data/shadow0-png.h>
 #include <data/shadow1-png.h>

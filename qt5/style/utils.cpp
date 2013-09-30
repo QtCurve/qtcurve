@@ -20,7 +20,7 @@
 
 #include "utils.h"
 #ifdef QTC_ENABLE_X11
-#  include "xcb_utils.h"
+#  include <qtcurve-utils/x11utils.h>
 #  include <QApplication>
 #  include <QDesktopWidget>
 #endif

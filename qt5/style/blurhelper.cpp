@@ -39,7 +39,7 @@
 #include <QToolBar>
 
 #ifdef QTC_ENABLE_X11
-#  include "xcb_utils.h"
+#  include <qtcurve-utils/x11utils.h>
 #endif
 
 namespace QtCurve {

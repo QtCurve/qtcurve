@@ -65,7 +65,7 @@
 
 #ifdef QTC_ENABLE_X11
 #  ifndef QTC_QT5_ENABLE_KDE
-#    include "xcb_utils.h"
+#    include <qtcurve-utils/x11utils.h>
 #  else
 #    include <NETRootInfo>
 #  endif
