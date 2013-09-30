@@ -199,10 +199,14 @@ qtc_color_luma(const QColor *color)
 QTC_ALWAYS_INLINE static inline void
 qtc_shade(const QColor *ca, QColor *cb, double k, EShading shading)
 {
+    if (qtc_equal(k, 1.0)) {
+        *cb = *ca;
+        return;
+    }
     const QtcColor qtc_ca = {ca->redF(), ca->greenF(), ca->blueF()};
     QtcColor qtc_cb;
     _qtc_shade(&qtc_ca, &qtc_cb, k, shading);
-    cb->setRgbF(qtc_cb.red, qtc_cb.green, qtc_cb.blue, ca->alpha());
+    cb->setRgbF(qtc_cb.red, qtc_cb.green, qtc_cb.blue, ca->alphaF());
 }
 
 QTC_ALWAYS_INLINE static inline double

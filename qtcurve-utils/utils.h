@@ -76,14 +76,14 @@ qtc_utils_alloc0(size_t size)
 #define qtc_utils_new(type) qtc_utils_new_size(type, sizeof(type))
 #define qtc_utils_new_n(type, n) qtc_utils_new_size(type, sizeof(type) * n)
 
-QTC_ALWAYS_INLINE static inline int
-qtc_limit(double d, int l)
+QTC_ALWAYS_INLINE static inline double
+qtc_limit(double d, double l)
 {
     if (d <= 0)
         return 0;
     if (d >= l)
         return l;
-    return (int)d;
+    return d;
 }
 
 QTC_ALWAYS_INLINE static inline boolean

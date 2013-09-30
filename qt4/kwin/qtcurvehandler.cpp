@@ -237,44 +237,47 @@ KDecoration * QtCurveHandler::createDecoration(KDecorationBridge *bridge)
 
 bool QtCurveHandler::supports(Ability ability) const
 {
-    switch(ability)
-    {
-        // announce
-        case AbilityAnnounceButtons:
-        case AbilityAnnounceColors:
-        // buttons
-        case AbilityButtonMenu:
-        case AbilityButtonOnAllDesktops:
-        case AbilityButtonSpacer:
-        case AbilityButtonHelp:
-        case AbilityButtonMinimize:
-        case AbilityButtonMaximize:
-        case AbilityButtonClose:
-        case AbilityButtonAboveOthers:
-        case AbilityButtonBelowOthers:
-        case AbilityButtonShade:
-        // colors
-        case AbilityColorTitleBack:
-        case AbilityColorTitleFore:
-        case AbilityColorFrame:
-            return true;
+    switch (ability) {
+    // announce
+    case AbilityAnnounceButtons:
+    case AbilityAnnounceColors:
+    // buttons
+    case AbilityButtonMenu:
+    case AbilityButtonOnAllDesktops:
+    case AbilityButtonSpacer:
+    case AbilityButtonHelp:
+    case AbilityButtonMinimize:
+    case AbilityButtonMaximize:
+    case AbilityButtonClose:
+    case AbilityButtonAboveOthers:
+    case AbilityButtonBelowOthers:
+    case AbilityButtonShade:
+    // TODO
+    // case AbilityButtonResize:
+    case AbilityButtonApplicationMenu:
+    // colors
+    case AbilityColorTitleBack:
+    case AbilityColorTitleFore:
+    case AbilityColorFrame:
+        return true;
 #if KDE_IS_VERSION(4, 3, 0)
-        case AbilityUsesAlphaChannel:
-            return true; // !Handler()->outerBorder(); ???
-        case AbilityProvidesShadow:
-            return customShadows();
+    case AbilityUsesAlphaChannel:
+        return true; // !Handler()->outerBorder(); ???
+    case AbilityProvidesShadow:
+        return customShadows();
 #endif
 #if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
-        case AbilityClientGrouping:
-            return grouping();
+    case AbilityClientGrouping:
+        return grouping();
 #endif
 #if KDE_IS_VERSION(4, 5, 85)
-        case AbilityUsesBlurBehind:
-            return opacity(true)<100 || opacity(false)<100 || wStyle()->pixelMetric((QStyle::PixelMetric)QtC_CustomBgnd, 0L, 0L);
+    case AbilityUsesBlurBehind:
+        return opacity(true)<100 || opacity(false)<100 || wStyle()->pixelMetric((QStyle::PixelMetric)QtC_CustomBgnd, 0L, 0L);
 #endif
-        default:
-            return false;
-    };
+        // TODO's
+    default:
+        return false;
+    }
 }
 
 bool QtCurveHandler::readConfig(bool compositingToggled)

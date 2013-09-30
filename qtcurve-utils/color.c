@@ -372,10 +372,10 @@ qtcHsvToRgb(double *r, double *g, double *b, double h, double s, double v)
 QTC_EXPORT void
 _qtc_shade(const QtcColor *ca, QtcColor *cb, double k, EShading shading)
 {
-    if (qtc_equal(k, 1.0)) {
-        *cb = *ca;
-        return;
-    }
+    /* if (qtc_equal(k, 1.0)) { */
+    /*     *cb = *ca; */
+    /*     return; */
+    /* } */
     switch (shading) {
     case SHADING_SIMPLE: {
         double v = k - 1;
