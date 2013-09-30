@@ -5,10 +5,7 @@ set(qtcurve_style_common_SRCS
 
 include_directories(
   ${GTK2_INCLUDE_DIRS}
-  ${PROJECT_SOURCE_DIR}
-  ${CMAKE_CURRENT_BINARY_DIR}
-  ${PROJECT_SOURCE_DIR}/common
-  ${PROJECT_BINARY_DIR})
+  ${CMAKE_CURRENT_BINARY_DIR})
 
 add_definitions(${GTK2_CFLAGS})
 

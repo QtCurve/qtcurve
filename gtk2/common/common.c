@@ -1,8 +1,8 @@
 #include <string.h>
 #include <stdarg.h>
 #include <math.h>
-#include "common.h"
-#include "colorutils.h"
+#include <common/common.h>
+#include <common/colorutils.h>
 
 #ifdef __cplusplus
 #include <qglobal.h>

@@ -22,8 +22,8 @@
  */
 
 #include <gdk/gdk.h>
-#include "common.h"
+#include <common/common.h>
 
-GdkPixbuf * getPixbuf(GdkColor *widgetColor, EPixmap p, double shade);
+GdkPixbuf *getPixbuf(GdkColor *widgetColor, EPixmap p, double shade);
 
 #endif

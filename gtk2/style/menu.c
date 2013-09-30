@@ -18,13 +18,12 @@
   Boston, MA 02110-1301, USA.
 */
 
-#include <gtk/gtk.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <gdk/gdkx.h>
 #include "qtcurve-gtk-common.h"
 #include "compatability.h"
-#include "common.h"
+#include <common/common.h>
 
 gboolean
 qtcMenuEmitSize(GtkWidget *w, unsigned int size)

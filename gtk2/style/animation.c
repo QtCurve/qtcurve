@@ -31,7 +31,7 @@
 /* #define CHECK_ANIMATION_TIME 0.5 */
 
 #include "animation.h"
-#include "common.h"
+#include <common/common.h>
 #include "compatability.h"
 
 #if GTK_CHECK_VERSION(2, 12, 0)

@@ -21,7 +21,7 @@
 #include "drawing.h"
 #include "qt_settings.h"
 #include "qtcurve.h"
-#include "config_file.h"
+#include <common/config_file.h>
 #include "helpers.h"
 #include "pixcache.h"
 #include "entry.h"

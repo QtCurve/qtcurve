@@ -23,7 +23,7 @@ The code has been modified to work with QColor (Qt3 &Qt4) and GdkColor
  * Boston, MA 02110-1301, USA.
  */
 #include "config.h"
-#include "common.h"
+#include <common/common.h>
 
 #ifdef __cplusplus
 #include <qglobal.h>

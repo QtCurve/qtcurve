@@ -21,9 +21,9 @@
 #include "config.h"
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
-#include "common.h"
-#include "config_file.h"
-#include "colorutils.h"
+#include <common/common.h>
+#include <common/config_file.h>
+#include <common/colorutils.h>
 #include "qt_settings.h"
 #include "helpers.h"
 #include <time.h>

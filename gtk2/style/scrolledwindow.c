@@ -21,7 +21,7 @@
 #include <gtk/gtk.h>
 #include <string.h>
 #include "compatability.h"
-#include "common.h"
+#include <common/common.h>
 
 extern Options opts;
 

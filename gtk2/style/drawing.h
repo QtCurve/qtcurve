@@ -23,7 +23,7 @@
 
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
-#include "common.h"
+#include <common/common.h>
 #include "compatability.h"
 
 #define M_PI 3.14159265358979323846

@@ -23,7 +23,7 @@
 
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
-#include "common.h"
+#include <common/common.h>
 #include "config.h"
 #include "compatability.h"
 

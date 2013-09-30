@@ -49,24 +49,7 @@ set(CMAKE_MODULE_LINKER_FLAGS
   "-Wl,--as-needed -Wl,--no-undefined ${CMAKE_MODULE_LINKER_FLAGS}")
 add_definitions("-D_GNU_SOURCE")
 
-find_package(PkgConfig)
-pkg_check_modules(GTK2 REQUIRED gtk+-2.0)
-if(GTK2_THEME_PREFIX)
-  set(GTK2_PREIX "${GTK2_THEME_PREFIX}")
-else()
-  if(NOT GTK2_PREFIX)
-    set(GTK2_PREFIX "${CMAKE_INSTALL_PREFIX}")
-  endif()
-endif()
-if(NOT GTK2_LIBDIR)
-  set(GTK2_LIBDIR "${GTK2_PREFIX}/lib")
-endif()
-
-_pkgconfig_invoke(gtk+-2.0 GTK2 BIN_VERSION "" --variable=gtk_binary_version)
-set(GTK2_THEME_DIR ${GTK2_PREFIX}/share/themes/QtCurve)
-
-add_subdirectory(style)
-add_subdirectory(mozilla)
+add_subdirectory(gtk2)
 
 if(QTC_REORDER_GTK2_DIALOG_BUTTONS)
   message("**************************************************************\n"

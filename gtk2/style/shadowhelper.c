@@ -25,7 +25,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <gdk/gdkx.h>
-#include "common.h"
+#include <common/common.h>
 #include "qt_settings.h"
 #include "shadow.h"
 #include "compatability.h"

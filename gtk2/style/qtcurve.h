@@ -22,7 +22,7 @@
  */
 
 #include <gtk/gtk.h>
-#include "common.h"
+#include <common/common.h>
 #include "config.h"
 
 typedef struct _QtCurveStyleClass QtCurveStyleClass;
