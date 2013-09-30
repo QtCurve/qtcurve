@@ -1302,7 +1302,7 @@ gboolean mapToTopLevel(GdkWindow *window, GtkWidget *widget, gint *x, gint *y, g
     return FALSE;
 }
 
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
 #define GIMP_MAIN   "GimpToolbox"      /* Main GIMP toolbox */
 #define GIMP_WINDOW "GimpDisplayShell" /* Image window */
 

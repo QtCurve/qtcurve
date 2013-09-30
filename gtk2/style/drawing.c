@@ -2506,7 +2506,7 @@ void drawTreeViewLines(cairo_t *cr, GdkColor *col, int x, int y, int h, int dept
 
 void drawPolygon(GdkWindow *window, GtkStyle *style, GdkColor *col, GdkRectangle *area, GdkPoint *points, int npoints, gboolean fill)
 {
-#if (defined QTC_USE_CAIRO_FOR_ARROWS) || GTK_CHECK_VERSION(2, 90, 0)
+#if (defined QTC_GTK2_USE_CAIRO_FOR_ARROWS) || GTK_CHECK_VERSION(2, 90, 0)
     CAIRO_BEGIN
     int               i;
     cairo_antialias_t aa=cairo_get_antialias(cr);

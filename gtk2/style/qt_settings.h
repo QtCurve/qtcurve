@@ -133,7 +133,7 @@ typedef struct
                     inactiveSelectCol;*/
     char            *fonts[FONT_NUM_TOTAL],
                     *icons,
-#ifdef QTC_STYLE_SUPPORT
+#ifdef QTC_GTK2_STYLE_SUPPORT
                     *styleName,
 #endif
                     *appName;

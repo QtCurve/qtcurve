@@ -1091,7 +1091,7 @@ typedef struct
                      highlightTab,
                      roundAllTabs,
                      animatedProgress,
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
                      fixParentlessDialogs,
 #endif
                      customMenuTextColor,
@@ -1250,7 +1250,7 @@ typedef struct
                      noMenuBgndOpacityApps,
                      noBgndImageApps;
 #endif
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     Strings          noDlgFixApps;
 #endif
     Strings          noMenuStripeApps;

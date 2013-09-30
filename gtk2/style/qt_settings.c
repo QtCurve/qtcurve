@@ -261,7 +261,7 @@ enum
     RD_BUTTON_ICONS      = 0x000100,
     RD_SMALL_ICON_SIZE   = 0x000200,
     RD_LIST_COLOR        = 0x000400,
-#ifdef QTC_STYLE_SUPPORT
+#ifdef QTC_GTK2_STYLE_SUPPORT
     RD_STYLE             = 0x000800,
 #else
     RD_STYLE             = 0x000000,
@@ -984,7 +984,7 @@ static void readKdeGlobals(const char *rc, int rd, bool first, bool kde4)
                     opts.contrast=DEFAULT_CONTRAST;
                 found|=RD_CONTRAST;
             }
-#ifdef QTC_STYLE_SUPPORT
+#ifdef QTC_GTK2_STYLE_SUPPORT
             else if(kde4 && SECT_GENERAL==section && rd&RD_STYLE && !(found&RD_STYLE) &&
                      0==strncmp_i(line, "widgetStyle=", 12))
             {
@@ -1214,7 +1214,7 @@ static void readQtRc(const char *rc, int rd, gboolean absolute, gboolean setDefa
                     found|=RD_INACT_PALETTE;
                 }
 #endif
-#ifdef QTC_STYLE_SUPPORT
+#ifdef QTC_GTK2_STYLE_SUPPORT
                 else if (SECT_GENERAL==section && rd&RD_STYLE && !(found&RD_STYLE) && 0==strncmp_i(line, "style=", 6))
                 {
                     int len=strlen(line);
@@ -1586,8 +1586,8 @@ char * getAppName()
                              "menubar > menu[_moz-menuactive=\"true\"][open=\"false\"] { color: #%02x%02x%02x !important; } "\
                              "menubar > menu[_moz-menuactive=\"true\"][open=\"true\"] { color: #%02x%02x%02x !important; } "\
                              "/* "MENU_GUARD_STR" */\n"
-#define CSS_FILE_STR     "@import url(\"file://"QTC_MOZILLA_DIR"/QtCurve.css\"); /* "GUARD_STR" */\n"
-#define BTN_CSS_FILE_STR "@import url(\"file://"QTC_MOZILLA_DIR"/QtCurve-KDEButtonOrder.css\"); /* "GUARD_STR" */\n"
+#define CSS_FILE_STR     "@import url(\"file://"QTC_GTK2_MOZILLA_DIR"/QtCurve.css\"); /* "GUARD_STR" */\n"
+#define BTN_CSS_FILE_STR "@import url(\"file://"QTC_GTK2_MOZILLA_DIR"/QtCurve-KDEButtonOrder.css\"); /* "GUARD_STR" */\n"
 
 static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_menu_colors)
 {
@@ -1596,7 +1596,7 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
                 *menu_text_str=NULL;
     gboolean    remove_menu_colors=FALSE,
                 remove_old_menu_colors=FALSE;
-#ifdef QTC_MODIFY_MOZILLA
+#ifdef QTC_GTK2_MODIFY_MOZILLA
     gboolean    remove_btn_css=FALSE,
                 add_css=TRUE;
 #endif
@@ -1649,7 +1649,7 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
                 {
                     gboolean write_line=TRUE;
 
-#ifdef QTC_MODIFY_MOZILLA
+#ifdef QTC_GTK2_MODIFY_MOZILLA
                     if(0==strcmp(line, BTN_CSS_FILE_STR))
                     {
                         if (add_btn_css)
@@ -1686,7 +1686,7 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
         fclose(f);
     }
 
-#ifdef QTC_MODIFY_MOZILLA
+#ifdef QTC_GTK2_MODIFY_MOZILLA
     if(!contents || add_btn_css || add_menu_colors || add_css)
 #else
     if(!contents || add_menu_colors)
@@ -1703,7 +1703,7 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
 
         if(contents)
         {
-#ifdef QTC_MODIFY_MOZILLA
+#ifdef QTC_GTK2_MODIFY_MOZILLA
             if(add_css)
             {
                 char *css_contents=(char *)malloc(new_size);
@@ -1742,7 +1742,7 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
         }
     }
 
-#ifdef QTC_MODIFY_MOZILLA
+#ifdef QTC_GTK2_MODIFY_MOZILLA
     if(contents && (add_btn_css || remove_btn_css || add_menu_colors || remove_menu_colors || remove_old_menu_colors))
 #else
     if(contents && (add_menu_colors || remove_menu_colors || remove_old_menu_colors))
@@ -1788,7 +1788,7 @@ static void processMozillaApp(gboolean add_btn_css, gboolean add_menu_colors, ch
                  {
                     char        sub[MAX_CSS_HOME];
                     struct stat statbuf;
-#ifdef QTC_MODIFY_MOZILLA
+#ifdef QTC_GTK2_MODIFY_MOZILLA
                     FILE        *userJs=NULL;
                     gboolean    alterUserJs=TRUE;
 
@@ -1960,7 +1960,7 @@ gboolean qtSettingsInit()
             qtSettings.colors[PAL_ACTIVE][COLOR_LV]=setGdkColor(0, 0, 0);
             qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT]=setGdkColor(0, 0, 0);
             qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP]=setGdkColor(0xFF, 0xFF, 192);
-#ifdef QTC_STYLE_SUPPORT
+#ifdef QTC_GTK2_STYLE_SUPPORT
             qtSettings.styleName=NULL;
 #endif
             qtSettings.inactiveChangeSelectionColor=FALSE;
@@ -1980,7 +1980,7 @@ gboolean qtSettingsInit()
 
             {
             int        f=0;
-            const char *files[]={GTK_THEME_DIR"/kdeglobals", /* QtCurve supplied kdeglobals file */
+            const char *files[]={QTC_GTK2_THEME_DIR"/kdeglobals", /* QtCurve supplied kdeglobals file */
                                  "/etc/kderc",
                                  "/etc/kde4/kdeglobals",
                                  "/etc/kde4rc",
@@ -1997,7 +1997,7 @@ gboolean qtSettingsInit()
                                0==f, TRUE);
             }
 
-#ifdef QTC_STYLE_SUPPORT
+#ifdef QTC_GTK2_STYLE_SUPPORT
             /* Only for testing - allows me to simulate Qt's -style parameter. e.g start Gtk2 app as follows:
 
                 QTC_STYLE=qtc_klearlooks gtk-demo
@@ -2075,7 +2075,7 @@ gboolean qtSettingsInit()
                              add_btn_css=FALSE;
 
                     mozVersion=getMozillaVersion(getpid());
-#ifdef QTC_MODIFY_MOZILLA
+#ifdef QTC_GTK2_MODIFY_MOZILLA
                     if(mozVersion<MAKE_VERSION(3, 0) && !opts.gtkButtonOrder)
                        add_btn_css=TRUE;
 #endif
@@ -2094,7 +2094,7 @@ gboolean qtSettingsInit()
                         processMozillaApp(add_btn_css, add_menu_colors, "mozilla-thunderbird", FALSE);
 
                     qtSettings.app=
-#ifndef QTC_OLD_MOZILLA
+#ifndef QTC_GTK2_OLD_MOZILLA
                         firefox || NULL!=getenv("QTC_NEW_MOZILLA")
                                     ? GTK_APP_NEW_MOZILLA :
 #endif
@@ -2198,7 +2198,7 @@ gboolean qtSettingsInit()
             if(qtSettings.useAlpha && opts.version<MAKE_VERSION3(1, 7, 2) && 100==opts.menuBgndOpacity && 100==opts.dlgOpacity && 100==opts.bgndOpacity)
                 qtSettings.useAlpha=false;
 
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
             if(opts.fixParentlessDialogs && excludedApp(opts.noDlgFixApps))
                 opts.fixParentlessDialogs=FALSE;
 #endif
@@ -2362,7 +2362,7 @@ gboolean qtSettingsInit()
 
                 if(!checkFileVersion(tmpStr, version, versionLen))
                 {
-                    static const char *constCmdStrFmt="perl "GTK_THEME_DIR"/map_kde_icons.pl "GTK_THEME_DIR"/icons%d %s %d %d %d %d %d %d %d %s "QTC_VERSION" > %s.%d && mv %s.%d %s";
+                    static const char *constCmdStrFmt="perl "QTC_GTK2_THEME_DIR"/map_kde_icons.pl "QTC_GTK2_THEME_DIR"/icons%d %s %d %d %d %d %d %d %d %s "QTC_VERSION" > %s.%d && mv %s.%d %s";
 
                     const char *kdeprefix=kdeIconsPrefix();
                     int        fileNameLen=strlen(tmpStr);

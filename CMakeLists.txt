@@ -9,6 +9,35 @@ set(QTCURVE_VERSION_PATCH "16")
 set(QTCURVE_VERSION "${QTCURVE_VERSION_MAJOR}.${QTCURVE_VERSION_MINOR}")
 set(QTCURVE_VERSION_FULL "${QTCURVE_VERSION}.${QTCURVE_VERSION_PATCH}")
 
+function(def_compat_option new_opt old_opt)
+  if("${ARGC}" GREATER 2 AND "${ARGV2}")
+    set(reverse True)
+  else()
+    set(reverse False)
+  endif()
+  if(DEFINED "${old_opt}" AND NOT DEFINED "${new_opt}")
+    if(reverse)
+      if("${${old_opt}}")
+        set("${new_opt}" Off PARENT_SCOPE)
+      else()
+        set("${new_opt}" On PARENT_SCOPE)
+      endif()
+    else()
+      set("${new_opt}" "${${old_opt}}" PARENT_SCOPE)
+    endif()
+  endif()
+endfunction()
+
+option(ENABLE_GTK2 "Building Gtk2 theme." On)
+def_compat_option(QTC_GTK2_MODIFY_MOZILLA QTC_MODIFY_MOZILLA)
+option(QTC_GTK2_MODIFY_MOZILLA "Modify Mozilla Gtk2 with js and css." Off)
+def_compat_option(QTC_GTK2_OLD_MOZILLA QTC_OLD_MOZILLA)
+option(QTC_GTK2_OLD_MOZILLA
+  "Defaulting to treating Firefox(Gtk2) as Firefox < 3.0." Off)
+def_compat_option(QTC_GTK2_USE_CAIRO_FOR_ARROWS QTC_USE_CAIRO_FOR_ARROWS)
+option(QTC_GTK2_USE_CAIRO_FOR_ARROWS "Using ciaro to draw arrows." Off)
+option(QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+  "Qt5 support for the 'fix parentless dialogs'." Off)
 
 # Only try to figure out what kde prefix is if not specified at command line.
 if(NOT DEFINED QTC_KDE4_PREFIX)
@@ -51,15 +80,7 @@ add_definitions("-D_GNU_SOURCE")
 
 add_subdirectory(gtk2)
 
-if(QTC_REORDER_GTK2_DIALOG_BUTTONS)
-  message("**************************************************************\n"
-    "Warning: You have enabled the option for QtCurve to try to manually\n"
-    "         re-order the buttons of Gtk dialogs. Note: This will cause\n"
-    "         errors to be printed to the console, and is only an\n"
-    "         experiment!\n"
-    "**************************************************************\n")
-endif()
-if(QTC_OLD_MOZILLA)
+if(QTC_GTK2_OLD_MOZILLA)
   message("**************************************************************\n"
     "Information: Defaulting to treating Firefox as Firefox < 3.0\n"
     "**************************************************************\n")
@@ -68,7 +89,7 @@ else()
     "Information: Defaulting to treating Firefox as Firefox >= 3.0\n"
     "**************************************************************\n")
 endif()
-if(QTC_MODIFY_MOZILLA)
+if(QTC_GTK2_MODIFY_MOZILLA)
   message("**************************************************************\n"
     "**************************************************************\n"
     "Warning: You have enabled the option for QtCurve to modify the\n"
@@ -87,9 +108,9 @@ if(QTC_MODIFY_MOZILLA)
     "**************************************************************\n")
 endif()
 
-if(QTC_USE_CAIRO_FOR_ARROWS)
+if(QTC_GTK2_USE_CAIRO_FOR_ARROWS)
   message("**************************************************************\n"
-    "Warning: Using ciaro to draw arrows - this has been reported to \n"
+    "Warning: Using cairo to draw arrows - this has been reported to \n"
     "         fail with intel Xorg driver > 2.8\n"
     "**************************************************************\n")
 else()
@@ -98,7 +119,7 @@ else()
     "**************************************************************\n")
 endif()
 
-if(QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT)
+if(QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT)
   message("**************************************************************\n"
     "Warning: You have enabled support for the 'fix parentless dialogs'\n"
     "         option. This is known to BREAK some applications. Please\n"

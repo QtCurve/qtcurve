@@ -134,7 +134,7 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
         }
     }
 #endif
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+#ifdef QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     if(widget && opts.fixParentlessDialogs && !isMenuOrToolTipWindow && GTK_IS_WINDOW(widget) && detail && 0==strcmp(detail, "base"))
     {
         GtkWidget *topLevel=gtk_widget_get_toplevel(widget);
@@ -2725,7 +2725,7 @@ static void styleRealize(GtkStyle *style)
     else
         qtcurveStyle->menutext[0]=NULL;
 
-#if !GTK_CHECK_VERSION(2, 90, 0) && !defined QTC_USE_CAIRO_FOR_ARROWS
+#if !GTK_CHECK_VERSION(2, 90, 0) && !defined QTC_GTK2_USE_CAIRO_FOR_ARROWS
     qtcurveStyle->arrow_gc=NULL;
 #endif
 }
@@ -2736,7 +2736,7 @@ static void styleUnrealize(GtkStyle *style)
 
     parent_class->unrealize(style);
 
-#if !GTK_CHECK_VERSION(2, 90, 0) && !defined QTC_USE_CAIRO_FOR_ARROWS
+#if !GTK_CHECK_VERSION(2, 90, 0) && !defined QTC_GTK2_USE_CAIRO_FOR_ARROWS
     if(qtcurveStyle->arrow_gc)
     {
         g_object_unref(qtcurveStyle->arrow_gc);
