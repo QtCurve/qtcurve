@@ -22,12 +22,14 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <gdk/gdkx.h>
+#include <stdlib.h>
 #include "compatability.h"
 #include "common.h"
 #include "helpers.h"
 #include "qt_settings.h"
 #include "menu.h"
 #include "tab.h"
+#include <string.h>
 
 extern Options opts;
 
@@ -51,7 +53,8 @@ static gboolean qtcWMMoveBtnReleaseHook(GSignalInvocationHint *a, guint b, const
     return TRUE;
 }
 
-static qtcWMMoveRegisterBtnReleaseHook()
+static void
+qtcWMMoveRegisterBtnReleaseHook()
 {
     if(0==qtcWMMoveBtnReleaseSignalId && 0==qtcWMMoveBtnReleaseHookId)
     {

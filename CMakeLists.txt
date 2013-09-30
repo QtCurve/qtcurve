@@ -1,11 +1,36 @@
 project(QtCurve-Gtk2)
 cmake_minimum_required(VERSION 2.8)
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}"
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(QTCURVE_VERSION_MAJOR "1")
 set(QTCURVE_VERSION_MINOR "8")
 set(QTCURVE_VERSION_PATCH "16")
 set(QTCURVE_VERSION "${QTCURVE_VERSION_MAJOR}.${QTCURVE_VERSION_MINOR}")
 set(QTCURVE_VERSION_FULL "${QTCURVE_VERSION}.${QTCURVE_VERSION_PATCH}")
+
+# Only try to figure out what kde prefix is if not specified at command line.
+if(NOT DEFINED QTC_KDE4_PREFIX)
+  find_package(KDE4)
+  find_program(KDE4_KDECONFIG_EXECUTABLE NAMES kde4-config
+    PATHS "${CMAKE_INSTALL_PREFIX}/bin" ${_KDEDIRS} /opt/kde4/bin
+    NO_DEFAULT_PATH)
+  if(NOT KDE4_KDECONFIG_EXECUTABLE)
+    find_program(KDE4_KDECONFIG_EXECUTABLE NAMES kde4-config)
+  endif()
+  if(KDE4_KDECONFIG_EXECUTABLE)
+    execute_process(COMMAND "${KDE4_KDECONFIG_EXECUTABLE}" --prefix
+      OUTPUT_VARIABLE QTC_KDE4_PREFIX)
+    string(STRIP "${QTC_KDE4_PREFIX}" QTC_KDE4_PREFIX)
+  else()
+    set(QTC_KDE4_PREFIX "${CMAKE_INSTALL_PREFIX}")
+  endif()
+endif()
+
+set(CMAKE_C_FLAGS "-Wall -Wextra ${CMAKE_C_FLAGS} -std=gnu99")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra ${CMAKE_CXX_FLAGS} -std=gnu++0x")
+set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed ${CMAKE_SHARED_LINKER_FLAGS}")
+set(CMAKE_MODULE_LINKER_FLAGS "-Wl,--as-needed ${CMAKE_MODULE_LINKER_FLAGS}")
 
 find_package(PkgConfig)
 pkg_check_modules(GTK2 REQUIRED gtk+-2.0)
@@ -31,21 +56,14 @@ find_program(KDE4CONFIG_EXECUTABLE NAMES kde4-config )
 if(KDE4CONFIG_EXECUTABLE)
   execute_process(COMMAND ${KDE4CONFIG_EXECUTABLE} --expandvars --install icon
     OUTPUT_VARIABLE KDE4_ICONS_PREFIX)
-  execute_process(COMMAND ${KDE4CONFIG_EXECUTABLE} --prefix
-    OUTPUT_VARIABLE KDE4PREFIX)
   string(STRIP "${KDE4_ICONS_PREFIX}" KDE4_ICONS_PREFIX)
-  string(STRIP "${KDE4PREFIX}" KDE4PREFIX)
 endif()
 
 _pkgconfig_invoke(gtk+-2.0 GTK2 BIN_VERSION "" --variable=gtk_binary_version)
 set(GTK2_THEME_DIR ${GTK2_PREFIX}/share/themes/QtCurve)
 
-if(NOT KDE4PREFIX)
-  set(KDE4PREFIX "${CMAKE_INSTALL_PREFIX}")
-endif()
-
 if(NOT KDE4_ICONS_PREFIX)
-  set(KDE4_ICONS_PREFIX "${KDE4PREFIX}/share/icons")
+  set(KDE4_ICONS_PREFIX "${QTC_KDE4_PREFIX}/share/icons")
 endif()
 
 configure_file(config.h.in config.h)

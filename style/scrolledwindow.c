@@ -19,6 +19,7 @@
  */
 
 #include <gtk/gtk.h>
+#include <string.h>
 #include "compatability.h"
 #include "common.h"
 

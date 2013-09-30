@@ -21,11 +21,11 @@
   Boston, MA 02110-1301, USA.
  */
 
-extern gboolean qtcTabCurrentHoveredIndex(GtkWidget *widget);
-extern void qtcTabSetup(GtkWidget *widget);
-extern void qtcTabUpdateRect(GtkWidget *widget, int tabIndex, int x, int y, int width, int height);
-extern gboolean qtcTabIsLabel(GtkNotebook *notebook, GtkWidget *widget);
-extern GdkRectangle qtcTabGetTabbarRect(GtkNotebook *notebook);
-extern gboolean qtcTabHasVisibleArrows(GtkNotebook *notebook);
+gboolean qtcTabCurrentHoveredIndex(GtkWidget *widget);
+void qtcTabSetup(GtkWidget *widget);
+void qtcTabUpdateRect(GtkWidget *widget, int tabIndex, int x, int y, int width, int height);
+gboolean qtcTabIsLabel(GtkNotebook *notebook, GtkWidget *widget);
+GdkRectangle qtcTabGetTabbarRect(GtkNotebook *notebook);
+gboolean qtcTabHasVisibleArrows(GtkNotebook *notebook);
 
 #endif

@@ -30,6 +30,7 @@
 #include "qt_settings.h"
 #include "window.h"
 #include "menu.h"
+#include <string.h>
 
 extern Options opts;
 

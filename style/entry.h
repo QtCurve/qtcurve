@@ -21,7 +21,7 @@
   Boston, MA 02110-1301, USA.
  */
 
-extern gboolean qtcEntryIsLastMo(GtkWidget *widget);
-extern void qtcEntrySetup(GtkWidget *widget);
+gboolean qtcEntryIsLastMo(GtkWidget *widget);
+void qtcEntrySetup(GtkWidget *widget);
 
 #endif

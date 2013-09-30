@@ -3255,7 +3255,7 @@ bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool 
 #else
         cfg->setGroup(SETTINGS_GROUP);
 #endif
-        CFG.writeEntry(VERSION_KEY, VERSION);
+        CFG.writeEntry(VERSION_KEY, QTC_VERSION);
         CFG_WRITE_ENTRY_NUM(passwordChar)
         CFG_WRITE_ENTRY_NUM(gbFactor)
         CFG_WRITE_ENTRY(round)

@@ -80,56 +80,56 @@
 #define ARROW_STATE(state) (GTK_STATE_INSENSITIVE==state ? state : GTK_STATE_NORMAL)
 /* (GTK_STATE_ACTIVE==state ? GTK_STATE_NORMAL : state) */
 
-extern void debugDisplayWidget(GtkWidget *widget, int level);
-extern bool haveAlternateListViewCol();
-extern gboolean isMozilla();
-extern gboolean isMozillaTab(GtkWidget *widget);
-extern gboolean isFakeGtk();
-extern GdkColor * menuColors(gboolean active);
-extern EBorder shadowToBorder(GtkShadowType shadow);
-extern gboolean useButtonColor(const gchar *detail);
-extern void qtcShadeColors(GdkColor *base, GdkColor *vals);
-extern gboolean isSortColumn(GtkWidget *button);
-extern GdkColor * getCellCol(GdkColor *std, const gchar *detail);
-extern gboolean reverseLayout(GtkWidget *widget);
-extern gboolean isOnToolbar(GtkWidget *widget, gboolean *horiz, int level);
-extern gboolean isOnHandlebox(GtkWidget *widget, gboolean *horiz, int level);
-extern gboolean isButtonOnToolbar(GtkWidget *widget, gboolean *horiz);
-extern gboolean isButtonOnHandlebox(GtkWidget *widget, gboolean *horiz);
-extern gboolean isOnStatusBar(GtkWidget *widget, int level);
-extern gboolean isList(GtkWidget *widget);
-extern gboolean isListViewHeader(GtkWidget *widget);
-extern gboolean isEvolutionListViewHeader(GtkWidget *widget, const gchar *detail);
-extern gboolean isOnListViewHeader(GtkWidget *w, int level);
-extern gboolean isPathButton(GtkWidget *widget);
-extern GtkWidget * getComboEntry(GtkWidget *widget);
-extern GtkWidget * getComboButton(GtkWidget *widget);
-extern gboolean isSideBarBtn(GtkWidget *widget);
-extern gboolean isComboBoxButton(GtkWidget *widget);
-extern gboolean isComboBox(GtkWidget *widget);
-extern gboolean isComboBoxEntry(GtkWidget *widget);
-extern gboolean isComboBoxEntryButton(GtkWidget *widget);
-extern gboolean isGimpCombo(GtkWidget *widget);
-extern gboolean isOnComboEntry(GtkWidget *w, int level);
-extern gboolean isOnComboBox(GtkWidget *w, int level);
-extern gboolean isOnCombo(GtkWidget *w, int level);
+void debugDisplayWidget(GtkWidget *widget, int level);
+bool haveAlternateListViewCol();
+gboolean isMozilla();
+gboolean isMozillaTab(GtkWidget *widget);
+gboolean isFakeGtk();
+GdkColor * menuColors(gboolean active);
+EBorder shadowToBorder(GtkShadowType shadow);
+gboolean useButtonColor(const gchar *detail);
+void qtcShadeColors(GdkColor *base, GdkColor *vals);
+gboolean isSortColumn(GtkWidget *button);
+GdkColor * getCellCol(GdkColor *std, const gchar *detail);
+gboolean reverseLayout(GtkWidget *widget);
+gboolean isOnToolbar(GtkWidget *widget, gboolean *horiz, int level);
+gboolean isOnHandlebox(GtkWidget *widget, gboolean *horiz, int level);
+gboolean isButtonOnToolbar(GtkWidget *widget, gboolean *horiz);
+gboolean isButtonOnHandlebox(GtkWidget *widget, gboolean *horiz);
+gboolean isOnStatusBar(GtkWidget *widget, int level);
+gboolean isList(GtkWidget *widget);
+gboolean isListViewHeader(GtkWidget *widget);
+gboolean isEvolutionListViewHeader(GtkWidget *widget, const gchar *detail);
+gboolean isOnListViewHeader(GtkWidget *w, int level);
+gboolean isPathButton(GtkWidget *widget);
+GtkWidget * getComboEntry(GtkWidget *widget);
+GtkWidget * getComboButton(GtkWidget *widget);
+gboolean isSideBarBtn(GtkWidget *widget);
+gboolean isComboBoxButton(GtkWidget *widget);
+gboolean isComboBox(GtkWidget *widget);
+gboolean isComboBoxEntry(GtkWidget *widget);
+gboolean isComboBoxEntryButton(GtkWidget *widget);
+gboolean isGimpCombo(GtkWidget *widget);
+gboolean isOnComboEntry(GtkWidget *w, int level);
+gboolean isOnComboBox(GtkWidget *w, int level);
+gboolean isOnCombo(GtkWidget *w, int level);
 #if !GTK_CHECK_VERSION(2, 90, 0)
-extern gboolean isOnOptionMenu(GtkWidget *w, int level);
-extern gboolean isActiveOptionMenu(GtkWidget *widget);
+gboolean isOnOptionMenu(GtkWidget *w, int level);
+gboolean isActiveOptionMenu(GtkWidget *widget);
 #endif
-extern gboolean isOnMenuItem(GtkWidget *w, int level);
-extern gboolean isSpinButton(GtkWidget *widget);
-extern gboolean isStatusBarFrame(GtkWidget *widget);
-extern GtkMenuBar * isMenubar(GtkWidget *w, int level);
-extern gboolean isMenuitem(GtkWidget *w, int level);
+gboolean isOnMenuItem(GtkWidget *w, int level);
+gboolean isSpinButton(GtkWidget *widget);
+gboolean isStatusBarFrame(GtkWidget *widget);
+GtkMenuBar * isMenubar(GtkWidget *w, int level);
+gboolean isMenuitem(GtkWidget *w, int level);
 #define IS_MENU_ITEM(WIDGET) isMenuitem(WIDGET, 0)
-extern gboolean isMenuWindow(GtkWidget *w);
+gboolean isMenuWindow(GtkWidget *w);
 #define IS_GROUP_BOX(W) ((W) && GTK_IS_FRAME((W)) && (NULL!=gtk_frame_get_label(GTK_FRAME((W))) || \
                                                       NULL!=gtk_frame_get_label_widget(GTK_FRAME((W)))))
 
-extern gboolean isInGroupBox(GtkWidget *w, int level);
-extern gboolean isOnButton(GtkWidget *w, int level, gboolean *def);
-extern void optionMenuGetProps(GtkWidget *widget, GtkRequisition *indicator_size, GtkBorder *indicator_spacing);
+gboolean isInGroupBox(GtkWidget *w, int level);
+gboolean isOnButton(GtkWidget *w, int level, gboolean *def);
+void optionMenuGetProps(GtkWidget *widget, GtkRequisition *indicator_size, GtkBorder *indicator_spacing);
 
 typedef enum
 {
@@ -142,51 +142,53 @@ typedef enum
 
 #if GTK_CHECK_VERSION(2, 90, 0)
 #define sanitizeSize(A, B, C) sanitizeSizeReal(widget, B, C)
-extern void gdk_drawable_get_size(GdkWindow *window, gint *width, gint *height);
-extern void sanitizeSizeReal(GtkWidget *widget, gint *width, gint *height);
-extern EStepper getStepper(const char *detail);
+void gdk_drawable_get_size(GdkWindow *window, gint *width, gint *height);
+void sanitizeSizeReal(GtkWidget *widget, gint *width, gint *height);
+EStepper getStepper(const char *detail);
 #else
-extern EStepper getStepper(GtkWidget *widget, int x, int y, int width, int height);
-extern void sanitizeSize(GdkWindow *window, gint *width, gint *height);
+EStepper getStepper(GtkWidget *widget, int x, int y, int width, int height);
+void sanitizeSize(GdkWindow *window, gint *width, gint *height);
 #endif
 
-extern int getFillReal(GtkStateType state, gboolean set, gboolean darker);
+int getFillReal(GtkStateType state, gboolean set, gboolean darker);
 #define getFill(state, set) getFillReal(state, set, FALSE)
-extern gboolean isSbarDetail(const char *detail);
-extern gboolean isHorizontalProgressbar(GtkWidget *widget);
-extern gboolean isComboBoxPopupWindow(GtkWidget *widget, int level);
-extern gboolean isComboBoxList(GtkWidget *widget);
-extern gboolean isComboPopupWindow(GtkWidget *widget, int level);
-extern gboolean isComboList(GtkWidget *widget);
-extern gboolean isComboMenu(GtkWidget *widget);
-extern gboolean isComboFrame(GtkWidget *widget);
-extern gboolean isFixedWidget(GtkWidget *widget);
-extern gboolean isGimpDockable(GtkWidget *widget);
+gboolean isSbarDetail(const char *detail);
+gboolean isHorizontalProgressbar(GtkWidget *widget);
+gboolean isComboBoxPopupWindow(GtkWidget *widget, int level);
+gboolean isComboBoxList(GtkWidget *widget);
+gboolean isComboPopupWindow(GtkWidget *widget, int level);
+gboolean isComboList(GtkWidget *widget);
+gboolean isComboMenu(GtkWidget *widget);
+gboolean isComboFrame(GtkWidget *widget);
+gboolean isFixedWidget(GtkWidget *widget);
+gboolean isGimpDockable(GtkWidget *widget);
 #define isMozillaWidget(widget) (isMozilla() && isFixedWidget(widget))
-extern GdkColor * getParentBgCol(GtkWidget *widget);
-extern int getOpacity(GtkWidget *widget);
-extern gboolean eqRect(GdkRectangle *a, GdkRectangle *b);
-extern void setLowerEtchCol(cairo_t *cr, GtkWidget *widget);
-extern GdkColor shadeColor(GdkColor *orig, double mod);
-extern void constrainRect(QtcRect *rect, QtcRect *con);
-extern gboolean windowEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data);
-extern void adjustToolbarButtons(GtkWidget *widget, int *x, int *y, int *width, int *height, int *round, gboolean horiz);
-extern void getEntryParentBgCol(GtkWidget *widget, GdkColor *color);
-extern gboolean compositingActive(GtkWidget *widget);
-extern gboolean isRgbaWidget(GtkWidget *widget);
-extern void enableBlurBehind(GtkWidget *w, gboolean enable);
-extern getTopLevelSize(GdkWindow *window, gint *w, gint *h);
-extern void getTopLevelOrigin(GdkWindow *window, gint *x, gint *y);
-extern gboolean mapToTopLevel(GdkWindow *window, GtkWidget *widget, gint *x, gint *y, gint *w, gint *h); //, gboolean frame)
+GdkColor * getParentBgCol(GtkWidget *widget);
+int getOpacity(GtkWidget *widget);
+gboolean eqRect(GdkRectangle *a, GdkRectangle *b);
+void setLowerEtchCol(cairo_t *cr, GtkWidget *widget);
+GdkColor shadeColor(GdkColor *orig, double mod);
+void constrainRect(QtcRect *rect, QtcRect *con);
+gboolean windowEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data);
+void adjustToolbarButtons(GtkWidget *widget, int *x, int *y, int *width, int *height, int *round, gboolean horiz);
+void getEntryParentBgCol(GtkWidget *widget, GdkColor *color);
+gboolean compositingActive(GtkWidget *widget);
+gboolean isRgbaWidget(GtkWidget *widget);
+void enableBlurBehind(GtkWidget *w, gboolean enable);
+void getTopLevelSize(GdkWindow *window, gint *w, gint *h);
+void getTopLevelOrigin(GdkWindow *window, gint *x, gint *y);
+gboolean mapToTopLevel(GdkWindow *window, GtkWidget *widget, gint *x, gint *y, gint *w, gint *h); //, gboolean frame)
+int getRound(const char *detail, GtkWidget *widget, int x, int y,
+             int width, int height, gboolean rev);
 
 #ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-extern GtkWidget * getParentWindow(GtkWidget *widget);
-extern void dialogMapEvent(GtkWidget *widget, gpointer user_data);
+GtkWidget * getParentWindow(GtkWidget *widget);
+void dialogMapEvent(GtkWidget *widget, gpointer user_data);
 #endif
-extern gboolean treeViewCellHasChildren(GtkTreeView *treeView, GtkTreePath *path);
-extern gboolean treeViewCellIsLast(GtkTreeView *treeView, GtkTreePath *path);
-extern GtkTreePath * treeViewPathParent(GtkTreeView *treeView, GtkTreePath *path);
-extern void generateColors();
-extern GdkColor * getCheckRadioCol(GtkStyle *style, GtkStateType state, gboolean mnu);
+gboolean treeViewCellHasChildren(GtkTreeView *treeView, GtkTreePath *path);
+gboolean treeViewCellIsLast(GtkTreeView *treeView, GtkTreePath *path);
+GtkTreePath * treeViewPathParent(GtkTreeView *treeView, GtkTreePath *path);
+void generateColors();
+GdkColor * getCheckRadioCol(GtkStyle *style, GtkStateType state, gboolean mnu);
 
 #endif

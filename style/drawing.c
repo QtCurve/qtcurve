@@ -24,6 +24,12 @@
 #include "config_file.h"
 #include "helpers.h"
 #include "pixcache.h"
+#include "entry.h"
+#include "tab.h"
+#include "animation.h"
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
 
 #if GTK_CHECK_VERSION(2, 90, 0)
 static cairo_rectangle_int_t createRect(int x, int y, int w, int h)
@@ -327,15 +333,16 @@ void createPath(cairo_t *cr, double xd, double yd, double width, double height, 
         cairo_line_to(cr, xd, yd);
 }
 
-void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangle *area,
-                           gint x, gint y, gint width, gint height, GdkColor *c_colors, int round, EBorder borderProfile,
-                           EWidget widget, int flags, int borderVal)
+void
+realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state,
+               GdkRectangle *area, gint x, gint y, gint width, gint height,
+               GdkColor *c_colors, int round, EBorder borderProfile,
+               EWidget widget, int flags, int borderVal)
 {
-    if(ROUND_NONE==opts.round && WIDGET_RADIO_BUTTON!=widget)
-        round=ROUNDED_NONE;
+    if (ROUND_NONE == opts.round && WIDGET_RADIO_BUTTON != widget)
+        round = ROUNDED_NONE;
 
-    {
-    double       radius=qtcGetRadius(&opts, width, height, widget, RADIUS_EXTERNAL),
+    double radius = qtcGetRadius(&opts, width, height, widget, RADIUS_EXTERNAL),
                  xd=x+0.5,
                  yd=y+0.5;
     EAppearance  app=qtcWidgetApp(widget, &opts);
@@ -356,81 +363,82 @@ void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectang
 
     setCairoClipping(cr, area);
 
-    if(WIDGET_TAB_BOT==widget || WIDGET_TAB_TOP==widget)
+    if (WIDGET_TAB_BOT==widget || WIDGET_TAB_TOP==widget)
         colors=qtcPalette.background;
 
-    if(!(opts.thin&THIN_FRAMES))
-        switch(borderProfile)
-        {
-            case BORDER_FLAT:
-                break;
-            case BORDER_RAISED:
-            case BORDER_SUNKEN:
-            case BORDER_LIGHT:
-            {
-                double radiusi=qtcGetRadius(&opts, width-2, height-2, widget, RADIUS_INTERNAL),
-                       xdi=xd+1,
-                       ydi=yd+1,
-                       alpha=(hasMouseOver || hasFocus) && (WIDGET_ENTRY==widget || WIDGET_SPIN==widget || WIDGET_COMBO_BUTTON==widget)
-                                ? ENTRY_INNER_ALPHA : BORDER_BLEND_ALPHA(widget);
-                int    widthi=width-2,
-                       heighti=height-2;
+    if (!(opts.thin&THIN_FRAMES)) {
+        switch (borderProfile) {
+        case BORDER_FLAT:
+            break;
+        case BORDER_RAISED:
+        case BORDER_SUNKEN:
+        case BORDER_LIGHT: {
+            double radiusi = qtcGetRadius(&opts, width-2, height-2, widget, RADIUS_INTERNAL),
+                xdi=xd+1,
+                ydi=yd+1,
+                alpha=(hasMouseOver || hasFocus) && (WIDGET_ENTRY==widget || WIDGET_SPIN==widget || WIDGET_COMBO_BUTTON==widget)
+                ? ENTRY_INNER_ALPHA : BORDER_BLEND_ALPHA(widget);
+            int    widthi=width-2,
+                heighti=height-2;
 
-                if((GTK_STATE_INSENSITIVE!=state || BORDER_SUNKEN==borderProfile) /*&&
-                (BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile || APPEARANCE_FLAT!=app)*/)
-                {
-                    GdkColor *col=&colors[BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile
-                                                ? 0 : FRAME_DARK_SHADOW];
-                    if(flags&DF_BLEND)
-                    {
-                        if(WIDGET_SPIN==widget || WIDGET_COMBO_BUTTON==widget || WIDGET_SCROLLVIEW==widget)
-                        {
-                            cairo_set_source_rgb(cr, CAIRO_COL(style->base[state]));
-                            createTLPath(cr, xdi, ydi, widthi, heighti, radiusi, round);
-                            cairo_stroke(cr);
-                        }
-
-                        cairo_set_source_rgba(cr, CAIRO_COL(*col), alpha);
+            if((GTK_STATE_INSENSITIVE!=state || BORDER_SUNKEN==borderProfile)
+               /*&&
+                 (BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile || APPEARANCE_FLAT!=app)*/) {
+                GdkColor *col=&colors[BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile ? 0 : FRAME_DARK_SHADOW];
+                if (flags & DF_BLEND) {
+                    if (WIDGET_SPIN==widget || WIDGET_COMBO_BUTTON==widget ||
+                        WIDGET_SCROLLVIEW==widget) {
+                        cairo_set_source_rgb(cr, CAIRO_COL(style->base[state]));
+                        createTLPath(cr, xdi, ydi, widthi, heighti, radiusi,
+                                     round);
+                        cairo_stroke(cr);
                     }
-                    else
-                        cairo_set_source_rgb(cr, CAIRO_COL(*col));
-                }
-                else
-                    cairo_set_source_rgb(cr, CAIRO_COL(style->bg[state]));
 
-                createTLPath(cr, xdi, ydi, widthi, heighti, radiusi, round);
+                    cairo_set_source_rgba(cr, CAIRO_COL(*col), alpha);
+                } else {
+                    cairo_set_source_rgb(cr, CAIRO_COL(*col));
+                }
+            } else {
+                cairo_set_source_rgb(cr, CAIRO_COL(style->bg[state]));
+            }
+
+            createTLPath(cr, xdi, ydi, widthi, heighti, radiusi, round);
+            cairo_stroke(cr);
+            if (WIDGET_CHECKBOX!=widget) {
+                if(!hasFocus && !hasMouseOver && BORDER_LIGHT!=borderProfile) {
+                    if(WIDGET_SCROLLVIEW==widget) {
+                        /* Because of list view headers, need to draw dark line on right! */
+                        cairo_save(cr);
+                        cairo_set_source_rgb(cr, CAIRO_COL(style->base[state]));
+                        createBRPath(cr, xdi, ydi, widthi, heighti, radiusi,
+                                     round);
+                        cairo_stroke(cr);
+                        cairo_restore(cr);
+                    } else if (WIDGET_SCROLLVIEW == widget ||
+                               WIDGET_ENTRY == widget) {
+                        cairo_set_source_rgb(cr, CAIRO_COL(style->base[state]));
+                    } else if (GTK_STATE_INSENSITIVE!=state &&
+                               (BORDER_SUNKEN == borderProfile ||
+                                /*APPEARANCE_FLAT!=app ||*/
+                                WIDGET_TAB_TOP == widget ||
+                                WIDGET_TAB_BOT == widget)) {
+                        GdkColor *col=&colors[BORDER_RAISED==borderProfile ? FRAME_DARK_SHADOW : 0];
+                        if(flags&DF_BLEND) {
+                            cairo_set_source_rgba(cr, CAIRO_COL(*col), BORDER_SUNKEN==borderProfile ? 0.0 : alpha);
+                        } else {
+                            cairo_set_source_rgb(cr, CAIRO_COL(*col));
+                        }
+                    } else {
+                        cairo_set_source_rgb(cr, CAIRO_COL(style->bg[state]));
+                    }
+                }
+
+                createBRPath(cr, xdi, ydi, widthi, heighti, radiusi, round);
                 cairo_stroke(cr);
-                if(WIDGET_CHECKBOX!=widget)
-                {
-                    if(!hasFocus && !hasMouseOver && BORDER_LIGHT!=borderProfile)
-                        if(WIDGET_SCROLLVIEW==widget)
-                        {
-                            /* Because of list view headers, need to draw dark line on right! */
-                            cairo_save(cr);
-                            cairo_set_source_rgb(cr, CAIRO_COL(style->base[state]));
-                            createBRPath(cr, xdi, ydi, widthi, heighti, radiusi, round);
-                            cairo_stroke(cr);
-                            cairo_restore(cr);
-                        }
-                        else if(WIDGET_SCROLLVIEW==widget || WIDGET_ENTRY==widget)
-                            cairo_set_source_rgb(cr, CAIRO_COL(style->base[state]));
-                        else if(GTK_STATE_INSENSITIVE!=state && (BORDER_SUNKEN==borderProfile || /*APPEARANCE_FLAT!=app ||*/
-                                                                WIDGET_TAB_TOP==widget || WIDGET_TAB_BOT==widget))
-                        {
-                            GdkColor *col=&colors[BORDER_RAISED==borderProfile ? FRAME_DARK_SHADOW : 0];
-                            if(flags&DF_BLEND)
-                                cairo_set_source_rgba(cr, CAIRO_COL(*col), BORDER_SUNKEN==borderProfile ? 0.0 : alpha);
-                            else
-                                cairo_set_source_rgb(cr, CAIRO_COL(*col));
-                        }
-                        else
-                            cairo_set_source_rgb(cr, CAIRO_COL(style->bg[state]));
-
-                    createBRPath(cr, xdi, ydi, widthi, heighti, radiusi, round);
-                    cairo_stroke(cr);
-                }
             }
         }
+        }
+    }
 
     if(BORDER_SUNKEN==borderProfile &&
        (WIDGET_FRAME==widget || ((WIDGET_ENTRY==widget || WIDGET_SCROLLVIEW==widget) &&
@@ -450,7 +458,6 @@ void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectang
         cairo_stroke(cr);
     }
     unsetCairoClipping(cr);
-    }
 }
 
 void drawGlowReal(cairo_t *cr, GdkRectangle *area, int x, int y, int w, int h, int round, EWidget widget, const GdkColor *colors)

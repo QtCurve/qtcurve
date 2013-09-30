@@ -25,6 +25,7 @@
 #include "config_file.h"
 #include "colorutils.h"
 #include "qt_settings.h"
+#include "helpers.h"
 #include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -43,6 +44,7 @@
 #include <unistd.h>
 #include <pwd.h>
 #include <sys/types.h>
+#include <math.h>
 
 #define strcmp_i(A, B) strncmp_i(A, B, -1)
 
@@ -56,37 +58,35 @@ Options    opts;
 #define KDEGLOBALS_FILE     "kdeglobals"
 #define KDEGLOBALS_SYS_FILE "system.kdeglobals"
 
-static char * getKdeHome()
+static char *getKdeHome()
 {
-    static char *kdeHome=NULL;
+    static char *kdeHome = NULL;
 
-    if(!kdeHome)
-        if(runCommand("kde4-config --expandvars --localprefix", &kdeHome))
-        {
-            int len=strlen(kdeHome);
+    if(!kdeHome) {
+        if (runCommand("kde4-config --expandvars --localprefix", &kdeHome)) {
+            int len = strlen(kdeHome);
 
-            if(len>1 && kdeHome[len-1]=='\n')
+            if (len>1 && kdeHome[len-1] == '\n') {
                 kdeHome[len-1]='\0';
+            }
+        } else {
+            kdeHome = NULL;
         }
-        else
-            kdeHome=0L;
+    }
 
-    if(!kdeHome)
-    {
-        char *env=getenv(getuid() ? "KDEHOME" : "KDEROOTHOME");
+    if (!kdeHome) {
+        char *env = getenv(getuid() ? "KDEHOME" : "KDEROOTHOME");
 
-        if(env)
-            kdeHome=env;
-        else
-        {
+        if(env) {
+            kdeHome = env;
+        } else {
             static char kdeHomeStr[MAX_CONFIG_FILENAME_LEN+1];
 
             const char *home=qtcGetHome();
 
-            if(home && strlen(home)<(MAX_CONFIG_FILENAME_LEN-5))
-            {
+            if (home && strlen(home) < (MAX_CONFIG_FILENAME_LEN-5)) {
                 sprintf(kdeHomeStr, "%s/.kde", home);
-                kdeHome=kdeHomeStr;
+                kdeHome = kdeHomeStr;
             }
         }
     }
@@ -1294,16 +1294,16 @@ static const char * kdeIconsPrefix()
 {
     static char *kdeIcons=NULL;
 
-    if(!kdeIcons)
-        if(runCommand("kde4-config --expandvars --install icon", &kdeIcons))
-        {
+    if(!kdeIcons) {
+        if (runCommand("kde4-config --expandvars --install icon", &kdeIcons)) {
             int len=strlen(kdeIcons);
 
             if(len>1 && kdeIcons[len-1]=='\n')
                 kdeIcons[len-1]='\0';
+        } else {
+            kdeIcons = 0L;
         }
-        else
-            kdeIcons=0L;
+    }
 
     if(!kdeIcons)
         kdeIcons = (KDE4_ICONS_PREFIX && strlen(KDE4_ICONS_PREFIX) > 2 ?
@@ -1984,8 +1984,9 @@ gboolean qtSettingsInit()
                                  "/etc/kderc",
                                  "/etc/kde4/kdeglobals",
                                  "/etc/kde4rc",
-                                 KDE4PREFIX KDE4_SYS_CFG_DIR KDEGLOBALS_FILE,
-                                 KDE4PREFIX KDE4_SYS_CFG_DIR KDEGLOBALS_SYS_FILE,
+                                 QTC_KDE4_PREFIX KDE4_SYS_CFG_DIR KDEGLOBALS_FILE,
+                                 QTC_KDE4_PREFIX KDE4_SYS_CFG_DIR
+                                 KDEGLOBALS_SYS_FILE,
                                  kdeGlobals(),
                                  0L};
 
@@ -2019,7 +2020,8 @@ gboolean qtSettingsInit()
                 rcFile=themeFile(getKdeHome(), qtSettings.styleName, &tmpStr);
 
                 if (!rcFile) {
-                    rcFile = themeFile(KDE4PREFIX, qtSettings.styleName, &tmpStr);
+                    rcFile = themeFile(QTC_KDE4_PREFIX, qtSettings.styleName,
+                                       &tmpStr);
                 }
             }
 
@@ -2343,24 +2345,24 @@ gboolean qtSettingsInit()
             if(opts.mapKdeIcons && (path=getIconPath()))
             {
                 const char *iconTheme=qtSettings.icons ? qtSettings.icons : "XX";
-                int  versionLen=1+strlen(VERSION)+1+strlen(iconTheme)+1+2+(6*2)+1;  /* '#' VERSION ' '<kde version> <..nums above..>\0 */
+                int  versionLen=1+strlen(QTC_VERSION)+1+strlen(iconTheme)+1+2+(6*2)+1;  /* '#' VERSION ' '<kde version> <..nums above..>\0 */
                 char *version=(char *)malloc(versionLen);
 
                 getGtk2CfgFile(&tmpStr, "gtk-icons");
                 sprintf(version, "#%s %s %02X%02X%02X%02X%02X%02X%02X",
-                                 VERSION,
-                                 iconTheme,
-                                 4,
-                                 qtSettings.iconSizes.smlTbSize,
-                                 qtSettings.iconSizes.tbSize,
-                                 qtSettings.iconSizes.dndSize,
-                                 qtSettings.iconSizes.btnSize,
-                                 qtSettings.iconSizes.mnuSize,
-                                 qtSettings.iconSizes.dlgSize);
+                        QTC_VERSION,
+                        iconTheme,
+                        4,
+                        qtSettings.iconSizes.smlTbSize,
+                        qtSettings.iconSizes.tbSize,
+                        qtSettings.iconSizes.dndSize,
+                        qtSettings.iconSizes.btnSize,
+                        qtSettings.iconSizes.mnuSize,
+                        qtSettings.iconSizes.dlgSize);
 
                 if(!checkFileVersion(tmpStr, version, versionLen))
                 {
-                    static const char *constCmdStrFmt="perl "GTK_THEME_DIR"/map_kde_icons.pl "GTK_THEME_DIR"/icons%d %s %d %d %d %d %d %d %d %s "VERSION" > %s.%d && mv %s.%d %s";
+                    static const char *constCmdStrFmt="perl "GTK_THEME_DIR"/map_kde_icons.pl "GTK_THEME_DIR"/icons%d %s %d %d %d %d %d %d %d %s "QTC_VERSION" > %s.%d && mv %s.%d %s";
 
                     const char *kdeprefix=kdeIconsPrefix();
                     int        fileNameLen=strlen(tmpStr);

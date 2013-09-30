@@ -40,7 +40,7 @@ add_definitions(-Dopts=qtcurve_gtk2_opts)
 target_link_libraries(qtcurve
   ${GTK2_LDFLAGS}
   ${GTK2_LIBRARIES}
-  -lm -lX11)
+  m X11)
 
 if(CMAKE_SYSTEM_NAME MATCHES Linux OR CMAKE_SYSTEM_NAME STREQUAL GNU)
   if(CMAKE_COMPILER_IS_GNUCXX)

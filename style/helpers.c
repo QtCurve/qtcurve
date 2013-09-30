@@ -1186,23 +1186,24 @@ void enableBlurBehind(GtkWidget *w, gboolean enable)
     }
 }
 
+void
 getTopLevelSize(GdkWindow *window, gint *w, gint *h)
 {
-    if(!(window && GDK_IS_WINDOW(window)))
-    {
-        if(w)
+    if (!(window && GDK_IS_WINDOW(window))) {
+        if (w) {
             *w = -1;
-        if(h)
+        }
+        if (h) {
             *h = -1;
-    }
-    else
-    {
-        GdkWindow *topLevel=gdk_window_get_toplevel(window);
+        }
+    } else {
+        GdkWindow *topLevel = gdk_window_get_toplevel(window);
 
-        if(topLevel)
+        if (topLevel) {
             gdk_drawable_get_size(topLevel, w, h);
-        else
-            gdk_drawable_get_size(window, w, h );
+        } else {
+            gdk_drawable_get_size(window, w, h);
+        }
     }
 }
 

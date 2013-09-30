@@ -21,11 +21,12 @@
   Boston, MA 02110-1301, USA.
  */
 
-extern gboolean qtcWindowIsActive(GtkWidget *widget);
-extern gboolean qtcWindowSetup(GtkWidget *widget, int opacity);
-extern GtkWidget * qtcWindowGetMenuBar(GtkWidget *parent, int level);
-extern gboolean qtcWindowSetStatusBarProp(GtkWidget *w);
-extern GtkWidget * qtcWindowGetStatusBar(GtkWidget *parent, int level);
-extern void qtcWindowStatusBarDBus(GtkWidget *widget, gboolean state);
+gboolean qtcWindowIsActive(GtkWidget *widget);
+gboolean qtcWindowSetup(GtkWidget *widget, int opacity);
+GtkWidget * qtcWindowGetMenuBar(GtkWidget *parent, int level);
+gboolean qtcWindowSetStatusBarProp(GtkWidget *w);
+GtkWidget * qtcWindowGetStatusBar(GtkWidget *parent, int level);
+void qtcWindowStatusBarDBus(GtkWidget *widget, gboolean state);
+void qtcWindowMenuBarDBus(GtkWidget *widget, int size);
 
 #endif

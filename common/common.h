@@ -1376,9 +1376,10 @@ typedef enum
 #define MAX_RADIUS_EXTERNAL (MAX_RADIUS_INTERNAL+2.0)
 
 extern double qtcRingAlpha[3];
-extern ERound qtcGetWidgetRound(const Options *opts, int w, int h, EWidget widget);
-extern double qtcGetRadius(const Options *opts, int w, int h, EWidget widget, ERadius rad);
-extern double qtcShineAlpha(const color *bgnd);
-extern void qtcCalcRingAlphas(const color *bgnd);
+ERound qtcGetWidgetRound(const Options *opts, int w, int h, EWidget widget);
+double qtcGetRadius(const Options *opts, int w, int h, EWidget widget, ERadius rad);
+double qtcShineAlpha(const color *bgnd);
+void qtcCalcRingAlphas(const color *bgnd);
+void qtcHsvToRgb(double *r, double *g, double *b, double h, double s, double v);
 
 #endif // __COMMON_H__
