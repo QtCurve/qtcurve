@@ -1,0 +1,5 @@
+Firefox:
+GTK: Combobox is not drawn correctly, and doesnt hightlight on focus,
+     but neither do other styles - think this is a firefox issue.
+
+ALL: GTK/KDE have different disabled text behaviour when contrast setting changed!

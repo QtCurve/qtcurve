@@ -5,7 +5,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}"
 
 set(QTCURVE_VERSION_MAJOR "1")
 set(QTCURVE_VERSION_MINOR "8")
-set(QTCURVE_VERSION_PATCH "15")
+set(QTCURVE_VERSION_PATCH "17")
 set(QTCURVE_VERSION "${QTCURVE_VERSION_MAJOR}.${QTCURVE_VERSION_MINOR}")
 set(QTCURVE_VERSION_FULL "${QTCURVE_VERSION}.${QTCURVE_VERSION_PATCH}")
 
@@ -30,6 +30,7 @@ endfunction()
 
 option(ENABLE_QT4 "Building Qt4 theme." On)
 option(ENABLE_QT5 "Building Qt5 theme." On)
+option(ENABLE_GTK2 "Building Gtk2 theme." On)
 option(QTC_ENABLE_X11 "Enable X11" On)
 
 def_compat_option(QTC_QT4_ENABLE_KDE QTC_QT_ONLY True)
@@ -53,6 +54,16 @@ option(QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
   "Qt4 support for the 'fix parentless dialogs'." Off)
 option(QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
   "Qt5 support for the 'fix parentless dialogs'." Off)
+
+def_compat_option(QTC_GTK2_MODIFY_MOZILLA QTC_MODIFY_MOZILLA)
+option(QTC_GTK2_MODIFY_MOZILLA "Modify Mozilla Gtk2 with js and css." Off)
+def_compat_option(QTC_GTK2_OLD_MOZILLA QTC_OLD_MOZILLA)
+option(QTC_GTK2_OLD_MOZILLA
+  "Defaulting to treating Firefox(Gtk2) as Firefox < 3.0." Off)
+def_compat_option(QTC_GTK2_USE_CAIRO_FOR_ARROWS QTC_USE_CAIRO_FOR_ARROWS)
+option(QTC_GTK2_USE_CAIRO_FOR_ARROWS "Using ciaro to draw arrows." Off)
+option(QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+  "Gtk2 support for the 'fix parentless dialogs'." Off)
 
 # Only try to figure out what kde prefix is if not specified at command line.
 if(NOT DEFINED QTC_KDE4_PREFIX)
@@ -102,6 +113,7 @@ add_subdirectory(tools)
 add_subdirectory(po)
 add_subdirectory(qt4)
 add_subdirectory(qt5)
+add_subdirectory(gtk2)
 add_subdirectory(data)
 
 if(QTC_QT4_KWIN_MAX_BUTTON_HACK)
@@ -112,10 +124,50 @@ if(QTC_QT4_KWIN_MAX_BUTTON_HACK)
 endif()
 
 if(QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT OR
-    QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT)
+    QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT OR
+    QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT)
   message(WARNING
     "You have enabled support for the 'fix parentless dialogs' option. "
     "This is known to BREAK some applications. Please "
     "DO NOT report errors to application authors when you have "
     "this enabled. Please reconsider DISABLING this option.")
+endif()
+
+if(QTC_GTK2_OLD_MOZILLA)
+  message("**************************************************************\n"
+    "Information: Defaulting to treating Firefox as Firefox < 3.0\n"
+    "**************************************************************\n")
+else()
+  message("**************************************************************\n"
+    "Information: Defaulting to treating Firefox as Firefox >= 3.0\n"
+    "**************************************************************\n")
+endif()
+if(QTC_GTK2_MODIFY_MOZILLA)
+  message("**************************************************************\n"
+    "**************************************************************\n"
+    "Warning: You have enabled the option for QtCurve to modify the\n"
+    "         configuration files of Mozilla applications (Firefox, \n"
+    "         Thunderbird, Seamonkey). Note: This sometimes causes\n"
+    "         issues with newer versions of these applications. Should\n"
+    "         such issues occur, you should recompile QtCurve without\n"
+    "         this option - and you will have to remove BY HAND the \n"
+    "         changes that QtCurve has made. This will entail removing\n"
+    "         lines from userChrom.css that indicate 'Added by QtCurve'\n"
+    "         userChrome.css is usually in a folder such as:\n"
+    "             ~/.mozilla/firefox/xxxxxxx.default/chrome/userChrome.css\n"
+    "             ~/.thunderbird/xxxxxxx.default/chrome/userChrome.css\n"
+    "         Where xxxxxxx is a series of random characters.\n"
+    "**************************************************************\n"
+    "**************************************************************\n")
+endif()
+
+if(QTC_GTK2_USE_CAIRO_FOR_ARROWS)
+  message("**************************************************************\n"
+    "Warning: Using cairo to draw arrows - this has been reported to \n"
+    "         fail with intel Xorg driver > 2.8\n"
+    "**************************************************************\n")
+else()
+  message("**************************************************************\n"
+    "Information: Using Gdk to draw arrows.\n"
+    "**************************************************************\n")
 endif()
