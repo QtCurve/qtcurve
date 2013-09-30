@@ -78,8 +78,6 @@ typedef QSet<QString> Strings;
 typedef gboolean bool;
 typedef GdkColor color;
 typedef gchar ** Strings;
-#define true TRUE
-#define false FALSE
 #endif // __cplusplus
 
 #define SETTINGS_GROUP        "Settings"
