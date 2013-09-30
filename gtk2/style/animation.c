@@ -31,6 +31,7 @@
 /* #define CHECK_ANIMATION_TIME 0.5 */
 
 #include "animation.h"
+#include <qtcurve-utils/utils.h>
 #include <common/common.h>
 #include "compatability.h"
 

@@ -23,7 +23,7 @@
 #include <gdk/gdkx.h>
 #include <stdlib.h>
 #include "compatability.h"
-#include <common/common.h>
+#include <qtcurve-utils/utils.h>
 #include "helpers.h"
 #include "qt_settings.h"
 #include "menu.h"

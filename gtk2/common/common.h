@@ -22,11 +22,10 @@
 */
 
 #include "config.h"
+#include <qtcurve-utils/options.h>
 
 #define MAKE_VERSION(a, b) (((a) << 16) | ((b) << 8))
 #define MAKE_VERSION3(a, b, c) (((a) << 16) | ((b) << 8) | (c))
-
-#define QTC_UNUSED(v) ((void)(v))
 
 /*
     The following #define disables the rounding when scrollbar type==none.
@@ -39,14 +38,6 @@
     between the slider and the buttons.
 */
 #define INCREASE_SB_SLIDER
-
-typedef enum
-{
-    SHADING_SIMPLE=0,
-    SHADING_HSL=1,
-    SHADING_HSV=2,
-    SHADING_HCY=3
-} EShading;
 
 #ifdef __cplusplus
 #include <qconfig.h>
@@ -391,8 +382,8 @@ enum
 #define ETCH_RADIO_BOTTOM_ALPHA  1.0
 // #endif
 
-#define RINGS_INNER_ALPHA(T) qtcRingAlpha[IMG_PLAIN_RINGS==(T) ? 1 : 0] //(IMG_PLAIN_RINGS==opts.bgndImage.type ? 0.25 :  0.125)
-#define RINGS_OUTER_ALPHA    qtcRingAlpha[2] //0.5
+#define RINGS_INNER_ALPHA(T) qtc_ring_alpha[IMG_PLAIN_RINGS==(T) ? 1 : 0] //(IMG_PLAIN_RINGS==opts.bgndImage.type ? 0.25 :  0.125)
+#define RINGS_OUTER_ALPHA    qtc_ring_alpha[2] //0.5
 #define RINGS_WIDTH(T)       (IMG_SQUARE_RINGS==T ? 260 : 450)
 #define RINGS_HEIGHT(T)      (IMG_SQUARE_RINGS==T ? 220 : 360)
 
@@ -1280,24 +1271,19 @@ typedef struct
 #define tint(COLA, COLB, FACTOR) KColorUtils::tint((COLA), (COLB), (FACTOR))
 #define midColor(COLA, COLB) KColorUtils::mix((COLA), (COLB), 0.5)
 #else // QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY
-#include "colorutils.h"
+#include <qtcurve-utils/color.h>
 #ifdef __cplusplus
-#define tint(COLA, COLB, FACTOR) ColorUtils_tint(&(COLA), &(COLB), (FACTOR))
-#define midColor(COLA, COLB) ColorUtils_mix(&(COLA), &(COLB), 0.5)
-#define midColorF(COLA, COLB, FACTOR) ColorUtils_mix(&(COLA), &(COLB), FACTOR-0.5)
+#define tint(COLA, COLB, FACTOR) qtc_color_tint(&(COLA), &(COLB), (FACTOR))
+#define midColor(COLA, COLB) qtc_color_mix(&(COLA), &(COLB), 0.5)
+#define midColorF(COLA, COLB, FACTOR) qtc_color_mix(&(COLA), &(COLB), FACTOR-0.5)
 #else // __cplusplus
-#define tint(COLA, COLB, FACTOR) ColorUtils_tint((COLA), (COLB), (FACTOR))
-#define midColor(COLA, COLB) ColorUtils_mix((COLA), (COLB), 0.5)
+#define tint(COLA, COLB, FACTOR) qtc_color_tint((COLA), (COLB), (FACTOR))
+#define midColor(COLA, COLB) qtc_color_mix((COLA), (COLB), 0.5)
 #endif // __cplusplus
 #endif // QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY
 
 extern void qtcRgbToHsv(double r, double g, double b, double *h, double *s, double *v);
 extern void qtcRgbToHsv(double r, double g, double b, double *h, double *s, double *v);
-#ifdef __cplusplus
-extern void qtcShade(const Options *opts, const color &ca, color *cb, double k);
-#else
-extern void qtcShade(const Options *opts, const color *ca, color *cb, double k);
-#endif
 
 extern void qtcAdjustPix(unsigned char *data, int numChannels, int w, int h, int stride, int ro, int go, int bo, double shade);
 extern void qtcSetupGradient(Gradient *grad, EGradientBorder border, int numStops, ...);
@@ -1375,11 +1361,8 @@ typedef enum
 #define MAX_RADIUS_INTERNAL 9.0
 #define MAX_RADIUS_EXTERNAL (MAX_RADIUS_INTERNAL+2.0)
 
-extern double qtcRingAlpha[3];
 ERound qtcGetWidgetRound(const Options *opts, int w, int h, EWidget widget);
 double qtcGetRadius(const Options *opts, int w, int h, EWidget widget, ERadius rad);
-double qtcShineAlpha(const color *bgnd);
-void qtcCalcRingAlphas(const color *bgnd);
 void qtcHsvToRgb(double *r, double *g, double *b, double h, double s, double v);
 
 #endif // __COMMON_H__

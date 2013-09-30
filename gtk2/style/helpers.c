@@ -26,6 +26,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <gdk/gdkx.h>
+#include <qtcurve-utils/color.h>
 
 static void dumpChildren(GtkWidget *widget, int level)
 {
@@ -137,12 +138,14 @@ void qtcShadeColors(GdkColor *base, GdkColor *vals)
     gboolean useCustom=USE_CUSTOM_SHADES(opts);
     double   hl=TO_FACTOR(opts.highlightFactor);
 
-    for(i=0; i<NUM_STD_SHADES; ++i)
-        qtcShade(&opts, base, &vals[i], useCustom ? opts.customShades[i] : SHADE(opts.contrast, i));
-    qtcShade(&opts, base, &vals[SHADE_ORIG_HIGHLIGHT], hl);
-    qtcShade(&opts, &vals[4], &vals[SHADE_4_HIGHLIGHT], hl);
-    qtcShade(&opts, &vals[2], &vals[SHADE_2_HIGHLIGHT], hl);
-    vals[ORIGINAL_SHADE]=*base;
+    for (i = 0;i < NUM_STD_SHADES;++i) {
+        qtc_shade(base, &vals[i], useCustom ? opts.customShades[i] :
+                  SHADE(opts.contrast, i), opts.shading);
+    }
+    qtc_shade(base, &vals[SHADE_ORIG_HIGHLIGHT], hl, opts.shading);
+    qtc_shade(&vals[4], &vals[SHADE_4_HIGHLIGHT], hl, opts.shading);
+    qtc_shade(&vals[2], &vals[SHADE_2_HIGHLIGHT], hl, opts.shading);
+    vals[ORIGINAL_SHADE] = *base;
 }
 
 gboolean isSortColumn(GtkWidget *button)
@@ -972,26 +975,24 @@ void setLowerEtchCol(cairo_t *cr, GtkWidget *widget)
     {
         GdkColor *parentBg=getParentBgCol(widget);
 
-        if(parentBg)
-        {
+        if (parentBg) {
             GdkColor col;
-
-            qtcShade(&opts, parentBg, &col, 1.06);
+            qtc_shade(parentBg, &col, 1.06, opts.shading);
             cairo_set_source_rgb(cr, CAIRO_COL(col));
-        }
-        else
+        } else {
             cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 0.1); // 0.25);
-    }
-    else
+        }
+    } else {
         cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 0.1); // 0.4);
+    }
 }
 
-GdkColor shadeColor(GdkColor *orig, double mod)
+GdkColor
+shadeColor(GdkColor *orig, double mod)
 {
-    if(!qtcEqual(mod, 0.0))
-    {
+    if (!qtcEqual(mod, 0.0)) {
         GdkColor modified;
-        qtcShade(&opts, orig, &modified, mod);
+        qtc_shade(orig, &modified, mod, opts.shading);
         return modified;
     }
     return *orig;
@@ -1111,9 +1112,10 @@ void getEntryParentBgCol(GtkWidget *widget, GdkColor *color)
     while (parent && (qtcWidgetNoWindow(parent)))
     {
         GtkStyle *style=NULL;
-        if(opts.tabBgnd && GTK_IS_NOTEBOOK(parent) && (style=qtcWidgetGetStyle(parent)))
-        {
-            qtcShade(&opts, &(style->bg[GTK_STATE_NORMAL]), color, TO_FACTOR(opts.tabBgnd));
+        if (opts.tabBgnd && GTK_IS_NOTEBOOK(parent) &&
+            (style = qtcWidgetGetStyle(parent))) {
+            qtc_shade(&(style->bg[GTK_STATE_NORMAL]), color,
+                      TO_FACTOR(opts.tabBgnd), opts.shading);
             return;
         }
         parent = qtcWidgetGetParent(parent);
@@ -1432,10 +1434,12 @@ void generateColors()
         {
             GdkColor color;
 
-            if(IS_GLASS(opts.appearance))
-                qtcShade(&opts, &qtcPalette.highlight[ORIGINAL_SHADE], &color, MENUBAR_GLASS_SELECTED_DARK_FACTOR);
-            else
-                color=qtcPalette.highlight[ORIGINAL_SHADE];
+            if (IS_GLASS(opts.appearance)) {
+                qtc_shade(&qtcPalette.highlight[ORIGINAL_SHADE], &color,
+                          MENUBAR_GLASS_SELECTED_DARK_FACTOR, opts.shading);
+            } else {
+                color = qtcPalette.highlight[ORIGINAL_SHADE];
+            }
 
             qtcShadeColors(&color, qtcPalette.menubar);
             break;
@@ -1443,11 +1447,10 @@ void generateColors()
         case SHADE_CUSTOM:
             qtcShadeColors(&opts.customMenubarsColor, qtcPalette.menubar);
             break;
-        case SHADE_DARKEN:
-        {
+        case SHADE_DARKEN: {
             GdkColor color;
-
-            qtcShade(&opts, &qtcPalette.background[ORIGINAL_SHADE], &color, MENUBAR_DARK_FACTOR);
+            qtc_shade(&qtcPalette.background[ORIGINAL_SHADE], &color,
+                      MENUBAR_DARK_FACTOR, opts.shading);
             qtcShadeColors(&color, qtcPalette.menubar);
             break;
         }
@@ -1512,8 +1515,10 @@ void generateColors()
             GdkColor color;
 
             qtcPalette.sortedlv=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
-            qtcShade(&opts, opts.lvButton ? &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]
-                                       : &qtcPalette.background[ORIGINAL_SHADE], &color, LV_HEADER_DARK_FACTOR);
+            qtc_shade(opts.lvButton ?
+                      &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE] :
+                      &qtcPalette.background[ORIGINAL_SHADE],
+                      &color, LV_HEADER_DARK_FACTOR, opts.shading);
             qtcShadeColors(&color, qtcPalette.sortedlv);
             break;
         }
@@ -1602,10 +1607,12 @@ void generateColors()
         GdkColor *cols=opts.shadePopupMenu
                             ? menuColors(TRUE)
                             : qtcPalette.background;
-        if(opts.lighterPopupMenuBgnd)
-            qtcShade(&opts, &cols[ORIGINAL_SHADE], &color, TO_FACTOR(opts.lighterPopupMenuBgnd));
-        else
-            color=cols[ORIGINAL_SHADE];
+        if (opts.lighterPopupMenuBgnd) {
+            qtc_shade(&cols[ORIGINAL_SHADE], &color,
+                      TO_FACTOR(opts.lighterPopupMenuBgnd), opts.shading);
+        } else {
+            color = cols[ORIGINAL_SHADE];
+        }
         qtcShadeColors(&color, qtcPalette.menu);
     }
 
@@ -1671,17 +1678,17 @@ void generateColors()
 
     qtcPalette.selectedcr=NULL;
 
-    switch(opts.crColor)
-    {
-        case SHADE_DARKEN:
-        {
-            GdkColor color;
+    switch (opts.crColor) {
+    case SHADE_DARKEN: {
+        GdkColor color;
 
-            qtcPalette.selectedcr=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
-            qtcShade(&opts, &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE], &color, LV_HEADER_DARK_FACTOR);
-            qtcShadeColors(&color, qtcPalette.selectedcr);
-            break;
-        }
+        qtcPalette.selectedcr =
+            (GdkColor*)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+        qtc_shade(&qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE], &color,
+                  LV_HEADER_DARK_FACTOR, opts.shading);
+        qtcShadeColors(&color, qtcPalette.selectedcr);
+        break;
+    }
         default:
         case SHADE_NONE:
             qtcPalette.selectedcr=qtcPalette.button[PAL_ACTIVE];

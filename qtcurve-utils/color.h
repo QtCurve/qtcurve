@@ -160,12 +160,13 @@ qtc_color_shade(const QColor *color, double ky, double kc)
 QTC_ALWAYS_INLINE static inline QColor
 qtc_color_tint(const QColor *base, const QColor *col, double amount)
 {
-    if (amount <= 0.0)
+    if (amount <= 0.0) {
         return *base;
-    if (amount >= 1.0)
+    } else if (amount >= 1.0) {
         return *col;
-    if (isnan(amount))
+    } else if (isnan(amount)) {
         return *base;
+    }
     const QtcColor qtc_base = {base->redF(), base->greenF(), base->blueF()};
     const QtcColor qtc_col = {col->redF(), col->greenF(), col->blueF()};
     QtcColor out;
@@ -176,12 +177,13 @@ qtc_color_tint(const QColor *base, const QColor *col, double amount)
 QTC_ALWAYS_INLINE static inline QColor
 qtc_color_mix(const QColor *c1, const QColor *c2, double bias)
 {
-    if (bias <= 0.0)
+    if (bias <= 0.0) {
         return *c1;
-    if (bias >= 1.0)
+    } else if (bias >= 1.0) {
         return *c2;
-    if (isnan(bias))
+    } else if (isnan(bias)) {
         return *c1;
+    }
     const QtcColor qtc_c1 = {c1->redF(), c1->greenF(), c1->blueF()};
     const QtcColor qtc_c2 = {c2->redF(), c2->greenF(), c2->blueF()};
     QtcColor out;
@@ -224,6 +226,119 @@ qtc_calc_ring_alphas(const QColor *bgnd)
 }
 
 #else
+#include <gdk/gdk.h>
+
+QTC_ALWAYS_INLINE static inline GdkColor
+_qtc_color_to_gdk(const QtcColor *qtc_color)
+{
+    GdkColor color;
+    color.red = qtc_color->red * 65535;
+    color.green = qtc_color->green * 65535;
+    color.blue = qtc_color->blue * 65535;
+    return color;
+}
+
+QTC_ALWAYS_INLINE static inline QtcColor
+_qtc_color_from_gdk(const GdkColor *color)
+{
+    QtcColor qtc_color;
+    qtc_color.red = color->red / 65535.0;
+    qtc_color.green = color->green / 65535.0;
+    qtc_color.blue = color->blue / 65535.0;
+    return qtc_color;
+}
+
+QTC_ALWAYS_INLINE static inline GdkColor
+qtc_color_lighten(const GdkColor *color, double ky, double kc)
+{
+    QtcColor qtc_color = _qtc_color_from_gdk(color);
+    _qtc_color_lighten(&qtc_color, ky, kc);
+    return _qtc_color_to_gdk(&qtc_color);
+}
+
+QTC_ALWAYS_INLINE static inline GdkColor
+qtc_color_darken(const GdkColor *color, double ky, double kc)
+{
+    QtcColor qtc_color = _qtc_color_from_gdk(color);
+    _qtc_color_darken(&qtc_color, ky, kc);
+    return _qtc_color_to_gdk(&qtc_color);
+}
+
+QTC_ALWAYS_INLINE static inline GdkColor
+qtc_color_shade(const GdkColor *color, double ky, double kc)
+{
+    QtcColor qtc_color = _qtc_color_from_gdk(color);
+    _qtc_color_shade(&qtc_color, ky, kc);
+    return _qtc_color_to_gdk(&qtc_color);
+}
+
+QTC_ALWAYS_INLINE static inline GdkColor
+qtc_color_tint(const GdkColor *base, const GdkColor *col, double amount)
+{
+    if (amount <= 0.0) {
+        return *base;
+    } else if (amount >= 1.0) {
+        return *col;
+    } else if (isnan(amount)) {
+        return *base;
+    }
+    QtcColor qtc_base = _qtc_color_from_gdk(base);
+    QtcColor qtc_col = _qtc_color_from_gdk(col);
+    QtcColor out;
+    _qtc_color_tint(&qtc_base, &qtc_col, amount, &out);
+    return _qtc_color_to_gdk(&out);
+}
+
+QTC_ALWAYS_INLINE static inline GdkColor
+qtc_color_mix(const GdkColor *c1, const GdkColor *c2, double bias)
+{
+    if (bias <= 0.0) {
+        return *c1;
+    } else if (bias >= 1.0) {
+        return *c2;
+    } else if (isnan(bias)) {
+        return *c1;
+    }
+    QtcColor qtc_c1 = _qtc_color_from_gdk(c1);
+    QtcColor qtc_c2 = _qtc_color_from_gdk(c2);
+    QtcColor out;
+    _qtc_color_mix(&qtc_c1, &qtc_c2, bias, &out);
+    return _qtc_color_to_gdk(&out);
+}
+
+QTC_ALWAYS_INLINE static inline double
+qtc_color_luma(const GdkColor *color)
+{
+    QtcColor qtc_color = _qtc_color_from_gdk(color);
+    return qtc_color_HCY_luma(&qtc_color);
+}
+
+QTC_ALWAYS_INLINE static inline void
+qtc_shade(const GdkColor *ca, GdkColor *cb, double k, EShading shading)
+{
+    if (qtc_equal(k, 1.0)) {
+        *cb = *ca;
+        return;
+    }
+    QtcColor qtc_ca = _qtc_color_from_gdk(ca);
+    QtcColor qtc_cb;
+    _qtc_shade(&qtc_ca, &qtc_cb, k, shading);
+    *cb = _qtc_color_to_gdk(&qtc_cb);
+}
+
+QTC_ALWAYS_INLINE static inline double
+qtc_shine_alpha(const GdkColor *bgnd)
+{
+    QtcColor qtc_bgnd = _qtc_color_from_gdk(bgnd);
+    return _qtc_shine_alpha(&qtc_bgnd);
+}
+
+QTC_ALWAYS_INLINE static inline void
+qtc_calc_ring_alphas(const GdkColor *bgnd)
+{
+    QtcColor qtc_bgnd = _qtc_color_from_gdk(bgnd);
+    _qtc_calc_ring_alphas(&qtc_bgnd);
+}
 
 #endif
 

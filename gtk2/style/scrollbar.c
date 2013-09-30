@@ -18,7 +18,7 @@
   Boston, MA 02110-1301, USA.
  */
 
-#include <common/common.h>
+#include <qtcurve-utils/utils.h>
 #include "qtcurve-gtk-common.h"
 #include "compatability.h"
 

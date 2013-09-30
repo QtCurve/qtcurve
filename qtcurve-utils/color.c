@@ -150,7 +150,7 @@ _qtc_color_darken(QtcColor *color, double ky, double kc)
 }
 
 QTC_EXPORT void
-qtc_color_shade(QtcColor *color, double ky, double kc)
+_qtc_color_shade(QtcColor *color, double ky, double kc)
 {
     QtcColorHCY hcy;
     qtc_color_HCY_fromColor(color, &hcy);

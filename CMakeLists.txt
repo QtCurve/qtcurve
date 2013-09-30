@@ -91,6 +91,22 @@ if(NOT DEFINED QTC_KDE4_ICONS_PREFIX)
   set(QTC_KDE4_ICONS_PREFIX "${QTC_KDE4_PREFIX}/share/icons")
 endif()
 
+if(ENABLE_GTK2)
+  find_package(PkgConfig)
+  pkg_check_modules(GTK2 REQUIRED gtk+-2.0)
+  if(GTK2_THEME_PREFIX)
+    set(GTK2_PREIX "${GTK2_THEME_PREFIX}")
+  elseif(NOT GTK2_PREFIX)
+    set(GTK2_PREFIX "${CMAKE_INSTALL_PREFIX}")
+  endif()
+  if(NOT GTK2_LIBDIR)
+    set(GTK2_LIBDIR "${GTK2_PREFIX}/lib")
+  endif()
+
+  _pkgconfig_invoke(gtk+-2.0 GTK2 BIN_VERSION "" --variable=gtk_binary_version)
+  set(GTK2_THEME_DIR ${GTK2_PREFIX}/share/themes/QtCurve)
+endif()
+
 configure_file(config.h.in config.h @ONLY)
 
 include_directories(

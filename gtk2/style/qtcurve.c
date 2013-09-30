@@ -28,6 +28,7 @@
 #include "compatability.h"
 #include "qtcurve.h"
 #include <common/config_file.h>
+#include <qtcurve-utils/color.h>
 
 #define MO_ARROW(MENU, COL) (!MENU && MO_NONE!=opts.coloredMouseOver && GTK_STATE_PRELIGHT==state \
                                     ? &qtcPalette.mouseover[ARROW_MO_SHADE] : (COL))
@@ -2049,14 +2050,15 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
             if(area)
             {
                 area2=*area;
-                if(NO_FRAME(opts.groupBox))
-                    area2.x-=MAX(0, MIN(diff, 8));
-                else if(opts.gbLabel&GB_LBL_OUTSIDE)
-                    area2.x-=MAX(0, MIN(diff, 4));
-                else if(opts.gbLabel&GB_LBL_INSIDE)
-                    area2.x-=MAX(0, MIN(diff, 2));
-                else
+                if (NO_FRAME(opts.groupBox)) {
+                    area2.x -= QtcMax(0, QtcMin(diff, 8));
+                } else if (opts.gbLabel & GB_LBL_OUTSIDE) {
+                    area2.x-= QtcMax(0, QtcMin(diff, 4));
+                } else if(opts.gbLabel&GB_LBL_INSIDE) {
+                    area2.x -= QtcMax(0, QtcMin(diff, 2));
+                } else {
                     area2.x+=5;
+                }
                 area=&area2;
             }
 #endif
@@ -2838,8 +2840,11 @@ static void qtcurve_rc_style_merge(GtkRcStyle *dest, GtkRcStyle *src)
                                   (0==getuid() && src && src->name && (0==strcmp(src->name, "ToolTip") ||
                                                                       0==strcmp(src->name, "default"))));
 
-    if(isQtCNoteBook)
-        qtcShade(&opts, &qtcPalette.background[ORIGINAL_SHADE], &src->bg[GTK_STATE_NORMAL], TO_FACTOR(opts.tabBgnd));
+    if (isQtCNoteBook) {
+        qtc_shade(&qtcPalette.background[ORIGINAL_SHADE],
+                  &src->bg[GTK_STATE_NORMAL], TO_FACTOR(opts.tabBgnd),
+                  opts.shading);
+    }
 
     if(dontChangeColors)
     {

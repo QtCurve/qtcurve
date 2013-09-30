@@ -30,6 +30,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include <qtcurve-utils/color.h>
 
 #if GTK_CHECK_VERSION(2, 90, 0)
 static cairo_rectangle_int_t createRect(int x, int y, int w, int h)
@@ -196,8 +197,11 @@ void drawBevelGradientAlpha(cairo_t *cr, GdkRectangle *area, int x, int y, int w
             }
             else
             {
-                double val=botTab && opts.invertBotTab ? INVERT_SHADE(grad->stops[i].val) : grad->stops[i].val;
-                qtcShade(&opts, base, &col, botTab && opts.invertBotTab ? MAX(val, 0.9) : val);
+                double val = (botTab && opts.invertBotTab ?
+                              INVERT_SHADE(grad->stops[i].val) :
+                              grad->stops[i].val);
+                qtc_shade(base, &col, botTab && opts.invertBotTab ?
+                          QtcMax(val, 0.9) : val, opts.shading);
             }
 
 #if (CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 10, 0))
@@ -218,7 +222,7 @@ void drawBevelGradientAlpha(cairo_t *cr, GdkRectangle *area, int x, int y, int w
                 pos=0.999;
 #endif
 
-            qtcShade(&opts, base, &col, AGUA_MID_SHADE);
+            qtc_shade(base, &col, AGUA_MID_SHADE, opts.shading);
             cairo_pattern_add_color_stop_rgba(pt, pos, CAIRO_COL(col), alpha); /* *grad->stops[i].alpha); */
             cairo_pattern_add_color_stop_rgba(pt, 1.0-pos, CAIRO_COL(col), alpha); /* *grad->stops[i].alpha); */
         }
@@ -1293,8 +1297,7 @@ void drawStripedBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, gint x, g
                             gboolean isWindow, double alpha)
 {
     GdkColor col2;
-
-    qtcShade(&opts, col, &col2, BGND_STRIPE_SHADE);
+    qtc_shade(col, &col2, BGND_STRIPE_SHADE, opts.shading);
 
     cairo_pattern_t *pat=cairo_pattern_create_linear(x, y, x, y+4);
     cairo_pattern_add_color_stop_rgba(pat, 0.0, CAIRO_COL(*col), alpha);
@@ -1416,7 +1419,7 @@ gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, GdkWin
                 if(GT_HORIZ==opts.bgndGrad && GB_SHINE==qtcGetGradient(opts.bgndAppearance, &opts)->border)
                 {
                     int             size=MIN(BGND_SHINE_SIZE, MIN(wh*2, ww));
-                    double          alpha=qtcShineAlpha(col);
+                    double alpha = qtc_shine_alpha(col);
                     cairo_pattern_t *pat=NULL;
 
                     size/=BGND_SHINE_STEPS;
@@ -2697,10 +2700,9 @@ void fillTab(cairo_t *cr, GtkStyle *style, GtkWidget *widget, GdkRectangle *area
              b;
     double   alpha=1.0;
 
-    if(selected && 0!=opts.tabBgnd)
-    {
-        qtcShade(&opts, col, &b, TO_FACTOR(opts.tabBgnd));
-        c=&b;
+    if (selected && 0 != opts.tabBgnd) {
+        qtc_shade(col, &b, TO_FACTOR(opts.tabBgnd), opts.shading);
+        c = &b;
     }
 
     if(!selected && (100!=opts.bgndOpacity || 100!=opts.dlgOpacity))

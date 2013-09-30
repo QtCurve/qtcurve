@@ -23,6 +23,7 @@
 #include <gdk/gdkx.h>
 #include "qtcurve-gtk-common.h"
 #include "compatability.h"
+#include <qtcurve-utils/utils.h>
 #include <common/common.h>
 
 gboolean
