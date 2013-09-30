@@ -735,7 +735,7 @@ void Style::polish(QWidget *widget)
         }
 
     if(qobject_cast<QMenu *>(widget)/* && !(widget->parentWidget() &&
-                                       #ifdef QTC_QT_ONLY
+                                       #ifndef QTC_QT5_ENABLE_KDE
                                        widget->inherits("KMenu") && widget->parentWidget()->inherits("KXmlGuiWindow")
                                        #else
                                        qobject_cast<KMenu *>(widget) && qobject_cast<KXmlGuiWindow *>(widget->parentWidget())

@@ -1708,12 +1708,11 @@ void QtCurveClient::sendToggleToApp(bool menubar)
 
 const QString & QtCurveClient::windowClass()
 {
-    if(itsWindowClass.isEmpty())
-    {
-        KWindowInfo info(windowId(), NET::WMWindowType, NET::WM2WindowClass|NET::WM2WindowRole);
+    if (itsWindowClass.isEmpty()) {
+        KWindowInfo info(windowId(), NET::WMWindowType,
+                         NET::WM2WindowClass | NET::WM2WindowRole);
 
-        switch(info.windowType(NET::AllTypesMask))
-        {
+        switch (info.windowType((int)NET::AllTypesMask)) {
             case NET::Dialog:
                 itsWindowClass="D "+info.windowClassName()+' '+info.windowClassClass()+' '+info.windowRole();
                 break;

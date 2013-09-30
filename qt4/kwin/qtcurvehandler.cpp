@@ -141,7 +141,7 @@ void QtCurveHandler::setStyle()
 #endif
                                                                )
                                         ? QString("QtCurve") : styleName);
-        itsTimeStamp=getTimeStamp(xdgConfigFolder()+"/qtcurve/stylerc");
+        itsTimeStamp=getTimeStamp(xdgConfigFolder() + "/qtcurve/stylerc");
     }
 }
 
@@ -322,7 +322,7 @@ bool QtCurveHandler::readConfig(bool compositingToggled)
 
     itsTitleHeight+=2*titleBarPad();
 
-    QFile in(xdgConfigFolder()+"/qtcurve/"BORDER_SIZE_FILE);
+    QFile in(xdgConfigFolder() + "/qtcurve/" BORDER_SIZE_FILE);
     int   prevSize(-1), prevToolSize(-1), prevSide(-1), prevBot(-1);
 
     if(in.open(QIODevice::ReadOnly))
@@ -342,7 +342,7 @@ bool QtCurveHandler::readConfig(bool compositingToggled)
                             prevBot!=borderSize(true) || prevSide!=borderSize(false);
     if(borderSizesChanged)
     {
-        KSaveFile sizeFile(xdgConfigFolder()+"/qtcurve/"BORDER_SIZE_FILE);
+        KSaveFile sizeFile(xdgConfigFolder() + "/qtcurve/" BORDER_SIZE_FILE);
 
         if (sizeFile.open())
         {

@@ -1223,7 +1223,7 @@ typedef struct
 #include <KDE/KColorUtils>
 #define tint(COLA, COLB, FACTOR) KColorUtils::tint((COLA), (COLB), (FACTOR))
 #define midColor(COLA, COLB) KColorUtils::mix((COLA), (COLB), 0.5)
-#else // QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY
+#else
 #include <qtcurve-utils/color.h>
 #ifdef __cplusplus
 #define tint(COLA, COLB, FACTOR) qtc_color_tint(&(COLA), &(COLB), (FACTOR))
@@ -1233,7 +1233,7 @@ typedef struct
 #define tint(COLA, COLB, FACTOR) qtc_color_tint((COLA), (COLB), (FACTOR))
 #define midColor(COLA, COLB) qtc_color_mix((COLA), (COLB), 0.5)
 #endif // __cplusplus
-#endif // QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY
+#endif
 
 extern void qtcRgbToHsv(double r, double g, double b, double *h, double *s, double *v);
 

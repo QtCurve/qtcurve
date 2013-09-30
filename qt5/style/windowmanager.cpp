@@ -680,7 +680,7 @@ void WindowManager::startDrag( QWidget* widget, const QPoint& position )
         NETRootInfo rootInfo(QX11Info::display(), NET::WMMoveResize);
         rootInfo.moveResizeRequest(widget->window()->winId(),
                                    position.x(), position.y(), NET::Move);
-#endif // QTC_QT_ONLY
+#endif
 #endif
 
     }

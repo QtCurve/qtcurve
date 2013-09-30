@@ -64,9 +64,9 @@ bool compositingActive()
 #else // QTC_ENABLE_X11
     return false;
 #endif // QTC_ENABLE_X11
-#else // QTC_QT_ONLY
+#else
     return KWindowSystem::compositingActive();
-#endif // QTC_QT_ONLY
+#endif
 }
 
 bool hasAlphaChannel(const QWidget *widget)

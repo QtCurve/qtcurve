@@ -1769,7 +1769,7 @@ void QtCurveConfig::setupStack()
 
 void QtCurveConfig::setupPresets(const Options &currentStyle, const Options &defaultStyle)
 {
-    QStringList files(KGlobal::dirs()->findAllResources("data", "QtCurve/*"EXTENSION, KStandardDirs::NoDuplicates));
+    QStringList files(KGlobal::dirs()->findAllResources("data", "QtCurve/*" EXTENSION, KStandardDirs::NoDuplicates));
 
     files.sort();
 
@@ -2663,12 +2663,12 @@ void QtCurveConfig::deletePreset()
 
 void QtCurveConfig::importPreset()
 {
-    QString file(KFileDialog::getOpenFileName(KUrl(),
-                                              i18n("*"EXTENSION"|QtCurve Settings Files\n"
-                                                   THEME_PREFIX"*"THEME_SUFFIX"|QtCurve KDE Theme Files"), this));
+    QString file(KFileDialog::getOpenFileName(
+                     KUrl(), i18n("*" EXTENSION "|QtCurve Settings Files\n"
+                                  THEME_PREFIX "*" THEME_SUFFIX
+                                  "|QtCurve KDE Theme Files"), this));
 
-    if(!file.isEmpty())
-    {
+    if (!file.isEmpty()) {
         KMimeType::Ptr mimeType=KMimeType::findByFileContent(file);;
         bool           compressed(mimeType && !mimeType->is("text/plain"));
         QString        fileName(getFileName(file)),
@@ -2686,9 +2686,7 @@ void QtCurveConfig::importPreset()
             QString  qtcFile(file);
             KZip     *zip=compressed ? new KZip(file) : 0L;
             KTempDir *tmpDir=0L;
-    
-            if(compressed)
-            {
+            if (compressed) {
                 qtcFile=QString();
                 if(!zip->open(QIODevice::ReadOnly))
                     KMessageBox::error(this, i18n("Sorry, failed to open compressed file."));
@@ -2810,10 +2808,11 @@ void QtCurveConfig::exportPreset()
 #endif
 
     bool    compressed=haveImages();
-    QString file(KFileDialog::getSaveFileName(KUrl(), i18n("*"EXTENSION"|QtCurve Settings Files"), this));
+    QString file(KFileDialog::getSaveFileName(
+                     KUrl(), i18n("*" EXTENSION "|QtCurve Settings Files"),
+                     this));
 
-    if(!file.isEmpty())
-    {
+    if (!file.isEmpty()) {
         KZip *zip(compressed ? new KZip(file) : 0L);
         bool rv(true);
 

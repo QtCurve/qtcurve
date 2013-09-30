@@ -95,7 +95,7 @@
 #include <KDE/KAboutApplicationDialog>
 #include <KDE/KIcon>
 
-#endif // QTC_QT_ONLY
+#endif
 
 #include <qtcurve-utils/color.h>
 
@@ -512,7 +512,7 @@ void Style::init(bool initial)
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Highlight), itsMouseOverCols);
 // Dont setup KDE4 fonts/colours here - seems to mess things up when using proxy styles.
 // See http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=638629
-//#if !defined QTC_QT_ONLY
+//#ifdef QTC_QT5_ENABLE_KDE
 //    setupKde4();
 //#endif
 
