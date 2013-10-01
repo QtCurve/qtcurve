@@ -23,13 +23,12 @@
 #include <gdk/gdkx.h>
 #include <stdlib.h>
 #include "compatability.h"
-#include <qtcurve-utils/utils.h>
+#include <qtcurve-utils/gtkutils.h>
 #include "helpers.h"
 #include "qt_settings.h"
 #include "menu.h"
 #include "tab.h"
 #include <string.h>
-#include "qtcurve-gtk-common.h"
 
 extern Options opts;
 

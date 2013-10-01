@@ -18,7 +18,7 @@
   Boston, MA 02110-1301, USA.
 */
 
-#include "qtcurve-gtk-common.h"
+#include <qtcurve-utils/gtkutils.h>
 #include <gdk/gdkkeysyms.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>

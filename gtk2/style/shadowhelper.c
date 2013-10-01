@@ -23,7 +23,7 @@
 #include <common/common.h>
 #include "qt_settings.h"
 #include <qtcurve-utils/kdex11shadow.h>
-#include "qtcurve-gtk-common.h"
+#include <qtcurve-utils/gtkutils.h>
 
 static guint realizeSignalId = 0;
 static gulong realizeHookId = 0;

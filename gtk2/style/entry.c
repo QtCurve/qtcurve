@@ -18,8 +18,7 @@
   Boston, MA 02110-1301, USA.
  */
 
-#include <qtcurve-utils/utils.h>
-#include "qtcurve-gtk-common.h"
+#include <qtcurve-utils/gtkutils.h>
 #include "compatability.h"
 
 static GtkWidget *qtcEntryLastMo = NULL;

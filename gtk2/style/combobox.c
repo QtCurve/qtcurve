@@ -18,10 +18,9 @@
   Boston, MA 02110-1301, USA.
 */
 
-#include <qtcurve-utils/utils.h>
+#include <qtcurve-utils/gtkutils.h>
 #include "combobox.h"
 #include "compatability.h"
-#include "qtcurve-gtk-common.h"
 
 /**
  * Setting appears-as-list on a non-editable combo creates a view over the 'label' which

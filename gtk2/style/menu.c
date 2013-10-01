@@ -21,9 +21,8 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <gdk/gdkx.h>
-#include "qtcurve-gtk-common.h"
 #include "compatability.h"
-#include <qtcurve-utils/utils.h>
+#include <qtcurve-utils/gtkutils.h>
 #include <common/common.h>
 
 gboolean

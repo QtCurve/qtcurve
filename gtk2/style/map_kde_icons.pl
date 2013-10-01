@@ -1,14 +1,16 @@
-#This perl script is called by the QtCurve Gtk2 theme, it is not intended to be useful by itself.
+# This perl script is called by the QtCurve Gtk2 theme, it is not intended
+# to be useful by itself.
 # (C) Craig Drummond, 2007 - 2010 craig.p.drummond@gmail.com
 # Release uneder the GPL, v2 or later.
 #
 # Usage perl map_kde_icons.pl <icon map file> <kde prefix> <kde version> <small toolbar size> <toolbar size> <dnd size> <btn size> <menu size> <dialog size> <icon theme name> <icons map file version>
-#@iconSizes = ( 22,                  32,           22,        16,         16,                  48           );
+# @iconSizes = (22, 32, 22, 16, 16, 48);
 # KDE Uses 32x32 for dialogs, and 16x16 for buttons
-@iconSizes = ( $ARGV[3],            $ARGV[4],             $ARGV[5], $ARGV[6],     $ARGV[7],   $ARGV[8]     );
-@gtk       = ( "gtk-small-toolbar", "gtk-large-toolbar", "gtk-dnd", "gtk-button", "gtk-menu", "gtk-dialog" );
-$numSizes=$#iconSizes+1;
-$useCustom=0;
+@iconSizes = ($ARGV[3], $ARGV[4], $ARGV[5], $ARGV[6], $ARGV[7], $ARGV[8]);
+@gtk = ("gtk-small-toolbar", "gtk-large-toolbar", "gtk-dnd", "gtk-button",
+        "gtk-menu", "gtk-dialog" );
+$numSizes = $#iconSizes + 1;
+$useCustom = 0;
 
 printf "#%s %s %02X%02X%02X%02X%02X%02X%02X\n", $ARGV[10], $ARGV[9], $ARGV[2], $ARGV[3], $ARGV[4], $ARGV[5], $ARGV[6], $ARGV[7], $ARGV[8];
 printf "#This file is created, and used by, QtCurve. Alterations may be overwritten.\n";
