@@ -100,6 +100,24 @@ qtc_equal(double d1, double d2)
     return (fabs(d1 - d2) < 0.0001);
 }
 
+QTC_END_DECLS
+
+#ifdef __cplusplus
+template<typename T>
+static inline const T&
+QtcMax(const T &a, const T &b)
+{
+    return (a > b) ? a : b;
+}
+
+template<typename T>
+static inline const T&
+QtcMin(const T &a, const T &b)
+{
+    return (a < b) ? a : b;
+}
+
+#else
 #define QtcMax(a, b)                            \
     ({                                          \
         typeof(a) _a = (a);                     \
@@ -113,7 +131,6 @@ qtc_equal(double d1, double d2)
         typeof(b) _b = (b);                     \
         (_a < _b) ? _a : _b;                    \
     })
-
-QTC_END_DECLS
+#endif
 
 #endif

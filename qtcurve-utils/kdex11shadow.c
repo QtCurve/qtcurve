@@ -20,14 +20,14 @@
 
 #include "kdex11shadow_p.h"
 #include <xcb/xcb_image.h>
-#include <data/shadow0-png.h>
-#include <data/shadow1-png.h>
-#include <data/shadow2-png.h>
-#include <data/shadow3-png.h>
-#include <data/shadow4-png.h>
-#include <data/shadow5-png.h>
-#include <data/shadow6-png.h>
-#include <data/shadow7-png.h>
+#include <shadow0-png.h>
+#include <shadow1-png.h>
+#include <shadow2-png.h>
+#include <shadow3-png.h>
+#include <shadow4-png.h>
+#include <shadow5-png.h>
+#include <shadow6-png.h>
+#include <shadow7-png.h>
 
 /*!
   shadow atom and property specification available at

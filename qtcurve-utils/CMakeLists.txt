@@ -3,6 +3,8 @@ set(qtcurve_utils_SRCS
 set(qtcurve_utils_LINKS
   m)
 
+include_directories("${CMAKE_CURRENT_BINARY_DIR}")
+
 if(QTC_ENABLE_X11)
   set(qtcurve_utils_SRCS
     ${qtcurve_utils_SRCS}
@@ -21,9 +23,16 @@ add_library(qtcurve-utils SHARED
   ${qtcurve_utils_SRCS})
 
 if(QTC_ENABLE_X11)
-  add_dependencies(qtcurve-utils
-    qtc_shadow0_hdr qtc_shadow1_hdr qtc_shadow2_hdr qtc_shadow3_hdr
-    qtc_shadow4_hdr qtc_shadow5_hdr qtc_shadow6_hdr qtc_shadow7_hdr)
+  foreach(num RANGE 7)
+    add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/shadow${num}-png.h"
+      COMMAND "${PROJECT_BINARY_DIR}/tools/gen-image-header"
+      "${PROJECT_SOURCE_DIR}/data/shadow${num}.png" "qtc_shadow${num}"
+      "${CMAKE_CURRENT_BINARY_DIR}/shadow${num}-png.h"
+      DEPENDS gen-image-header "${PROJECT_SOURCE_DIR}/data/shadow${num}.png")
+    add_custom_target(qtc_shadow${num}_hdr
+      DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/shadow${num}-png.h")
+    add_dependencies(qtcurve-utils qtc_shadow${num}_hdr)
+  endforeach()
 endif()
 
 target_link_libraries(qtcurve-utils ${qtcurve_utils_LINKS})

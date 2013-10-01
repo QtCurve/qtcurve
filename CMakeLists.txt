@@ -133,7 +133,7 @@ include_directories(
   "${CMAKE_CURRENT_SOURCE_DIR}"
   "${CMAKE_CURRENT_BINARY_DIR}")
 set(CMAKE_C_FLAGS "-Wall -Wextra ${CMAKE_C_FLAGS} -std=gnu99")
-set(CMAKE_CXX_FLAGS "-Wall -Wextra ${CMAKE_CXX_FLAGS} -std=gnu++0x")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra ${CMAKE_CXX_FLAGS} -std=c++0x")
 set(CMAKE_SHARED_LINKER_FLAGS
   "-Wl,--as-needed -Wl,--no-undefined ${CMAKE_SHARED_LINKER_FLAGS}")
 set(CMAKE_MODULE_LINKER_FLAGS
@@ -150,7 +150,6 @@ add_subdirectory(po)
 add_subdirectory(qt4)
 add_subdirectory(qt5)
 add_subdirectory(gtk2)
-add_subdirectory(data)
 
 if(QTC_QT4_KWIN_MAX_BUTTON_HACK)
   message(WARNING

@@ -11314,7 +11314,8 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
             else
             {
                 QRectF ra(r.x()+0.5, r.y()+0.5, r.width(), r.height());
-                double size=(QtcMin((horiz ? ra.height() : ra.width())/2.0, 16)),
+                double size = QtcMin((horiz ? ra.height() : ra.width()) / 2.0,
+                                     16.0),
                        rad=size/2.0;
                 int    mod=4;
 
