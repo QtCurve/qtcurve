@@ -18,22 +18,15 @@
   Boston, MA 02110-1301, USA.
  */
 
-#include <string.h>
 #include <gtk/gtk.h>
-#include <gdk/gdk.h>
-#include <cairo-xlib.h>
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
 #include <gdk/gdkx.h>
 #include <common/common.h>
 #include "qt_settings.h"
-#include "shadow.h"
-#include "compatability.h"
 #include <qtcurve-utils/kdex11shadow.h>
 #include "qtcurve-gtk-common.h"
 
-static guint realizeSignalId=0;
-static gulong realizeHookId=0;
+static guint realizeSignalId = 0;
+static gulong realizeHookId = 0;
 
 static void
 installX11Shadows(GtkWidget* widget)
