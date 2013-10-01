@@ -18,6 +18,8 @@
   Boston, MA 02110-1301, USA.
  */
 
+#include "config.h"
+
 #include <gmodule.h>
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
@@ -29,6 +31,11 @@
 #include "qtcurve.h"
 #include <common/config_file.h>
 #include <qtcurve-utils/color.h>
+
+#ifdef QTC_ENABLE_X11
+#include <gdk/gdkx.h>
+#include <qtcurve-utils/x11utils.h>
+#endif
 
 #define MO_ARROW(MENU, COL) (!MENU && MO_NONE!=opts.coloredMouseOver && GTK_STATE_PRELIGHT==state \
                                     ? &qtcPalette.mouseover[ARROW_MO_SHADE] : (COL))
@@ -2969,6 +2976,9 @@ void qtcurve_rc_style_register_type(GTypeModule *module)
 
 G_MODULE_EXPORT void theme_init(GTypeModule *module)
 {
+#ifdef QTC_ENABLE_X11
+    qtc_x11_init_xlib(GDK_DISPLAY_XDISPLAY(gdk_display_get_default()));
+#endif
     qtcurve_rc_style_register_type(module);
     qtcurve_style_register_type(module);
 }
