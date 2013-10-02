@@ -93,7 +93,7 @@ typedef enum
 } EDrawFlags;
 
 #define drawBorder(a, b, c, d, e, f, g, h, i, j, k, l, m) \
-    realDrawBorder(a, b, c, d, e, f, g, h, i, j, k, l, m, STD_BORDER)
+    realDrawBorder(a, b, c, d, e, f, g, h, i, j, k, l, m, QTC_STD_BORDER)
 
 extern void plotPoints(cairo_t *cr, GdkPoint *pts, int count);
 extern void createTLPath(cairo_t *cr, double xd, double yd, double width, double height, double radius, int round);

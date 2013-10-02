@@ -202,6 +202,8 @@ void _qtcShade(const QtcColor *ca, QtcColor *cb, double k, EShading shading);
 double _qtcShineAlpha(const QtcColor *bgnd);
 void _qtcCalcRingAlphas(const QtcColor *bgnd);
 
+QTC_END_DECLS
+
 #ifndef QTC_UTILS_INTERNAL
 
 // Use __cplusplus to distinguish between gtk and qt for now.
@@ -418,7 +420,5 @@ qtcCalcRingAlphas(const GdkColor *bgnd)
 #endif
 
 #endif
-
-QTC_END_DECLS
 
 #endif

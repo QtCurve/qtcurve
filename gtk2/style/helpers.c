@@ -19,130 +19,118 @@
  */
 
 #include <qtcurve-utils/gtkutils.h>
+#include <qtcurve-utils/x11utils.h>
 #include <qtcurve-utils/color.h>
+#include <qtcurve-utils/log.h>
 
 #include "helpers.h"
 #include "qt_settings.h"
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
 #include <gdk/gdkx.h>
 
-static void
-dumpChildren(GtkWidget *widget, int level)
+void
+debugDisplayWidget(GtkWidget *widget, int level)
 {
-    if (level < 5) {
-        GList *children = gtk_container_get_children(GTK_CONTAINER(widget));
-        GList *child = children;
-
-        for (;child;child = child->next) {
-            GtkWidget *boxChild = (GtkWidget*)child->data;
-
-            printf(":[%d]%s:", level, g_type_name(G_OBJECT_TYPE(boxChild)));
-            if (GTK_IS_BOX(boxChild)) {
-                dumpChildren(boxChild, ++level);
-            }
-        }
-        if(children)
-            g_list_free(children);
-    }
-}
-
-void debugDisplayWidget(GtkWidget *widget, int level)
-{
-    if(level>=0)
-    {
-        printf("%s(%s)[%x] ", widget ? g_type_name(G_OBJECT_TYPE(widget)) : "NULL",
-               widget && gtk_widget_get_name(widget) ? gtk_widget_get_name(widget) : "NULL", (int)widget);
-        /*if(widget)
-            printf("[%d, %dx%d : %d,%d , %0X] ", gtk_widget_get_state(widget), widget->allocation.x,
-                   widget->allocation.y,
-                   widget->allocation.width, widget->allocation.height, gtk_widget_get_window(widget));*/
-        if(widget && gtk_widget_get_parent(widget))
-            debugDisplayWidget(gtk_widget_get_parent(widget), --level);
-        else
-            printf("\n");
-    }
-    else
+    if (qtcLogLevel > QTC_LOG_DEBUG)
+        return;
+    if (level < 0 || !widget) {
         printf("\n");
+        return;
+    }
+    const char *type_name = g_type_name(G_OBJECT_TYPE(widget));
+    const char *widget_name = gtk_widget_get_name(widget);
+    qtcDebug("%s(%s)[%p] ", type_name, widget_name ? widget_name : "NULL",
+             widget);
+    debugDisplayWidget(gtk_widget_get_parent(widget), level - 1);
 }
 
-bool haveAlternateListViewCol()
+bool
+haveAlternateListViewCol()
 {
-    return 0!=qtSettings.colors[PAL_ACTIVE][COLOR_LV].red || 0!=qtSettings.colors[PAL_ACTIVE][COLOR_LV].green ||
-           0!=qtSettings.colors[PAL_ACTIVE][COLOR_LV].blue;
+    return (qtSettings.colors[PAL_ACTIVE][COLOR_LV].red != 0 ||
+            qtSettings.colors[PAL_ACTIVE][COLOR_LV].green != 0 ||
+            qtSettings.colors[PAL_ACTIVE][COLOR_LV].blue != 0);
 }
 
-gboolean isMozilla()
+gboolean
+isMozilla()
 {
-    return GTK_APP_MOZILLA==qtSettings.app || GTK_APP_NEW_MOZILLA==qtSettings.app;
+    return (GTK_APP_MOZILLA == qtSettings.app ||
+            GTK_APP_NEW_MOZILLA == qtSettings.app);
 }
 
-gboolean isMozillaTab(GtkWidget *widget)
+gboolean
+isMozillaTab(GtkWidget *widget)
 {
-    return /*isMozillaWidget(widget) */ isFixedWidget(widget) && GTK_IS_NOTEBOOK(widget);
+    return isFixedWidget(widget) && GTK_IS_NOTEBOOK(widget);
 }
 
-gboolean isFakeGtk()
+gboolean
+isFakeGtk()
 {
-    return isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app;
+    return (isMozilla() || GTK_APP_OPEN_OFFICE == qtSettings.app ||
+            GTK_APP_JAVA == qtSettings.app);
 }
 
-GdkColor * menuColors(gboolean active)
+GdkColor*
+menuColors(gboolean active)
 {
-    return SHADE_WINDOW_BORDER==opts.shadeMenubars
-            ? qtcPalette.wborder[active ? 1 : 0]
-            : SHADE_NONE==opts.shadeMenubars || (opts.shadeMenubarOnlyWhenActive && !active)
-                ? qtcPalette.background
-                : qtcPalette.menubar;
+    return (SHADE_WINDOW_BORDER == opts.shadeMenubars ?
+            qtcPalette.wborder[active ? 1 : 0] :
+            SHADE_NONE == opts.shadeMenubars ||
+            (opts.shadeMenubarOnlyWhenActive && !active) ?
+            qtcPalette.background : qtcPalette.menubar);
 }
 
-EBorder shadowToBorder(GtkShadowType shadow)
+EBorder
+shadowToBorder(GtkShadowType shadow)
 {
-    switch(shadow)
-    {
-        case GTK_SHADOW_NONE:
-            return BORDER_FLAT;
-        case GTK_SHADOW_IN:
-        case GTK_SHADOW_ETCHED_IN:
-            return BORDER_SUNKEN;
-        case GTK_SHADOW_OUT:
-        case GTK_SHADOW_ETCHED_OUT:
-            return BORDER_RAISED;
+    switch (shadow) {
+    default:
+    case GTK_SHADOW_NONE:
+        return BORDER_FLAT;
+    case GTK_SHADOW_IN:
+    case GTK_SHADOW_ETCHED_IN:
+        return BORDER_SUNKEN;
+    case GTK_SHADOW_OUT:
+    case GTK_SHADOW_ETCHED_OUT:
+        return BORDER_RAISED;
     }
 }
 
-gboolean useButtonColor(const gchar *detail)
+gboolean
+useButtonColor(const gchar *detail)
 {
-    return detail &&( 0==strcmp(detail, "optionmenu") ||
-                      0==strcmp(detail, "button") ||
-                      0==strcmp(detail, "buttondefault") ||
-                      0==strcmp(detail, "togglebuttondefault") ||
-                      0==strcmp(detail, "togglebutton") ||
-                      0==strcmp(detail, "hscale") ||
-                      0==strcmp(detail, "vscale") ||
-                      0==strcmp(detail, "spinbutton") ||
-                      0==strcmp(detail, "spinbutton_up") ||
-                      0==strcmp(detail, "spinbutton_down") ||
-                      0==strcmp(detail, "slider") ||
-                      0==strcmp(detail, "qtc-slider") ||
-                      (detail[1] && &detail[1]==strstr(detail, "scrollbar")) ||
-                      0==strcmp(detail, "stepper") );
+    return (detail &&
+            (strcmp(detail, "optionmenu") == 0 ||
+             strcmp(detail, "button") == 0 ||
+             strcmp(detail, "buttondefault") == 0 ||
+             strcmp(detail, "togglebuttondefault") == 0 ||
+             strcmp(detail, "togglebutton") == 0 ||
+             strcmp(detail, "hscale") == 0 ||
+             strcmp(detail, "vscale") == 0 ||
+             strcmp(detail, "spinbutton") == 0 ||
+             strcmp(detail, "spinbutton_up") == 0 ||
+             strcmp(detail, "spinbutton_down") == 0 ||
+             strcmp(detail, "slider") == 0 ||
+             strcmp(detail, "qtc-slider") == 0 ||
+             (detail[0] && strncmp(detail + 1, "scrollbar",
+                                   strlen("scrollbar")) == 0) ||
+             strcmp(detail, "stepper") == 0));
 }
 
-void qtcShadeColors(GdkColor *base, GdkColor *vals)
+void
+qtcShadeColors(GdkColor *base, GdkColor *vals)
 {
-    SHADES
+    gboolean useCustom = USE_CUSTOM_SHADES(opts);
+    double hl = TO_FACTOR(opts.highlightFactor);
 
-    int      i;
-    gboolean useCustom=USE_CUSTOM_SHADES(opts);
-    double   hl=TO_FACTOR(opts.highlightFactor);
-
-    for (i = 0;i < NUM_STD_SHADES;++i) {
+    for (int i = 0;i < QTC_NUM_STD_SHADES;i++) {
         qtcShade(base, &vals[i], useCustom ? opts.customShades[i] :
-                 SHADE(opts.contrast, i), opts.shading);
+                 qtcShadeGetIntern(opts.contrast, i, opts.darkerBorders,
+                                   opts.shading), opts.shading);
     }
     qtcShade(base, &vals[SHADE_ORIG_HIGHLIGHT], hl, opts.shading);
     qtcShade(&vals[4], &vals[SHADE_4_HIGHLIGHT], hl, opts.shading);
@@ -150,85 +138,85 @@ void qtcShadeColors(GdkColor *base, GdkColor *vals)
     vals[ORIGINAL_SHADE] = *base;
 }
 
-gboolean isSortColumn(GtkWidget *button)
+gboolean
+isSortColumn(GtkWidget *button)
 {
-    GtkWidget *parent=NULL;
-    if(button && (parent=gtk_widget_get_parent(button)) && GTK_IS_TREE_VIEW(parent))
-    {
+    GtkWidget *parent = NULL;
+    if (button && (parent = gtk_widget_get_parent(button)) &&
+        GTK_IS_TREE_VIEW(parent)) {
 #if GTK_CHECK_VERSION(2, 90, 0)
-        GtkWidget *box=GTK_IS_BUTTON(button) ? gtk_bin_get_child(GTK_BIN(button)) : NULL;
+        GtkWidget *box = (GTK_IS_BUTTON(button) ?
+                          gtk_bin_get_child(GTK_BIN(button)) : NULL);
 
-        if(box && GTK_IS_BOX(box))
-        {
-            GList    *children=gtk_container_get_children(GTK_CONTAINER(box)),
-                     *child;
-            gboolean found=FALSE;
+        if (box && GTK_IS_BOX(box)) {
+            GList *children = gtk_container_get_children(GTK_CONTAINER(box));
+            gboolean found = FALSE;
 
-            for (child = children; child && !found; child=g_list_next(child))
-                if(GTK_IS_ARROW(child->data))
-                {
-                    GValue val = {0,};
-
+            for (GList *child = children;child && !found;
+                 child = g_list_next(child)) {
+                if (GTK_IS_ARROW(child->data)) {
+                    GValue val = {0};
                     g_value_init(&val, G_TYPE_INT);
                     g_object_get_property(child->data, "arrow-type", &val);
-
-                    if(GTK_ARROW_NONE!=g_value_get_int(&val))
-                        found=TRUE;
+                    if (GTK_ARROW_NONE != g_value_get_int(&val))
+                        found = TRUE;
                     g_value_unset(&val);
                 }
+            }
 
-            if(children)
+            if (children)
                 g_list_free(children);
             return found;
         }
 #else
-        GtkWidget *sort=NULL;;
-        GList     *columns=gtk_tree_view_get_columns(GTK_TREE_VIEW(parent)),
-                  *column;
+        GtkWidget *sort = NULL;
+        GList *columns = gtk_tree_view_get_columns(GTK_TREE_VIEW(parent));
 
-        for (column = columns; column && !sort && sort!=button; column=g_list_next(column))
-            if(GTK_IS_TREE_VIEW_COLUMN(column->data))
-            {
-                GtkTreeViewColumn *c=GTK_TREE_VIEW_COLUMN(column->data);
-
-                if(gtk_tree_view_column_get_sort_indicator(c))
-                    sort=c->button;
+        for (GList *column = columns;column && !sort && sort != button;
+             column = g_list_next(column)) {
+            if (GTK_IS_TREE_VIEW_COLUMN(column->data)) {
+                GtkTreeViewColumn *c = GTK_TREE_VIEW_COLUMN(column->data);
+                if (gtk_tree_view_column_get_sort_indicator(c)) {
+                    sort = c->button;
+                }
             }
+        }
 
-        if(columns)
+        if (columns)
             g_list_free(columns);
-        return sort==button;
+        return sort == button;
 #endif
     }
     return FALSE;
 };
 
-GdkColor * getCellCol(GdkColor *std, const gchar *detail)
+GdkColor*
+getCellCol(GdkColor *std, const gchar *detail)
 {
     static GdkColor shaded;
 
-    if(!qtSettings.shadeSortedList || !strstr(detail, "_sorted"))
+    if (!qtSettings.shadeSortedList || !strstr(detail, "_sorted"))
         return std;
 
-    shaded=*std;
+    shaded = *std;
 
     if (IS_BLACK(shaded)) {
-        shaded.red=shaded.green=shaded.blue=55<<8;
+        shaded.red = shaded.green = shaded.blue = 55 << 8;
     } else {
-        double r=shaded.red/65535.0,
-               g=shaded.green/65535.0,
-               b=shaded.blue/65535.0;
+        double r = shaded.red / 65535.0;
+        double g = shaded.green / 65535.0;
+        double b = shaded.blue / 65535.0;
         double h, s, v;
 
         qtcRgbToHsv(r, g, b, &h, &s, &v);
 
-        if (v > 175.0/255.0)
-            v*=100.0/104.0;
-        else
-            v*=120.0/100.0;
+        if (v > 175.0 / 255.0) {
+            v *= 100.0 / 104.0;
+        } else {
+            v *= 120.0 / 100.0;
+        }
 
-        if (v > 1.0)
-        {
+        if (v > 1.0) {
             s -= v - 1.0;
             if (s < 0)
                 s = 0;
@@ -243,75 +231,80 @@ GdkColor * getCellCol(GdkColor *std, const gchar *detail)
     return &shaded;
 }
 
-gboolean reverseLayout(GtkWidget *widget)
+gboolean
+reverseLayout(GtkWidget *widget)
 {
-    return widget
-        ? GTK_TEXT_DIR_RTL==gtk_widget_get_direction(widget)
-        : FALSE;
-}
-
-gboolean isOnToolbar(GtkWidget *widget, gboolean *horiz, int level)
-{
-    if(widget)
-    {
-        if(GTK_IS_TOOLBAR(widget))
-        {
-            if(horiz)
-                *horiz=GTK_ORIENTATION_HORIZONTAL==qtcToolbarGetOrientation(widget);
-            return TRUE;
-        }
-        else if(level<4)
-            return isOnToolbar(gtk_widget_get_parent(widget), horiz, ++level);
-    }
-
+    if (widget)
+        return GTK_TEXT_DIR_RTL == gtk_widget_get_direction(widget);
     return FALSE;
 }
 
-gboolean isOnHandlebox(GtkWidget *widget, gboolean *horiz, int level)
+gboolean
+isOnToolbar(GtkWidget *widget, gboolean *horiz, int level)
 {
-    if(widget)
-    {
-        if(GTK_IS_HANDLE_BOX(widget))
-        {
-            if(horiz)
-            {
-                GtkPositionType pos=gtk_handle_box_get_handle_position(GTK_HANDLE_BOX(widget));
-                *horiz=GTK_POS_LEFT==pos || GTK_POS_RIGHT==pos;
+    if (widget) {
+        if (GTK_IS_TOOLBAR(widget)) {
+            if (horiz)
+                *horiz = (GTK_ORIENTATION_HORIZONTAL ==
+                          qtcToolbarGetOrientation(widget));
+            return TRUE;
+        } else if (level < 4) {
+            return isOnToolbar(gtk_widget_get_parent(widget), horiz, level + 1);
+        }
+    }
+    return FALSE;
+}
+
+gboolean
+isOnHandlebox(GtkWidget *widget, gboolean *horiz, int level)
+{
+    if (widget) {
+        if (GTK_IS_HANDLE_BOX(widget)) {
+            if (horiz) {
+                GtkPositionType pos =
+                    gtk_handle_box_get_handle_position(GTK_HANDLE_BOX(widget));
+                *horiz = (GTK_POS_LEFT == pos || GTK_POS_RIGHT == pos);
             }
             return TRUE;
+        } else if (level < 4) {
+            return isOnHandlebox(gtk_widget_get_parent(widget), horiz,
+                                 level + 1);
         }
-        else if(level<4)
-            return isOnHandlebox(gtk_widget_get_parent(widget), horiz, ++level);
     }
-
     return FALSE;
 }
 
-gboolean isButtonOnToolbar(GtkWidget *widget, gboolean *horiz)
+gboolean
+isButtonOnToolbar(GtkWidget *widget, gboolean *horiz)
 {
-    GtkWidget *parent=NULL;
-    return (widget && (parent=gtk_widget_get_parent(widget)) && GTK_IS_BUTTON(widget))
-               ? isOnToolbar(parent, horiz, 0)
-               : FALSE;
+    GtkWidget *parent = NULL;
+    if (widget && (parent = gtk_widget_get_parent(widget)) &&
+        GTK_IS_BUTTON(widget))
+        return isOnToolbar(parent, horiz, 0);
+    return FALSE;
 }
 
-gboolean isButtonOnHandlebox(GtkWidget *widget, gboolean *horiz)
+gboolean
+isButtonOnHandlebox(GtkWidget *widget, gboolean *horiz)
 {
-    GtkWidget *parent=NULL;
-    return (widget && (parent=gtk_widget_get_parent(widget)) && GTK_IS_BUTTON(widget))
-               ? isOnHandlebox(parent, horiz, 0)
-               : FALSE;
+    GtkWidget *parent = NULL;
+    if (widget && (parent = gtk_widget_get_parent(widget)) &&
+        GTK_IS_BUTTON(widget))
+        return isOnHandlebox(parent, horiz, 0);
+    return FALSE;
 }
 
-gboolean isOnStatusBar(GtkWidget *widget, int level)
+gboolean
+isOnStatusBar(GtkWidget *widget, int level)
 {
-    GtkWidget *parent=gtk_widget_get_parent(widget);
-    if(parent)
-        if(GTK_IS_STATUSBAR(parent))
+    GtkWidget *parent = gtk_widget_get_parent(widget);
+    if (parent) {
+        if (GTK_IS_STATUSBAR(parent)) {
             return TRUE;
-        else if(level<4)
-            return isOnStatusBar(parent, ++level);
-
+        } else if (level < 4) {
+            return isOnStatusBar(parent, level + 1);
+        }
+    }
     return FALSE;
 }
 
@@ -328,7 +321,7 @@ gboolean isList(GtkWidget *widget)
 #endif
             GTK_IS_CTREE(widget) ||
 #endif
-            0==strcmp(g_type_name(G_OBJECT_TYPE(widget)), "GtkSCTree"));
+            0 == strcmp(g_type_name(G_OBJECT_TYPE(widget)), "GtkSCTree"));
 }
 
 gboolean isListViewHeader(GtkWidget *widget)
@@ -336,16 +329,16 @@ gboolean isListViewHeader(GtkWidget *widget)
     GtkWidget *parent=NULL;
     return widget && GTK_IS_BUTTON(widget) && (parent=gtk_widget_get_parent(widget)) &&
            (isList(parent) ||
-            (GTK_APP_GIMP==qtSettings.app && GTK_IS_BOX(parent) &&
+            (GTK_APP_GIMP == qtSettings.app && GTK_IS_BOX(parent) &&
              (parent=gtk_widget_get_parent(parent)) && GTK_IS_EVENT_BOX(parent) &&
-             (parent=gtk_widget_get_parent(parent)) && 0==strcmp(g_type_name(G_OBJECT_TYPE(parent)), "GimpThumbBox")));
+             (parent=gtk_widget_get_parent(parent)) && 0 == strcmp(g_type_name(G_OBJECT_TYPE(parent)), "GimpThumbBox")));
 }
 
 gboolean isEvolutionListViewHeader(GtkWidget *widget, const gchar *detail)
 {
     GtkWidget *parent=NULL;
-    return GTK_APP_EVOLUTION==qtSettings.app && widget && DETAIL("button") &&
-           0==strcmp(g_type_name(G_OBJECT_TYPE(widget)), "ECanvas") &&
+    return GTK_APP_EVOLUTION == qtSettings.app && widget && DETAIL("button") &&
+           0 == strcmp(g_type_name(G_OBJECT_TYPE(widget)), "ECanvas") &&
            (parent=gtk_widget_get_parent(widget)) && (parent=gtk_widget_get_parent(parent)) &&
            GTK_IS_SCROLLED_WINDOW(parent);
 }
@@ -365,7 +358,7 @@ gboolean isOnListViewHeader(GtkWidget *w, int level)
 gboolean isPathButton(GtkWidget *widget)
 {
     return widget && gtk_widget_get_parent(widget) && GTK_IS_BUTTON(widget) &&
-           0==strcmp(g_type_name(G_OBJECT_TYPE(gtk_widget_get_parent(widget))), "GtkPathBar");
+           0 == strcmp(g_type_name(G_OBJECT_TYPE(gtk_widget_get_parent(widget))), "GtkPathBar");
 }
 
 // static gboolean isTabButton(GtkWidget *widget)
@@ -415,12 +408,12 @@ GtkWidget * getComboButton(GtkWidget *widget)
 
 gboolean isSideBarBtn(GtkWidget *widget)
 {
-    GtkWidget *parent=NULL;
+    GtkWidget *parent = NULL;
     return widget && (parent=gtk_widget_get_parent(widget)) &&
-           (0==strcmp(g_type_name(G_OBJECT_TYPE(parent)), "GdlDockBar") ||
-            (0==strcmp(g_type_name(G_OBJECT_TYPE(parent)), "GdlSwitcher")/* &&
+           (0 == strcmp(g_type_name(G_OBJECT_TYPE(parent)), "GdlDockBar") ||
+            (0 == strcmp(g_type_name(G_OBJECT_TYPE(parent)), "GdlSwitcher")/* &&
              gtk_widget_get_parent(parent) &&
-             0==strcmp(g_type_name(G_OBJECT_TYPE(parent)), "GdlDockNotebook")*/) );
+             0 == strcmp(g_type_name(G_OBJECT_TYPE(parent)), "GdlDockNotebook")*/) );
 }
 
 gboolean isComboBoxButton(GtkWidget *widget)
@@ -453,18 +446,18 @@ gboolean isComboBoxEntryButton(GtkWidget *widget)
 /*
 static gboolean isSwtComboBoxEntry(GtkWidget *widget)
 {
-    return GTK_APP_JAVA_SWT==qtSettings.app &&
+    return GTK_APP_JAVA_SWT == qtSettings.app &&
            isComboBoxEntry(widget) &&
-           gtk_widget_get_parent(widget)->parent && 0==strcmp(g_type_name(G_OBJECT_TYPE(gtk_widget_get_parent(widget)->parent)), "SwtFixed");
+           gtk_widget_get_parent(widget)->parent && 0 == strcmp(g_type_name(G_OBJECT_TYPE(gtk_widget_get_parent(widget)->parent)), "SwtFixed");
 }
 */
 
 gboolean isGimpCombo(GtkWidget *widget)
 {
     GtkWidget *parent=NULL;
-    return GTK_APP_GIMP==qtSettings.app &&
+    return GTK_APP_GIMP == qtSettings.app &&
            widget && (parent=gtk_widget_get_parent(widget)) && GTK_IS_TOGGLE_BUTTON(widget) &&
-           0==strcmp(g_type_name(G_OBJECT_TYPE(parent)), "GimpEnumComboBox");
+           0 == strcmp(g_type_name(G_OBJECT_TYPE(parent)), "GimpEnumComboBox");
 }
 
 gboolean isOnComboEntry(GtkWidget *w, int level)
@@ -647,11 +640,11 @@ EStepper getStepper(GtkWidget *widget, int x, int y, int width, int height)
 #if GTK_CHECK_VERSION(2, 90, 0)
     if(detail && detail[1])
     {
-        if(0==strcmp(&detail[11], "end_inner"))
+        if(0 == strcmp(&detail[11], "end_inner"))
             return STEPPER_C;
         else if(strstr(&detail[11], "start_inner"))
             return STEPPER_B;
-        else if(0==strcmp(&detail[11], "end"))
+        else if(0 == strcmp(&detail[11], "end"))
             return STEPPER_D;
         else if(strstr(&detail[11], "start"))
             return STEPPER_A;
@@ -674,13 +667,13 @@ EStepper getStepper(GtkWidget *widget, int x, int y, int width, int height)
         check_rectangle.width  = stepper.width;
         check_rectangle.height = stepper.height;
 
-        if (-1==alloc.x && -1==alloc.y)
+        if (-1 == alloc.x && -1 == alloc.y)
             return STEPPER_NONE;
 
         if (gdk_rectangle_intersect(&stepper, &check_rectangle, &tmp))
             return STEPPER_A;
 
-        if (GTK_ORIENTATION_HORIZONTAL==orientation)
+        if (GTK_ORIENTATION_HORIZONTAL == orientation)
             check_rectangle.x = alloc.x + stepper.width;
         else
             check_rectangle.y = alloc.y + stepper.height;
@@ -688,7 +681,7 @@ EStepper getStepper(GtkWidget *widget, int x, int y, int width, int height)
         if (gdk_rectangle_intersect(&stepper, &check_rectangle, &tmp))
             return STEPPER_B;
 
-        if (GTK_ORIENTATION_HORIZONTAL==orientation)
+        if (GTK_ORIENTATION_HORIZONTAL == orientation)
             check_rectangle.x = alloc.x + alloc.width - (stepper.width * 2);
         else
             check_rectangle.y = alloc.y + alloc.height - (stepper.height * 2);
@@ -696,7 +689,7 @@ EStepper getStepper(GtkWidget *widget, int x, int y, int width, int height)
         if (gdk_rectangle_intersect(&stepper, &check_rectangle, &tmp))
             return STEPPER_C;
 
-        if (GTK_ORIENTATION_HORIZONTAL==orientation)
+        if (GTK_ORIENTATION_HORIZONTAL == orientation)
             check_rectangle.x = alloc.x + alloc.width - stepper.width;
         else
             check_rectangle.y = alloc.y + alloc.height - stepper.height;
@@ -717,17 +710,17 @@ void gdk_drawable_get_size(GdkWindow *window, gint *width, gint *height)
 
 void sanitizeSizeReal(GtkWidget *widget, gint *width, gint *height)
 {
-    if(-1==*width || -1==*height)
+    if(-1 == *width || -1 == *height)
     {
         GdkWindow *window=gtk_widget_get_window(widget);
 
         if(window)
         {
-            if((-1==*width) && (-1==*height))
+            if((-1 == *width) && (-1 == *height))
                 gdk_drawable_get_size(window, width, height);
-            else if(-1==*width)
+            else if(-1 == *width)
                 gdk_drawable_get_size(window, width, NULL);
-            else if(-1==*height)
+            else if(-1 == *height)
                 gdk_drawable_get_size(window, NULL, height);
         }
     }
@@ -735,24 +728,24 @@ void sanitizeSizeReal(GtkWidget *widget, gint *width, gint *height)
 #else
 void sanitizeSize(GdkWindow *window, gint *width, gint *height)
 {
-    if((-1==*width) && (-1==*height))
+    if((-1 == *width) && (-1 == *height))
         gdk_window_get_size(window, width, height);
-    else if(-1==*width)
+    else if(-1 == *width)
         gdk_window_get_size(window, width, NULL);
-    else if(-1==*height)
+    else if(-1 == *height)
         gdk_window_get_size(window, NULL, height);
 }
 #endif
 
 int getFillReal(GtkStateType state, gboolean set, gboolean darker)
 {
-    return GTK_STATE_INSENSITIVE==state
+    return GTK_STATE_INSENSITIVE == state
                ? (darker ? 2 : ORIGINAL_SHADE)
-               : GTK_STATE_PRELIGHT==state
+               : GTK_STATE_PRELIGHT == state
                    ? set /*&& allow_mouse_over_set*/
                        ? (darker ? 3 : SHADE_4_HIGHLIGHT)
                        : (darker ? SHADE_2_HIGHLIGHT : SHADE_ORIG_HIGHLIGHT)
-                   : set || GTK_STATE_ACTIVE==state
+                   : set || GTK_STATE_ACTIVE == state
                        ? (darker ? 5 : 4)
                        : (darker ? 2 : ORIGINAL_SHADE);
 }
@@ -761,32 +754,32 @@ gboolean isSbarDetail(const char *detail)
 {
     return detail && (
 #if GTK_CHECK_VERSION(2, 90, 0)
-                      (detail[1] && &detail[1]==strstr(detail, "scrollbar")) ||
+                      (detail[1] && &detail[1] == strstr(detail, "scrollbar")) ||
 #endif
-                      0==strcmp(detail, "hscrollbar") || 0==strcmp(detail, "vscrollbar") || 0==strcmp(detail, "stepper"));
+                      0 == strcmp(detail, "hscrollbar") || 0 == strcmp(detail, "vscrollbar") || 0 == strcmp(detail, "stepper"));
 }
 
 int getRound(const char *detail, GtkWidget *widget, int x, int y, int width, int height, gboolean rev)
 {
     if(detail)
     {
-        if(0==strcmp(detail, "slider"))
+        if(0 == strcmp(detail, "slider"))
             return
 #ifndef SIMPLE_SCROLLBARS
-                    !(opts.square&SQUARE_SB_SLIDER) && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons)
+                    !(opts.square&SQUARE_SB_SLIDER) && (SCROLLBAR_NONE == opts.scrollbarType || opts.flatSbarButtons)
                         ? ROUNDED_ALL :
 #endif
                     ROUNDED_NONE;
-        else if(0==strcmp(detail, "qtc-slider"))
-            return opts.square&SQUARE_SLIDER && (SLIDER_PLAIN==opts.sliderStyle || SLIDER_PLAIN_ROTATED==opts.sliderStyle)
+        else if(0 == strcmp(detail, "qtc-slider"))
+            return opts.square&SQUARE_SLIDER && (SLIDER_PLAIN == opts.sliderStyle || SLIDER_PLAIN_ROTATED == opts.sliderStyle)
                 ? ROUNDED_NONE : ROUNDED_ALL;
-        else if(0==strcmp(detail, "splitter") || 0==strcmp(detail, "optionmenu")  ||
-                0==strcmp(detail, "togglebutton") || 0==strcmp(detail, "hscale") ||
-                0==strcmp(detail, "vscale") )
+        else if(0 == strcmp(detail, "splitter") || 0 == strcmp(detail, "optionmenu")  ||
+                0 == strcmp(detail, "togglebutton") || 0 == strcmp(detail, "hscale") ||
+                0 == strcmp(detail, "vscale") )
             return ROUNDED_ALL;
-        else if(0==strcmp(detail, "spinbutton_up"))
+        else if(0 == strcmp(detail, "spinbutton_up"))
             return rev ? ROUNDED_TOPLEFT : ROUNDED_TOPRIGHT;
-        else if(0==strcmp(detail, "spinbutton_down"))
+        else if(0 == strcmp(detail, "spinbutton_down"))
             return rev ? ROUNDED_BOTTOMLEFT : ROUNDED_BOTTOMRIGHT;
         else if(isSbarDetail(detail))
         {
@@ -800,14 +793,14 @@ int getRound(const char *detail, GtkWidget *widget, int x, int y, int width, int
                               ))
             {
                 case STEPPER_A:
-                    return 'h'==detail[0] ? ROUNDED_LEFT : ROUNDED_TOP;
+                    return 'h' == detail[0] ? ROUNDED_LEFT : ROUNDED_TOP;
                 case STEPPER_D:
-                    return 'v'==detail[0] ? ROUNDED_BOTTOM : ROUNDED_RIGHT;
+                    return 'v' == detail[0] ? ROUNDED_BOTTOM : ROUNDED_RIGHT;
                 default:
                     return ROUNDED_NONE;
             }
         }
-        else if(0==strcmp(detail, "button"))
+        else if(0 == strcmp(detail, "button"))
         {
             if(isListViewHeader(widget))
                 return ROUNDED_NONE;
@@ -827,7 +820,7 @@ gboolean isHorizontalProgressbar(GtkWidget *widget)
         return TRUE;
 
 #if GTK_CHECK_VERSION(2, 90, 0)
-    return GTK_ORIENTATION_HORIZONTAL==qtcGetWidgetOrientation(widget);
+    return GTK_ORIENTATION_HORIZONTAL == qtcGetWidgetOrientation(widget);
 #else
     switch(GTK_PROGRESS_BAR(widget)->orientation)
     {
@@ -847,7 +840,7 @@ gboolean isComboBoxPopupWindow(GtkWidget *widget, int level)
     if(widget)
     {
         if(gtk_widget_get_name(widget) && GTK_IS_WINDOW(widget) &&
-           0==strcmp(gtk_widget_get_name(widget), "gtk-combobox-popup-window"))
+           0 == strcmp(gtk_widget_get_name(widget), "gtk-combobox-popup-window"))
             return TRUE;
         else if(level<4)
             return isComboBoxPopupWindow(gtk_widget_get_parent(widget), ++level);
@@ -866,7 +859,7 @@ gboolean isComboPopupWindow(GtkWidget *widget, int level)
     if(widget)
     {
         if(gtk_widget_get_name(widget) && GTK_IS_WINDOW(widget) &&
-            0==strcmp(gtk_widget_get_name(widget), "gtk-combo-popup-window"))
+            0 == strcmp(gtk_widget_get_name(widget), "gtk-combo-popup-window"))
             return TRUE;
         else if(level<4)
             return isComboPopupWindow(gtk_widget_get_parent(widget), ++level);
@@ -882,7 +875,7 @@ gboolean isComboList(GtkWidget *widget)
 
 gboolean isComboMenu(GtkWidget *widget)
 {
-    if(widget && gtk_widget_get_name(widget) && GTK_IS_MENU(widget) && 0==strcmp(gtk_widget_get_name(widget), "gtk-combobox-popup-menu"))
+    if(widget && gtk_widget_get_name(widget) && GTK_IS_MENU(widget) && 0 == strcmp(gtk_widget_get_name(widget), "gtk-combobox-popup-menu"))
         return TRUE;
     else
     {
@@ -913,13 +906,13 @@ gboolean isFixedWidget(GtkWidget *widget)
 
 gboolean isGimpDockable(GtkWidget *widget)
 {
-    if(GTK_APP_GIMP==qtSettings.app)
+    if(GTK_APP_GIMP == qtSettings.app)
     {
         GtkWidget *wid=widget;
         while(wid)
         {
-            if(0==strcmp(g_type_name(G_OBJECT_TYPE(wid)), "GimpDockable") ||
-               0==strcmp(g_type_name(G_OBJECT_TYPE(wid)), "GimpToolbox"))
+            if(0 == strcmp(g_type_name(G_OBJECT_TYPE(wid)), "GimpDockable") ||
+               0 == strcmp(g_type_name(G_OBJECT_TYPE(wid)), "GimpToolbox"))
                 return TRUE;
             wid=gtk_widget_get_parent(wid);
         }
@@ -947,7 +940,7 @@ GdkColor * getParentBgCol(GtkWidget *widget)
 
 int getOpacity(GtkWidget *widget)
 {
-    if(opts.bgndOpacity==opts.dlgOpacity)
+    if(opts.bgndOpacity == opts.dlgOpacity)
         return opts.bgndOpacity;
 
     if(opts.bgndOpacity!=100 || opts.dlgOpacity!=100)
@@ -965,7 +958,7 @@ int getOpacity(GtkWidget *widget)
 
 gboolean eqRect(GdkRectangle *a, GdkRectangle *b)
 {
-    return a->x==b->x && a->y==b->y && a->width==b->width && a->height==b->height;
+    return a->x == b->x && a->y == b->y && a->width == b->width && a->height == b->height;
 }
 
 void setLowerEtchCol(cairo_t *cr, GtkWidget *widget)
@@ -1020,11 +1013,12 @@ void constrainRect(QtcRect *rect, QtcRect *con)
     }
 }
 
-gboolean windowEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data)
+gboolean
+windowEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
-    if(GDK_FOCUS_CHANGE==event->type)
-        gtk_widget_queue_draw((GtkWidget *)user_data);
-
+    QTC_UNUSED(widget);
+    if (GDK_FOCUS_CHANGE == event->type)
+        gtk_widget_queue_draw((GtkWidget*)user_data);
     return FALSE;
 }
 
@@ -1035,7 +1029,7 @@ void adjustToolbarButtons(GtkWidget *widget, int *x, int *y, int *width, int *he
     GtkWidget   *w=widget;
     int         i;
 
-    for(i=0; i<5 && w && (NULL==toolbar || NULL==toolitem); ++i)
+    for(i=0; i<5 && w && (NULL == toolbar || NULL == toolitem); ++i)
     {
         if(GTK_IS_TOOLBAR(w))
             toolbar=GTK_TOOLBAR(w);
@@ -1152,38 +1146,46 @@ gboolean isRgbaWidget(GtkWidget *widget)
         gdk_visual_get_green_pixel_details(visual, &greenMask, NULL, NULL);
         gdk_visual_get_blue_pixel_details(visual, &blueMask, NULL, NULL);
 
-        return 32==gdk_visual_get_depth(visual) && (0xff0000==redMask && 0x00ff00==greenMask && 0x0000ff==blueMask);
+        return 32 == gdk_visual_get_depth(visual) && (0xff0000 == redMask && 0x00ff00 == greenMask && 0x0000ff == blueMask);
 #else
-        return 32==visual->depth && (0xff0000==visual->red_mask && 0x00ff00==visual->green_mask && 0x0000ff==visual->blue_mask);
+        return 32 == visual->depth && (0xff0000 == visual->red_mask && 0x00ff00 == visual->green_mask && 0x0000ff == visual->blue_mask);
 #endif
     }
     return FALSE;
 }
 
 #define BLUR_BEHIND_OBJECT "QTC_BLUR_BEHIND"
-void enableBlurBehind(GtkWidget *w, gboolean enable)
+void
+enableBlurBehind(GtkWidget *w, gboolean enable)
 {
-    GtkWindow  *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
+    qtcDebug("%p, %d\n", w, enable);
+    GtkWindow *topLevel = GTK_WINDOW(gtk_widget_get_toplevel(w));
 
-    if(topLevel)
-    {
-        GdkDisplay *display=gtk_widget_get_display(GTK_WIDGET(topLevel));
+    if (topLevel) {
+        GdkDisplay *display = gtk_widget_get_display(GTK_WIDGET(topLevel));
 
-        if(display)
-        {
-            int oldValue=(int)g_object_get_data(G_OBJECT(w), BLUR_BEHIND_OBJECT);
+        if (display) {
+            int oldValue =
+                GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w),
+                                                  BLUR_BEHIND_OBJECT));
 
-            if(0==oldValue || (enable && 1!=oldValue) || (!enable && 2!=oldValue))
-            {
-                Atom atom = gdk_x11_get_xatom_by_name_for_display(display, "_KDE_NET_WM_BLUR_BEHIND_REGION");
-                int  value=enable ? 1 : 2;
+            if (oldValue == 0 || (enable && oldValue != 1) ||
+                (!enable && oldValue != 2)) {
+                xcb_atom_t atom =
+                    qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_BLUR_BEHIND_REGION];
+                int value = enable ? 1 : 2;
+                xcb_window_t wid =
+                    GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel)));
 
-                g_object_set_data(G_OBJECT(w), MENU_SIZE_ATOM, (gpointer)value);
-                if (enable)
-                    XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel))), atom,
-                                    XA_CARDINAL, 32, PropModeReplace, 0, 0);
-                else
-                    XDeleteProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel))), atom);
+                g_object_set_data(G_OBJECT(w), MENU_SIZE_ATOM,
+                                  GINT_TO_POINTER(value));
+                if (enable) {
+                    qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE,
+                                   wid, atom, XCB_ATOM_CARDINAL, 32, 0, 0);
+                } else {
+                    qtcX11CallVoid(delete_property, wid, atom);
+                }
+                qtcX11Flush();
             }
         }
     }
@@ -1327,13 +1329,13 @@ GtkWidget * getParentWindow(GtkWidget *widget)
             }
         }
 
-    if(!top && GTK_APP_GIMP==qtSettings.app)
+    if(!top && GTK_APP_GIMP == qtSettings.app)
     {
         for(topWindows=node=gtk_window_list_toplevels(); node; node = node->next)
         {
             GtkWidget *w=node->data;
 
-            if(w && GTK_IS_WIDGET(w) && 0==strcmp(g_type_name(G_OBJECT_TYPE(w)), GIMP_MAIN))
+            if(w && GTK_IS_WIDGET(w) && 0 == strcmp(g_type_name(G_OBJECT_TYPE(w)), GIMP_MAIN))
             {
                 top=w;
                 break;
@@ -1485,7 +1487,7 @@ void generateColors()
             qtcPalette.combobtn=qtcPalette.highlight;
             break;
         case SHADE_CUSTOM:
-            if(SHADE_CUSTOM==opts.shadeSliders && EQUAL_COLOR(opts.customSlidersColor, opts.customComboBtnColor))
+            if(SHADE_CUSTOM == opts.shadeSliders && EQUAL_COLOR(opts.customSlidersColor, opts.customComboBtnColor))
                 qtcPalette.combobtn=qtcPalette.slider;
             else
             {
@@ -1494,7 +1496,7 @@ void generateColors()
             }
             break;
         case SHADE_BLEND_SELECTED:
-            if(SHADE_BLEND_SELECTED==opts.shadeSliders)
+            if(SHADE_BLEND_SELECTED == opts.shadeSliders)
                 qtcPalette.combobtn=qtcPalette.slider;
             else
             {
@@ -1527,9 +1529,9 @@ void generateColors()
             qtcPalette.sortedlv=qtcPalette.highlight;
             break;
         case SHADE_CUSTOM:
-            if(SHADE_CUSTOM==opts.shadeSliders && EQUAL_COLOR(opts.customSlidersColor, opts.customSortedLvColor))
+            if(SHADE_CUSTOM == opts.shadeSliders && EQUAL_COLOR(opts.customSlidersColor, opts.customSortedLvColor))
                 qtcPalette.sortedlv=qtcPalette.slider;
-            else if(SHADE_CUSTOM==opts.comboBtn && EQUAL_COLOR(opts.customComboBtnColor, opts.customSortedLvColor))
+            else if(SHADE_CUSTOM == opts.comboBtn && EQUAL_COLOR(opts.customComboBtnColor, opts.customSortedLvColor))
                 qtcPalette.sortedlv=qtcPalette.combobtn;
             else
             {
@@ -1538,9 +1540,9 @@ void generateColors()
             }
             break;
         case SHADE_BLEND_SELECTED:
-            if(SHADE_BLEND_SELECTED==opts.shadeSliders)
+            if(SHADE_BLEND_SELECTED == opts.shadeSliders)
                 qtcPalette.sortedlv=qtcPalette.slider;
-            else if(SHADE_BLEND_SELECTED==opts.comboBtn)
+            else if(SHADE_BLEND_SELECTED == opts.comboBtn)
                 qtcPalette.sortedlv=qtcPalette.combobtn;
             else
             {
@@ -1572,7 +1574,7 @@ void generateColors()
         default:
             break;
         case IND_COLORED:
-            if(SHADE_BLEND_SELECTED==opts.shadeSliders)
+            if(SHADE_BLEND_SELECTED == opts.shadeSliders)
                 qtcPalette.defbtn=qtcPalette.slider;
             else
             {
@@ -1635,12 +1637,12 @@ void generateColors()
         {
             GdkColor *col=&qtcPalette.menu[ORIGINAL_SHADE];
             GdkColor text=opts.shadePopupMenu
-                            ? SHADE_WINDOW_BORDER==opts.shadeMenubars
+                            ? SHADE_WINDOW_BORDER == opts.shadeMenubars
                                 ? qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER_TEXT]
                                 : opts.customMenuTextColor
                                     ? opts.customMenuNormTextColor
-                                    : SHADE_BLEND_SELECTED==opts.shadeMenubars || SHADE_SELECTED==opts.shadeMenubars ||
-                                    (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(qtcPalette.menubar[ORIGINAL_SHADE]))
+                                    : SHADE_BLEND_SELECTED == opts.shadeMenubars || SHADE_SELECTED == opts.shadeMenubars ||
+                                    (SHADE_CUSTOM == opts.shadeMenubars && TOO_DARK(qtcPalette.menubar[ORIGINAL_SHADE]))
                                     ? qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED]
                                     : qtSettings.colors[PAL_ACTIVE][COLOR_TEXT]
                             : qtSettings.colors[PAL_ACTIVE][COLOR_TEXT],
@@ -1698,11 +1700,11 @@ void generateColors()
             qtcPalette.selectedcr=qtcPalette.highlight;
             break;
         case SHADE_CUSTOM:
-            if(SHADE_CUSTOM==opts.shadeSliders && EQUAL_COLOR(opts.customSlidersColor, opts.customCrBgndColor))
+            if(SHADE_CUSTOM == opts.shadeSliders && EQUAL_COLOR(opts.customSlidersColor, opts.customCrBgndColor))
                 qtcPalette.selectedcr=qtcPalette.slider;
-            else if(SHADE_CUSTOM==opts.comboBtn && EQUAL_COLOR(opts.customComboBtnColor, opts.customCrBgndColor))
+            else if(SHADE_CUSTOM == opts.comboBtn && EQUAL_COLOR(opts.customComboBtnColor, opts.customCrBgndColor))
                 qtcPalette.selectedcr=qtcPalette.combobtn;
-            else if(SHADE_CUSTOM==opts.sortedLv && EQUAL_COLOR(opts.customSortedLvColor, opts.customCrBgndColor))
+            else if(SHADE_CUSTOM == opts.sortedLv && EQUAL_COLOR(opts.customSortedLvColor, opts.customCrBgndColor))
                 qtcPalette.selectedcr=qtcPalette.sortedlv;
             else
             {
@@ -1711,11 +1713,11 @@ void generateColors()
             }
             break;
         case SHADE_BLEND_SELECTED:
-            if(SHADE_BLEND_SELECTED==opts.shadeSliders)
+            if(SHADE_BLEND_SELECTED == opts.shadeSliders)
                 qtcPalette.selectedcr=qtcPalette.slider;
-            else if(SHADE_BLEND_SELECTED==opts.comboBtn)
+            else if(SHADE_BLEND_SELECTED == opts.comboBtn)
                 qtcPalette.selectedcr=qtcPalette.combobtn;
-            else if(SHADE_BLEND_SELECTED==opts.sortedLv)
+            else if(SHADE_BLEND_SELECTED == opts.sortedLv)
                 qtcPalette.selectedcr=qtcPalette.sortedlv;
             else
             {
@@ -1728,9 +1730,9 @@ void generateColors()
 
     qtcPalette.sidebar=NULL;
     if(!opts.stdSidebarButtons)
-        if(SHADE_BLEND_SELECTED==opts.shadeSliders)
+        if(SHADE_BLEND_SELECTED == opts.shadeSliders)
              qtcPalette.sidebar=qtcPalette.slider;
-        else if(IND_COLORED==opts.defBtnIndicator)
+        else if(IND_COLORED == opts.defBtnIndicator)
             qtcPalette.sidebar=qtcPalette.defbtn;
         else
         {
@@ -1749,13 +1751,13 @@ void generateColors()
             /* Not set! */
             break;
         case SHADE_CUSTOM:
-            if(SHADE_CUSTOM==opts.shadeSliders && EQUAL_COLOR(opts.customSlidersColor, opts.customProgressColor))
+            if(SHADE_CUSTOM == opts.shadeSliders && EQUAL_COLOR(opts.customSlidersColor, opts.customProgressColor))
                 qtcPalette.progress=qtcPalette.slider;
-            else if(SHADE_CUSTOM==opts.comboBtn && EQUAL_COLOR(opts.customComboBtnColor, opts.customProgressColor))
+            else if(SHADE_CUSTOM == opts.comboBtn && EQUAL_COLOR(opts.customComboBtnColor, opts.customProgressColor))
                 qtcPalette.progress=qtcPalette.combobtn;
-            else if(SHADE_CUSTOM==opts.sortedLv && EQUAL_COLOR(opts.customSortedLvColor, opts.customProgressColor))
+            else if(SHADE_CUSTOM == opts.sortedLv && EQUAL_COLOR(opts.customSortedLvColor, opts.customProgressColor))
                 qtcPalette.progress=qtcPalette.sortedlv;
-            else if(SHADE_CUSTOM==opts.crColor && EQUAL_COLOR(opts.customCrBgndColor, opts.customProgressColor))
+            else if(SHADE_CUSTOM == opts.crColor && EQUAL_COLOR(opts.customCrBgndColor, opts.customProgressColor))
                 qtcPalette.progress=qtcPalette.selectedcr;
             else
             {
@@ -1764,13 +1766,13 @@ void generateColors()
             }
             break;
         case SHADE_BLEND_SELECTED:
-            if(SHADE_BLEND_SELECTED==opts.shadeSliders)
+            if(SHADE_BLEND_SELECTED == opts.shadeSliders)
                 qtcPalette.progress=qtcPalette.slider;
-            else if(SHADE_BLEND_SELECTED==opts.comboBtn)
+            else if(SHADE_BLEND_SELECTED == opts.comboBtn)
                 qtcPalette.progress=qtcPalette.combobtn;
-            else if(SHADE_BLEND_SELECTED==opts.sortedLv)
+            else if(SHADE_BLEND_SELECTED == opts.sortedLv)
                 qtcPalette.progress=qtcPalette.sortedlv;
-            else if(SHADE_BLEND_SELECTED==opts.crColor)
+            else if(SHADE_BLEND_SELECTED == opts.crColor)
                 qtcPalette.progress=qtcPalette.selectedcr;
             else
             {
@@ -1786,7 +1788,7 @@ GdkColor * getCheckRadioCol(GtkStyle *style, GtkStateType state, gboolean mnu)
 {
     return !qtSettings.qt4 && mnu
                 ? &style->text[state]
-                : GTK_STATE_INSENSITIVE==state
+                : GTK_STATE_INSENSITIVE == state
                     ? &qtSettings.colors[PAL_DISABLED][opts.crButton ? COLOR_BUTTON_TEXT : COLOR_TEXT]
                     : qtcPalette.check_radio;
 }

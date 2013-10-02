@@ -18,11 +18,11 @@
   Boston, MA 02110-1301, USA.
 */
 
+#include <qtcurve-utils/x11utils.h>
 #include <qtcurve-utils/gtkutils.h>
+#include <qtcurve-utils/log.h>
 
 #include <gdk/gdkkeysyms.h>
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
 #include <gdk/gdkx.h>
 #include <stdlib.h>
 #include "compatability.h"
@@ -403,15 +403,15 @@ gboolean
 qtcWindowSetStatusBarProp(GtkWidget *w)
 {
     if (w && !g_object_get_data(G_OBJECT(w), STATUSBAR_ATOM)) {
-        GtkWindow  *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
-        GdkDisplay *display=gtk_widget_get_display(GTK_WIDGET(topLevel));
+        GtkWindow *topLevel = GTK_WINDOW(gtk_widget_get_toplevel(w));
+        xcb_window_t wid =
+            GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel)));
 
-        unsigned short setting=1;
+        unsigned short setting = 1;
         g_object_set_data(G_OBJECT(w), STATUSBAR_ATOM, (gpointer)1);
-        XChangeProperty(GDK_DISPLAY_XDISPLAY(display),
-                        GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel))),
-                        gdk_x11_get_xatom_by_name_for_display(display, STATUSBAR_ATOM),
-                        XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&setting, 1);
+        qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, wid,
+                       qtc_x11_atoms[QTC_X11_ATOM_QTC_STATUSBAR],
+                       XCB_ATOM_CARDINAL, 16, 1, (unsigned char*)&setting);
         return TRUE;
     }
     return FALSE;
@@ -440,23 +440,29 @@ static void
 qtcWindowSetProperties(GtkWidget *w, unsigned short opacity)
 {
     GtkWindow *topLevel = GTK_WINDOW(gtk_widget_get_toplevel(w));
-    GdkDisplay *display = gtk_widget_get_display(GTK_WIDGET(topLevel));
     unsigned long prop = (IS_FLAT_BGND(opts.bgndAppearance) ?
                           (IMG_NONE != opts.bgndImage.type ?
                            APPEARANCE_RAISED : APPEARANCE_FLAT) :
-                          opts.bgndAppearance)&0xFF;
-    //GtkRcStyle    *rcStyle=gtk_widget_get_modifier_style(w);
-    GdkColor      *bgnd=/*rcStyle ? &rcStyle->bg[GTK_STATE_NORMAL] : */&qtcPalette.background[ORIGINAL_SHADE];
+                          opts.bgndAppearance) & 0xFF;
+    //GtkRcStyle *rcStyle=gtk_widget_get_modifier_style(w);
+    GdkColor *bgnd = /* rcStyle ? &rcStyle->bg[GTK_STATE_NORMAL] : */
+        &qtcPalette.background[ORIGINAL_SHADE];
+    xcb_window_t wid =
+        GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel)));
 
-    if(100!=opacity)
-        XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel))),
-                        gdk_x11_get_xatom_by_name_for_display(display, OPACITY_ATOM),
-                        XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&opacity, 1);
+    if (opacity != 100) {
+        qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, wid,
+                       qtc_x11_atoms[QTC_X11_ATOM_QTC_OPACITY],
+                       XCB_ATOM_CARDINAL, 16, 1, (unsigned char*)&opacity);
+    }
 
-    prop|=((toQtColor(bgnd->red)&0xFF)<<24)|((toQtColor(bgnd->green)&0xFF)<<16)|((toQtColor(bgnd->blue)&0xFF)<<8);
-    XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel))),
-                    gdk_x11_get_xatom_by_name_for_display(display, BGND_ATOM),
-                    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)&prop, 1);
+    prop |= (((toQtColor(bgnd->red) & 0xFF) << 24) |
+             ((toQtColor(bgnd->green) & 0xFF) << 16) |
+             ((toQtColor(bgnd->blue) & 0xFF) << 8));
+    qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, wid,
+                   qtc_x11_atoms[QTC_X11_ATOM_QTC_BGND], XCB_ATOM_CARDINAL,
+                   32, 1, (unsigned char*)&prop);
+    qtcX11Flush();
 }
 
 static gboolean qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
@@ -506,8 +512,10 @@ static gboolean qtcWindowMap(GtkWidget *widget, GdkEventKey *event, gpointer use
     return FALSE;
 }
 
-gboolean qtcWindowSetup(GtkWidget *widget, int opacity)
+gboolean
+qtcWindowSetup(GtkWidget *widget, int opacity)
 {
+    qtcDebug("%p, %d\n", widget, opacity);
     GObject *obj = NULL;
     if (widget && (obj = G_OBJECT(widget)) &&
         !g_object_get_data(obj, "QTC_WINDOW_HACK_SET")) {

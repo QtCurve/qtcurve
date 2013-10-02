@@ -2348,21 +2348,19 @@ void QtCurveConfig::setupAlpha(KDoubleNumInput *w, int alpha)
 
 void QtCurveConfig::populateShades(const Options &opts)
 {
-    SHADES
-    int contrast=QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", 7).toInt();
+    int contrast = (QSettings(QLatin1String("Trolltech"))
+                    .value("/Qt/KDE/contrast", 7).toInt());
 
     if(contrast<0 || contrast>10)
         contrast=7;
 
     customShading->setChecked(USE_CUSTOM_SHADES(opts));
 
-    for(int i=0; i<NUM_STD_SHADES; ++i)
-        shadeVals[i]->setValue(USE_CUSTOM_SHADES(opts)
-                                  ? opts.customShades[i]
-                                  : shades[SHADING_SIMPLE==shading->currentIndex()
-                                            ? 1 : 0]
-                                          [contrast]
-                                          [i]);
+    for(int i=0; i<QTC_NUM_STD_SHADES; ++i)
+        shadeVals[i]->setValue(USE_CUSTOM_SHADES(opts) ? opts.customShades[i] :
+                               qtc_intern_shades[SHADING_SIMPLE ==
+                                                 shading->currentIndex() ? 1 : 0]
+                               [contrast][i]);
 
     customAlphas->setChecked(USE_CUSTOM_ALPHAS(opts));
     alphaVals[0]->setValue(USE_CUSTOM_ALPHAS(opts) ? opts.customAlphas[0] : ETCH_TOP_ALPHA);
@@ -2377,7 +2375,7 @@ bool QtCurveConfig::diffShades(const Options &opts)
 
     if(customShading->isChecked())
     {
-        for(int i=0; i<NUM_STD_SHADES; ++i)
+        for(int i=0; i<QTC_NUM_STD_SHADES; ++i)
             if(!qtcEqual(shadeVals[i]->value(), opts.customShades[i]))
                 return true;
     }
@@ -3124,7 +3122,7 @@ void QtCurveConfig::setOptions(Options &opts)
 
     if(customShading->isChecked())
     {
-        for(int i=0; i<NUM_STD_SHADES; ++i)
+        for(int i=0; i<QTC_NUM_STD_SHADES; ++i)
             opts.customShades[i]=shadeVals[i]->value();
     }
     else

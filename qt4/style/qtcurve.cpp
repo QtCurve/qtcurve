@@ -1679,12 +1679,12 @@ void Style::polish(QPalette &palette)
     }
 
     palette.setColor(QPalette::Active, QPalette::Light, itsBackgroundCols[0]);
-    palette.setColor(QPalette::Active, QPalette::Dark, itsBackgroundCols[STD_BORDER]);
+    palette.setColor(QPalette::Active, QPalette::Dark, itsBackgroundCols[QTC_STD_BORDER]);
     palette.setColor(QPalette::Inactive, QPalette::Light, itsBackgroundCols[0]);
-    palette.setColor(QPalette::Inactive, QPalette::Dark, itsBackgroundCols[STD_BORDER]);
+    palette.setColor(QPalette::Inactive, QPalette::Dark, itsBackgroundCols[QTC_STD_BORDER]);
     palette.setColor(QPalette::Inactive, QPalette::WindowText, palette.color(QPalette::Active, QPalette::WindowText));
     palette.setColor(QPalette::Disabled, QPalette::Light, itsBackgroundCols[0]);
-    palette.setColor(QPalette::Disabled, QPalette::Dark, itsBackgroundCols[STD_BORDER]);
+    palette.setColor(QPalette::Disabled, QPalette::Dark, itsBackgroundCols[QTC_STD_BORDER]);
 
     palette.setColor(QPalette::Disabled, QPalette::Base, palette.color(QPalette::Active, QPalette::Background));
     palette.setColor(QPalette::Disabled, QPalette::Background, palette.color(QPalette::Active, QPalette::Background));
@@ -2901,7 +2901,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                     EGradientBorder border=qtcGetGradient(opts.menuBgndAppearance, &opts)->border;
 
                     p.setClipping(false);
-                    p.setPen(use[STD_BORDER]);
+                    p.setPen(use[QTC_STD_BORDER]);
                     // For now dont round combos - getting weird effects with shadow/clipping in Gtk2 style :-(
                     if(opts.square&SQUARE_POPUP_MENUS) // || isCombo)
                         drawRect(&p, r);
@@ -2972,7 +2972,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                                     ? QRect(frame->rect().x(), frame->rect().y()+ (frame->rect().height()/2), frame->rect().width(), 1)
                                     : QRect(frame->rect().x()+(frame->rect().width()/2),  frame->rect().y(), 1, frame->rect().height()));
 
-                        drawFadedLine(&painter, r, backgroundColors(frame->palette().window().color())[STD_BORDER], true, true,
+                        drawFadedLine(&painter, r, backgroundColors(frame->palette().window().color())[QTC_STD_BORDER], true, true,
                                       QFrame::HLine==frame->frameShape());
                         return true;
                     }
@@ -4166,7 +4166,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             {
                 QStyleOptionFrameV2 frameV2(*frame);
                 if (frameV2.features & QStyleOptionFrameV2::Flat || FRAME_LINE==opts.groupBox)
-                    drawFadedLine(painter, QRect(r.x(), r.y(), r.width(), 1), backgroundColors(option)[STD_BORDER],
+                    drawFadedLine(painter, QRect(r.x(), r.y(), r.width(), 1), backgroundColors(option)[QTC_STD_BORDER],
                                   opts.gbLabel&GB_LBL_CENTRED || reverse, opts.gbLabel&GB_LBL_CENTRED || !reverse, true);
                 else
                 {
@@ -4209,7 +4209,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                                         /*state&State_Raised && opts.gbFactor<0 ? BORDER_RAISED : */BORDER_SUNKEN);
                         else
                         {
-                            QColor          col(backgroundColors(option)[STD_BORDER]);
+                            QColor          col(backgroundColors(option)[QTC_STD_BORDER]);
                             QLinearGradient grad(r.topLeft(), r.bottomLeft());
 
                             col.setAlphaF(1.0);
@@ -4249,7 +4249,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                     const QColor *use(APP_KRUNNER==theThemedApp ? itsBackgroundCols : backgroundColors(option));
 
                     painter->save();
-                    painter->setPen(use[STD_BORDER]);
+                    painter->setPen(use[QTC_STD_BORDER]);
                     drawRect(painter, r);
                     painter->setPen(palette.base().color());
                     drawRect(painter, r.adjusted(1, 1, -1, -1));
@@ -4263,7 +4263,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                 if(APP_K3B==theThemedApp && !(state&(State_Sunken|State_Raised)) && fo && 1==fo->lineWidth)
                 {
                     painter->save();
-                    painter->setPen(backgroundColors(option)[STD_BORDER]);
+                    painter->setPen(backgroundColors(option)[QTC_STD_BORDER]);
                     drawRect(painter, r);
                     painter->restore();
                 }
@@ -4279,7 +4279,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                                                     : theThemedApp==APP_KWIN
                                                         ? buttonColors(option)
                                                         : getMdiColors(option, state&State_Active));
-                        border=borderCols[fo->version==TBAR_BORDER_VERSION_HACK ? 0 : STD_BORDER];
+                        border=borderCols[fo->version==TBAR_BORDER_VERSION_HACK ? 0 : QTC_STD_BORDER];
                     }
 
                     border.setAlphaF(1.0);
@@ -4451,12 +4451,12 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                     drawFadedLine(painter, QRect(topLine.p1(), topLine.p2()),
                                   QTabBar::RoundedSouth==tbb->shape && APPEARANCE_FLAT==opts.appearance
                                     ? palette.background().color()
-                                    : use[QTabBar::RoundedNorth==tbb->shape ? STD_BORDER
+                                    : use[QTabBar::RoundedNorth==tbb->shape ? QTC_STD_BORDER
                                                                             : (opts.borderTab ? 0 : FRAME_DARK_SHADOW)],
                                   fadeState, fadeEnd, horiz, fadeSizeStart, fadeSizeEnd);
                     if(!(opts.thin&THIN_FRAMES))
                         drawFadedLine(painter, QRect(bottomLine.p1(), bottomLine.p2()),
-                                      use[QTabBar::RoundedNorth==tbb->shape ? 0 : STD_BORDER],
+                                      use[QTabBar::RoundedNorth==tbb->shape ? 0 : QTC_STD_BORDER],
                                       fadeState, fadeEnd, horiz, fadeSizeStart, fadeSizeEnd);
                     painter->restore();
                 }
@@ -4473,7 +4473,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                 const QColor    *use(popupMenuCols(option));
                 EGradientBorder border=qtcGetGradient(opts.menuBgndAppearance, &opts)->border;
                 painter->save();
-                painter->setPen(use[STD_BORDER]);
+                painter->setPen(use[QTC_STD_BORDER]);
                 drawRect(painter, r);
 
                 if(USE_BORDER(border) && APPEARANCE_FLAT!=opts.menuBgndAppearance)
@@ -4504,7 +4504,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             painter->setPen(use[0]);
             painter->drawLine(r.x(), r.y(), r.x()+r.width()-1, r.y());
             painter->drawLine(r.x(), r.y(), r.x(), r.y()+r.height()-1);
-            painter->setPen(use[APPEARANCE_FLAT==opts.appearance ? ORIGINAL_SHADE : STD_BORDER]);
+            painter->setPen(use[APPEARANCE_FLAT==opts.appearance ? ORIGINAL_SHADE : QTC_STD_BORDER]);
             painter->drawLine(r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
             painter->drawLine(r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
             painter->restore();
@@ -5221,7 +5221,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             QColor       light(borderCols[0]),
                          dark(option->version==(TBAR_BORDER_VERSION_HACK+2)
                                 ? palette.color(QPalette::Active, QPalette::Shadow)
-                                : borderCols[option && option->version==TBAR_BORDER_VERSION_HACK ? 0 : STD_BORDER]);
+                                : borderCols[option && option->version==TBAR_BORDER_VERSION_HACK ? 0 : QTC_STD_BORDER]);
             bool         isKWin=state&QtC_StateKWin,
                          addLight=opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER && (!isKWin || qtcGetWindowBorderSize().sides>1);
 
@@ -5262,8 +5262,8 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                 if(FULLLY_ROUNDED && !(state&QtC_StateKWinCompositing))
                 {
                     QColor col(opts.windowBorder&WINDOW_BORDER_COLOR_TITLEBAR_ONLY
-                                ? backgroundColors(option)[STD_BORDER]
-                                : buttonColors(option)[STD_BORDER]);
+                                ? backgroundColors(option)[QTC_STD_BORDER]
+                                : buttonColors(option)[QTC_STD_BORDER]);
 
                     painter->setRenderHint(QPainter::Antialiasing, false);
                     painter->setPen(col);
@@ -5669,7 +5669,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
         {
             const QColor *use(popupMenuCols());
             painter->fillRect(r, use[ORIGINAL_SHADE]);
-            painter->setPen(use[STD_BORDER]);
+            painter->setPen(use[QTC_STD_BORDER]);
             drawRect(painter, r);
             drawPrimitive(((state&State_DownArrow) ? PE_IndicatorArrowDown : PE_IndicatorArrowUp), option, painter, widget);
             break;
@@ -5726,7 +5726,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                 case LINE_NONE:
                     break;
                 case LINE_1DOT:
-                    painter->drawPixmap(r.x()+((r.width()-5)/2), r.y()+((r.height()-5)/2), *getPixmap(border[STD_BORDER], PIX_DOT, 1.0));
+                    painter->drawPixmap(r.x()+((r.width()-5)/2), r.y()+((r.height()-5)/2), *getPixmap(border[QTC_STD_BORDER], PIX_DOT, 1.0));
                     break;
                 default:
                 case LINE_DOTS:
@@ -5997,7 +5997,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     drawAaLine(painter, r.x()+r.width()-2, r.y(), r.x()+r.width()-2, r.y()+r.height()-1);
             }
 
-            painter->setPen(use[STD_BORDER]);
+            painter->setPen(use[QTC_STD_BORDER]);
             if(horiz)
                 drawAaLine(painter, r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
             else if(reverse)
@@ -6045,7 +6045,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
                     if(Qt::Horizontal==ho->orientation)
                     {
-                        painter->setPen(use[STD_BORDER]);
+                        painter->setPen(use[QTC_STD_BORDER]);
                         drawAaLine(painter, r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
                         if(opts.coloredMouseOver && state&State_MouseOver && state&State_Enabled)
                             drawHighlight(painter, QRect(r.x(), r.y()+r.height()-2, r.width(), 2), true, true);
@@ -6053,13 +6053,13 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                         if(q3Header ||
                            (QStyleOptionHeader::End!=ho->position && QStyleOptionHeader::OnlyOneSection!=ho->position))
                         {
-                            drawFadedLine(painter, QRect(r.x()+r.width()-2, r.y()+5, 1, r.height()-10), use[STD_BORDER], true, true, false);
+                            drawFadedLine(painter, QRect(r.x()+r.width()-2, r.y()+5, 1, r.height()-10), use[QTC_STD_BORDER], true, true, false);
                             drawFadedLine(painter, QRect(r.x()+r.width()-1, r.y()+5, 1, r.height()-10), use[0], true, true, false);
                         }
                     }
                     else
                     {
-                        painter->setPen(use[STD_BORDER]);
+                        painter->setPen(use[QTC_STD_BORDER]);
                         if(reverse)
                             drawAaLine(painter, r.x(), r.y(), r.x(), r.y()+r.height()-1);
                         else
@@ -6068,7 +6068,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                         if(q3Header ||
                            (QStyleOptionHeader::End!=ho->position && QStyleOptionHeader::OnlyOneSection!=ho->position))
                         {
-                            drawFadedLine(painter, QRect(r.x()+5, r.y()+r.height()-2, r.width()-10, 1), use[STD_BORDER], true, true, true);
+                            drawFadedLine(painter, QRect(r.x()+5, r.y()+r.height()-2, r.width()-10, 1), use[QTC_STD_BORDER], true, true, true);
                             drawFadedLine(painter, QRect(r.x()+5, r.y()+r.height()-1, r.width()-10, 1), use[0], true, true, true);
                         }
                         if(opts.coloredMouseOver && state&State_MouseOver && state&State_Enabled)
@@ -6149,7 +6149,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                 drawEtch(painter, r.adjusted(-1, -1, 1, 1), widget, WIDGET_PBAR_TROUGH);
             else if(!opts.borderProgress)
             {
-                painter->setPen(itsBackgroundCols[STD_BORDER]);
+                painter->setPen(itsBackgroundCols[QTC_STD_BORDER]);
                 if(horiz)
                 {
                     painter->drawLine(r.topLeft(), r.topRight());
@@ -6443,7 +6443,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
                     if(isOO)
                     {
-                        painter->setPen(use[STD_BORDER]);
+                        painter->setPen(use[QTC_STD_BORDER]);
                         painter->drawLine(rx.topLeft(), rx.bottomLeft());
                         painter->drawLine(rx.topRight(), rx.bottomRight());
                     }
@@ -6611,7 +6611,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
                 if(isOO)
                 {
-                    painter->setPen(use[STD_BORDER]);
+                    painter->setPen(use[QTC_STD_BORDER]);
                     painter->drawLine(rx.topLeft(), rx.bottomLeft());
                     painter->drawLine(rx.topRight(), rx.bottomRight());
                 }
@@ -7133,7 +7133,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
                             if(docFixLeft)
                             {
-                                QColor col(use[STD_BORDER]);
+                                QColor col(use[QTC_STD_BORDER]);
                                 col.setAlphaF(0.5);
                                 painter->setPen(col);
                                 painter->drawPoint(r2.x(), r2.y()+r2.height()-1);
@@ -7143,7 +7143,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                         {
                             int l(fixLeft ? r2.left()+(opts.round>ROUND_SLIGHT && !(opts.square&SQUARE_TAB_FRAME) ? 2 : 1) : r2.left()-1),
                                 r(fixRight ? r2.right()-2 : r2.right()+1);
-                            painter->setPen(use[STD_BORDER]);
+                            painter->setPen(use[QTC_STD_BORDER]);
                             painter->drawLine(l, r2.bottom()-1, r, r2.bottom()-1);
                             if(!thin)
                             {
@@ -7218,7 +7218,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                             }
                             if(docFixLeft)
                             {
-                                QColor col(use[STD_BORDER]);
+                                QColor col(use[QTC_STD_BORDER]);
                                 col.setAlphaF(0.5);
                                 painter->setPen(col);
                                 painter->drawPoint(r2.x(), r2.y());
@@ -7228,7 +7228,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                         {
                             int l(fixLeft ? r2.left()+(opts.round>ROUND_SLIGHT && !(opts.square&SQUARE_TAB_FRAME)? 2 : 1) : r2.left()-1),
                                 r(fixRight ? r2.right()-2 : r2.right());
-                            painter->setPen(use[STD_BORDER]);
+                            painter->setPen(use[QTC_STD_BORDER]);
                             painter->drawLine(l, r2.top()+1, r, r2.top()+1);
                             if(!thin)
                             {
@@ -7306,7 +7306,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                             int t(firstTab ? r2.top()+(opts.round>ROUND_SLIGHT && !(opts.square&SQUARE_TAB_FRAME)? 2 : 1) : r2.top()-1),
                                 b(/*lastTab ? r2.bottom()-2 : */ r2.bottom()+1);
 
-                            painter->setPen(use[STD_BORDER]);
+                            painter->setPen(use[QTC_STD_BORDER]);
                             painter->drawLine(r2.right()-1, t, r2.right()-1, b);
                             if(!thin)
                             {
@@ -7384,7 +7384,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                             int t(firstTab ? r2.top()+(opts.round>ROUND_SLIGHT && !(opts.square&SQUARE_TAB_FRAME)? 2 : 1) : r2.top()-1),
                                 b(/*lastTab ? r2.bottom()-2 : */ r2.bottom()+1);
 
-                            painter->setPen(use[STD_BORDER]);
+                            painter->setPen(use[QTC_STD_BORDER]);
                             painter->drawLine(r2.left()+1, t, r2.left()+1, b);
                             if(!thin)
                             {
@@ -8195,10 +8195,10 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                             drawFadedLine(painter, QRect(br.x()+constSpace, br.y(), br.width()-(constSpace*2), 1), use[0], true, true, true);
                         if(rightAdjust)
                             drawFadedLine(painter, QRect(br.x()+br.width()-1, br.y()+constSpace, 1, br.height()-(constSpace*2)),
-                                          use[STD_BORDER], true, true, false);
+                                          use[QTC_STD_BORDER], true, true, false);
                         if(bottomAdjust)
                             drawFadedLine(painter, QRect(br.x()+constSpace, br.y()+br.height()-1, br.width()-(constSpace*2), 1),
-                                          use[STD_BORDER], true, true, true);
+                                          use[QTC_STD_BORDER], true, true, true);
                     }
                 }
 
@@ -8704,7 +8704,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                 if (option->subControls&SC_SliderTickmarks)
                 {
                     QPen oldPen = painter->pen();
-                    painter->setPen(backgroundColors(option)[STD_BORDER]);
+                    painter->setPen(backgroundColors(option)[QTC_STD_BORDER]);
                     int tickSize(pixelMetric(PM_SliderTickmarkOffset, option, widget)),
                         available(pixelMetric(PM_SliderSpaceAvailable, slider, widget)),
                         interval(slider->tickInterval);
@@ -8801,7 +8801,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                 ERound       round=(opts.square&SQUARE_WINDOWS && opts.round>ROUND_SLIGHT) ? ROUND_SLIGHT : opts.round;
                 QColor       borderCol(kwin && option->version==(TBAR_BORDER_VERSION_HACK+2)
                                         ? palette.color(QPalette::Active, QPalette::Shadow)
-                                        : titleCols[kwin && option->version==TBAR_BORDER_VERSION_HACK ? 0 : STD_BORDER]);
+                                        : titleCols[kwin && option->version==TBAR_BORDER_VERSION_HACK ? 0 : QTC_STD_BORDER]);
 
                 if(!kwin && widget && BLEND_TITLEBAR && qobject_cast<const QMdiSubWindow *>(widget))
                 {
@@ -8920,7 +8920,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                         QLinearGradient grad(start, end);
 
                         grad.setColorAt(0, dark);
-                        grad.setColorAt(1, itsBackgroundCols[STD_BORDER]);
+                        grad.setColorAt(1, itsBackgroundCols[QTC_STD_BORDER]);
                         painter->setPen(QPen(QBrush(grad), 1));
                         painter->drawLine(r.x(), start.y(), r.x(), end.y());
                         painter->drawLine(r.x()+r.width()-1, start.y(), r.x()+r.width()-1, end.y());
@@ -11942,7 +11942,7 @@ void Style::drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, 
                           : cols[WIDGET_PROGRESSBAR==w
                                     ? PBAR_BORDER
                                     : !enabled && (WIDGET_BUTTON(w) || WIDGET_SLIDER_TROUGH==w)
-                                        ? DISABLED_BORDER
+                                        ? QTC_DISABLED_BORDER
                                             : itsMouseOverCols==cols && IS_SLIDER(w)
                                                 ? SLIDER_MO_BORDER_VAL
                                                 : borderVal]);
@@ -12547,7 +12547,7 @@ void Style::drawSbSliderHandle(QPainter *p, const QRect &rOrig, const QStyleOpti
         switch(opts.sliderThumbs)
         {
             case LINE_1DOT:
-                p->drawPixmap(r.x()+((r.width()-5)/2), r.y()+((r.height()-5)/2), *getPixmap(markers[STD_BORDER], PIX_DOT, 1.0));
+                p->drawPixmap(r.x()+((r.width()-5)/2), r.y()+((r.height()-5)/2), *getPixmap(markers[QTC_STD_BORDER], PIX_DOT, 1.0));
                 break;
             case LINE_FLAT:
                 drawLines(p, r, !horiz, 3, 5, markers, 0, 5, opts.sliderThumbs);
@@ -12942,7 +12942,7 @@ void Style::drawHandleMarkers(QPainter *p, const QRect &rx, const QStyleOption *
         case LINE_NONE:
             break;
         case LINE_1DOT:
-             p->drawPixmap(r.x()+((r.width()-5)/2), r.y()+((r.height()-5)/2), *getPixmap(border[STD_BORDER], PIX_DOT, 1.0));
+             p->drawPixmap(r.x()+((r.width()-5)/2), r.y()+((r.height()-5)/2), *getPixmap(border[QTC_STD_BORDER], PIX_DOT, 1.0));
             break;
         case LINE_DOTS:
             drawDots(p, r, !(option->state&State_Horizontal), 2, tb ? 5 : 3, border, tb ? -2 : 0, 5);
@@ -13001,13 +13001,13 @@ void Style::colorTab(QPainter *p, const QRect &r, bool horiz, EWidget tab, int r
 
 void Style::shadeColors(const QColor &base, QColor *vals) const
 {
-    SHADES
+    bool useCustom(USE_CUSTOM_SHADES(opts));
+    double hl = TO_FACTOR(opts.highlightFactor);
 
-    bool   useCustom(USE_CUSTOM_SHADES(opts));
-    double hl=TO_FACTOR(opts.highlightFactor);
-
-    for(int i=0; i<NUM_STD_SHADES; ++i)
-        shade(base, &vals[i], useCustom ? opts.customShades[i] : SHADE(opts.contrast, i));
+    for(int i=0; i<QTC_NUM_STD_SHADES; ++i)
+        shade(base, &vals[i], useCustom ? opts.customShades[i] :
+              qtcShadeGetIntern(opts.contrast, i,
+                                opts.darkerBorders, opts.shading));
     shade(base, &vals[SHADE_ORIG_HIGHLIGHT], hl);
     shade(vals[4], &vals[SHADE_4_HIGHLIGHT], hl);
     shade(vals[2], &vals[SHADE_2_HIGHLIGHT], hl);

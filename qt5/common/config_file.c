@@ -1367,7 +1367,7 @@ static void copyOpts(Options *src, Options *dest)
 #endif
         dest->noMenuStripeApps=src->noMenuStripeApps;
         src->noBgndGradientApps=src->noBgndOpacityApps=src->noMenuBgndOpacityApps=src->noBgndImageApps=src->noMenuStripeApps=NULL;
-        memcpy(dest->customShades, src->customShades, sizeof(double)*NUM_STD_SHADES);
+        memcpy(dest->customShades, src->customShades, sizeof(double)*QTC_NUM_STD_SHADES);
         memcpy(dest->customAlphas, src->customAlphas, sizeof(double)*NUM_STD_ALPHAS);
         copyGradients(src, dest);
     }
@@ -1872,7 +1872,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                 opts->customShades[0]=0;
                 opts->customAlphas[0]=0;
                 if(USE_CUSTOM_SHADES(*def))
-                    memcpy(opts->customShades, def->customShades, sizeof(double)*NUM_STD_SHADES);
+                    memcpy(opts->customShades, def->customShades, sizeof(double)*QTC_NUM_STD_SHADES);
             }
 
             CFG_READ_INT(gbFactor)
@@ -2088,7 +2088,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_STRING_LIST(useQtFileDialogApps)
             CFG_READ_STRING_LIST(windowDragWhiteList)
             CFG_READ_STRING_LIST(windowDragBlackList)
-            readDoubleList(cfg, "customShades", opts->customShades, NUM_STD_SHADES);
+            readDoubleList(cfg, "customShades", opts->customShades, QTC_NUM_STD_SHADES);
             readDoubleList(cfg, "customAlphas", opts->customAlphas, NUM_STD_ALPHAS);
 
 #ifdef __cplusplus
@@ -3369,7 +3369,7 @@ bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool 
             if(0==opts.customShades[0])
                  str << 0;
             else
-                for(int i=0; i<NUM_STD_SHADES; ++i)
+                for(int i=0; i<QTC_NUM_STD_SHADES; ++i)
                     if(0==i)
                         str << opts.customShades[i];
                     else

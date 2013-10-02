@@ -255,7 +255,7 @@ private:
     void drawBorder(QPainter *p, const QRect &r, const QStyleOption *option,
                     int round, const QColor *custom=0,
                     EWidget w=WIDGET_OTHER, EBorder borderProfile=BORDER_FLAT,
-                    bool doBlend=true, int borderVal=STD_BORDER) const;
+                    bool doBlend=true, int borderVal=QTC_STD_BORDER) const;
     void drawMdiControl(QPainter *p, const QStyleOptionTitleBar *titleBar,
                         SubControl sc, const QWidget *widget,
                         ETitleBarButtons btn, const QColor &iconColor,

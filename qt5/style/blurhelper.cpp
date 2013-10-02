@@ -192,6 +192,7 @@ void BlurHelper::update( QWidget* widget ) const
         qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE,
                        widget->winId(), _atom, XCB_ATOM_CARDINAL,
                        32, data.size(), data.constData());
+        qtcX11Flush();
     }
 
     // force update
@@ -208,6 +209,7 @@ void BlurHelper::clear( QWidget* widget ) const
     qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE,
                    widget->winId(), _atom, XCB_ATOM_CARDINAL,
                    32, 0, (const void*)0);
+    qtcX11Flush();
 #endif
 }
 

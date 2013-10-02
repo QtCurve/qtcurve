@@ -53,6 +53,7 @@ qtcX11ShadowCreatePixmap(const QtcPixmap *data)
                    data->width, data->height, 0, 0, 0, 32, data->len,
                    (unsigned char*)data->data);
     qtcX11CallVoid(free_gc, cid);
+    qtcX11Flush();
     return pixmap;
 }
 

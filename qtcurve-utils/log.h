@@ -73,18 +73,18 @@ void _qtcLogV(QtcLogLevel level, const char *fname, int line, const char *func,
 #define qtcLog(__level, fmt, args...) do {                              \
         QtcLogLevel level = (__level);                                  \
         if (level < 0 || level > QTC_LOG_ERROR || level < qtcLogLevel)  \
-            return;                                                     \
+            break;                                                      \
         _qtcLog(level, __FILE__, __LINE__, __FUNCTION__, fmt, ##args);  \
     } while (0)
 
 #define qtcDebug(fmt, args...)                  \
-    qtcLog(QTC_LOG_DEBUG, fmt, args)
+    qtcLog(QTC_LOG_DEBUG, fmt, ##args)
 #define qtcInfo(fmt, args...)                   \
-    qtcLog(QTC_LOG_INFO, fmt, args)
+    qtcLog(QTC_LOG_INFO, fmt, ##args)
 #define qtcWarn(fmt, args...)                   \
-    qtcLog(QTC_LOG_WARN, fmt, args)
+    qtcLog(QTC_LOG_WARN, fmt, ##args)
 #define qtcError(fmt, args...)                  \
-    qtcLog(QTC_LOG_ERROR, fmt, args)
+    qtcLog(QTC_LOG_ERROR, fmt, ##args)
 
 QTC_END_DECLS
 

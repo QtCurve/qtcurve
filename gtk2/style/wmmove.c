@@ -19,9 +19,8 @@
 */
 
 #include <qtcurve-utils/gtkutils.h>
+#include <qtcurve-utils/x11utils.h>
 
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
 #include <gdk/gdkx.h>
 #include <stdlib.h>
 #include "compatability.h"
@@ -41,8 +40,8 @@ static GtkWidget *qtcWMMoveDragWidget = NULL;
 /*! this spares some time (by not processing the same event twice), and prevents some bugs */
 GdkEventButton *qtcWMMoveLastRejectedEvent=NULL;
 
-static int       qtcWMMoveBtnReleaseSignalId=0;
-static int       qtcWMMoveBtnReleaseHookId=0;
+static int qtcWMMoveBtnReleaseSignalId = 0;
+static int qtcWMMoveBtnReleaseHookId = 0;
 
 static gboolean qtcWMMoveDragEnd();
 
@@ -62,67 +61,78 @@ qtcWMMoveBtnReleaseHook(GSignalInvocationHint *a, guint b,
 static void
 qtcWMMoveRegisterBtnReleaseHook()
 {
-    if(0==qtcWMMoveBtnReleaseSignalId && 0==qtcWMMoveBtnReleaseHookId)
-    {
-        qtcWMMoveBtnReleaseSignalId = g_signal_lookup("button-release-event", GTK_TYPE_WIDGET);
-        if(qtcWMMoveBtnReleaseSignalId)
-            qtcWMMoveBtnReleaseHookId = g_signal_add_emission_hook(qtcWMMoveBtnReleaseSignalId,
-                                                                   (GQuark)0L, qtcWMMoveBtnReleaseHook, 0L, 0L);
+    if (qtcWMMoveBtnReleaseSignalId == 0 && qtcWMMoveBtnReleaseHookId == 0) {
+        qtcWMMoveBtnReleaseSignalId =
+            g_signal_lookup("button-release-event", GTK_TYPE_WIDGET);
+        if (qtcWMMoveBtnReleaseSignalId) {
+            qtcWMMoveBtnReleaseHookId =
+                g_signal_add_emission_hook(qtcWMMoveBtnReleaseSignalId,
+                                           (GQuark)0L, qtcWMMoveBtnReleaseHook,
+                                           0L, 0L);
+        }
     }
 }
 
-static void qtcWMMoveStopTimer()
+static void
+qtcWMMoveStopTimer()
 {
-    if(qtcWMMoveTimer)
+    if (qtcWMMoveTimer)
         g_source_remove(qtcWMMoveTimer);
-    qtcWMMoveTimer=0;
+    qtcWMMoveTimer = 0;
 }
 
-static void qtcWMMoveReset()
+static void
+qtcWMMoveReset()
 {
-    qtcWMMoveLastX=-1;
-    qtcWMMoveLastY=-1;
-    qtcWMMoveDragWidget=NULL;
-    qtcWMMoveLastRejectedEvent=NULL;
+    qtcWMMoveLastX = -1;
+    qtcWMMoveLastY = -1;
+    qtcWMMoveDragWidget = NULL;
+    qtcWMMoveLastRejectedEvent = NULL;
     qtcWMMoveStopTimer();
 }
 
-static void qtcWMMoveStore(GtkWidget *widget, GdkEventButton *event)
+static void
+qtcWMMoveStore(GtkWidget *widget, GdkEventButton *event)
 {
-    qtcWMMoveLastX=event ? event->x_root : -1;
-    qtcWMMoveLastY=event ? event->y_root : -1;
-    qtcWMMoveDragWidget=widget;
+    qtcWMMoveLastX = event ? event->x_root : -1;
+    qtcWMMoveLastY = event ? event->y_root : -1;
+    qtcWMMoveDragWidget = widget;
 }
 
 #if !GTK_CHECK_VERSION(2, 12, 0)
-GdkWindow *gtk_widget_get_window(GtkWidget *widget)
+GdkWindow*
+gtk_widget_get_window(GtkWidget *widget)
 {
     return widget->window;
 }
 #endif
 
-static void qtcWMMoveTrigger(GtkWidget *w, int x, int y)
+static void
+qtcWMMoveTrigger(GtkWidget *w, int x, int y)
 {
-    XEvent     xev;
-    GtkWindow  *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
-    GdkWindow  *window=gtk_widget_get_window(GTK_WIDGET(topLevel));
-    GdkDisplay *display=gtk_widget_get_display(GTK_WIDGET(topLevel));
-    GdkWindow  *root=gdk_screen_get_root_window(gtk_window_get_screen(topLevel));
-
-    xev.xclient.type = ClientMessage;
-    xev.xclient.message_type = gdk_x11_get_xatom_by_name_for_display(display, "_NET_WM_MOVERESIZE");
-    xev.xclient.display = GDK_DISPLAY_XDISPLAY(display);
-    xev.xclient.window = GDK_WINDOW_XID(window);
-    xev.xclient.format = 32;
-    xev.xclient.data.l[0] = x;
-    xev.xclient.data.l[1] = y;
-    xev.xclient.data.l[2] = 8; // NET::Move
-    xev.xclient.data.l[3] = Button1;
-    xev.xclient.data.l[4] = 0;
-    XUngrabPointer(GDK_DISPLAY_XDISPLAY(display), CurrentTime);
-
-    XSendEvent(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(root), False, SubstructureRedirectMask | SubstructureNotifyMask, &xev);
-    /* force a release as some widgets miss it... */
+    qtcX11CallVoid(ungrab_pointer, XCB_TIME_CURRENT_TIME);
+    union {
+        char _buff[32];
+        xcb_client_message_event_t ev;
+    } buff;
+    memset(&buff, 0, sizeof(buff));
+    //...Taken from bespin...
+    // stolen... errr "adapted!" from QSizeGrip
+    GtkWindow *topLevel = GTK_WINDOW(gtk_widget_get_toplevel(w));
+    xcb_window_t wid =
+        GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel)));
+    xcb_client_message_event_t *xev = &buff.ev;
+    xev->response_type = XCB_CLIENT_MESSAGE;
+    xev->format = 32;
+    xev->window = wid;
+    xev->type = qtc_x11_atoms[QTC_X11_ATOM_NET_WM_MOVERESIZE];
+    xev->data.data32[0] = x;
+    xev->data.data32[1] = y;
+    xev->data.data32[2] = 8; // NET::Move
+    xev->data.data32[3] = XCB_KEY_BUT_MASK_BUTTON_1;
+    qtcX11CallVoid(send_event, false, qtcX11RootWindow(),
+                   XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY |
+                   XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT, (const char*)xev);
     qtcWMMoveDragEnd(w);
 }
 
@@ -169,13 +179,15 @@ static gboolean qtcWMMoveWithinWidget(GtkWidget *widget, GdkEventButton *event)
 
 static gboolean qtcWMMoveIsBlackListed(GObject *object)
 {
-    static const char *widgets[]={ "GtkPizza", "GladeDesignLayout", "MetaFrames", "SPHRuler", "SPVRuler", 0 };
+    static const char *widgets[] = {
+        "GtkPizza", "GladeDesignLayout", "MetaFrames", "SPHRuler", "SPVRuler", 0
+    };
 
-    int i;
-
-    for(i=0; widgets[i]; ++i)
-        if(objectIsA(object, widgets[i]))
+    for (int i = 0;widgets[i];i++) {
+        if (objectIsA(object, widgets[i])) {
             return TRUE;
+        }
+    }
     return FALSE;
 }
 

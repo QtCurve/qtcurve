@@ -166,4 +166,5 @@ qtcX11SetWMClass(xcb_window_t win, const char *wmclass, size_t len)
     qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, win,
                    qtc_x11_atoms[QTC_X11_ATOM_WM_CLASS], XCB_ATOM_STRING,
                    8, len, wmclass);
+    qtcX11Flush();
 }

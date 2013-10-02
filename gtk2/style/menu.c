@@ -19,9 +19,8 @@
 */
 
 #include <qtcurve-utils/gtkutils.h>
+#include <qtcurve-utils/x11utils.h>
 
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
 #include <gdk/gdkx.h>
 #include "compatability.h"
 #include <common/common.h>
@@ -35,19 +34,18 @@ qtcMenuEmitSize(GtkWidget *w, unsigned int size)
 
         if (oldSize != size) {
             GtkWidget *topLevel = gtk_widget_get_toplevel(w);
-            GdkDisplay *display = gtk_widget_get_display(topLevel);
+            xcb_window_t wid =
+                GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel)));
 
-            if (0xFFFF == size)
+            if (size == 0xFFFF)
                 size = 0;
             g_object_set_data(G_OBJECT(w), MENU_SIZE_ATOM,
                               GINT_TO_POINTER(size));
             unsigned short ssize = size;
-            XChangeProperty(gdk_x11_display_get_xdisplay(display),
-                            GDK_WINDOW_XID(gtk_widget_get_window(topLevel)),
-                            gdk_x11_get_xatom_by_name_for_display(display,
-                                                                  MENU_SIZE_ATOM),
-                            XA_CARDINAL, 16, PropModeReplace,
-                            (unsigned char*)&ssize, 1);
+            qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE,
+                           wid, qtc_x11_atoms[QTC_X11_ATOM_QTC_MENUBAR_SIZE],
+                           XCB_ATOM_CARDINAL, 16, 1, &ssize);
+            qtcX11Flush();
             return TRUE;
         }
     }

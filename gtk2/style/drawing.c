@@ -20,6 +20,7 @@
 
 #include <qtcurve-utils/gtkutils.h>
 #include <qtcurve-utils/color.h>
+#include <qtcurve-utils/log.h>
 
 #include "drawing.h"
 #include "qt_settings.h"
@@ -358,11 +359,9 @@ realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state,
                  hasFocus=enabled && qtcPalette.focus && c_colors==qtcPalette.focus, /* CPD USED TO INDICATE FOCUS! */
                  hasMouseOver=enabled && qtcPalette.mouseover && c_colors==qtcPalette.mouseover && ENTRY_MO;
     GdkColor     *colors=c_colors ? c_colors : qtcPalette.background;
-    int          useBorderVal=!enabled && WIDGET_BUTTON(widget)
-                                ? DISABLED_BORDER
-                                : qtcPalette.mouseover==colors && IS_SLIDER(widget)
-                                    ? SLIDER_MO_BORDER_VAL
-                                    : borderVal;
+    int useBorderVal = (!enabled && WIDGET_BUTTON(widget) ? QTC_DISABLED_BORDER :
+                        qtcPalette.mouseover==colors && IS_SLIDER(widget) ?
+                        SLIDER_MO_BORDER_VAL : borderVal);
     GdkColor     *border_col= useText ? &style->text[GTK_STATE_NORMAL] : &colors[useBorderVal];
 
     width--;
@@ -1017,8 +1016,8 @@ void drawDot(cairo_t *cr, int x, int y, int w, int h, GdkColor *cols)
     cairo_pattern_t *p1=cairo_pattern_create_linear(dx, dy, dx+4, dy+4),
                     *p2=cairo_pattern_create_linear(dx+2, dy+2, dx+4, dx+4);
 
-    cairo_pattern_add_color_stop_rgba(p1, 0.0, CAIRO_COL(cols[STD_BORDER]), 1.0);
-    cairo_pattern_add_color_stop_rgba(p1, CAIRO_GRAD_END, CAIRO_COL(cols[STD_BORDER]), 0.4);
+    cairo_pattern_add_color_stop_rgba(p1, 0.0, CAIRO_COL(cols[QTC_STD_BORDER]), 1.0);
+    cairo_pattern_add_color_stop_rgba(p1, CAIRO_GRAD_END, CAIRO_COL(cols[QTC_STD_BORDER]), 0.4);
 
     cairo_pattern_add_color_stop_rgba(p2, CAIRO_GRAD_END, 1.0, 1.0, 1.0, 0.9);
     cairo_pattern_add_color_stop_rgba(p2, 0.0, 1.0, 1.0, 1.0, 0.7);
@@ -1821,13 +1820,13 @@ void drawProgressGroove(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkWin
     else /* if(!opts.borderProgress) */
         if(horiz)
         {
-            drawHLine(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]), 1.0, x, y, width);
-            drawHLine(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]), 1.0, x, y+height-1, width);
+            drawHLine(cr, CAIRO_COL(qtcPalette.background[QTC_STD_BORDER]), 1.0, x, y, width);
+            drawHLine(cr, CAIRO_COL(qtcPalette.background[QTC_STD_BORDER]), 1.0, x, y+height-1, width);
         }
         else
         {
-            drawVLine(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]), 1.0, x, y, height);
-            drawVLine(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]), 1.0, x+width-1, y, height);
+            drawVLine(cr, CAIRO_COL(qtcPalette.background[QTC_STD_BORDER]), 1.0, x, y, height);
+            drawVLine(cr, CAIRO_COL(qtcPalette.background[QTC_STD_BORDER]), 1.0, x+width-1, y, height);
         }
 }
 
@@ -2988,22 +2987,27 @@ void drawMenuItem(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *w
     }
 }
 
-void drawMenu(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget, GdkRectangle *area, int x, int y, int width, int height)
+void
+drawMenu(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
+         GdkRectangle *area, int x, int y, int width, int height)
 {
-    double   radius=0.0,
-             alpha=1.0;
-    gboolean nonGtk=isFakeGtk(),
-             roundedMenu=/*!comboMenu &&*/ !(opts.square&SQUARE_POPUP_MENUS) && !nonGtk,
-             compsActive=compositingActive(widget),
-             isAlphaWidget=compsActive && isRgbaWidget(widget),
-             useAlpha=isAlphaWidget && opts.menuBgndOpacity<100,
-             useAlphaForCorners=!nonGtk && qtSettings.useAlpha && isAlphaWidget,
-             comboMenu=useAlphaForCorners || !compsActive ? FALSE : isComboMenu(widget);
-             /* Cant round combos, unless using rgba - getting weird effects with shadow/clipping :-( */
-             /* If 'useAlphaForCorners', then dont care if its a combo menu - as it can still be rounded */
+    double radius = 0.0;
+    double alpha = 1.0;
+    gboolean nonGtk = isFakeGtk();
+    gboolean roundedMenu = /*!comboMenu &&*/
+        !(opts.square & SQUARE_POPUP_MENUS) && !nonGtk;
+    gboolean compsActive = compositingActive(widget);
+    gboolean isAlphaWidget = compsActive && isRgbaWidget(widget);
+    gboolean useAlpha = isAlphaWidget && opts.menuBgndOpacity < 100;
+    gboolean useAlphaForCorners =
+        !nonGtk && qtSettings.useAlpha && isAlphaWidget;
+    gboolean comboMenu =
+        useAlphaForCorners || !compsActive ? FALSE : isComboMenu(widget);
+    /* Cant round combos, unless using rgba - getting weird effects with
+       shadow/clipping :-(. If 'useAlphaForCorners', then dont care if its a
+       combo menu - as it can still be rounded */
 
-    if(roundedMenu && !comboMenu)
-    {
+    if (roundedMenu && !comboMenu) {
         radius=MENU_AND_TOOLTIP_RADIUS;
         if(useAlphaForCorners)
         {
@@ -3102,7 +3106,7 @@ void drawMenu(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widge
             cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
 
         cairo_new_path(cr);
-        cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.menu[STD_BORDER]));
+        cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.menu[QTC_STD_BORDER]));
             /*For now dont round combos - getting weird effects with shadow/clipping :-( */
         if(roundedMenu && !comboMenu)
             createPath(cr, x+0.5, y+0.5, width-1, height-1, radius-1, ROUNDED_ALL);
@@ -3200,7 +3204,7 @@ void drawBoxGapFixes(cairo_t *cr, GtkWidget *widget,  gint x, gint y, gint width
 {
     GdkColor *col1 = &qtcPalette.background[0],
              *col2 = &qtcPalette.background[opts.borderTab ? 0 : (APPEARANCE_FLAT==opts.appearance ? ORIGINAL_SHADE : FRAME_DARK_SHADOW)],
-             *outer = &qtcPalette.background[STD_BORDER];
+             *outer = &qtcPalette.background[QTC_STD_BORDER];
     gboolean rev = reverseLayout(widget),
              thin=opts.thin&THIN_FRAMES;
     int      rightPos=(width -(gapX + gapWidth));
@@ -3370,7 +3374,7 @@ void drawShadowGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow, GtkStateT
                 if(FRAME_LINE==opts.groupBox)
                 {
                     GdkRectangle gap={x, y, gapWidth, 1};
-                    drawFadedLine(cr, x, y, width, 1, &qtcPalette.background[STD_BORDER], area, gapWidth>0 ? &gap : NULL, FALSE, TRUE, TRUE);
+                    drawFadedLine(cr, x, y, width, 1, &qtcPalette.background[QTC_STD_BORDER], area, gapWidth>0 ? &gap : NULL, FALSE, TRUE, TRUE);
                     drawFrame=FALSE;
                 }
                 else if(GTK_SHADOW_NONE!=shadow)
@@ -3400,8 +3404,8 @@ void drawShadowGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow, GtkStateT
                     if(FRAME_FADED==opts.groupBox)
                     {
                         pt=cairo_pattern_create_linear(x, y, x, y+height-1);
-                        cairo_pattern_add_color_stop_rgba(pt, 0, CAIRO_COL(qtcPalette.background[STD_BORDER]), 1.0);
-                        cairo_pattern_add_color_stop_rgba(pt, CAIRO_GRAD_END, CAIRO_COL(qtcPalette.background[STD_BORDER]), 0);
+                        cairo_pattern_add_color_stop_rgba(pt, 0, CAIRO_COL(qtcPalette.background[QTC_STD_BORDER]), 1.0);
+                        cairo_pattern_add_color_stop_rgba(pt, CAIRO_GRAD_END, CAIRO_COL(qtcPalette.background[QTC_STD_BORDER]), 0);
                         setGapClip(cr, area, gapSide, gapX, gapWidth, x, y, width, height, FALSE);
                         cairo_set_source(cr, pt);
                         createPath(cr, x+0.5, y+0.5, width-1, height-1, radius, round);
@@ -4133,18 +4137,18 @@ void drawListViewHeader(cairo_t *cr, GtkStateType state, GdkColor *btnColors, in
 
     if(APPEARANCE_RAISED==opts.lvAppearance)
         drawHLine(cr, CAIRO_COL(qtcPalette.background[4]), 1.0, x, y+height-2, width);
-    drawHLine(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]), 1.0, x, y+height-1, width);
+    drawHLine(cr, CAIRO_COL(qtcPalette.background[QTC_STD_BORDER]), 1.0, x, y+height-1, width);
 
     if(GTK_STATE_PRELIGHT==state && opts.coloredMouseOver)
         drawHighlight(cr, x, y+height-2, width, 2, area, true, true);
 
 #if GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
-    drawFadedLine(cr, x+width-2, y+4, 1, height-8, &btnColors[STD_BORDER], area, NULL, TRUE, TRUE, FALSE);
+    drawFadedLine(cr, x+width-2, y+4, 1, height-8, &btnColors[QTC_STD_BORDER], area, NULL, TRUE, TRUE, FALSE);
     drawFadedLine(cr, x+width-1, y+4, 1, height-8, &btnColors[0], area, NULL, TRUE, TRUE, FALSE);
 #else
     if(x>3 && height>10)
     {
-        drawFadedLine(cr, x, y+4, 1, height-8, &btnColors[STD_BORDER], area, NULL, TRUE, TRUE, FALSE);
+        drawFadedLine(cr, x, y+4, 1, height-8, &btnColors[QTC_STD_BORDER], area, NULL, TRUE, TRUE, FALSE);
         drawFadedLine(cr, x+1, y+4, 1, height-8, &btnColors[0], area, NULL, TRUE, TRUE, FALSE);
     }
 #endif

@@ -236,7 +236,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
 #endif
     CGradientPreview       *gradPreview;
     GradientCont           customGradient;
-    KDoubleNumInput        *shadeVals[NUM_STD_SHADES],
+    KDoubleNumInput        *shadeVals[QTC_NUM_STD_SHADES],
                            *alphaVals[NUM_STD_ALPHAS];
     QString                currentText,
                            defaultText;

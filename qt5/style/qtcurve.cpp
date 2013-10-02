@@ -2513,7 +2513,7 @@ void Style::drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, 
                         : cols[WIDGET_PROGRESSBAR==w
                                ? PBAR_BORDER
                                : !enabled && (WIDGET_BUTTON(w) || WIDGET_SLIDER_TROUGH==w)
-                               ? DISABLED_BORDER
+                               ? QTC_DISABLED_BORDER
                                : itsMouseOverCols==cols && IS_SLIDER(w)
                                ? SLIDER_MO_BORDER_VAL
                                : borderVal]);
@@ -3105,7 +3105,7 @@ void Style::drawSbSliderHandle(QPainter *p, const QRect &rOrig, const QStyleOpti
         switch(opts.sliderThumbs)
         {
         case LINE_1DOT:
-            p->drawPixmap(r.x()+((r.width()-5)/2), r.y()+((r.height()-5)/2), *getPixmap(markers[STD_BORDER], PIX_DOT, 1.0));
+            p->drawPixmap(r.x()+((r.width()-5)/2), r.y()+((r.height()-5)/2), *getPixmap(markers[QTC_STD_BORDER], PIX_DOT, 1.0));
             break;
         case LINE_FLAT:
             drawLines(p, r, !horiz, 3, 5, markers, 0, 5, opts.sliderThumbs);
@@ -3500,7 +3500,7 @@ void Style::drawHandleMarkers(QPainter *p, const QRect &rx, const QStyleOption *
     case LINE_NONE:
         break;
     case LINE_1DOT:
-        p->drawPixmap(r.x()+((r.width()-5)/2), r.y()+((r.height()-5)/2), *getPixmap(border[STD_BORDER], PIX_DOT, 1.0));
+        p->drawPixmap(r.x()+((r.width()-5)/2), r.y()+((r.height()-5)/2), *getPixmap(border[QTC_STD_BORDER], PIX_DOT, 1.0));
         break;
     case LINE_DOTS:
         drawDots(p, r, !(option->state&State_Horizontal), 2, tb ? 5 : 3, border, tb ? -2 : 0, 5);
@@ -3559,13 +3559,13 @@ void Style::colorTab(QPainter *p, const QRect &r, bool horiz, EWidget tab, int r
 
 void Style::shadeColors(const QColor &base, QColor *vals) const
 {
-    SHADES
-
-        bool   useCustom(USE_CUSTOM_SHADES(opts));
+    bool useCustom(USE_CUSTOM_SHADES(opts));
     double hl=TO_FACTOR(opts.highlightFactor);
 
-    for(int i=0; i<NUM_STD_SHADES; ++i)
-        shade(base, &vals[i], useCustom ? opts.customShades[i] : SHADE(opts.contrast, i));
+    for(int i=0; i<QTC_NUM_STD_SHADES; ++i)
+        shade(base, &vals[i], useCustom ? opts.customShades[i] :
+              qtcShadeGetIntern(opts.contrast, i,
+                                opts.darkerBorders, opts.shading));
     shade(base, &vals[SHADE_ORIG_HIGHLIGHT], hl);
     shade(vals[4], &vals[SHADE_4_HIGHLIGHT], hl);
     shade(vals[2], &vals[SHADE_2_HIGHLIGHT], hl);
@@ -4428,7 +4428,7 @@ void Style::emitMenuSize(QWidget *w, unsigned short size, bool force)
 
         if (oldSize != size) {
             static const auto menuAtom =
-                qtc_x11_atoms[QTC_X11_ATOM_QTC_OPACITY];
+                qtc_x11_atoms[QTC_X11_ATOM_QTC_MENUBAR_SIZE];
             w->setProperty(constMenuSizeProperty, size);
             qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE,
                            w->window()->winId(), menuAtom,
