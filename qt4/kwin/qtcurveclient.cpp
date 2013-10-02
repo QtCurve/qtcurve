@@ -57,6 +57,8 @@
 #include <fixx11h.h>
 #include <style/qtcurve.h>
 #include <QX11Info>
+#include <qtcurve-utils/x11utils.h>
+#include <qtcurve-utils/log.h>
 
 #if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
 #include <KDE/KIconLoader>
@@ -107,8 +109,6 @@ int getProperty(WId wId, const Atom &atom)
             rv=val;
         XFree(data);
     }
-    //else
-    //    *data = NULL; // superflous?!?
     return rv;
 }
 
@@ -1018,11 +1018,14 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     painter.end();
 }
 
-void QtCurveClient::paintTitle(QPainter *painter, const QRect &capRect, const QRect &alignFullRect,
-                               const QString &cap, const QPixmap &pix, int shadowSize, bool isTab, bool isActiveTab)
+void
+QtCurveClient::paintTitle(QPainter *painter, const QRect &capRect,
+                          const QRect &alignFullRect, const QString &cap,
+                          const QPixmap &pix, int shadowSize, bool isTab,
+                          bool isActiveTab)
 {
-    int  iconX=capRect.x();
-    bool showIcon=!pix.isNull() && capRect.width()>pix.width();
+    int iconX = capRect.x();
+    bool showIcon = !pix.isNull() && capRect.width()>pix.width();
 
     if(!cap.isEmpty())
     {

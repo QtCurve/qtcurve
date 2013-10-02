@@ -23,18 +23,18 @@
 #include "color.h"
 
 static void
-qtc_color_HCY_fromColor(const QtcColor *color, QtcColorHCY *hcy)
+qtcColorHCYFromColor(const QtcColor *color, QtcColorHCY *hcy)
 {
-    double r = qtc_color_HCY_gamma(color->red);
-    double g = qtc_color_HCY_gamma(color->green);
-    double b = qtc_color_HCY_gamma(color->blue);
+    double r = qtcColorHCYGamma(color->red);
+    double g = qtcColorHCYGamma(color->green);
+    double b = qtcColorHCYGamma(color->blue);
 
     // luma component
-    hcy->y = qtc_color_HCY_lumag(r, g, b);
+    hcy->y = qtcColorHCYLumag(r, g, b);
 
     // hue component
-    double p = QtcMax(QtcMax(r, g), b);
-    double n = QtcMin(QtcMin(r, g), b);
+    double p = qtcMax(qtcMax(r, g), b);
+    double n = qtcMin(qtcMin(r, g), b);
     double d = 6.0 * (p - n);
     if (n == p) {
         hcy->h = 0.0;
@@ -50,17 +50,17 @@ qtc_color_HCY_fromColor(const QtcColor *color, QtcColorHCY *hcy)
     if (0.0 == hcy->y || 1.0 == hcy->y) {
         hcy->c = 0.0;
     } else {
-        hcy->c = QtcMax((hcy->y - n) / hcy->y, (p - hcy->y) / (1 - hcy->y) );
+        hcy->c = qtcMax((hcy->y - n) / hcy->y, (p - hcy->y) / (1 - hcy->y) );
     }
 }
 
 static void
-qtc_color_HCY_toColor(const QtcColorHCY *hcy, QtcColor *color)
+qtcColorHCYToColor(const QtcColorHCY *hcy, QtcColor *color)
 {
     // start with sane component values
-    double _h = qtc_color_wrap(hcy->h, 1);
-    double _c = qtc_color_normalize(hcy->c);
-    double _y = qtc_color_normalize(hcy->y);
+    double _h = qtcColorWrap(hcy->h, 1);
+    double _c = qtcColorNormalize(hcy->c);
+    double _y = qtcColorNormalize(hcy->y);
 
     // calculate some needed variables
     double _hs = _h * 6.0, th, tm;
@@ -96,30 +96,30 @@ qtc_color_HCY_toColor(const QtcColorHCY *hcy, QtcColor *color)
         tn = _y - (1.0 - _y) * _c * tm / (1.0 - tm);
     }
 
-    tp = qtc_color_HCY_igamma(tp);
-    to = qtc_color_HCY_igamma(to);
-    tn = qtc_color_HCY_igamma(tn);
+    tp = qtcColorHCYIGamma(tp);
+    to = qtcColorHCYIGamma(to);
+    tn = qtcColorHCYIGamma(tn);
     // return RGB channels in appropriate order
     if (_hs < 1.0) {
-        qtc_color_fill(color, tp, to, tn);
+        qtcColorFill(color, tp, to, tn);
     } else if (_hs < 2.0) {
-        qtc_color_fill(color, to, tp, tn);
+        qtcColorFill(color, to, tp, tn);
     } else if (_hs < 3.0) {
-        qtc_color_fill(color, tn, tp, to);
+        qtcColorFill(color, tn, tp, to);
     } else if (_hs < 4.0) {
-        qtc_color_fill(color, tn, to, tp);
+        qtcColorFill(color, tn, to, tp);
     } else if (_hs < 5.0) {
-        qtc_color_fill(color, to, tn, tp);
+        qtcColorFill(color, to, tn, tp);
     } else {
-        qtc_color_fill(color, tp, tn, to);
+        qtcColorFill(color, tp, tn, to);
     }
 }
 
 static double
-qtc_color_contrastRatio(const QtcColor *c1, const QtcColor *c2)
+qtcColorContrastRatio(const QtcColor *c1, const QtcColor *c2)
 {
-    double y1 = qtc_color_HCY_luma(c1);
-    double y2 = qtc_color_HCY_luma(c2);
+    double y1 = qtcColorHCYLuma(c1);
+    double y2 = qtcColorHCYLuma(c2);
     if (y1 > y2) {
         return (y1 + 0.05) / (y2 + 0.05);
     } else {
@@ -128,72 +128,72 @@ qtc_color_contrastRatio(const QtcColor *c1, const QtcColor *c2)
 }
 
 QTC_EXPORT void
-_qtc_color_lighten(QtcColor *color, double ky, double kc)
+_qtcColorLighten(QtcColor *color, double ky, double kc)
 {
     QtcColorHCY hcy;
-    qtc_color_HCY_fromColor(color, &hcy);
+    qtcColorHCYFromColor(color, &hcy);
 
-    hcy.y = 1.0 - qtc_color_normalize((1.0 - hcy.y) * (1.0 - ky));
-    hcy.c = 1.0 - qtc_color_normalize((1.0 - hcy.c) * kc);
-    qtc_color_HCY_toColor(&hcy, color);
+    hcy.y = 1.0 - qtcColorNormalize((1.0 - hcy.y) * (1.0 - ky));
+    hcy.c = 1.0 - qtcColorNormalize((1.0 - hcy.c) * kc);
+    qtcColorHCYToColor(&hcy, color);
 }
 
 QTC_EXPORT void
-_qtc_color_darken(QtcColor *color, double ky, double kc)
+_qtcColorDarken(QtcColor *color, double ky, double kc)
 {
     QtcColorHCY hcy;
-    qtc_color_HCY_fromColor(color, &hcy);
+    qtcColorHCYFromColor(color, &hcy);
 
-    hcy.y = qtc_color_normalize(hcy.y * (1.0 - ky));
-    hcy.c = qtc_color_normalize(hcy.c * kc);
-    qtc_color_HCY_toColor(&hcy, color);
+    hcy.y = qtcColorNormalize(hcy.y * (1.0 - ky));
+    hcy.c = qtcColorNormalize(hcy.c * kc);
+    qtcColorHCYToColor(&hcy, color);
 }
 
 QTC_EXPORT void
-_qtc_color_shade(QtcColor *color, double ky, double kc)
+_qtcColorShade(QtcColor *color, double ky, double kc)
 {
     QtcColorHCY hcy;
-    qtc_color_HCY_fromColor(color, &hcy);
+    qtcColorHCYFromColor(color, &hcy);
 
-    hcy.y = qtc_color_normalize(hcy.y + ky);
-    hcy.c = qtc_color_normalize(hcy.c + kc);
-    return qtc_color_HCY_toColor(&hcy, color);
+    hcy.y = qtcColorNormalize(hcy.y + ky);
+    hcy.c = qtcColorNormalize(hcy.c + kc);
+    return qtcColorHCYToColor(&hcy, color);
 }
 
 static void
-qtc_color_tintHelper(const QtcColor *base, const QtcColor *col,
-                     double amount, QtcColor *out)
+qtcColorTintHelper(const QtcColor *base, const QtcColor *col,
+                   double amount, QtcColor *out)
 {
     QtcColor mixed;
-    _qtc_color_mix(base, col, pow(amount, 0.3), &mixed);
+    _qtcColorMix(base, col, pow(amount, 0.3), &mixed);
     QtcColorHCY hcy;
-    qtc_color_HCY_fromColor(&mixed, &hcy);
-    hcy.y = qtc_color_mixQreal(qtc_color_HCY_luma(base), hcy.y, amount);
+    qtcColorHCYFromColor(&mixed, &hcy);
+    hcy.y = qtcColorMixF(qtcColorHCYLuma(base), hcy.y, amount);
 
-    qtc_color_HCY_toColor(&hcy, out);
+    qtcColorHCYToColor(&hcy, out);
 }
 
 QTC_EXPORT void
-_qtc_color_tint(const QtcColor *base, const QtcColor *col,
-                double amount, QtcColor *out)
+_qtcColorTint(const QtcColor *base, const QtcColor *col,
+              double amount, QtcColor *out)
 {
-    if (qtc_unlikely(amount <= 0.0 || isnan(amount))) {
+    if (qtcUnlikely(amount <= 0.0 || isnan(amount))) {
         *out = *base;
         return;
     }
-    if (qtc_unlikely(amount >= 1.0)) {
+    if (qtcUnlikely(amount >= 1.0)) {
         *out = *col;
         return;
     }
 
-    double ri = qtc_color_contrastRatio(base, col);
+    double ri = qtcColorContrastRatio(base, col);
     double rg = 1.0 + ((ri + 1.0) * amount * amount * amount);
     double u = 1.0, l = 0.0;
     int i;
     for (i = 12;i;i--) {
         double a = 0.5 * (l + u);
-        qtc_color_tintHelper(base, col, a, out);
-        double ra = qtc_color_contrastRatio(base, out);
+        qtcColorTintHelper(base, col, a, out);
+        double ra = qtcColorContrastRatio(base, out);
         if (ra > rg) {
             u = a;
         } else {
@@ -203,10 +203,9 @@ _qtc_color_tint(const QtcColor *base, const QtcColor *col,
 }
 
 QTC_EXPORT void
-_qtc_color_mix(const QtcColor *c1, const QtcColor *c2,
-               double bias, QtcColor *out)
+_qtcColorMix(const QtcColor *c1, const QtcColor *c2, double bias, QtcColor *out)
 {
-    if (qtc_unlikely(bias <= 0.0 || isnan(bias))) {
+    if (qtcUnlikely(bias <= 0.0 || isnan(bias))) {
         *out = *c1;
         return;
     }
@@ -215,16 +214,16 @@ _qtc_color_mix(const QtcColor *c1, const QtcColor *c2,
         return;
     }
 
-    qtc_color_fill(out, qtc_color_mixQreal(c1->red, c2->red, bias),
-                   qtc_color_mixQreal(c1->green, c2->green, bias),
-                   qtc_color_mixQreal(c1->blue, c2->blue, bias));
+    qtcColorFill(out, qtcColorMixF(c1->red, c2->red, bias),
+                 qtcColorMixF(c1->green, c2->green, bias),
+                 qtcColorMixF(c1->blue, c2->blue, bias));
 }
 
 static inline void
 rgbToHsl(double r, double g, double b, double *h, double *s, double *l)
 {
-    double min = QtcMin(QtcMin(r, g), b);
-    double max = QtcMax(QtcMax(r, g), b);
+    double min = qtcMin(qtcMin(r, g), b);
+    double max = qtcMax(qtcMax(r, g), b);
 
     *l = 0.5 * (max + min);
     *s = 0.0;
@@ -257,14 +256,14 @@ rgbToHsl(double r, double g, double b, double *h, double *s, double *l)
 static inline double
 h2c(double h, double m1, double m2)
 {
-    h = qtc_color_wrap(h, 6.0);
+    h = qtcColorWrap(h, 6.0);
 
     if (h < 1.0)
-        return qtc_color_mixf(m1, m2, h);
+        return qtcColorMixF(m1, m2, h);
     if (h < 3.0)
         return m2;
     if (h < 4.0)
-        return qtc_color_mixf(m1, m2, 4.0 - h);
+        return qtcColorMixF(m1, m2, 4.0 - h);
     return m1;
 }
 
@@ -289,7 +288,7 @@ hslToRgb(double h, double s, double l, double *r, double *g, double *b)
 }
 
 QTC_EXPORT void
-_qtc_shade(const QtcColor *ca, QtcColor *cb, double k, EShading shading)
+_qtcShade(const QtcColor *ca, QtcColor *cb, double k, EShading shading)
 {
     /* if (qtc_equal(k, 1.0)) { */
     /*     *cb = *ca; */
@@ -298,9 +297,9 @@ _qtc_shade(const QtcColor *ca, QtcColor *cb, double k, EShading shading)
     switch (shading) {
     case SHADING_SIMPLE: {
         double v = k - 1;
-        qtc_color_fill(cb, qtc_limit(ca->red + v, 1.0),
-                       qtc_limit(ca->green + v, 1.0),
-                       qtc_limit(ca->blue + v, 1.0));
+        qtcColorFill(cb, qtcLimit(ca->red + v, 1.0),
+                     qtcLimit(ca->green + v, 1.0),
+                     qtcLimit(ca->blue + v, 1.0));
         break;
     }
     case SHADING_HSL: {
@@ -310,11 +309,11 @@ _qtc_shade(const QtcColor *ca, QtcColor *cb, double k, EShading shading)
         double h, s, l;
 
         rgbToHsl(r, g, b, &h, &s, &l);
-        l = qtc_color_normalize(l * k);
-        s = qtc_color_normalize(s * k);
+        l = qtcColorNormalize(l * k);
+        s = qtcColorNormalize(s * k);
         hslToRgb(h, s, l, &r, &g, &b);
-        qtc_color_fill(cb, qtc_limit(r, 1.0), qtc_limit(g, 1.0),
-                       qtc_limit(b, 1.0));
+        qtcColorFill(cb, qtcLimit(r, 1.0), qtcLimit(g, 1.0),
+                     qtcLimit(b, 1.0));
         break;
     }
     case SHADING_HSV: {
@@ -323,7 +322,7 @@ _qtc_shade(const QtcColor *ca, QtcColor *cb, double k, EShading shading)
         double b = ca->blue;
         double h, s, v;
 
-        qtc_rgb_to_hsv(r, g, b, &h, &s, &v);
+        qtcRgbToHsv(r, g, b, &h, &s, &v);
 
         v *= k;
         if (v > 1.0) {
@@ -332,43 +331,43 @@ _qtc_shade(const QtcColor *ca, QtcColor *cb, double k, EShading shading)
                 s = 0;
             v = 1.0;
         }
-        qtc_hsv_to_rgb(&r, &g, &b, h, s, v);
-        qtc_color_fill(cb, qtc_limit(r, 1.0), qtc_limit(g, 1.0),
-                       qtc_limit(b, 1.0));
+        qtcHsvToRgb(&r, &g, &b, h, s, v);
+        qtcColorFill(cb, qtcLimit(r, 1.0), qtcLimit(g, 1.0),
+                     qtcLimit(b, 1.0));
         break;
     }
     case SHADING_HCY:
 #define HCY_FACTOR 0.15
         *cb = *ca;
         if (k > 1) {
-            _qtc_color_lighten(cb, (k * (1 + HCY_FACTOR)) - 1.0, 1.0);
+            _qtcColorLighten(cb, (k * (1 + HCY_FACTOR)) - 1.0, 1.0);
         } else {
-            _qtc_color_darken(cb, 1.0 - (k * (1 - HCY_FACTOR)), 1.0);
+            _qtcColorDarken(cb, 1.0 - (k * (1 - HCY_FACTOR)), 1.0);
         }
     }
 }
 
 QTC_EXPORT double
-_qtc_shine_alpha(const QtcColor *bgnd)
+_qtcShineAlpha(const QtcColor *bgnd)
 {
     double r = bgnd->red;
     double g = bgnd->green;
     double b = bgnd->blue;
     double h = 0, s = 0, v = 0;
-    qtc_rgb_to_hsv(r, g, b, &h, &s, &v);
+    qtcRgbToHsv(r, g, b, &h, &s, &v);
     return v * 0.8;
 }
 
 QTC_EXPORT double qtc_ring_alpha[3] = {0.125, 0.125, 0.5};
 
 QTC_EXPORT void
-_qtc_calc_ring_alphas(const QtcColor *bgnd)
+_qtcCalcRingAlphas(const QtcColor *bgnd)
 {
     double r = bgnd->red;
     double g = bgnd->green;
     double b = bgnd->blue;
     double h = 0, s = 0, v = 0;
-    qtc_rgb_to_hsv(r, g, b, &h, &s, &v);
+    qtcRgbToHsv(r, g, b, &h, &s, &v);
     qtc_ring_alpha[0] = v * 0.26;
     qtc_ring_alpha[1] = v * 0.14;
     qtc_ring_alpha[2] = v * 0.55;

@@ -18,7 +18,8 @@
   Boston, MA 02110-1301, USA.
  */
 
-#include <gtk/gtk.h>
+#include <qtcurve-utils/gtkutils.h>
+
 #include <string.h>
 #include "compatability.h"
 #include <common/common.h>
@@ -67,12 +68,12 @@ static GtkWidget *qtcScrolledWindowHover=NULL;
 
 gboolean qtcScrolledWindowHasFocus(GtkWidget *widget)
 {
-    return widget && (qtcWidgetHasFocus(widget) || widget==qtcScrolledWindowFocus);
+    return widget && (gtk_widget_has_focus(widget) || widget==qtcScrolledWindowFocus);
 }
 
 gboolean qtcScrolledWindowHovered(GtkWidget *widget)
 {
-    return widget && (GTK_STATE_PRELIGHT==qtcWidgetGetState(widget) || widget==qtcScrolledWindowHover);
+    return widget && (GTK_STATE_PRELIGHT==gtk_widget_get_state(widget) || widget==qtcScrolledWindowHover);
 }
 
 static gboolean qtcScrolledWindowEnter(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
@@ -148,7 +149,7 @@ static void qtcScrolledWindowSetupConnections(GtkWidget *widget, GtkWidget *pare
             gint          x, y;
             GtkAllocation alloc=qtcWidgetGetAllocation(parent);
 
-            gdk_window_get_pointer(qtcWidgetGetWindow(parent), &x, &y, 0L);
+            gdk_window_get_pointer(gtk_widget_get_window(parent), &x, &y, 0L);
             if(x>=0 && x<alloc.width && y>=0 && y<alloc.height)
                 qtcScrolledWindowHover=parent;
         }
@@ -157,7 +158,7 @@ static void qtcScrolledWindowSetupConnections(GtkWidget *widget, GtkWidget *pare
 
 void qtcScrolledWindowRegisterChild(GtkWidget *child)
 {
-    GtkWidget *parent=child ? qtcWidgetGetParent(child) : NULL;
+    GtkWidget *parent=child ? gtk_widget_get_parent(child) : NULL;
 
     if(parent && GTK_IS_SCROLLED_WINDOW(parent) && g_object_get_data(G_OBJECT(parent), "QTC_SCROLLED_WINDOW_SET"))
         qtcScrolledWindowSetupConnections(child, parent);
@@ -180,7 +181,7 @@ void qtcScrolledWindowSetup(GtkWidget *widget)
                 qtcScrolledWindowSetupConnections(child, widget);
             else
             {
-                const gchar *type=g_type_name(qtcWidgetType(child));
+                const gchar *type=g_type_name(G_OBJECT_TYPE(child));
 
                 if(type && (0==strcmp(type, "ExoIconView") || 0==strcmp(type, "FMIconContainer")))
                     qtcScrolledWindowSetupConnections(child, widget);

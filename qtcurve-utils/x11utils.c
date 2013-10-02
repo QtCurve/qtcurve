@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 #include "x11utils.h"
-#include "kdex11shadow_p.h"
+#include "x11shadow_p.h"
 
 #include <xcb/xcb_image.h>
 #include <X11/Xlib-xcb.h>
@@ -53,19 +53,19 @@ static const char *const qtc_x11_atom_names[_QTC_X11_ATOM_NUMBER] = {
 };
 
 QTC_EXPORT xcb_window_t
-qtc_x11_root_window()
+qtcX11RootWindow()
 {
     return qtc_root_window;
 }
 
 QTC_EXPORT int
-qtc_x11_default_screen_no()
+qtcX11DefaultScreenNo()
 {
     return qtc_default_screen_no;
 }
 
 QTC_EXPORT xcb_screen_t*
-qtc_x11_default_screen()
+qtcX11DefaultScreen()
 {
     return qtc_default_screen;
 }
@@ -86,7 +86,7 @@ screen_of_display(xcb_connection_t *c, int screen)
 }
 
 QTC_EXPORT xcb_screen_t*
-qtc_x11_get_screen(int screen_no)
+qtcX11GetScreen(int screen_no)
 {
     if (screen_no == -1 || screen_no == qtc_default_screen_no)
         return qtc_default_screen;
@@ -94,9 +94,9 @@ qtc_x11_get_screen(int screen_no)
 }
 
 QTC_EXPORT void
-qtc_x11_init_xcb(xcb_connection_t *conn, int screen_no)
+qtcX11InitXcb(xcb_connection_t *conn, int screen_no)
 {
-    if (qtc_unlikely(qtc_xcb_conn) || !conn)
+    if (qtcUnlikely(qtc_xcb_conn) || !conn)
         return;
     if (screen_no < 0)
         screen_no = 0;
@@ -108,40 +108,40 @@ qtc_x11_init_xcb(xcb_connection_t *conn, int screen_no)
     }
     const size_t base_len = strlen("_NET_WM_CM_S");
     sprintf(wm_cm_s_atom_name + base_len, "%d", screen_no);
-    qtc_x11_get_atoms(_QTC_X11_ATOM_NUMBER, qtc_x11_atoms,
-                      qtc_x11_atom_names, true);
-    qtc_kde_x11_shadow_init();
+    qtcX11GetAtoms(_QTC_X11_ATOM_NUMBER, qtc_x11_atoms,
+                   qtc_x11_atom_names, true);
+    qtcX11ShadowInit();
 }
 
 QTC_EXPORT void
-qtc_x11_init_xlib(Display *disp)
+qtcX11InitXlib(Display *disp)
 {
-    if (qtc_unlikely(qtc_xcb_conn) || !disp)
+    if (qtcUnlikely(qtc_xcb_conn) || !disp)
         return;
-    qtc_x11_init_xcb(XGetXCBConnection(disp), DefaultScreen(disp));
+    qtcX11InitXcb(XGetXCBConnection(disp), DefaultScreen(disp));
 }
 
 QTC_EXPORT xcb_connection_t*
-qtc_x11_get_conn()
+qtcX11GetConn()
 {
     return qtc_xcb_conn;
 }
 
 QTC_EXPORT void
-qtc_x11_flush()
+qtcX11Flush()
 {
     xcb_flush(qtc_xcb_conn);
 }
 
 QTC_EXPORT uint32_t
-qtc_x11_generate_id()
+qtcX11GenerateId()
 {
     return xcb_generate_id(qtc_xcb_conn);
 }
 
 QTC_EXPORT void
-qtc_x11_get_atoms(size_t n, xcb_atom_t *atoms,
-                  const char *const names[], boolean create)
+qtcX11GetAtoms(size_t n, xcb_atom_t *atoms,
+               const char *const names[], boolean create)
 {
     xcb_connection_t *conn = qtc_xcb_conn;
     xcb_intern_atom_cookie_t cookies[n];
@@ -161,9 +161,9 @@ qtc_x11_get_atoms(size_t n, xcb_atom_t *atoms,
 }
 
 QTC_EXPORT void
-qtc_x11_set_wmclass(xcb_window_t win, const char *wmclass, size_t len)
+qtcX11SetWMClass(xcb_window_t win, const char *wmclass, size_t len)
 {
-    qtc_x11_call_void(change_property, XCB_PROP_MODE_REPLACE, win,
-                      qtc_x11_atoms[QTC_X11_ATOM_WM_CLASS], XCB_ATOM_STRING,
-                      8, len, wmclass);
+    qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, win,
+                   qtc_x11_atoms[QTC_X11_ATOM_WM_CLASS], XCB_ATOM_STRING,
+                   8, len, wmclass);
 }

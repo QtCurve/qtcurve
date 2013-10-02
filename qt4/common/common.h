@@ -921,14 +921,14 @@ typedef struct
 
     bool operator==(const GradientStop &o) const
     {
-        return (qtc_equal(pos, o.pos) && qtc_equal(val, o.val) &&
-                qtc_equal(alpha, o.alpha));
+        return (qtcEqual(pos, o.pos) && qtcEqual(val, o.val) &&
+                qtcEqual(alpha, o.alpha));
     }
 
     bool operator<(const GradientStop &o) const
     {
-        return pos<o.pos || (qtc_equal(pos, o.pos) &&
-                             (val < o.val || (qtc_equal(val, o.val) &&
+        return pos<o.pos || (qtcEqual(pos, o.pos) &&
+                             (val < o.val || (qtcEqual(val, o.val) &&
                                               alpha < o.alpha)));
     }
 #endif //__cplusplus
@@ -1213,12 +1213,12 @@ typedef struct {
 #else // QT_VERSION && (QT_VERSION >= 0x040000) && defined QTC_QT4_ENABLE_KDE
 #include <qtcurve-utils/color.h>
 #ifdef __cplusplus
-#define tint(COLA, COLB, FACTOR) qtc_color_tint(&(COLA), &(COLB), (FACTOR))
-#define midColor(COLA, COLB) qtc_color_mix(&(COLA), &(COLB), 0.5)
-#define midColorF(COLA, COLB, FACTOR) qtc_color_mix(&(COLA), &(COLB), FACTOR-0.5)
+#define tint(COLA, COLB, FACTOR) qtcColorTint(&(COLA), &(COLB), (FACTOR))
+#define midColor(COLA, COLB) qtcColorMix(&(COLA), &(COLB), 0.5)
+#define midColorF(COLA, COLB, FACTOR) qtcColorMix(&(COLA), &(COLB), FACTOR-0.5)
 #else // __cplusplus
-#define tint(COLA, COLB, FACTOR) qtc_color_tint((COLA), (COLB), (FACTOR))
-#define midColor(COLA, COLB) qtc_color_mix((COLA), (COLB), 0.5)
+#define tint(COLA, COLB, FACTOR) qtcColorTint((COLA), (COLB), (FACTOR))
+#define midColor(COLA, COLB) qtcColorMix((COLA), (COLB), 0.5)
 #endif // __cplusplus
 #endif // QT_VERSION && (QT_VERSION >= 0x040000) && defined QTC_QT4_ENABLE_KDE
 

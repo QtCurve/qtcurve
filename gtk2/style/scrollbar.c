@@ -58,7 +58,7 @@ qtcScrollbarParentScrolledWindow(GtkWidget *widget)
 {
     GtkWidget *parent = widget;
 
-    while (parent && (parent = qtcWidgetGetParent(parent))) {
+    while (parent && (parent = gtk_widget_get_parent(parent))) {
         if (GTK_IS_SCROLLED_WINDOW(parent)) {
             return GTK_SCROLLED_WINDOW(parent);
         }

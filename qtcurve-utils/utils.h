@@ -45,17 +45,17 @@ typedef struct {
     const unsigned char *data;
 } QtcPixmap;
 
-#define qtc_container_of(ptr, type, member)             \
+#define qtcContainerOf(ptr, type, member)             \
     ((type*)(((void*)(ptr)) - offsetof(type, member)))
 
 #if (defined(__GNUC__) && (__GNUC__ > 2))
-#  define qtc_expect(exp, var) __builtin_expect(exp, var)
+#  define qtcExpect(exp, var) __builtin_expect(exp, var)
 #else
-#  define qtc_expect(exp, var) (exp)
+#  define qtcExpect(exp, var) (exp)
 #endif
 
-#define qtc_likely(x) qtc_expect(!!(x), 1)
-#define qtc_unlikely(x) qtc_expect(!!(x), 0)
+#define qtcLikely(x) qtcExpect(!!(x), 1)
+#define qtcUnlikely(x) qtcExpect(!!(x), 0)
 
 #define QTC_EXPORT __attribute__((visibility("default")))
 
@@ -73,19 +73,19 @@ typedef struct {
 QTC_BEGIN_DECLS
 
 QTC_ALWAYS_INLINE static inline void*
-qtc_utils_alloc0(size_t size)
+qtcUtilsAlloc0(size_t size)
 {
     void *p = malloc(size);
     memset(p, 0, size);
     return p;
 }
 
-#define qtc_utils_new_size(type, size) ((type*)qtc_utils_alloc0(size))
-#define qtc_utils_new(type) qtc_utils_new_size(type, sizeof(type))
-#define qtc_utils_new_n(type, n) qtc_utils_new_size(type, sizeof(type) * n)
+#define qtcUtilsNewSize(type, size) ((type*)qtcUtilsAlloc0(size))
+#define qtcUtilsNew(type) qtcUtilsNewSize(type, sizeof(type))
+#define qtcUtilsNewN(type, n) qtcUtilsNewSize(type, sizeof(type) * n)
 
 QTC_ALWAYS_INLINE static inline double
-qtc_limit(double d, double l)
+qtcLimit(double d, double l)
 {
     if (d <= 0)
         return 0;
@@ -95,7 +95,7 @@ qtc_limit(double d, double l)
 }
 
 QTC_ALWAYS_INLINE static inline boolean
-qtc_equal(double d1, double d2)
+qtcEqual(double d1, double d2)
 {
     return (fabs(d1 - d2) < 0.0001);
 }
@@ -105,32 +105,38 @@ QTC_END_DECLS
 #ifdef __cplusplus
 template<typename T>
 static inline const T&
-QtcMax(const T &a, const T &b)
+qtcMax(const T &a, const T &b)
 {
     return (a > b) ? a : b;
 }
-
 template<typename T>
 static inline const T&
-QtcMin(const T &a, const T &b)
+qtcMin(const T &a, const T &b)
 {
     return (a < b) ? a : b;
 }
+template<typename T>
+static inline const T&
+qtcBound(const T &a, const T &b, const T &c)
+{
+    return qtcMax(a, qtcMin(b, c));
+}
 
 #else
-#define QtcMax(a, b)                            \
+#define qtcMax(a, b)                            \
     ({                                          \
         typeof(a) _a = (a);                     \
         typeof(b) _b = (b);                     \
         (_a > _b) ? _a : _b;                    \
     })
-
-#define QtcMin(a, b)                            \
+#define qtcMin(a, b)                            \
     ({                                          \
         typeof(a) _a = (a);                     \
         typeof(b) _b = (b);                     \
         (_a < _b) ? _a : _b;                    \
     })
+#define qtcBound(a, b, c) qtcMax(a, qtcMin(b, c))
+
 #endif
 
 #endif

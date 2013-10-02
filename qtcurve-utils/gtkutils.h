@@ -42,4 +42,28 @@ qtcDisconnectFromData(GObject *obj, const char *name)
         obj, GPOINTER_TO_INT(g_object_steal_data(obj, name)));
 }
 
+static inline GtkAllocation
+qtcWidgetGetAllocation(GtkWidget *widget)
+{
+    GtkAllocation alloc;
+    gtk_widget_get_allocation(widget, &alloc);
+    return alloc;
+}
+
+static inline GtkRequisition
+qtcWidgetGetRequisition(GtkWidget *widget)
+{
+    GtkRequisition req;
+    gtk_widget_get_requisition(widget, &req);
+    return req;
+}
+
+static inline gfloat
+qtcFrameGetLabelYAlign(GtkFrame *f)
+{
+    gfloat x, y;
+    gtk_frame_get_label_align(f, &x, &y);
+    return y;
+}
+
 #endif

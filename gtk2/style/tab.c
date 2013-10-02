@@ -18,7 +18,8 @@
   Boston, MA 02110-1301, USA.
  */
 
-#include <gtk/gtk.h>
+#include <qtcurve-utils/gtkutils.h>
+
 #include <stdlib.h>
 #include "compatability.h"
 
@@ -155,7 +156,7 @@ static gboolean qtcTabMotion(GtkWidget *widget, GdkEventMotion *event, gpointer 
     if(tab)
     {
         int px, py, t;
-        gdk_window_get_pointer(qtcWidgetGetWindow(widget), &px, &py, NULL);
+        gdk_window_get_pointer(gtk_widget_get_window(widget), &px, &py, NULL);
 
         for(t=0; t < tab->numRects; t++)
         {

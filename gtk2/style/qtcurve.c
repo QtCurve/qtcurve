@@ -20,8 +20,10 @@
 
 #include "config.h"
 
+#include <qtcurve-utils/color.h>
+#include <qtcurve-utils/gtkutils.h>
+
 #include <gmodule.h>
-#include <gtk/gtk.h>
 #include <gdk/gdk.h>
 #include <math.h>
 #include <string.h>
@@ -30,7 +32,6 @@
 #include "compatability.h"
 #include "qtcurve.h"
 #include <common/config_file.h>
-#include <qtcurve-utils/color.h>
 
 #ifdef QTC_ENABLE_X11
 #include <gdk/gdkx.h>
@@ -111,7 +112,7 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
     CAIRO_BEGIN
 
     gboolean isMenuOrToolTipWindow=widget && GTK_IS_WINDOW(widget) &&
-                                   ((qtcWidgetName(widget) && 0==strcmp(qtcWidgetName(widget), "gtk-tooltip")) ||
+                                   ((gtk_widget_get_name(widget) && 0==strcmp(gtk_widget_get_name(widget), "gtk-tooltip")) ||
                                     isMenuWindow(widget));
 
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %s  ", __FUNCTION__, state, shadow, x, y, width, height, detail ? detail : "NULL"),
@@ -147,9 +148,9 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
     {
         GtkWidget *topLevel=gtk_widget_get_toplevel(widget);
 
-        if(topLevel && qtcWidgetTopLevel(topLevel))
+        if(topLevel && gtk_widget_is_toplevel(topLevel))
         {
-            const gchar *typename=g_type_name(qtcWidgetType(topLevel));
+            const gchar *typename=g_type_name(G_OBJECT_TYPE(topLevel));
 
             if(GTK_APP_GIMP_PLUGIN==qtSettings.app)
             {
@@ -297,7 +298,7 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
         if(isCombo)
         {
             if(GTK_STATE_SELECTED==state)
-                drawAreaColor(cr, area, &style->base[widget && qtcWidgetHasFocus(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE],
+                drawAreaColor(cr, area, &style->base[widget && gtk_widget_has_focus(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE],
                               x, y, width, height);
         }
         else
@@ -407,7 +408,7 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
 
 /*
         if(DO_EFFECT && GTK_STATE_INSENSITIVE!=state && DETAIL("entry_bg") &&
-           isSwtComboBoxEntry(widget) && qtcWidgetHasFocus(widget))
+           isSwtComboBoxEntry(widget) && gtk_widget_has_focus(widget))
         {
             drawHLine(cr, CAIRO_COL(qtcPalette.highlight[FRAME_DARK_SHADOW]), 1.0, x, y, width);
             drawHLine(cr, CAIRO_COL(qtcPalette.highlight[0]), 1.0, x, y+height-1, width);
@@ -446,7 +447,7 @@ static void gtkDrawHandle(GtkStyle *style, GdkWindow *window, GtkStateType state
             DETAIL("dockitem") || paf)
     {
         if(widget && GTK_STATE_INSENSITIVE!=state)
-            state=qtcWidgetGetState(widget);
+            state=gtk_widget_get_state(widget);
 
         if(paf)  /* The paf here is expected to be on the gnome panel */
             if(height<width)
@@ -503,8 +504,8 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
             GdkColor *arrowColor=MO_ARROW(false, &qtSettings.colors[GTK_STATE_INSENSITIVE==state
                                                                             ? PAL_DISABLED : PAL_ACTIVE]
                                                                        [COLOR_BUTTON_TEXT]);
-            //gboolean moz=isMozilla() && widget && qtcWidgetGetParent(widget) && qtcWidgetGetParent(widget)->parent && qtcWidgetGetParent(widget)->parent->parent &&
-            //             isFixedWidget(qtcWidgetGetParent(widget)->parent->parent);
+            //gboolean moz=isMozilla() && widget && gtk_widget_get_parent(widget) && gtk_widget_get_parent(widget)->parent && gtk_widget_get_parent(widget)->parent->parent &&
+            //             isFixedWidget(gtk_widget_get_parent(widget)->parent->parent);
             x++;
 
 #if !GTK_CHECK_VERSION(2, 90, 0)
@@ -524,7 +525,7 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
             else
             {
                 GtkWidget *parent=NULL;
-                if(!opts.gtkComboMenus && !((parent=qtcWidgetGetParent(widget)) && (parent=qtcWidgetGetParent(parent)) && !qtcComboHasFrame(parent)))
+                if(!opts.gtkComboMenus && !((parent=gtk_widget_get_parent(widget)) && (parent=gtk_widget_get_parent(parent)) && !qtcComboHasFrame(parent)))
                     x+=2;
                 drawArrow(window, style, arrowColor, area,  GTK_ARROW_DOWN, x+(width>>1), y+(height>>1), FALSE, TRUE);
             }
@@ -686,7 +687,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
              spinUp=!hscrollbar && DETAIL("spinbutton_up"),
              spinDown=!spinUp && DETAIL("spinbutton_down"),
              menuScroll=detail && NULL!=strstr(detail, "menu_scroll_arrow_"),
-             rev=reverseLayout(widget) || (widget && reverseLayout(qtcWidgetGetParent(widget))),
+             rev=reverseLayout(widget) || (widget && reverseLayout(gtk_widget_get_parent(widget))),
              activeWindow=TRUE;
     GdkColor new_cols[TOTAL_SHADES+1],
              *btnColors;
@@ -806,7 +807,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
     {
         if(IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, window, widget, x, y, width, height)))
         {
-            qtcStyleApplyDefBgnd(widget && !qtcWidgetNoWindow(widget),
+            qtcStyleApplyDefBgnd(widget && gtk_widget_get_has_window(widget),
                                  GTK_STATE_INSENSITIVE==state ? GTK_STATE_INSENSITIVE : GTK_STATE_NORMAL);
             if(widget && IMG_NONE!=opts.bgndImage.type)
                 drawWindowBgnd(cr, style, area, window, widget, x, y, width, height);
@@ -814,7 +815,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
 
         if(opts.unifySpin)
         {
-            gboolean rev=reverseLayout(widget) || (widget && reverseLayout(qtcWidgetGetParent(widget))),
+            gboolean rev=reverseLayout(widget) || (widget && reverseLayout(gtk_widget_get_parent(widget))),
                      moz=isMozillaWidget(widget);
 
             if(!rev)
@@ -858,7 +859,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
     {
         if(opts.highlightScrollViews && widget)
         {
-            GtkWidget *parent=qtcWidgetGetParent(widget);
+            GtkWidget *parent=gtk_widget_get_parent(widget);
 
             if(parent && GTK_IS_TREE_VIEW(parent))
                 qtcScrolledWindowRegisterChild(parent);
@@ -892,7 +893,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
                             : (slider && width<height) || vscrollbar || vscale || (stepper && widget && GTK_IS_VSCROLLBAR(widget))
                                 ? FALSE
                                 : TRUE,
-                    defBtn=GTK_STATE_INSENSITIVE!=state && (button || togglebutton) && widget && qtcWidgetHasDefault(widget);
+                    defBtn=GTK_STATE_INSENSITIVE!=state && (button || togglebutton) && widget && gtk_widget_has_default(widget);
 //        drawBgnd(cr, &btnColors[bgnd], widget, area, x, y, width, height); // CPD removed as it messes up toolbars and firefox3
 
 #if !GTK_CHECK_VERSION(2, 90, 0)
@@ -911,7 +912,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
 
         {
             /* Yuck this is a horrible mess!!!!! */
-            gboolean glowFocus=widget && qtcWidgetHasFocus(widget) && MO_GLOW==opts.coloredMouseOver && FULL_FOCUS;
+            gboolean glowFocus=widget && gtk_widget_has_focus(widget) && MO_GLOW==opts.coloredMouseOver && FULL_FOCUS;
             EWidget  widgetType=isComboBoxButton(widget)
                                 ? WIDGET_COMBO_BUTTON
                                 : slider
@@ -1004,8 +1005,8 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
             if(slider && widget && GTK_IS_RANGE(widget) && !opts.flatSbarButtons && SCROLLBAR_NONE!=opts.scrollbarType
                 /*&& !(GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver)*/)
             {
-                GtkAdjustment *adj       = qtcRangeGetAdjustment(GTK_RANGE(widget));
-                gboolean      horizontal = GTK_ORIENTATION_HORIZONTAL==qtcRangeGetOrientation(widget),
+                GtkAdjustment *adj = gtk_range_get_adjustment(GTK_RANGE(widget));
+                gboolean horizontal = GTK_ORIENTATION_HORIZONTAL==qtcRangeGetOrientation(widget),
 #if GTK_CHECK_VERSION(2, 90, 0)
                               hasStartStepper = SCROLLBAR_PLATINUM!=opts.scrollbarType,
                               hasEndStepper   = SCROLLBAR_NEXT!=opts.scrollbarType,
@@ -1014,9 +1015,9 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
                               hasEndStepper   = qtcRangeHasStepperC(widget) || qtcRangeHasStepperD(widget),
 #endif
                               atEnd      = FALSE;
-                double        value      = qtcAdjustmentGetValue(adj);
+                double        value      = gtk_adjustment_get_value(adj);
 
-                if(hasStartStepper && value <= qtcAdjustmentGetLower(adj))
+                if(hasStartStepper && value <= gtk_adjustment_get_lower(adj))
                 {
                     if (horizontal)
                         x--, width++;
@@ -1025,7 +1026,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
 
                     atEnd=TRUE;
                 }
-                if(hasEndStepper && value >= qtcAdjustmentGetUpper(adj) - qtcAdjustmentGetPageSize(adj))
+                if(hasEndStepper && value >= gtk_adjustment_get_upper(adj) - gtk_adjustment_get_page_size(adj))
                 {
                     if (horizontal)
                         width++;
@@ -1051,7 +1052,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
             }
 #endif
             if(WIDGET_COMBO==widgetType && !opts.gtkComboMenus && !isMozilla() &&
-                ((parent=qtcWidgetGetParent(widget)) && GTK_IS_COMBO_BOX(parent) && !QTC_COMBO_ENTRY(parent)))
+                ((parent=gtk_widget_get_parent(widget)) && GTK_IS_COMBO_BOX(parent) && !QTC_COMBO_ENTRY(parent)))
             {
                 GtkWidget *mapped=NULL;
                 gboolean  changedFocus=FALSE,
@@ -1080,29 +1081,29 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
                         gtk_widget_queue_draw(mapped);
                     else
                     {
-                        GtkStateType mappedState=qtcWidgetGetState(mapped);
+                        GtkStateType mappedState=gtk_widget_get_state(mapped);
                         if(GTK_STATE_INSENSITIVE==state && GTK_STATE_INSENSITIVE!=mappedState)
                             state=mappedState;
-                        if(mappedState!=qtcWidgetGetState(widget) && GTK_STATE_INSENSITIVE!=mappedState && GTK_STATE_INSENSITIVE!=state)
+                        if(mappedState!=gtk_widget_get_state(widget) && GTK_STATE_INSENSITIVE!=mappedState && GTK_STATE_INSENSITIVE!=state)
                             gtk_widget_set_state(mapped, state);
                     }
                 }
             }
             else if(opts.unifyCombo && WIDGET_COMBO_BUTTON==widgetType)
             {
-                GtkWidget    *parent=widget ? qtcWidgetGetParent(widget) : NULL;
+                GtkWidget    *parent=widget ? gtk_widget_get_parent(widget) : NULL;
                 GtkWidget    *entry=parent ? getComboEntry(parent) : NULL;
-                GtkStateType entryState=entry ? qtcWidgetGetState(entry) : GTK_STATE_NORMAL;
+                GtkStateType entryState=entry ? gtk_widget_get_state(entry) : GTK_STATE_NORMAL;
                 gboolean     rev=FALSE,
                              mozToolbar=isMozilla() && parent &&
                                         GTK_IS_TOGGLE_BUTTON(widget) &&
                                         QTC_COMBO_ENTRY(parent) &&
-                                        (parent=qtcWidgetGetParent(parent)) && GTK_IS_FIXED(parent) &&
-                                        (parent=qtcWidgetGetParent(parent)) && GTK_IS_WINDOW(parent) &&
-                                        0==strcmp(qtcWidgetName(parent), "MozillaGtkWidget");
+                                        (parent=gtk_widget_get_parent(parent)) && GTK_IS_FIXED(parent) &&
+                                        (parent=gtk_widget_get_parent(parent)) && GTK_IS_WINDOW(parent) &&
+                                        0==strcmp(gtk_widget_get_name(parent), "MozillaGtkWidget");
 
-                if(!entry && widget && qtcWidgetGetParent(widget))
-                    entry=qtcWidgetMapGetWidget(qtcWidgetGetParent(widget), 1);
+                if(!entry && widget && gtk_widget_get_parent(widget))
+                    entry=qtcWidgetMapGetWidget(gtk_widget_get_parent(widget), 1);
 
                 if(entry)
                     rev=reverseLayout(entry);
@@ -1127,7 +1128,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
 
                 // Get entry to redraw by setting its state...
                 // ...cant do a queue redraw, as then entry does for the button, else we get stuck in a loop!
-                if(!mozToolbar && widget && entry && entryState!=qtcWidgetGetState(widget) && GTK_STATE_INSENSITIVE!=entryState &&
+                if(!mozToolbar && widget && entry && entryState!=gtk_widget_get_state(widget) && GTK_STATE_INSENSITIVE!=entryState &&
                     GTK_STATE_INSENSITIVE!=state)
                     gtk_widget_set_state(entry, state);
             }
@@ -1138,8 +1139,8 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
                 {
                     /* This section messes up Gtk3 scrollbars with custom background - and doesnt seem to be required for Gtk2 either. remove at 1.7.1 */
                     /* Re-added in 1.7.2 as needed by Mozilla! */
-                    if(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) && 0!=opts.tabBgnd && widget && qtcWidgetGetParent(widget) && qtcWidgetGetParent(widget)->parent &&
-                       GTK_IS_SCROLLED_WINDOW(qtcWidgetGetParent(widget)) && GTK_IS_NOTEBOOK(qtcWidgetGetParent(widget)->parent))
+                    if(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) && 0!=opts.tabBgnd && widget && gtk_widget_get_parent(widget) && gtk_widget_get_parent(widget)->parent &&
+                       GTK_IS_SCROLLED_WINDOW(gtk_widget_get_parent(widget)) && GTK_IS_NOTEBOOK(gtk_widget_get_parent(widget)->parent))
                         drawAreaModColor(cr, area, &qtcPalette.background[ORIGINAL_SHADE], TO_FACTOR(opts.tabBgnd), xo, yo, wo, ho);
                     else if(IS_FLAT_BGND(opts.bgndAppearance) || !(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) &&
                                                               widget && drawWindowBgnd(cr, style, area, window, widget, xo, yo, wo, ho)))
@@ -1551,7 +1552,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
         int      bgnd=getFill(state, FALSE); // TODO!!! btnDown???
         gboolean sunken=//btnDown || (GTK_IS_BUTTON(widget) && qtcButtonIsDepressed(widget)) ||
                     GTK_STATE_ACTIVE==state || (2==bgnd || 3==bgnd);
-        GtkWidget *parent=qtcWidgetGetParent(widget),
+        GtkWidget *parent=gtk_widget_get_parent(widget),
                   *mapped=parent ? qtcWidgetMapGetWidget(parent, 0) : NULL;
 
         if(parent && qtcComboBoxIsHovered(parent))
@@ -1570,10 +1571,10 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
 
         if(GTK_STATE_PRELIGHT!=state)
         {
-            if(mapped && GTK_STATE_PRELIGHT==qtcWidgetGetState(mapped))
-                state=GTK_STATE_PRELIGHT, qtcWidgetSetState(widget, GTK_STATE_PRELIGHT);
+            if(mapped && GTK_STATE_PRELIGHT==gtk_widget_get_state(mapped))
+                state=GTK_STATE_PRELIGHT, gtk_widget_set_state(widget, GTK_STATE_PRELIGHT);
         }
-        if(mapped && GTK_STATE_INSENSITIVE!=qtcWidgetGetState(widget))
+        if(mapped && GTK_STATE_INSENSITIVE!=gtk_widget_get_state(widget))
             gtk_widget_queue_draw(mapped);
 
         qtcWidgetMapSetup(parent, widget, 1);
@@ -1581,7 +1582,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
     }
     else if(DETAIL("entry") || DETAIL("text"))
     {
-        GtkWidget *parent=widget ? qtcWidgetGetParent(widget) : NULL;
+        GtkWidget *parent=widget ? gtk_widget_get_parent(widget) : NULL;
         if(parent && isList(parent))
         {
             // Dont draw shadow for entries in listviews...
@@ -1617,8 +1618,8 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                 btn=getComboButton(parent);
                 if(!btn && parent)
                     btn=qtcWidgetMapGetWidget(parent, 0);
-                if(btn && GTK_STATE_PRELIGHT==qtcWidgetGetState(btn))
-                    state=GTK_STATE_PRELIGHT, qtcWidgetSetState(widget, GTK_STATE_PRELIGHT);
+                if(btn && GTK_STATE_PRELIGHT==gtk_widget_get_state(btn))
+                    state=GTK_STATE_PRELIGHT, gtk_widget_set_state(widget, GTK_STATE_PRELIGHT);
             }
 
 #if GTK_CHECK_VERSION(2, 90, 0)
@@ -1634,7 +1635,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                         WIDGET_ENTRY);
             if(combo && opts.unifyCombo && parent)
             {
-                if(btn && GTK_STATE_INSENSITIVE!=qtcWidgetGetState(widget))
+                if(btn && GTK_STATE_INSENSITIVE!=gtk_widget_get_state(widget))
                     gtk_widget_queue_draw(btn);
 
                 if(QTC_COMBO_ENTRY(parent))
@@ -1699,7 +1700,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
             if(GTK_SHADOW_NONE!=shadow &&
                (!frame || opts.drawStatusBarFrames || !isFakeGtk()))
             {
-                GtkWidget *parent=widget ? qtcWidgetGetParent(widget) : NULL;
+                GtkWidget *parent=widget ? gtk_widget_get_parent(widget) : NULL;
                 gboolean  doBorder=!viewport && !drawSquare,
                           windowFrame=parent && !isFixedWidget(widget) && GTK_IS_FRAME(widget) && GTK_IS_WINDOW(parent);
 
@@ -1710,8 +1711,8 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                     windowFrame=eqRect(&wAlloc, &pAlloc);
                 }
 
-//                 if(!drawSquare && widget && qtcWidgetGetParent(widget) && !isFixedWidget(widget) &&
-//                    GTK_IS_FRAME(widget) && GTK_IS_WINDOW(qtcWidgetGetParent(widget)))
+//                 if(!drawSquare && widget && gtk_widget_get_parent(widget) && !isFixedWidget(widget) &&
+//                    GTK_IS_FRAME(widget) && GTK_IS_WINDOW(gtk_widget_get_parent(widget)))
 //                     drawSquare=true;
 
                 if(scrolledWindow)
@@ -1890,7 +1891,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
                      but=isOnButton(widget, 0, &def_but),
                      swapColors=FALSE;
         GdkRectangle area2;
-        GtkWidget    *parent=widget ? qtcWidgetGetParent(widget) : NULL;
+        GtkWidget    *parent=widget ? gtk_widget_get_parent(widget) : NULL;
 
         if(!opts.colorMenubarMouseOver && mb && !activeMb && GTK_STATE_PRELIGHT==state)
             state=GTK_STATE_NORMAL;
@@ -1905,7 +1906,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
                                                IS_MENU_ITEM(widget), detail ? detail : "NULL"),
                                         debugDisplayWidget(widget, 10);
 
-        if(DETAIL("cellrenderertext") && widget && GTK_STATE_INSENSITIVE==qtcWidgetGetState(widget))
+        if(DETAIL("cellrenderertext") && widget && GTK_STATE_INSENSITIVE==gtk_widget_get_state(widget))
              state=GTK_STATE_INSENSITIVE;
 
 #ifndef READ_INACTIVE_PAL /* If we reead the inactive palette, then there is no need for the following... */
@@ -1999,7 +2000,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
 
                 if(tabLabel==widget)
                 {
-                    active=GTK_STATE_NORMAL==qtcWidgetGetState(tabLabel);
+                    active=GTK_STATE_NORMAL==gtk_widget_get_state(tabLabel);
                     break;
                 }
             }
@@ -2044,11 +2045,11 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
             int diff=qtcWidgetGetAllocation(widget).x-qtcWidgetGetAllocation(parent).x;
 
             if (NO_FRAME(opts.groupBox)) {
-                x -= QtcMax(0, QtcMin(diff, 8));
+                x -= qtcBound(0, diff, 8);
             } else if (opts.gbLabel&GB_LBL_OUTSIDE) {
-                x -= QtcMax(0, QtcMin(diff, 4));
+                x -= qtcBound(0, diff, 4);
             } else if(opts.gbLabel&GB_LBL_INSIDE) {
-                x -= QtcMax(0, QtcMin(diff, 2));
+                x -= qtcBound(0, diff, 2);
             } else {
                 x += 5;
             }
@@ -2059,13 +2060,13 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
             {
                 area2=*area;
                 if (NO_FRAME(opts.groupBox)) {
-                    area2.x -= QtcMax(0, QtcMin(diff, 8));
+                    area2.x -= qtcBound(0, diff, 8);
                 } else if (opts.gbLabel & GB_LBL_OUTSIDE) {
-                    area2.x-= QtcMax(0, QtcMin(diff, 4));
+                    area2.x -= qtcBound(0, diff, 4);
                 } else if(opts.gbLabel&GB_LBL_INSIDE) {
-                    area2.x -= QtcMax(0, QtcMin(diff, 2));
+                    area2.x -= qtcBound(0, diff, 2);
                 } else {
-                    area2.x+=5;
+                    area2.x += 5;
                 }
                 area=&area2;
             }
@@ -2109,7 +2110,7 @@ static void gtkDrawTab(GtkStyle *style, GdkWindow *window, GtkStateType state, G
         x++, y++;
 #endif
 
-    x=reverseLayout(widget) || ((widget=qtcWidgetGetParent(widget)) && reverseLayout(widget))
+    x=reverseLayout(widget) || ((widget=gtk_widget_get_parent(widget)) && reverseLayout(widget))
                 ? x+1
                 : x+(width>>1);
 
@@ -2416,7 +2417,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
                                     debugDisplayWidget(widget, 10);
 
     {
-    GtkWidget *parent=widget ? qtcWidgetGetParent(widget) : NULL;
+    GtkWidget *parent=widget ? gtk_widget_get_parent(widget) : NULL;
     gboolean  doEtch=DO_EFFECT,
               btn=false,
               comboButton=false,
@@ -2488,7 +2489,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
         {
             // Gimps buttons in its toolbox are
             const gchar *text=NULL;
-            toolbarBtn=GTK_APP_GIMP==qtSettings.app && (NULL==(text=qtcButtonGetLabelText(GTK_BUTTON(widget))) ||
+            toolbarBtn=GTK_APP_GIMP==qtSettings.app && (NULL==(text=gtk_button_get_label(GTK_BUTTON(widget))) ||
                                                         '\0'==text[0]);
 
             if(!toolbarBtn && FOCUS_GLOW==opts.focus && !isMozilla())
@@ -2849,9 +2850,9 @@ static void qtcurve_rc_style_merge(GtkRcStyle *dest, GtkRcStyle *src)
                                                                       0==strcmp(src->name, "default"))));
 
     if (isQtCNoteBook) {
-        qtc_shade(&qtcPalette.background[ORIGINAL_SHADE],
-                  &src->bg[GTK_STATE_NORMAL], TO_FACTOR(opts.tabBgnd),
-                  opts.shading);
+        qtcShade(&qtcPalette.background[ORIGINAL_SHADE],
+                 &src->bg[GTK_STATE_NORMAL], TO_FACTOR(opts.tabBgnd),
+                 opts.shading);
     }
 
     if(dontChangeColors)
@@ -2977,7 +2978,7 @@ void qtcurve_rc_style_register_type(GTypeModule *module)
 G_MODULE_EXPORT void theme_init(GTypeModule *module)
 {
 #ifdef QTC_ENABLE_X11
-    qtc_x11_init_xlib(GDK_DISPLAY_XDISPLAY(gdk_display_get_default()));
+    qtcX11InitXlib(GDK_DISPLAY_XDISPLAY(gdk_display_get_default()));
 #endif
     qtcurve_rc_style_register_type(module);
     qtcurve_style_register_type(module);

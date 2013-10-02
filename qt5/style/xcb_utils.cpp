@@ -38,7 +38,7 @@ void
 setWindowWMClass(WId wid)
 {
     static QByteArray wmclass = getWMClass();
-    qtc_x11_set_wmclass(wid, wmclass.constData(), wmclass.count());
+    qtcX11SetWMClass(wid, wmclass.constData(), wmclass.count());
 }
 
 }

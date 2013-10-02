@@ -18,7 +18,8 @@
   Boston, MA 02110-1301, USA.
  */
 
-#include <gtk/gtk.h>
+#include <qtcurve-utils/gtkutils.h>
+
 #include <stdlib.h>
 #include "compatability.h"
 
@@ -223,7 +224,7 @@ void qtcTreeViewSetup(GtkWidget *widget)
     {
         QtCTreeView *tv=qtcTreeViewLookupHash(widget, TRUE);
         GtkTreeView *treeView=GTK_TREE_VIEW(widget);
-        GtkWidget   *parent=qtcWidgetGetParent(widget);
+        GtkWidget   *parent=gtk_widget_get_parent(widget);
 
         if(tv)
         {
@@ -234,7 +235,7 @@ void qtcTreeViewSetup(GtkWidget *widget)
 #else
             gtk_widget_style_get(widget, "row_ending_details", &tv->fullWidth, NULL);
 #endif
-            gdk_window_get_pointer(qtcWidgetGetWindow(widget), &x, &y, 0L);
+            gdk_window_get_pointer(gtk_widget_get_window(widget), &x, &y, 0L);
             gtk_tree_view_convert_widget_to_bin_window_coords(treeView, x, y, &x, &y);
             qtcTreeViewUpdatePosition(widget, x, y);
                 

@@ -23,7 +23,7 @@ public:
     virtual QStyle *create(const QString &key) override
         {
 #ifdef QTC_ENABLE_X11
-            qtc_x11_init_xcb(QX11Info::connection(), QX11Info::appScreen());
+            qtcX11InitXcb(QX11Info::connection(), QX11Info::appScreen());
 #endif
             return "qtcurve" == key.toLower() ? new Style : 0;
         }

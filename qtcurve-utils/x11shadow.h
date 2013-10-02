@@ -18,14 +18,15 @@
  *   51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.              *
  ***************************************************************************/
 
-#ifndef _QTC_UTILS_KDEX11SHADOW_P_H_
-#define _QTC_UTILS_KDEX11SHADOW_P_H_
+#ifndef _QTC_UTILS_X11SHADOW_H_
+#define _QTC_UTILS_X11SHADOW_H_
 
-#include "kdex11shadow.h"
+#include "x11utils.h"
 
 QTC_BEGIN_DECLS
 
-void qtc_kde_x11_shadow_init();
+void qtcX11ShadowInstall(xcb_window_t win);
+void qtcX11ShadowUninstall(xcb_window_t win);
 
 QTC_END_DECLS
 

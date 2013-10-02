@@ -18,11 +18,12 @@
   Boston, MA 02110-1301, USA.
 */
 
+#include <qtcurve-utils/gtkutils.h>
+
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <gdk/gdkx.h>
 #include "compatability.h"
-#include <qtcurve-utils/gtkutils.h>
 #include <common/common.h>
 
 gboolean
@@ -42,7 +43,7 @@ qtcMenuEmitSize(GtkWidget *w, unsigned int size)
                               GINT_TO_POINTER(size));
             unsigned short ssize = size;
             XChangeProperty(gdk_x11_display_get_xdisplay(display),
-                            GDK_WINDOW_XID(qtcWidgetGetWindow(topLevel)),
+                            GDK_WINDOW_XID(gtk_widget_get_window(topLevel)),
                             gdk_x11_get_xatom_by_name_for_display(display,
                                                                   MENU_SIZE_ATOM),
                             XA_CARDINAL, 16, PropModeReplace,
@@ -76,11 +77,11 @@ static const int constMenuAdjust = 2;
 static gboolean
 menuIsSelectable(GtkWidget *menu)
 {
-    return !((!qtcBinGetChild(GTK_BIN(menu)) &&
+    return !((!gtk_bin_get_child(GTK_BIN(menu)) &&
               G_OBJECT_TYPE(menu) == GTK_TYPE_MENU_ITEM) ||
              GTK_IS_SEPARATOR_MENU_ITEM(menu) ||
-             !qtcWidgetIsSensitive(menu) ||
-             !qtcWidgetVisible(menu));
+             !gtk_widget_is_sensitive(menu) ||
+             !gtk_widget_get_visible(menu));
 }
 
 static gboolean
@@ -91,7 +92,7 @@ qtcMenuShellButtonPress(GtkWidget *widget, GdkEventButton *event, gpointer data)
         // QtCurve's menubars have a 2 pixel border ->
         // but want the left/top to be 'active'...
         int nx, ny;
-        gdk_window_get_origin(qtcWidgetGetWindow(widget), &nx, &ny);
+        gdk_window_get_origin(gtk_widget_get_window(widget), &nx, &ny);
         if ((event->x_root-nx) <= 2.0 || (event->y_root - ny) <= 2.0) {
             GtkMenuShell *menuShell = GTK_MENU_SHELL(widget);
             GList *children =
@@ -189,7 +190,7 @@ qtcMenuShellMotion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
         gint pointer_x, pointer_y;
         GdkModifierType pointer_mask;
 
-        gdk_window_get_pointer(qtcWidgetGetWindow(widget), &pointer_x,
+        gdk_window_get_pointer(gtk_widget_get_window(widget), &pointer_x,
                                &pointer_y, &pointer_mask);
 
         if (GTK_IS_CONTAINER(widget)) {
@@ -199,7 +200,7 @@ qtcMenuShellMotion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
             for (child = g_list_first(children);child;
                  child = g_list_next(child)) {
                 if((child->data) && GTK_IS_WIDGET(child->data) &&
-                   (qtcWidgetGetState(GTK_WIDGET(child->data)) !=
+                   (gtk_widget_get_state(GTK_WIDGET(child->data)) !=
                     GTK_STATE_INSENSITIVE)) {
                     GtkAllocation alloc =
                         qtcWidgetGetAllocation(GTK_WIDGET(child->data));
@@ -236,19 +237,19 @@ qtcMenuShellLeave(GtkWidget *widget, GdkEventCrossing *event, gpointer data)
 
         for (child = g_list_first(children);child;child = g_list_next(child)) {
             if((child->data) && GTK_IS_MENU_ITEM(child->data) &&
-               (qtcWidgetGetState(GTK_WIDGET(child->data)) !=
+               (gtk_widget_get_state(GTK_WIDGET(child->data)) !=
                 GTK_STATE_INSENSITIVE)) {
                 GtkWidget *submenu =
-                    qtcMenuItemGetSubMenu(GTK_MENU_ITEM(child->data));
+                    gtk_menu_item_get_submenu(GTK_MENU_ITEM(child->data));
                 GtkWidget *topLevel =
-                    submenu ? qtcMenuGetTopLevel(submenu) : NULL;
+                    submenu ? gtk_widget_get_toplevel(submenu) : NULL;
 
                 if (submenu &&
                     ((!GTK_IS_MENU(submenu)) ||
-                     (!(qtcWidgetRealized(submenu) &&
-                        qtcWidgetVisible(submenu) &&
-                        qtcWidgetRealized(topLevel) &&
-                        qtcWidgetVisible(topLevel))))) {
+                     (!(gtk_widget_get_realized(submenu) &&
+                        gtk_widget_get_visible(submenu) &&
+                        gtk_widget_get_realized(topLevel) &&
+                        gtk_widget_get_visible(topLevel))))) {
                     gtk_widget_set_state(GTK_WIDGET(child->data),
                                          GTK_STATE_NORMAL);
                 }

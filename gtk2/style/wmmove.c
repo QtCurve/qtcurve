@@ -18,12 +18,13 @@
   Boston, MA 02110-1301, USA.
 */
 
+#include <qtcurve-utils/gtkutils.h>
+
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <gdk/gdkx.h>
 #include <stdlib.h>
 #include "compatability.h"
-#include <qtcurve-utils/gtkutils.h>
 #include "helpers.h"
 #include "qt_settings.h"
 #include "menu.h"
@@ -196,7 +197,7 @@ static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *eve
             GdkWindow *window=NULL;
 
             // check widget state and type
-            if(GTK_STATE_PRELIGHT==qtcWidgetGetState(childWidget))
+            if(GTK_STATE_PRELIGHT==gtk_widget_get_state(childWidget))
             {
                 // if widget is prelight, we don't need to check where event happen,
                 // any prelight widget indicate we can't do a move
@@ -218,7 +219,7 @@ static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *eve
             if(
                 (qtcWMMoveIsBlackListed(G_OBJECT(childWidget))) ||
                 (GTK_IS_NOTEBOOK(widget) && qtcTabIsLabel(GTK_NOTEBOOK(widget), childWidget)) ||
-                (GTK_IS_BUTTON(childWidget) && qtcWidgetGetState(childWidget) != GTK_STATE_INSENSITIVE) ||
+                (GTK_IS_BUTTON(childWidget) && gtk_widget_get_state(childWidget) != GTK_STATE_INSENSITIVE) ||
                 (gtk_widget_get_events(childWidget) & (GDK_BUTTON_PRESS_MASK|GDK_BUTTON_RELEASE_MASK)) ||
                 (GTK_IS_MENU_ITEM(childWidget)) ||
                 (GTK_IS_SCROLLED_WINDOW(childWidget) && (!inNoteBook || gtk_widget_is_focus(childWidget))))
@@ -379,7 +380,7 @@ void qtcWMMoveSetup(GtkWidget *widget)
         gtk_event_box_get_above_child(GTK_EVENT_BOX(widget)))
         return;
 
-    parent = qtcWidgetGetParent(widget);
+    parent = gtk_widget_get_parent(widget);
 
     // widgets used in tabs also must be ignored (happens, unfortunately)
     if (GTK_IS_NOTEBOOK(parent) && qtcTabIsLabel(GTK_NOTEBOOK(parent), widget))
@@ -392,7 +393,7 @@ void qtcWMMoveSetup(GtkWidget *widget)
       means that it does something with such events, in which case we should
       not use them for grabbing
     */
-    if (0 == strcmp(g_type_name(qtcWidgetType(widget)), "GtkWindow") &&
+    if (0 == strcmp(g_type_name(G_OBJECT_TYPE(widget)), "GtkWindow") &&
        (gtk_widget_get_events(widget) &
         (GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK)))
         return;

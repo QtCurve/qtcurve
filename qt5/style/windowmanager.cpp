@@ -650,7 +650,7 @@ void WindowManager::startDrag( QWidget* widget, const QPoint& position )
     // ungrab pointer
     if (useWMMoveResize()) {
 #ifdef QTC_ENABLE_X11
-        qtc_x11_call_void(ungrab_pointer, 0L);
+        qtcX11CallVoid(ungrab_pointer, 0L);
 #ifndef QTC_QT5_ENABLE_KDE
         static const auto moveResizeAtom =
             qtc_x11_atoms[QTC_X11_ATOM_NET_WM_MOVERESIZE];
@@ -670,13 +670,13 @@ void WindowManager::startDrag( QWidget* widget, const QPoint& position )
         xev->data.data32[1] = position.y();
         xev->data.data32[2] = 8; // NET::Move
         xev->data.data32[3] = XCB_KEY_BUT_MASK_BUTTON_1;
-        qtc_x11_call_void(send_event, false, qtc_x11_root_window(),
-                          XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY |
-                          XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT,
-                          (const char*)xev);
-        qtc_x11_flush();
+        qtcX11CallVoid(send_event, false, qtcX11RootWindow(),
+                       XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY |
+                       XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT,
+                       (const char*)xev);
+        qtcX11Flush();
 #else
-        qtc_x11_flush();
+        qtcX11Flush();
         NETRootInfo rootInfo(QX11Info::display(), NET::WMMoveResize);
         rootInfo.moveResizeRequest(widget->window()->winId(),
                                    position.x(), position.y(), NET::Move);

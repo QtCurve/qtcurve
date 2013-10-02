@@ -172,7 +172,7 @@ qtcAnimationUpdateInfo(gpointer key, gpointer value, gpointer user_data)
         g_assert_not_reached();
 
     /* remove the widget from the hash table if it is not drawable */
-    if (!qtcWidgetDrawable(widget))
+    if (!gtk_widget_is_drawable(widget))
         return TRUE;
 
     if (GTK_IS_PROGRESS_BAR(widget)) {

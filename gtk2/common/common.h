@@ -938,17 +938,6 @@ typedef enum
 #endif
 
 #ifdef __cplusplus
-#include <math.h>
-
-inline bool qtcEqual(double d1, double d2)
-{
-    return (fabs(d1 - d2) < 0.0001);
-}
-#else // __cplusplus
-#define qtcEqual(A, B) (fabs(A - B) < 0.0001)
-#endif // __cplusplus
-
-#ifdef __cplusplus
 struct GradientStop
 #else // __cplusplus
 typedef struct
@@ -1256,12 +1245,12 @@ typedef struct {
 #else // QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY
 #include <qtcurve-utils/color.h>
 #ifdef __cplusplus
-#define tint(COLA, COLB, FACTOR) qtc_color_tint(&(COLA), &(COLB), (FACTOR))
-#define midColor(COLA, COLB) qtc_color_mix(&(COLA), &(COLB), 0.5)
-#define midColorF(COLA, COLB, FACTOR) qtc_color_mix(&(COLA), &(COLB), FACTOR-0.5)
+#define tint(COLA, COLB, FACTOR) qtcColorTint(&(COLA), &(COLB), (FACTOR))
+#define midColor(COLA, COLB) qtcColorMix(&(COLA), &(COLB), 0.5)
+#define midColorF(COLA, COLB, FACTOR) qtcColorMix(&(COLA), &(COLB), FACTOR-0.5)
 #else // __cplusplus
-#define tint(COLA, COLB, FACTOR) qtc_color_tint((COLA), (COLB), (FACTOR))
-#define midColor(COLA, COLB) qtc_color_mix((COLA), (COLB), 0.5)
+#define tint(COLA, COLB, FACTOR) qtcColorTint((COLA), (COLB), (FACTOR))
+#define midColor(COLA, COLB) qtcColorMix((COLA), (COLB), 0.5)
 #endif // __cplusplus
 #endif // QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY
 

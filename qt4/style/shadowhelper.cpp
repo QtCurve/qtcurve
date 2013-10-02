@@ -33,7 +33,7 @@
 #include <QToolBar>
 #include <QEvent>
 
-#include <qtcurve-utils/kdex11shadow.h>
+#include <qtcurve-utils/x11shadow.h>
 
 namespace QtCurve {
 const char *const ShadowHelper::netWMForceShadowPropertyName =
@@ -158,7 +158,7 @@ bool ShadowHelper::installX11Shadows( QWidget* widget )
           widget->internalWinId()))
         return false;
 
-    qtc_kde_x11_shadow_install(widget->winId());
+    qtcX11ShadowInstall(widget->winId());
     return true;
 }
 
@@ -167,6 +167,6 @@ void ShadowHelper::uninstallX11Shadows( QWidget* widget ) const
 {
     if (!(widget && widget->testAttribute(Qt::WA_WState_Created)))
         return;
-    qtc_kde_x11_shadow_uninstall(widget->winId());
+    qtcX11ShadowUninstall(widget->winId());
 }
 }

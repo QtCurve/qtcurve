@@ -1,5 +1,6 @@
 set(qtcurve_utils_SRCS
-  color.c)
+  color.c
+  log.c)
 set(qtcurve_utils_LINKS
   m)
 
@@ -8,7 +9,7 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 if(QTC_ENABLE_X11)
   set(qtcurve_utils_SRCS
     ${qtcurve_utils_SRCS}
-    kdex11shadow.c
+    x11shadow.c
     x11utils.c)
   set(qtcurve_utils_LINKS
     ${qtcurve_utils_LINKS}

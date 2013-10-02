@@ -63,11 +63,11 @@ gboolean
 qtcComboBoxIsFocusChanged(GtkWidget *widget)
 {
     if (qtcComboFocus == widget) {
-        if (!qtcWidgetHasFocus(widget)) {
+        if (!gtk_widget_has_focus(widget)) {
             qtcComboFocus = NULL;
             return TRUE;
         }
-    } else if (qtcWidgetHasFocus(widget)) {
+    } else if (gtk_widget_has_focus(widget)) {
         qtcComboFocus = widget;
         return TRUE;
     }
@@ -77,7 +77,7 @@ qtcComboBoxIsFocusChanged(GtkWidget *widget)
 gboolean
 qtcComboBoxHasFocus(GtkWidget *widget, GtkWidget *mapped)
 {
-    return qtcWidgetHasFocus(widget) || (mapped && mapped == qtcComboFocus);
+    return gtk_widget_has_focus(widget) || (mapped && mapped == qtcComboFocus);
 }
 
 gboolean

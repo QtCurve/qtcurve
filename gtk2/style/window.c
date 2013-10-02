@@ -19,6 +19,7 @@
 */
 
 #include <qtcurve-utils/gtkutils.h>
+
 #include <gdk/gdkkeysyms.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -222,7 +223,7 @@ qtcWindowSizeRequest(GtkWidget *widget)
         } else {
             rect.width = alloc.width, rect.height = alloc.height;
         }
-        gdk_window_invalidate_rect(qtcWidgetGetWindow(widget), &rect, FALSE);
+        gdk_window_invalidate_rect(gtk_widget_get_window(widget), &rect, FALSE);
     }
     return FALSE;
 }
@@ -276,15 +277,15 @@ static gboolean
 canGetChildren(GtkWidget *widget)
 {
     return (GTK_APP_GHB != qtSettings.app ||
-            0 != strcmp(g_type_name(qtcWidgetType(widget)), "GhbCompositor") ||
-            qtcWidgetRealized(widget));
+            0 != strcmp(g_type_name(G_OBJECT_TYPE(widget)), "GhbCompositor") ||
+            gtk_widget_get_realized(widget));
 }
 
 GtkWidget*
 qtcWindowGetMenuBar(GtkWidget *parent, int level)
 {
     if (level < 3 && GTK_IS_CONTAINER(parent) && canGetChildren(parent)
-        /* && qtcWidgetRealized(parent)*/) {
+        /* && gtk_widget_get_realized(parent)*/) {
         GtkWidget *rv = NULL;
         GList *children = gtk_container_get_children(GTK_CONTAINER(parent));
         GList *child = children;
@@ -310,7 +311,7 @@ GtkWidget*
 qtcWindowGetStatusBar(GtkWidget *parent, int level)
 {
     if (level < 3 && GTK_IS_CONTAINER(parent) && canGetChildren(parent)
-        /* && qtcWidgetRealized(parent)*/) {
+        /* && gtk_widget_get_realized(parent)*/) {
         GtkWidget *rv = NULL;
         GList *children = gtk_container_get_children(GTK_CONTAINER(parent));
         GList *child = children;
@@ -336,7 +337,7 @@ void
 qtcWindowMenuBarDBus(GtkWidget *widget, int size)
 {
     GtkWindow *topLevel = GTK_WINDOW(gtk_widget_get_toplevel(widget));
-    unsigned int xid = GDK_WINDOW_XID(qtcWidgetGetWindow(GTK_WIDGET(topLevel)));
+    unsigned int xid = GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel)));
 
     char cmd[160];
     //sprintf(cmd, "qdbus org.kde.kwin /QtCurve menuBarSize %u %d", xid, size);
@@ -358,7 +359,7 @@ void
 qtcWindowStatusBarDBus(GtkWidget *widget, gboolean state)
 {
     GtkWindow *topLevel = GTK_WINDOW(gtk_widget_get_toplevel(widget));
-    unsigned int xid = GDK_WINDOW_XID(qtcWidgetGetWindow(GTK_WIDGET(topLevel)));
+    unsigned int xid = GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel)));
 
     char cmd[160];
     //sprintf(cmd, "qdbus org.kde.kwin /QtCurve statusBarState %u %s", xid, state ? "true" : "false");
@@ -383,8 +384,8 @@ qtcWindowToggleMenuBar(GtkWidget *widget)
 
     if (menuBar) {
         int size = 0;
-        qtcSetMenuBarHidden(qtSettings.appName, qtcWidgetVisible(menuBar));
-        if (qtcWidgetVisible(menuBar)) {
+        qtcSetMenuBarHidden(qtSettings.appName, gtk_widget_get_visible(menuBar));
+        if (gtk_widget_get_visible(menuBar)) {
             gtk_widget_hide(menuBar);
         } else {
             size = qtcWidgetGetAllocation(menuBar).height;
@@ -408,7 +409,7 @@ qtcWindowSetStatusBarProp(GtkWidget *w)
         unsigned short setting=1;
         g_object_set_data(G_OBJECT(w), STATUSBAR_ATOM, (gpointer)1);
         XChangeProperty(GDK_DISPLAY_XDISPLAY(display),
-                        GDK_WINDOW_XID(qtcWidgetGetWindow(GTK_WIDGET(topLevel))),
+                        GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel))),
                         gdk_x11_get_xatom_by_name_for_display(display, STATUSBAR_ATOM),
                         XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&setting, 1);
         return TRUE;
@@ -422,7 +423,7 @@ qtcWindowToggleStatusBar(GtkWidget *widget)
     GtkWidget *statusBar = qtcWindowGetStatusBar(widget, 0);
 
     if (statusBar) {
-        gboolean state=qtcWidgetVisible(statusBar);
+        gboolean state=gtk_widget_get_visible(statusBar);
         qtcSetStatusBarHidden(qtSettings.appName, state);
         if (state) {
             gtk_widget_hide(statusBar);
@@ -448,12 +449,12 @@ qtcWindowSetProperties(GtkWidget *w, unsigned short opacity)
     GdkColor      *bgnd=/*rcStyle ? &rcStyle->bg[GTK_STATE_NORMAL] : */&qtcPalette.background[ORIGINAL_SHADE];
 
     if(100!=opacity)
-        XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(qtcWidgetGetWindow(GTK_WIDGET(topLevel))),
+        XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel))),
                         gdk_x11_get_xatom_by_name_for_display(display, OPACITY_ATOM),
                         XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&opacity, 1);
 
     prop|=((toQtColor(bgnd->red)&0xFF)<<24)|((toQtColor(bgnd->green)&0xFF)<<16)|((toQtColor(bgnd->blue)&0xFF)<<8);
-    XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(qtcWidgetGetWindow(GTK_WIDGET(topLevel))),
+    XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel))),
                     gdk_x11_get_xatom_by_name_for_display(display, BGND_ATOM),
                     XA_CARDINAL, 32, PropModeReplace, (unsigned char *)&prop, 1);
 }
@@ -488,7 +489,7 @@ static gboolean qtcWindowMap(GtkWidget *widget, GdkEventKey *event, gpointer use
 
         if(menuBar)
         {
-            int size=qtcWidgetVisible(menuBar) ? qtcWidgetGetAllocation(menuBar).height : 0;
+            int size=gtk_widget_get_visible(menuBar) ? qtcWidgetGetAllocation(menuBar).height : 0;
 
             qtcMenuEmitSize(menuBar, size);
             qtcWindowMenuBarDBus(widget, size);
@@ -500,7 +501,7 @@ static gboolean qtcWindowMap(GtkWidget *widget, GdkEventKey *event, gpointer use
         GtkWidget *statusBar=qtcWindowGetStatusBar(widget, 0);
 
         if(statusBar)
-            qtcWindowStatusBarDBus(widget, !qtcWidgetVisible(statusBar));
+            qtcWindowStatusBarDBus(widget, !gtk_widget_get_visible(statusBar));
     }
     return FALSE;
 }

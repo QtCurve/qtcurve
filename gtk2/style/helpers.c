@@ -18,6 +18,9 @@
   Boston, MA 02110-1301, USA.
  */
 
+#include <qtcurve-utils/gtkutils.h>
+#include <qtcurve-utils/color.h>
+
 #include "helpers.h"
 #include "qt_settings.h"
 #include <stdlib.h>
@@ -26,22 +29,21 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <gdk/gdkx.h>
-#include <qtcurve-utils/color.h>
 
-static void dumpChildren(GtkWidget *widget, int level)
+static void
+dumpChildren(GtkWidget *widget, int level)
 {
-    if(level<5)
-    {
-        GList *children = gtk_container_get_children(GTK_CONTAINER(widget)),
-              *child    = children;
+    if (level < 5) {
+        GList *children = gtk_container_get_children(GTK_CONTAINER(widget));
+        GList *child = children;
 
-        for(; child; child=child->next)
-        {
-            GtkWidget *boxChild=(GtkWidget *)child->data;
+        for (;child;child = child->next) {
+            GtkWidget *boxChild = (GtkWidget*)child->data;
 
-            printf(":[%d]%s:", level, g_type_name(qtcWidgetType(boxChild)));
-            if(GTK_IS_BOX(boxChild))
+            printf(":[%d]%s:", level, g_type_name(G_OBJECT_TYPE(boxChild)));
+            if (GTK_IS_BOX(boxChild)) {
                 dumpChildren(boxChild, ++level);
+            }
         }
         if(children)
             g_list_free(children);
@@ -52,14 +54,14 @@ void debugDisplayWidget(GtkWidget *widget, int level)
 {
     if(level>=0)
     {
-        printf("%s(%s)[%x] ", widget ? g_type_name(qtcWidgetType(widget)) : "NULL",
-               widget && qtcWidgetName(widget) ? qtcWidgetName(widget) : "NULL", (int)widget);
+        printf("%s(%s)[%x] ", widget ? g_type_name(G_OBJECT_TYPE(widget)) : "NULL",
+               widget && gtk_widget_get_name(widget) ? gtk_widget_get_name(widget) : "NULL", (int)widget);
         /*if(widget)
-            printf("[%d, %dx%d : %d,%d , %0X] ", qtcWidgetGetState(widget), widget->allocation.x,
+            printf("[%d, %dx%d : %d,%d , %0X] ", gtk_widget_get_state(widget), widget->allocation.x,
                    widget->allocation.y,
-                   widget->allocation.width, widget->allocation.height, qtcWidgetGetWindow(widget));*/
-        if(widget && qtcWidgetGetParent(widget))
-            debugDisplayWidget(qtcWidgetGetParent(widget), --level);
+                   widget->allocation.width, widget->allocation.height, gtk_widget_get_window(widget));*/
+        if(widget && gtk_widget_get_parent(widget))
+            debugDisplayWidget(gtk_widget_get_parent(widget), --level);
         else
             printf("\n");
     }
@@ -139,19 +141,19 @@ void qtcShadeColors(GdkColor *base, GdkColor *vals)
     double   hl=TO_FACTOR(opts.highlightFactor);
 
     for (i = 0;i < NUM_STD_SHADES;++i) {
-        qtc_shade(base, &vals[i], useCustom ? opts.customShades[i] :
-                  SHADE(opts.contrast, i), opts.shading);
+        qtcShade(base, &vals[i], useCustom ? opts.customShades[i] :
+                 SHADE(opts.contrast, i), opts.shading);
     }
-    qtc_shade(base, &vals[SHADE_ORIG_HIGHLIGHT], hl, opts.shading);
-    qtc_shade(&vals[4], &vals[SHADE_4_HIGHLIGHT], hl, opts.shading);
-    qtc_shade(&vals[2], &vals[SHADE_2_HIGHLIGHT], hl, opts.shading);
+    qtcShade(base, &vals[SHADE_ORIG_HIGHLIGHT], hl, opts.shading);
+    qtcShade(&vals[4], &vals[SHADE_4_HIGHLIGHT], hl, opts.shading);
+    qtcShade(&vals[2], &vals[SHADE_2_HIGHLIGHT], hl, opts.shading);
     vals[ORIGINAL_SHADE] = *base;
 }
 
 gboolean isSortColumn(GtkWidget *button)
 {
     GtkWidget *parent=NULL;
-    if(button && (parent=qtcWidgetGetParent(button)) && GTK_IS_TREE_VIEW(parent))
+    if(button && (parent=gtk_widget_get_parent(button)) && GTK_IS_TREE_VIEW(parent))
     {
 #if GTK_CHECK_VERSION(2, 90, 0)
         GtkWidget *box=GTK_IS_BUTTON(button) ? gtk_bin_get_child(GTK_BIN(button)) : NULL;
@@ -218,7 +220,7 @@ GdkColor * getCellCol(GdkColor *std, const gchar *detail)
                b=shaded.blue/65535.0;
         double h, s, v;
 
-        qtc_rgb_to_hsv(r, g, b, &h, &s, &v);
+        qtcRgbToHsv(r, g, b, &h, &s, &v);
 
         if (v > 175.0/255.0)
             v*=100.0/104.0;
@@ -233,7 +235,7 @@ GdkColor * getCellCol(GdkColor *std, const gchar *detail)
             v = 1.0;
         }
 
-        qtc_hsv_to_rgb(&r, &g, &b, h, s, v);
+        qtcHsvToRgb(&r, &g, &b, h, s, v);
         shaded.red = r * 65535.0;
         shaded.green = g * 65535.0;
         shaded.blue = b * 65535.0;
@@ -259,7 +261,7 @@ gboolean isOnToolbar(GtkWidget *widget, gboolean *horiz, int level)
             return TRUE;
         }
         else if(level<4)
-            return isOnToolbar(qtcWidgetGetParent(widget), horiz, ++level);
+            return isOnToolbar(gtk_widget_get_parent(widget), horiz, ++level);
     }
 
     return FALSE;
@@ -279,7 +281,7 @@ gboolean isOnHandlebox(GtkWidget *widget, gboolean *horiz, int level)
             return TRUE;
         }
         else if(level<4)
-            return isOnHandlebox(qtcWidgetGetParent(widget), horiz, ++level);
+            return isOnHandlebox(gtk_widget_get_parent(widget), horiz, ++level);
     }
 
     return FALSE;
@@ -288,7 +290,7 @@ gboolean isOnHandlebox(GtkWidget *widget, gboolean *horiz, int level)
 gboolean isButtonOnToolbar(GtkWidget *widget, gboolean *horiz)
 {
     GtkWidget *parent=NULL;
-    return (widget && (parent=qtcWidgetGetParent(widget)) && GTK_IS_BUTTON(widget))
+    return (widget && (parent=gtk_widget_get_parent(widget)) && GTK_IS_BUTTON(widget))
                ? isOnToolbar(parent, horiz, 0)
                : FALSE;
 }
@@ -296,14 +298,14 @@ gboolean isButtonOnToolbar(GtkWidget *widget, gboolean *horiz)
 gboolean isButtonOnHandlebox(GtkWidget *widget, gboolean *horiz)
 {
     GtkWidget *parent=NULL;
-    return (widget && (parent=qtcWidgetGetParent(widget)) && GTK_IS_BUTTON(widget))
+    return (widget && (parent=gtk_widget_get_parent(widget)) && GTK_IS_BUTTON(widget))
                ? isOnHandlebox(parent, horiz, 0)
                : FALSE;
 }
 
 gboolean isOnStatusBar(GtkWidget *widget, int level)
 {
-    GtkWidget *parent=qtcWidgetGetParent(widget);
+    GtkWidget *parent=gtk_widget_get_parent(widget);
     if(parent)
         if(GTK_IS_STATUSBAR(parent))
             return TRUE;
@@ -326,25 +328,25 @@ gboolean isList(GtkWidget *widget)
 #endif
             GTK_IS_CTREE(widget) ||
 #endif
-            0==strcmp(g_type_name(qtcWidgetType(widget)), "GtkSCTree"));
+            0==strcmp(g_type_name(G_OBJECT_TYPE(widget)), "GtkSCTree"));
 }
 
 gboolean isListViewHeader(GtkWidget *widget)
 {
     GtkWidget *parent=NULL;
-    return widget && GTK_IS_BUTTON(widget) && (parent=qtcWidgetGetParent(widget)) &&
+    return widget && GTK_IS_BUTTON(widget) && (parent=gtk_widget_get_parent(widget)) &&
            (isList(parent) ||
             (GTK_APP_GIMP==qtSettings.app && GTK_IS_BOX(parent) &&
-             (parent=qtcWidgetGetParent(parent)) && GTK_IS_EVENT_BOX(parent) &&
-             (parent=qtcWidgetGetParent(parent)) && 0==strcmp(g_type_name(qtcWidgetType(parent)), "GimpThumbBox")));
+             (parent=gtk_widget_get_parent(parent)) && GTK_IS_EVENT_BOX(parent) &&
+             (parent=gtk_widget_get_parent(parent)) && 0==strcmp(g_type_name(G_OBJECT_TYPE(parent)), "GimpThumbBox")));
 }
 
 gboolean isEvolutionListViewHeader(GtkWidget *widget, const gchar *detail)
 {
     GtkWidget *parent=NULL;
     return GTK_APP_EVOLUTION==qtSettings.app && widget && DETAIL("button") &&
-           0==strcmp(g_type_name(qtcWidgetType(widget)), "ECanvas") &&
-           (parent=qtcWidgetGetParent(widget)) && (parent=qtcWidgetGetParent(parent)) &&
+           0==strcmp(g_type_name(G_OBJECT_TYPE(widget)), "ECanvas") &&
+           (parent=gtk_widget_get_parent(widget)) && (parent=gtk_widget_get_parent(parent)) &&
            GTK_IS_SCROLLED_WINDOW(parent);
 }
 
@@ -355,22 +357,22 @@ gboolean isOnListViewHeader(GtkWidget *w, int level)
         if(isListViewHeader(w))
             return TRUE;
         else if(level<4)
-            return isOnListViewHeader(qtcWidgetGetParent(w), ++level);
+            return isOnListViewHeader(gtk_widget_get_parent(w), ++level);
     }
     return FALSE;
 }
 
 gboolean isPathButton(GtkWidget *widget)
 {
-    return widget && qtcWidgetGetParent(widget) && GTK_IS_BUTTON(widget) &&
-           0==strcmp(g_type_name(qtcWidgetType(qtcWidgetGetParent(widget))), "GtkPathBar");
+    return widget && gtk_widget_get_parent(widget) && GTK_IS_BUTTON(widget) &&
+           0==strcmp(g_type_name(G_OBJECT_TYPE(gtk_widget_get_parent(widget))), "GtkPathBar");
 }
 
 // static gboolean isTabButton(GtkWidget *widget)
 // {
-//     return widget && GTK_IS_BUTTON(widget) && qtcWidgetGetParent(widget) &&
-//            (GTK_IS_NOTEBOOK(qtcWidgetGetParent(widget)) ||
-//             (qtcWidgetGetParent(widget)->parent && GTK_IS_BOX(qtcWidgetGetParent(widget)) && GTK_IS_NOTEBOOK(qtcWidgetGetParent(widget)->parent)));
+//     return widget && GTK_IS_BUTTON(widget) && gtk_widget_get_parent(widget) &&
+//            (GTK_IS_NOTEBOOK(gtk_widget_get_parent(widget)) ||
+//             (gtk_widget_get_parent(widget)->parent && GTK_IS_BOX(gtk_widget_get_parent(widget)) && GTK_IS_NOTEBOOK(gtk_widget_get_parent(widget)->parent)));
 // }
 
 GtkWidget * getComboEntry(GtkWidget *widget)
@@ -414,38 +416,38 @@ GtkWidget * getComboButton(GtkWidget *widget)
 gboolean isSideBarBtn(GtkWidget *widget)
 {
     GtkWidget *parent=NULL;
-    return widget && (parent=qtcWidgetGetParent(widget)) &&
-           (0==strcmp(g_type_name(qtcWidgetType(parent)), "GdlDockBar") ||
-            (0==strcmp(g_type_name(qtcWidgetType(parent)), "GdlSwitcher")/* &&
-             qtcWidgetGetParent(parent) &&
-             0==strcmp(g_type_name(qtcWidgetType(parent)), "GdlDockNotebook")*/) );
+    return widget && (parent=gtk_widget_get_parent(widget)) &&
+           (0==strcmp(g_type_name(G_OBJECT_TYPE(parent)), "GdlDockBar") ||
+            (0==strcmp(g_type_name(G_OBJECT_TYPE(parent)), "GdlSwitcher")/* &&
+             gtk_widget_get_parent(parent) &&
+             0==strcmp(g_type_name(G_OBJECT_TYPE(parent)), "GdlDockNotebook")*/) );
 }
 
 gboolean isComboBoxButton(GtkWidget *widget)
 {
     GtkWidget *parent=NULL;
-    return widget && GTK_IS_BUTTON(widget) && (parent=qtcWidgetGetParent(widget)) &&
+    return widget && GTK_IS_BUTTON(widget) && (parent=gtk_widget_get_parent(widget)) &&
            (QTC_COMBO_ENTRY(parent) || QTC_IS_COMBO(parent));
 }
 
 gboolean isComboBox(GtkWidget *widget)
 {
     GtkWidget *parent=NULL;
-    return widget && GTK_IS_BUTTON(widget) && (parent=qtcWidgetGetParent(widget)) &&
+    return widget && GTK_IS_BUTTON(widget) && (parent=gtk_widget_get_parent(widget)) &&
            !QTC_COMBO_ENTRY(parent) && (GTK_IS_COMBO_BOX(parent) || QTC_IS_COMBO(parent));
 }
 
 gboolean isComboBoxEntry(GtkWidget *widget)
 {
     GtkWidget *parent=NULL;
-    return widget && GTK_IS_ENTRY(widget) && (parent=qtcWidgetGetParent(widget)) &&
+    return widget && GTK_IS_ENTRY(widget) && (parent=gtk_widget_get_parent(widget)) &&
            (QTC_COMBO_ENTRY(parent) || QTC_IS_COMBO(parent));
 }
 
 gboolean isComboBoxEntryButton(GtkWidget *widget)
 {
     GtkWidget *parent=NULL;
-    return widget && (parent=qtcWidgetGetParent(widget)) && GTK_IS_TOGGLE_BUTTON(widget) && QTC_COMBO_ENTRY(parent);
+    return widget && (parent=gtk_widget_get_parent(widget)) && GTK_IS_TOGGLE_BUTTON(widget) && QTC_COMBO_ENTRY(parent);
 }
 
 /*
@@ -453,7 +455,7 @@ static gboolean isSwtComboBoxEntry(GtkWidget *widget)
 {
     return GTK_APP_JAVA_SWT==qtSettings.app &&
            isComboBoxEntry(widget) &&
-           qtcWidgetGetParent(widget)->parent && 0==strcmp(g_type_name(qtcWidgetType(qtcWidgetGetParent(widget)->parent)), "SwtFixed");
+           gtk_widget_get_parent(widget)->parent && 0==strcmp(g_type_name(G_OBJECT_TYPE(gtk_widget_get_parent(widget)->parent)), "SwtFixed");
 }
 */
 
@@ -461,8 +463,8 @@ gboolean isGimpCombo(GtkWidget *widget)
 {
     GtkWidget *parent=NULL;
     return GTK_APP_GIMP==qtSettings.app &&
-           widget && (parent=qtcWidgetGetParent(widget)) && GTK_IS_TOGGLE_BUTTON(widget) &&
-           0==strcmp(g_type_name(qtcWidgetType(parent)), "GimpEnumComboBox");
+           widget && (parent=gtk_widget_get_parent(widget)) && GTK_IS_TOGGLE_BUTTON(widget) &&
+           0==strcmp(g_type_name(G_OBJECT_TYPE(parent)), "GimpEnumComboBox");
 }
 
 gboolean isOnComboEntry(GtkWidget *w, int level)
@@ -472,7 +474,7 @@ gboolean isOnComboEntry(GtkWidget *w, int level)
         if(QTC_COMBO_ENTRY(w))
             return TRUE;
         else if(level<4)
-            return isOnComboEntry(qtcWidgetGetParent(w), ++level);
+            return isOnComboEntry(gtk_widget_get_parent(w), ++level);
     }
     return FALSE;
 }
@@ -484,7 +486,7 @@ gboolean isOnComboBox(GtkWidget *w, int level)
         if(GTK_IS_COMBO_BOX(w))
             return TRUE;
         else if(level<4)
-            return isOnComboBox(qtcWidgetGetParent(w), ++level);
+            return isOnComboBox(gtk_widget_get_parent(w), ++level);
     }
     return FALSE;
 }
@@ -496,7 +498,7 @@ gboolean isOnCombo(GtkWidget *w, int level)
         if(QTC_IS_COMBO(w))
             return TRUE;
         else if(level<4)
-            return isOnCombo(qtcWidgetGetParent(w), ++level);
+            return isOnCombo(gtk_widget_get_parent(w), ++level);
     }
 }
 
@@ -508,7 +510,7 @@ gboolean isOnOptionMenu(GtkWidget *w, int level)
         if(GTK_IS_OPTION_MENU(w))
             return TRUE;
         else if(level<4)
-            return isOnOptionMenu(qtcWidgetGetParent(w), ++level);
+            return isOnOptionMenu(gtk_widget_get_parent(w), ++level);
     }
     return FALSE;
 }
@@ -518,7 +520,7 @@ gboolean isActiveOptionMenu(GtkWidget *widget)
     if(GTK_IS_OPTION_MENU(widget))
     {
         GtkWidget *menu=gtk_option_menu_get_menu(GTK_OPTION_MENU(widget));
-        if(menu && qtcWidgetVisible(menu) && qtcWidgetRealized(menu))
+        if(menu && gtk_widget_get_visible(menu) && gtk_widget_get_realized(menu))
             return TRUE;
     }
     return FALSE;
@@ -532,7 +534,7 @@ gboolean isOnMenuItem(GtkWidget *w, int level)
         if(GTK_IS_MENU_ITEM(w))
             return TRUE;
         else if(level<4)
-            return isOnMenuItem(qtcWidgetGetParent(w), ++level);
+            return isOnMenuItem(gtk_widget_get_parent(w), ++level);
     }
     return FALSE;
 }
@@ -545,8 +547,8 @@ gboolean isSpinButton(GtkWidget *widget)
 gboolean isStatusBarFrame(GtkWidget *widget)
 {
     GtkWidget *parent=NULL;
-    return widget && (parent=qtcWidgetGetParent(widget)) && GTK_IS_FRAME(widget) &&
-           (GTK_IS_STATUSBAR(parent) || ((parent=qtcWidgetGetParent(parent)) && GTK_IS_STATUSBAR(parent)));
+    return widget && (parent=gtk_widget_get_parent(widget)) && GTK_IS_FRAME(widget) &&
+           (GTK_IS_STATUSBAR(parent) || ((parent=gtk_widget_get_parent(parent)) && GTK_IS_STATUSBAR(parent)));
 }
 
 GtkMenuBar * isMenubar(GtkWidget *w, int level)
@@ -556,7 +558,7 @@ GtkMenuBar * isMenubar(GtkWidget *w, int level)
         if(GTK_IS_MENU_BAR(w))
             return (GtkMenuBar*)w;
         else if(level<3)
-            return isMenubar(qtcWidgetGetParent(w), level++);
+            return isMenubar(gtk_widget_get_parent(w), level++);
     }
 
     return NULL;
@@ -569,7 +571,7 @@ gboolean isMenuitem(GtkWidget *w, int level)
         if(GTK_IS_MENU_ITEM(w))
             return TRUE;
         else if(level<3)
-            return isMenuitem(qtcWidgetGetParent(w), level++);
+            return isMenuitem(gtk_widget_get_parent(w), level++);
     }
 
     return FALSE;
@@ -577,7 +579,7 @@ gboolean isMenuitem(GtkWidget *w, int level)
 
 gboolean isMenuWindow(GtkWidget *w)
 {
-    GtkWidget *def=qtcWindowDefaultWidget(w);
+    GtkWidget *def = gtk_window_get_default_widget(GTK_WINDOW(w));
 
     return def && GTK_IS_MENU(def);
 }
@@ -589,7 +591,7 @@ gboolean isInGroupBox(GtkWidget *w, int level)
         if(IS_GROUP_BOX(w))
             return TRUE;
         else if(level<5)
-            return isInGroupBox(qtcWidgetGetParent(w), level++);
+            return isInGroupBox(gtk_widget_get_parent(w), level++);
     }
 
     return FALSE;
@@ -606,11 +608,11 @@ gboolean isOnButton(GtkWidget *w, int level, gboolean *def)
             ) && (!(GTK_IS_RADIO_BUTTON(w) || GTK_IS_CHECK_BUTTON(w))))
         {
             if(def)
-                *def=qtcWidgetHasDefault(w);
+                *def=gtk_widget_has_default(w);
             return TRUE;
         }
         else if(level<3)
-            return isOnButton(qtcWidgetGetParent(w), level++, def);
+            return isOnButton(gtk_widget_get_parent(w), level++, def);
     }
 
     return FALSE;
@@ -821,7 +823,7 @@ int getRound(const char *detail, GtkWidget *widget, int x, int y, int width, int
 
 gboolean isHorizontalProgressbar(GtkWidget *widget)
 {
-    if(!widget || isMozilla() ||!GTK_IS_PROGRESS_BAR(widget))
+    if (!widget || isMozilla() || !GTK_IS_PROGRESS_BAR(widget))
         return TRUE;
 
 #if GTK_CHECK_VERSION(2, 90, 0)
@@ -844,11 +846,11 @@ gboolean isComboBoxPopupWindow(GtkWidget *widget, int level)
 {
     if(widget)
     {
-        if(qtcWidgetName(widget) && GTK_IS_WINDOW(widget) &&
-           0==strcmp(qtcWidgetName(widget), "gtk-combobox-popup-window"))
+        if(gtk_widget_get_name(widget) && GTK_IS_WINDOW(widget) &&
+           0==strcmp(gtk_widget_get_name(widget), "gtk-combobox-popup-window"))
             return TRUE;
         else if(level<4)
-            return isComboBoxPopupWindow(qtcWidgetGetParent(widget), ++level);
+            return isComboBoxPopupWindow(gtk_widget_get_parent(widget), ++level);
     }
     return FALSE;
 }
@@ -856,18 +858,18 @@ gboolean isComboBoxPopupWindow(GtkWidget *widget, int level)
 gboolean isComboBoxList(GtkWidget *widget)
 {
     GtkWidget *parent=NULL;
-    return widget && (parent=qtcWidgetGetParent(widget)) && /*GTK_IS_FRAME(widget) && */isComboBoxPopupWindow(parent, 0);
+    return widget && (parent=gtk_widget_get_parent(widget)) && /*GTK_IS_FRAME(widget) && */isComboBoxPopupWindow(parent, 0);
 }
 
 gboolean isComboPopupWindow(GtkWidget *widget, int level)
 {
     if(widget)
     {
-        if(qtcWidgetName(widget) && GTK_IS_WINDOW(widget) &&
-            0==strcmp(qtcWidgetName(widget), "gtk-combo-popup-window"))
+        if(gtk_widget_get_name(widget) && GTK_IS_WINDOW(widget) &&
+            0==strcmp(gtk_widget_get_name(widget), "gtk-combo-popup-window"))
             return TRUE;
         else if(level<4)
-            return isComboPopupWindow(qtcWidgetGetParent(widget), ++level);
+            return isComboPopupWindow(gtk_widget_get_parent(widget), ++level);
     }
     return FALSE;
 }
@@ -875,38 +877,38 @@ gboolean isComboPopupWindow(GtkWidget *widget, int level)
 gboolean isComboList(GtkWidget *widget)
 {
     GtkWidget *parent=NULL;
-    return widget && (parent=qtcWidgetGetParent(widget)) && isComboPopupWindow(parent, 0);
+    return widget && (parent=gtk_widget_get_parent(widget)) && isComboPopupWindow(parent, 0);
 }
 
 gboolean isComboMenu(GtkWidget *widget)
 {
-    if(widget && qtcWidgetName(widget) && GTK_IS_MENU(widget) && 0==strcmp(qtcWidgetName(widget), "gtk-combobox-popup-menu"))
+    if(widget && gtk_widget_get_name(widget) && GTK_IS_MENU(widget) && 0==strcmp(gtk_widget_get_name(widget), "gtk-combobox-popup-menu"))
         return TRUE;
     else
     {
         GtkWidget *top        = gtk_widget_get_toplevel(widget),
-                  *topChild   = top ? qtcBinGetChild(GTK_BIN(top)) : NULL,
+                  *topChild   = top ? gtk_bin_get_child(GTK_BIN(top)) : NULL,
                   *transChild = NULL;
         GtkWindow *trans      = NULL;
 
         return topChild && (isComboBoxPopupWindow(topChild, 0) ||
                        //GTK_IS_DIALOG(top) || /* Dialogs should not have menus! */
-                       (GTK_IS_WINDOW(top) && (trans=qtcWindowTransientFor(GTK_WINDOW(top))) &&
-                        (transChild=qtcBinGetChild(GTK_BIN(trans))) && isComboMenu(transChild)));
+                       (GTK_IS_WINDOW(top) && (trans=gtk_window_get_transient_for(GTK_WINDOW(top))) &&
+                        (transChild=gtk_bin_get_child(GTK_BIN(trans))) && isComboMenu(transChild)));
     }
 }
 
 gboolean isComboFrame(GtkWidget *widget)
 {
     GtkWidget *parent=NULL;
-    return !QTC_COMBO_ENTRY(widget) && GTK_IS_FRAME(widget) && (parent=qtcWidgetGetParent(widget)) && GTK_IS_COMBO_BOX(parent);
+    return !QTC_COMBO_ENTRY(widget) && GTK_IS_FRAME(widget) && (parent=gtk_widget_get_parent(widget)) && GTK_IS_COMBO_BOX(parent);
 }
 
 gboolean isFixedWidget(GtkWidget *widget)
 {
     GtkWidget *parent=NULL;
-    return widget && (parent=qtcWidgetGetParent(widget)) && GTK_IS_FIXED(parent) &&
-           (parent=qtcWidgetGetParent(parent)) && GTK_IS_WINDOW(parent);
+    return widget && (parent=gtk_widget_get_parent(widget)) && GTK_IS_FIXED(parent) &&
+           (parent=gtk_widget_get_parent(parent)) && GTK_IS_WINDOW(parent);
 }
 
 gboolean isGimpDockable(GtkWidget *widget)
@@ -916,10 +918,10 @@ gboolean isGimpDockable(GtkWidget *widget)
         GtkWidget *wid=widget;
         while(wid)
         {
-            if(0==strcmp(g_type_name(qtcWidgetType(wid)), "GimpDockable") ||
-               0==strcmp(g_type_name(qtcWidgetType(wid)), "GimpToolbox"))
+            if(0==strcmp(g_type_name(G_OBJECT_TYPE(wid)), "GimpDockable") ||
+               0==strcmp(g_type_name(G_OBJECT_TYPE(wid)), "GimpToolbox"))
                 return TRUE;
-            wid=qtcWidgetGetParent(wid);
+            wid=gtk_widget_get_parent(wid);
         }
     }
     return FALSE;
@@ -928,18 +930,18 @@ gboolean isGimpDockable(GtkWidget *widget)
 GdkColor * getParentBgCol(GtkWidget *widget)
 {
     if(GTK_IS_SCROLLBAR(widget))
-        widget=qtcWidgetGetParent(widget);
+        widget=gtk_widget_get_parent(widget);
 
     if(widget)
     {
-        widget=qtcWidgetGetParent(widget);
+        widget=gtk_widget_get_parent(widget);
         while(widget && GTK_IS_BOX(widget))
-            widget=qtcWidgetGetParent(widget);
+            widget=gtk_widget_get_parent(widget);
     }
 
-    GtkStyle *style=widget ? qtcWidgetGetStyle(widget) : NULL;
+    GtkStyle *style=widget ? gtk_widget_get_style(widget) : NULL;
     return style
-               ? &(style->bg[qtcWidgetGetState(widget)])
+               ? &(style->bg[gtk_widget_get_state(widget)])
                : NULL;
 }
 
@@ -976,7 +978,7 @@ void setLowerEtchCol(cairo_t *cr, GtkWidget *widget)
 
         if (parentBg) {
             GdkColor col;
-            qtc_shade(parentBg, &col, 1.06, opts.shading);
+            qtcShade(parentBg, &col, 1.06, opts.shading);
             cairo_set_source_rgb(cr, CAIRO_COL(col));
         } else {
             cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 0.1); // 0.25);
@@ -991,7 +993,7 @@ shadeColor(GdkColor *orig, double mod)
 {
     if (!qtcEqual(mod, 0.0)) {
         GdkColor modified;
-        qtc_shade(orig, &modified, mod, opts.shading);
+        qtcShade(orig, &modified, mod, opts.shading);
         return modified;
     }
     return *orig;
@@ -1039,7 +1041,7 @@ void adjustToolbarButtons(GtkWidget *widget, int *x, int *y, int *width, int *he
             toolbar=GTK_TOOLBAR(w);
         else if(GTK_IS_TOOL_ITEM(w))
             toolitem=GTK_TOOL_ITEM(w);
-        w=qtcWidgetGetParent(w);
+        w=gtk_widget_get_parent(w);
     }
 
     if(toolbar && toolitem)
@@ -1055,8 +1057,8 @@ void adjustToolbarButtons(GtkWidget *widget, int *x, int *y, int *width, int *he
             gboolean    roundLeft=!prev || !GTK_IS_TOOL_BUTTON(prev),
                         roundRight=!next || !GTK_IS_TOOL_BUTTON(next),
                         isMenuButton=widget && GTK_IS_BUTTON(widget) &&
-                                     (parent=qtcWidgetGetParent(widget)) && GTK_IS_BOX(parent) &&
-                                     (parent=qtcWidgetGetParent(parent)) && GTK_IS_MENU_TOOL_BUTTON(parent),
+                                     (parent=gtk_widget_get_parent(widget)) && GTK_IS_BOX(parent) &&
+                                     (parent=gtk_widget_get_parent(parent)) && GTK_IS_MENU_TOOL_BUTTON(parent),
                         isArrowButton=isMenuButton && GTK_IS_TOGGLE_BUTTON(widget);
             int         *pos=horiz ? x : y,
                         *size=horiz ? width : height;
@@ -1106,27 +1108,27 @@ void getEntryParentBgCol(GtkWidget *widget, GdkColor *color)
         return;
     }
 
-    parent = qtcWidgetGetParent(widget);
+    parent = gtk_widget_get_parent(widget);
 
-    while (parent && (qtcWidgetNoWindow(parent)))
+    while (parent && (!gtk_widget_get_has_window(parent)))
     {
         GtkStyle *style=NULL;
         if (opts.tabBgnd && GTK_IS_NOTEBOOK(parent) &&
-            (style = qtcWidgetGetStyle(parent))) {
-            qtc_shade(&(style->bg[GTK_STATE_NORMAL]), color,
+            (style = gtk_widget_get_style(parent))) {
+            qtcShade(&(style->bg[GTK_STATE_NORMAL]), color,
                       TO_FACTOR(opts.tabBgnd), opts.shading);
             return;
         }
-        parent = qtcWidgetGetParent(parent);
+        parent = gtk_widget_get_parent(parent);
     }
 
     if (!parent)
         parent = widget;
 
-    style=qtcWidgetGetStyle(parent);
+    style=gtk_widget_get_style(parent);
 
     if(style)
-        *color = style->bg[qtcWidgetGetState(parent)];
+        *color = style->bg[gtk_widget_get_state(parent)];
 }
 
 gboolean compositingActive(GtkWidget *widget)
@@ -1178,10 +1180,10 @@ void enableBlurBehind(GtkWidget *w, gboolean enable)
 
                 g_object_set_data(G_OBJECT(w), MENU_SIZE_ATOM, (gpointer)value);
                 if (enable)
-                    XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(qtcWidgetGetWindow(GTK_WIDGET(topLevel))), atom,
+                    XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel))), atom,
                                     XA_CARDINAL, 32, PropModeReplace, 0, 0);
                 else
-                    XDeleteProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(qtcWidgetGetWindow(GTK_WIDGET(topLevel))), atom);
+                    XDeleteProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel))), atom);
             }
         }
     }
@@ -1318,7 +1320,7 @@ GtkWidget * getParentWindow(GtkWidget *widget)
         {
             GtkWidget *w=node->data;
 
-            if(w && GTK_IS_WIDGET(w) && qtcWidgetGetWindow(w) && w!=widget && qtcWindowIsActive(w))
+            if(w && GTK_IS_WIDGET(w) && gtk_widget_get_window(w) && w!=widget && qtcWindowIsActive(w))
             {
                 top=w;
                 break;
@@ -1331,7 +1333,7 @@ GtkWidget * getParentWindow(GtkWidget *widget)
         {
             GtkWidget *w=node->data;
 
-            if(w && GTK_IS_WIDGET(w) && 0==strcmp(g_type_name(qtcWidgetType(w)), GIMP_MAIN))
+            if(w && GTK_IS_WIDGET(w) && 0==strcmp(g_type_name(G_OBJECT_TYPE(w)), GIMP_MAIN))
             {
                 top=w;
                 break;
@@ -1349,7 +1351,7 @@ void dialogMapEvent(GtkWidget *widget, gpointer user_data)
     if(top)
     {
         GTK_WINDOW(widget)->transient_parent=GTK_WINDOW(top);
-        gdk_window_set_transient_for(qtcWidgetGetWindow(widget), qtcWidgetGetWindow(top));
+        gdk_window_set_transient_for(gtk_widget_get_window(widget), gtk_widget_get_window(top));
         /*gtk_window_set_skip_taskbar_hint(GTK_WINDOW(widget), TRUE);
         gtk_window_set_skip_pager_hint(GTK_WINDOW(widget), TRUE); */
     }
@@ -1434,7 +1436,7 @@ void generateColors()
             GdkColor color;
 
             if (IS_GLASS(opts.appearance)) {
-                qtc_shade(&qtcPalette.highlight[ORIGINAL_SHADE], &color,
+                qtcShade(&qtcPalette.highlight[ORIGINAL_SHADE], &color,
                           MENUBAR_GLASS_SELECTED_DARK_FACTOR, opts.shading);
             } else {
                 color = qtcPalette.highlight[ORIGINAL_SHADE];
@@ -1448,7 +1450,7 @@ void generateColors()
             break;
         case SHADE_DARKEN: {
             GdkColor color;
-            qtc_shade(&qtcPalette.background[ORIGINAL_SHADE], &color,
+            qtcShade(&qtcPalette.background[ORIGINAL_SHADE], &color,
                       MENUBAR_DARK_FACTOR, opts.shading);
             qtcShadeColors(&color, qtcPalette.menubar);
             break;
@@ -1514,7 +1516,7 @@ void generateColors()
             GdkColor color;
 
             qtcPalette.sortedlv=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
-            qtc_shade(opts.lvButton ?
+            qtcShade(opts.lvButton ?
                       &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE] :
                       &qtcPalette.background[ORIGINAL_SHADE],
                       &color, LV_HEADER_DARK_FACTOR, opts.shading);
@@ -1607,7 +1609,7 @@ void generateColors()
                             ? menuColors(TRUE)
                             : qtcPalette.background;
         if (opts.lighterPopupMenuBgnd) {
-            qtc_shade(&cols[ORIGINAL_SHADE], &color,
+            qtcShade(&cols[ORIGINAL_SHADE], &color,
                       TO_FACTOR(opts.lighterPopupMenuBgnd), opts.shading);
         } else {
             color = cols[ORIGINAL_SHADE];
@@ -1683,8 +1685,8 @@ void generateColors()
 
         qtcPalette.selectedcr =
             (GdkColor*)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
-        qtc_shade(&qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE], &color,
-                  LV_HEADER_DARK_FACTOR, opts.shading);
+        qtcShade(&qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE], &color,
+                 LV_HEADER_DARK_FACTOR, opts.shading);
         qtcShadeColors(&color, qtcPalette.selectedcr);
         break;
     }

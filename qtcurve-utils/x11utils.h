@@ -53,34 +53,50 @@ extern xcb_atom_t qtc_x11_atoms[_QTC_X11_ATOM_NUMBER];
 
 typedef struct _XDisplay Display;
 
-void qtc_x11_init_xcb(xcb_connection_t *conn, int screen_no);
-void qtc_x11_init_xlib(Display *disp);
-xcb_connection_t *qtc_x11_get_conn();
-int qtc_x11_default_screen_no();
-xcb_screen_t *qtc_x11_default_screen();
-xcb_window_t qtc_x11_root_window();
-void qtc_x11_flush();
-uint32_t qtc_x11_generate_id();
-void qtc_x11_get_atoms(size_t n, xcb_atom_t *atoms,
-                       const char *const names[], boolean create);
+void qtcX11InitXcb(xcb_connection_t *conn, int screen_no);
+void qtcX11InitXlib(Display *disp);
+xcb_connection_t *qtcX11GetConn();
+int qtcX11DefaultScreenNo();
+xcb_screen_t *qtcX11DefaultScreen();
+xcb_window_t qtcX11RootWindow();
+void qtcX11Flush();
+uint32_t qtcX11GenerateId();
+void qtcX11GetAtoms(size_t n, xcb_atom_t *atoms,
+                    const char *const names[], boolean create);
 QTC_ALWAYS_INLINE static inline xcb_atom_t
-qtc_x11_get_atom(const char *name, boolean create)
+qtcX11GetAtom(const char *name, boolean create)
 {
     xcb_atom_t atom;
-    qtc_x11_get_atoms(1, &atom, &name, create);
+    qtcX11GetAtoms(1, &atom, &name, create);
     return atom;
 }
-#define qtc_x11_call(name, args...)                             \
+#define qtcX11Call(name, args...)                               \
     ({                                                          \
-        xcb_connection_t *conn = qtc_x11_get_conn();            \
+        xcb_connection_t *conn = qtcX11GetConn();               \
         xcb_##name##_reply(conn, xcb_##name(conn, args), 0);    \
     })
-#define qtc_x11_call_void(name, args...)                \
+#define qtcX11CallVoid(name, args...)                   \
     ({                                                  \
-        xcb_connection_t *conn = qtc_x11_get_conn();    \
+        xcb_connection_t *conn = qtcX11GetConn();       \
         xcb_##name(conn, args).sequence;                \
     })
-void qtc_x11_set_wmclass(xcb_window_t win, const char *wmclass, size_t len);
+void qtcX11SetWMClass(xcb_window_t win, const char *wmclass, size_t len);
+
+static inline int32_t
+qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom)
+{
+    int32_t res = -1;
+    xcb_get_property_reply_t *reply =
+        qtcX11Call(get_property, 0, win, atom, XCB_ATOM_CARDINAL, 0, 1);
+    if (xcb_get_property_value_length(reply) > 0) {
+        uint32_t val = *(int32_t*)xcb_get_property_value(reply);
+        if (val < 512) {
+            res = val;
+        }
+    }
+    free(reply);
+    return res;
+}
 
 QTC_END_DECLS
 

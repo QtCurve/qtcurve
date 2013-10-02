@@ -1039,17 +1039,17 @@ static void readKdeGlobals(const char *rc, int rd, bool first, bool kde4)
                y;
 
         contrast = (1.0 > contrast ? (-1.0 < contrast ? contrast : -1.0) : 1.0);
-        y = qtc_color_luma(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]);
+        y = qtcColorLuma(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]);
 
         if(y<0.006)
-            qtSettings.colors[PAL_ACTIVE][COLOR_MID]=qtc_color_shade(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], 0.01 + 0.20 * contrast, 0.0);
+            qtSettings.colors[PAL_ACTIVE][COLOR_MID]=qtcColorShade(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], 0.01 + 0.20 * contrast, 0.0);
         else if(y>0.93)
-            qtSettings.colors[PAL_ACTIVE][COLOR_MID]=qtc_color_shade(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], -0.02 - 0.20 * contrast, 0.0);
+            qtSettings.colors[PAL_ACTIVE][COLOR_MID]=qtcColorShade(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], -0.02 - 0.20 * contrast, 0.0);
         else
         {
             double darkAmount =  (     - y       ) * (0.55 + contrast * 0.35);
 
-            qtSettings.colors[PAL_ACTIVE][COLOR_MID]=qtc_color_shade(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], (0.35 + 0.15 * y) * darkAmount, 0.0);
+            qtSettings.colors[PAL_ACTIVE][COLOR_MID]=qtcColorShade(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], (0.35 + 0.15 * y) * darkAmount, 0.0);
         }
 
         for(eff=0; eff<2; ++eff)
@@ -1064,26 +1064,29 @@ static void readKdeGlobals(const char *rc, int rd, bool first, bool kde4)
                     switch(effects[eff].intensity.effect)
                     {
                         case IntensityShade:
-                            qtSettings.colors[p][col] = qtc_color_shade(&qtSettings.colors[p][col], effects[eff].intensity.amount, 0.0);
+                            qtSettings.colors[p][col] = qtcColorShade(&qtSettings.colors[p][col], effects[eff].intensity.amount, 0.0);
                             break;
                         case IntensityDarken:
-                            qtSettings.colors[p][col] = qtc_color_darken(&qtSettings.colors[p][col], effects[eff].intensity.amount, 1.0);
+                            qtSettings.colors[p][col] = qtcColorDarken(&qtSettings.colors[p][col], effects[eff].intensity.amount, 1.0);
                             break;
                         case IntensityLighten:
-                            qtSettings.colors[p][col] = qtc_color_lighten(&qtSettings.colors[p][col], effects[eff].intensity.amount, 1.0);
+                            qtSettings.colors[p][col] =
+                                qtcColorLighten(
+                                    &qtSettings.colors[p][col],
+                                    effects[eff].intensity.amount, 1.0);
                         default:
                             break;
                     }
                     switch (effects[eff].color.effect)
                     {
                         case ColorDesaturate:
-                            qtSettings.colors[p][col] = qtc_color_darken(&qtSettings.colors[p][col], 0.0, 1.0 - effects[eff].color.amount);
+                            qtSettings.colors[p][col] = qtcColorDarken(&qtSettings.colors[p][col], 0.0, 1.0 - effects[eff].color.amount);
                             break;
                         case ColorFade:
-                            qtSettings.colors[p][col] = qtc_color_mix(&qtSettings.colors[p][col], &effects[eff].col, effects[eff].color.amount);
+                            qtSettings.colors[p][col] = qtcColorMix(&qtSettings.colors[p][col], &effects[eff].col, effects[eff].color.amount);
                             break;
                         case ColorTint:
-                            qtSettings.colors[p][col] = qtc_color_tint(&qtSettings.colors[p][col], &effects[eff].col, effects[eff].color.amount);
+                            qtSettings.colors[p][col] = qtcColorTint(&qtSettings.colors[p][col], &effects[eff].col, effects[eff].color.amount);
                         default:
                             break;
                     }
@@ -1101,12 +1104,12 @@ static void readKdeGlobals(const char *rc, int rd, bool first, bool kde4)
                         switch(effects[eff].contrast.effect)
                         {
                             case ContrastFade:
-                                qtSettings.colors[p][col]=qtc_color_mix(&qtSettings.colors[p][col],
-                                                                         &qtSettings.colors[PAL_DISABLED][other],
-                                                                         effects[eff].contrast.amount);
+                                qtSettings.colors[p][col]=qtcColorMix(&qtSettings.colors[p][col],
+                                                                      &qtSettings.colors[PAL_DISABLED][other],
+                                                                      effects[eff].contrast.amount);
                                 break;
                             case ContrastTint:
-                                qtSettings.colors[p][col]=qtc_color_tint(&qtSettings.colors[p][col],
+                                qtSettings.colors[p][col]=qtcColorTint(&qtSettings.colors[p][col],
                                                                           &qtSettings.colors[PAL_DISABLED][other],
                                                                           effects[eff].contrast.amount);
                             default:
@@ -1121,7 +1124,7 @@ static void readKdeGlobals(const char *rc, int rd, bool first, bool kde4)
 #if 0 // Use alpha values instead...
         if(qtSettings.inactiveChangeSelectionColor)
             if(effects[PAL_INACTIVE].enabled)
-                qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED]=qtc_color_tint(&qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW],
+                qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED]=qtcColorTint(&qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW],
                                                                                 &qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED],
                                                                                 0.4);
             else
@@ -1863,7 +1866,7 @@ static gboolean checkFileVersion(const char *fname, const char *versionStr, int 
             static const int constVLen=32;
 
             char line[constVLen+1];
-            int  numChars=QtcMin(constVLen, versionStrLen-1);
+            int  numChars=qtcMin(constVLen, versionStrLen-1);
 
             diff=NULL==fgets(line, numChars+1, f) || memcmp(versionStr, line, numChars);
         }
@@ -2825,7 +2828,7 @@ gboolean qtSettingsInit()
                 IMG_PLAIN_RINGS == opts.menuBgndImage.type ||
                 IMG_BORDERED_RINGS == opts.menuBgndImage.type ||
                 IMG_SQUARE_RINGS == opts.menuBgndImage.type) {
-                qtc_calc_ring_alphas(
+                qtcCalcRingAlphas(
                     &qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]);
             }
 

@@ -747,7 +747,7 @@ void Style::init(bool initial)
        IMG_SQUARE_RINGS==opts.bgndImage.type ||
        IMG_PLAIN_RINGS==opts.menuBgndImage.type || IMG_BORDERED_RINGS==opts.menuBgndImage.type ||
        IMG_SQUARE_RINGS==opts.menuBgndImage.type)
-        qtc_calc_ring_alphas(&itsBackgroundCols[ORIGINAL_SHADE]);
+        qtcCalcRingAlphas(&itsBackgroundCols[ORIGINAL_SHADE]);
 
     itsBlurHelper->setEnabled(100!=opts.bgndOpacity || 100!=opts.dlgOpacity || 100!=opts.menuBgndOpacity);
 
@@ -1885,7 +1885,7 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
             else
             {
                 QRectF ra(r.x()+0.5, r.y()+0.5, r.width(), r.height());
-                double size = QtcMin((horiz ? ra.height() : ra.width()) / 2.0,
+                double size = qtcMin((horiz ? ra.height() : ra.width()) / 2.0,
                                      16.0),
                     rad=size/2.0;
                 int    mod=4;
@@ -2205,7 +2205,7 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
                 pix.fill(Qt::transparent);
                 QRadialGradient gradient(QPointF(pix.width()/2.0, 0), pix.width()/2.0, QPointF(pix.width()/2.0, 0));
                 QColor          c(Qt::white);
-                double          alpha(qtc_shine_alpha(&col));
+                double          alpha(qtcShineAlpha(&col));
 
                 c.setAlphaF(alpha);
                 gradient.setColorAt(0, c);
@@ -4069,13 +4069,13 @@ const QColor & Style::checkRadioCol(const QStyleOption *opt) const
 QColor Style::shade(const QColor &a, double k) const
 {
     QColor mod;
-    qtc_shade(&a, &mod, k, opts.shading);
+    qtcShade(&a, &mod, k, opts.shading);
     return mod;
 }
 
 void Style::shade(const color &ca, color *cb, double k) const
 {
-    qtc_shade(&ca, cb, k, opts.shading);
+    qtcShade(&ca, cb, k, opts.shading);
 }
 
 QColor Style::getLowerEtchCol(const QWidget *widget) const
@@ -4430,10 +4430,10 @@ void Style::emitMenuSize(QWidget *w, unsigned short size, bool force)
             static const auto menuAtom =
                 qtc_x11_atoms[QTC_X11_ATOM_QTC_OPACITY];
             w->setProperty(constMenuSizeProperty, size);
-            qtc_x11_call_void(change_property, XCB_PROP_MODE_REPLACE,
-                              w->window()->winId(), menuAtom,
-                              XCB_ATOM_CARDINAL, 16, 1, &size);
-            qtc_x11_flush();
+            qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE,
+                           w->window()->winId(), menuAtom,
+                           XCB_ATOM_CARDINAL, 16, 1, &size);
+            qtcX11Flush();
             if(!itsDBus)
                 itsDBus = new QDBusInterface("org.kde.kwin", "/QtCurve",
                                              "org.kde.QtCurve");

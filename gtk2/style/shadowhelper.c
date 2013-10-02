@@ -22,7 +22,7 @@
 #include <gdk/gdkx.h>
 #include <common/common.h>
 #include "qt_settings.h"
-#include <qtcurve-utils/kdex11shadow.h>
+#include <qtcurve-utils/x11shadow.h>
 #include <qtcurve-utils/gtkutils.h>
 
 static guint realizeSignalId = 0;
@@ -34,7 +34,7 @@ installX11Shadows(GtkWidget* widget)
     if (DEBUG_ALL == qtSettings.debug)
         printf(DEBUG_PREFIX "%s\n", __FUNCTION__);
     GdkWindow *window = gtk_widget_get_window(widget);
-    qtc_kde_x11_shadow_install(GDK_WINDOW_XID(window));
+    qtcX11ShadowInstall(GDK_WINDOW_XID(window));
 }
 
 static gboolean

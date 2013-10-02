@@ -55,91 +55,88 @@ class QtCurveClient :
 #endif
 {
     Q_OBJECT
-
-    public:
-
+public:
     QtCurveClient(KDecorationBridge *bridge, QtCurveHandler *factory);
     virtual ~QtCurveClient();
 
-    QString                   visibleName() const;
-    bool                      decorationBehaviour(DecorationBehaviour behaviour) const;
-    int                       layoutMetric(LayoutMetric lm, bool respectWindowState = true,
-                                           const KCommonDecorationButton *btn= 0) const;
-    KCommonDecorationButton * createButton(ButtonType type);
-    void                      init();
-    void                      maximizeChange();
-    void                      shadeChange();
-    void                      activeChange();
-    void                      captionChange();
-    void                      reset(unsigned long changed);
-    void                      paintEvent(QPaintEvent *e);
-    void                      paintTitle(QPainter *painter, const QRect &capRect, const QRect &alignFullRect,
-                                         const QString &cap, const QPixmap &pix, int shadowSize=0,
-                                         bool isTab=false, bool activeTab=false);
-    void                      updateWindowShape();
-    QRegion                   getMask(int round, const QRect &r) const;
-    void                      updateCaption();
-    bool                      eventFilter(QObject *o, QEvent *e);
-    bool isMaximized() const { return maximizeMode()==MaximizeFull && !options()->moveResizeMaximizedWindows();  }
-    void                      menuBarSize(int size);
-    void                      statusBarState(bool state);
-    QtCurveToggleButton *     createToggleButton(bool menubar);
-    void                      informAppOfBorderSizeChanges();
-    void                      sendToggleToApp(bool menubar);
+    QString visibleName() const;
+    bool decorationBehaviour(DecorationBehaviour behaviour) const;
+    int layoutMetric(LayoutMetric lm, bool respectWindowState=true,
+                     const KCommonDecorationButton *btn=0) const;
+    KCommonDecorationButton *createButton(ButtonType type);
+    void init();
+    void maximizeChange();
+    void shadeChange();
+    void activeChange();
+    void captionChange();
+    void reset(unsigned long changed);
+    void paintEvent(QPaintEvent *e);
+    void paintTitle(QPainter *painter, const QRect &capRect,
+                    const QRect &alignFullRect, const QString &cap,
+                    const QPixmap &pix, int shadowSize=0, bool isTab=false,
+                    bool activeTab=false);
+    void updateWindowShape();
+    QRegion getMask(int round, const QRect &r) const;
+    void updateCaption();
+    bool eventFilter(QObject *o, QEvent *e);
+    bool isMaximized() const
+        {
+            return maximizeMode() == MaximizeFull &&
+                !options()->moveResizeMaximizedWindows();
+        }
+    void menuBarSize(int size);
+    void statusBarState(bool state);
+    QtCurveToggleButton *createToggleButton(bool menubar);
+    void informAppOfBorderSizeChanges();
+    void sendToggleToApp(bool menubar);
+public Q_SLOTS:
+    void toggleMenuBar();
+    void toggleStatusBar();
 
-    public Q_SLOTS:
-
-    void                      toggleMenuBar();
-    void                      toggleStatusBar();
-
-    private:
-
+private:
 #if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
-    bool                      mouseSingleClickEvent(QMouseEvent *e);
-    bool                      mouseMoveEvent(QMouseEvent *e);
-    bool                      mouseButtonPressEvent(QMouseEvent *e);
-    bool                      mouseButtonReleaseEvent(QMouseEvent *e);
-    bool                      dragMoveEvent(QDragMoveEvent *e);
-    bool                      dragLeaveEvent(QDragLeaveEvent *e);
-    bool                      dragEnterEvent(QDragEnterEvent *e);
-    bool                      dropEvent(QDropEvent *e);
-    int                       itemClicked(const QPoint &point, bool between=false, bool drag=false);
+    bool mouseSingleClickEvent(QMouseEvent *e);
+    bool mouseMoveEvent(QMouseEvent *e);
+    bool mouseButtonPressEvent(QMouseEvent *e);
+    bool mouseButtonReleaseEvent(QMouseEvent *e);
+    bool dragMoveEvent(QDragMoveEvent *e);
+    bool dragLeaveEvent(QDragLeaveEvent *e);
+    bool dragEnterEvent(QDragEnterEvent *e);
+    bool dropEvent(QDropEvent *e);
+    int itemClicked(const QPoint &point, bool between=false, bool drag=false);
 #endif
-    bool                      onlyMenuIcon(bool left) const;
-    QRect                     captionRect() const;
-    void                      createSizeGrip();
-    void                      deleteSizeGrip();
-    void                      informAppOfActiveChange();
-    const QString &           windowClass();
-
-    private:
-
-    struct ButtonBgnd
-    {
+    bool onlyMenuIcon(bool left) const;
+    QRect captionRect() const;
+    void createSizeGrip();
+    void deleteSizeGrip();
+    void informAppOfActiveChange();
+    const QString &windowClass();
+private:
+    struct ButtonBgnd {
         QPixmap pix;
-        int     app;
-        QColor  col;
+        int app;
+        QColor col;
     };
 
-    static const int constNumButtonStates=2;
+    static const int constNumButtonStates = 2;
 
-    QtCurveSizeGrip        *itsResizeGrip;
-    ButtonBgnd             itsButtonBackground[constNumButtonStates];
-    QRect                  itsCaptionRect;
-    QString                itsCaption,
-                           itsWindowClass;
-    QFont                  itsTitleFont;
-    int                    itsMenuBarSize;
-    QtCurveToggleButton    *itsToggleMenuBarButton,
-                           *itsToggleStatusBarButton;
-//     bool                   itsHover;
+    QtCurveSizeGrip *itsResizeGrip;
+    ButtonBgnd itsButtonBackground[constNumButtonStates];
+    QRect itsCaptionRect;
+    QString itsCaption;
+    QString itsWindowClass;
+    QFont itsTitleFont;
+    int itsMenuBarSize;
+    QtCurveToggleButton *itsToggleMenuBarButton;
+    QtCurveToggleButton *itsToggleStatusBarButton;
+    // bool itsHover;
 #if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
-    QList<QtCurveButton *> itsCloseButtons;
-    bool                   itsClickInProgress,
-                           itsDragInProgress;
-    Qt::MouseButton        itsMouseButton;
-    QPoint                 itsClickPoint;
-    int                    itsTargetTab;
+    QList<QtCurveButton*> itsCloseButtons;
+    bool itsClickInProgress;
+    bool itsDragInProgress;
+    Qt::MouseButton itsMouseButton;
+    QPoint itsClickPoint;
+    int itsTargetTab;
 #endif
 };
 

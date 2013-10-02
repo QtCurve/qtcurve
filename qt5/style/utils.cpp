@@ -50,7 +50,7 @@ bool compositingActive()
             return false;
         }
     }
-    auto reply = qtc_x11_call(get_selection_owner, atom);
+    auto reply = qtcX11Call(get_selection_owner, atom);
     bool res = false;
     if (reply) {
         res = reply->owner != 0;
@@ -71,7 +71,7 @@ bool hasAlphaChannel(const QWidget *widget)
     if (compositingActive()) {
         WId wid = widget ? widget->window()->winId() : 0;
         if (wid) {
-            auto reply = qtc_x11_call(get_geometry, wid);
+            auto reply = qtcX11Call(get_geometry, wid);
             bool res = false;
             if (reply) {
                 res = reply->depth == 32;
