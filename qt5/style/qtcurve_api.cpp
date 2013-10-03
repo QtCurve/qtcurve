@@ -28,7 +28,6 @@
 
 #ifdef QTC_ENABLE_X11
 #include "shadowhelper.h"
-#include "xcb_utils.h"
 #include <qtcurve-utils/x11utils.h>
 #include <sys/time.h>
 #endif
@@ -67,7 +66,6 @@ namespace QtCurve {
 
 void Style::polish(QApplication *app)
 {
-    qtcDebug() << __func__;
     // appName = getFile(app->arguments()[0]);
 
     if ("kwin" == appName) {
@@ -104,8 +102,6 @@ void Style::polish(QApplication *app)
         theThemedApp=APP_KONSOLE;
     else if("Kde4ToolkitLibrary"==appName)
         theThemedApp=APP_OPERA;
-
-    qtcDebug() << "QtCurve: Application name:" << appName;
 
     if(APP_REKONQ==theThemedApp)
         opts.statusbarHiding=0;
@@ -172,7 +168,6 @@ void Style::polish(QApplication *app)
 
 void Style::polish(QPalette &palette)
 {
-    qtcDebug() << __func__;
     int  contrast(QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", DEFAULT_CONTRAST).toInt());
     bool newContrast(false);
 
@@ -340,17 +335,10 @@ void Style::polish(QPalette &palette)
 
 void Style::polish(QWidget *widget)
 {
-    qtcDebug() << __func__;
     if (!widget)
         return;
 
     bool enableMouseOver(opts.highlightFactor || opts.coloredMouseOver);
-
-    // {
-    //     for(QWidget *w=widget; w; w=w->parentWidget())
-    //         printf("%s ", w->metaObject()->className());
-    //     printf("\n");
-    // }
 
     // 'Fix' konqueror's large menubar...
     if (APP_KONQUEROR == theThemedApp && widget->parentWidget() &&
@@ -369,9 +357,6 @@ void Style::polish(QWidget *widget)
     itsWindowManager->registerWidget(widget);
 #ifdef QTC_ENABLE_X11
     itsShadowHelper->registerWidget(widget);
-    if (widget->isWindow()) {
-        XcbUtils::setWindowWMClass(widget->winId());
-    }
 #endif
 
     // Need to register all widgets to blur helper, in order to have proper
@@ -715,8 +700,8 @@ void Style::polish(QWidget *widget)
             widget->inherits("QComboBoxPrivateContainer") && !widget->testAttribute(Qt::WA_TranslucentBackground))
         setTranslucentBackground(widget);
 
-    if(widget->inherits("QTipLabel") && !IS_FLAT(opts.tooltipAppearance) && APP_OPERA!=theThemedApp)
-    {
+    if (widget->inherits("QTipLabel") && !IS_FLAT(opts.tooltipAppearance) &&
+        APP_OPERA != theThemedApp) {
         widget->setBackgroundRole(QPalette::NoRole);
         setTranslucentBackground(widget);
     }
@@ -906,19 +891,17 @@ void Style::polish(QWidget *widget)
 
 void Style::unpolish(QApplication *app)
 {
-    qtcDebug() << __func__;
-    if(opts.hideShortcutUnderline)
+    if (opts.hideShortcutUnderline)
         app->removeEventFilter(itsShortcutHandler);
     BASE_STYLE::unpolish(app);
 }
 
 void Style::unpolish(QWidget *widget)
 {
-    qtcDebug() << __func__;
-    if(!widget)
+    if (!widget)
         return;
 
-    if (EFFECT_NONE!=opts.buttonEffect && theNoEtchWidgets.contains(widget)) {
+    if (EFFECT_NONE != opts.buttonEffect && theNoEtchWidgets.contains(widget)) {
         theNoEtchWidgets.remove(static_cast<const QWidget*>(widget));
         disconnect(widget, &QWidget::destroyed,
                    this, &Style::widgetDestroyed);
@@ -1101,6 +1084,7 @@ void Style::unpolish(QWidget *widget)
 
     if(qobject_cast<QMenu *>(widget))
     {
+        qtcDebug("remove Qt::WA_TranslucentBackground: %p\n", widget);
         widget->removeEventFilter(this);
         widget->setAttribute(Qt::WA_PaintOnScreen, false);
         widget->setAttribute(Qt::WA_NoSystemBackground, false);
@@ -1114,6 +1098,7 @@ void Style::unpolish(QWidget *widget)
     if((!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) &&
        widget->inherits("QComboBoxPrivateContainer"))
     {
+        qtcDebug("remove Qt::WA_TranslucentBackground: %p\n", widget);
         widget->removeEventFilter(this);
         widget->setAttribute(Qt::WA_PaintOnScreen, false);
         widget->setAttribute(Qt::WA_NoSystemBackground, false);
@@ -1139,7 +1124,6 @@ void Style::unpolish(QWidget *widget)
 
 bool Style::eventFilter(QObject *object, QEvent *event)
 {
-    qtcDebug() << __func__;
     bool isSViewCont=APP_KONTACT==theThemedApp && itsSViewContainers.contains((QWidget*)object);
 
     if(::qobject_cast<QMenuBar *>(object) && dynamic_cast<QMouseEvent *>(event))
@@ -1501,10 +1485,12 @@ bool Style::eventFilter(QObject *object, QEvent *event)
         else if(!(opts.square&SQUARE_POPUP_MENUS) && object->inherits("QComboBoxPrivateContainer"))
         {
             QWidget *widget=static_cast<QWidget *>(object);
-            if(Utils::hasAlphaChannel(widget))
+            if (Utils::hasAlphaChannel(widget)) {
                 widget->clearMask();
-            else
-                widget->setMask(windowMask(widget->rect(), opts.round>ROUND_SLIGHT));
+            } else {
+                widget->setMask(windowMask(widget->rect(),
+                                           opts.round > ROUND_SLIGHT));
+            }
             return false;
         }
 #ifdef QTC_ENABLE_X11
@@ -1642,9 +1628,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
 
 void Style::timerEvent(QTimerEvent *event)
 {
-    qtcDebug() << __func__;
-    if (event->timerId() == itsProgressBarAnimateTimer)
-    {
+    if (event->timerId() == itsProgressBarAnimateTimer) {
         itsAnimateStep = itsTimer.elapsed() / (1000 / constProgressBarFps);
         foreach (QProgressBar *bar, itsProgressBars)
             if ((opts.animatedProgress && 0==itsAnimateStep%2 && bar->value()!=bar->minimum() && bar->value()!=bar->maximum()) ||
@@ -1657,9 +1641,7 @@ void Style::timerEvent(QTimerEvent *event)
 
 int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const
 {
-    qtcDebug() << __func__;
-    switch((int)metric)
-    {
+    switch((int)metric) {
     case PM_ToolTipLabelFrameWidth:
         return !ROUNDED || opts.square&SQUARE_TOOLTIPS ? BASE_STYLE::pixelMetric(metric, option, widget) : 3;
     case PM_MdiSubWindowFrameWidth:
@@ -1923,9 +1905,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
 
 int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *widget, QStyleHintReturn *returnData) const
 {
-    qtcDebug() << __func__;
-    switch (hint)
-    {
+    switch (hint) {
     case SH_ToolTip_Mask:
     case SH_Menu_Mask:
         if((SH_ToolTip_Mask==hint && (opts.square&SQUARE_TOOLTIPS)) ||
@@ -2093,7 +2073,6 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
 
 QPalette Style::standardPalette() const
 {
-    qtcDebug() << __func__;
 #ifndef QTC_QT5_ENABLE_KDE
     return BASE_STYLE::standardPalette();
 #else
@@ -2104,7 +2083,6 @@ QPalette Style::standardPalette() const
 void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
                           QPainter *painter, const QWidget *widget) const
 {
-    qtcDebug() << __func__;
     QRect r(option->rect);
     State state(option->state);
     const QPalette &palette(option->palette);
@@ -3731,7 +3709,6 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
 
 void Style::drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
-    qtcDebug() << __func__;
     QRect r(option->rect);
     const State &state(option->state);
     const QPalette &palette(option->palette);
@@ -5980,7 +5957,6 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
 void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
 {
-    qtcDebug() << __func__;
     QRect               r(option->rect);
     const State &state(option->state);
     const QPalette      &palette(option->palette);
@@ -7567,7 +7543,6 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 void Style::drawItemText(QPainter *painter, const QRect &rect, int flags, const QPalette &pal, bool enabled, const QString &text,
                          QPalette::ColorRole textRole) const
 {
-    qtcDebug() << __func__;
     if(QPalette::ButtonText==textRole && !opts.stdSidebarButtons)
     {
         const QAbstractButton *button=getButton(NULL, painter);
@@ -7588,7 +7563,6 @@ void Style::drawItemText(QPainter *painter, const QRect &rect, int flags, const 
 
 QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &size, const QWidget *widget) const
 {
-    qtcDebug() << __func__;
     QSize newSize(BASE_STYLE::sizeFromContents(type, option, size, widget));
 
     switch (type)
@@ -7857,7 +7831,6 @@ QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, con
 
 QRect Style::subElementRect(SubElement element, const QStyleOption *option, const QWidget *widget) const
 {
-    qtcDebug() << __func__;
     QRect rect;
     switch (element) {
     case SE_SliderFocusRect:
@@ -8021,7 +7994,6 @@ QRect Style::subElementRect(SubElement element, const QStyleOption *option, cons
 
 QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget) const
 {
-    qtcDebug() << __func__;
     QRect r(option->rect);
     bool  reverse(Qt::RightToLeft==option->direction);
 
@@ -8541,13 +8513,13 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
     return BASE_STYLE::subControlRect(control, option, subControl, widget);
 }
 
-QStyle::SubControl Style::hitTestComplexControl(ComplexControl control, const QStyleOptionComplex *option,
-                                                const QPoint &pos, const QWidget *widget) const
+QStyle::SubControl
+Style::hitTestComplexControl(ComplexControl control,
+                             const QStyleOptionComplex *option,
+                             const QPoint &pos, const QWidget *widget) const
 {
-    qtcDebug() << __func__;
-    itsSbWidget=0L;
-    switch (control)
-    {
+    itsSbWidget = 0L;
+    switch (control) {
     case CC_ScrollBar:
         if (const QStyleOptionSlider *scrollBar = qstyleoption_cast<const QStyleOptionSlider *>(option))
         {

@@ -30,6 +30,7 @@
 // IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
 
+#include <qtcurve-utils/log.h>
 #include "utils.h"
 
 #include <QObject>
@@ -149,13 +150,17 @@ private:
 
 };
 
-bool BlurHelper::isTransparent(const QWidget *widget) const
+bool
+BlurHelper::isTransparent(const QWidget *widget) const
 {
+    qtcDebug("%p, TranslucentBackground: %d, hasAlphaChannel: %d\n",
+             widget, widget->testAttribute(Qt::WA_TranslucentBackground),
+             Utils::hasAlphaChannel(widget));
     return (widget->isWindow() &&
             widget->testAttribute(Qt::WA_TranslucentBackground) &&
             // widgets using qgraphicsview
             !(widget->graphicsProxyWidget() ||
-              widget->inherits( "Plasma::Dialog")) &&
+              widget->inherits("Plasma::Dialog")) &&
             // flags and special widgets
             (widget->testAttribute(Qt::WA_StyledBackground) ||
              qobject_cast<const QMenu*>(widget) ||

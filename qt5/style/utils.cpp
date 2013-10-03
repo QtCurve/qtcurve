@@ -55,7 +55,6 @@ bool compositingActive()
 
 bool hasAlphaChannel(const QWidget *widget)
 {
-    printf("%s\n", __func__);
 #ifdef QTC_ENABLE_X11
     return qtcX11HasAlpha(widget ? widget->window()->winId() : 0);
 #else

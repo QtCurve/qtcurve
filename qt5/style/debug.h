@@ -24,10 +24,7 @@
 #define _QTC_DEBUG_H_
 
 namespace QtCurve {
-
 extern bool qtcDebugEnabled;
-#define qtcDebug if (qtcDebugEnabled) qDebug
-
 }
 
 #endif

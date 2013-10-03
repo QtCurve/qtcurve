@@ -18,6 +18,8 @@
   Boston, MA 02110-1301, USA.
 */
 
+#include <qtcurve-utils/log.h>
+
 #include <QtGui>
 #ifdef Q_WS_X11
 #include <QtDBus>
@@ -1705,14 +1707,11 @@ void Style::polish(QPalette &palette)
 #endif
 }
 
-static inline void setTranslucentBackground(QWidget *widget)
+static inline void
+setTranslucentBackground(QWidget *widget)
 {
+    qtcDebug("add Qt::WA_TranslucentBackground: %p\n", widget);
     widget->setAttribute(Qt::WA_TranslucentBackground);
-
-    #ifdef Q_WS_WIN
-    //FramelessWindowHint is needed on windows to make WA_TranslucentBackground work properly
-    widget->setWindowFlags(widget->windowFlags()|Qt::FramelessWindowHint);
-    #endif
 }
 
 static inline QWidget*
@@ -1723,31 +1722,27 @@ getParent(QWidget *w, int level)
     return w;
 }
 
-void Style::polish(QWidget *widget)
+void
+Style::polish(QWidget *widget)
 {
-    if(!widget)
+    if (!widget)
         return;
 
     bool enableMouseOver(opts.highlightFactor || opts.coloredMouseOver);
 
-    /*
-    {
-        for(QWidget *w=widget; w; w=w->parentWidget())
-            printf("%s ", w->metaObject()->className());
-        printf("\n");
-    }
-    */
-
     // 'Fix' konqueror's large menubar...
     if (!opts.xbar && APP_KONQUEROR == theThemedApp &&
         qobject_cast<QToolButton*>(widget) &&
-        qtcCheckType0<QMenuBar>(widget->parentWidget()))
-        widget->parentWidget()->setMaximumSize(32768, konqMenuBarSize((QMenuBar *)widget->parentWidget()));
+        qtcCheckType0<QMenuBar>(widget->parentWidget())) {
+        widget->parentWidget()->setMaximumSize(
+            32768, konqMenuBarSize((QMenuBar*)widget->parentWidget()));
+    }
 
-    if(EFFECT_NONE!=opts.buttonEffect && !USE_CUSTOM_ALPHAS(opts) && isNoEtchWidget(widget))
-    {
-        theNoEtchWidgets.insert(static_cast<const QWidget *>(widget));
-        connect(widget, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
+    if (EFFECT_NONE != opts.buttonEffect && !USE_CUSTOM_ALPHAS(opts) &&
+        isNoEtchWidget(widget)) {
+        theNoEtchWidgets.insert(static_cast<const QWidget*>(widget));
+        connect(widget, SIGNAL(destroyed(QObject*)),
+                this, SLOT(widgetDestroyed(QObject*)));
     }
 
     itsWindowManager->registerWidget(widget);
@@ -1755,12 +1750,21 @@ void Style::polish(QWidget *widget)
     itsShadowHelper->registerWidget(widget);
 #endif
 
-    // Need to register all widgets to blur helper, in order to have proper blur_behind region set have proper regions removed for opaque widgets.
-    // Note: that the helper does nothing as long as compositing and ARGB are not enabled
-    if( (100!=opts.menuBgndOpacity && qobject_cast<QMenu *>(widget)) ||
-        (100!=opts.bgndOpacity && (!widget->topLevelWidget() || Qt::Dialog!=(widget->topLevelWidget()->windowFlags() & Qt::WindowType_Mask))) ||
-        (100!=opts.dlgOpacity && (!widget->topLevelWidget() || Qt::Dialog==(widget->topLevelWidget()->windowFlags() & Qt::WindowType_Mask))) )
+    // Need to register all widgets to blur helper, in order to have proper
+    // blur_behind region set have proper regions removed for opaque widgets.
+    // Note: that the helper does nothing as long as compositing and ARGB
+    // are not enabled
+    if ((100 != opts.menuBgndOpacity && qobject_cast<QMenu*>(widget)) ||
+        (100 != opts.bgndOpacity &&
+         (!widget->topLevelWidget() ||
+          Qt::Dialog != (widget->topLevelWidget()->windowFlags() &
+                         Qt::WindowType_Mask))) ||
+        (100 != opts.dlgOpacity &&
+         (!widget->topLevelWidget() ||
+          Qt::Dialog == (widget->topLevelWidget()->windowFlags() &
+                         Qt::WindowType_Mask)))) {
         itsBlurHelper->registerWidget(widget);
+    }
 
     // Sometimes get background errors with QToolBox (e.g. in Bespin config), and setting WA_StyledBackground seems to
     // fix this,..
@@ -1790,15 +1794,14 @@ void Style::polish(QWidget *widget)
                 int  opacity=Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask) ? opts.dlgOpacity : opts.bgndOpacity;
 
 #ifdef Q_WS_X11
-                if(APP_KONSOLE==theThemedApp && 100!=opacity && widget->testAttribute(Qt::WA_TranslucentBackground) &&
-                   widget->inherits("Konsole::MainWindow"))
-                {
+                if (APP_KONSOLE == theThemedApp && 100 != opacity &&
+                    widget->testAttribute(Qt::WA_TranslucentBackground) &&
+                    widget->inherits("Konsole::MainWindow")) {
                     // Background translucency does not work for konsole :-(
                     // So, just set titlebar opacity...
                     setOpacityProp(widget, (unsigned short)opacity);
                     break;
-                }
-                else
+                } else
 #endif
                 if(100==opacity || !widget->isWindow() || Qt::Desktop==widget->windowType() || widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
                    widget->testAttribute(Qt::WA_TranslucentBackground) || widget->testAttribute(Qt::WA_NoSystemBackground) ||
@@ -2605,6 +2608,7 @@ void Style::unpolish(QWidget *widget)
 
     if(qobject_cast<QMenu *>(widget))
     {
+        qtcDebug("remove Qt::WA_TranslucentBackground: %p\n", widget);
         widget->removeEventFilter(this);
         widget->setAttribute(Qt::WA_PaintOnScreen, false);
         widget->setAttribute(Qt::WA_NoSystemBackground, false);
@@ -2618,6 +2622,7 @@ void Style::unpolish(QWidget *widget)
     if((!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) &&
         widget->inherits("QComboBoxPrivateContainer"))
     {
+        qtcDebug("remove Qt::WA_TranslucentBackground: %p\n", widget);
         widget->removeEventFilter(this);
         widget->setAttribute(Qt::WA_PaintOnScreen, false);
         widget->setAttribute(Qt::WA_NoSystemBackground, false);
@@ -13569,8 +13574,8 @@ int Style::getFrameRound(const QWidget *widget) const
 
 void Style::unregisterArgbWidget(QWidget *w)
 {
-    if(itsTransparentWidgets.contains(w))
-    {
+    if (itsTransparentWidgets.contains(w)) {
+        qtcDebug("remove Qt::WA_TranslucentBackground: %p\n", w);
         w->setAttribute(Qt::WA_NoSystemBackground, false);
         w->setAttribute(Qt::WA_TranslucentBackground, false);
     }

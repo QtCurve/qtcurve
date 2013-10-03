@@ -34,7 +34,6 @@ set(qtcurve_MOC_HDRS
 if(QTC_ENABLE_X11)
   set(qtcurve_SRCS
     shadowhelper.cpp
-    xcb_utils.cpp
     ${qtcurve_SRCS})
   set(qtcurve_MOC_HDRS
     shadowhelper.h

@@ -21,6 +21,7 @@
 #ifndef __QTCURVE_P_H__
 #define __QTCURVE_P_H__
 
+#include <qtcurve-utils/log.h>
 #include "qtcurve.h"
 #include <QPainter>
 #include <QPushButton>
@@ -156,12 +157,8 @@ void setSbProp(QWidget *w);
 static inline void
 setTranslucentBackground(QWidget *widget)
 {
+    qtcDebug("add Qt::WA_TranslucentBackground: %p\n", widget);
     widget->setAttribute(Qt::WA_TranslucentBackground);
-#ifdef Q_OS_WIN
-    // FramelessWindowHint is needed on windows to make
-    // WA_TranslucentBackground work properly
-    widget->setWindowFlags(widget->windowFlags() | Qt::FramelessWindowHint);
-#endif
 }
 
 static inline QList<QStatusBar*>
