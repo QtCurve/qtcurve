@@ -55,7 +55,7 @@
 
 #ifdef QTC_ENABLE_X11
 #include "shadowhelper.h"
-#include <qtcurve-utils/x11utils.h>
+#include <qtcurve-utils/x11qtc.h>
 #include <sys/time.h>
 #endif
 
@@ -100,10 +100,7 @@ bool isNoEtchWidget(const QWidget *widget)
 void setOpacityProp(QWidget *w, unsigned short opacity)
 {
     if (w && canAccessId(w)) {
-        static const auto opacityAtom = qtc_x11_atoms[QTC_X11_ATOM_QTC_OPACITY];
-        qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE,
-                       w->window()->winId(), opacityAtom,
-                       XCB_ATOM_CARDINAL, 16, 1, &opacity);
+        qtcX11SetOpacity(w->window()->winId(), opacity);
         qtcX11Flush();
     }
 }
@@ -111,7 +108,6 @@ void setOpacityProp(QWidget *w, unsigned short opacity)
 void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
 {
     if (w && canAccessId(w)) {
-        static const auto bgndAtom = qtc_x11_atoms[QTC_X11_ATOM_QTC_BGND];
         uint32_t prop = (((IS_FLAT_BGND(app) ?
                            (unsigned short)(haveBgndImage ?
                                             APPEARANCE_RAISED :
@@ -119,9 +115,7 @@ void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
                            app) & 0xFF) |
                          (w->palette().background().color().rgb() &
                           0x00FFFFFF) << 8);
-        qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE,
-                       w->window()->winId(), bgndAtom,
-                       XCB_ATOM_CARDINAL, 32, 1, &prop);
+        qtcX11SetBgnd(w->window()->winId(), prop);
         qtcX11Flush();
     }
 }
@@ -129,17 +123,12 @@ void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
 void setSbProp(QWidget *w)
 {
     if (w && canAccessId(w->window())) {
-        static const char *constStatusBarProperty="qtcStatusBar";
+        static const char *constStatusBarProperty = "qtcStatusBar";
         QVariant prop(w->property(constStatusBarProperty));
 
         if (!prop.isValid() || !prop.toBool()) {
-            static const auto sbAtom =
-                qtc_x11_atoms[QTC_X11_ATOM_QTC_STATUSBAR];
-            unsigned short s = 1;
             w->setProperty(constStatusBarProperty, true);
-            qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE,
-                           w->window()->winId(), sbAtom,
-                           XCB_ATOM_CARDINAL, 16, 1, &s);
+            qtcX11SetStatusBar(w->window()->winId());
             qtcX11Flush();
         }
     }

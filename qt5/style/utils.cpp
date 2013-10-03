@@ -18,6 +18,7 @@
   Boston, MA 02110-1301, USA.
 */
 
+#include <qtcurve-utils/log.h>
 #include "utils.h"
 #ifdef QTC_ENABLE_X11
 #  include <qtcurve-utils/x11utils.h>
@@ -43,20 +44,7 @@ bool compositingActive()
 {
 #ifndef QTC_QT5_ENABLE_KDE
 #ifdef QTC_ENABLE_X11
-    static xcb_atom_t atom;
-    if (!atom) {
-        atom = qtc_x11_atoms[QTC_X11_ATOM_NET_WM_CM_S_DEFAULT];
-        if (!atom) {
-            return false;
-        }
-    }
-    auto reply = qtcX11Call(get_selection_owner, atom);
-    bool res = false;
-    if (reply) {
-        res = reply->owner != 0;
-        free(reply);
-    }
-    return res;
+    return qtcX11CompositingActive();
 #else // QTC_ENABLE_X11
     return false;
 #endif // QTC_ENABLE_X11
@@ -67,22 +55,9 @@ bool compositingActive()
 
 bool hasAlphaChannel(const QWidget *widget)
 {
+    printf("%s\n", __func__);
 #ifdef QTC_ENABLE_X11
-    if (compositingActive()) {
-        WId wid = widget ? widget->window()->winId() : 0;
-        if (wid) {
-            auto reply = qtcX11Call(get_geometry, wid);
-            bool res = false;
-            if (reply) {
-                res = reply->depth == 32;
-                free(reply);
-            }
-            return res;
-        }
-        return true;
-    } else {
-        return false;
-    }
+    return qtcX11HasAlpha(widget ? widget->window()->winId() : 0);
 #else
     Q_UNUSED(widget);
     return compositingActive();

@@ -2186,9 +2186,10 @@ gboolean qtSettingsInit()
             if(IMG_NONE!=opts.bgndImage.type && excludedApp(opts.noBgndImageApps))
                 opts.bgndImage.type=IMG_NONE;
 
-            if(isMozilla() || GTK_APP_FLASH_PLUGIN==qtSettings.app || GTK_APP_OPEN_OFFICE==qtSettings.app ||
-               GTK_APP_JAVA==qtSettings.app || GTK_APP_JAVA_SWT==qtSettings.app)
-            {
+            if (isMozilla() || GTK_APP_FLASH_PLUGIN == qtSettings.app ||
+                GTK_APP_OPEN_OFFICE == qtSettings.app ||
+                GTK_APP_JAVA == qtSettings.app ||
+                GTK_APP_JAVA_SWT == qtSettings.app) {
                 opts.bgndOpacity=opts.dlgOpacity=opts.menuBgndOpacity=100;
                 qtSettings.useAlpha=false;
             }

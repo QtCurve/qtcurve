@@ -23,19 +23,17 @@
 
 #include <QWidget>
 
-namespace QtCurve
+namespace QtCurve {
+namespace Utils {
+static inline void
+addEventFilter(QObject *object, QObject *filter)
 {
-    namespace Utils
-    {
-        inline void addEventFilter(QObject *object, QObject *filter)
-        {
-            object->removeEventFilter(filter);
-            object->installEventFilter(filter);
-        }
-
-        extern bool compositingActive();
-        extern bool hasAlphaChannel(const QWidget *widget);
-    }
+    object->removeEventFilter(filter);
+    object->installEventFilter(filter);
+}
+bool compositingActive();
+bool hasAlphaChannel(const QWidget *widget);
+}
 }
 
 #endif

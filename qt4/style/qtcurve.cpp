@@ -46,16 +46,12 @@
 #ifdef Q_WS_X11
 #include "macmenu.h"
 #include "shadowhelper.h"
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#include "fixx11h.h"
-#include <QX11Info>
 #include <sys/time.h>
 #endif
 
 #ifdef QTC_ENABLE_X11
 #include <QX11Info>
-#include <qtcurve-utils/x11utils.h>
+#include <qtcurve-utils/x11qtc.h>
 #endif
 
 #ifdef QTC_QT4_ENABLE_KDE
@@ -579,46 +575,48 @@ static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
 #define SB_SUB2 ((QStyle::SubControl)(QStyle::SC_ScrollBarGroove << 1))
 
 #ifdef Q_WS_X11
-static bool canAccessId(const QWidget *w)
+static bool
+canAccessId(const QWidget *w)
 {
     return w && w->testAttribute(Qt::WA_WState_Created) && w->internalWinId();
 }
 
-void setOpacityProp(QWidget *w, unsigned short opacity)
+void
+setOpacityProp(QWidget *w, unsigned short opacity)
 {
-    if(w && canAccessId(w))
-    {
-        static const Atom constAtom = XInternAtom(QX11Info::display(), OPACITY_ATOM, False);
-        XChangeProperty(QX11Info::display(), w->window()->winId(), constAtom, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&opacity, 1);
+    if (w && canAccessId(w)) {
+        qtcX11SetOpacity(w->window()->winId(), opacity);
+        qtcX11Flush();
     }
 }
 
-void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
+void
+setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
 {
-    if(w && canAccessId(w))
-    {
-        static const Atom constAtom = XInternAtom(QX11Info::display(), BGND_ATOM, False);
-        unsigned long prop=((IS_FLAT_BGND(app) ? (unsigned short)(haveBgndImage ? APPEARANCE_RAISED : APPEARANCE_FLAT) : app)&0xFF) |
-                           (w->palette().background().color().rgb()&0x00FFFFFF)<<8;
+    if (w && canAccessId(w)) {
+        unsigned long prop =
+            ((IS_FLAT_BGND(app) ? (unsigned short)(haveBgndImage ?
+                                                   APPEARANCE_RAISED :
+                                                   APPEARANCE_FLAT) :
+              app) & 0xFF) | (w->palette().background().color().rgb() &
+                              0x00FFFFFF) << 8;
 
-        XChangeProperty(QX11Info::display(), w->window()->winId(), constAtom, XA_CARDINAL, 32, PropModeReplace, (unsigned char *)&prop, 1);
+        qtcX11SetBgnd(w->window()->winId(), prop);
+        qtcX11Flush();
     }
 }
 
-void setSbProp(QWidget *w)
+void
+setSbProp(QWidget *w)
 {
-    if(w && canAccessId(w->window()))
-    {
-        static const char * constStatusBarProperty="qtcStatusBar";
-        QVariant            prop(w->property(constStatusBarProperty));
+    if (w && canAccessId(w->window())) {
+        static const char *constStatusBarProperty = "qtcStatusBar";
+        QVariant prop(w->property(constStatusBarProperty));
 
-        if(!prop.isValid() || !prop.toBool())
-        {
-            static const Atom constAtom = XInternAtom(QX11Info::display(), STATUSBAR_ATOM, False);
-
-            unsigned short s=1;
+        if (!prop.isValid() || !prop.toBool()) {
             w->setProperty(constStatusBarProperty, true);
-            XChangeProperty(QX11Info::display(), w->window()->winId(), constAtom, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&s, 1);
+            qtcX11SetStatusBar(w->window()->winId());
+            qtcX11Flush();
         }
     }
 }
@@ -13847,35 +13845,30 @@ void Style::toggleStatusBar(QMainWindow *window)
 #ifdef Q_WS_X11
 void Style::emitMenuSize(QWidget *w, unsigned short size, bool force)
 {
-    if(w && canAccessId(w->window()))
-    {
-        static const char * constMenuSizeProperty="qtcMenuSize";
-
-        unsigned short oldSize=2000;
-
-        if(!force)
-        {
+    if (w && canAccessId(w->window())) {
+        static const char *constMenuSizeProperty="qtcMenuSize";
+        unsigned short oldSize = 2000;
+        if (!force) {
             QVariant prop(w->property(constMenuSizeProperty));
 
-            if(prop.isValid())
-            {
+            if (prop.isValid()) {
                 bool ok;
-                oldSize=prop.toUInt(&ok);
-                if(!ok)
-                    oldSize=2000;
+                oldSize = prop.toUInt(&ok);
+                if (!ok) {
+                    oldSize = 2000;
+                }
             }
         }
 
-        if(oldSize!=size)
-        {
-            static const Atom constQtCMenuSize = XInternAtom(QX11Info::display(), MENU_SIZE_ATOM, False);
-
+        if (oldSize != size) {
             w->setProperty(constMenuSizeProperty, size);
-            XChangeProperty(QX11Info::display(), w->window()->winId(),
-                            constQtCMenuSize, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&size, 1);
-            if(!itsDBus)
-                itsDBus=new QDBusInterface("org.kde.kwin", "/QtCurve", "org.kde.QtCurve");
-            itsDBus->call(QDBus::NoBlock, "menuBarSize", (unsigned int)w->window()->winId(), (int)size);
+            qtcX11SetMenubarSize(w->window()->winId(), size);
+            if (!itsDBus) {
+                itsDBus = new QDBusInterface("org.kde.kwin", "/QtCurve",
+                                             "org.kde.QtCurve");
+            }
+            itsDBus->call(QDBus::NoBlock, "menuBarSize",
+                          (unsigned int)w->window()->winId(), (int)size);
         }
     }
 }

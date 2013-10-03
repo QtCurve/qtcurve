@@ -105,13 +105,13 @@ QtCurveHandler::QtCurveHandler()
               , itsDBus(NULL)
 {
 #ifdef QTC_ENABLE_X11
-        qtcX11InitXlib(QX11Info::display());
+    qtcX11InitXlib(QX11Info::display());
 #endif
-    handler=this;
+    handler = this;
     setStyle();
     reset(0);
 
-    itsDBus=new QtCurveDBus(this);
+    itsDBus = new QtCurveDBus(this);
     QDBusConnection::sessionBus().registerObject("/QtCurve", this);
 }
 

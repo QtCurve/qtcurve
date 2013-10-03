@@ -35,7 +35,6 @@
 */
 
 static uint32_t shadow_pixmaps[8];
-static xcb_atom_t shadow_atom;
 static int shadow_size = 0;
 
 static xcb_pixmap_t
@@ -60,7 +59,6 @@ qtcX11ShadowCreatePixmap(const QtcPixmap *data)
 void
 qtcX11ShadowInit()
 {
-    shadow_atom = qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_SHADOW];
     shadow_pixmaps[0] = qtcX11ShadowCreatePixmap(&qtc_shadow0);
     shadow_pixmaps[1] = qtcX11ShadowCreatePixmap(&qtc_shadow1);
     shadow_pixmaps[2] = qtcX11ShadowCreatePixmap(&qtc_shadow2);
@@ -89,13 +87,15 @@ qtcX11ShadowInstall(xcb_window_t win)
     memcpy(data, shadow_pixmaps, sizeof(shadow_pixmaps));
     data[8] = data[9] = data[10] = data[11] = shadow_size - 4;
     qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, win,
-                   shadow_atom, XCB_ATOM_CARDINAL, 32, 12, data);
+                   qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_SHADOW],
+                   XCB_ATOM_CARDINAL, 32, 12, data);
     qtcX11Flush();
 }
 
 QTC_EXPORT void
 qtcX11ShadowUninstall(xcb_window_t win)
 {
-    qtcX11CallVoid(delete_property, win, shadow_atom);
+    qtcX11CallVoid(delete_property, win,
+                   qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_SHADOW]);
     qtcX11Flush();
 }

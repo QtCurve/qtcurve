@@ -34,9 +34,10 @@
 #include <stdio.h>
 namespace KWinQtCurve {
 
-static int point2Pixel(double point)
+static int
+point2Pixel(double point)
 {
-    return (int)(((point*QX11Info::appDpiY())/72.0)+0.5);
+    return (int)(((point * QX11Info::appDpiY()) / 72.0) + 0.5);
 }
 
 QtCurveToggleButton::QtCurveToggleButton(bool menubar, QtCurveClient *parent)

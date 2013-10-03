@@ -68,7 +68,7 @@
 
 #ifdef QTC_ENABLE_X11
 #include "shadowhelper.h"
-#include <qtcurve-utils/x11utils.h>
+#include <qtcurve-utils/x11qtc.h>
 #include <sys/time.h>
 #endif
 
@@ -2365,8 +2365,8 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
     QRect         bgndRect(widget->rect()),
         imgRect(bgndRect);
 
-    if(100!=opacity && !QtCurve::Utils::hasAlphaChannel(window))
-        opacity=100;
+    if (100 != opacity && !QtCurve::Utils::hasAlphaChannel(window))
+        opacity = 100;
 
     p->setClipRegion(widget->rect(), Qt::IntersectClip);
 
@@ -4427,12 +4427,8 @@ void Style::emitMenuSize(QWidget *w, unsigned short size, bool force)
         }
 
         if (oldSize != size) {
-            static const auto menuAtom =
-                qtc_x11_atoms[QTC_X11_ATOM_QTC_MENUBAR_SIZE];
             w->setProperty(constMenuSizeProperty, size);
-            qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE,
-                           w->window()->winId(), menuAtom,
-                           XCB_ATOM_CARDINAL, 16, 1, &size);
+            qtcX11SetMenubarSize(w->window()->winId(), size);
             qtcX11Flush();
             if(!itsDBus)
                 itsDBus = new QDBusInterface("org.kde.kwin", "/QtCurve",

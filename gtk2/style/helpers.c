@@ -1177,7 +1177,7 @@ enableBlurBehind(GtkWidget *w, gboolean enable)
                 xcb_window_t wid =
                     GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel)));
 
-                g_object_set_data(G_OBJECT(w), MENU_SIZE_ATOM,
+                g_object_set_data(G_OBJECT(w), QTC_MENUBAR_SIZE,
                                   GINT_TO_POINTER(value));
                 if (enable) {
                     qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE,

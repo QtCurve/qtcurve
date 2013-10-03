@@ -23,6 +23,10 @@
   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
   Boston, MA 02110-1301, USA.
  */
+
+#include <qtcurve-utils/x11utils.h>
+#include <qtcurve-utils/log.h>
+
 #define DRAW_INTO_PIXMAPS
 #include <KDE/KLocale>
 #include <QBitmap>
@@ -51,14 +55,7 @@
 #include "tileset.h"
 #endif
 
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-
-#include <fixx11h.h>
 #include <style/qtcurve.h>
-#include <QX11Info>
-#include <qtcurve-utils/x11utils.h>
-#include <qtcurve-utils/log.h>
 
 #if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
 #include <KDE/KIconLoader>
@@ -92,64 +89,38 @@ static inline int tabCloseIconSize(int titleHeight)
 
 #endif
 
-int getProperty(WId wId, const Atom &atom)
-{
-
-    unsigned char *data;
-    int           dummy;
-    unsigned long num,
-                  dummy2;
-    int           rv(-1);
-
-    if (Success==XGetWindowProperty(QX11Info::display(), wId, atom, 0L, 1, False, XA_CARDINAL, &dummy2, &dummy, &num, &dummy2, &data) && num>0)
-    {
-        unsigned short val=*((unsigned short*)data);
-
-        if(val<512)
-            rv=val;
-        XFree(data);
-    }
-    return rv;
-}
-
 int getMenubarSizeProperty(WId wId)
 {
-    static const Atom constAtom = XInternAtom(QX11Info::display(), MENU_SIZE_ATOM, False);
-    return getProperty(wId, constAtom);
+    return qtcX11GetShortProp(wId,
+                              qtc_x11_atoms[QTC_X11_ATOM_QTC_MENUBAR_SIZE]);
 }
 
 int getStatusbarSizeProperty(WId wId)
 {
-    static const Atom constAtom = XInternAtom(QX11Info::display(), STATUSBAR_ATOM, False);
-    return getProperty(wId, constAtom);
+    return qtcX11GetShortProp(wId, qtc_x11_atoms[QTC_X11_ATOM_QTC_STATUSBAR]);
 }
 
 int getOpacityProperty(WId wId)
 {
-    static const Atom constAtom = XInternAtom(QX11Info::display(), OPACITY_ATOM, False);
-    int o=getProperty(wId, constAtom);
-    return o<0 || o>100 ? 100 : o;
+    int o = qtcX11GetShortProp(wId, qtc_x11_atoms[QTC_X11_ATOM_QTC_OPACITY]);
+    return o <= 0 || o >= 100 ? 100 : o;
 }
 
 void getBgndSettings(WId wId, EAppearance &app, QColor &col)
 {
-    static const Atom constAtom = XInternAtom(QX11Info::display(), BGND_ATOM, False);
+    auto reply = qtcX11Call(get_property, 0, wId,
+                            qtc_x11_atoms[QTC_X11_ATOM_QTC_BGND],
+                            XCB_ATOM_CARDINAL, 0, 1);
+    if (xcb_get_property_value_length(reply) > 0) {
+        uint32_t val = *(int32_t*)xcb_get_property_value(reply);
+        app = (EAppearance)(val&0xFF);
+        col.setRgb((val & 0xFF000000) >> 24, (val & 0x00FF0000) >> 16,
+                   (val & 0x0000FF00) >> 8);
 
-    unsigned char *data;
-    int           dummy;
-    unsigned long num,
-                  dummy2;
-
-    if (Success==XGetWindowProperty(QX11Info::display(), wId, constAtom, 0L, 1, False, XA_CARDINAL, &dummy2, &dummy, &num, &dummy2, &data) && num>0)
-    {
-        unsigned long val=*((unsigned long*)data);
-        app=(EAppearance)(val&0xFF);
-        col.setRgb((val&0xFF000000)>>24, (val&0x00FF0000)>>16, (val&0x0000FF00)>>8);
-
-        XFree(data);
     }
-    //else
-    //    *data = NULL; // superflous?!?
+    if (qtcLikely(reply)) {
+        free(reply);
+    }
 }
 
 static QPainterPath createPath(const QRectF &r, double radiusTop, double radiusBot)
@@ -1655,57 +1626,65 @@ void QtCurveClient::deleteSizeGrip()
 
 void QtCurveClient::informAppOfBorderSizeChanges()
 {
-    static const Atom constQtCTitleBarSize = XInternAtom(QX11Info::display(), TITLEBAR_SIZE_ATOM, False);
-
-    QX11Info info;
-    XEvent xev;
-    xev.xclient.type = ClientMessage;
-    xev.xclient.message_type = constQtCTitleBarSize;
-    xev.xclient.display = QX11Info::display();
-    xev.xclient.window = windowId();
-    xev.xclient.format = 32;
-    xev.xclient.data.l[0] = 0;
-    XSendEvent(QX11Info::display(), windowId(), False, NoEventMask, &xev);
+    union {
+        char _buff[32];
+        xcb_client_message_event_t ev;
+    } buff;
+    xcb_client_message_event_t *xev = &buff.ev;
+    xev->response_type = XCB_CLIENT_MESSAGE;
+    xev->format = 32;
+    xev->window = windowId();
+    xev->type = qtc_x11_atoms[QTC_X11_ATOM_QTC_TITLEBAR_SIZE];
+    xev->data.data32[0] = 0;
+    qtcX11CallVoid(send_event, false, windowId(), XCB_EVENT_MASK_NO_EVENT,
+                   (const char*)xev);
+    qtcX11Flush();
 }
 
 void QtCurveClient::informAppOfActiveChange()
 {
-    if(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_ShadeMenubarOnlyWhenActive, NULL, NULL))
-    {
-        static const Atom constQtCActiveWindow = XInternAtom(QX11Info::display(), ACTIVE_WINDOW_ATOM, False);
-
-        QX11Info info;
-        XEvent xev;
-        xev.xclient.type = ClientMessage;
-        xev.xclient.message_type = constQtCActiveWindow;
-        xev.xclient.display = QX11Info::display();
-        xev.xclient.window = windowId();
-        xev.xclient.format = 32;
-        xev.xclient.data.l[0] = isActive() ? 1 : 0;
-        XSendEvent(QX11Info::display(), windowId(), False, NoEventMask, &xev);
+    if (Handler()->wStyle()->pixelMetric(
+            (QStyle::PixelMetric)QtC_ShadeMenubarOnlyWhenActive, NULL, NULL)) {
+        union {
+            char _buff[32];
+            xcb_client_message_event_t ev;
+        } buff;
+        xcb_client_message_event_t *xev = &buff.ev;
+        xev->response_type = XCB_CLIENT_MESSAGE;
+        xev->format = 32;
+        xev->window = windowId();
+        xev->type = qtc_x11_atoms[QTC_X11_ATOM_QTC_ACTIVE_WINDOW];
+        xev->data.data32[0] = isActive() ? 1 : 0;
+        qtcX11CallVoid(send_event, false, windowId(), XCB_EVENT_MASK_NO_EVENT,
+                       (const char*)xev);
+        qtcX11Flush();
     }
 }
 
 void QtCurveClient::sendToggleToApp(bool menubar)
 {
-    //if(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_ShadeMenubarOnlyWhenActive, NULL, NULL))
+    // if (Handler()->wStyle()->pixelMetric(
+    //         (QStyle::PixelMetric)QtC_ShadeMenubarOnlyWhenActive, NULL, NULL))
     {
-        static const Atom constQtCToggleMenuBar   = XInternAtom(QX11Info::display(), TOGGLE_MENUBAR_ATOM, False);
-        static const Atom constQtCToggleStatusBar = XInternAtom(QX11Info::display(), TOGGLE_STATUSBAR_ATOM, False);
-
-        QX11Info info;
-        XEvent xev;
-        xev.xclient.type = ClientMessage;
-        xev.xclient.message_type = menubar ? constQtCToggleMenuBar : constQtCToggleStatusBar;
-        xev.xclient.display = QX11Info::display();
-        xev.xclient.window = windowId();
-        xev.xclient.format = 32;
-        xev.xclient.data.l[0]=0;
-        XSendEvent(QX11Info::display(), windowId(), False, NoEventMask, &xev);
-        if(menubar)
+        union {
+            char _buff[32];
+            xcb_client_message_event_t ev;
+        } buff;
+        xcb_client_message_event_t *xev = &buff.ev;
+        xev->response_type = XCB_CLIENT_MESSAGE;
+        xev->format = 32;
+        xev->window = windowId();
+        xev->type = qtc_x11_atoms[menubar ? QTC_X11_ATOM_QTC_TOGGLE_MENUBAR :
+                                  QTC_X11_ATOM_QTC_TOGGLE_STATUSBAR];
+        xev->data.data32[0] = 0;
+        qtcX11CallVoid(send_event, false, windowId(), XCB_EVENT_MASK_NO_EVENT,
+                       (const char*)xev);
+        qtcX11Flush();
+        if (menubar) {
             Handler()->emitToggleMenuBar(windowId());
-        else
+        } else {
             Handler()->emitToggleStatusBar(windowId());
+        }
     }
 }
 

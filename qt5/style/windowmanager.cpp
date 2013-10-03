@@ -652,8 +652,6 @@ void WindowManager::startDrag( QWidget* widget, const QPoint& position )
 #ifdef QTC_ENABLE_X11
         qtcX11CallVoid(ungrab_pointer, 0L);
 #ifndef QTC_QT5_ENABLE_KDE
-        static const auto moveResizeAtom =
-            qtc_x11_atoms[QTC_X11_ATOM_NET_WM_MOVERESIZE];
         union {
             char _buff[32];
             xcb_client_message_event_t ev;
@@ -665,7 +663,7 @@ void WindowManager::startDrag( QWidget* widget, const QPoint& position )
         xev->response_type = XCB_CLIENT_MESSAGE;
         xev->format = 32;
         xev->window = widget->window()->winId();
-        xev->type = moveResizeAtom;
+        xev->type = qtc_x11_atoms[QTC_X11_ATOM_NET_WM_MOVERESIZE];
         xev->data.data32[0] = position.x();
         xev->data.data32[1] = position.y();
         xev->data.data32[2] = 8; // NET::Move

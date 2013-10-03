@@ -18,7 +18,7 @@
   Boston, MA 02110-1301, USA.
 */
 
-#include <qtcurve-utils/x11utils.h>
+#include <qtcurve-utils/x11qtc.h>
 #include <qtcurve-utils/gtkutils.h>
 #include <qtcurve-utils/log.h>
 
@@ -407,11 +407,9 @@ qtcWindowSetStatusBarProp(GtkWidget *w)
         xcb_window_t wid =
             GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel)));
 
-        unsigned short setting = 1;
         g_object_set_data(G_OBJECT(w), STATUSBAR_ATOM, (gpointer)1);
-        qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, wid,
-                       qtc_x11_atoms[QTC_X11_ATOM_QTC_STATUSBAR],
-                       XCB_ATOM_CARDINAL, 16, 1, (unsigned char*)&setting);
+        qtcX11SetStatusBar(wid);
+        qtcX11Flush();
         return TRUE;
     }
     return FALSE;
@@ -450,11 +448,8 @@ qtcWindowSetProperties(GtkWidget *w, unsigned short opacity)
     xcb_window_t wid =
         GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel)));
 
-    if (opacity != 100) {
-        qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, wid,
-                       qtc_x11_atoms[QTC_X11_ATOM_QTC_OPACITY],
-                       XCB_ATOM_CARDINAL, 16, 1, (unsigned char*)&opacity);
-    }
+    if (opacity != 100)
+        qtcX11SetOpacity(wid, opacity);
 
     prop |= (((toQtColor(bgnd->red) & 0xFF) << 24) |
              ((toQtColor(bgnd->green) & 0xFF) << 16) |

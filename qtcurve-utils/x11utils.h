@@ -26,6 +26,8 @@
 
 QTC_BEGIN_DECLS
 
+#define QTC_MENUBAR_SIZE "_QTCURVE_MENUBAR_SIZE_"
+
 typedef enum {
     QTC_X11_ATOM_WM_CLASS,
 
@@ -80,23 +82,12 @@ qtcX11GetAtom(const char *name, boolean create)
         xcb_connection_t *conn = qtcX11GetConn();       \
         xcb_##name(conn, args).sequence;                \
     })
-void qtcX11SetWMClass(xcb_window_t win, const char *wmclass, size_t len);
 
-static inline int32_t
-qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom)
-{
-    int32_t res = -1;
-    xcb_get_property_reply_t *reply =
-        qtcX11Call(get_property, 0, win, atom, XCB_ATOM_CARDINAL, 0, 1);
-    if (xcb_get_property_value_length(reply) > 0) {
-        uint32_t val = *(int32_t*)xcb_get_property_value(reply);
-        if (val < 512) {
-            res = val;
-        }
-    }
-    free(reply);
-    return res;
-}
+void qtcX11SetWMClass(xcb_window_t win, const char *wmclass, size_t len);
+int32_t qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom);
+void qtcX11MapRaised(xcb_window_t win);
+boolean qtcX11CompositingActive();
+boolean qtcX11HasAlpha(xcb_window_t win);
 
 QTC_END_DECLS
 

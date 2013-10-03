@@ -26,6 +26,7 @@
 // IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
 
+#include <qtcurve-utils/x11utils.h>
 
 #include "qtcurvesizegrip.h"
 #include "qtcurvebutton.h"
@@ -36,217 +37,183 @@
 #include <QPolygon>
 #include <QTimer>
 
-#include <QX11Info>
-#include <X11/Xlib.h>
-
-namespace KWinQtCurve
+namespace KWinQtCurve {
+static inline bool
+similar(const QColor &a, const QColor &b)
 {
-static inline bool similar(const QColor &a, const QColor &b)
-{
-    static const int constDiff=18;
-
-    return abs(a.red()-b.red())<constDiff &&
-           abs(a.green()-b.green())<constDiff &&
-           abs(a.blue()-b.blue())<constDiff;
+    static const int diff = 18;
+    return (abs(a.red() - b.red()) < diff &&
+            abs(a.green() - b.green()) < diff &&
+            abs(a.blue() - b.blue()) < diff);
 }
 
-  //_____________________________________________
-  QtCurveSizeGrip::QtCurveSizeGrip( QtCurveClient* client ):
+QtCurveSizeGrip::QtCurveSizeGrip(QtCurveClient* client):
     QWidget(0),
-    client_( client )
-  {
-
+    client_(client)
+{
     setAttribute(Qt::WA_NoSystemBackground );
-    setAutoFillBackground( false );
+    setAutoFillBackground(false);
 
     // cursor
-    setCursor( Qt::SizeFDiagCursor );
+    setCursor(Qt::SizeFDiagCursor);
 
     // size
-    setFixedSize( QSize( GRIP_SIZE, GRIP_SIZE ) );
+    setFixedSize(QSize(GRIP_SIZE, GRIP_SIZE));
 
     // mask
     QPolygon p;
-    p << QPoint( 0, GRIP_SIZE )
-      << QPoint( GRIP_SIZE, 0 )
-      << QPoint( GRIP_SIZE, GRIP_SIZE )
-      << QPoint( 0, GRIP_SIZE );
+    p << QPoint(0, GRIP_SIZE)
+      << QPoint(GRIP_SIZE, 0)
+      << QPoint(GRIP_SIZE, GRIP_SIZE)
+      << QPoint(0, GRIP_SIZE);
 
-    setMask( QRegion( p ) );
+    setMask(QRegion(p));
 
     // embed
     embed();
     updatePosition();
 
     // event filter
-    client->widget()->installEventFilter( this );
+    client->widget()->installEventFilter(this);
 
     // show
     show();
+}
 
-  }
+QtCurveSizeGrip::~QtCurveSizeGrip()
+{
+}
 
-  //_____________________________________________
-  QtCurveSizeGrip::~QtCurveSizeGrip( void )
-  {}
+void
+QtCurveSizeGrip::activeChange()
+{
+    qtcX11MapRaised(winId());
+}
 
-  //_____________________________________________
-  void QtCurveSizeGrip::activeChange( void )
-  { XMapRaised( QX11Info::display(), winId() ); }
-
-  //_____________________________________________
-  void QtCurveSizeGrip::embed( void )
-  {
-
+void
+QtCurveSizeGrip::embed()
+{
     WId window_id = client().windowId();
-    if( client().isPreview() ) {
-
-      setParent( client().widget() );
-
-    } else if( window_id ) {
-
-      WId current = window_id;
-      while( true )
-      {
-        WId root, parent = 0;
-        WId *children = 0L;
-        uint child_count = 0;
-        XQueryTree(QX11Info::display(), current, &root, &parent, &children, &child_count);
-        if( parent && parent != root && parent != current ) current = parent;
-        else break;
-      }
-
-      // reparent
-      XReparentWindow( QX11Info::display(), winId(), current, 0, 0 );
+    if (client().isPreview()) {
+        setParent(client().widget());
+    } else if (window_id) {
+        WId current = window_id;
+        while (true) {
+            auto reply = qtcX11Call(query_tree, current);
+            if (reply->parent && reply->parent != reply->root &&
+                reply->parent != current) {
+                current = reply->parent;
+            } else {
+                break;
+            }
+            free(reply);
+        }
+        qtcX11CallVoid(reparent_window, winId(), current, 0, 0);
+        qtcX11Flush();
     } else {
-
-      hide();
-
+        hide();
     }
+}
 
-  }
+bool
+QtCurveSizeGrip::eventFilter(QObject *object, QEvent *event)
+{
 
-  //_____________________________________________
-  bool QtCurveSizeGrip::eventFilter( QObject* object, QEvent* event )
-  {
-
-    if( object != client().widget() ) return false;
-    if ( event->type() == QEvent::Resize) updatePosition();
+    if (object != client().widget())
+        return false;
+    if (event->type() == QEvent::Resize)
+        updatePosition();
     return false;
+}
 
-  }
-
-  //_____________________________________________
-  void QtCurveSizeGrip::paintEvent( QPaintEvent* )
-  {
-
+void
+QtCurveSizeGrip::paintEvent(QPaintEvent*)
+{
     // get relevant colors
-    QColor base(KDecoration::options()->color(KDecoration::ColorTitleBar, client().isActive()));
-    //QColor light( client().helper().calcDarkColor( base ) );
-    //QColor dark( client().helper().calcDarkColor( base.darker(150) ) );
+    QColor base(KDecoration::options()->color(KDecoration::ColorTitleBar,
+                                              client().isActive()));
+    // QColor light(client().helper().calcDarkColor(base));
+    // QColor dark(client().helper().calcDarkColor(base.darker(150)));
 
-    if(similar(base, client().widget()->palette().color(backgroundRole())))
+    if (similar(base, client().widget()->palette().color(backgroundRole())))
         base = base.value() > 100 ? base.dark(120) : base.light(120);
 
     // create and configure painter
     QPainter painter(this);
-//     painter.setRenderHints(QPainter::Antialiasing );
+    // painter.setRenderHints(QPainter::Antialiasing);
 
-    painter.setPen( Qt::NoPen );
-    painter.setBrush( base );
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(base);
 
     // polygon
     QPolygon p;
-    p << QPoint( 0, GRIP_SIZE )
-      << QPoint( GRIP_SIZE, 0 )
-      << QPoint( GRIP_SIZE, GRIP_SIZE )
-      << QPoint( 0, GRIP_SIZE );
-    painter.drawPolygon( p );
+    p << QPoint(0, GRIP_SIZE)
+      << QPoint(GRIP_SIZE, 0)
+      << QPoint(GRIP_SIZE, GRIP_SIZE)
+      << QPoint(0, GRIP_SIZE);
+    painter.drawPolygon(p);
 
-//     // diagonal border
-//     painter.setBrush( Qt::NoBrush );
-//     painter.setPen( QPen( dark, 3 ) );
-//     painter.drawLine( QPoint( 0, GRIP_SIZE ), QPoint( GRIP_SIZE, 0 ) );
-// 
-//     // side borders
-//     painter.setPen( QPen( light, 1.5 ) );
-//     painter.drawLine( QPoint( 1, GRIP_SIZE ), QPoint( GRIP_SIZE, GRIP_SIZE ) );
-//     painter.drawLine( QPoint( GRIP_SIZE, 1 ), QPoint( GRIP_SIZE, GRIP_SIZE ) );
-//     painter.end();
+    // // diagonal border
+    // painter.setBrush(Qt::NoBrush);
+    // painter.setPen(QPen(dark, 3));
+    // painter.drawLine(QPoint(0, GRIP_SIZE), QPoint(GRIP_SIZE, 0));
 
-  }
+    // // side borders
+    // painter.setPen(QPen(light, 1.5));
+    // painter.drawLine(QPoint(1, GRIP_SIZE), QPoint(GRIP_SIZE, GRIP_SIZE));
+    // painter.drawLine(QPoint(GRIP_SIZE, 1), QPoint(GRIP_SIZE, GRIP_SIZE));
+    // painter.end();
+}
 
-  //_____________________________________________
-  void QtCurveSizeGrip::mousePressEvent( QMouseEvent* event )
-  {
-
-    switch (event->button())
-    {
-
-      case Qt::RightButton:
-      {
+void
+QtCurveSizeGrip::mousePressEvent(QMouseEvent *event)
+{
+    switch (event->button()) {
+    case Qt::RightButton:
         hide();
         QTimer::singleShot(5000, this, SLOT(show()));
         break;
-      }
-
-      case Qt::MidButton:
-      {
+    case Qt::MidButton:
         hide();
         break;
-      }
-
-      case Qt::LeftButton:
-      if( rect().contains( event->pos() ) )
-      {
-
-        // check client window id
-        if( !client().windowId() ) break;
-        client().widget()->setFocus();
-        if( client().decoration() )
-        { client().decoration()->performWindowOperation( KDecorationDefines::ResizeOp ); }
-
+    case Qt::LeftButton:
+      if (rect().contains(event->pos())) {
+          // check client window id
+          if (!client().windowId())
+              break;
+          client().widget()->setFocus();
+          if (client().decoration()) {
+              client().decoration()->performWindowOperation(
+                  KDecorationDefines::ResizeOp);
+          }
       }
       break;
-
-      default: break;
-
+    default:
+        break;
     }
-
     return;
+}
 
-  }
-
-  //_______________________________________________________________________________
-  void QtCurveSizeGrip::updatePosition( void )
-  {
-
-    QPoint position(
-      client().width() - GRIP_SIZE - OFFSET,
-      client().height() - GRIP_SIZE - OFFSET );
-
+void
+QtCurveSizeGrip::updatePosition()
+{
+    QPoint position(client().width() - GRIP_SIZE - OFFSET,
+                    client().height() - GRIP_SIZE - OFFSET);
 #if KDE_IS_VERSION(4, 3, 0)
-    if( client().isPreview() )
-    {
-
+    if (client().isPreview()) {
       position -= QPoint(
-        client().layoutMetric( QtCurveClient::LM_BorderRight )+
-        client().layoutMetric( QtCurveClient::LM_OuterPaddingRight ),
-        client().layoutMetric( QtCurveClient::LM_OuterPaddingBottom )+
-        client().layoutMetric( QtCurveClient::LM_BorderBottom )
-        );
-
+        client().layoutMetric(QtCurveClient::LM_BorderRight) +
+        client().layoutMetric(QtCurveClient::LM_OuterPaddingRight),
+        client().layoutMetric(QtCurveClient::LM_OuterPaddingBottom) +
+        client().layoutMetric(QtCurveClient::LM_BorderBottom));
     } else {
 #endif
-      position -= QPoint(
-        client().layoutMetric( QtCurveClient::LM_BorderRight ),
-        client().layoutMetric( QtCurveClient::LM_BorderBottom ) );
+        position -= QPoint(
+            client().layoutMetric(QtCurveClient::LM_BorderRight),
+            client().layoutMetric(QtCurveClient::LM_BorderBottom));
 #if KDE_IS_VERSION(4, 3, 0)
     }
 #endif
-
     move( position );
-
-  }
-
+}
 }

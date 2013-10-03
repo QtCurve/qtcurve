@@ -133,6 +133,7 @@ qtcWMMoveTrigger(GtkWidget *w, int x, int y)
     qtcX11CallVoid(send_event, false, qtcX11RootWindow(),
                    XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY |
                    XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT, (const char*)xev);
+    qtcX11Flush();
     qtcWMMoveDragEnd(w);
 }
 

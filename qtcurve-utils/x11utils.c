@@ -18,6 +18,8 @@
  *   51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.              *
  ***************************************************************************/
 
+// TODO multi screen?
+
 #include "x11utils.h"
 #include "x11shadow_p.h"
 
@@ -167,4 +169,59 @@ qtcX11SetWMClass(xcb_window_t win, const char *wmclass, size_t len)
                    qtc_x11_atoms[QTC_X11_ATOM_WM_CLASS], XCB_ATOM_STRING,
                    8, len, wmclass);
     qtcX11Flush();
+}
+
+QTC_EXPORT int32_t
+qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom)
+{
+    int32_t res = -1;
+    xcb_get_property_reply_t *reply =
+        qtcX11Call(get_property, 0, win, atom, XCB_ATOM_CARDINAL, 0, 1);
+    if (xcb_get_property_value_length(reply) > 0) {
+        uint32_t val = *(int32_t*)xcb_get_property_value(reply);
+        if (val < 512) {
+            res = val;
+        }
+    }
+    if (qtcLikely(reply))
+        free(reply);
+    return res;
+}
+
+QTC_EXPORT void
+qtcX11MapRaised(xcb_window_t win)
+{
+    static const uint32_t val = XCB_STACK_MODE_ABOVE;
+    qtcX11CallVoid(configure_window, win, XCB_CONFIG_WINDOW_STACK_MODE, &val);
+    qtcX11CallVoid(map_window, win);
+}
+
+QTC_EXPORT boolean
+qtcX11CompositingActive()
+{
+    xcb_get_selection_owner_reply_t *reply =
+        qtcX11Call(get_selection_owner,
+                   qtc_x11_atoms[QTC_X11_ATOM_NET_WM_CM_S_DEFAULT]);
+    boolean res = false;
+    if (reply) {
+        res = reply->owner != 0;
+        free(reply);
+    }
+    return res;
+}
+
+QTC_EXPORT boolean
+qtcX11HasAlpha(xcb_window_t win)
+{
+    if (!qtcX11CompositingActive())
+        return false;
+    if (!win)
+        return true;
+    xcb_get_geometry_reply_t *reply = qtcX11Call(get_geometry, win);
+    boolean res = false;
+    if (reply) {
+        res = reply->depth == 32;
+        free(reply);
+    }
+    return res;
 }
