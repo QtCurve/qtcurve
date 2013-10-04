@@ -111,6 +111,8 @@ void getBgndSettings(WId wId, EAppearance &app, QColor &col)
     auto reply = qtcX11Call(get_property, 0, wId,
                             qtc_x11_atoms[QTC_X11_ATOM_QTC_BGND],
                             XCB_ATOM_CARDINAL, 0, 1);
+    if (!reply)
+        return;
     if (xcb_get_property_value_length(reply) > 0) {
         uint32_t val = *(int32_t*)xcb_get_property_value(reply);
         app = (EAppearance)(val&0xFF);
@@ -118,9 +120,7 @@ void getBgndSettings(WId wId, EAppearance &app, QColor &col)
                    (val & 0x0000FF00) >> 8);
 
     }
-    if (qtcLikely(reply)) {
-        free(reply);
-    }
+    free(reply);
 }
 
 static QPainterPath createPath(const QRectF &r, double radiusTop, double radiusBot)

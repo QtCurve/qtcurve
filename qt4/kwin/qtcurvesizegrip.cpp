@@ -100,7 +100,7 @@ QtCurveSizeGrip::embed()
         WId current = window_id;
         while (true) {
             auto reply = qtcX11Call(query_tree, current);
-            if (reply->parent && reply->parent != reply->root &&
+            if (reply && reply->parent && reply->parent != reply->root &&
                 reply->parent != current) {
                 current = reply->parent;
             } else {

@@ -177,14 +177,15 @@ qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom)
     int32_t res = -1;
     xcb_get_property_reply_t *reply =
         qtcX11Call(get_property, 0, win, atom, XCB_ATOM_CARDINAL, 0, 1);
+    if (!reply)
+        return -1;
     if (xcb_get_property_value_length(reply) > 0) {
         uint32_t val = *(int32_t*)xcb_get_property_value(reply);
         if (val < 512) {
             res = val;
         }
     }
-    if (qtcLikely(reply))
-        free(reply);
+    free(reply);
     return res;
 }
 
@@ -202,11 +203,10 @@ qtcX11CompositingActive()
     xcb_get_selection_owner_reply_t *reply =
         qtcX11Call(get_selection_owner,
                    qtc_x11_atoms[QTC_X11_ATOM_NET_WM_CM_S_DEFAULT]);
-    boolean res = false;
-    if (reply) {
-        res = reply->owner != 0;
-        free(reply);
-    }
+    if (!reply)
+        return false;
+    boolean res = (reply->owner != 0);
+    free(reply);
     return res;
 }
 
@@ -218,10 +218,9 @@ qtcX11HasAlpha(xcb_window_t win)
     if (!win)
         return true;
     xcb_get_geometry_reply_t *reply = qtcX11Call(get_geometry, win);
-    boolean res = false;
-    if (reply) {
-        res = reply->depth == 32;
-        free(reply);
-    }
+    if (!reply)
+        return false;
+    boolean res = (reply->depth == 32);
+    free(reply);
     return res;
 }
