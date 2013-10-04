@@ -1710,7 +1710,6 @@ void Style::polish(QPalette &palette)
 static inline void
 setTranslucentBackground(QWidget *widget)
 {
-    qtcDebug("add Qt::WA_TranslucentBackground: %p\n", widget);
     widget->setAttribute(Qt::WA_TranslucentBackground);
 }
 
@@ -1768,86 +1767,105 @@ Style::polish(QWidget *widget)
 
     // Sometimes get background errors with QToolBox (e.g. in Bespin config), and setting WA_StyledBackground seems to
     // fix this,..
-    if(CUSTOM_BGND || FRAME_SHADED==opts.groupBox || FRAME_FADED==opts.groupBox)
-    {
-        switch (widget->windowFlags() & Qt::WindowType_Mask)
-        {
-            case Qt::Window:
-            case Qt::Dialog:
-            {
-                // For non-transparent widgets, only need to set WA_StyledBackground - and PE_Widget will be called to
-                // render background...
-                widget->setAttribute(Qt::WA_StyledBackground);
+    if (CUSTOM_BGND || FRAME_SHADED == opts.groupBox ||
+        FRAME_FADED == opts.groupBox) {
+        switch (widget->windowFlags() & Qt::WindowType_Mask) {
+        case Qt::Window:
+        case Qt::Dialog: {
+            // For non-transparent widgets, only need to set
+            // WA_StyledBackground - and PE_Widget will be called to
+            // render background...
+            widget->setAttribute(Qt::WA_StyledBackground);
 
-                // Hack: stop here if application is of type Plasma
-                /*
-                Right now we need to reject window candidates if the application is of type plasma
-                because it conflicts with some widgets embedded into the SysTray. Ideally one would
-                rather find a "generic" reason, not to handle them
-                */
-                if(APP_PLASMA==theThemedApp && !widget->inherits("QDialog"))
-                    break;
-
-#ifdef Q_WS_X11
-                Utils::addEventFilter(widget, this);
-#endif
-                int  opacity=Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask) ? opts.dlgOpacity : opts.bgndOpacity;
+            // Hack: stop here if application is of type Plasma
+            /*
+              Right now we need to reject window candidates if the application
+              is of type plasma because it conflicts with some widgets embedded
+              into the SysTray. Ideally one would rather find a "generic" reason,
+              not to handle them
+              TODO: maybe it is because of xembed.
+            */
+            if (APP_PLASMA == theThemedApp && !widget->inherits("QDialog"))
+                break;
 
 #ifdef Q_WS_X11
-                if (APP_KONSOLE == theThemedApp && 100 != opacity &&
-                    widget->testAttribute(Qt::WA_TranslucentBackground) &&
-                    widget->inherits("Konsole::MainWindow")) {
-                    // Background translucency does not work for konsole :-(
-                    // So, just set titlebar opacity...
-                    setOpacityProp(widget, (unsigned short)opacity);
-                    break;
-                } else
+            Utils::addEventFilter(widget, this);
 #endif
-                if(100==opacity || !widget->isWindow() || Qt::Desktop==widget->windowType() || widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
-                   widget->testAttribute(Qt::WA_TranslucentBackground) || widget->testAttribute(Qt::WA_NoSystemBackground) ||
-                   widget->testAttribute(Qt::WA_PaintOnScreen) || widget->inherits("KScreenSaver") || widget->inherits( "QTipLabel") ||
-                   widget->inherits( "QSplashScreen") || widget->windowFlags().testFlag(Qt::FramelessWindowHint) ||
-                   !(widget->testAttribute(Qt::WA_WState_Created) || widget->internalWinId()))
+            int opacity =
+                (Qt::Dialog == (widget->windowFlags() & Qt::WindowType_Mask) ?
+                 opts.dlgOpacity : opts.bgndOpacity);
+
+#ifdef Q_WS_X11
+            if (APP_KONSOLE == theThemedApp && 100 != opacity &&
+                widget->testAttribute(Qt::WA_TranslucentBackground) &&
+                widget->inherits("Konsole::MainWindow")) {
+                // Background translucency does not work for konsole :-(
+                // So, just set titlebar opacity...
+                setOpacityProp(widget, (unsigned short)opacity);
+                break;
+            } else
+#endif
+                if (100 == opacity || !widget->isWindow() ||
+                    Qt::Desktop == widget->windowType() ||
+                    widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
+                    widget->testAttribute(Qt::WA_TranslucentBackground) ||
+                    widget->testAttribute(Qt::WA_NoSystemBackground) ||
+                    widget->testAttribute(Qt::WA_PaintOnScreen) ||
+                    widget->inherits("KScreenSaver") ||
+                    widget->inherits("QTipLabel") ||
+                    widget->inherits("QSplashScreen") ||
+                    widget->windowFlags().testFlag(Qt::FramelessWindowHint) ||
+                    !(widget->testAttribute(Qt::WA_WState_Created) ||
+                      widget->internalWinId())) {
                     break;
 
-                // whenever you set the translucency flag, Qt will create a new widget under the hood, replacing the old
-                // ...unfortunately some properties are lost, among them the window icon.
-                QIcon icon(widget->windowIcon());
+            // whenever you set the translucency flag, Qt will
+            // create a new widget under the hood, replacing the old
+            // ...unfortunately some properties are lost, among them the
+            // window icon.
+            QIcon icon(widget->windowIcon());
 
-                setTranslucentBackground(widget);
-                widget->setWindowIcon(icon);
-                // WORKAROUND: somehow the window gets repositioned to <1,<1 and thus always appears in the upper left corner
-                // we just move it faaaaar away so kwin will take back control and apply smart placement or whatever
-                if(!widget->isVisible())
-                {
-                    QWidget *pw=Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask)
-                                        ? widget->parentWidget()
-                                            ? widget->parentWidget()->topLevelWidget()
-                                            : QApplication::activeWindow()
-                                        : 0L;
+            setTranslucentBackground(widget);
+            widget->setWindowIcon(icon);
+            // WORKAROUND: somehow the window gets repositioned to <1, <1 and
+            // thus always appears in the upper left corner. We just move it
+            // faaaaar away so kwin will take back control and apply smart
+            // placement or whatever
+            if (!widget->isVisible()) {
+                QWidget *pw =
+                    Qt::Dialog == (widget->windowFlags() & Qt::WindowType_Mask) ?
+                    widget->parentWidget() ?
+                    widget->parentWidget()->topLevelWidget() :
+                    QApplication::activeWindow() : 0L;
 
-                    if(pw && pw!=widget)
-                    {
-                        widget->adjustSize();
-                        widget->move(pw->pos()+QPoint((pw->size().width()-widget->size().width())/2,
-                                                      (pw->size().height()-widget->size().height())/2));
-                    }
-                    else
-                        widget->move(900000, 900000);
+                if (pw && pw != widget) {
+                    widget->adjustSize();
+                    widget->move(pw->pos() +
+                                 QPoint((pw->size().width() -
+                                         widget->size().width()) / 2,
+                                        (pw->size().height() -
+                                         widget->size().height()) / 2));
+                } else {
+                    widget->move(900000, 900000);
                 }
-
-                // PE_Widget is not called for transparent widgets, so need event filter here...
-                Utils::addEventFilter(widget, this);
-                itsTransparentWidgets.insert(widget);
-                connect(widget, SIGNAL(destroyed(QObject *)), SLOT(widgetDestroyed(QObject *)));
-                break;
             }
-            case Qt::Popup: // we currently don't want that kind of gradient on menus etc
-            case Qt::Tool: // this we exclude as it is used for dragging of icons etc
-            default:
-                break;
+
+            // PE_Widget is not called for transparent widgets,
+            // so need event filter here...
+            Utils::addEventFilter(widget, this);
+            itsTransparentWidgets.insert(widget);
+            connect(widget, SIGNAL(destroyed(QObject *)),
+                    SLOT(widgetDestroyed(QObject *)));
+            break;
         }
-        if(qobject_cast<QSlider *>(widget))
+        case Qt::Popup:
+            // we currently don't want that kind of gradient on menus etc
+        case Qt::Tool:
+            // this we exclude as it is used for dragging of icons etc
+        default:
+            break;
+        }
+        if (qobject_cast<QSlider *>(widget))
             widget->setBackgroundRole(QPalette::NoRole);
 
         if (widget->autoFillBackground() && widget->parentWidget() &&
@@ -2078,12 +2096,16 @@ Style::polish(QWidget *widget)
         Utils::addEventFilter(widget, this);
     }
 #endif
-    else if((!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) &&
-             widget->inherits("QComboBoxPrivateContainer") && !widget->testAttribute(Qt::WA_TranslucentBackground))
+    else if ((!IS_FLAT_BGND(opts.menuBgndAppearance) ||
+              100 != opts.menuBgndOpacity ||
+              !(opts.square & SQUARE_POPUP_MENUS)) &&
+             widget->inherits("QComboBoxPrivateContainer") &&
+             !widget->testAttribute(Qt::WA_TranslucentBackground)) {
         setTranslucentBackground(widget);
+    }
 
-    if(widget->inherits("QTipLabel") && !IS_FLAT(opts.tooltipAppearance) && APP_OPERA!=theThemedApp)
-    {
+    if (widget->inherits("QTipLabel") && !IS_FLAT(opts.tooltipAppearance) &&
+        APP_OPERA != theThemedApp) {
         widget->setBackgroundRole(QPalette::NoRole);
         setTranslucentBackground(widget);
     }
@@ -2135,14 +2157,17 @@ Style::polish(QWidget *widget)
         //   QLatin1String("QtCurvePreview") ==
         //   widget->parentWidget()->objectName())
         ) {
-        if(!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS))
-        {
+        if (!IS_FLAT_BGND(opts.menuBgndAppearance) ||
+            100 != opts.menuBgndOpacity ||
+            !(opts.square & SQUARE_POPUP_MENUS)) {
             Utils::addEventFilter(widget, this);
-            if((100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) && !widget->testAttribute(Qt::WA_TranslucentBackground))
+            if ((100 != opts.menuBgndOpacity ||
+                 !(opts.square & SQUARE_POPUP_MENUS)) &&
+                !widget->testAttribute(Qt::WA_TranslucentBackground)) {
                 setTranslucentBackground(widget);
+            }
         }
-        if(USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu)
-        {
+        if (USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu) {
             QPalette pal(widget->palette());
 
             pal.setBrush(QPalette::Active, QPalette::Window, popupMenuCols()[ORIGINAL_SHADE]);
@@ -2154,12 +2179,15 @@ Style::polish(QWidget *widget)
         }
     }
 
-    if((!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) &&
-        widget->inherits("QComboBoxPrivateContainer"))
-    {
+    if ((!IS_FLAT_BGND(opts.menuBgndAppearance) ||
+         100 != opts.menuBgndOpacity || !(opts.square & SQUARE_POPUP_MENUS)) &&
+        widget->inherits("QComboBoxPrivateContainer")) {
         Utils::addEventFilter(widget, this);
-        if((100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) && !widget->testAttribute(Qt::WA_TranslucentBackground))
+        if ((100 != opts.menuBgndOpacity ||
+             !(opts.square & SQUARE_POPUP_MENUS)) &&
+            !widget->testAttribute(Qt::WA_TranslucentBackground)) {
             setTranslucentBackground(widget);
+        }
     }
 
     bool parentIsToolbar(false);
@@ -2606,23 +2634,21 @@ void Style::unpolish(QWidget *widget)
                 widget->setPalette(QApplication::palette());
         }
 
-    if(qobject_cast<QMenu *>(widget))
-    {
-        qtcDebug("remove Qt::WA_TranslucentBackground: %p\n", widget);
+    if (qobject_cast<QMenu*>(widget)) {
         widget->removeEventFilter(this);
         widget->setAttribute(Qt::WA_PaintOnScreen, false);
         widget->setAttribute(Qt::WA_NoSystemBackground, false);
         widget->setAttribute(Qt::WA_TranslucentBackground, false);
         widget->clearMask();
 
-        if(USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu)
+        if (USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu) {
             widget->setPalette(QApplication::palette());
+        }
     }
 
-    if((!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) &&
-        widget->inherits("QComboBoxPrivateContainer"))
-    {
-        qtcDebug("remove Qt::WA_TranslucentBackground: %p\n", widget);
+    if ((!IS_FLAT_BGND(opts.menuBgndAppearance) ||
+         100 != opts.menuBgndOpacity || !(opts.square & SQUARE_POPUP_MENUS)) &&
+        widget->inherits("QComboBoxPrivateContainer")) {
         widget->removeEventFilter(this);
         widget->setAttribute(Qt::WA_PaintOnScreen, false);
         widget->setAttribute(Qt::WA_NoSystemBackground, false);
@@ -13575,7 +13601,6 @@ int Style::getFrameRound(const QWidget *widget) const
 void Style::unregisterArgbWidget(QWidget *w)
 {
     if (itsTransparentWidgets.contains(w)) {
-        qtcDebug("remove Qt::WA_TranslucentBackground: %p\n", w);
         w->setAttribute(Qt::WA_NoSystemBackground, false);
         w->setAttribute(Qt::WA_TranslucentBackground, false);
     }

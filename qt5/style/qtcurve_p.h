@@ -157,7 +157,6 @@ void setSbProp(QWidget *w);
 static inline void
 setTranslucentBackground(QWidget *widget)
 {
-    qtcDebug("add Qt::WA_TranslucentBackground: %p\n", widget);
     widget->setAttribute(Qt::WA_TranslucentBackground);
 }
 

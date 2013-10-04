@@ -1084,9 +1084,7 @@ void Style::unpolish(QWidget *widget)
                 widget->setPalette(QApplication::palette());
         }
 
-    if(qobject_cast<QMenu *>(widget))
-    {
-        qtcDebug("remove Qt::WA_TranslucentBackground: %p\n", widget);
+    if (qobject_cast<QMenu*>(widget)) {
         widget->removeEventFilter(this);
         widget->setAttribute(Qt::WA_PaintOnScreen, false);
         widget->setAttribute(Qt::WA_NoSystemBackground, false);
@@ -1098,9 +1096,7 @@ void Style::unpolish(QWidget *widget)
     }
 
     if((!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) &&
-       widget->inherits("QComboBoxPrivateContainer"))
-    {
-        qtcDebug("remove Qt::WA_TranslucentBackground: %p\n", widget);
+       widget->inherits("QComboBoxPrivateContainer")) {
         widget->removeEventFilter(this);
         widget->setAttribute(Qt::WA_PaintOnScreen, false);
         widget->setAttribute(Qt::WA_NoSystemBackground, false);

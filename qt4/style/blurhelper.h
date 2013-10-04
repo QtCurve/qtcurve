@@ -135,9 +135,6 @@ private:
 bool
 BlurHelper::isTransparent(const QWidget *widget) const
 {
-    qtcDebug("%p, TranslucentBackground: %d, hasAlphaChannel: %d\n",
-             widget, widget->testAttribute(Qt::WA_TranslucentBackground),
-             Utils::hasAlphaChannel(widget));
     return (widget->isWindow() &&
             widget->testAttribute(Qt::WA_TranslucentBackground) &&
             // widgets using qgraphicsview
