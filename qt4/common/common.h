@@ -25,9 +25,6 @@
 #include <qtcurve-utils/shade.h>
 #include <qtcurve-utils/utils.h>
 
-#define MAKE_VERSION(a, b) (((a) << 16) | ((b) << 8))
-#define MAKE_VERSION3(a, b, c) (((a) << 16) | ((b) << 8) | (c))
-
 /*
     The following #define disables the rounding when scrollbar type==none.
 #define SIMPLE_SCROLLBARS
@@ -209,7 +206,7 @@ enum {
 
 #define USE_LIGHTER_POPUP_MENU (opts.lighterPopupMenuBgnd)
 #define USE_BORDER(B)          (GB_SHINE!=(B) && GB_NONE!=(B))
-#define DRAW_MENU_BORDER       (APPEARANCE_FLAT!=opts.menuBgndAppearance && opts.version>=MAKE_VERSION(1,7) && \
+#define DRAW_MENU_BORDER       (APPEARANCE_FLAT!=opts.menuBgndAppearance && opts.version>=qtcMakeVersion(1,7) && \
                                 USE_BORDER(qtcGetGradient(opts.menuBgndAppearance, &opts)->border))
 
 #define USE_GLOW_FOCUS(mouseOver) (FOCUS_GLOW==opts.focus && (MO_GLOW!=opts.coloredMouseOver || !(mouseOver)))

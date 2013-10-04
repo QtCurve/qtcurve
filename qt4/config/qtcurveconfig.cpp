@@ -75,7 +75,7 @@
 #include <common/config_file.h>
 
 #define EXTENSION                  ".qtcurve"
-#define VERSION_WITH_KWIN_SETTINGS MAKE_VERSION(1, 5)
+#define VERSION_WITH_KWIN_SETTINGS qtcMakeVersion(1, 5)
 
 #define THEME_IMAGE_PREFIX "style"
 #define BGND_FILE "-bgnd"
@@ -2655,10 +2655,6 @@ void QtCurveConfig::deletePreset()
     }
 }
 
-#ifndef MAKE_VERSION
-#define MAKE_VERSION(a, b) (((a) << 16) | ((b) << 8))
-#endif
-
 void QtCurveConfig::importPreset()
 {
     QString file(KFileDialog::getOpenFileName(
@@ -2768,7 +2764,7 @@ void QtCurveConfig::importPreset()
                             KConfigGroup grp(&cfg, SETTINGS_GROUP);
                             QStringList  ver(grp.readEntry("version", QString()).split('.'));
 
-                            if(3==ver.count() && MAKE_VERSION(ver[0].toInt(), ver[1].toInt())>=VERSION_WITH_KWIN_SETTINGS)
+                            if(3==ver.count() && qtcMakeVersion(ver[0].toInt(), ver[1].toInt())>=VERSION_WITH_KWIN_SETTINGS)
                                 kwin->load(&cfg);
                         }
                         readyForPreview=true;

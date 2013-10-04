@@ -327,8 +327,8 @@ static int getMozillaVersion(int pid)
                             break;
                         }
                     ver=major && minor
-                        ? MAKE_VERSION(strtol(major, NULL, 10), strtol(minor, NULL, 10))
-                        : MAKE_VERSION(dot[-1]-'0', 0);
+                        ? qtcMakeVersion(strtol(major, NULL, 10), strtol(minor, NULL, 10))
+                        : qtcMakeVersion(dot[-1]-'0', 0);
                 }
             }
         }
@@ -2081,7 +2081,7 @@ gboolean qtSettingsInit()
 
                     mozVersion=getMozillaVersion(getpid());
 #ifdef QTC_GTK2_MODIFY_MOZILLA
-                    if(mozVersion<MAKE_VERSION(3, 0) && !opts.gtkButtonOrder)
+                    if(mozVersion<qtcMakeVersion(3, 0) && !opts.gtkButtonOrder)
                        add_btn_css=TRUE;
 #endif
 
@@ -2089,8 +2089,8 @@ gboolean qtSettingsInit()
                         printf(DEBUG_PREFIX"Mozilla app version:%X\n", mozVersion);
                     if(firefox)
                     {
-                        processMozillaApp(mozVersion<MAKE_VERSION(3, 5) && !opts.gtkButtonOrder, add_menu_colors, "firefox", TRUE);
-                        if(mozVersion>=MAKE_VERSION(3, 5) && 0==strcmp(qtSettings.appName, "firefox-3.5"))
+                        processMozillaApp(mozVersion<qtcMakeVersion(3, 5) && !opts.gtkButtonOrder, add_menu_colors, "firefox", TRUE);
+                        if(mozVersion>=qtcMakeVersion(3, 5) && 0==strcmp(qtSettings.appName, "firefox-3.5"))
                             processMozillaApp(FALSE, add_menu_colors, "firefox-3.5", TRUE);
                     }
                     else if(thunderbird)
@@ -2104,10 +2104,10 @@ gboolean qtSettingsInit()
                                     ? GTK_APP_NEW_MOZILLA :
 #endif
                                     GTK_APP_MOZILLA;
-                    if(GTK_APP_MOZILLA==qtSettings.app && mozVersion>MAKE_VERSION(2, 0))
+                    if(GTK_APP_MOZILLA==qtSettings.app && mozVersion>qtcMakeVersion(2, 0))
                         qtSettings.app=GTK_APP_NEW_MOZILLA;
                     if(GTK_APP_NEW_MOZILLA!=qtSettings.app && APPEARANCE_FADE==opts.menuitemAppearance &&
-                       (thunderbird || mozThunderbird || (seamonkey && mozVersion<MAKE_VERSION(2, 0))))
+                       (thunderbird || mozThunderbird || (seamonkey && mozVersion<qtcMakeVersion(2, 0))))
                         opts.menuitemAppearance=APPEARANCE_FLAT;
                 }
                 else if(0==strcmp(qtSettings.appName, "soffice.bin"))
@@ -2201,7 +2201,7 @@ gboolean qtSettingsInit()
                 opts.menuBgndOpacity=100, qtSettings.useAlpha=false;
 
             /* Disable usage of alpha channel for older configs, unless app is uing opacity... */
-            if(qtSettings.useAlpha && opts.version<MAKE_VERSION3(1, 7, 2) && 100==opts.menuBgndOpacity && 100==opts.dlgOpacity && 100==opts.bgndOpacity)
+            if(qtSettings.useAlpha && opts.version<qtcMakeVersion(1, 7, 2) && 100==opts.menuBgndOpacity && 100==opts.dlgOpacity && 100==opts.bgndOpacity)
                 qtSettings.useAlpha=false;
 
 #ifdef QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT

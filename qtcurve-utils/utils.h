@@ -37,6 +37,16 @@ typedef int32_t boolean;
 #  endif
 #endif
 
+static inline int
+_qtcMakeVersionReal(int a, int b, int c)
+{
+    return a << 16 | b << 8 | c;
+}
+#define _qtcMakeVersionV(a, b, c, ...)          \
+    _qtcMakeVersionReal(a, b, c)
+#define qtcMakeVersion(a, b, arg...)            \
+    _qtcMakeVersionV(a, b, ##arg, 0)
+
 typedef struct {
     int len;
     int width;

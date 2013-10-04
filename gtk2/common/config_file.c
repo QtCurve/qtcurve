@@ -1027,7 +1027,7 @@ static int readVersionEntry(QtCConfig &cfg, const QString &key)
     int           major, minor, patch;
 
     return !val.isEmpty() && 3==sscanf(TO_LATIN1(val), "%d.%d.%d", &major, &minor, &patch)
-            ? MAKE_VERSION3(major, minor, patch)
+            ? qtcMakeVersion(major, minor, patch)
             : 0;
 }
 
@@ -1184,7 +1184,7 @@ static int readVersionEntry(GHashTable *cfg, char *key)
     int  major, minor, patch;
 
     return str && 3==sscanf(str, "%d.%d.%d", &major, &minor, &patch)
-            ? MAKE_VERSION3(major, minor, patch)
+            ? qtcMakeVersion(major, minor, patch)
             : 0;
 }
 
@@ -1799,7 +1799,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
 #endif
 
             /* Check if the config file expects old default values... */
-            if(opts->version<MAKE_VERSION(1, 6))
+            if(opts->version<qtcMakeVersion(1, 6))
             {
                 bool framelessGroupBoxes=readBoolEntry(cfg, "framelessGroupBoxes", true),
                      groupBoxLine=readBoolEntry(cfg, "groupBoxLine", true);
@@ -1815,7 +1815,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                 CFG_READ_INT(gbLabel)
             }
 
-            if(opts->version<MAKE_VERSION(1, 5))
+            if(opts->version<qtcMakeVersion(1, 5))
             {
                 opts->windowBorder=
                     (readBoolEntry(cfg, "colorTitlebarOnly", def->windowBorder&WINDOW_BORDER_COLOR_TITLEBAR_ONLY)
@@ -1828,13 +1828,13 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             else
                 CFG_READ_INT(windowBorder);
 
-            if(opts->version<MAKE_VERSION(1, 7))
+            if(opts->version<qtcMakeVersion(1, 7))
             {
                 opts->windowBorder|=WINDOW_BORDER_FILL_TITLEBAR;
                 def->square=SQUARE_POPUP_MENUS;
             }
 
-            if(opts->version<MAKE_VERSION(1, 4))
+            if(opts->version<qtcMakeVersion(1, 4))
             {
                 opts->square=
                     (readBoolEntry(cfg, "squareLvSelection", def->square&SQUARE_LISTVIEW_SELECTION) ? SQUARE_LISTVIEW_SELECTION : SQUARE_NONE)+
@@ -1844,7 +1844,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             }
             else
                 CFG_READ_INT(square)
-            if(opts->version<MAKE_VERSION(1, 7))
+            if(opts->version<qtcMakeVersion(1, 7))
             {
                 def->tbarBtns=TBTN_STANDARD;
                 opts->thin=(readBoolEntry(cfg, "thinnerMenuItems", def->thin&THIN_MENU_ITEMS) ? THIN_MENU_ITEMS : 0)+
@@ -1854,13 +1854,13 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             {
                 CFG_READ_INT(thin)
             }
-            if(opts->version<MAKE_VERSION(1, 6))
+            if(opts->version<qtcMakeVersion(1, 6))
                 opts->square|=SQUARE_TOOLTIPS;
-            if(opts->version<MAKE_VERSION3(1, 6, 1))
+            if(opts->version<qtcMakeVersion(1, 6, 1))
                 opts->square|=SQUARE_POPUP_MENUS;
-            if(opts->version<MAKE_VERSION(1, 2))
+            if(opts->version<qtcMakeVersion(1, 2))
                 def->crSize=CR_SMALL_SIZE;
-            if(opts->version<MAKE_VERSION(1, 0))
+            if(opts->version<qtcMakeVersion(1, 0))
             {
                 def->roundAllTabs=false;
                 def->smallRadio=false;
@@ -1875,9 +1875,9 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
 #endif
                 def->inactiveTitlebarAppearance=APPEARANCE_CUSTOM2;
             }
-            if(opts->version<MAKE_VERSION(0, 67))
+            if(opts->version<qtcMakeVersion(0, 67))
                 def->doubleGtkComboArrow=false;
-            if(opts->version<MAKE_VERSION(0, 66))
+            if(opts->version<qtcMakeVersion(0, 66))
             {
                 def->menuStripeAppearance=APPEARANCE_GRADIENT;
                 def->etchEntry=true;
@@ -1888,7 +1888,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                 def->titlebarIcon=TITLEBAR_ICON_MENU_BUTTON;
 #endif
             }
-            if(opts->version<MAKE_VERSION(0, 65))
+            if(opts->version<qtcMakeVersion(0, 65))
             {
                 def->tabMouseOver=TAB_MO_BOTTOM;
                 def->activeTabAppearance=APPEARANCE_FLAT;
@@ -1897,7 +1897,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                 def->borderTab=false;
                 def->thin=0;
             }
-            if(opts->version<MAKE_VERSION(0, 63))
+            if(opts->version<qtcMakeVersion(0, 63))
             {
                 def->tabMouseOver=TAB_MO_TOP;
                 def->sliderStyle=SLIDER_TRIANGULAR;
@@ -1905,7 +1905,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                 def->titlebarAlignment=ALIGN_LEFT;
 #endif
             }
-            if(opts->version<MAKE_VERSION(0, 62))
+            if(opts->version<qtcMakeVersion(0, 62))
             {
                 def->titlebarAppearance=APPEARANCE_GRADIENT;
                 def->inactiveTitlebarAppearance=APPEARANCE_GRADIENT;
@@ -1924,7 +1924,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                 def->sunkenAppearance=APPEARANCE_INVERTED;
                 def->focus=FOCUS_FILLED;
             }
-            if(opts->version<MAKE_VERSION(0, 61))
+            if(opts->version<qtcMakeVersion(0, 61))
             {
                 def->coloredMouseOver=MO_PLASTIK;
                 def->buttonEffect=EFFECT_NONE;
@@ -1963,7 +1963,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_INT(tabBgnd)
             CFG_READ_TB_BORDER(toolbarBorders)
             CFG_READ_APPEARANCE(appearance, APP_ALLOW_BASIC)
-            if(opts->version<MAKE_VERSION(1, 8))
+            if(opts->version<qtcMakeVersion(1, 8))
             {
                 opts->tbarBtnAppearance=APPEARANCE_NONE;
                 opts->tbarBtnEffect=EFFECT_NONE;
@@ -1979,7 +1979,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_INT_BOOL(lighterPopupMenuBgnd, def->lighterPopupMenuBgnd)
             CFG_READ_APPEARANCE_PIXMAP(menuBgndAppearance, APP_ALLOW_STRIPED, &(opts->menuBgndPixmap), checkImages)
 
-            if(APPEARANCE_FLAT==opts->menuBgndAppearance && 0==opts->lighterPopupMenuBgnd && opts->version<MAKE_VERSION(1, 7))
+            if(APPEARANCE_FLAT==opts->menuBgndAppearance && 0==opts->lighterPopupMenuBgnd && opts->version<qtcMakeVersion(1, 7))
                 opts->menuBgndAppearance=APPEARANCE_RAISED;
 
 #ifdef QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
@@ -2018,7 +2018,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_BOOL(useHighlightForMenu)
             CFG_READ_BOOL(shadeMenubarOnlyWhenActive)
             CFG_READ_TBAR_BTN(tbarBtns)
-            if(opts->version<MAKE_VERSION(0, 63))
+            if(opts->version<qtcMakeVersion(0, 63))
             {
                 if(IS_BLACK(opts->customSlidersColor))
                     CFG_READ_COLOR(customSlidersColor)
@@ -2040,14 +2040,14 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_APPEARANCE(grooveAppearance, APP_ALLOW_BASIC)
             CFG_READ_APPEARANCE(sunkenAppearance, APP_ALLOW_BASIC)
             CFG_READ_APPEARANCE(sbarBgndAppearance, APP_ALLOW_BASIC)
-            if(opts->version<MAKE_VERSION(1, 6))
+            if(opts->version<qtcMakeVersion(1, 6))
                 opts->tooltipAppearance=APPEARANCE_FLAT;
             else
             {
                 CFG_READ_APPEARANCE(tooltipAppearance, APP_ALLOW_BASIC)
             }
 
-            if(opts->version<MAKE_VERSION(0, 63))
+            if(opts->version<qtcMakeVersion(0, 63))
                 opts->sliderFill=IS_FLAT(opts->appearance) ? opts->grooveAppearance : APPEARANCE_GRADIENT;
             else
             {
@@ -2114,7 +2114,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_INT(dlgOpacity)
             CFG_READ_SHADE(menuStripe, true, true, &opts->customMenuStripeColor)
             CFG_READ_APPEARANCE(menuStripeAppearance, APP_ALLOW_BASIC)
-            if(opts->version<MAKE_VERSION(0, 63) && IS_BLACK(opts->customMenuStripeColor))
+            if(opts->version<qtcMakeVersion(0, 63) && IS_BLACK(opts->customMenuStripeColor))
                 CFG_READ_COLOR(customMenuStripeColor)
             CFG_READ_SHADE(comboBtn, true, false, &opts->customComboBtnColor);
             CFG_READ_BOOL(gtkScrollViews)
@@ -2171,7 +2171,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_STRING_LIST(noMenuBgndOpacityApps)
             CFG_READ_STRING_LIST(noBgndImageApps)
 #ifdef CONFIG_DIALOG
-            if(opts->version<MAKE_VERSION3(1, 7, 2))
+            if(opts->version<qtcMakeVersion(1, 7, 2))
                 opts->noMenuBgndOpacityApps << "gtk";
 #endif
 #endif
