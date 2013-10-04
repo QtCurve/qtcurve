@@ -52,6 +52,8 @@ static const char *const qtc_x11_atom_names[_QTC_X11_ATOM_NUMBER] = {
     "_QTCURVE_TOGGLE_STATUSBAR_",
     "_QTCURVE_OPACITY_",
     "_QTCURVE_BGND_",
+
+    "_XEMBED_INFO",
 };
 
 QTC_EXPORT xcb_window_t
@@ -221,6 +223,20 @@ qtcX11HasAlpha(xcb_window_t win)
     if (!reply)
         return false;
     boolean res = (reply->depth == 32);
+    free(reply);
+    return res;
+}
+
+QTC_EXPORT boolean
+qtcX11IsEmbed(xcb_window_t win)
+{
+    xcb_atom_t xembed_atom = qtc_x11_atoms[QTC_X11_ATOM_XEMBED_INFO];
+    xcb_get_property_reply_t *reply =
+        qtcX11Call(get_property, 0, win, xembed_atom,
+                   xembed_atom, 0, 1);
+    if (!reply)
+        return false;
+    boolean res = xcb_get_property_value_length(reply) > 0;
     free(reply);
     return res;
 }

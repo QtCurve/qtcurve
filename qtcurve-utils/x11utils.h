@@ -45,6 +45,7 @@ typedef enum {
     QTC_X11_ATOM_QTC_TOGGLE_STATUSBAR,
     QTC_X11_ATOM_QTC_OPACITY,
     QTC_X11_ATOM_QTC_BGND,
+    QTC_X11_ATOM_XEMBED_INFO,
 
     _QTC_X11_ATOM_NUMBER,
 } QtcX11AtomId;
@@ -86,6 +87,7 @@ int32_t qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom);
 void qtcX11MapRaised(xcb_window_t win);
 boolean qtcX11CompositingActive();
 boolean qtcX11HasAlpha(xcb_window_t win);
+boolean qtcX11IsEmbed(xcb_window_t win);
 
 QTC_END_DECLS
 

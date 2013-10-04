@@ -1818,6 +1818,12 @@ Style::polish(QWidget *widget)
                     !(widget->testAttribute(Qt::WA_WState_Created) ||
                       widget->internalWinId())) {
                     break;
+                }
+            // The window has already been created.
+            if (qtcX11IsEmbed(widget->winId())) {
+                qtcDebug("XEmbed Window Found, do not recreate.\n");
+                break;
+            }
 
             // whenever you set the translucency flag, Qt will
             // create a new widget under the hood, replacing the old
