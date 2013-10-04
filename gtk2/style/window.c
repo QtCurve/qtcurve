@@ -123,8 +123,7 @@ qtcWindowClientEvent(GtkWidget *widget, GdkEventClient *event, gpointer data)
 {
     QTC_UNUSED(data);
     if (gdk_x11_atom_to_xatom(event->message_type) ==
-        gdk_x11_get_xatom_by_name_for_display(
-            gtk_widget_get_display(widget), ACTIVE_WINDOW_ATOM)) {
+        qtc_x11_atoms[QTC_X11_ATOM_QTC_ACTIVE_WINDOW]) {
         if (event->data.l[0]) {
             qtcCurrentActiveWindow = widget;
         } else if (qtcCurrentActiveWindow == widget) {
@@ -132,8 +131,7 @@ qtcWindowClientEvent(GtkWidget *widget, GdkEventClient *event, gpointer data)
         }
         gtk_widget_queue_draw(widget);
     } else if (gdk_x11_atom_to_xatom(event->message_type) ==
-               gdk_x11_get_xatom_by_name_for_display(
-                   gtk_widget_get_display(widget), TITLEBAR_SIZE_ATOM)) {
+               qtc_x11_atoms[QTC_X11_ATOM_QTC_TITLEBAR_SIZE]) {
         qtcGetWindowBorderSize(TRUE);
         GtkWidget *menubar = qtcWindowGetMenuBar(widget, 0);
 
@@ -141,14 +139,12 @@ qtcWindowClientEvent(GtkWidget *widget, GdkEventClient *event, gpointer data)
             gtk_widget_queue_draw(menubar);
         }
     } else if (gdk_x11_atom_to_xatom(event->message_type) ==
-               gdk_x11_get_xatom_by_name_for_display(
-                   gtk_widget_get_display(widget), TOGGLE_MENUBAR_ATOM)) {
+               qtc_x11_atoms[QTC_X11_ATOM_QTC_TOGGLE_MENUBAR]) {
         if (opts.menubarHiding & HIDE_KWIN && qtcWindowToggleMenuBar(widget)) {
             gtk_widget_queue_draw(widget);
         }
     } else if (gdk_x11_atom_to_xatom(event->message_type) ==
-               gdk_x11_get_xatom_by_name_for_display(
-                   gtk_widget_get_display(widget), TOGGLE_STATUSBAR_ATOM)) {
+               qtc_x11_atoms[QTC_X11_ATOM_QTC_TOGGLE_STATUSBAR]) {
         if (opts.statusbarHiding & HIDE_KWIN &&
             qtcWindowToggleStatusBar(widget)) {
             gtk_widget_queue_draw(widget);
@@ -402,12 +398,12 @@ qtcWindowToggleMenuBar(GtkWidget *widget)
 gboolean
 qtcWindowSetStatusBarProp(GtkWidget *w)
 {
-    if (w && !g_object_get_data(G_OBJECT(w), STATUSBAR_ATOM)) {
+    if (w && !g_object_get_data(G_OBJECT(w), QTC_STATUSBAR)) {
         GtkWindow *topLevel = GTK_WINDOW(gtk_widget_get_toplevel(w));
         xcb_window_t wid =
             GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel)));
 
-        g_object_set_data(G_OBJECT(w), STATUSBAR_ATOM, (gpointer)1);
+        g_object_set_data(G_OBJECT(w), QTC_STATUSBAR, GINT_TO_POINTER(1));
         qtcX11SetStatusBar(wid);
         qtcX11Flush();
         return TRUE;

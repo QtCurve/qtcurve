@@ -26,8 +26,6 @@
 
 QTC_BEGIN_DECLS
 
-#define QTC_MENUBAR_SIZE "_QTCURVE_MENUBAR_SIZE_"
-
 typedef enum {
     QTC_X11_ATOM_WM_CLASS,
 

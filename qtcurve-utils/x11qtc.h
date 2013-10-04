@@ -23,6 +23,9 @@
 
 #include "x11utils.h"
 
+#define QTC_MENUBAR_SIZE "_QTCURVE_MENUBAR_SIZE_"
+#define QTC_STATUSBAR "_QTCURVE_STATUSBAR_"
+
 static inline void
 qtcX11SetShortProp(xcb_window_t win, xcb_atom_t atom, unsigned short prop)
 {

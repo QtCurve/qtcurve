@@ -19,7 +19,7 @@
  */
 
 #include <qtcurve-utils/gtkutils.h>
-#include <qtcurve-utils/x11utils.h>
+#include <qtcurve-utils/x11qtc.h>
 #include <qtcurve-utils/color.h>
 #include <qtcurve-utils/log.h>
 
