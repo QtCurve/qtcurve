@@ -2463,8 +2463,13 @@ void QtCurveConfig::focusChanged()
 
 void QtCurveConfig::roundChanged()
 {
-    if(ROUND_MAX==round->currentIndex() && FOCUS_LINE!=focus->currentIndex() && !(EFFECT_NONE!=buttonEffect->currentIndex() && FOCUS_GLOW==focus->currentIndex()))
-        focus->setCurrentIndex(EFFECT_NONE==buttonEffect->currentIndex() ? FOCUS_LINE : FOCUS_GLOW);
+    if (ROUND_MAX == round->currentIndex() &&
+        FOCUS_LINE != focus->currentIndex() &&
+        !(EFFECT_NONE != buttonEffect->currentIndex() &&
+          FOCUS_GLOW == focus->currentIndex())) {
+        focus->setCurrentIndex(EFFECT_NONE == buttonEffect->currentIndex() ?
+                               FOCUS_LINE : FOCUS_GLOW);
+    }
 
     if(round->currentIndex()>ROUND_FULL && IND_COLORED==defBtnIndicator->currentIndex())
         defBtnIndicator->setCurrentIndex(IND_TINT);
