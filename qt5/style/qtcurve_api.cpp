@@ -64,46 +64,48 @@
 
 namespace QtCurve {
 
-void Style::polish(QApplication *app)
+void
+Style::polish(QApplication *app)
 {
     // appName = getFile(app->arguments()[0]);
 
     if ("kwin" == appName) {
         theThemedApp = APP_KWIN;
-    } else if("systemsettings"==appName)
-        theThemedApp=APP_SYSTEMSETTINGS;
-    else if("plasma"==appName || appName.startsWith("plasma-"))
-        theThemedApp=APP_PLASMA;
-    else if("krunner"==appName || "krunner_lock"==appName || "kscreenlocker"==appName)
-        theThemedApp=APP_KRUNNER;
-    else if("konqueror"==appName)
-        theThemedApp=APP_KONQUEROR;
-    else if("kontact"==appName)
-        theThemedApp=APP_KONTACT;
-    else if("k3b"==appName)
-        theThemedApp=APP_K3B;
-    else if("skype"==appName)
-        theThemedApp=APP_SKYPE;
-    else if("arora"==appName)
-        theThemedApp=APP_ARORA;
-    else if("rekonq"==appName)
-        theThemedApp=APP_REKONQ;
-    else if("Designer"==QCoreApplication::applicationName())
-        theThemedApp=APP_QTDESIGNER;
-    else if("QtCreator"==QCoreApplication::applicationName())
-        theThemedApp=APP_QTCREATOR;
-    else if("kdevelop"==appName || "kdevelop.bin"==appName)
-        theThemedApp=APP_KDEVELOP;
-    else if("soffice.bin"==appName)
-        theThemedApp=APP_OPENOFFICE;
-    else if("kdmgreet"==appName)
+    } else if ("systemsettings" == appName) {
+        theThemedApp = APP_SYSTEMSETTINGS;
+    } else if ("plasma" == appName || appName.startsWith("plasma-")) {
+        theThemedApp = APP_PLASMA;
+    } else if ("krunner" == appName || "krunner_lock" == appName ||
+               "kscreenlocker" == appName) {
+        theThemedApp = APP_KRUNNER;
+    } else if ("konqueror" == appName) {
+        theThemedApp = APP_KONQUEROR;
+    } else if ("kontact" == appName) {
+        theThemedApp = APP_KONTACT;
+    } else if ("k3b" == appName) {
+        theThemedApp = APP_K3B;
+    } else if("skype" == appName) {
+        theThemedApp = APP_SKYPE;
+    } else if("arora" == appName) {
+        theThemedApp = APP_ARORA;
+    } else if("rekonq" == appName) {
+        theThemedApp = APP_REKONQ;
+    } else if("Designer" == QCoreApplication::applicationName()) {
+        theThemedApp = APP_QTDESIGNER;
+    } else if("QtCreator" == QCoreApplication::applicationName()) {
+        theThemedApp = APP_QTCREATOR;
+    } else if("kdevelop" == appName || "kdevelop.bin" == appName) {
+        theThemedApp = APP_KDEVELOP;
+    } else if("soffice.bin" == appName) {
+        theThemedApp = APP_OPENOFFICE;
+    } else if("kdmgreet" == appName) {
         opts.forceAlternateLvCols=false;
-    else if("konsole"==appName)
-        theThemedApp=APP_KONSOLE;
-    else if("Kde4ToolkitLibrary"==appName)
-        theThemedApp=APP_OPERA;
-
-    if(APP_REKONQ==theThemedApp)
+    } else if("konsole" == appName) {
+        theThemedApp = APP_KONSOLE;
+    } else if("Kde4ToolkitLibrary" == appName) {
+        theThemedApp = APP_OPERA;
+    }
+    if(APP_REKONQ == theThemedApp)
         opts.statusbarHiding=0;
     if(opts.menubarHiding)
         itsSaveMenuBarStatus=opts.menubarApps.contains("kde") || opts.menubarApps.contains(appName);
@@ -111,7 +113,7 @@ void Style::polish(QApplication *app)
         itsSaveStatusBarStatus=opts.statusbarApps.contains("kde") || opts.statusbarApps.contains(appName);
 
     if(!IS_FLAT_BGND(opts.bgndAppearance) && opts.noBgndGradientApps.contains(appName))
-        opts.bgndAppearance=APPEARANCE_FLAT;
+        opts.bgndAppearance = APPEARANCE_FLAT;
     if(IMG_NONE!=opts.bgndImage.type && opts.noBgndImageApps.contains(appName))
         opts.bgndImage.type=IMG_NONE;
     if(SHADE_NONE!=opts.menuStripe && opts.noMenuStripeApps.contains(appName))
@@ -119,7 +121,7 @@ void Style::polish(QApplication *app)
 
 #ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     // Plasma and Kate do not like the 'Fix parentless dialogs' option...
-    if(opts.fixParentlessDialogs && (APP_PLASMA==theThemedApp || opts.noDlgFixApps.contains(appName) || opts.noDlgFixApps.contains("kde")))
+    if(opts.fixParentlessDialogs && (APP_PLASMA == theThemedApp || opts.noDlgFixApps.contains(appName) || opts.noDlgFixApps.contains("kde")))
         opts.fixParentlessDialogs=false;
 #endif
 
@@ -129,15 +131,15 @@ void Style::polish(QApplication *app)
         opts.noMenuBgndOpacityApps.contains(appName))
         opts.menuBgndOpacity = 100;
 
-    if(APP_PLASMA==theThemedApp)
+    if(APP_PLASMA == theThemedApp)
         opts.bgndOpacity=100;
-    else if(APP_KWIN==theThemedApp)
-        opts.bgndOpacity=opts.dlgOpacity=100, opts.bgndAppearance=APPEARANCE_FLAT;
-    else if(APP_OPENOFFICE==theThemedApp)
+    else if(APP_KWIN == theThemedApp)
+        opts.bgndOpacity=opts.dlgOpacity=100, opts.bgndAppearance = APPEARANCE_FLAT;
+    else if(APP_OPENOFFICE == theThemedApp)
     {
         opts.scrollbarType=SCROLLBAR_WINDOWS;
-        if(APPEARANCE_FADE==opts.menuitemAppearance)
-            opts.menuitemAppearance=APPEARANCE_FLAT;
+        if(APPEARANCE_FADE == opts.menuitemAppearance)
+            opts.menuitemAppearance = APPEARANCE_FLAT;
         opts.borderMenuitems=opts.etchEntry=false;
 
         if(opts.useHighlightForMenu && blendOOMenuHighlight(QApplication::palette(), itsHighlightCols[ORIGINAL_SHADE]))
@@ -147,9 +149,9 @@ void Style::polish(QApplication *app)
         }
         opts.menubarHiding=opts.statusbarHiding=HIDE_NONE;
         opts.square|=SQUARE_POPUP_MENUS|SQUARE_TOOLTIPS;
-        if(!IS_FLAT_BGND(opts.menuBgndAppearance) && 0==opts.lighterPopupMenuBgnd)
+        if(!IS_FLAT_BGND(opts.menuBgndAppearance) && 0 == opts.lighterPopupMenuBgnd)
             opts.lighterPopupMenuBgnd=1; // shade so that we dont have 3d-ish borders...
-        opts.menuBgndAppearance=APPEARANCE_FLAT;
+        opts.menuBgndAppearance = APPEARANCE_FLAT;
     }
 
 #ifdef QTC_QT5_ENABLE_KDE
@@ -186,34 +188,34 @@ void Style::polish(QPalette &palette)
                 itsBackgroundCols[ORIGINAL_SHADE]!=palette.color(QPalette::Active, QPalette::Background)),
         newButton(newContrast ||
                   itsButtonCols[ORIGINAL_SHADE]!=palette.color(QPalette::Active, QPalette::Button)),
-        newSlider(itsSliderCols && itsHighlightCols!=itsSliderCols && SHADE_BLEND_SELECTED==opts.shadeSliders &&
+        newSlider(itsSliderCols && itsHighlightCols!=itsSliderCols && SHADE_BLEND_SELECTED == opts.shadeSliders &&
                   (newButton || newHighlight)),
         newDefBtn(itsDefBtnCols && (IND_COLORED!=opts.defBtnIndicator || SHADE_BLEND_SELECTED!=opts.shadeSliders) &&
                   IND_SELECTED!=opts.defBtnIndicator && IND_GLOW!=opts.defBtnIndicator &&
                   (newContrast || newButton || newHighlight)),
         newComboBtn(itsComboBtnCols && itsHighlightCols!=itsComboBtnCols && itsSliderCols!=itsComboBtnCols &&
-                    SHADE_BLEND_SELECTED==opts.comboBtn &&
+                    SHADE_BLEND_SELECTED == opts.comboBtn &&
                     (newButton || newHighlight)),
-        newSortedLv(itsSortedLvColors && ( (SHADE_BLEND_SELECTED==opts.sortedLv && itsDefBtnCols!=itsSortedLvColors &&
+        newSortedLv(itsSortedLvColors && ( (SHADE_BLEND_SELECTED == opts.sortedLv && itsDefBtnCols!=itsSortedLvColors &&
                                             itsSliderCols!=itsSortedLvColors && itsComboBtnCols!=itsSortedLvColors) ||
-                                           SHADE_DARKEN==opts.sortedLv) &&
+                                           SHADE_DARKEN == opts.sortedLv) &&
                     (newContrast || (opts.lvButton ? newButton : newGray))),
-        newCheckRadioSelCols(itsCheckRadioSelCols && ( (SHADE_BLEND_SELECTED==opts.crColor && itsDefBtnCols!=itsCheckRadioSelCols &&
+        newCheckRadioSelCols(itsCheckRadioSelCols && ( (SHADE_BLEND_SELECTED == opts.crColor && itsDefBtnCols!=itsCheckRadioSelCols &&
                                                         itsSliderCols!=itsCheckRadioSelCols && itsComboBtnCols!=itsCheckRadioSelCols &&
                                                         itsSortedLvColors!=itsCheckRadioSelCols) ||
-                                                       SHADE_DARKEN==opts.crColor) &&
+                                                       SHADE_DARKEN == opts.crColor) &&
                              (newContrast || newButton)),
-        newProgressCols(itsProgressCols && SHADE_BLEND_SELECTED==opts.progressColor &&
+        newProgressCols(itsProgressCols && SHADE_BLEND_SELECTED == opts.progressColor &&
                         itsSliderCols!=itsProgressCols && itsComboBtnCols!=itsProgressCols &&
                         itsSortedLvColors!=itsProgressCols && itsCheckRadioSelCols!=itsProgressCols && (newContrast || newButton));
 
     if(newGray)
     {
         shadeColors(palette.color(QPalette::Active, QPalette::Background), itsBackgroundCols);
-        if(IMG_PLAIN_RINGS==opts.bgndImage.type || IMG_BORDERED_RINGS==opts.bgndImage.type ||
-           IMG_SQUARE_RINGS==opts.bgndImage.type ||
-           IMG_PLAIN_RINGS==opts.menuBgndImage.type || IMG_BORDERED_RINGS==opts.menuBgndImage.type ||
-           IMG_SQUARE_RINGS==opts.menuBgndImage.type)
+        if(IMG_PLAIN_RINGS == opts.bgndImage.type || IMG_BORDERED_RINGS == opts.bgndImage.type ||
+           IMG_SQUARE_RINGS == opts.bgndImage.type ||
+           IMG_PLAIN_RINGS == opts.menuBgndImage.type || IMG_BORDERED_RINGS == opts.menuBgndImage.type ||
+           IMG_SQUARE_RINGS == opts.menuBgndImage.type)
         {
             qtcCalcRingAlphas(&itsBackgroundCols[ORIGINAL_SHADE]);
             if(itsUsePixmapCache)
@@ -239,7 +241,7 @@ void Style::polish(QPalette &palette)
 
     if(newDefBtn)
     {
-        if(IND_TINT==opts.defBtnIndicator)
+        if(IND_TINT == opts.defBtnIndicator)
             shadeColors(tint(itsButtonCols[ORIGINAL_SHADE],
                              itsHighlightCols[ORIGINAL_SHADE], DEF_BNT_TINT), itsDefBtnCols);
         else if(IND_GLOW!=opts.defBtnIndicator)
@@ -252,7 +254,7 @@ void Style::polish(QPalette &palette)
 
     if(newSortedLv)
     {
-        if(SHADE_BLEND_SELECTED==opts.sortedLv)
+        if(SHADE_BLEND_SELECTED == opts.sortedLv)
             shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
                                  opts.lvButton ? itsButtonCols[ORIGINAL_SHADE] : itsBackgroundCols[ORIGINAL_SHADE]), itsSortedLvColors);
         else
@@ -280,7 +282,7 @@ void Style::polish(QPalette &palette)
 
     if(newCheckRadioSelCols)
     {
-        if(SHADE_BLEND_SELECTED==opts.crColor)
+        if(SHADE_BLEND_SELECTED == opts.crColor)
             shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE], itsButtonCols[ORIGINAL_SHADE]), itsCheckRadioSelCols);
         else
             shadeColors(shade(itsButtonCols[ORIGINAL_SHADE], LV_HEADER_DARK_FACTOR), itsCheckRadioSelCols);
@@ -289,7 +291,7 @@ void Style::polish(QPalette &palette)
     if(newProgressCols)
         shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE], itsBackgroundCols[ORIGINAL_SHADE]), itsProgressCols);
 
-    if(APP_OPENOFFICE==theThemedApp && opts.useHighlightForMenu && (newGray || newHighlight))
+    if(APP_OPENOFFICE == theThemedApp && opts.useHighlightForMenu && (newGray || newHighlight))
     {
         if(blendOOMenuHighlight(palette, itsHighlightCols[ORIGINAL_SHADE]))
         {
@@ -324,7 +326,7 @@ void Style::polish(QPalette &palette)
         palette.setColor(QPalette::Inactive, (QPalette::ColorRole)i, palette.color(QPalette::Active, (QPalette::ColorRole)i));
 
     // Force this to be re-generated!
-    if(SHADE_BLEND_SELECTED==opts.menuStripe)
+    if(SHADE_BLEND_SELECTED == opts.menuStripe)
         opts.customMenuStripeColor=Qt::black;
 #ifdef QTC_QT5_ENABLE_KDE
     // Only set palette here...
@@ -1124,21 +1126,24 @@ void Style::unpolish(QWidget *widget)
 
 bool Style::eventFilter(QObject *object, QEvent *event)
 {
-    bool isSViewCont=APP_KONTACT==theThemedApp && itsSViewContainers.contains((QWidget*)object);
+    bool isSViewCont = (APP_KONTACT == theThemedApp &&
+                        itsSViewContainers.contains((QWidget*)object));
 
-    if(::qobject_cast<QMenuBar *>(object) && dynamic_cast<QMouseEvent *>(event))
-    {
-        if(updateMenuBarEvent((QMouseEvent *)event, (QMenuBar*)object))
+    if (::qobject_cast<QMenuBar*>(object) &&
+        dynamic_cast<QMouseEvent*>(event)) {
+        if (updateMenuBarEvent((QMouseEvent*)event, (QMenuBar*)object)) {
             return true;
+        }
     }
 
-    if (QEvent::Show==event->type() && qobject_cast<QAbstractScrollArea *>(object) && object->inherits("KFilePlacesView"))
-    {
-        QWidget  *view   = ((QAbstractScrollArea *)object)->viewport();
+    if (QEvent::Show == event->type() &&
+        qobject_cast<QAbstractScrollArea*>(object) &&
+        object->inherits("KFilePlacesView")) {
+        QWidget *view = ((QAbstractScrollArea*)object)->viewport();
         QPalette palette = view->palette();
-        QColor   color   = ((QWidget *)object)->palette().background().color();
+        QColor color = ((QWidget*)object)->palette().background().color();
 
-        if(CUSTOM_BGND)
+        if (CUSTOM_BGND)
             color.setAlphaF(0.0);
 
         palette.setColor(view->backgroundRole(), color);
@@ -1146,62 +1151,62 @@ bool Style::eventFilter(QObject *object, QEvent *event)
         object->removeEventFilter(this);
     }
 
-    if((!opts.gtkScrollViews &&  ::qobject_cast<QAbstractScrollArea *>(object)) || isSViewCont)
-    {
+    if ((!opts.gtkScrollViews &&
+         ::qobject_cast<QAbstractScrollArea*>(object)) || isSViewCont) {
         QPoint pos;
-        switch(event->type())
-        {
+        switch (event->type()) {
         case QEvent::MouseMove:
         case QEvent::MouseButtonPress:
         case QEvent::MouseButtonRelease:
-            pos=((QMouseEvent *)event)->pos();
+            pos = ((QMouseEvent*)event)->pos();
             break;
         case QEvent::Wheel:
-            pos=((QWheelEvent *)event)->pos();
+            pos=((QWheelEvent*)event)->pos();
         default:
             break;
         }
 
-        if(!pos.isNull())
-        {
-            QAbstractScrollArea *area=0L;
-            QPoint              mapped(pos);
+        if (!pos.isNull()) {
+            QAbstractScrollArea *area = 0L;
+            QPoint mapped(pos);
 
-            if(isSViewCont)
-            {
-                QSet<QWidget *>::ConstIterator it(itsSViewContainers[(QWidget *)object].begin()),
-                    end(itsSViewContainers[(QWidget *)object].end());
+            if (isSViewCont) {
+                QSet<QWidget*>::ConstIterator it =
+                    itsSViewContainers[(QWidget*)object].begin();
+                QSet<QWidget*>::ConstIterator end =
+                    itsSViewContainers[(QWidget*)object].end();
 
-                for(; it!=end && !area; ++it)
-                    if((*it)->isVisible())
-                    {
-                        mapped=(*it)->mapFrom((QWidget *)object, pos);
-                        if((*it)->rect().adjusted(0, 0, 4, 4).contains(mapped))
-                            area=(QAbstractScrollArea *)(*it);
+                for (;it != end && !area;++it) {
+                    if ((*it)->isVisible()) {
+                        mapped = (*it)->mapFrom((QWidget*)object, pos);
+                        if ((*it)->rect().adjusted(0, 0, 4, 4).contains(mapped)) {
+                            area = (QAbstractScrollArea*)(*it);
+                        }
                     }
+                }
+            } else {
+                area = (QAbstractScrollArea*)object;
             }
-            else
-                area=(QAbstractScrollArea *)object;
 
-            if(area)
-            {
-                QScrollBar *sbars[2]={area->verticalScrollBar(), area->horizontalScrollBar() };
+            if (area) {
+                QScrollBar *sbars[2] = {
+                    area->verticalScrollBar(),
+                    area->horizontalScrollBar()
+                };
 
-                for(int i=0; i<2; ++i)
-                    if(sbars[i])
-                    {
-                        QRect r(i ? 0 : area->rect().right()-3,   i ? area->rect().bottom()-3 : 0,
-                                sbars[i]->rect().width(), sbars[i]->rect().height());
+                for (int i = 0;i < 2;++i) {
+                    if (sbars[i]) {
+                        QRect r(i ? 0 : area->rect().right()-3,
+                                i ? area->rect().bottom()-3 : 0,
+                                sbars[i]->rect().width(),
+                                sbars[i]->rect().height());
 
-                        if(r.contains(pos) ||
-                           (sbars[i]==itsSViewSBar &&
-                            (QEvent::MouseMove==event->type() ||
-                             QEvent::MouseButtonRelease==event->type())))
-                        {
-                            if(QEvent::Wheel!=event->type())
-                            {
-                                struct HackEvent : public QMouseEvent
-                                {
+                        if (r.contains(pos) ||
+                            (sbars[i] == itsSViewSBar &&
+                             (QEvent::MouseMove == event->type() ||
+                              QEvent::MouseButtonRelease == event->type()))) {
+                            if (QEvent::Wheel != event->type()) {
+                                struct HackEvent : public QMouseEvent {
                                     void set(const QPoint &mapped, bool vert)
                                         {
                                             l = QPointF(vert ? 0 : mapped.x(),
@@ -1210,17 +1215,19 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                                                         s.y() + (vert ? -3 : 0));
                                         }
                                 };
-
-                                ((HackEvent *)event)->set(mapped, 0==i);
+                                ((HackEvent*)event)->set(mapped, 0 == i);
                             }
                             sbars[i]->event(event);
-                            if(QEvent::MouseButtonPress==event->type())
-                                itsSViewSBar=sbars[i];
-                            else if(QEvent::MouseButtonRelease==event->type())
-                                itsSViewSBar=0L;
+                            if (QEvent::MouseButtonPress == event->type()) {
+                                itsSViewSBar = sbars[i];
+                            } else if (QEvent::MouseButtonRelease ==
+                                       event->type()) {
+                                itsSViewSBar = 0L;
+                            }
                             return true;
                         }
                     }
+                }
             }
         }
     }
@@ -1232,7 +1239,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
     case QEvent::Resize:
         if(!(opts.square & SQUARE_POPUP_MENUS) &&
            object->inherits("QComboBoxPrivateContainer")) {
-            QWidget *widget=static_cast<QWidget *>(object);
+            QWidget *widget = static_cast<QWidget*>(object);
             if (Utils::hasAlphaChannel(widget)) {
                 widget->clearMask();
             } else {
@@ -1250,7 +1257,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
             QResizeEvent *re = static_cast<QResizeEvent*>(event);
 
             if (re->size().height() != re->oldSize().height()) {
-                emitMenuSize((QMenuBar *)object,
+                emitMenuSize((QMenuBar*)object,
                              PREVIEW_MDI == itsIsPreview ||
                              !((QMenuBar*)object)->isVisible() ? 0 :
                              re->size().height());
@@ -1259,22 +1266,23 @@ bool Style::eventFilter(QObject *object, QEvent *event)
 #endif
         break;
     case QEvent::ShortcutOverride:
-        if((opts.menubarHiding || opts.statusbarHiding) && qobject_cast<QMainWindow *>(object))
-        {
-            QMainWindow *window=static_cast<QMainWindow *>(object);
+        if ((opts.menubarHiding || opts.statusbarHiding) &&
+            qobject_cast<QMainWindow*>(object)) {
+            QMainWindow *window = static_cast<QMainWindow*>(object);
 
-            if(window->isVisible())
-            {
-                if(opts.menubarHiding&HIDE_KEYBOARD && window->menuWidget())
-                {
-                    QKeyEvent *k=static_cast<QKeyEvent *>(event);
+            if (window->isVisible()) {
+                if (opts.menubarHiding & HIDE_KEYBOARD &&
+                    window->menuWidget()) {
+                    QKeyEvent *k = static_cast<QKeyEvent*>(event);
 
-                    if(k->modifiers()&Qt::ControlModifier && k->modifiers()&Qt::AltModifier && Qt::Key_M==k->key())
+                    if (k->modifiers() & Qt::ControlModifier &&
+                        k->modifiers() & Qt::AltModifier &&
+                        Qt::Key_M == k->key()) {
                         toggleMenuBar(window);
+                    }
                 }
-                if(opts.statusbarHiding&HIDE_KEYBOARD)
-                {
-                    QKeyEvent *k=static_cast<QKeyEvent *>(event);
+                if (opts.statusbarHiding & HIDE_KEYBOARD) {
+                    QKeyEvent *k = static_cast<QKeyEvent*>(event);
 
                     if(k->modifiers()&Qt::ControlModifier && k->modifiers()&Qt::AltModifier && Qt::Key_S==k->key())
                         toggleStatusBar(window);

@@ -23,8 +23,9 @@
 #include "compatability.h"
 
 /**
- * Setting appears-as-list on a non-editable combo creates a view over the 'label' which
- * is of 'base' colour. gtk_cell_view_set_background_color removes this
+ * Setting appears-as-list on a non-editable combo creates a view over the
+ * 'label' which is of 'base' colour. gtk_cell_view_set_background_color
+ * removes this
  */
 static gboolean
 qtcComboBoxCellViewHasBgnd(GtkWidget *view)

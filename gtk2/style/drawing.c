@@ -16,7 +16,7 @@
   along with this program; see the file COPYING.  If not, write to
   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
   Boston, MA 02110-1301, USA.
- */
+*/
 
 #include <qtcurve-utils/gtkutils.h>
 #include <qtcurve-utils/color.h>
@@ -37,9 +37,10 @@
 
 
 #if GTK_CHECK_VERSION(2, 90, 0)
-static cairo_rectangle_int_t createRect(int x, int y, int w, int h)
+static cairo_rectangle_int_t
+createRect(int x, int y, int w, int h)
 {
-    cairo_rectangle_int_t r={x, y, w, h};
+    cairo_rectangle_int_t r = {x, y, w, h};
     return r;
 }
 
@@ -143,12 +144,13 @@ void drawAreaColorAlpha(cairo_t *cr, GdkRectangle *area, GdkColor *col, gint x, 
     unsetCairoClipping(cr);
 }
 
-void drawBgnd(cairo_t *cr, GdkColor *col, GtkWidget *widget, GdkRectangle *area, int x, int y, int width, int height)
+void
+drawBgnd(cairo_t *cr, GdkColor *col, GtkWidget *widget, GdkRectangle *area,
+         int x, int y, int width, int height)
 {
-    GdkColor *parent_col=getParentBgCol(widget),
-             *bgnd_col=parent_col ? parent_col : col;
-
-    drawAreaColor(cr, area, parent_col ? parent_col : col, x, y, width, height);
+    GdkColor *parent_col = getParentBgCol(widget);
+    drawAreaColor(cr, area, parent_col ? parent_col : col,
+                  x, y, width, height);
 }
 
 void drawAreaModColor(cairo_t *cr, GdkRectangle *area, GdkColor *orig, double mod, gint x, gint y, gint width, gint height)
@@ -158,77 +160,86 @@ void drawAreaModColor(cairo_t *cr, GdkRectangle *area, GdkColor *orig, double mo
     drawAreaColor(cr, area, &modified, x, y, width, height);
 }
 
-void drawBevelGradientAlpha(cairo_t *cr, GdkRectangle *area, int x, int y, int width, int height, GdkColor *base, gboolean horiz,
-                                   gboolean sel, EAppearance bevApp, EWidget w, double alpha)
+void
+drawBevelGradientAlpha(cairo_t *cr, GdkRectangle *area, int x, int y,
+                       int width, int height, GdkColor *base, gboolean horiz,
+                       gboolean sel, EAppearance bevApp,
+                       EWidget w, double alpha)
 {
-    EAppearance app=APPEARANCE_BEVELLED!=bevApp || WIDGET_BUTTON(w) || WIDGET_LISTVIEW_HEADER==w
-                        ? bevApp
-                        : APPEARANCE_GRADIENT;
+    /* EAppearance app = ((APPEARANCE_BEVELLED != bevApp || WIDGET_BUTTON(w) || */
+    /*                     WIDGET_LISTVIEW_HEADER == w) ? bevApp : */
+    /*                    APPEARANCE_GRADIENT); */
 
-    if(IS_FLAT(bevApp))
-    {
-        if((WIDGET_TAB_TOP!=w && WIDGET_TAB_BOT!=w) || !CUSTOM_BGND || opts.tabBgnd || !sel)
+    if (IS_FLAT(bevApp)) {
+        if ((WIDGET_TAB_TOP != w && WIDGET_TAB_BOT != w) ||
+            !CUSTOM_BGND || opts.tabBgnd || !sel) {
             drawAreaColorAlpha(cr, area, base, x, y, width, height, alpha);
-    }
-    else
-    {
-        cairo_pattern_t *pt=cairo_pattern_create_linear(x, y, horiz ? x : x+width-1, horiz ? y+height-1 : y);
-        gboolean        topTab=WIDGET_TAB_TOP==w,
-                        botTab=WIDGET_TAB_BOT==w,
-                        selected=(topTab || botTab) ? false : sel;
-        EAppearance     app=selected
-                                ? opts.sunkenAppearance
-                                : WIDGET_LISTVIEW_HEADER==w && APPEARANCE_BEVELLED==bevApp
-                                    ? APPEARANCE_LV_BEVELLED
-                                    : APPEARANCE_BEVELLED!=bevApp || WIDGET_BUTTON(w) || WIDGET_LISTVIEW_HEADER==w
-                                        ? bevApp
-                                        : APPEARANCE_GRADIENT;
-        const Gradient  *grad=qtcGetGradient(app, &opts);
-        int             i=0;
+        }
+    } else {
+        cairo_pattern_t *pt =
+            cairo_pattern_create_linear(x, y, horiz ? x : x+width - 1,
+                                        horiz ? y + height - 1 : y);
+        gboolean topTab = WIDGET_TAB_TOP == w;
+        gboolean botTab = WIDGET_TAB_BOT == w;
+        gboolean selected = (topTab || botTab) ? false : sel;
+        EAppearance app = (selected ? opts.sunkenAppearance :
+                           WIDGET_LISTVIEW_HEADER == w &&
+                           APPEARANCE_BEVELLED == bevApp ?
+                           APPEARANCE_LV_BEVELLED :
+                           APPEARANCE_BEVELLED != bevApp ||
+                           WIDGET_BUTTON(w) ||
+                           WIDGET_LISTVIEW_HEADER == w ? bevApp :
+                           APPEARANCE_GRADIENT);
+        const Gradient *grad = qtcGetGradient(app, &opts);
+        int i = 0;
 
         setCairoClipping(cr, area);
 
-        for(i=0; i<grad->numStops; ++i)
-        {
+        for (i = 0;i < grad->numStops;++i) {
             GdkColor col;
-            double   pos=botTab ? 1.0-grad->stops[i].pos : grad->stops[i].pos;
+            double pos = botTab ? 1.0 - grad->stops[i].pos : grad->stops[i].pos;
 
-            if(/*sel && */(topTab || botTab) && i==grad->numStops-1)
-            {
-                if(sel /*&& CUSTOM_BGND*/ && 0==opts.tabBgnd && !isMozilla())
-                    alpha=0.0;
-                col=*base;
-            }
-            else
-            {
+            if (/*sel && */(topTab || botTab) && i == grad->numStops - 1) {
+                if (sel /*&& CUSTOM_BGND*/ && 0 == opts.tabBgnd &&
+                    !isMozilla()) {
+                    alpha = 0.0;
+                }
+                col = *base;
+            } else {
                 double val = (botTab && opts.invertBotTab ?
                               INVERT_SHADE(grad->stops[i].val) :
                               grad->stops[i].val);
                 qtcShade(base, &col, botTab && opts.invertBotTab ?
-                          qtcMax(val, 0.9) : val, opts.shading);
+                         qtcMax(val, 0.9) : val, opts.shading);
             }
 
 #if (CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 10, 0))
-            if(pos>0.9999)
-                pos=0.999;
+            if (pos > 0.9999)
+                pos = 0.999;
 #endif
-            cairo_pattern_add_color_stop_rgba(pt, pos,
-                                              CAIRO_COL(col), WIDGET_TOOLTIP==w || WIDGET_LISTVIEW_HEADER==w ? alpha : alpha*grad->stops[i].alpha);
+            cairo_pattern_add_color_stop_rgba(pt, pos, CAIRO_COL(col),
+                                              WIDGET_TOOLTIP == w ||
+                                              WIDGET_LISTVIEW_HEADER == w ?
+                                              alpha :
+                                              alpha * grad->stops[i].alpha);
         }
 
-        if(APPEARANCE_AGUA==app && !(topTab || botTab) && (horiz ? height : width)>AGUA_MAX)
-        {
+        if (APPEARANCE_AGUA == app && !(topTab || botTab) &&
+            (horiz ? height : width) > AGUA_MAX) {
             GdkColor col;
-            double pos=AGUA_MAX/((horiz ? height : width)*2.0);
+            double pos = AGUA_MAX / ((horiz ? height : width) * 2.0);
 
 #if (CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 10, 0))
-            if(pos>0.9999)
-                pos=0.999;
+            if (pos > 0.9999)
+                pos = 0.999;
 #endif
 
             qtcShade(base, &col, AGUA_MID_SHADE, opts.shading);
-            cairo_pattern_add_color_stop_rgba(pt, pos, CAIRO_COL(col), alpha); /* *grad->stops[i].alpha); */
-            cairo_pattern_add_color_stop_rgba(pt, 1.0-pos, CAIRO_COL(col), alpha); /* *grad->stops[i].alpha); */
+            cairo_pattern_add_color_stop_rgba(pt, pos, CAIRO_COL(col), alpha);
+            /* *grad->stops[i].alpha); */
+            cairo_pattern_add_color_stop_rgba(pt, 1.0 - pos,
+                                              CAIRO_COL(col), alpha);
+            /* *grad->stops[i].alpha); */
         }
 
         cairo_set_source(cr, pt);
@@ -351,13 +362,13 @@ realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state,
         round = ROUNDED_NONE;
 
     double radius = qtcGetRadius(&opts, width, height, widget, RADIUS_EXTERNAL),
-                 xd=x+0.5,
-                 yd=y+0.5;
-    EAppearance  app=qtcWidgetApp(widget, &opts);
+        xd=x+0.5,
+        yd=y+0.5;
+    /* EAppearance app = qtcWidgetApp(widget, &opts); */
     gboolean     enabled=GTK_STATE_INSENSITIVE!=state,
-                 useText=GTK_STATE_INSENSITIVE!=state && WIDGET_DEF_BUTTON==widget && IND_FONT_COLOR==opts.defBtnIndicator && enabled,
-                 hasFocus=enabled && qtcPalette.focus && c_colors==qtcPalette.focus, /* CPD USED TO INDICATE FOCUS! */
-                 hasMouseOver=enabled && qtcPalette.mouseover && c_colors==qtcPalette.mouseover && ENTRY_MO;
+        useText=GTK_STATE_INSENSITIVE!=state && WIDGET_DEF_BUTTON==widget && IND_FONT_COLOR==opts.defBtnIndicator && enabled,
+        hasFocus=enabled && qtcPalette.focus && c_colors==qtcPalette.focus, /* CPD USED TO INDICATE FOCUS! */
+        hasMouseOver=enabled && qtcPalette.mouseover && c_colors==qtcPalette.mouseover && ENTRY_MO;
     GdkColor     *colors=c_colors ? c_colors : qtcPalette.background;
     int useBorderVal = (!enabled && WIDGET_BUTTON(widget) ? QTC_DISABLED_BORDER :
                         qtcPalette.mouseover==colors && IS_SLIDER(widget) ?
@@ -471,16 +482,16 @@ void drawGlowReal(cairo_t *cr, GdkRectangle *area, int x, int y, int w, int h, i
     if(qtcPalette.mouseover || qtcPalette.defbtn || colors)
     {
         double   xd=x+0.5,
-                 yd=y+0.5,
-                 radius=qtcGetRadius(&opts, w, h, widget, RADIUS_ETCH);
+            yd=y+0.5,
+            radius=qtcGetRadius(&opts, w, h, widget, RADIUS_ETCH);
         gboolean def=WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator,
-                 defShade=def && (!qtcPalette.defbtn ||
-                                  (qtcPalette.mouseover &&
-                                   EQUAL_COLOR(qtcPalette.defbtn[ORIGINAL_SHADE], qtcPalette.mouseover[ORIGINAL_SHADE])));
+            defShade=def && (!qtcPalette.defbtn ||
+                             (qtcPalette.mouseover &&
+                              EQUAL_COLOR(qtcPalette.defbtn[ORIGINAL_SHADE], qtcPalette.mouseover[ORIGINAL_SHADE])));
         const GdkColor *col=colors
-                        ? &colors[GLOW_MO]
-                        : (def && qtcPalette.defbtn) || !qtcPalette.mouseover
-                            ? &qtcPalette.defbtn[GLOW_DEFBTN] : &qtcPalette.mouseover[GLOW_MO];
+            ? &colors[GLOW_MO]
+            : (def && qtcPalette.defbtn) || !qtcPalette.mouseover
+            ? &qtcPalette.defbtn[GLOW_DEFBTN] : &qtcPalette.mouseover[GLOW_MO];
 
         setCairoClipping(cr, area);
         cairo_set_source_rgba(cr, CAIRO_COL(*col), GLOW_ALPHA(defShade));
@@ -493,10 +504,10 @@ void drawGlowReal(cairo_t *cr, GdkRectangle *area, int x, int y, int w, int h, i
 void drawEtch(cairo_t *cr, GdkRectangle *area, GtkWidget *widget, int x, int y, int w, int h, gboolean raised, int round, EWidget wid)
 {
     double       xd=x+0.5,
-                 yd=y+0.5,
-                 radius=qtcGetRadius(&opts, w, h, wid, RADIUS_ETCH);
+        yd=y+0.5,
+        radius=qtcGetRadius(&opts, w, h, wid, RADIUS_ETCH);
     GdkRectangle *a=area,
-                 b;
+        b;
 
     if(WIDGET_TOOLBAR_BUTTON==wid && EFFECT_ETCH==opts.tbarBtnEffect)
         raised=FALSE;
@@ -554,294 +565,392 @@ void addStripes(cairo_t *cr, int x, int y, int w, int h, bool horizontal)
     cairo_pattern_destroy(pat);
 }
 
-void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangle *area, gint x, gint y,
-                    gint width, gint height, GdkColor *base, GdkColor *colors, int round, EWidget widget,
-                    EBorder borderProfile, int flags, GtkWidget *wid)
+void
+drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
+               GdkRectangle *area, gint x, gint y,
+               gint width, gint height, GdkColor *base, GdkColor *colors,
+               int round, EWidget widget, EBorder borderProfile, int flags,
+               GtkWidget *wid)
 {
-    EAppearance app=qtcWidgetApp(APPEARANCE_NONE!=opts.tbarBtnAppearance &&
-                              (WIDGET_TOOLBAR_BUTTON==widget || (WIDGET_BUTTON(widget) && isOnToolbar(wid, NULL, 0)))
-                                ? WIDGET_TOOLBAR_BUTTON : widget, &opts);
-    gboolean    sunken=flags&DF_SUNKEN,
-                doColouredMouseOver=opts.coloredMouseOver && qtcPalette.mouseover &&
-                                  WIDGET_SPIN!=widget && WIDGET_SPIN_DOWN!=widget && WIDGET_SPIN_UP!=widget &&
-                                  WIDGET_COMBO_BUTTON!=widget && WIDGET_SB_BUTTON!=widget &&
-                                  (!SLIDER(widget) || !opts.colorSliderMouseOver) &&
-                                  WIDGET_UNCOLOURED_MO_BUTTON!=widget &&
-                                  GTK_STATE_PRELIGHT==state &&
-                                  (!sunken || IS_TOGGLE_BUTTON(widget) || (WIDGET_TOOLBAR_BUTTON==widget && opts.coloredTbarMo)),
-                plastikMouseOver=doColouredMouseOver && MO_PLASTIK==opts.coloredMouseOver,
-                colouredMouseOver=doColouredMouseOver &&
-                                  (MO_COLORED==opts.coloredMouseOver || MO_COLORED_THICK==opts.coloredMouseOver),
-                flatWidget=WIDGET_PROGRESSBAR==widget && !opts.borderProgress,
-                lightBorder=!flatWidget && DRAW_LIGHT_BORDER(sunken, widget, app),
-                draw3dfull=!flatWidget && !lightBorder && DRAW_3D_FULL_BORDER(sunken, app),
-                draw3d=!flatWidget && (draw3dfull || (!lightBorder && DRAW_3D_BORDER(sunken, app))),
-                drawShine=DRAW_SHINE(sunken, app),
-                bevelledButton=WIDGET_BUTTON(widget) && APPEARANCE_BEVELLED==app,
-                doEtch=flags&DF_DO_BORDER && (ETCH_WIDGET(widget) || (WIDGET_COMBO_BUTTON==widget && opts.etchEntry)) && DO_EFFECT,
-                glowFocus=doEtch && USE_GLOW_FOCUS(GTK_STATE_PRELIGHT==state) && wid && ((flags&DF_HAS_FOCUS) || gtk_widget_has_focus(wid)) &&
-                          GTK_STATE_INSENSITIVE!=state && !isComboBoxEntryButton(wid) &&
-                          ((WIDGET_RADIO_BUTTON!=widget && WIDGET_CHECKBOX!=widget) || GTK_STATE_ACTIVE!=state),
-                glowFocusSunkenToggle=sunken && (glowFocus || (doColouredMouseOver && MO_GLOW==opts.coloredMouseOver)) &&
-                                      wid && GTK_IS_TOGGLE_BUTTON(wid),
-                horiz=!(flags&DF_VERT);
-    int         xe=x, ye=y, we=width, he=height, origWidth=width, origHeight=height;
-    double      xd=x+0.5, yd=y+0.5;
+    EAppearance app = qtcWidgetApp(APPEARANCE_NONE != opts.tbarBtnAppearance &&
+                                   (WIDGET_TOOLBAR_BUTTON == widget ||
+                                    (WIDGET_BUTTON(widget) &&
+                                     isOnToolbar(wid, NULL, 0))) ?
+                                   WIDGET_TOOLBAR_BUTTON : widget, &opts);
+    gboolean sunken = flags & DF_SUNKEN;
+    gboolean doColouredMouseOver =
+        (opts.coloredMouseOver && qtcPalette.mouseover &&
+         WIDGET_SPIN != widget && WIDGET_SPIN_DOWN != widget &&
+         WIDGET_SPIN_UP != widget && WIDGET_COMBO_BUTTON != widget &&
+         WIDGET_SB_BUTTON != widget && (!SLIDER(widget) ||
+                                        !opts.colorSliderMouseOver) &&
+         WIDGET_UNCOLOURED_MO_BUTTON != widget && GTK_STATE_PRELIGHT == state &&
+         (!sunken || IS_TOGGLE_BUTTON(widget) ||
+          (WIDGET_TOOLBAR_BUTTON == widget && opts.coloredTbarMo)));
+    gboolean plastikMouseOver = (doColouredMouseOver &&
+                                 MO_PLASTIK == opts.coloredMouseOver);
+    gboolean colouredMouseOver =
+        doColouredMouseOver && (MO_COLORED == opts.coloredMouseOver ||
+                                MO_COLORED_THICK == opts.coloredMouseOver);
+    gboolean flatWidget = (WIDGET_PROGRESSBAR == widget &&
+                           !opts.borderProgress);
+    gboolean lightBorder =
+        !flatWidget && DRAW_LIGHT_BORDER(sunken, widget, app);
+    gboolean draw3dfull = (!flatWidget && !lightBorder &&
+                           DRAW_3D_FULL_BORDER(sunken, app));
+    gboolean draw3d =
+        (!flatWidget && (draw3dfull ||
+                         (!lightBorder && DRAW_3D_BORDER(sunken, app))));
+    gboolean drawShine = DRAW_SHINE(sunken, app);
+    gboolean bevelledButton = (WIDGET_BUTTON(widget) &&
+                               APPEARANCE_BEVELLED == app);
+    gboolean doEtch =
+        (flags & DF_DO_BORDER &&
+         (ETCH_WIDGET(widget) || (WIDGET_COMBO_BUTTON == widget &&
+                                  opts.etchEntry)) && DO_EFFECT);
+    gboolean glowFocus =
+        (doEtch && USE_GLOW_FOCUS(GTK_STATE_PRELIGHT == state) && wid &&
+         ((flags&DF_HAS_FOCUS) || gtk_widget_has_focus(wid)) &&
+         GTK_STATE_INSENSITIVE != state && !isComboBoxEntryButton(wid) &&
+         ((WIDGET_RADIO_BUTTON != widget && WIDGET_CHECKBOX != widget) ||
+          GTK_STATE_ACTIVE != state));
+    gboolean glowFocusSunkenToggle =
+        (sunken && (glowFocus || (doColouredMouseOver &&
+                                  MO_GLOW == opts.coloredMouseOver)) &&
+         wid && GTK_IS_TOGGLE_BUTTON(wid));
+    gboolean horiz = !(flags & DF_VERT);
+    int xe = x, ye = y;
+    int we = width, he = height;
+    int origWidth = width, origHeight = height;
+    double xd = x + 0.5, yd = y + 0.5;
+    if (CIRCULAR_SLIDER(widget))
+        horiz = true;
 
-    if(CIRCULAR_SLIDER(widget))
-        horiz=true;
+    if (WIDGET_TROUGH == widget && !opts.borderSbarGroove &&
+        flags & DF_DO_BORDER) {
+        flags -= DF_DO_BORDER;
+    }
 
-    if(WIDGET_TROUGH==widget && !opts.borderSbarGroove && flags&DF_DO_BORDER)
-        flags-=DF_DO_BORDER;
-
-    if(WIDGET_COMBO_BUTTON==widget && doEtch)
-        if(ROUNDED_RIGHT==round)
-            x--, xd-=1, width++;
-        else if(ROUNDED_LEFT==round)
+    if (WIDGET_COMBO_BUTTON == widget && doEtch) {
+        if (ROUNDED_RIGHT == round) {
+            x--;
+            xd -= 1;
             width++;
+        } else if(ROUNDED_LEFT == round) {
+            width++;
+        }
+    }
 
-    if(doEtch)
-        xd+=1, x++, yd+=1, y++, width-=2, height-=2, xe=x, ye=y, we=width, he=height;
+    if (doEtch) {
+        xd += 1;
+        x++;
+        yd += 1;
+        y++;
+        width -= 2;
+        height -= 2;
+        xe = x;
+        ye = y;
+        we = width;
+        he = height;
+    }
 
-    if(width>0 && height>0)
-    {
-        if(!(flags&DF_DO_BORDER))
-            clipPathRadius(cr, x, y, width, height, qtcGetRadius(&opts, width, height, widget, RADIUS_EXTERNAL), round);
-        else
+    if (width > 0 && height > 0) {
+        if (!(flags & DF_DO_BORDER)) {
+            clipPathRadius(cr, x, y, width, height,
+                           qtcGetRadius(&opts, width, height, widget,
+                                        RADIUS_EXTERNAL), round);
+        } else {
             clipPath(cr, x, y, width, height, widget, RADIUS_EXTERNAL, round);
+        }
 
-        drawBevelGradient(cr, area, x, y, width, height, base, horiz, sunken && !IS_TROUGH(widget), app, widget);
+        drawBevelGradient(cr, area, x, y, width, height, base, horiz,
+                          sunken && !IS_TROUGH(widget), app, widget);
 
-        if(plastikMouseOver)
-        {
-            if(SLIDER(widget))
-            {
-                int len=SB_SLIDER_MO_LEN(horiz ? width : height),
-                    so=lightBorder ? SLIDER_MO_PLASTIK_BORDER : 1,
-                    eo=len+so,
-                    col=SLIDER_MO_SHADE;
+        if (plastikMouseOver) {
+            if (SLIDER(widget)) {
+                int len = SB_SLIDER_MO_LEN(horiz ? width : height);
+                int so = lightBorder ? SLIDER_MO_PLASTIK_BORDER : 1;
+                int eo = len + so;
+                int col = SLIDER_MO_SHADE;
 
-                if(horiz)
-                {
-                    drawBevelGradient(cr, area, x+so, y, len, height, &qtcPalette.mouseover[col], horiz, sunken, app, widget);
-                    drawBevelGradient(cr, area, x+width-eo, y, len, height, &qtcPalette.mouseover[col], horiz, sunken, app, widget);
+                if (horiz) {
+                    drawBevelGradient(cr, area, x + so, y, len, height,
+                                      &qtcPalette.mouseover[col], horiz,
+                                      sunken, app, widget);
+                    drawBevelGradient(cr, area, x + width - eo, y, len,
+                                      height, &qtcPalette.mouseover[col],
+                                      horiz, sunken, app, widget);
+                } else {
+                    drawBevelGradient(cr, area, x, y + so, width, len,
+                                      &qtcPalette.mouseover[col], horiz,
+                                      sunken, app, widget);
+                    drawBevelGradient(cr, area, x, y + height - eo, width,
+                                      len, &qtcPalette.mouseover[col],
+                                      horiz, sunken, app, widget);
                 }
-                else
-                {
-                    drawBevelGradient(cr, area, x, y+so, width, len, &qtcPalette.mouseover[col], horiz, sunken, app, widget);
-                    drawBevelGradient(cr, area, x, y+height-eo, width, len, &qtcPalette.mouseover[col], horiz, sunken, app, widget);
-                }
-            }
-            else
-            {
-                int      mh=height;
-                GdkColor *col=&qtcPalette.mouseover[MO_PLASTIK_DARK(widget)];
-                bool     horizontal=(horiz && !(WIDGET_SB_BUTTON==widget || SLIDER(widget)))||
-                                    (!horiz && (WIDGET_SB_BUTTON==widget || SLIDER(widget))),
-                         thin=WIDGET_SB_BUTTON==widget || WIDGET_SPIN_UP==widget || WIDGET_SPIN_DOWN==widget ||
-                              ((horiz ? height : width)<16);
+            } else {
+                int mh = height;
+                GdkColor *col = &qtcPalette.mouseover[MO_PLASTIK_DARK(widget)];
+                gboolean horizontal =
+                    ((horiz && !(WIDGET_SB_BUTTON == widget ||
+                                 SLIDER(widget))) ||
+                     (!horiz && (WIDGET_SB_BUTTON == widget ||
+                                 SLIDER(widget))));
+                gboolean thin =
+                    (WIDGET_SB_BUTTON == widget || WIDGET_SPIN_UP == widget ||
+                     WIDGET_SPIN_DOWN == widget ||
+                     ((horiz ? height : width) < 16));
 
-                if(EFFECT_NONE!=opts.buttonEffect && WIDGET_SPIN_UP==widget && horiz)
+                if (EFFECT_NONE != opts.buttonEffect &&
+                    WIDGET_SPIN_UP == widget && horiz) {
                     mh--;
+                }
                 cairo_new_path(cr);
                 cairo_set_source_rgb(cr, CAIRO_COL(*col));
-                if(horizontal)
-                {
-                    cairo_move_to(cr, x+1, yd+1);
-                    cairo_line_to(cr, x+width-1, yd+1);
-                    cairo_move_to(cr, x+1, yd+mh-2);
-                    cairo_line_to(cr, x+width-1, yd+mh-2);
-                }
-                else
-                {
-                    cairo_move_to(cr, xd+1, y+1);
-                    cairo_line_to(cr, xd+1, y+mh-1);
-                    cairo_move_to(cr, xd+width-2, y+1);
-                    cairo_line_to(cr, xd+width-2, y+mh-1);
+                if (horizontal) {
+                    cairo_move_to(cr, x + 1, yd + 1);
+                    cairo_line_to(cr, x + width -1, yd + 1);
+                    cairo_move_to(cr, x + 1, yd + mh - 2);
+                    cairo_line_to(cr, x + width - 1, yd + mh - 2);
+                } else {
+                    cairo_move_to(cr, xd + 1, y + 1);
+                    cairo_line_to(cr, xd + 1, y + mh - 1);
+                    cairo_move_to(cr, xd + width - 2, y + 1);
+                    cairo_line_to(cr, xd + width - 2, y + mh - 1);
                 }
                 cairo_stroke(cr);
-                if(!thin)
-                {
-                    col=&qtcPalette.mouseover[MO_PLASTIK_LIGHT(widget)];
+                if (!thin) {
+                    col = &qtcPalette.mouseover[MO_PLASTIK_LIGHT(widget)];
                     cairo_new_path(cr);
                     cairo_set_source_rgb(cr, CAIRO_COL(*col));
-                    if(horizontal)
-                    {
-                        cairo_move_to(cr, x+1, yd+2);
-                        cairo_line_to(cr, x+width-1, yd+2);
-                        cairo_move_to(cr, x+1, yd+mh-3);
-                        cairo_line_to(cr, x+width-1, yd+mh-3);
-                    }
-                    else
-                    {
-                        cairo_move_to(cr, xd+2, y+1);
-                        cairo_line_to(cr, xd+2, y+mh-1);
-                        cairo_move_to(cr, xd+width-3, y+1);
-                        cairo_line_to(cr, xd+width-3, y+mh-1);
+                    if (horizontal) {
+                        cairo_move_to(cr, x + 1, yd + 2);
+                        cairo_line_to(cr, x + width - 1, yd + 2);
+                        cairo_move_to(cr, x + 1, yd + mh - 3);
+                        cairo_line_to(cr, x + width - 1, yd + mh - 3);
+                    } else {
+                        cairo_move_to(cr, xd + 2, y + 1);
+                        cairo_line_to(cr, xd + 2, y + mh - 1);
+                        cairo_move_to(cr, xd + width - 3, y + 1);
+                        cairo_line_to(cr, xd + width - 3, y + mh - 1);
                     }
                     cairo_stroke(cr);
                 }
             }
         }
 
-        if(drawShine)
-        {
-            gboolean mo=GTK_STATE_PRELIGHT==state && opts.highlightFactor;
-            int      xa=x, ya=y, wa=width, ha=height;
+        if (drawShine) {
+            gboolean mo = GTK_STATE_PRELIGHT == state && opts.highlightFactor;
+            int xa = x, ya = y;
+            int wa = width, ha = height;
 
-            if(WIDGET_RADIO_BUTTON==widget || CIRCULAR_SLIDER(widget))
-            {
-                double          topSize=(ha*0.4),
-                                topWidthAdjust=3.5,
-                                topGradRectX=xa+topWidthAdjust,
-                                topGradRectY=ya,
-                                topGradRectW=wa-(topWidthAdjust*2)-1,
-                                topGradRectH=topSize-1;
-                cairo_pattern_t *pt=cairo_pattern_create_linear(topGradRectX, topGradRectY, topGradRectX, topGradRectY+topGradRectH);
+            if (WIDGET_RADIO_BUTTON == widget || CIRCULAR_SLIDER(widget)) {
+                double topSize = ha * 0.4;
+                double topWidthAdjust = 3.5;
+                double topGradRectX = xa + topWidthAdjust;
+                double topGradRectY = ya;
+                double topGradRectW = wa - topWidthAdjust * 2 - 1;
+                double topGradRectH = topSize - 1;
+                cairo_pattern_t *pt =
+                    cairo_pattern_create_linear(topGradRectX, topGradRectY,
+                                                topGradRectX,
+                                                topGradRectY + topGradRectH);
 
-                clipPathRadius(cr, topGradRectX+0.5, topGradRectY+0.5, topGradRectW, topGradRectH, topGradRectW/2.0, ROUNDED_ALL);
+                clipPathRadius(cr, topGradRectX + 0.5, topGradRectY + 0.5,
+                               topGradRectW, topGradRectH, topGradRectW / 2.0,
+                               ROUNDED_ALL);
 
-                cairo_pattern_add_color_stop_rgba(pt, 0.0, 1.0, 1.0, 1.0, mo ? (opts.highlightFactor>0 ? 0.8 : 0.7) : 0.75);
-                cairo_pattern_add_color_stop_rgba(pt, CAIRO_GRAD_END, 1.0, 1.0, 1.0, /*mo ? (opts.highlightFactor>0 ? 0.3 : 0.1) :*/ 0.2);
+                cairo_pattern_add_color_stop_rgba(
+                    pt, 0.0, 1.0, 1.0, 1.0,
+                    mo ? (opts.highlightFactor > 0 ? 0.8 : 0.7) : 0.75);
+                cairo_pattern_add_color_stop_rgba(
+                    pt, CAIRO_GRAD_END, 1.0, 1.0, 1.0,
+                    /*mo ? (opts.highlightFactor>0 ? 0.3 : 0.1) :*/ 0.2);
 
                 cairo_set_source(cr, pt);
-                cairo_rectangle(cr, topGradRectX, topGradRectY, topGradRectW, topGradRectH);
+                cairo_rectangle(cr, topGradRectX, topGradRectY, topGradRectW,
+                                topGradRectH);
                 cairo_fill(cr);
                 cairo_pattern_destroy(pt);
                 cairo_restore(cr);
-            }
-            else
-            {
-                double          size=(qtcMin((horiz ? ha : wa)/2.0, 16)),
-                                rad=size/2.0;
-                cairo_pattern_t *pt=NULL;
-                int             mod=4;
+            } else {
+                double size = qtcMin((horiz ? ha : wa) / 2.0, 16);
+                double rad = size / 2.0;
+                cairo_pattern_t *pt = NULL;
+                int mod = 4;
 
-                if(horiz)
-                {
-                    if(!(ROUNDED_LEFT&round))
-                        xa-=8, wa+=8;
-                    if(!(ROUNDED_RIGHT&round))
-                        wa+=8;
+                if (horiz) {
+                    if (!(ROUNDED_LEFT & round)) {
+                        xa -= 8;
+                        wa += 8;
+                    }
+                    if (!(ROUNDED_RIGHT & round)) {
+                        wa += 8;
+                    }
+                } else {
+                    if (!(ROUNDED_TOP & round)) {
+                        ya -= 8;
+                        ha += 8;
+                    }
+                    if (!(ROUNDED_BOTTOM & round)) {
+                        ha += 8;
+                    }
                 }
-                else
-                {
-                    if(!(ROUNDED_TOP&round))
-                        ya-=8, ha+=8;
-                    if(!(ROUNDED_BOTTOM&round))
-                        ha+=8;
-                }
-                pt=cairo_pattern_create_linear(xa, ya, xa+(horiz ? 0.0 : size), ya+(horiz ? size : 0.0));
+                pt = cairo_pattern_create_linear(
+                    xa, ya, xa + (horiz ? 0.0 : size),
+                    ya + (horiz ? size : 0.0));
 
-                if(qtcGetWidgetRound(&opts, origWidth, origHeight, widget)<ROUND_MAX || (!IS_MAX_ROUND_WIDGET(widget) && !IS_SLIDER(widget)))
-                {
-                    rad/=2.0;
-                    mod=mod>>1;
+                if (qtcGetWidgetRound(&opts, origWidth, origHeight,
+                                      widget) <ROUND_MAX ||
+                    (!IS_MAX_ROUND_WIDGET(widget) && !IS_SLIDER(widget))) {
+                    rad /= 2.0;
+                    mod = mod >> 1;
                 }
 
-                if(horiz)
-                    clipPathRadius(cr, xa+mod+0.5, ya+0.5, wa-(mod*2)-1, size-1, rad, round);
-                else
-                    clipPathRadius(cr, xa+0.5, ya+mod+0.5, size-1, ha-(mod*2)-1, rad, round);
+                if (horiz) {
+                    clipPathRadius(cr, xa + mod + 0.5, ya + 0.5,
+                                   wa - mod * 2 - 1, size - 1, rad, round);
+                } else {
+                    clipPathRadius(cr, xa + 0.5, ya + mod + 0.5, size - 1,
+                                   ha - mod * 2 - 1, rad, round);
+                }
 
-                cairo_pattern_add_color_stop_rgba(pt, 0.0, 1.0, 1.0, 1.0, mo ? (opts.highlightFactor>0 ? 0.95 : 0.85) : 0.9);
-                cairo_pattern_add_color_stop_rgba(pt, CAIRO_GRAD_END, 1.0, 1.0, 1.0, mo ? (opts.highlightFactor>0 ? 0.3 : 0.1) : 0.2);
+                cairo_pattern_add_color_stop_rgba(
+                    pt, 0.0, 1.0, 1.0, 1.0,
+                    mo ? (opts.highlightFactor > 0 ? 0.95 : 0.85) : 0.9);
+                cairo_pattern_add_color_stop_rgba(
+                    pt, CAIRO_GRAD_END, 1.0, 1.0, 1.0,
+                    mo ? (opts.highlightFactor > 0 ? 0.3 : 0.1) : 0.2);
 
                 cairo_set_source(cr, pt);
-                cairo_rectangle(cr, xa, ya, horiz ? wa : size, horiz ? size : ha);
+                cairo_rectangle(cr, xa, ya, horiz ? wa : size,
+                                horiz ? size : ha);
                 cairo_fill(cr);
                 cairo_pattern_destroy(pt);
                 cairo_restore(cr);
             }
         }
-
         cairo_restore(cr);
     }
-    xd+=1, x++, yd+=1, y++, width-=2, height-=2;
+    xd += 1;
+    x++;
+    yd += 1;
+    y++;
+    width -= 2;
+    height -= 2;
 
-    if(plastikMouseOver) // && !sunken)
-    {
-        bool         thin=WIDGET_SB_BUTTON==widget || WIDGET_SPIN==widget || ((horiz ? height : width)<16),
-                     horizontal=SLIDER(widget) ? !horiz
-                                                   : (horiz && WIDGET_SB_BUTTON!=widget) ||
-                                                      (!horiz && WIDGET_SB_BUTTON==widget);
-        int          len=SLIDER(widget) ? SB_SLIDER_MO_LEN(horiz ? width : height) : (thin ? 1 : 2);
+    if (plastikMouseOver /* && !sunken */) {
+        gboolean thin = (WIDGET_SB_BUTTON == widget || WIDGET_SPIN == widget ||
+                         ((horiz ? height : width) < 16));
+        gboolean horizontal =
+            (SLIDER(widget) ? !horiz : (horiz && WIDGET_SB_BUTTON != widget) ||
+             (!horiz && WIDGET_SB_BUTTON == widget));
+        int len = (SLIDER(widget) ? SB_SLIDER_MO_LEN(horiz ? width : height) :
+                   (thin ? 1 : 2));
         GdkRectangle rect;
-        if(horizontal)
-            rect.x=x, rect.y=y+len, rect.width=width, rect.height=height-(len*2);
-        else
-            rect.x=x+len, rect.y=y, rect.width=width-(len*2), rect.height=height;
+        if (horizontal) {
+            rect.x = x;
+            rect.y = y + len;
+            rect.width = width;
+            rect.height = height - (len * 2);
+        } else {
+            rect.x = x + len;
+            rect.y = y;
+            rect.width = width - len * 2;
+            rect.height = height;
+        }
         setCairoClipping(cr, &rect);
-    }
-    else
+    } else {
         setCairoClipping(cr, area);
+    }
 
-    if(!colouredMouseOver && lightBorder)
-    {
-        GdkColor *col=&colors[LIGHT_BORDER(app)];
+    if (!colouredMouseOver && lightBorder) {
+        GdkColor *col = &colors[LIGHT_BORDER(app)];
 
         cairo_new_path(cr);
         cairo_set_source_rgb(cr, CAIRO_COL(*col));
-        createPath(cr, xd, yd, width-1, height-1, qtcGetRadius(&opts, width, height, widget, RADIUS_INTERNAL), round);
+        createPath(cr, xd, yd, width - 1, height - 1,
+                   qtcGetRadius(&opts, width, height, widget, RADIUS_INTERNAL),
+                   round);
         cairo_stroke(cr);
-    }
-    else if(colouredMouseOver || (!sunken && (draw3d || flags&DF_DRAW_INSIDE)))
-    {
-        int      dark=/*bevelledButton ? */2/* : 4*/;
-        GdkColor *col1=colouredMouseOver ? &qtcPalette.mouseover[MO_STD_LIGHT(widget, sunken)]
-                                         : &colors[sunken ? dark : 0];
+    }  else if (colouredMouseOver ||
+                (!sunken && (draw3d || flags & DF_DRAW_INSIDE))) {
+        int dark = /*bevelledButton ? */2/* : 4*/;
+        GdkColor *col1 =
+            (colouredMouseOver ?
+             &qtcPalette.mouseover[MO_STD_LIGHT(widget, sunken)] :
+             &colors[sunken ? dark : 0]);
 
         cairo_new_path(cr);
         cairo_set_source_rgb(cr, CAIRO_COL(*col1));
-        createTLPath(cr, xd, yd, width-1, height-1, qtcGetRadius(&opts, width, height, widget, RADIUS_INTERNAL), round);
+        createTLPath(cr, xd, yd, width - 1, height - 1,
+                     qtcGetRadius(&opts, width, height, widget,
+                                  RADIUS_INTERNAL), round);
         cairo_stroke(cr);
-        if(colouredMouseOver || bevelledButton || draw3dfull)
-        {
-            GdkColor *col2=colouredMouseOver ? &qtcPalette.mouseover[MO_STD_DARK(widget)]
-                                             : &colors[sunken ? 0 : dark];
+        if (colouredMouseOver || bevelledButton || draw3dfull) {
+            GdkColor *col2 = colouredMouseOver ?
+                &qtcPalette.mouseover[MO_STD_DARK(widget)] :
+                &colors[sunken ? 0 : dark];
 
             cairo_new_path(cr);
             cairo_set_source_rgb(cr, CAIRO_COL(*col2));
-            createBRPath(cr, xd, yd, width-1, height-1, qtcGetRadius(&opts, width, height, widget, RADIUS_INTERNAL), round);
+            createBRPath(cr, xd, yd, width - 1, height - 1,
+                         qtcGetRadius(&opts, width, height, widget,
+                                      RADIUS_INTERNAL), round);
             cairo_stroke(cr);
         }
     }
 
     unsetCairoClipping(cr);
 
-    if((doEtch || glowFocus) && !(flags&DF_HIDE_EFFECT))
-        if((!sunken || glowFocusSunkenToggle) && GTK_STATE_INSENSITIVE!=state && !(opts.thin&THIN_FRAMES) &&
-            ((WIDGET_OTHER!=widget && WIDGET_SLIDER_TROUGH!=widget && WIDGET_COMBO_BUTTON!=widget &&
-             MO_GLOW==opts.coloredMouseOver && GTK_STATE_PRELIGHT==state) ||
-             glowFocus ||
-            (WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator)))
-            drawGlowReal(cr, area, xe-1, ye-1, we+2, he+2, round,
-                         WIDGET_DEF_BUTTON==widget && GTK_STATE_PRELIGHT==state ? WIDGET_STD_BUTTON : widget,
+    if ((doEtch || glowFocus) && !(flags & DF_HIDE_EFFECT)) {
+        if ((!sunken || glowFocusSunkenToggle) &&
+            GTK_STATE_INSENSITIVE != state && !(opts.thin&THIN_FRAMES) &&
+            ((WIDGET_OTHER != widget && WIDGET_SLIDER_TROUGH != widget &&
+              WIDGET_COMBO_BUTTON != widget &&
+              MO_GLOW == opts.coloredMouseOver &&
+              GTK_STATE_PRELIGHT == state) || glowFocus ||
+             (WIDGET_DEF_BUTTON == widget &&
+              IND_GLOW == opts.defBtnIndicator))) {
+            drawGlowReal(cr, area, xe - 1, ye - 1, we + 2, he + 2, round,
+                         WIDGET_DEF_BUTTON == widget &&
+                         GTK_STATE_PRELIGHT == state ?
+                         WIDGET_STD_BUTTON : widget,
                          glowFocus ? qtcPalette.focus : NULL);
-        else
-            drawEtch(cr, area, wid, xe-(WIDGET_COMBO_BUTTON==widget ? (ROUNDED_RIGHT==round ? 3 : 1) : 1), ye-1,
-                                    we+(WIDGET_COMBO_BUTTON==widget ? (ROUNDED_RIGHT==round ? 4 : 5) : 2), he+2,
-                    EFFECT_SHADOW==opts.buttonEffect && WIDGET_COMBO_BUTTON!=widget && WIDGET_BUTTON(widget) && !sunken,
-                    round, widget);
+        } else {
+            drawEtch(cr, area, wid,
+                     xe - (WIDGET_COMBO_BUTTON == widget ?
+                           (ROUNDED_RIGHT==round ? 3 : 1) : 1), ye - 1,
+                     we + (WIDGET_COMBO_BUTTON == widget ?
+                           (ROUNDED_RIGHT == round ? 4 : 5) : 2), he + 2,
+                     EFFECT_SHADOW == opts.buttonEffect &&
+                     WIDGET_COMBO_BUTTON != widget && WIDGET_BUTTON(widget) &&
+                     !sunken, round, widget);
+        }
+    }
 
-    xd-=1, x--, yd-=1, y--, width+=2, height+=2;
-    if(flags&DF_DO_BORDER && width>2 && height>2)
-    {
+    xd -= 1;
+    x--;
+    yd -= 1;
+    y--;
+    width += 2;
+    height += 2;
+    if (flags & DF_DO_BORDER && width > 2 && height > 2) {
         GdkColor *borderCols=glowFocus && (!sunken || glowFocusSunkenToggle)
-                            ? qtcPalette.focus
-                            : (WIDGET_COMBO==widget || WIDGET_COMBO_BUTTON==widget) && colors==qtcPalette.combobtn
-                                ? GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver && !sunken
-                                    ? qtcPalette.mouseover
-                                    : qtcPalette.button[PAL_ACTIVE]
-                                : colors;
+            ? qtcPalette.focus
+            : (WIDGET_COMBO==widget || WIDGET_COMBO_BUTTON==widget) && colors==qtcPalette.combobtn
+            ? GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver && !sunken
+            ? qtcPalette.mouseover
+            : qtcPalette.button[PAL_ACTIVE]
+            : colors;
 
         cairo_new_path(cr);
         /* Yuck! this is a mess!!!! */
 // Copied from KDE4 version...
         if(!sunken && GTK_STATE_INSENSITIVE!=state && !glowFocus &&
-            ( ( ( (doEtch && WIDGET_OTHER!=widget && WIDGET_SLIDER_TROUGH!=widget) || SLIDER(widget) || WIDGET_COMBO==widget || WIDGET_MENU_BUTTON==widget ) &&
-                 (MO_GLOW==opts.coloredMouseOver/* || MO_COLORED==opts.colorMenubarMouseOver*/) && GTK_STATE_PRELIGHT==state) ||
-               (doEtch && WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator)))
+           ( ( ( (doEtch && WIDGET_OTHER!=widget && WIDGET_SLIDER_TROUGH!=widget) || SLIDER(widget) || WIDGET_COMBO==widget || WIDGET_MENU_BUTTON==widget ) &&
+               (MO_GLOW==opts.coloredMouseOver/* || MO_COLORED==opts.colorMenubarMouseOver*/) && GTK_STATE_PRELIGHT==state) ||
+             (doEtch && WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator)))
 
 // Previous Gtk2...
 //         if(!sunken && (doEtch || SLIDER(widget)) &&
@@ -851,7 +960,7 @@ void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectang
             drawBorder(cr, style, state, area, x, y, width, height,
                        WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator &&
                        (GTK_STATE_PRELIGHT!=state || !qtcPalette.mouseover)
-                            ? qtcPalette.defbtn : qtcPalette.mouseover,
+                       ? qtcPalette.defbtn : qtcPalette.mouseover,
                        round, borderProfile, widget, flags);
         else
             drawBorder(cr, style, state, area, x, y, width, height,
@@ -859,26 +968,27 @@ void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectang
                        round, borderProfile, widget, flags);
     }
 
-    if(WIDGET_SB_SLIDER==widget && opts.stripedSbar)
-    {
-        clipPathRadius(cr, x, y, width, height, qtcGetRadius(&opts, width, height, WIDGET_SB_SLIDER, RADIUS_INTERNAL), round);
-        addStripes(cr, x+1, y+1, width-2, height-2, horiz);
+    if (WIDGET_SB_SLIDER == widget && opts.stripedSbar) {
+        clipPathRadius(cr, x, y, width, height,
+                       qtcGetRadius(&opts, width, height, WIDGET_SB_SLIDER,
+                                    RADIUS_INTERNAL), round);
+        addStripes(cr, x + 1, y + 1, width - 2, height - 2, horiz);
         cairo_restore(cr);
     }
 }
 
 void drawFadedLineReal(cairo_t *cr, int x, int y, int width, int height, GdkColor *col, GdkRectangle *area, GdkRectangle *gap,
-                              gboolean fadeStart, gboolean fadeEnd, gboolean horiz, double alpha)
+                       gboolean fadeStart, gboolean fadeEnd, gboolean horiz, double alpha)
 {
     double          rx=x+0.5,
-                    ry=y+0.5;
+        ry=y+0.5;
     cairo_pattern_t *pt=cairo_pattern_create_linear(rx, ry, horiz ? rx+(width-1) : rx+1, horiz ? ry+1 : ry+(height-1));
 
     if(gap)
     {
         QtcRect   r={x, y, width, height};
         QtcRegion *region=qtcRegionRect(area ? area : &r),
-                  *inner=qtcRegionRect(gap);
+            *inner=qtcRegionRect(gap);
 
         qtcRegionXor(region, inner);
         setCairoClippingRegion(cr, region);
@@ -929,7 +1039,7 @@ void setLineCol(cairo_t *cr, cairo_pattern_t *pt, GdkColor *col)
 }
 
 void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight, gboolean horiz,
-                      int nLines, int offset, GdkColor *cols, GdkRectangle *area, int dark, ELine type)
+               int nLines, int offset, GdkColor *cols, GdkRectangle *area, int dark, ELine type)
 {
     if(horiz)
         ry+=0.5,  rwidth+=1;
@@ -937,74 +1047,74 @@ void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight, gbool
         rx+=0.5,  rheight+=1;
 
     {
-    int             space = (nLines*2)+(LINE_DASHES!=type ? (nLines-1) : 0),
-                    step = LINE_DASHES!=type ? 3 : 2,
-                    i,
-                    etchedDisp = LINE_SUNKEN==type ? 1 : 0;
-    double          x = (horiz ? rx : rx+((rwidth-space)>>1)),
-                    y = (horiz ? ry+((rheight-space)>>1) : ry),
-                    x2 = rx + rwidth-1,
-                    y2 = ry + rheight-1;
-    GdkColor        *col1 = &cols[dark],
-                    *col2 = &cols[0];
-    cairo_pattern_t *pt1=(opts.fadeLines && (horiz ? rwidth : rheight)>(16+etchedDisp))
-                          ? cairo_pattern_create_linear(rx, ry, horiz ? x2 : rx+1, horiz ? ry+1 : y2)
-                          : NULL,
-                    *pt2=(pt1 && LINE_FLAT!=type)
-                          ? cairo_pattern_create_linear(rx, ry, horiz ? x2 : rx+1, horiz ? ry+1 : y2)
-                          : NULL;
+        int             space = (nLines*2)+(LINE_DASHES!=type ? (nLines-1) : 0),
+            step = LINE_DASHES!=type ? 3 : 2,
+            i,
+            etchedDisp = LINE_SUNKEN==type ? 1 : 0;
+        double          x = (horiz ? rx : rx+((rwidth-space)>>1)),
+            y = (horiz ? ry+((rheight-space)>>1) : ry),
+            x2 = rx + rwidth-1,
+            y2 = ry + rheight-1;
+        GdkColor        *col1 = &cols[dark],
+            *col2 = &cols[0];
+        cairo_pattern_t *pt1=(opts.fadeLines && (horiz ? rwidth : rheight)>(16+etchedDisp))
+            ? cairo_pattern_create_linear(rx, ry, horiz ? x2 : rx+1, horiz ? ry+1 : y2)
+            : NULL,
+            *pt2=(pt1 && LINE_FLAT!=type)
+            ? cairo_pattern_create_linear(rx, ry, horiz ? x2 : rx+1, horiz ? ry+1 : y2)
+            : NULL;
 
-    setCairoClipping(cr, area);
-    setLineCol(cr, pt1, col1);
+        setCairoClipping(cr, area);
+        setLineCol(cr, pt1, col1);
 
-    if(horiz)
-    {
-        for(i=0; i<space; i+=step)
+        if(horiz)
         {
-            cairo_move_to(cr, x+offset, y+i);
-            cairo_line_to(cr, x2-offset, y+i);
-        }
-        cairo_stroke(cr);
-
-        if(LINE_FLAT!=type)
-        {
-            setLineCol(cr, pt2, col2);
-            x+=etchedDisp;
-            x2+=etchedDisp;
-            for(i=1; i<space; i+=step)
+            for(i=0; i<space; i+=step)
             {
                 cairo_move_to(cr, x+offset, y+i);
                 cairo_line_to(cr, x2-offset, y+i);
             }
             cairo_stroke(cr);
+
+            if(LINE_FLAT!=type)
+            {
+                setLineCol(cr, pt2, col2);
+                x+=etchedDisp;
+                x2+=etchedDisp;
+                for(i=1; i<space; i+=step)
+                {
+                    cairo_move_to(cr, x+offset, y+i);
+                    cairo_line_to(cr, x2-offset, y+i);
+                }
+                cairo_stroke(cr);
+            }
         }
-    }
-    else
-    {
-        for(i=0; i<space; i+=step)
+        else
         {
-            cairo_move_to(cr, x+i, y+offset);
-            cairo_line_to(cr, x+i, y2-offset);
-        }
-        cairo_stroke(cr);
-        if(LINE_FLAT!=type)
-        {
-            setLineCol(cr, pt2, col2);
-            y+=etchedDisp;
-            y2+=etchedDisp;
-            for(i=1; i<space; i+=step)
+            for(i=0; i<space; i+=step)
             {
                 cairo_move_to(cr, x+i, y+offset);
                 cairo_line_to(cr, x+i, y2-offset);
             }
             cairo_stroke(cr);
+            if(LINE_FLAT!=type)
+            {
+                setLineCol(cr, pt2, col2);
+                y+=etchedDisp;
+                y2+=etchedDisp;
+                for(i=1; i<space; i+=step)
+                {
+                    cairo_move_to(cr, x+i, y+offset);
+                    cairo_line_to(cr, x+i, y2-offset);
+                }
+                cairo_stroke(cr);
+            }
         }
-    }
-    if(pt1)
-        cairo_pattern_destroy(pt1);
-    if(pt2)
-        cairo_pattern_destroy(pt2);
-    unsetCairoClipping(cr);
+        if(pt1)
+            cairo_pattern_destroy(pt1);
+        if(pt2)
+            cairo_pattern_destroy(pt2);
+        unsetCairoClipping(cr);
     }
 }
 
@@ -1012,9 +1122,9 @@ void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight, gbool
 void drawDot(cairo_t *cr, int x, int y, int w, int h, GdkColor *cols)
 {
     double          dx=(x+((w-5)>>1))/*+0.5*/,
-                    dy=(y+((h-5)>>1))/*+0.5*/;
+        dy=(y+((h-5)>>1))/*+0.5*/;
     cairo_pattern_t *p1=cairo_pattern_create_linear(dx, dy, dx+4, dy+4),
-                    *p2=cairo_pattern_create_linear(dx+2, dy+2, dx+4, dx+4);
+        *p2=cairo_pattern_create_linear(dx+2, dy+2, dx+4, dx+4);
 
     cairo_pattern_add_color_stop_rgba(p1, 0.0, CAIRO_COL(cols[QTC_STD_BORDER]), 1.0);
     cairo_pattern_add_color_stop_rgba(p1, CAIRO_GRAD_END, CAIRO_COL(cols[QTC_STD_BORDER]), 0.4);
@@ -1040,15 +1150,15 @@ void drawDot(cairo_t *cr, int x, int y, int w, int h, GdkColor *cols)
 }
 
 void drawDots(cairo_t *cr, int rx, int ry, int rwidth, int rheight, gboolean horiz, int nLines, int offset, GdkColor *cols, GdkRectangle *area,
-                     int startOffset, int dark)
+              int startOffset, int dark)
 {
     int      space =(nLines*2)+(nLines-1),
-             x = horiz ? rx : rx+((rwidth-space)>>1),
-             y = horiz ? ry+((rheight-space)>>1) : ry,
-             i, j,
-             numDots=(horiz ? (rwidth-(2*offset))/3 : (rheight-(2*offset))/3)+1;
+        x = horiz ? rx : rx+((rwidth-space)>>1),
+        y = horiz ? ry+((rheight-space)>>1) : ry,
+        i, j,
+        numDots=(horiz ? (rwidth-(2*offset))/3 : (rheight-(2*offset))/3)+1;
     GdkColor *col1 = &cols[dark],
-             *col2 = &cols[0];
+        *col2 = &cols[0];
 
     setCairoClipping(cr, area);
     if(horiz)
@@ -1118,8 +1228,8 @@ void drawEntryCorners(cairo_t *cr, GdkRectangle *area, int round, int x, int y, 
 void drawBgndRing(cairo_t *cr, int x, int y, int size, int size2, gboolean isWindow)
 {
     double width=(size-size2)/2.0,
-           width2=width/2.0,
-           radius=(size2+width)/2.0;
+        width2=width/2.0,
+        radius=(size2+width)/2.0;
 
     cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, RINGS_INNER_ALPHA(isWindow ? opts.bgndImage.type : opts.menuBgndImage.type));
     cairo_set_line_width(cr, width);
@@ -1146,148 +1256,153 @@ void drawBgndRings(cairo_t *cr, gint x, gint y, gint width, gint height, gboolea
     static cairo_surface_t *menuBgndImage=NULL;
 
     bool useWindow=isWindow || (opts.bgndImage.type==opts.menuBgndImage.type &&
-                               (IMG_FILE!=opts.bgndImage.type ||
-                                (opts.bgndImage.height==opts.menuBgndImage.height &&
-                                 opts.bgndImage.width==opts.menuBgndImage.width &&
-                                 opts.bgndImage.pixmap.file==opts.menuBgndImage.pixmap.file)));
+                                (IMG_FILE!=opts.bgndImage.type ||
+                                 (opts.bgndImage.height==opts.menuBgndImage.height &&
+                                  opts.bgndImage.width==opts.menuBgndImage.width &&
+                                  opts.bgndImage.pixmap.file==opts.menuBgndImage.pixmap.file)));
     QtCImage *img=useWindow ? &opts.bgndImage : &opts.menuBgndImage;
     int      imgWidth=IMG_FILE==img->type ? img->width : RINGS_WIDTH(img->type),
-             imgHeight=IMG_FILE==img->type ? img->height : RINGS_HEIGHT(img->type);
+        imgHeight=IMG_FILE==img->type ? img->height : RINGS_HEIGHT(img->type);
 
     switch(img->type)
     {
-        case IMG_NONE:
-            break;
-        case IMG_FILE:
-            qtcLoadBgndImage(img);
-            if(img->pixmap.img)
-            {
-                switch(img->pos)
-                {
-                    case PP_TL:
-                        gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x, y);
-                        break;
-                    case PP_TM:
-                        gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x+((width-img->width)/2), y);
-                        break;
-                    default:
-                    case PP_TR:
-                        gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x+(width-img->width)-1, y);
-                        break;
-                    case PP_BL:
-                        gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x, y+(height-img->height));
-                        break;
-                    case PP_BM:
-                        gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x+((width-img->width)/2), y+(height-img->height)-1);
-                        break;
-                    case PP_BR:
-                        gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x+(width-img->width)-1, y+(height-img->height)-1);
-                        break;
-                    case PP_LM:
-                        gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x, y+((height-img->height)/2));
-                        break;
-                    case PP_RM:
-                        gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x+(width-img->width)-1, y+((height-img->height)/2));
-                        break;
-                    case PP_CENTRED:
-                        gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x+((width-img->width)/2), y+((height-img->height)/2));
-                }
-                cairo_paint(cr);
-            }
-            break;
-        case IMG_PLAIN_RINGS:
-        case IMG_BORDERED_RINGS:
+    case IMG_NONE:
+        break;
+    case IMG_FILE:
+        qtcLoadBgndImage(img);
+        if(img->pixmap.img)
         {
-            cairo_surface_t *crImg=useWindow ? bgndImage : menuBgndImage;
-
-            if(!crImg)
+            switch(img->pos)
             {
-                cairo_t *ci;
-                crImg=cairo_image_surface_create(CAIRO_FORMAT_ARGB32, imgWidth+1, imgHeight+1);
-                ci=cairo_create(crImg);
-                drawBgndRing(ci, 0, 0, 200, 140, isWindow);
-
-                drawBgndRing(ci, 210, 10, 230, 214, isWindow);
-                drawBgndRing(ci, 226, 26, 198, 182, isWindow);
-                drawBgndRing(ci, 300, 100, 50, 0, isWindow);
-
-                drawBgndRing(ci, 100, 96, 160, 144, isWindow);
-                drawBgndRing(ci, 116, 112, 128, 112, isWindow);
-
-                drawBgndRing(ci, 250, 160, 200, 140, isWindow);
-                drawBgndRing(ci, 310, 220, 80, 0, isWindow);
-                cairo_destroy(ci);
-                if(useWindow)
-                    bgndImage=crImg;
-                else
-                    menuBgndImage=crImg;
+            case PP_TL:
+                gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x, y);
+                break;
+            case PP_TM:
+                gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x+((width-img->width)/2), y);
+                break;
+            default:
+            case PP_TR:
+                gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x+(width-img->width)-1, y);
+                break;
+            case PP_BL:
+                gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x, y+(height-img->height));
+                break;
+            case PP_BM:
+                gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x+((width-img->width)/2), y+(height-img->height)-1);
+                break;
+            case PP_BR:
+                gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x+(width-img->width)-1, y+(height-img->height)-1);
+                break;
+            case PP_LM:
+                gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x, y+((height-img->height)/2));
+                break;
+            case PP_RM:
+                gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x+(width-img->width)-1, y+((height-img->height)/2));
+                break;
+            case PP_CENTRED:
+                gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x+((width-img->width)/2), y+((height-img->height)/2));
             }
-
-            cairo_set_source_surface(cr, crImg, width-imgWidth, y+1);
             cairo_paint(cr);
-            break;
         }
-        case IMG_SQUARE_RINGS:
+        break;
+    case IMG_PLAIN_RINGS:
+    case IMG_BORDERED_RINGS:
+    {
+        cairo_surface_t *crImg=useWindow ? bgndImage : menuBgndImage;
+
+        if(!crImg)
         {
-            cairo_surface_t *crImg=useWindow ? bgndImage : menuBgndImage;
+            cairo_t *ci;
+            crImg=cairo_image_surface_create(CAIRO_FORMAT_ARGB32, imgWidth+1, imgHeight+1);
+            ci=cairo_create(crImg);
+            drawBgndRing(ci, 0, 0, 200, 140, isWindow);
 
-            if(!crImg)
-            {
-                cairo_t *ci;
-                double  halfWidth=RINGS_SQUARE_LINE_WIDTH/2.0;
-                crImg=cairo_image_surface_create(CAIRO_FORMAT_ARGB32, imgWidth+1, imgHeight+1);
-                ci=cairo_create(crImg);
+            drawBgndRing(ci, 210, 10, 230, 214, isWindow);
+            drawBgndRing(ci, 226, 26, 198, 182, isWindow);
+            drawBgndRing(ci, 300, 100, 50, 0, isWindow);
 
-                cairo_set_source_rgba(ci, 1.0, 1.0, 1.0, RINGS_SQUARE_SMALL_ALPHA);
-                cairo_set_line_width(ci, RINGS_SQUARE_LINE_WIDTH);
-                createPath(ci, halfWidth+0.5, halfWidth+0.5, RINGS_SQUARE_SMALL_SIZE, RINGS_SQUARE_SMALL_SIZE,
-                               RINGS_SQUARE_RADIUS, ROUNDED_ALL);
-                cairo_stroke(ci);
+            drawBgndRing(ci, 100, 96, 160, 144, isWindow);
+            drawBgndRing(ci, 116, 112, 128, 112, isWindow);
 
-                cairo_new_path(ci);
-                cairo_set_source_rgba(ci, 1.0, 1.0, 1.0, RINGS_SQUARE_SMALL_ALPHA);
-                cairo_set_line_width(ci, RINGS_SQUARE_LINE_WIDTH);
-                createPath(ci, halfWidth+0.5+(imgWidth-(RINGS_SQUARE_SMALL_SIZE+RINGS_SQUARE_LINE_WIDTH)),
-                               halfWidth+0.5+(imgHeight-(RINGS_SQUARE_SMALL_SIZE+RINGS_SQUARE_LINE_WIDTH)),
-                               RINGS_SQUARE_SMALL_SIZE, RINGS_SQUARE_SMALL_SIZE,
-                               RINGS_SQUARE_RADIUS, ROUNDED_ALL);
-                cairo_stroke(ci);
-
-                cairo_new_path(ci);
-                cairo_set_source_rgba(ci, 1.0, 1.0, 1.0, RINGS_SQUARE_LARGE_ALPHA);
-                cairo_set_line_width(ci, RINGS_SQUARE_LINE_WIDTH);
-                createPath(ci, halfWidth+0.5+((imgWidth-RINGS_SQUARE_LARGE_SIZE-RINGS_SQUARE_LINE_WIDTH)/2.0),
-                               halfWidth+0.5+((imgHeight-RINGS_SQUARE_LARGE_SIZE-RINGS_SQUARE_LINE_WIDTH)/2.0),
-                               RINGS_SQUARE_LARGE_SIZE, RINGS_SQUARE_LARGE_SIZE,
-                               RINGS_SQUARE_RADIUS, ROUNDED_ALL);
-                cairo_stroke(ci);
-
-                cairo_destroy(ci);
-
-                if(useWindow)
-                    bgndImage=crImg;
-                else
-                    menuBgndImage=crImg;
-            }
-
-            cairo_set_source_surface(cr, crImg, width-imgWidth, y+1);
-            cairo_paint(cr);
-            break;
+            drawBgndRing(ci, 250, 160, 200, 140, isWindow);
+            drawBgndRing(ci, 310, 220, 80, 0, isWindow);
+            cairo_destroy(ci);
+            if(useWindow)
+                bgndImage=crImg;
+            else
+                menuBgndImage=crImg;
         }
+
+        cairo_set_source_surface(cr, crImg, width-imgWidth, y+1);
+        cairo_paint(cr);
+        break;
+    }
+    case IMG_SQUARE_RINGS:
+    {
+        cairo_surface_t *crImg=useWindow ? bgndImage : menuBgndImage;
+
+        if(!crImg)
+        {
+            cairo_t *ci;
+            double  halfWidth=RINGS_SQUARE_LINE_WIDTH/2.0;
+            crImg=cairo_image_surface_create(CAIRO_FORMAT_ARGB32, imgWidth+1, imgHeight+1);
+            ci=cairo_create(crImg);
+
+            cairo_set_source_rgba(ci, 1.0, 1.0, 1.0, RINGS_SQUARE_SMALL_ALPHA);
+            cairo_set_line_width(ci, RINGS_SQUARE_LINE_WIDTH);
+            createPath(ci, halfWidth+0.5, halfWidth+0.5, RINGS_SQUARE_SMALL_SIZE, RINGS_SQUARE_SMALL_SIZE,
+                       RINGS_SQUARE_RADIUS, ROUNDED_ALL);
+            cairo_stroke(ci);
+
+            cairo_new_path(ci);
+            cairo_set_source_rgba(ci, 1.0, 1.0, 1.0, RINGS_SQUARE_SMALL_ALPHA);
+            cairo_set_line_width(ci, RINGS_SQUARE_LINE_WIDTH);
+            createPath(ci, halfWidth+0.5+(imgWidth-(RINGS_SQUARE_SMALL_SIZE+RINGS_SQUARE_LINE_WIDTH)),
+                       halfWidth+0.5+(imgHeight-(RINGS_SQUARE_SMALL_SIZE+RINGS_SQUARE_LINE_WIDTH)),
+                       RINGS_SQUARE_SMALL_SIZE, RINGS_SQUARE_SMALL_SIZE,
+                       RINGS_SQUARE_RADIUS, ROUNDED_ALL);
+            cairo_stroke(ci);
+
+            cairo_new_path(ci);
+            cairo_set_source_rgba(ci, 1.0, 1.0, 1.0, RINGS_SQUARE_LARGE_ALPHA);
+            cairo_set_line_width(ci, RINGS_SQUARE_LINE_WIDTH);
+            createPath(ci, halfWidth+0.5+((imgWidth-RINGS_SQUARE_LARGE_SIZE-RINGS_SQUARE_LINE_WIDTH)/2.0),
+                       halfWidth+0.5+((imgHeight-RINGS_SQUARE_LARGE_SIZE-RINGS_SQUARE_LINE_WIDTH)/2.0),
+                       RINGS_SQUARE_LARGE_SIZE, RINGS_SQUARE_LARGE_SIZE,
+                       RINGS_SQUARE_RADIUS, ROUNDED_ALL);
+            cairo_stroke(ci);
+
+            cairo_destroy(ci);
+
+            if(useWindow)
+                bgndImage=crImg;
+            else
+                menuBgndImage=crImg;
+        }
+
+        cairo_set_source_surface(cr, crImg, width-imgWidth, y+1);
+        cairo_paint(cr);
+        break;
+    }
     }
 }
 
-void drawBgndImage(cairo_t *cr, GtkStyle *style, GdkRectangle *area, gint x, gint y, gint w, gint h, GdkColor *col,
-                          gboolean isWindow, double alpha)
+void
+drawBgndImage(cairo_t *cr, GtkStyle *style, GdkRectangle *area, gint x, gint y,
+              gint w, gint h, GdkColor *col, gboolean isWindow, double alpha)
 {
-    GdkPixbuf *pix=isWindow ? opts.bgndPixmap.img : opts.menuBgndPixmap.img;//getPixbuf(getCheckRadioCol(style, ind_state, mnu), PIX_CHECK, 1.0);
-//     int       pw=gdk_pixbuf_get_width(pix),
-//               ph=gdk_pixbuf_get_height(pix),
-//               dx=(x+(opts.crSize/2))-(pw/2),
-//               dy=(y+(opts.crSize/2))-(ph/2);
+    QTC_UNUSED(style);
+    QTC_UNUSED(area);
+    QTC_UNUSED(col);
+    QTC_UNUSED(alpha);
+    GdkPixbuf *pix = isWindow ? opts.bgndPixmap.img : opts.menuBgndPixmap.img;
+    /* getPixbuf(getCheckRadioCol(style, ind_state, mnu), PIX_CHECK, 1.0); */
+    /* int       pw=gdk_pixbuf_get_width(pix), */
+    /*           ph=gdk_pixbuf_get_height(pix), */
+    /*           dx=(x+(opts.crSize/2))-(pw/2), */
+    /*           dy=(y+(opts.crSize/2))-(ph/2); */
 
-    if(pix)
-    {
+    if (pix) {
         gdk_cairo_set_source_pixbuf(cr, pix, 0, 0);
         cairo_pattern_set_extend(cairo_get_source(cr), CAIRO_EXTEND_REPEAT);
         cairo_rectangle(cr, x, y, w, h);
@@ -1295,13 +1410,18 @@ void drawBgndImage(cairo_t *cr, GtkStyle *style, GdkRectangle *area, gint x, gin
     }
 }
 
-void drawStripedBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, gint x, gint y, gint w, gint h, GdkColor *col,
-                            gboolean isWindow, double alpha)
+void
+drawStripedBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
+                gint x, gint y, gint w, gint h, GdkColor *col,
+                gboolean isWindow, double alpha)
 {
+    QTC_UNUSED(style);
+    QTC_UNUSED(area);
+    QTC_UNUSED(isWindow);
     GdkColor col2;
     qtcShade(col, &col2, BGND_STRIPE_SHADE, opts.shading);
 
-    cairo_pattern_t *pat=cairo_pattern_create_linear(x, y, x, y+4);
+    cairo_pattern_t *pat = cairo_pattern_create_linear(x, y, x, y + 4);
     cairo_pattern_add_color_stop_rgba(pat, 0.0, CAIRO_COL(*col), alpha);
     cairo_pattern_add_color_stop_rgba(pat, 0.25-0.0001, CAIRO_COL(*col), alpha);
     cairo_pattern_add_color_stop_rgba(pat, 0.5, CAIRO_COL(col2), alpha);
@@ -1320,36 +1440,36 @@ void drawStripedBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, gint x, g
     cairo_fill(cr);
     cairo_pattern_destroy(pat);
 /*
-    TODO: Use image? Would this speed up drawing???
-    static cairo_surface_t *bgndStripedImage=NULL;
-    static GdkColor        bgndStripedImageColor;
-    static cairo_surface_t *menuBgndStripedImage=NULL;
-    static GdkColor        menuBgndStripedImageColor;
+  TODO: Use image? Would this speed up drawing???
+  static cairo_surface_t *bgndStripedImage=NULL;
+  static GdkColor        bgndStripedImageColor;
+  static cairo_surface_t *menuBgndStripedImage=NULL;
+  static GdkColor        menuBgndStripedImageColor;
 
-    bool            useWindow=isWindow || (bgndStripedImage && *col==bgndStripedImageColor));
-    GdkColor        *imgCol=useWindow ? &bgndStripedImageColor : &menuBgndStripedImageColor;
-    cairo_surface_t **img=useWindow ? &bgndStripedImage : &menuBgndStripedImage;
+  bool            useWindow=isWindow || (bgndStripedImage && *col==bgndStripedImageColor));
+  GdkColor        *imgCol=useWindow ? &bgndStripedImageColor : &menuBgndStripedImageColor;
+  cairo_surface_t **img=useWindow ? &bgndStripedImage : &menuBgndStripedImage;
 
-    if(!(*img) || *imgCol!=*col)
-    {
-        static const inst constSize=64;
+  if(!(*img) || *imgCol!=*col)
+  {
+  static const inst constSize=64;
 
-        GdkColor col2;
-        cairo_t  *ci;
+  GdkColor col2;
+  cairo_t  *ci;
 
-        qtcShade(&opts, col, &col2, BGND_STRIPE_SHADE);
+  qtcShade(&opts, col, &col2, BGND_STRIPE_SHADE);
 
-        if(!(*img)
-            *img=cairo_image_surface_create(CAIRO_FORMAT_ARGB32, constSize, constSize);
-        ci=cairo_create(crImg);
-    }
-    cairo_set_source_surface(cr, *img, width-imgWidth, y+1);
-    cairo_paint(cr);
+  if(!(*img)
+  *img=cairo_image_surface_create(CAIRO_FORMAT_ARGB32, constSize, constSize);
+  ci=cairo_create(crImg);
+  }
+  cairo_set_source_surface(cr, *img, width-imgWidth, y+1);
+  cairo_paint(cr);
 */
 }
 
 gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, GdkWindow *window, GtkWidget *widget,
-                               gint x, gint y, gint width, gint height)
+                        gint x, gint y, gint width, gint height)
 {
     GtkWidget *parent=NULL;
     if(widget && (parent=gtk_widget_get_parent(widget)) && isOnHandlebox(parent, NULL, 0))
@@ -1368,10 +1488,10 @@ gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, GdkWin
             GdkRectangle  clip;
             GtkWidget     *topLevel=gtk_widget_get_toplevel(widget);
             int           opacity=!topLevel || !GTK_IS_DIALOG(topLevel) ? opts.bgndOpacity : opts.dlgOpacity,
-                          xmod=0, ymod=0, wmod=0, hmod=0;
+                xmod=0, ymod=0, wmod=0, hmod=0;
             double        alpha=1.0;
             gboolean      useAlpha=opacity<100 && isRgbaWidget(topLevel) && compositingActive(topLevel),
-                          flatBgnd=IS_FLAT_BGND(opts.bgndAppearance);
+                flatBgnd=IS_FLAT_BGND(opts.bgndAppearance);
             GdkColor      *col=NULL;
             GtkStyle      *topStyle=gtk_widget_get_style(topLevel);
 
@@ -1452,94 +1572,117 @@ gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, GdkWin
     return FALSE;
 }
 
-void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkWindow *window, GtkWidget *widget, GdkRectangle *area,
-                           gint x, gint y, gint width, gint height, int round, EWidget w)
+void
+drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
+               GdkWindow *window, GtkWidget *widget, GdkRectangle *area,
+               gint x, gint y, gint width, gint height, int round, EWidget w)
 {
-    gboolean enabled=!(GTK_STATE_INSENSITIVE==state || (widget && !gtk_widget_is_sensitive(widget))),
-             highlightReal=enabled && widget && gtk_widget_has_focus(widget) && GTK_APP_JAVA!=qtSettings.app && qtcPalette.focus,
-             mouseOver=ENTRY_MO && enabled && (GTK_STATE_PRELIGHT==state || qtcEntryIsLastMo(widget) ) &&
-                       qtcPalette.mouseover && GTK_APP_JAVA!=qtSettings.app,
-             highlight=highlightReal || mouseOver,
-             doEtch=DO_EFFECT && opts.etchEntry,
-             comboOrSpin=WIDGET_SPIN==w || WIDGET_COMBO_BUTTON==w;
-    GdkColor *colors=mouseOver
-                        ? qtcPalette.mouseover
-                        : highlightReal
-                            ? qtcPalette.focus
-                            : qtcPalette.background;
-    int      origHeight=height;
+    gboolean enabled = !(GTK_STATE_INSENSITIVE == state ||
+                         (widget && !gtk_widget_is_sensitive(widget)));
+    gboolean highlightReal =
+        (enabled && widget && gtk_widget_has_focus(widget) &&
+         GTK_APP_JAVA != qtSettings.app && qtcPalette.focus);
+    gboolean mouseOver =
+        (ENTRY_MO && enabled && (GTK_STATE_PRELIGHT == state ||
+                                 qtcEntryIsLastMo(widget)) &&
+         qtcPalette.mouseover && GTK_APP_JAVA != qtSettings.app);
+    gboolean highlight = highlightReal || mouseOver;
+    gboolean doEtch = DO_EFFECT && opts.etchEntry;
+    gboolean comboOrSpin = WIDGET_SPIN == w || WIDGET_COMBO_BUTTON == w;
+    GdkColor *colors = (mouseOver ? qtcPalette.mouseover : highlightReal ?
+                        qtcPalette.focus : qtcPalette.background);
 
-    if(GTK_APP_JAVA!=qtSettings.app)
+    if (GTK_APP_JAVA != qtSettings.app)
         qtcEntrySetup(widget);
 
-    if((doEtch || ROUND_NONE!=opts.round) && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
-        if(!IS_FLAT_BGND(opts.bgndAppearance) && widget && drawWindowBgnd(cr, style, area, window, widget, x, y, width, height))
-            ;
-        else
-        {
+    if ((doEtch || ROUND_NONE != opts.round) &&
+        (!widget || !g_object_get_data(G_OBJECT(widget),
+                                       "transparent-bg-hint"))) {
+        if (IS_FLAT_BGND(opts.bgndAppearance) || !widget ||
+            !drawWindowBgnd(cr, style, area, window, widget, x, y,
+                            width, height)) {
             GdkColor parentBgCol;
             getEntryParentBgCol(widget, &parentBgCol);
-            drawEntryCorners(cr, area, round, x, y, width, height, CAIRO_COL(parentBgCol), 1.0);
+            drawEntryCorners(cr, area, round, x, y, width, height,
+                             CAIRO_COL(parentBgCol), 1.0);
         }
-
-    if(0!=opts.gbFactor && (FRAME_SHADED==opts.groupBox || FRAME_FADED==opts.groupBox) && isInGroupBox(widget, 0))
-    {
-        double col=opts.gbFactor<0 ? 0.0 : 1.0;
-        drawEntryCorners(cr, area, round, x, y, width, height, col, col, col, TO_ALPHA(opts.gbFactor));
     }
 
-    if(doEtch)
-        y++,  x++, height-=2,  width-=2;
+    if (0 != opts.gbFactor && (FRAME_SHADED == opts.groupBox ||
+                               FRAME_FADED == opts.groupBox) &&
+        isInGroupBox(widget, 0)) {
+        double col = opts.gbFactor < 0 ? 0.0 : 1.0;
+        drawEntryCorners(cr, area, round, x, y, width, height, col, col, col,
+                         TO_ALPHA(opts.gbFactor));
+    }
 
-    if(DEBUG_ALL==qtSettings.debug)  printf(DEBUG_PREFIX "%s %d %d %d %d %d %d ", __FUNCTION__, state, x, y, width, height, round),
-                                     debugDisplayWidget(widget, 10);
+    if (doEtch) {
+        y++;
+        x++;
+        height -= 2;
+        width -= 2;
+    }
 
-    if(ROUNDED_ALL!=round)
-    {
-        if(comboOrSpin)
-            x-=2, width+=2;
-        else if(highlight)
-        {
-            if(doEtch)
-                if(ROUNDED_RIGHT==round)  /* RtoL */
+    if (DEBUG_ALL == qtSettings.debug) {
+        printf(DEBUG_PREFIX "%s %d %d %d %d %d %d ", __FUNCTION__,
+               state, x, y, width, height, round);
+        debugDisplayWidget(widget, 10);
+    }
+
+    if (ROUNDED_ALL != round) {
+        if (comboOrSpin) {
+            x -= 2;
+            width += 2;
+        } else if (highlight) {
+            if (doEtch) {
+                if (ROUNDED_RIGHT == round) {
+                    /* RtoL */
                     x--;
-                else
+                } else {
                     width++;
+                }
+            }
+        } else {
+            if (ROUNDED_RIGHT == round) {
+                /* RtoL */
+                x -= 2;
+            } else {
+                width += 2;
+            }
         }
-        else
-            if(ROUNDED_RIGHT==round)  /* RtoL */
-                x-=2;
-            else
-                width+=2;
     }
 
-    /*if(GTK_APP_OPEN_OFFICE!=qtSettings.app)*/
-    {
-        if(opts.round>ROUND_FULL)
-            clipPath(cr, x+1, y+1, width-2, height-2, WIDGET_ENTRY, RADIUS_INTERNAL, ROUNDED_ALL);
+    /*if (GTK_APP_OPEN_OFFICE != qtSettings.app)*/ {
+        if (opts.round > ROUND_FULL)
+            clipPath(cr, x + 1, y + 1, width - 2, height - 2,
+                     WIDGET_ENTRY, RADIUS_INTERNAL, ROUNDED_ALL);
+        drawAreaColor(cr, area, enabled ? &style->base[GTK_STATE_NORMAL] :
+                      &style->bg[GTK_STATE_INSENSITIVE], x + 1, y + 1,
+                      width - 2, height - 2);
 
-        drawAreaColor(cr, area, enabled
-                                    ? &style->base[GTK_STATE_NORMAL]
-                                    : &style->bg[GTK_STATE_INSENSITIVE], x+1, y+1, width-2, height-2);
-
-        if(opts.round>ROUND_FULL)
+        if (opts.round > ROUND_FULL) {
             unsetCairoClipping(cr);
+        }
     }
 
-    if(GTK_APP_OPEN_OFFICE==qtSettings.app && comboOrSpin)
-    {
+    if (GTK_APP_OPEN_OFFICE == qtSettings.app && comboOrSpin) {
         GdkRectangle rect;
 
-        rect.x=x, rect.width=width, rect.y=y, rect.height=height;
-        x-=4, width+=4;
+        rect.x = x;
+        rect.width = width;
+        rect.y = y;
+        rect.height = height;
+        x -= 4;
+        width += 4;
         setCairoClipping(cr, &rect);
     }
 
-    {
-    int xo=x, yo=y, widtho=width, heighto=height;
+    int xo = x;
+    int yo = y;
+    int widtho = width;
+    int heighto = height;
 
-    if(doEtch)
-    {
+    if (doEtch) {
         QtcRect   rect;
         QtcRegion *region=NULL;
 
@@ -1565,7 +1708,6 @@ void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkWindow 
 
     drawBorder(cr, style, !widget || gtk_widget_is_sensitive(widget) ? state : GTK_STATE_INSENSITIVE, area, xo, yo, widtho, heighto,
                colors, round, BORDER_SUNKEN, WIDGET_ENTRY, DF_BLEND);
-    }
 
     if(GTK_APP_OPEN_OFFICE==qtSettings.app && comboOrSpin)
         unsetCairoClipping(cr);
@@ -1580,197 +1722,210 @@ void setProgressStripeClipping(cairo_t *cr, GdkRectangle *area, int x, int y, in
 
     switch(opts.stripedProgress)
     {
-        default:
-        case STRIPE_PLAIN:
-        {
-            QtcRect   rect={x, y, width-2, height-2};
-            QtcRegion *region=NULL;
+    default:
+    case STRIPE_PLAIN:
+    {
+        QtcRect   rect={x, y, width-2, height-2};
+        QtcRegion *region=NULL;
 
 #if !GTK_CHECK_VERSION(2, 90, 0)
-            constrainRect(&rect, area);
+        constrainRect(&rect, area);
 #endif
-            region=qtcRegionRect(&rect);
-            if(horiz)
-                for(stripeOffset=0; stripeOffset<(width+PROGRESS_CHUNK_WIDTH); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
-                {
-                    QtcRect innerRect={x+stripeOffset+animShift, y+1, PROGRESS_CHUNK_WIDTH, height-2};
+        region=qtcRegionRect(&rect);
+        if(horiz)
+            for(stripeOffset=0; stripeOffset<(width+PROGRESS_CHUNK_WIDTH); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
+            {
+                QtcRect innerRect={x+stripeOffset+animShift, y+1, PROGRESS_CHUNK_WIDTH, height-2};
 
 #if !GTK_CHECK_VERSION(2, 90, 0)
-                    constrainRect(&innerRect, area);
+                constrainRect(&innerRect, area);
 #endif
-                    if(innerRect.width>0 && innerRect.height>0)
-                    {
-                        QtcRegion *innerRegion=qtcRegionRect(&innerRect);
-
-                        qtcRegionXor(region, innerRegion);
-                        qtcRegionDestroy(innerRegion);
-                    }
-                }
-            else
-                for(stripeOffset=0; stripeOffset<(height+PROGRESS_CHUNK_WIDTH); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
+                if(innerRect.width>0 && innerRect.height>0)
                 {
-                    QtcRect innerRect={x+1, y+stripeOffset+animShift, width-2, PROGRESS_CHUNK_WIDTH};
+                    QtcRegion *innerRegion=qtcRegionRect(&innerRect);
 
-                    /*constrainRect(&innerRect, area);*/
-                    if(innerRect.width>0 && innerRect.height>0)
-                    {
-                        QtcRegion *innerRegion=qtcRegionRect(&innerRect);
-
-                        qtcRegionXor(region, innerRegion);
-                        qtcRegionDestroy(innerRegion);
-                    }
+                    qtcRegionXor(region, innerRegion);
+                    qtcRegionDestroy(innerRegion);
                 }
-            setCairoClippingRegion(cr, region);
-            qtcRegionDestroy(region);
-            break;
-        }
-        case STRIPE_DIAGONAL:
-            cairo_new_path(cr);
-            cairo_save(cr);
+            }
+        else
+            for(stripeOffset=0; stripeOffset<(height+PROGRESS_CHUNK_WIDTH); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
+            {
+                QtcRect innerRect={x+1, y+stripeOffset+animShift, width-2, PROGRESS_CHUNK_WIDTH};
+
+                /*constrainRect(&innerRect, area);*/
+                if(innerRect.width>0 && innerRect.height>0)
+                {
+                    QtcRegion *innerRegion=qtcRegionRect(&innerRect);
+
+                    qtcRegionXor(region, innerRegion);
+                    qtcRegionDestroy(innerRegion);
+                }
+            }
+        setCairoClippingRegion(cr, region);
+        qtcRegionDestroy(region);
+        break;
+    }
+    case STRIPE_DIAGONAL:
+        cairo_new_path(cr);
+        cairo_save(cr);
 // #if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
 //             if(area)
 //                 cairo_rectangle(cr, area->x, area->y, area->width, area->height);
 // #endif
-            if(horiz)
-                for(stripeOffset=0; stripeOffset<(width+height+2); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
-                {
-                    GdkPoint pts[4]={ {x+stripeOffset+animShift,                               y},
-                                      {x+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH,          y},
-                                      {(x+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH)-height, y+height-1},
-                                      {(x+stripeOffset+animShift)-height,                      y+height-1}};
+        if(horiz)
+            for(stripeOffset=0; stripeOffset<(width+height+2); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
+            {
+                GdkPoint pts[4]={ {x+stripeOffset+animShift,                               y},
+                                  {x+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH,          y},
+                                  {(x+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH)-height, y+height-1},
+                                  {(x+stripeOffset+animShift)-height,                      y+height-1}};
 
-                    plotPoints(cr, pts, 4);
-                }
-            else
-                for(stripeOffset=0; stripeOffset<(height+width+2); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
-                {
-                    GdkPoint pts[4]={{x,         y+stripeOffset+animShift},
-                                     {x+width-1, (y+stripeOffset+animShift)-width},
-                                     {x+width-1, (y+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH)-width},
-                                     {x,         y+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH}};
+                plotPoints(cr, pts, 4);
+            }
+        else
+            for(stripeOffset=0; stripeOffset<(height+width+2); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
+            {
+                GdkPoint pts[4]={{x,         y+stripeOffset+animShift},
+                                 {x+width-1, (y+stripeOffset+animShift)-width},
+                                 {x+width-1, (y+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH)-width},
+                                 {x,         y+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH}};
 
-                    plotPoints(cr, pts, 4);
-                }
+                plotPoints(cr, pts, 4);
+            }
 
-            cairo_clip(cr);
+        cairo_clip(cr);
     }
 }
 
-void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state, GtkWidget *widget, GdkRectangle *area, int x, int y, int width, int height,
-                         gboolean rev, gboolean isEntryProg)
+void
+drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
+             GtkWidget *widget, GdkRectangle *area, int x, int y,
+             int width, int height, gboolean rev, gboolean isEntryProg)
 {
 #if GTK_CHECK_VERSION(2, 90, 0)
-    gboolean                  revProg=widget && GTK_IS_PROGRESS_BAR(widget) && gtk_progress_bar_get_inverted(GTK_PROGRESS_BAR(widget));
+    gboolean revProg = (widget && GTK_IS_PROGRESS_BAR(widget) &&
+                        gtk_progress_bar_get_inverted(GTK_PROGRESS_BAR(widget)));
 #else
-    GtkProgressBarOrientation orientation=widget && GTK_IS_PROGRESS_BAR(widget)
-                                    ? gtk_progress_bar_get_orientation(GTK_PROGRESS_BAR(widget))
-                                    : GTK_PROGRESS_LEFT_TO_RIGHT;
-    gboolean                  revProg=GTK_PROGRESS_RIGHT_TO_LEFT==orientation || GTK_PROGRESS_BOTTOM_TO_TOP==orientation;
+    GtkProgressBarOrientation orientation = widget && GTK_IS_PROGRESS_BAR(widget)
+        ? gtk_progress_bar_get_orientation(GTK_PROGRESS_BAR(widget))
+        : GTK_PROGRESS_LEFT_TO_RIGHT;
+    gboolean revProg = (GTK_PROGRESS_RIGHT_TO_LEFT == orientation ||
+                        GTK_PROGRESS_BOTTOM_TO_TOP == orientation);
 #endif
-    gboolean                  horiz=isHorizontalProgressbar(widget);
-    int                       wid=isEntryProg ? WIDGET_ENTRY_PROGRESSBAR : WIDGET_PROGRESSBAR,
-                              animShift=revProg ? 0 : -PROGRESS_CHUNK_WIDTH,
-                              xo=x, yo=y, wo=width, ho=height;
+    const gboolean horiz = isHorizontalProgressbar(widget);
+    int wid = isEntryProg ? WIDGET_ENTRY_PROGRESSBAR : WIDGET_PROGRESSBAR;
+    int animShift = revProg ? 0 : -PROGRESS_CHUNK_WIDTH;
+    int xo=x, yo=y, wo=width, ho=height;
 
-    if(opts.fillProgress)
+    if (opts.fillProgress)
         x--, y--, width+=2, height+=2, xo=x, yo=y, wo=width, ho=height;
 
-    if(STRIPE_NONE!=opts.stripedProgress && opts.animatedProgress && (isEntryProg || IS_PROGRESS_BAR(widget)))
-    {
+    if (STRIPE_NONE!=opts.stripedProgress && opts.animatedProgress && (isEntryProg || IS_PROGRESS_BAR(widget))) {
 #if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
-        if(isEntryProg || !GTK_PROGRESS(widget)->activity_mode)
+        if (isEntryProg || !GTK_PROGRESS(widget)->activity_mode)
 #endif
             qtcAnimationAddProgressBar((gpointer)widget, isEntryProg);
 
         animShift+=(revProg ? -1 : 1)*
-                    (((int)(qtcAnimationElapsed(widget)*PROGRESS_CHUNK_WIDTH))%(PROGRESS_CHUNK_WIDTH*2));
+            (((int)(qtcAnimationElapsed(widget)*PROGRESS_CHUNK_WIDTH))%(PROGRESS_CHUNK_WIDTH*2));
     }
 
-    {
-        gboolean grayItem=GTK_STATE_INSENSITIVE==state && ECOLOR_BACKGROUND!=opts.progressGrooveColor;
-        GdkColor *itemCols=grayItem
-                            ? qtcPalette.background
-                            : qtcPalette.progress
-                                ? qtcPalette.progress
-                                : qtcPalette.highlight;
-        int      new_state=GTK_STATE_PRELIGHT==state ? GTK_STATE_NORMAL : state,
-                 fillVal=grayItem ? 4 : ORIGINAL_SHADE,
-                 borderVal=0;
+    gboolean grayItem = (GTK_STATE_INSENSITIVE == state &&
+                         ECOLOR_BACKGROUND != opts.progressGrooveColor);
+    GdkColor *itemCols = (grayItem ? qtcPalette.background :
+                          qtcPalette.progress ? qtcPalette.progress :
+                          qtcPalette.highlight);
+    int new_state = GTK_STATE_PRELIGHT == state ? GTK_STATE_NORMAL : state;
+    int fillVal = grayItem ? 4 : ORIGINAL_SHADE;
 
-        x++, y++, width-=2, height-=2;
+    x++, y++, width-=2, height-=2;
 
-        if(opts.borderProgress && opts.round>ROUND_SLIGHT && (horiz ? width : height)<4)
-            clipPath(cr, x, y, width, height, wid, RADIUS_EXTERNAL, ROUNDED_ALL);
+    if (opts.borderProgress && opts.round>ROUND_SLIGHT &&
+        (horiz ? width : height) < 4) {
+        clipPath(cr, x, y, width, height, wid, RADIUS_EXTERNAL, ROUNDED_ALL);
+    }
 
-        if((horiz ? width : height)>1)
-            drawLightBevel(cr, style, new_state, area, x, y, width, height, &itemCols[fillVal],
-                           itemCols, ROUNDED_ALL, wid, BORDER_FLAT, (horiz ? 0 : DF_VERT), widget);
+    if ((horiz ? width : height) > 1)
+        drawLightBevel(cr, style, new_state, area, x, y, width, height,
+                       &itemCols[fillVal], itemCols, ROUNDED_ALL, wid,
+                       BORDER_FLAT, (horiz ? 0 : DF_VERT), widget);
+    if (opts.stripedProgress && width > 4 && height > 4) {
+        if (STRIPE_FADE == opts.stripedProgress) {
+            int posMod = opts.animatedProgress ? STRIPE_WIDTH - animShift : 0;
+            int sizeMod = opts.animatedProgress ? (STRIPE_WIDTH * 2) : 0;
+            addStripes(cr, x - (horiz ? posMod : 0), y - (horiz ? 0 : posMod),
+                       width + (horiz ? sizeMod : 0),
+                       height + (horiz ? 0 : sizeMod), horiz);
+        } else {
+            setProgressStripeClipping(cr, area, xo, yo, wo, ho,
+                                      animShift, horiz);
+            drawLightBevel(cr, style, new_state, NULL, x, y, width, height,
+                           &itemCols[1], qtcPalette.highlight, ROUNDED_ALL,
+                           wid, BORDER_FLAT,
+                           (opts.fillProgress || !opts.borderProgress ? 0 :
+                            DF_DO_BORDER) | (horiz ? 0 : DF_VERT), widget);
+            unsetCairoClipping(cr);
+        }
+    }
+    if (opts.glowProgress && (horiz ? width : height)>3) {
+        int offset = opts.borderProgress ? 1 : 0;
+        cairo_pattern_t *pat =
+            cairo_pattern_create_linear(x+offset, y+offset, horiz ?
+                                        x + width - offset : x + offset,
+                                        horiz ? y + offset :
+                                        y + height - offset);
+        gboolean inverted = FALSE;
 
-        if(opts.stripedProgress && width>4 && height>4)
-            if(STRIPE_FADE==opts.stripedProgress)
-            {
-                int posMod=opts.animatedProgress ? STRIPE_WIDTH-animShift : 0,
-                    sizeMod=opts.animatedProgress ? (STRIPE_WIDTH*2) : 0;
-                addStripes(cr, x-(horiz ? posMod : 0), y-(horiz ? 0 : posMod),
-                                 width+(horiz ? sizeMod : 0), height+(horiz ? 0 : sizeMod), horiz);
-            }
-            else
-            {
-                setProgressStripeClipping(cr, area, xo, yo, wo, ho, animShift, horiz);
-                drawLightBevel(cr, style, new_state, NULL, x, y, width, height, &itemCols[1],
-                               qtcPalette.highlight, ROUNDED_ALL, wid, BORDER_FLAT,
-                               (opts.fillProgress || !opts.borderProgress ? 0 : DF_DO_BORDER)|(horiz ? 0 : DF_VERT), widget);
-                unsetCairoClipping(cr);
-            }
-
-        if(opts.glowProgress && (horiz ? width : height)>3)
-        {
-            int             offset=opts.borderProgress ? 1 : 0;
-            cairo_pattern_t *pat=cairo_pattern_create_linear(x+offset, y+offset,
-                                                             horiz ? x+width-offset : x+offset,
-                                                             horiz ? y+offset : y+height-offset);
-            gboolean        inverted=FALSE;
-
-            if(GLOW_MIDDLE!=opts.glowProgress && widget && GTK_IS_PROGRESS_BAR(widget))
-                if(isHorizontalProgressbar)
-                {
-                    if(revProg)
-                        inverted=!rev;
-                    else
-                        inverted=rev;
+        if (GLOW_MIDDLE != opts.glowProgress && widget &&
+            GTK_IS_PROGRESS_BAR(widget)) {
+            if (horiz) {
+                if (revProg) {
+                    inverted =! rev;
+                } else {
+                    inverted = rev;
                 }
-                else
-                    inverted=revProg;
-
-            cairo_pattern_add_color_stop_rgba(pat, 0.0, 1.0, 1.0, 1.0,
-                                              (inverted ? GLOW_END : GLOW_START)==opts.glowProgress ? GLOW_PROG_ALPHA : 0.0);
-
-            if(GLOW_MIDDLE==opts.glowProgress)
-                cairo_pattern_add_color_stop_rgba(pat, 0.5, 1.0, 1.0, 1.0, GLOW_PROG_ALPHA);
-
-            cairo_pattern_add_color_stop_rgba(pat, CAIRO_GRAD_END, 1.0, 1.0, 1.0,
-                                              (inverted ? GLOW_START : GLOW_END)==opts.glowProgress ? GLOW_PROG_ALPHA : 0.0);
-            cairo_set_source(cr, pat);
-            cairo_rectangle(cr, x+offset, y+offset, width-(2*offset), height-(2*offset));
-            cairo_fill(cr);
-            cairo_pattern_destroy(pat);
+            } else {
+                inverted = revProg;
+            }
         }
 
-        if(width>2 && height>2 && opts.borderProgress)
-            realDrawBorder(cr, style, state, area, x, y, width, height,
-                           itemCols, ROUNDED_ALL, BORDER_FLAT, wid, 0, PBAR_BORDER);
+        cairo_pattern_add_color_stop_rgba(
+            pat, 0.0, 1.0, 1.0, 1.0,
+            (inverted ? GLOW_END : GLOW_START) == opts.glowProgress ?
+            GLOW_PROG_ALPHA : 0.0);
 
-        if(!opts.borderProgress)
-            if(horiz)
-            {
-                drawHLine(cr, CAIRO_COL(itemCols[PBAR_BORDER]), 1.0, x, y, width);
-                drawHLine(cr, CAIRO_COL(itemCols[PBAR_BORDER]), 1.0, x, y+height-1, width);
+        if (GLOW_MIDDLE == opts.glowProgress)
+            cairo_pattern_add_color_stop_rgba(pat, 0.5, 1.0, 1.0, 1.0,
+                                              GLOW_PROG_ALPHA);
+
+        cairo_pattern_add_color_stop_rgba(
+            pat, CAIRO_GRAD_END, 1.0, 1.0, 1.0,
+            (inverted ? GLOW_START : GLOW_END) == opts.glowProgress ?
+            GLOW_PROG_ALPHA : 0.0);
+        cairo_set_source(cr, pat);
+        cairo_rectangle(cr, x + offset, y + offset, width - 2 * offset,
+                        height - 2 * offset);
+        cairo_fill(cr);
+        cairo_pattern_destroy(pat);
+        if (width > 2 && height > 2 && opts.borderProgress)
+            realDrawBorder(cr, style, state, area, x, y, width, height,
+                           itemCols, ROUNDED_ALL, BORDER_FLAT,
+                           wid, 0, PBAR_BORDER);
+
+        if (!opts.borderProgress) {
+            if (horiz) {
+                drawHLine(cr, CAIRO_COL(itemCols[PBAR_BORDER]),
+                          1.0, x, y, width);
+                drawHLine(cr, CAIRO_COL(itemCols[PBAR_BORDER]),
+                          1.0, x, y + height - 1, width);
+            } else {
+                drawVLine(cr, CAIRO_COL(itemCols[PBAR_BORDER]),
+                          1.0, x, y, height);
+                drawVLine(cr, CAIRO_COL(itemCols[PBAR_BORDER]),
+                          1.0, x + width - 1, y, height);
             }
-            else
-            {
-                drawVLine(cr, CAIRO_COL(itemCols[PBAR_BORDER]), 1.0, x, y, height);
-                drawVLine(cr, CAIRO_COL(itemCols[PBAR_BORDER]), 1.0, x+width-1, y, height);
-            }
+        }
     }
 }
 
@@ -1783,19 +1938,19 @@ void drawProgressGroove(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkWin
 
     switch(opts.progressGrooveColor)
     {
-        default:
-        case ECOLOR_BASE:
-            col=&style->base[state];
-            break;
-        case ECOLOR_BACKGROUND:
-            col=&qtcPalette.background[ORIGINAL_SHADE];
-            break;
-        case ECOLOR_DARK:
-            col=&qtcPalette.background[2];
+    default:
+    case ECOLOR_BASE:
+        col=&style->base[state];
+        break;
+    case ECOLOR_BACKGROUND:
+        col=&qtcPalette.background[ORIGINAL_SHADE];
+        break;
+    case ECOLOR_DARK:
+        col=&qtcPalette.background[2];
     }
 
     if(!isList && (IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, window, widget, x, y, width, height)))
-        && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
+       && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
         drawAreaColor(cr, area, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
 
     if(doEtch && opts.borderProgress)
@@ -1832,28 +1987,32 @@ void drawProgressGroove(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkWin
 
 #define SLIDER_TROUGH_SIZE 5
 
-void drawSliderGroove(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkWindow *window, GtkWidget *widget, const gchar *detail,
-                      GdkRectangle *area, int x, int y, int width, int height, gboolean horiz)
+void
+drawSliderGroove(cairo_t *cr, GtkStyle *style, GtkStateType state,
+                 GdkWindow *window, GtkWidget *widget, const gchar *detail,
+                 GdkRectangle *area, int x, int y, int width, int height,
+                 gboolean horiz)
 {
+    QTC_UNUSED(window);
     GdkColor      *bgndcols=qtcPalette.background,
-                  *bgndcol=&bgndcols[2];
+        *bgndcol=&bgndcols[2];
     GtkAdjustment *adjustment = gtk_range_get_adjustment(GTK_RANGE(widget));
     double        upper=gtk_adjustment_get_upper(adjustment),
-                  lower=gtk_adjustment_get_lower(adjustment),
-                  value=gtk_adjustment_get_value(adjustment);
+        lower=gtk_adjustment_get_lower(adjustment),
+        value=gtk_adjustment_get_value(adjustment);
     int           used_x=x, used_y=y, used_h=0, used_w=0,
-                  pos=(int)(((double)(horiz ? width : height) /
-                            (upper - lower))  *
-                            (value - lower));
+        pos=(int)(((double)(horiz ? width : height) /
+                   (upper - lower))  *
+                  (value - lower));
     gboolean      inverted=gtk_range_get_inverted(GTK_RANGE(widget)),
-                  doEtch=DO_EFFECT,
-                  rev=reverseLayout(widget) || (widget && reverseLayout(gtk_widget_get_parent(widget)));
+        doEtch=DO_EFFECT,
+        rev=reverseLayout(widget) || (widget && reverseLayout(gtk_widget_get_parent(widget)));
     int           troughSize=SLIDER_TROUGH_SIZE+(doEtch ? 2 : 0);
     GdkColor      *usedcols=opts.fillSlider && upper!=lower && state!=GTK_STATE_INSENSITIVE
-                            ? qtcPalette.slider
-                                ? qtcPalette.slider
-                                : qtcPalette.highlight
-                            : qtcPalette.background;
+        ? qtcPalette.slider
+        ? qtcPalette.slider
+        : qtcPalette.highlight
+        : qtcPalette.background;
     EWidget       wid=WIDGET_SLIDER_TROUGH;
 
     if(horiz && rev)
@@ -1883,8 +2042,8 @@ void drawSliderGroove(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkWindo
         wid=WIDGET_FILLED_SLIDER_TROUGH;
     }
     drawLightBevel(cr, style, state, area, x, y, width, height,
-                    bgndcol, bgndcols, opts.square&SQUARE_SLIDER ? ROUNDED_NONE : ROUNDED_ALL, wid,
-                    BORDER_FLAT, DF_SUNKEN|DF_DO_BORDER|(horiz ? 0 : DF_VERT), NULL);
+                   bgndcol, bgndcols, opts.square&SQUARE_SLIDER ? ROUNDED_NONE : ROUNDED_ALL, wid,
+                   BORDER_FLAT, DF_SUNKEN|DF_DO_BORDER|(horiz ? 0 : DF_VERT), NULL);
 
     if(opts.fillSlider && upper!=lower && state!=GTK_STATE_INSENSITIVE && 0==strcmp(detail, "trough"))
     {
@@ -1908,17 +2067,21 @@ void drawSliderGroove(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkWindo
         if(used_w>0 && used_h>0)
         {
             drawLightBevel(cr, style, state, area, used_x, used_y, used_w, used_h,
-                            &usedcols[ORIGINAL_SHADE], usedcols,
-                            opts.square&SQUARE_SLIDER ? ROUNDED_NONE : ROUNDED_ALL, WIDGET_FILLED_SLIDER_TROUGH,
-                            BORDER_FLAT, DF_SUNKEN|DF_DO_BORDER|(horiz ? 0 : DF_VERT), NULL);
+                           &usedcols[ORIGINAL_SHADE], usedcols,
+                           opts.square&SQUARE_SLIDER ? ROUNDED_NONE : ROUNDED_ALL, WIDGET_FILLED_SLIDER_TROUGH,
+                           BORDER_FLAT, DF_SUNKEN|DF_DO_BORDER|(horiz ? 0 : DF_VERT), NULL);
         }
     }
 }
 
-void drawTriangularSlider(cairo_t *cr, GtkStyle *style, GtkStateType state, const gchar *detail, GdkRectangle *area, int x, int y, int width, int height)
+void
+drawTriangularSlider(cairo_t *cr, GtkStyle *style, GtkStateType state,
+                     const gchar *detail, GdkRectangle *area, int x, int y,
+                     int width, int height)
 {
+    QTC_UNUSED(area);
     GdkColor newColors[TOTAL_SHADES+1],
-             *btnColors;
+        *btnColors;
 
     /* Fix Java swing sliders looking pressed */
     if(GTK_STATE_ACTIVE==state)
@@ -1937,34 +2100,33 @@ void drawTriangularSlider(cairo_t *cr, GtkStyle *style, GtkStateType state, cons
         {
             GtkWidget *widget=NULL; /* Keep SET_BTN_COLS happy */
             SET_BTN_COLS(FALSE, TRUE, FALSE, state)
-        }
+                }
     }
 
     {
-    gboolean     coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver && !opts.colorSliderMouseOver,
-                 horiz=height>width || DETAIL("hscale");
-    int          bgnd=getFillReal(state, FALSE, SHADE_DARKEN==opts.shadeSliders),
-                 xo=horiz ? 8 : 0,
-                 yo=horiz ? 0 : 8,
-                 size=15,
-                 light=APPEARANCE_DULL_GLASS==opts.sliderAppearance ? 1 : 0;
-    GdkColor     *colors=btnColors,
-                 *borderCols=GTK_STATE_PRELIGHT==state && (MO_GLOW==opts.coloredMouseOver ||
-                                                            MO_COLORED==opts.coloredMouseOver)
-                                ? qtcPalette.mouseover : btnColors;
-    GdkPoint     clip[8];
-    GtkArrowType direction=horiz ? GTK_ARROW_DOWN : GTK_ARROW_RIGHT;
-    gboolean     drawLight=MO_PLASTIK!=opts.coloredMouseOver || !coloredMouseOver;
-    int          borderVal=qtcPalette.mouseover==borderCols ? SLIDER_MO_BORDER_VAL : BORDER_VAL(GTK_STATE_INSENSITIVE==state);
+        gboolean     coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver && !opts.colorSliderMouseOver,
+            horiz=height>width || DETAIL("hscale");
+        int          bgnd=getFillReal(state, FALSE, SHADE_DARKEN==opts.shadeSliders),
+            xo=horiz ? 8 : 0,
+            yo=horiz ? 0 : 8,
+            size=15,
+            light=APPEARANCE_DULL_GLASS==opts.sliderAppearance ? 1 : 0;
+        GdkColor     *colors=btnColors,
+            *borderCols=GTK_STATE_PRELIGHT==state && (MO_GLOW==opts.coloredMouseOver ||
+                                                      MO_COLORED==opts.coloredMouseOver)
+            ? qtcPalette.mouseover : btnColors;
+        GtkArrowType direction=horiz ? GTK_ARROW_DOWN : GTK_ARROW_RIGHT;
+        gboolean     drawLight=MO_PLASTIK!=opts.coloredMouseOver || !coloredMouseOver;
+        int          borderVal=qtcPalette.mouseover==borderCols ? SLIDER_MO_BORDER_VAL : BORDER_VAL(GTK_STATE_INSENSITIVE==state);
 
-    if(MO_GLOW==opts.coloredMouseOver && DO_EFFECT)
-        x++, y++, xo++, yo++;
+        if(MO_GLOW==opts.coloredMouseOver && DO_EFFECT)
+            x++, y++, xo++, yo++;
 
-    cairo_new_path(cr);
-    cairo_save(cr);
+        cairo_new_path(cr);
+        cairo_save(cr);
 
-    switch(direction)
-    {
+        switch(direction)
+        {
         case GTK_ARROW_UP:
         default:
         case GTK_ARROW_DOWN:
@@ -1981,277 +2143,281 @@ void drawTriangularSlider(cairo_t *cr, GtkStyle *style, GtkStateType state, cons
                 GdkPoint pts[]={{x, y}, {x+2, y}, {x, y+2}, {x, y+8}, {x+2, y+10}, {x+9, y+10}, {x+14, y+5}, {x+9, y}};
                 plotPoints(cr, pts, 8);
             }
-    }
+        }
 
-    cairo_clip(cr);
+        cairo_clip(cr);
 
-    if(IS_FLAT(opts.sliderAppearance))
-    {
-        drawAreaColor(cr, NULL, &colors[bgnd], x+1, y+1, width-2, height-2);
-
-        if(MO_PLASTIK==opts.coloredMouseOver && coloredMouseOver)
+        if(IS_FLAT(opts.sliderAppearance))
         {
-            int col=SLIDER_MO_SHADE,
-                len=SLIDER_MO_LEN;
+            drawAreaColor(cr, NULL, &colors[bgnd], x+1, y+1, width-2, height-2);
 
-            if(horiz)
+            if(MO_PLASTIK==opts.coloredMouseOver && coloredMouseOver)
             {
-                drawAreaColor(cr, NULL, &qtcPalette.mouseover[col], x+1, y+1, len, size-2);
-                drawAreaColor(cr, NULL, &qtcPalette.mouseover[col], x+width-(1+len), y+1, len, size-2);
-            }
-            else
-            {
-                drawAreaColor(cr, NULL, &qtcPalette.mouseover[col], x+1, y+1, size-2, len);
-                drawAreaColor(cr, NULL, &qtcPalette.mouseover[col], x+1, y+height-(1+len), size-2, len);
+                int col=SLIDER_MO_SHADE,
+                    len=SLIDER_MO_LEN;
+
+                if(horiz)
+                {
+                    drawAreaColor(cr, NULL, &qtcPalette.mouseover[col], x+1, y+1, len, size-2);
+                    drawAreaColor(cr, NULL, &qtcPalette.mouseover[col], x+width-(1+len), y+1, len, size-2);
+                }
+                else
+                {
+                    drawAreaColor(cr, NULL, &qtcPalette.mouseover[col], x+1, y+1, size-2, len);
+                    drawAreaColor(cr, NULL, &qtcPalette.mouseover[col], x+1, y+height-(1+len), size-2, len);
+                }
             }
         }
-    }
-    else
-    {
-        drawBevelGradient(cr, NULL, x, y, horiz ? width-1 : size, horiz ? size : height-1, &colors[bgnd],
-                            horiz, FALSE, MODIFY_AGUA(opts.sliderAppearance), WIDGET_OTHER);
-
-        if(MO_PLASTIK==opts.coloredMouseOver && coloredMouseOver)
+        else
         {
-            int col=SLIDER_MO_SHADE,
-                len=SLIDER_MO_LEN;
+            drawBevelGradient(cr, NULL, x, y, horiz ? width-1 : size, horiz ? size : height-1, &colors[bgnd],
+                              horiz, FALSE, MODIFY_AGUA(opts.sliderAppearance), WIDGET_OTHER);
 
-            if(horiz)
+            if(MO_PLASTIK==opts.coloredMouseOver && coloredMouseOver)
             {
-                drawBevelGradient(cr, NULL, x+1, y+1, len, size-2, &qtcPalette.mouseover[col],
-                                    horiz, FALSE, MODIFY_AGUA(opts.sliderAppearance), WIDGET_OTHER);
-                drawBevelGradient(cr, NULL, x+width-(1+len), y+1, len, size-2, &qtcPalette.mouseover[col],
-                                    horiz, FALSE, MODIFY_AGUA(opts.sliderAppearance), WIDGET_OTHER);
-            }
-            else
-            {
-                drawBevelGradient(cr, NULL, x+1, y+1, size-2, len, &qtcPalette.mouseover[col],
-                                    horiz, FALSE, MODIFY_AGUA(opts.sliderAppearance), WIDGET_OTHER);
-                drawBevelGradient(cr, NULL, x+1, y+height-(1+len), size-2, len, &qtcPalette.mouseover[col],
-                                    horiz, FALSE, MODIFY_AGUA(opts.sliderAppearance), WIDGET_OTHER);
+                int col=SLIDER_MO_SHADE,
+                    len=SLIDER_MO_LEN;
+
+                if(horiz)
+                {
+                    drawBevelGradient(cr, NULL, x+1, y+1, len, size-2, &qtcPalette.mouseover[col],
+                                      horiz, FALSE, MODIFY_AGUA(opts.sliderAppearance), WIDGET_OTHER);
+                    drawBevelGradient(cr, NULL, x+width-(1+len), y+1, len, size-2, &qtcPalette.mouseover[col],
+                                      horiz, FALSE, MODIFY_AGUA(opts.sliderAppearance), WIDGET_OTHER);
+                }
+                else
+                {
+                    drawBevelGradient(cr, NULL, x+1, y+1, size-2, len, &qtcPalette.mouseover[col],
+                                      horiz, FALSE, MODIFY_AGUA(opts.sliderAppearance), WIDGET_OTHER);
+                    drawBevelGradient(cr, NULL, x+1, y+height-(1+len), size-2, len, &qtcPalette.mouseover[col],
+                                      horiz, FALSE, MODIFY_AGUA(opts.sliderAppearance), WIDGET_OTHER);
+                }
             }
         }
-    }
 
-    unsetCairoClipping(cr);
+        unsetCairoClipping(cr);
 
-    { /* C-Scope */
-    double   xd=x+0.5,
-             yd=y+0.5,
-             radius=2.5,
-             xdg=xd-1,
-             ydg=yd-1,
-             radiusg=radius+1;
-    gboolean glowMo=MO_GLOW==opts.coloredMouseOver && coloredMouseOver && DO_EFFECT;
+        { /* C-Scope */
+            double   xd=x+0.5,
+                yd=y+0.5,
+                radius=2.5,
+                xdg=xd-1,
+                ydg=yd-1,
+                radiusg=radius+1;
+            gboolean glowMo=MO_GLOW==opts.coloredMouseOver && coloredMouseOver && DO_EFFECT;
 
-    cairo_new_path(cr);
-    if(glowMo)
-        cairo_set_source_rgba(cr, CAIRO_COL(borderCols[GLOW_MO]), GLOW_ALPHA(FALSE));
-    else
-        cairo_set_source_rgb(cr, CAIRO_COL(borderCols[borderVal]));
-    switch(direction)
-    {
-        case GTK_ARROW_UP:
-        default:
-        case GTK_ARROW_DOWN:
+            cairo_new_path(cr);
             if(glowMo)
-            {
-                cairo_move_to(cr, xdg+radiusg, ydg);
-                cairo_arc(cr, xdg+12-radiusg, ydg+radiusg, radiusg, M_PI * 1.5, M_PI * 2);
-                cairo_line_to(cr, xdg+12, ydg+10.5);
-                cairo_line_to(cr, xdg+6, ydg+16.5);
-                cairo_line_to(cr, xdg, ydg+10.5);
-                cairo_arc(cr, xdg+radiusg, ydg+radiusg, radiusg, M_PI, M_PI * 1.5);
-                cairo_stroke(cr);
+                cairo_set_source_rgba(cr, CAIRO_COL(borderCols[GLOW_MO]), GLOW_ALPHA(FALSE));
+            else
                 cairo_set_source_rgb(cr, CAIRO_COL(borderCols[borderVal]));
-            }
-            cairo_move_to(cr, xd+radius, yd);
-            cairo_arc(cr, xd+10-radius, yd+radius, radius, M_PI * 1.5, M_PI * 2);
-            cairo_line_to(cr, xd+10, yd+9);
-            cairo_line_to(cr, xd+5, yd+14);
-            cairo_line_to(cr, xd, yd+9);
-            cairo_arc(cr, xd+radius, yd+radius, radius, M_PI, M_PI * 1.5);
-            cairo_stroke(cr);
-            if(drawLight)
+            switch(direction)
             {
-                drawVLine(cr, CAIRO_COL(colors[light]), 1.0, xd+1, yd+2, 7);
-                drawHLine(cr, CAIRO_COL(colors[light]), 1.0, xd+2, yd+1, 6);
-            }
-            break;
-        case GTK_ARROW_RIGHT:
-        case GTK_ARROW_LEFT:
-            if(glowMo)
-            {
-                cairo_move_to(cr, xdg, ydg+12-radiusg);
-                cairo_arc(cr, xdg+radiusg, ydg+radiusg, radiusg, M_PI, M_PI * 1.5);
-                cairo_line_to(cr, xdg+10.5, ydg);
-                cairo_line_to(cr, xdg+16.5, ydg+6);
-                cairo_line_to(cr, xdg+10.5, ydg+12);
-                cairo_arc(cr, xdg+radiusg, ydg+12-radiusg, radiusg, M_PI * 0.5, M_PI);
+            case GTK_ARROW_UP:
+            default:
+            case GTK_ARROW_DOWN:
+                if(glowMo)
+                {
+                    cairo_move_to(cr, xdg+radiusg, ydg);
+                    cairo_arc(cr, xdg+12-radiusg, ydg+radiusg, radiusg, M_PI * 1.5, M_PI * 2);
+                    cairo_line_to(cr, xdg+12, ydg+10.5);
+                    cairo_line_to(cr, xdg+6, ydg+16.5);
+                    cairo_line_to(cr, xdg, ydg+10.5);
+                    cairo_arc(cr, xdg+radiusg, ydg+radiusg, radiusg, M_PI, M_PI * 1.5);
+                    cairo_stroke(cr);
+                    cairo_set_source_rgb(cr, CAIRO_COL(borderCols[borderVal]));
+                }
+                cairo_move_to(cr, xd+radius, yd);
+                cairo_arc(cr, xd+10-radius, yd+radius, radius, M_PI * 1.5, M_PI * 2);
+                cairo_line_to(cr, xd+10, yd+9);
+                cairo_line_to(cr, xd+5, yd+14);
+                cairo_line_to(cr, xd, yd+9);
+                cairo_arc(cr, xd+radius, yd+radius, radius, M_PI, M_PI * 1.5);
                 cairo_stroke(cr);
-                cairo_set_source_rgb(cr, CAIRO_COL(borderCols[borderVal]));
+                if(drawLight)
+                {
+                    drawVLine(cr, CAIRO_COL(colors[light]), 1.0, xd+1, yd+2, 7);
+                    drawHLine(cr, CAIRO_COL(colors[light]), 1.0, xd+2, yd+1, 6);
+                }
+                break;
+            case GTK_ARROW_RIGHT:
+            case GTK_ARROW_LEFT:
+                if(glowMo)
+                {
+                    cairo_move_to(cr, xdg, ydg+12-radiusg);
+                    cairo_arc(cr, xdg+radiusg, ydg+radiusg, radiusg, M_PI, M_PI * 1.5);
+                    cairo_line_to(cr, xdg+10.5, ydg);
+                    cairo_line_to(cr, xdg+16.5, ydg+6);
+                    cairo_line_to(cr, xdg+10.5, ydg+12);
+                    cairo_arc(cr, xdg+radiusg, ydg+12-radiusg, radiusg, M_PI * 0.5, M_PI);
+                    cairo_stroke(cr);
+                    cairo_set_source_rgb(cr, CAIRO_COL(borderCols[borderVal]));
+                }
+                cairo_move_to(cr, xd, yd+10-radius);
+                cairo_arc(cr, xd+radius, yd+radius, radius, M_PI, M_PI * 1.5);
+                cairo_line_to(cr, xd+9, yd);
+                cairo_line_to(cr, xd+14, yd+5);
+                cairo_line_to(cr, xd+9, yd+10);
+                cairo_arc(cr, xd+radius, yd+10-radius, radius, M_PI * 0.5, M_PI);
+                cairo_stroke(cr);
+                if(drawLight)
+                {
+                    drawHLine(cr, CAIRO_COL(colors[light]), 1.0, xd+2, yd+1, 7);
+                    drawVLine(cr, CAIRO_COL(colors[light]), 1.0, xd+1, yd+2, 6);
+                }
             }
-            cairo_move_to(cr, xd, yd+10-radius);
-            cairo_arc(cr, xd+radius, yd+radius, radius, M_PI, M_PI * 1.5);
-            cairo_line_to(cr, xd+9, yd);
-            cairo_line_to(cr, xd+14, yd+5);
-            cairo_line_to(cr, xd+9, yd+10);
-            cairo_arc(cr, xd+radius, yd+10-radius, radius, M_PI * 0.5, M_PI);
-            cairo_stroke(cr);
-            if(drawLight)
-            {
-                drawHLine(cr, CAIRO_COL(colors[light]), 1.0, xd+2, yd+1, 7);
-                drawVLine(cr, CAIRO_COL(colors[light]), 1.0, xd+1, yd+2, 6);
-            }
-    }
-    } /* C-Scope */
+        } /* C-Scope */
     }
 }
-    
 #define SBAR_BTN_SIZE opts.sliderWidth
 
-void drawScrollbarGroove(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkWindow *window, GtkWidget *widget, const gchar *detail,
-                         GdkRectangle *area, int x, int y, int width, int height, gboolean horiz)
+void
+drawScrollbarGroove(cairo_t *cr, GtkStyle *style, GtkStateType state,
+                    GdkWindow *window, GtkWidget *widget, const gchar *detail,
+                    GdkRectangle *area, int x, int y, int width, int height,
+                    gboolean horiz)
 {
-    int      sbarRound=ROUNDED_ALL,
-             xo=x, yo=y, wo=width, ho=height;
+    QTC_UNUSED(window);
+    QTC_UNUSED(detail);
+    int sbarRound = ROUNDED_ALL;
+    int xo=x, yo=y, wo=width, ho=height;
     gboolean drawBg=opts.flatSbarButtons/* && !IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType*/,
-             thinner=opts.thinSbarGroove && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons);
+        thinner=opts.thinSbarGroove && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons);
 
-    if(opts.flatSbarButtons)
-    {
+    if (opts.flatSbarButtons) {
 #if GTK_CHECK_VERSION(2, 90, 0)
         gboolean lower=detail && strstr(detail, "-lower");
-        sbarRound=lower
-                    ? horiz
-                        ? ROUNDED_LEFT
-                        : ROUNDED_TOP
-                    : horiz
-                        ? ROUNDED_RIGHT
-                        : ROUNDED_BOTTOM;
+        sbarRound = (lower ? horiz ? ROUNDED_LEFT : ROUNDED_TOP : horiz ?
+                     ROUNDED_RIGHT : ROUNDED_BOTTOM);
 
-        switch(opts.scrollbarType)
-        {
-            case SCROLLBAR_KDE:
-                if(lower)
-                {
-                    if(horiz)
-                        x+=SBAR_BTN_SIZE;
-                    else
-                        y+=SBAR_BTN_SIZE;
+        switch (opts.scrollbarType) {
+        case SCROLLBAR_KDE:
+            if (lower) {
+                if (horiz) {
+                    x += SBAR_BTN_SIZE;
+                } else {
+                    y += SBAR_BTN_SIZE;
                 }
-                else
-                {
-                    if(horiz)
-                        width-=SBAR_BTN_SIZE*2;
-                    else
-                        height-=SBAR_BTN_SIZE*2;
+            } else {
+                if (horiz) {
+                    width -= SBAR_BTN_SIZE * 2;
+                } else {
+                    height -= SBAR_BTN_SIZE * 2;
                 }
-                break;
-            case SCROLLBAR_WINDOWS:
-                if(lower)
-                {
-                    if(horiz)
-                        x+=SBAR_BTN_SIZE;
-                    else
-                        y+=SBAR_BTN_SIZE;
+            }
+            break;
+        case SCROLLBAR_WINDOWS:
+            if (lower) {
+                if (horiz) {
+                    x += SBAR_BTN_SIZE;
+                } else {
+                    y += SBAR_BTN_SIZE;
                 }
-                else
-                {
-                    if(horiz)
-                        width-=SBAR_BTN_SIZE;
-                    else
-                        height-=SBAR_BTN_SIZE;
+            } else {
+                if (horiz) {
+                    width -= SBAR_BTN_SIZE;
+                } else {
+                    height -= SBAR_BTN_SIZE;
                 }
-                break;
-            case SCROLLBAR_NEXT:
-                if(lower)
-                {
-                    if(horiz)
-                        x+=SBAR_BTN_SIZE*2;
-                    else
-                        y+=SBAR_BTN_SIZE*2;
+            }
+            break;
+        case SCROLLBAR_NEXT:
+            if (lower) {
+                if (horiz) {
+                    x += SBAR_BTN_SIZE * 2;
+                } else {
+                    y += SBAR_BTN_SIZE * 2;
                 }
-                break;
-            case SCROLLBAR_PLATINUM:
-                if(!lower)
-                {
-                    if(horiz)
-                        width-=SBAR_BTN_SIZE*2;
-                    else
-                        height-=SBAR_BTN_SIZE*2;
+            }
+            break;
+        case SCROLLBAR_PLATINUM:
+            if (!lower) {
+                if (horiz) {
+                    width -= SBAR_BTN_SIZE * 2;
+                } else {
+                    height -= SBAR_BTN_SIZE * 2;
                 }
-                break;
+            }
+            break;
         }
 #else
-        switch(opts.scrollbarType)
-        {
-            case SCROLLBAR_KDE:
-                if(horiz)
-                    x+=SBAR_BTN_SIZE, width-=SBAR_BTN_SIZE*3;
-                else
-                    y+=SBAR_BTN_SIZE, height-=SBAR_BTN_SIZE*3;
-                break;
-            case SCROLLBAR_WINDOWS:
-                if(horiz)
-                    x+=SBAR_BTN_SIZE, width-=SBAR_BTN_SIZE*2;
-                else
-                    y+=SBAR_BTN_SIZE, height-=SBAR_BTN_SIZE*2;
-                break;
-            case SCROLLBAR_NEXT:
-                if(horiz)
-                    x+=SBAR_BTN_SIZE*2, width-=SBAR_BTN_SIZE*2;
-                else
-                    y+=SBAR_BTN_SIZE*2, height-=SBAR_BTN_SIZE*2;
-                break;
-            case SCROLLBAR_PLATINUM:
-                if(horiz)
-                    width-=SBAR_BTN_SIZE*2;
-                else
-                    height-=SBAR_BTN_SIZE*2;
-                break;
+        switch (opts.scrollbarType) {
+        case SCROLLBAR_KDE:
+            if (horiz) {
+                x += SBAR_BTN_SIZE;
+                width -= SBAR_BTN_SIZE * 3;
+            } else {
+                y += SBAR_BTN_SIZE;
+                height -= SBAR_BTN_SIZE * 3;
+            }
+            break;
+        case SCROLLBAR_WINDOWS:
+            if (horiz) {
+                x += SBAR_BTN_SIZE;
+                width -= SBAR_BTN_SIZE * 2;
+            } else {
+                y += SBAR_BTN_SIZE;
+                height -= SBAR_BTN_SIZE * 2;
+            }
+            break;
+        case SCROLLBAR_NEXT:
+            if (horiz) {
+                x+=SBAR_BTN_SIZE * 2;
+                width -= SBAR_BTN_SIZE * 2;
+            } else {
+                y += SBAR_BTN_SIZE * 2;
+                height -= SBAR_BTN_SIZE * 2;
+            }
+            break;
+        case SCROLLBAR_PLATINUM:
+            if (horiz) {
+                width -= SBAR_BTN_SIZE * 2;
+            } else {
+                height -= SBAR_BTN_SIZE * 2;
+            }
+            break;
+        default:
+            break;
         }
 #endif
-    }
-    else
-        switch(opts.scrollbarType)
-        {
-            default:
-                break;
-            case SCROLLBAR_NEXT:
-                sbarRound=horiz ? ROUNDED_LEFT : ROUNDED_TOP;
-                break;
-            case SCROLLBAR_PLATINUM:
-                sbarRound=horiz ? ROUNDED_RIGHT : ROUNDED_BOTTOM;
-                break;
+    } else {
+        switch (opts.scrollbarType) {
+        default:
+            break;
+        case SCROLLBAR_NEXT:
+            sbarRound = horiz ? ROUNDED_LEFT : ROUNDED_TOP;
+            break;
+        case SCROLLBAR_PLATINUM:
+            sbarRound = horiz ? ROUNDED_RIGHT : ROUNDED_BOTTOM;
+            break;
 #ifdef SIMPLE_SCROLLBARS
-            case SCROLLBAR_NONE:
-                sbarRound=ROUNDED_NONE;
-                break;
+        case SCROLLBAR_NONE:
+            sbarRound = ROUNDED_NONE;
+            break;
 #endif
         }
+    }
 
-    if(opts.square&SQUARE_SB_SLIDER)
-        sbarRound=ROUNDED_NONE;
+    if (opts.square & SQUARE_SB_SLIDER)
+        sbarRound = ROUNDED_NONE;
 
-    if(drawBg)
-    {
+    if(drawBg) {
         GtkWidget *parent=NULL;
         if(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) && 0!=opts.tabBgnd && widget &&
-            (parent=gtk_widget_get_parent(widget)) && GTK_IS_SCROLLED_WINDOW(parent) &&
-            (parent=gtk_widget_get_parent(parent)) && GTK_IS_NOTEBOOK(parent))
+           (parent=gtk_widget_get_parent(widget)) && GTK_IS_SCROLLED_WINDOW(parent) &&
+           (parent=gtk_widget_get_parent(parent)) && GTK_IS_NOTEBOOK(parent))
             drawAreaModColor(cr, area, &qtcPalette.background[ORIGINAL_SHADE], TO_FACTOR(opts.tabBgnd), xo, yo, wo, ho);
         else if(!IS_FLAT(opts.sbarBgndAppearance) || !opts.gtkScrollViews)
-                drawBevelGradient(cr, area, xo, yo, wo, ho, &qtcPalette.background[ORIGINAL_SHADE],
-                                horiz, FALSE, opts.sbarBgndAppearance, WIDGET_SB_BGND);
+            drawBevelGradient(cr, area, xo, yo, wo, ho, &qtcPalette.background[ORIGINAL_SHADE],
+                              horiz, FALSE, opts.sbarBgndAppearance, WIDGET_SB_BGND);
 #if !GTK_CHECK_VERSION(2, 90, 0)
         /* This was the old (pre 1.7.1) else if... but it messes up Gtk3 scrollbars wheb have custom background. And dont think its needed */
         /* But re-added in 1.7.2 for Mozilla! */
         /*  else if(!CUSTOM_BGND || !(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) &&
-                                                    widget && drawWindowBgnd(cr, style, area, widget, xo, yo, wo, ho)))
+            widget && drawWindowBgnd(cr, style, area, widget, xo, yo, wo, ho)))
         */ else if(isMozilla()) /* 1.7.3 added 'else' so as to not duplicate above! */
             drawBevelGradient(cr, area, xo, yo, wo, ho, &qtcPalette.background[ORIGINAL_SHADE],
-                                horiz, FALSE, opts.sbarBgndAppearance, WIDGET_SB_BGND);
+                              horiz, FALSE, opts.sbarBgndAppearance, WIDGET_SB_BGND);
 #endif
     }
 
@@ -2260,7 +2426,7 @@ void drawScrollbarGroove(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkWi
         if(!drawBg)
         {
             GdkColor *parent_col=getParentBgCol(widget),
-                        *bgnd_col=parent_col ? parent_col : &qtcPalette.background[ORIGINAL_SHADE];
+                *bgnd_col=parent_col ? parent_col : &qtcPalette.background[ORIGINAL_SHADE];
 
             setCairoClipping(cr, area);
 
@@ -2304,10 +2470,14 @@ void drawScrollbarGroove(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkWi
                    (horiz ? 0 : DF_VERT), widget);
 }
 
-void drawSelectionGradient(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangle *area,
-                                  int x, int y, int width, int height, int round, gboolean isLvSelection,
-                                  double alpha, GdkColor *col, gboolean horiz)
+void
+drawSelectionGradient(cairo_t *cr, GtkStyle *style, GtkStateType state,
+                      GdkRectangle *area, int x, int y, int width, int height,
+                      int round, gboolean isLvSelection,
+                      double alpha, GdkColor *col, gboolean horiz)
 {
+    QTC_UNUSED(style);
+    QTC_UNUSED(state);
     if((!isLvSelection || !(opts.square&SQUARE_LISTVIEW_SELECTION)) && ROUND_NONE!=opts.round)
         clipPathRadius(cr, x, y, width, height, qtcGetRadius(&opts, width, height, WIDGET_SELECTION, RADIUS_SELECTION), round);
     drawBevelGradientAlpha(cr, area, x, y, width, height, col,
@@ -2317,7 +2487,7 @@ void drawSelectionGradient(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
 }
 
 void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangle *area, GtkWidget *widget,
-                          int x, int y, int width, int height, int round, gboolean isLvSelection, double alphaMod, int factor)
+                   int x, int y, int width, int height, int round, gboolean isLvSelection, double alphaMod, int factor)
 {
     gboolean hasFocus=gtk_widget_has_focus(widget);
     double   alpha=alphaMod*(GTK_STATE_PRELIGHT==state ? 0.20 : 1.0)*(hasFocus || !qtSettings.inactiveChangeSelectionColor ? 1.0 : INACTIVE_SEL_ALPHA);
@@ -2331,8 +2501,8 @@ void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangl
     if(opts.borderSelection && (!isLvSelection || !(opts.square&SQUARE_LISTVIEW_SELECTION)))
     {
         double xd=x+0.5,
-               yd=y+0.5,
-               alpha=GTK_STATE_PRELIGHT==state || alphaMod<1.0 ? 0.20 : 1.0;
+            yd=y+0.5,
+            alpha=GTK_STATE_PRELIGHT==state || alphaMod<1.0 ? 0.20 : 1.0;
         int    xo=x, widtho=width;
 
         if(isLvSelection && !(opts.square&SQUARE_LISTVIEW_SELECTION) && ROUNDED_ALL!=round)
@@ -2360,22 +2530,24 @@ void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangl
 
 #define QTC_MASK_PROP "QTC_WIDGET_MASK"
 
-void createRoundedMask(cairo_t *cr, GtkWidget *widget, gint x, gint y, gint width, gint height, double radius, gboolean isToolTip)
+void
+createRoundedMask(cairo_t *cr, GtkWidget *widget, gint x, gint y, gint width,
+                  gint height, double radius, gboolean isToolTip)
 {
-    if(widget)
-    {
-        int size=((width&0xFFFF)<<16)+(height&0xFFFF),
-            old=(int)g_object_get_data(G_OBJECT(widget), QTC_MASK_PROP);
+    QTC_UNUSED(cr);
+    if (widget) {
+        int size = ((width & 0xFFFF) << 16) + (height & 0xFFFF);
+        int old = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget),
+                                                    QTC_MASK_PROP));
 
-        if(size!=old)
-        {
-    #if GTK_CHECK_VERSION(2, 90, 0)
-            QtcRegion *mask=windowMask(0, 0, width, height, opts.round>ROUND_SLIGHT);
+        if (size != old) {
+#if GTK_CHECK_VERSION(2, 90, 0)
+            QtcRegion *mask = windowMask(0, 0, width, height, opts.round>ROUND_SLIGHT);
 
             gtk_widget_shape_combine_region(widget, NULL);
             gtk_widget_shape_combine_region(widget, mask);
             qtcRegionDestroy(mask);
-    #else
+#else
             GdkBitmap *mask=gdk_pixmap_new(NULL, width, height, 1);
             cairo_t   *crMask = gdk_cairo_create((GdkDrawable *) mask);
 
@@ -2393,72 +2565,71 @@ void createRoundedMask(cairo_t *cr, GtkWidget *widget, gint x, gint y, gint widt
                 gdk_window_shape_combine_mask(gtk_widget_get_parent_window(widget), mask, 0, 0);
             cairo_destroy(crMask);
             gdk_pixmap_unref(mask);
-    #endif
-            g_object_set_data(G_OBJECT(widget), QTC_MASK_PROP, (gpointer)size);
-            /* Setting the window type to 'popup menu' seems to re-eanble kwin shadows! */
-            if(isToolTip, gtk_widget_get_window(widget))
-                gdk_window_set_type_hint(gtk_widget_get_window(widget), GDK_WINDOW_TYPE_HINT_POPUP_MENU);
+#endif
+            g_object_set_data(G_OBJECT(widget), QTC_MASK_PROP,
+                              GINT_TO_POINTER(size));
+            /* Setting the window type to 'popup menu' seems to
+               re-eanble kwin shadows! */
+            if (isToolTip && gtk_widget_get_window(widget)) {
+                gdk_window_set_type_hint(gtk_widget_get_window(widget),
+                                         GDK_WINDOW_TYPE_HINT_POPUP_MENU);
+            }
         }
     }
 }
 
-void clearRoundedMask(GtkWidget *widget, gboolean isToolTip)
+void
+clearRoundedMask(GtkWidget *widget, gboolean isToolTip)
 {
-    if(widget)
-    {
-        if((int)g_object_get_data(G_OBJECT(widget), QTC_MASK_PROP))
-        {
-    #if GTK_CHECK_VERSION(2, 90, 0)
+    if (widget) {
+        if (g_object_get_data(G_OBJECT(widget), QTC_MASK_PROP)) {
+#if GTK_CHECK_VERSION(2, 90, 0)
             gtk_widget_shape_combine_region(widget, NULL);
-    #else
+#else
             if(isToolTip)
                 gtk_widget_shape_combine_mask(widget, NULL, 0, 0);
             else
                 gdk_window_shape_combine_mask(gtk_widget_get_parent_window(widget), NULL, 0, 0);
-    #endif
+#endif
             g_object_set_data(G_OBJECT(widget), QTC_MASK_PROP, (gpointer)0);
         }
     }
 }
 
 void drawTreeViewLines(cairo_t *cr, GdkColor *col, int x, int y, int h, int depth, int levelIndent, int expanderSize,
-                              GtkTreeView *treeView, GtkTreePath *path, GtkTreeViewColumn *column)
+                       GtkTreeView *treeView, GtkTreePath *path, GtkTreeViewColumn *column)
 {
+    QTC_UNUSED(column);
     int        cellIndent=levelIndent + expanderSize + 4,
-               xStart=x + (cellIndent/2),
-               i,
-               isLastMask=0;
+        xStart=x + (cellIndent/2),
+        i,
+        isLastMask=0;
     gboolean   haveChildren=treeViewCellHasChildren(treeView, path),
-               useBitMask=depth<33;
+        useBitMask=depth<33;
     GByteArray *isLast=depth && !useBitMask ? g_byte_array_sized_new(depth) : NULL;
 
-    if(useBitMask || isLast)
-    {
+    if (useBitMask || isLast) {
         GtkTreePath  *p = path ? gtk_tree_path_copy(path) : NULL;
         int          index=depth-1;
 
-        while(p && gtk_tree_path_get_depth(p) > 0 && index>=0)
-        {
+        while (p && gtk_tree_path_get_depth(p) > 0 && index>=0) {
             GtkTreePath *next=treeViewPathParent(treeView, p);
-            char        last=treeViewCellIsLast(treeView, p) ? 1 : 0;
-            if(useBitMask)
-            {
-                if(last)
-                    isLastMask|=1<<index;
+            uint8_t last=treeViewCellIsLast(treeView, p) ? 1 : 0;
+            if (useBitMask) {
+                if (last) {
+                    isLastMask |= 1 << index;
+                }
+            } else {
+                isLast = g_byte_array_prepend(isLast, &last, 1);
             }
-            else
-                isLast=g_byte_array_prepend(isLast, &last, 1);
             gtk_tree_path_free(p);
-            p=next;
+            p = next;
             index--;
         }
-
         cairo_set_source_rgb(cr, CAIRO_COL(*col));
-
-        for(i=0; i<depth; ++i )
-        {
+        for(i = 0;i < depth;++i) {
             gboolean isLastCell=(useBitMask ? isLastMask&(1<<i) : isLast->data[i]) ? TRUE : FALSE,
-                     last=i == depth -1;
+                last=i == depth -1;
             double   xCenter = xStart;
             if(last)
             {
@@ -2514,7 +2685,7 @@ void drawPolygon(GdkWindow *window, GtkStyle *style, GdkColor *col, GdkRectangle
 {
 #if (defined QTC_GTK2_USE_CAIRO_FOR_ARROWS) || GTK_CHECK_VERSION(2, 90, 0)
     CAIRO_BEGIN
-    int               i;
+        int               i;
     cairo_antialias_t aa=cairo_get_antialias(cr);
     setCairoClipping(cr, area);
     cairo_set_source_rgb(cr, CAIRO_COL(*col));
@@ -2530,7 +2701,7 @@ void drawPolygon(GdkWindow *window, GtkStyle *style, GdkColor *col, GdkRectangle
     unsetCairoClipping(cr);
     CAIRO_END
 #else
-    QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
+        QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
 
     if(!qtcurveStyle->arrow_gc)
     {
@@ -2559,62 +2730,62 @@ void drawArrow(GdkWindow *window, GtkStyle *style, GdkColor *col, GdkRectangle *
     if(small)
         switch(arrow_type)
         {
-            case GTK_ARROW_UP:
-            {
-                GdkPoint a[]={{x+2,y},  {x,y-2},  {x-2,y},   {x-2,y+1}, {x,y-1}, {x+2,y+1}};
-                drawPolygon(window, style, col, area, a, opts.vArrows ? 6 : 3, fill);
-                break;
-            }
-            case GTK_ARROW_DOWN:
-            {
-                GdkPoint a[]={{x+2,y},  {x,y+2},  {x-2,y},   {x-2,y-1}, {x,y+1}, {x+2,y-1}};
-                drawPolygon(window, style, col, area, a, opts.vArrows ? 6 : 3, fill);
-                break;
-            }
-            case GTK_ARROW_RIGHT:
-            {
-                GdkPoint a[]={{x,y-2},  {x+2,y},  {x,y+2},   {x-1,y+2}, {x+1,y}, {x-1,y-2}};
-                drawPolygon(window, style, col, area, a, opts.vArrows ? 6 : 3, fill);
-                break;
-            }
-            case GTK_ARROW_LEFT:
-            {
-                GdkPoint a[]={{x,y-2},  {x-2,y},  {x,y+2},   {x+1,y+2}, {x-1,y}, {x+1,y-2}};
-                drawPolygon(window, style, col, area, a, opts.vArrows ? 6 : 3, fill);
-                break;
-            }
-            default:
-                return;
+        case GTK_ARROW_UP:
+        {
+            GdkPoint a[]={{x+2,y},  {x,y-2},  {x-2,y},   {x-2,y+1}, {x,y-1}, {x+2,y+1}};
+            drawPolygon(window, style, col, area, a, opts.vArrows ? 6 : 3, fill);
+            break;
+        }
+        case GTK_ARROW_DOWN:
+        {
+            GdkPoint a[]={{x+2,y},  {x,y+2},  {x-2,y},   {x-2,y-1}, {x,y+1}, {x+2,y-1}};
+            drawPolygon(window, style, col, area, a, opts.vArrows ? 6 : 3, fill);
+            break;
+        }
+        case GTK_ARROW_RIGHT:
+        {
+            GdkPoint a[]={{x,y-2},  {x+2,y},  {x,y+2},   {x-1,y+2}, {x+1,y}, {x-1,y-2}};
+            drawPolygon(window, style, col, area, a, opts.vArrows ? 6 : 3, fill);
+            break;
+        }
+        case GTK_ARROW_LEFT:
+        {
+            GdkPoint a[]={{x,y-2},  {x-2,y},  {x,y+2},   {x+1,y+2}, {x-1,y}, {x+1,y-2}};
+            drawPolygon(window, style, col, area, a, opts.vArrows ? 6 : 3, fill);
+            break;
+        }
+        default:
+            return;
         }
     else /* Large arrows... */
         switch(arrow_type)
         {
-            case GTK_ARROW_UP:
-            {
-                GdkPoint a[]={{x+3,y+1},  {x,y-2},  {x-3,y+1},    {x-3, y+2},  {x-2, y+2}, {x,y},  {x+2, y+2}, {x+3,y+2}};
-                drawPolygon(window, style, col, area, a, opts.vArrows ? 8 : 3, fill);
-                break;
-            }
-            case GTK_ARROW_DOWN:
-            {
-                GdkPoint a[]={{x+3,y-1},  {x,y+2},  {x-3,y-1},   {x-3,y-2},  {x-2, y-2}, {x,y}, {x+2, y-2}, {x+3,y-2}};
-                drawPolygon(window, style, col, area, a, opts.vArrows ? 8 : 3, fill);
-                break;
-            }
-            case GTK_ARROW_RIGHT:
-            {
-                GdkPoint a[]={{x-1,y+3},  {x+2,y},  {x-1,y-3},   {x-2,y-3}, {x-2, y-2},  {x,y}, {x-2, y+2},  {x-2,y+3}};
-                drawPolygon(window, style, col, area, a, opts.vArrows ? 8 : 3, fill);
-                break;
-            }
-            case GTK_ARROW_LEFT:
-            {
-                GdkPoint a[]={{x+1,y-3},  {x-2,y},  {x+1,y+3},   {x+2,y+3}, {x+2, y+2},  {x,y}, {x+2, y-2},  {x+2,y-3}};
-                drawPolygon(window, style, col, area, a, opts.vArrows ? 8 : 3, fill);
-                break;
-            }
-            default:
-                return;
+        case GTK_ARROW_UP:
+        {
+            GdkPoint a[]={{x+3,y+1},  {x,y-2},  {x-3,y+1},    {x-3, y+2},  {x-2, y+2}, {x,y},  {x+2, y+2}, {x+3,y+2}};
+            drawPolygon(window, style, col, area, a, opts.vArrows ? 8 : 3, fill);
+            break;
+        }
+        case GTK_ARROW_DOWN:
+        {
+            GdkPoint a[]={{x+3,y-1},  {x,y+2},  {x-3,y-1},   {x-3,y-2},  {x-2, y-2}, {x,y}, {x+2, y-2}, {x+3,y-2}};
+            drawPolygon(window, style, col, area, a, opts.vArrows ? 8 : 3, fill);
+            break;
+        }
+        case GTK_ARROW_RIGHT:
+        {
+            GdkPoint a[]={{x-1,y+3},  {x+2,y},  {x-1,y-3},   {x-2,y-3}, {x-2, y-2},  {x,y}, {x-2, y+2},  {x-2,y+3}};
+            drawPolygon(window, style, col, area, a, opts.vArrows ? 8 : 3, fill);
+            break;
+        }
+        case GTK_ARROW_LEFT:
+        {
+            GdkPoint a[]={{x+1,y-3},  {x-2,y},  {x+1,y+3},   {x+2,y+3}, {x+2, y+2},  {x,y}, {x+2, y-2},  {x+2,y-3}};
+            drawPolygon(window, style, col, area, a, opts.vArrows ? 8 : 3, fill);
+            break;
+        }
+        default:
+            return;
         }
 }
 
@@ -2628,25 +2799,25 @@ static void setGapClip(cairo_t *cr, GdkRectangle *area, GtkPositionType gapSide,
 
         switch(gapSide)
         {
-            case GTK_POS_TOP:
-                gapRect.x=x+gapX+adjust, gapRect.y=y, gapRect.width=gapWidth-(2*adjust), gapRect.height=2;
-                if(GTK_APP_JAVA==qtSettings.app && isTab)
-                    gapRect.width-=3;
-                break;
-            case GTK_POS_BOTTOM:
-                gapRect.x=x+gapX+adjust, gapRect.y=y+height-2, gapRect.width=gapWidth-(2*adjust), gapRect.height=2;
-                break;
-            case GTK_POS_LEFT:
-                gapRect.x=x, gapRect.y=y+gapX+adjust, gapRect.width=2, gapRect.height=gapWidth-(2*adjust);
-                break;
-            case GTK_POS_RIGHT:
-                gapRect.x=x+width-2, gapRect.y=y+gapX+adjust, gapRect.width=2, gapRect.height=gapWidth-(2*adjust);
-                break;
+        case GTK_POS_TOP:
+            gapRect.x=x+gapX+adjust, gapRect.y=y, gapRect.width=gapWidth-(2*adjust), gapRect.height=2;
+            if(GTK_APP_JAVA==qtSettings.app && isTab)
+                gapRect.width-=3;
+            break;
+        case GTK_POS_BOTTOM:
+            gapRect.x=x+gapX+adjust, gapRect.y=y+height-2, gapRect.width=gapWidth-(2*adjust), gapRect.height=2;
+            break;
+        case GTK_POS_LEFT:
+            gapRect.x=x, gapRect.y=y+gapX+adjust, gapRect.width=2, gapRect.height=gapWidth-(2*adjust);
+            break;
+        case GTK_POS_RIGHT:
+            gapRect.x=x+width-2, gapRect.y=y+gapX+adjust, gapRect.width=2, gapRect.height=gapWidth-(2*adjust);
+            break;
         }
 
         QtcRect   r={x, y, width, height};
         QtcRegion *region=qtcRegionRect(area ? area : &r),
-                  *inner=qtcRegionRect(&gapRect);
+            *inner=qtcRegionRect(&gapRect);
 
         qtcRegionXor(region, inner);
         setCairoClippingRegion(cr, region);
@@ -2684,23 +2855,23 @@ static void ge_cairo_transform_for_layout(cairo_t *cr, PangoLayout *layout, int 
 void drawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state, gboolean use_text, GdkRectangle *area, gint x, gint y, PangoLayout *layout)
 {
     CAIRO_BEGIN
-    gdk_cairo_set_source_color(cr, use_text || GTK_STATE_INSENSITIVE==state ? &style->text[state] : &style->fg[state]);
+        gdk_cairo_set_source_color(cr, use_text || GTK_STATE_INSENSITIVE==state ? &style->text[state] : &style->fg[state]);
     ge_cairo_transform_for_layout(cr, layout, x, y);
     pango_cairo_show_layout(cr, layout);
     CAIRO_END
-}
+        }
 
 void fillTab(cairo_t *cr, GtkStyle *style, GtkWidget *widget, GdkRectangle *area, GtkStateType state,
              GdkColor *col, int x, int y, int width, int height, gboolean horiz, EWidget tab, gboolean grad)
 {
     gboolean selected=GTK_STATE_NORMAL==state,
-             flatBgnd=!CUSTOM_BGND || 0!=opts.tabBgnd;
+        flatBgnd=!CUSTOM_BGND || 0!=opts.tabBgnd;
 
 //     if(selected && !flatBgnd)
 //         drawWindowBgnd(cr, style, area, widget, x, y, width, height);
 
     GdkColor *c=col,
-             b;
+        b;
     double   alpha=1.0;
 
     if (selected && 0 != opts.tabBgnd) {
@@ -2753,8 +2924,8 @@ void drawToolTip(cairo_t *cr, GtkWidget *widget, GdkRectangle *area, int x, int 
 
 #if GTK_CHECK_VERSION(2,9,0)
     gboolean nonGtk=isFakeGtk(),
-             rounded=!nonGtk && widget && !(opts.square&SQUARE_TOOLTIPS),
-             useAlpha=!nonGtk && qtSettings.useAlpha && isRgbaWidget(widget) && compositingActive(widget);
+        rounded=!nonGtk && widget && !(opts.square&SQUARE_TOOLTIPS),
+        useAlpha=!nonGtk && qtSettings.useAlpha && isRgbaWidget(widget) && compositingActive(widget);
 
 #if GTK_CHECK_VERSION(2,12,0)
     if(!nonGtk && !useAlpha && GTK_IS_WINDOW(widget))
@@ -2783,16 +2954,16 @@ void drawToolTip(cairo_t *cr, GtkWidget *widget, GdkRectangle *area, int x, int 
 #if GTK_CHECK_VERSION(2,9,0)
     if(!rounded)
 #endif
-    if(IS_FLAT(opts.tooltipAppearance))
-    {
-        cairo_new_path(cr);
-        /*if(IS_FLAT(opts.tooltipAppearance))*/
+        if(IS_FLAT(opts.tooltipAppearance))
+        {
+            cairo_new_path(cr);
+            /*if(IS_FLAT(opts.tooltipAppearance))*/
             cairo_set_source_rgb(cr, CAIRO_COL(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT]));
-        /*else
-            cairo_set_source_rgba(cr, 0, 0, 0, 0.25);*/
-        cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
-        cairo_stroke(cr);
-    }
+            /*else
+              cairo_set_source_rgba(cr, 0, 0, 0, 0.25);*/
+            cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
+            cairo_stroke(cr);
+        }
 
     if(useAlpha)
         cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
@@ -2801,8 +2972,8 @@ void drawToolTip(cairo_t *cr, GtkWidget *widget, GdkRectangle *area, int x, int 
 void drawSplitter(cairo_t *cr, GtkStateType state, GtkStyle *style, GdkRectangle *area, int x, int y, int width, int height)
 {
     GdkColor *cols=opts.coloredMouseOver && GTK_STATE_PRELIGHT==state
-                    ? qtcPalette.mouseover
-                    : qtcPalette.background;
+        ? qtcPalette.mouseover
+        : qtcPalette.background;
 
     if(GTK_STATE_PRELIGHT==state && opts.splitterHighlight)
     {
@@ -2812,19 +2983,19 @@ void drawSplitter(cairo_t *cr, GtkStateType state, GtkStyle *style, GdkRectangle
 
     switch(opts.splitters)
     {
-        case LINE_1DOT:
-            drawDot(cr, x, y, width, height, cols);
-            break;
-        case LINE_NONE:
-            break;
-        case LINE_DOTS:
-        default:
-            drawDots(cr, x, y, width, height, height>width, NUM_SPLITTER_DASHES, 1, cols, area, 0, 5);
-            break;
-        case LINE_FLAT:
-        case LINE_SUNKEN:
-        case LINE_DASHES:
-            drawLines(cr, x, y, width, height, height>width, NUM_SPLITTER_DASHES, 2, cols, area, 3, opts.splitters);
+    case LINE_1DOT:
+        drawDot(cr, x, y, width, height, cols);
+        break;
+    case LINE_NONE:
+        break;
+    case LINE_DOTS:
+    default:
+        drawDots(cr, x, y, width, height, height>width, NUM_SPLITTER_DASHES, 1, cols, area, 0, 5);
+        break;
+    case LINE_FLAT:
+    case LINE_SUNKEN:
+    case LINE_DASHES:
+        drawLines(cr, x, y, width, height, height>width, NUM_SPLITTER_DASHES, 2, cols, area, 3, opts.splitters);
     }
 }
 
@@ -2905,26 +3076,27 @@ void drawMenuItem(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *w
 #endif
 
     /* The following 'if' is just a hack for a menubar item problem with pidgin. Sometime, a 12pix width
-        empty menubar item is drawn on the right - and doesnt disappear! */
+       empty menubar item is drawn on the right - and doesnt disappear! */
     if(!mb || width>12)
     {
         gboolean grayItem=(!opts.colorMenubarMouseOver && mb && !active_mb && GTK_APP_OPEN_OFFICE!=qtSettings.app) ||
-                           !opts.useHighlightForMenu;
+            !opts.useHighlightForMenu;
         GdkColor *itemCols=grayItem ? qtcPalette.background : qtcPalette.highlight;
-        GdkColor *bgnd=qtcPalette.menubar && mb && !isMozilla() && GTK_APP_JAVA!=qtSettings.app
-                        ? &qtcPalette.menubar[ORIGINAL_SHADE] : NULL;
+        /* GdkColor *bgnd = (qtcPalette.menubar && mb && !isMozilla() && */
+        /*                   GTK_APP_JAVA != qtSettings.app ? */
+        /*                   &qtcPalette.menubar[ORIGINAL_SHADE] : NULL); */
         int      round=mb
-                        ? active_mb && opts.roundMbTopOnly
-                            ? ROUNDED_TOP
-                            : ROUNDED_ALL
-                        : ROUNDED_ALL,
-                 new_state=GTK_STATE_PRELIGHT==state ? GTK_STATE_NORMAL : state;
+            ? active_mb && opts.roundMbTopOnly
+            ? ROUNDED_TOP
+            : ROUNDED_ALL
+            : ROUNDED_ALL,
+            new_state=GTK_STATE_PRELIGHT==state ? GTK_STATE_NORMAL : state;
         gboolean stdColors=!mb || (SHADE_BLEND_SELECTED!=opts.shadeMenubars && SHADE_SELECTED!=opts.shadeMenubars);
         int      fillVal=grayItem ? 4 : ORIGINAL_SHADE,
-                 borderVal=opts.borderMenuitems ? 0 : fillVal;
+            borderVal=opts.borderMenuitems ? 0 : fillVal;
 
         if(grayItem && mb && !active_mb && !opts.colorMenubarMouseOver &&
-            (opts.borderMenuitems || !IS_FLAT(opts.menuitemAppearance)))
+           (opts.borderMenuitems || !IS_FLAT(opts.menuitemAppearance)))
             fillVal=ORIGINAL_SHADE;
 
         if(mb && !opts.roundMbTopOnly && !(opts.square&SQUARE_POPUP_MENUS))
@@ -2932,7 +3104,6 @@ void drawMenuItem(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *w
 
         if(grayItem && !mb && (USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu))
             itemCols=qtcPalette.menu;
-                        
         if(!mb && APPEARANCE_FADE==opts.menuitemAppearance)
         {
             gboolean        reverse=FALSE; /* TODO !!! */
@@ -2963,8 +3134,8 @@ void drawMenuItem(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *w
             /*For now dont round combos - getting weird effects with shadow/clipping :-( */
             /*...but these work ok if we have an rgba colormap, so in that case we dont care if its a combo...*/
             gboolean isCombo=!(opts.square&SQUARE_POPUP_MENUS) && widget && isComboMenu(gtk_widget_get_parent(widget)) &&
-                                !(qtSettings.useAlpha && compositingActive(widget) && isRgbaWidget(widget)),
-                        roundedMenu=(!widget || !isCombo) && !(opts.square&SQUARE_POPUP_MENUS);
+                !(qtSettings.useAlpha && compositingActive(widget) && isRgbaWidget(widget)),
+                roundedMenu=(!widget || !isCombo) && !(opts.square&SQUARE_POPUP_MENUS);
 
             if(roundedMenu)
                 clipPathRadius(cr, x, y, width, height, MENU_AND_TOOLTIP_RADIUS-1.0, round);
@@ -2975,7 +3146,7 @@ void drawMenuItem(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *w
         else if(stdColors && opts.borderMenuitems)
         {
             drawLightBevel(cr, style, new_state, area, x, y, width, height, &itemCols[fillVal],
-                            itemCols, round, WIDGET_MENU_ITEM, BORDER_FLAT, DF_DRAW_INSIDE|(stdColors ? DF_DO_BORDER : 0), widget);
+                           itemCols, round, WIDGET_MENU_ITEM, BORDER_FLAT, DF_DRAW_INSIDE|(stdColors ? DF_DO_BORDER : 0), widget);
         }
         else
         {
@@ -2991,6 +3162,7 @@ void
 drawMenu(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
          GdkRectangle *area, int x, int y, int width, int height)
 {
+    QTC_UNUSED(state);
     double radius = 0.0;
     double alpha = 1.0;
     gboolean nonGtk = isFakeGtk();
@@ -3040,7 +3212,7 @@ drawMenu(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
             drawBgndImage(cr, style, area, x, y, width, height, &qtcPalette.menu[ORIGINAL_SHADE], FALSE, alpha);
         else
             drawBevelGradientAlpha(cr, area, x, y, width, height, &qtcPalette.menu[ORIGINAL_SHADE], GT_HORIZ==opts.menuBgndGrad,
-                                    FALSE, opts.menuBgndAppearance, WIDGET_OTHER, alpha);
+                                   FALSE, opts.menuBgndAppearance, WIDGET_OTHER, alpha);
     }
     else if(opts.shadePopupMenu || USE_LIGHTER_POPUP_MENU || useAlpha)
         drawAreaColorAlpha(cr, area, &qtcPalette.menu[ORIGINAL_SHADE], x, y, width, height, alpha);
@@ -3060,7 +3232,7 @@ drawMenu(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
         {
             GtkMenuShell *menuShell=GTK_MENU_SHELL(widget);
             GList        *children=gtk_container_get_children(GTK_CONTAINER(menuShell)),
-                            *child=children;
+                *child=children;
 
             for(; child; child = child->next)
             {
@@ -3070,8 +3242,8 @@ drawMenu(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
                     stripeWidth=21;
 
                     if(0L==gtk_image_menu_item_get_image(item) ||
-                        (GTK_IS_IMAGE(gtk_image_menu_item_get_image(item)) &&
-                            GTK_IMAGE_EMPTY==gtk_image_get_storage_type(GTK_IMAGE(gtk_image_menu_item_get_image(item)))))
+                       (GTK_IS_IMAGE(gtk_image_menu_item_get_image(item)) &&
+                        GTK_IMAGE_EMPTY==gtk_image_get_storage_type(GTK_IMAGE(gtk_image_menu_item_get_image(item)))))
                     {
                         // Give it a blank icon - so that menuStripe looks ok, plus this matches KDE style!
                         if(0L==gtk_image_menu_item_get_image(item))
@@ -3079,7 +3251,7 @@ drawMenu(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
                                                                                                     PIX_BLANK, 1.0)));
                         else
                             gtk_image_set_from_pixbuf(GTK_IMAGE(gtk_image_menu_item_get_image(item)),
-                                                        getPixbuf(qtcPalette.check_radio, PIX_BLANK, 1.0));
+                                                      getPixbuf(qtcPalette.check_radio, PIX_BLANK, 1.0));
                         break;
                     }
                     else // TODO: Check image size!
@@ -3092,7 +3264,7 @@ drawMenu(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
         }
 
         drawBevelGradientAlpha(cr, area, x+1, y+1, stripeWidth+1, height-2, &opts.customMenuStripeColor, FALSE, FALSE,
-                                opts.menuStripeAppearance, WIDGET_OTHER, alpha);
+                               opts.menuStripeAppearance, WIDGET_OTHER, alpha);
     }
 
     if(opts.popupBorder)
@@ -3107,7 +3279,7 @@ drawMenu(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
 
         cairo_new_path(cr);
         cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.menu[QTC_STD_BORDER]));
-            /*For now dont round combos - getting weird effects with shadow/clipping :-( */
+        /*For now dont round combos - getting weird effects with shadow/clipping :-( */
         if(roundedMenu && !comboMenu)
             createPath(cr, x+0.5, y+0.5, width-1, height-1, radius-1, ROUNDED_ALL);
         else
@@ -3154,7 +3326,7 @@ void drawBoxGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow, GtkStateType
 
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %d %d ", __FUNCTION__, shadow, state, x, y, width, height, gapX,
                                            gapWidth, isTab),
-                                    debugDisplayWidget(widget, 10);
+                                        debugDisplayWidget(widget, 10);
 
     // *Very* hacky fix for tabs in thunderbird main window!!!
     if(isTab && isMozilla() && 250==gapWidth && (290==width || 270==width) && 6==height)
@@ -3178,18 +3350,18 @@ void drawBoxGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow, GtkStateType
         if(!(opts.square&SQUARE_TAB_FRAME) && gapX<=0)
             switch(gapSide)
             {
-                case GTK_POS_TOP:
-                    round=CORNER_TR|CORNER_BL|CORNER_BR;
-                    break;
-                case GTK_POS_BOTTOM:
-                    round=CORNER_BR|CORNER_TL|CORNER_TR;
-                    break;
-                case GTK_POS_LEFT:
-                    round=CORNER_TR|CORNER_BL|CORNER_BR;
-                    break;
-                case GTK_POS_RIGHT:
-                    round=CORNER_TL|CORNER_BL|CORNER_BR;
-                    break;
+            case GTK_POS_TOP:
+                round=CORNER_TR|CORNER_BL|CORNER_BR;
+                break;
+            case GTK_POS_BOTTOM:
+                round=CORNER_BR|CORNER_TL|CORNER_TR;
+                break;
+            case GTK_POS_LEFT:
+                round=CORNER_TR|CORNER_BL|CORNER_BR;
+                break;
+            case GTK_POS_RIGHT:
+                round=CORNER_TL|CORNER_BL|CORNER_BR;
+                break;
             }
 
         setGapClip(cr, area, gapSide, gapX, gapWidth, x, y, width, height, isTab);
@@ -3200,134 +3372,135 @@ void drawBoxGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow, GtkStateType
     }
 }
 
-void drawBoxGapFixes(cairo_t *cr, GtkWidget *widget,  gint x, gint y, gint width, gint height, GtkPositionType gapSide, gint gapX, gint gapWidth)
+void
+drawBoxGapFixes(cairo_t *cr, GtkWidget *widget,  gint x, gint y,
+                gint width, gint height, GtkPositionType gapSide, gint gapX,
+                gint gapWidth)
 {
     GdkColor *col1 = &qtcPalette.background[0],
-             *col2 = &qtcPalette.background[opts.borderTab ? 0 : (APPEARANCE_FLAT==opts.appearance ? ORIGINAL_SHADE : FRAME_DARK_SHADOW)],
-             *outer = &qtcPalette.background[QTC_STD_BORDER];
+        *col2 = &qtcPalette.background[opts.borderTab ? 0 : (APPEARANCE_FLAT==opts.appearance ? ORIGINAL_SHADE : FRAME_DARK_SHADOW)],
+        *outer = &qtcPalette.background[QTC_STD_BORDER];
     gboolean rev = reverseLayout(widget),
-             thin=opts.thin&THIN_FRAMES;
+        thin=opts.thin&THIN_FRAMES;
     int      rightPos=(width -(gapX + gapWidth));
 
-    switch(gapSide)
-    {
-        case GTK_POS_TOP:
-            if(gapX > 0)
-            {
-                if(!thin)
-                {
-                    drawHLine(cr, CAIRO_COL(*col1), 1.0, x+gapX-1, y+1, 3);
-                    drawHLine(cr, CAIRO_COL(*col1), 1.0, x+gapX-1, y, 3);
-                }
-                drawHLine(cr, CAIRO_COL(*outer), 1.0, x+gapX-1, y, 2);
+    switch (gapSide) {
+    case GTK_POS_TOP:
+        if (gapX > 0) {
+            if (!thin) {
+                drawHLine(cr, CAIRO_COL(*col1), 1.0, x+gapX-1, y+1, 3);
+                drawHLine(cr, CAIRO_COL(*col1), 1.0, x+gapX-1, y, 3);
             }
-            else if(!thin)
-                drawVLine(cr, CAIRO_COL(*col1), 1.0, x+1, y, 2);
+            drawHLine(cr, CAIRO_COL(*outer), 1.0, x+gapX-1, y, 2);
+        } else if (!thin) {
+            drawVLine(cr, CAIRO_COL(*col1), 1.0, x+1, y, 2);
+        }
+        if (rightPos >= 0) {
+            if (!thin) {
+                drawHLine(cr, CAIRO_COL(*col1), 1.0, x+gapX+gapWidth-2, y+1, 3);
+                drawVLine(cr, CAIRO_COL(*col2), 1.0, x+gapX+gapWidth-2,
+                          y, rightPos ? 1 : 0);
+            }
+            drawHLine(cr, CAIRO_COL(*outer), 1.0, x+gapX+gapWidth-1, y, 2);
+        }
+        if (!(opts.square & SQUARE_TAB_FRAME) && opts.round > ROUND_SLIGHT) {
+            if (gapX>0 && TAB_MO_GLOW==opts.tabMouseOver) {
+                drawVLine(cr, CAIRO_COL(*outer), 1.0,
+                          rev ? x + width - 2 : x + 1, y, 2);
+            } else {
+                drawVLine(cr, CAIRO_COL(*outer), 1.0,
+                          rev ? x + width - 1 : x, y, 3);
+                if (gapX > 0 && !thin) {
+                    drawHLine(cr, CAIRO_COL(qtcPalette.background[2]),
+                              1.0, x + 1, y, 1);
+                }
+            }
+        }
+        break;
+    case GTK_POS_BOTTOM:
+        if (gapX > 0) {
+            if (!thin) {
+                drawHLine(cr, CAIRO_COL(*col1), 1.0, x+gapX-1, y+height-1, 2);
+                drawHLine(cr, CAIRO_COL(*col2), 1.0, x+gapX-1, y+height-2, 2);
+            }
+            drawHLine(cr, CAIRO_COL(*outer), 1.0, x+gapX-1, y+height-1, 2);
+        } else if (!thin) {
+            drawVLine(cr, CAIRO_COL(*col1), 1.0, x+1, y+height-1, 2);
+        }
 
-            if(rightPos >= 0)
-            {
-                if(!thin)
-                {
-                    drawHLine(cr, CAIRO_COL(*col1), 1.0, x+gapX+gapWidth-2, y+1, 3);
-                    drawVLine(cr, CAIRO_COL(*col2), 1.0, x+gapX+gapWidth-2, y, rightPos ? 1 : 0);
-                }
-                drawHLine(cr, CAIRO_COL(*outer), 1.0, x+gapX+gapWidth-1, y, 2);
+        if (rightPos >= 0) {
+            if (!thin) {
+                drawHLine(cr, CAIRO_COL(*col2), 1.0, x+gapX+gapWidth-2, y+height-2, 3);
+                drawVLine(cr, CAIRO_COL(*col2), 1.0, x+gapX+gapWidth-2, y+height-1, rightPos ? 1 : 0);
             }
-            if(!(opts.square&SQUARE_TAB_FRAME) && opts.round>ROUND_SLIGHT)
-                if(gapX>0 && TAB_MO_GLOW==opts.tabMouseOver)
-                    drawVLine(cr, CAIRO_COL(*outer), 1.0, rev ? x+width-2 : x+1, y, 2);
-                else
-                {
-                    drawVLine(cr, CAIRO_COL(*outer), 1.0, rev ? x+width-1 : x, y, 3);
-                    if(gapX>0 && !thin)
-                        drawHLine(cr, CAIRO_COL(qtcPalette.background[2]), 1.0, x+1, y, 1);
-                }
-            break;
-        case GTK_POS_BOTTOM:
-            if(gapX > 0)
-            {
-                if(!thin)
-                {
-                    drawHLine(cr, CAIRO_COL(*col1), 1.0, x+gapX-1, y+height-1, 2);
-                    drawHLine(cr, CAIRO_COL(*col2), 1.0, x+gapX-1, y+height-2, 2);
-                }
-                drawHLine(cr, CAIRO_COL(*outer), 1.0, x+gapX-1, y+height-1, 2);
+            drawHLine(cr, CAIRO_COL(*outer), 1.0, x+gapX+gapWidth-1, y+height-1, 2);
+        }
+        if(!(opts.square&SQUARE_TAB_FRAME) && opts.round>ROUND_SLIGHT) {
+            if (gapX > 0 && TAB_MO_GLOW == opts.tabMouseOver) {
+                drawVLine(cr, CAIRO_COL(*outer), 1.0,
+                          rev ? x + width - 2 : x + 1, y + height - 2, 2);
+            } else {
+                drawVLine(cr, CAIRO_COL(*outer), 1.0,
+                          rev ? x + width - 1 : x, y + height - 3, 3);
             }
-            else if(!thin)
-                drawVLine(cr, CAIRO_COL(*col1), 1.0, x+1, y+height-1, 2);
+        }
+        break;
+    case GTK_POS_LEFT:
+        if (gapX > 0) {
+            if (!thin) {
+                drawVLine(cr, CAIRO_COL(*col1), 1.0, x+1, y+gapX-1, 3);
+                drawVLine(cr, CAIRO_COL(*col1), 1.0, x, y+gapX-1, 3);
+            }
+            drawVLine(cr, CAIRO_COL(*outer), 1.0, x, y+gapX-1, 2);
+        } else if (!thin) {
+            drawHLine(cr, CAIRO_COL(*col1), 1.0, x, y+1, 2);
+        }
 
-            if(rightPos >= 0)
-            {
-                if(!thin)
-                {
-                    drawHLine(cr, CAIRO_COL(*col2), 1.0, x+gapX+gapWidth-2, y+height-2, 3);
-                    drawVLine(cr, CAIRO_COL(*col2), 1.0, x+gapX+gapWidth-2, y+height-1, rightPos ? 1 : 0);
-                }
-                drawHLine(cr, CAIRO_COL(*outer), 1.0, x+gapX+gapWidth-1, y+height-1, 2);
+        if ((height-(gapX + gapWidth)) > 0) {
+            if (!thin) {
+                drawVLine(cr, CAIRO_COL(*col1), 1.0, x+1, y+gapX+gapWidth-2, 3);
+                drawVLine(cr, CAIRO_COL(*col2), 1.0, x, y+gapX+gapWidth-2, 1);
             }
-            if(!(opts.square&SQUARE_TAB_FRAME) && opts.round>ROUND_SLIGHT)
-                if(gapX>0 && TAB_MO_GLOW==opts.tabMouseOver)
-                    drawVLine(cr, CAIRO_COL(*outer), 1.0, rev ? x+width-2 : x+1, y+height-2, 2);
-                else
-                    drawVLine(cr, CAIRO_COL(*outer), 1.0, rev ? x+width-1 : x, y+height-3, 3);
-            break;
-        case GTK_POS_LEFT:
-            if(gapX>0)
-            {
-                if(!thin)
-                {
-                    drawVLine(cr, CAIRO_COL(*col1), 1.0, x+1, y+gapX-1, 3);
-                    drawVLine(cr, CAIRO_COL(*col1), 1.0, x, y+gapX-1, 3);
+            drawVLine(cr, CAIRO_COL(*outer), 1.0, x, y+gapX+gapWidth-1, 2);
+        }
+        if(!(opts.square&SQUARE_TAB_FRAME) && opts.round>ROUND_SLIGHT) {
+            if (gapX>0 && TAB_MO_GLOW == opts.tabMouseOver) {
+                drawHLine(cr, CAIRO_COL(*outer), 1.0, x, y+1, 2);
+            } else {
+                drawHLine(cr, CAIRO_COL(*outer), 1.0, x, y, 3);
+                if (gapX > 0 && !thin) {
+                    drawHLine(cr, CAIRO_COL(qtcPalette.background[2]),
+                              1.0, x, y+1, 1);
                 }
-                drawVLine(cr, CAIRO_COL(*outer), 1.0, x, y+gapX-1, 2);
             }
-            else if(!thin)
-                drawHLine(cr, CAIRO_COL(*col1), 1.0, x, y+1, 2);
+        }
+        break;
+    case GTK_POS_RIGHT:
+        if (gapX > 0) {
+            if (!thin)
+                drawVLine(cr, CAIRO_COL(*col2), 1.0, x+width-2, y+gapX-1, 2);
+            drawVLine(cr, CAIRO_COL(*outer), 1.0, x+width-1, y+gapX-1, 2);
+        } else if (!thin) {
+            drawHLine(cr, CAIRO_COL(*col1), 1.0, x+width-2, y+1, 3);
+        }
 
-            if((height-(gapX + gapWidth)) > 0)
-            {
-                if(!thin)
-                {
-                    drawVLine(cr, CAIRO_COL(*col1), 1.0, x+1, y+gapX+gapWidth-2, 3);
-                    drawVLine(cr, CAIRO_COL(*col2), 1.0, x, y+gapX+gapWidth-2, 1);
-                }
-                drawVLine(cr, CAIRO_COL(*outer), 1.0, x, y+gapX+gapWidth-1, 2);
+        if ((height-(gapX + gapWidth)) > 0) {
+            if (!thin) {
+                drawHLine(cr, CAIRO_COL(*col2), 1.0, x+width-2,
+                          y+gapX+gapWidth-2, 3);
+                drawVLine(cr, CAIRO_COL(*col2), 1.0, x+width-2,
+                          y+gapX+gapWidth-1, 2);
             }
-            if(!(opts.square&SQUARE_TAB_FRAME) && opts.round>ROUND_SLIGHT)
-                if(gapX>0 && TAB_MO_GLOW==opts.tabMouseOver)
-                    drawHLine(cr, CAIRO_COL(*outer), 1.0, x, y+1, 2);
-                else
-                {
-                    drawHLine(cr, CAIRO_COL(*outer), 1.0, x, y, 3);
-                    if(gapX>0 && !thin)
-                        drawHLine(cr, CAIRO_COL(qtcPalette.background[2]), 1.0, x, y+1, 1);
-                }
-            break;
-        case GTK_POS_RIGHT:
-            if(gapX>0)
-            {
-                if(!thin)
-                    drawVLine(cr, CAIRO_COL(*col2), 1.0, x+width-2, y+gapX-1, 2);
-                drawVLine(cr, CAIRO_COL(*outer), 1.0, x+width-1, y+gapX-1, 2);
+            drawVLine(cr, CAIRO_COL(*outer), 1.0, x+width-1, y+gapX+gapWidth-1, 2);
+        }
+        if(!(opts.square&SQUARE_TAB_FRAME) && opts.round>ROUND_SLIGHT) {
+            if (gapX > 0 && TAB_MO_GLOW == opts.tabMouseOver) {
+                drawHLine(cr, CAIRO_COL(*outer), 1.0, x+width-2, y+1, 2);
+            } else {
+                drawHLine(cr, CAIRO_COL(*outer), 1.0, x+width-3, y, 3);
             }
-            else if(!thin)
-                drawHLine(cr, CAIRO_COL(*col1), 1.0, x+width-2, y+1, 3);
-
-            if((height-(gapX + gapWidth)) > 0)
-            {
-                if(!thin)
-                {
-                    drawHLine(cr, CAIRO_COL(*col2), 1.0, x+width-2, y+gapX+gapWidth-2, 3);
-                    drawVLine(cr, CAIRO_COL(*col2), 1.0, x+width-2, y+gapX+gapWidth-1, 2);
-                }
-                drawVLine(cr, CAIRO_COL(*outer), 1.0, x+width-1, y+gapX+gapWidth-1, 2);
-            }
-            if(!(opts.square&SQUARE_TAB_FRAME) && opts.round>ROUND_SLIGHT)
-                if(gapX>0 && TAB_MO_GLOW==opts.tabMouseOver)
-                    drawHLine(cr, CAIRO_COL(*outer), 1.0, x+width-2, y+1, 2);
-                else
-                    drawHLine(cr, CAIRO_COL(*outer), 1.0, x+width-3, y, 3);
-            break;
+        }
+        break;
     }
 }
 
@@ -3336,7 +3509,7 @@ void drawShadowGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow, GtkStateT
                    gint gapX, gint gapWidth)
 {
     gboolean drawFrame=TRUE,
-             isGroupBox=IS_GROUP_BOX(widget);
+        isGroupBox=IS_GROUP_BOX(widget);
 
     if(isGroupBox)
     {
@@ -3345,88 +3518,88 @@ void drawShadowGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow, GtkStateT
 
         switch(opts.groupBox)
         {
-            case FRAME_NONE:
+        case FRAME_NONE:
+            drawFrame=FALSE;
+            return;
+        case FRAME_LINE:
+        case FRAME_SHADED:
+        case FRAME_FADED:
+            if(opts.gbLabel&(GB_LBL_INSIDE|GB_LBL_OUTSIDE) && widget && GTK_IS_FRAME(widget))
+            {
+                GtkFrame       *frame=GTK_FRAME(widget);
+                GtkRequisition child_requisition;
+                gint           height_extra;
+                GtkStyle       *style=frame ? gtk_widget_get_style(GTK_WIDGET(frame)) : NULL;
+                GtkWidget      *label=frame ? gtk_frame_get_label_widget(frame) : NULL;
+
+                if(style && label)
+                {
+                    gtk_widget_get_child_requisition(label, &child_requisition);
+                    height_extra = (qtcMax(0, child_requisition.height - style->ythickness)
+                                    - qtcFrameGetLabelYAlign(frame) * child_requisition.height) + 2;
+
+                    if(opts.gbLabel&GB_LBL_INSIDE)
+                        y-=height_extra, height+=height_extra, gapWidth=0;
+                    else if(opts.gbLabel&GB_LBL_OUTSIDE)
+                        y+=height_extra, height-=height_extra, gapWidth=0;
+                }
+            }
+            if(FRAME_LINE==opts.groupBox)
+            {
+                GdkRectangle gap={x, y, gapWidth, 1};
+                drawFadedLine(cr, x, y, width, 1, &qtcPalette.background[QTC_STD_BORDER], area, gapWidth>0 ? &gap : NULL, FALSE, TRUE, TRUE);
                 drawFrame=FALSE;
-                return;
-            case FRAME_LINE:
-            case FRAME_SHADED:
-            case FRAME_FADED:
-                if(opts.gbLabel&(GB_LBL_INSIDE|GB_LBL_OUTSIDE) && widget && GTK_IS_FRAME(widget))
+            }
+            else if(GTK_SHADOW_NONE!=shadow)
+            {
+                int             round=opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
+                double          col=opts.gbFactor<0 ? 0.0 : 1.0,
+                    radius=ROUNDED_ALL==round ? qtcGetRadius(&opts, width, height, WIDGET_FRAME, RADIUS_EXTERNAL) : 0.0;
+                cairo_pattern_t *pt=NULL;
+                if(0!=opts.gbFactor)
                 {
-                    GtkFrame       *frame=GTK_FRAME(widget);
-                    GtkRequisition child_requisition;
-                    gint           height_extra;
-                    GtkStyle       *style=frame ? gtk_widget_get_style(GTK_WIDGET(frame)) : NULL;
-                    GtkWidget      *label=frame ? gtk_frame_get_label_widget(frame) : NULL;
-
-                    if(style && label)
-                    {
-                        gtk_widget_get_child_requisition(label, &child_requisition);
-                        height_extra = (qtcMax(0, child_requisition.height - style->ythickness)
-                                        - qtcFrameGetLabelYAlign(frame) * child_requisition.height) + 2;
-
-                        if(opts.gbLabel&GB_LBL_INSIDE)
-                            y-=height_extra, height+=height_extra, gapWidth=0;
-                        else if(opts.gbLabel&GB_LBL_OUTSIDE)
-                            y+=height_extra, height-=height_extra, gapWidth=0;
-                    }
-                }
-                if(FRAME_LINE==opts.groupBox)
-                {
-                    GdkRectangle gap={x, y, gapWidth, 1};
-                    drawFadedLine(cr, x, y, width, 1, &qtcPalette.background[QTC_STD_BORDER], area, gapWidth>0 ? &gap : NULL, FALSE, TRUE, TRUE);
-                    drawFrame=FALSE;
-                }
-                else if(GTK_SHADOW_NONE!=shadow)
-                {
-                    int             round=opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
-                    double          col=opts.gbFactor<0 ? 0.0 : 1.0,
-                                    radius=ROUNDED_ALL==round ? qtcGetRadius(&opts, width, height, WIDGET_FRAME, RADIUS_EXTERNAL) : 0.0;
-                    cairo_pattern_t *pt=NULL;
-                    if(0!=opts.gbFactor)
-                    {
-                        clipPathRadius(cr, x+0.5, y+0.5, width-1, height-1, radius, round);
-                        cairo_rectangle(cr, x, y, width, height);
-                        if(FRAME_SHADED==opts.groupBox)
-                            cairo_set_source_rgba(cr, col, col, col, TO_ALPHA(opts.gbFactor));
-                        else
-                        {
-                            pt=cairo_pattern_create_linear(x, y, x, y+height-1);
-                            cairo_pattern_add_color_stop_rgba(pt, 0, col, col, col, TO_ALPHA(opts.gbFactor));
-                            cairo_pattern_add_color_stop_rgba(pt, CAIRO_GRAD_END, col, col, col, 0);
-                            cairo_set_source(cr, pt);
-                        }
-                        cairo_fill(cr);
-                        cairo_restore(cr);
-                        if(pt)
-                            cairo_pattern_destroy(pt);
-                    }
-                    if(FRAME_FADED==opts.groupBox)
+                    clipPathRadius(cr, x+0.5, y+0.5, width-1, height-1, radius, round);
+                    cairo_rectangle(cr, x, y, width, height);
+                    if(FRAME_SHADED==opts.groupBox)
+                        cairo_set_source_rgba(cr, col, col, col, TO_ALPHA(opts.gbFactor));
+                    else
                     {
                         pt=cairo_pattern_create_linear(x, y, x, y+height-1);
-                        cairo_pattern_add_color_stop_rgba(pt, 0, CAIRO_COL(qtcPalette.background[QTC_STD_BORDER]), 1.0);
-                        cairo_pattern_add_color_stop_rgba(pt, CAIRO_GRAD_END, CAIRO_COL(qtcPalette.background[QTC_STD_BORDER]), 0);
-                        setGapClip(cr, area, gapSide, gapX, gapWidth, x, y, width, height, FALSE);
+                        cairo_pattern_add_color_stop_rgba(pt, 0, col, col, col, TO_ALPHA(opts.gbFactor));
+                        cairo_pattern_add_color_stop_rgba(pt, CAIRO_GRAD_END, col, col, col, 0);
                         cairo_set_source(cr, pt);
-                        createPath(cr, x+0.5, y+0.5, width-1, height-1, radius, round);
-                        cairo_stroke(cr);
-                        cairo_pattern_destroy(pt);
-                        drawFrame=false;
                     }
+                    cairo_fill(cr);
+                    cairo_restore(cr);
+                    if(pt)
+                        cairo_pattern_destroy(pt);
                 }
-                break;
-            default:
-                break;
+                if(FRAME_FADED==opts.groupBox)
+                {
+                    pt=cairo_pattern_create_linear(x, y, x, y+height-1);
+                    cairo_pattern_add_color_stop_rgba(pt, 0, CAIRO_COL(qtcPalette.background[QTC_STD_BORDER]), 1.0);
+                    cairo_pattern_add_color_stop_rgba(pt, CAIRO_GRAD_END, CAIRO_COL(qtcPalette.background[QTC_STD_BORDER]), 0);
+                    setGapClip(cr, area, gapSide, gapX, gapWidth, x, y, width, height, FALSE);
+                    cairo_set_source(cr, pt);
+                    createPath(cr, x+0.5, y+0.5, width-1, height-1, radius, round);
+                    cairo_stroke(cr);
+                    cairo_pattern_destroy(pt);
+                    drawFrame=false;
+                }
+            }
+            break;
+        default:
+            break;
         }
     }
     if(drawFrame)
     {
         drawBoxGap(cr, style, shadow, state, widget, area, x, y, width, height, gapSide, gapX, gapWidth,
                    isGroupBox && FRAME_SHADED==opts.groupBox && GTK_SHADOW_NONE!=shadow
-                    ? /*opts.gbFactor<0
-                        ?*/ BORDER_SUNKEN
-                        /*: BORDER_RAISED*/
-                    : shadowToBorder(shadow),
+                   ? /*opts.gbFactor<0
+                       ?*/ BORDER_SUNKEN
+                   /*: BORDER_RAISED*/
+                   : shadowToBorder(shadow),
                    FALSE);
     }
 }
@@ -3434,175 +3607,19 @@ void drawShadowGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow, GtkStateT
 void drawCheckBox(cairo_t *cr, GtkStateType state, GtkShadowType shadow, GtkStyle *style, GtkWidget *widget, const gchar *detail,
                   GdkRectangle *area, int x, int y, int width, int height)
 {
-   if(GTK_STATE_PRELIGHT==state && (GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app))
-        state=GTK_STATE_NORMAL;
-    {
-
-    gboolean mnu=DETAIL("check"),
-             list=!mnu && isList(widget),
-             on=GTK_SHADOW_IN==shadow,
-             tri=GTK_SHADOW_ETCHED_IN==shadow,
-             doEtch=DO_EFFECT;
-    GdkColor newColors[TOTAL_SHADES+1],
-             *btnColors;
-    int      ind_state=(list || ( !mnu && GTK_STATE_INSENSITIVE==state ) ) ? state : GTK_STATE_NORMAL,
-             checkSpace=doEtch ? opts.crSize+2 : opts.crSize;
-
-    if(opts.crColor && GTK_STATE_INSENSITIVE!=state && (on || tri))
-        btnColors=qtcPalette.selectedcr;
-    else if(!mnu && !list && QT_CUSTOM_COLOR_BUTTON(style))
-    {
-        qtcShadeColors(&(style->bg[state]), newColors);
-        btnColors=newColors;
-    }
-    else
-        btnColors=qtcPalette.button[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE];
-
-    x+=(width-checkSpace)>>1;
-    y+=(height-checkSpace)>>1;
-
-    if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %s  ", __FUNCTION__, state, shadow, x, y, width, height, mnu,
-                                           detail ? detail : "NULL"),
-                                    debugDisplayWidget(widget, 10);
-
-    if((mnu && GTK_STATE_PRELIGHT==state) ||
-       (list && GTK_STATE_ACTIVE==state))
-        state=GTK_STATE_NORMAL;
-
-    if(mnu && isMozilla())
-        x-=2;
-
-//     if(!mnu && GTK_STATE_INSENSITIVE!=state && DETAIL("cellcheck") && isHoveredCell(widget, x, y, width, height))
-//         GTK_STATE_PRELIGHT==state;
-
-    if(!mnu || qtSettings.qt4)
-    {
-        if(opts.crButton)
-        {
-            drawLightBevel(cr, style, state, area, x, y, checkSpace, checkSpace, &btnColors[getFill(state, false)],
-                           btnColors, ROUNDED_ALL, WIDGET_CHECKBOX, BORDER_FLAT,
-                           DF_DO_BORDER|(GTK_STATE_ACTIVE==state ? DF_SUNKEN : 0), list ? NULL : widget);
-            if(doEtch)
-                x++, y++;
-        }
-        else
-        {
-            gboolean    coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver,
-                        glow=doEtch && GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver,
-                        lightBorder=DRAW_LIGHT_BORDER(FALSE, WIDGET_TROUGH, APPEARANCE_INVERTED),
-                        draw3dFull=!lightBorder && DRAW_3D_FULL_BORDER(FALSE, APPEARANCE_INVERTED),
-                        draw3d=draw3dFull || (!lightBorder && DRAW_3D_BORDER(FALSE, APPEARANCE_INVERTED));
-            GdkColor    *colors=coloredMouseOver
-                            ? qtcPalette.mouseover
-                            : btnColors,
-                        *bgndCol=/*!isList(widget) && */GTK_STATE_INSENSITIVE==state || GTK_STATE_ACTIVE==state
-                                    ? &style->bg[GTK_STATE_NORMAL]
-                                    : !mnu && GTK_STATE_PRELIGHT==state && !coloredMouseOver && !opts.crHighlight
-                                        ? &btnColors[CR_MO_FILL]
-                                        : &style->base[GTK_STATE_NORMAL];
-
-            if(doEtch)
-                x++, y++;
-
-            drawBevelGradient(cr, area, x+1, y+1, opts.crSize-2, opts.crSize-2, bgndCol, TRUE, FALSE, APPEARANCE_INVERTED, WIDGET_TROUGH);
-
-            if(coloredMouseOver && !glow)
-            {
-                cairo_new_path(cr);
-                cairo_set_source_rgb(cr, CAIRO_COL(colors[CR_MO_FILL]));
-                cairo_rectangle(cr, x+1.5, y+1.5, opts.crSize-3, opts.crSize-3);
-                //cairo_rectangle(cr, x+2.5, y+2.5, opts.crSize-5, opts.crSize-5);
-                cairo_stroke(cr);
-            }
-            else
-            {
-                cairo_new_path(cr);
-                if(lightBorder)
-                {
-                    cairo_set_source_rgb(cr, CAIRO_COL(btnColors[LIGHT_BORDER(APPEARANCE_INVERTED)]));
-                    cairo_rectangle(cr, x+1.5, y+1.5, opts.crSize-3, opts.crSize-3);
-                }
-                else
-                {
-                    GdkColor mid=midColor(GTK_STATE_INSENSITIVE==state
-                                            ? &style->bg[GTK_STATE_NORMAL] : &style->base[GTK_STATE_NORMAL], &(colors[3]));
-
-                    cairo_set_source_rgb(cr, CAIRO_COL(mid));
-                    cairo_move_to(cr, x+1.5, y+opts.crSize-1.5);
-                    cairo_line_to(cr, x+1.5, y+1.5);
-                    cairo_line_to(cr, x+opts.crSize-1.5, y+1.5);
-                }
-                cairo_stroke(cr);
-            }
-
-            if(doEtch && (!list || glow) && !mnu)
-            {
-                if(glow && !(opts.thin&THIN_FRAMES))
-                    drawGlow(cr, area, x-1, y-1, opts.crSize+2, opts.crSize+2, ROUNDED_ALL, WIDGET_CHECKBOX);
-                else
-                    drawEtch(cr, area, widget, x-1, y-1, opts.crSize+2, opts.crSize+2,
-                            false, ROUNDED_ALL, WIDGET_CHECKBOX);
-            }
-
-            drawBorder(cr, style, state, area, x, y, opts.crSize, opts.crSize, colors, ROUNDED_ALL, BORDER_FLAT, WIDGET_CHECKBOX, 0);
-        }
-    }
-
-    if(on)
-    {
-        GdkPixbuf *pix=getPixbuf(getCheckRadioCol(style, ind_state, mnu), PIX_CHECK, 1.0);
-        int       pw=gdk_pixbuf_get_width(pix),
-                  ph=gdk_pixbuf_get_height(pix),
-                  dx=(x+(opts.crSize/2))-(pw/2),
-                  dy=(y+(opts.crSize/2))-(ph/2);
-
-        gdk_cairo_set_source_pixbuf(cr, pix, dx, dy);
-        cairo_paint(cr);
-    }
-    else if (tri)
-    {
-        int      ty=y+(opts.crSize/2);
-        GdkColor *col=getCheckRadioCol(style, ind_state, mnu);
-
-        drawHLine(cr, CAIRO_COL(*col), 1.0, x+3, ty, opts.crSize-6);
-        drawHLine(cr, CAIRO_COL(*col), 1.0, x+3, ty+1, opts.crSize-6);
-    }
-
-    }
-}
-
-void drawRadioButton(cairo_t *cr, GtkStateType state, GtkShadowType shadow, GtkStyle *style, GtkWidget *widget, const gchar *detail,
-                     GdkRectangle *area, int x, int y, int width, int height)
-{
     if(GTK_STATE_PRELIGHT==state && (GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app))
         state=GTK_STATE_NORMAL;
     {
 
-    gboolean mnu=DETAIL("option"),
-             list=!mnu && isList(widget);
-
-    if((mnu && GTK_STATE_PRELIGHT==state) ||
-       (list && GTK_STATE_ACTIVE==state))
-        state=GTK_STATE_NORMAL;
-
-//     if(!mnu && GTK_STATE_INSENSITIVE!=state && DETAIL("cellradio") && isHoveredCell(widget, x, y, width, height))
-//         GTK_STATE_PRELIGHT==state;
-
-    if(!qtSettings.qt4 && mnu)
-        drawCheckBox(cr, state, shadow, style, widget, "check", area, x, y, width, height);
-    else
-    {
-        gboolean  on=GTK_SHADOW_IN==shadow,
-                  tri=GTK_SHADOW_ETCHED_IN==shadow,
-                  set=on||tri,
-                  doEtch=DO_EFFECT;
-        int       ind_state=GTK_STATE_INSENSITIVE==state ? state : GTK_STATE_NORMAL,
-                  optSpace=doEtch ? opts.crSize+2 : opts.crSize;
-        GdkColor  newColors[TOTAL_SHADES+1],
-                  *btnColors;
-
-        x+=((width-optSpace)>>1);
-        y+=((height-optSpace)>>1);
+        gboolean mnu=DETAIL("check"),
+            list=!mnu && isList(widget),
+            on=GTK_SHADOW_IN==shadow,
+            tri=GTK_SHADOW_ETCHED_IN==shadow,
+            doEtch=DO_EFFECT;
+        GdkColor newColors[TOTAL_SHADES+1],
+            *btnColors;
+        int      ind_state=(list || ( !mnu && GTK_STATE_INSENSITIVE==state ) ) ? state : GTK_STATE_NORMAL,
+            checkSpace=doEtch ? opts.crSize+2 : opts.crSize;
 
         if(opts.crColor && GTK_STATE_INSENSITIVE!=state && (on || tri))
             btnColors=qtcPalette.selectedcr;
@@ -3614,109 +3631,265 @@ void drawRadioButton(cairo_t *cr, GtkStateType state, GtkShadowType shadow, GtkS
         else
             btnColors=qtcPalette.button[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE];
 
-        if(opts.crButton)
+        x+=(width-checkSpace)>>1;
+        y+=(height-checkSpace)>>1;
+
+        if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %s  ", __FUNCTION__, state, shadow, x, y, width, height, mnu,
+                                               detail ? detail : "NULL"),
+                                            debugDisplayWidget(widget, 10);
+
+        if((mnu && GTK_STATE_PRELIGHT==state) ||
+           (list && GTK_STATE_ACTIVE==state))
+            state=GTK_STATE_NORMAL;
+
+        if(mnu && isMozilla())
+            x-=2;
+
+//     if(!mnu && GTK_STATE_INSENSITIVE!=state && DETAIL("cellcheck") && isHoveredCell(widget, x, y, width, height))
+//         GTK_STATE_PRELIGHT==state;
+
+        if(!mnu || qtSettings.qt4)
         {
-            drawLightBevel(cr, style, state, area, x, y, optSpace, optSpace, &btnColors[getFill(state, false)],
-                           btnColors, ROUNDED_ALL, WIDGET_RADIO_BUTTON, BORDER_FLAT,
-                           DF_DO_BORDER|(GTK_STATE_ACTIVE==state ? DF_SUNKEN : 0), list ? NULL : widget);
-            if(doEtch)
-                x++, y++;
-        }
-        else
-        {
-            bool     glow=doEtch && GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver;
-            gboolean lightBorder=DRAW_LIGHT_BORDER(FALSE, WIDGET_TROUGH, APPEARANCE_INVERTED),
-                     draw3d=!lightBorder &&
-                            (DRAW_3D_BORDER(FALSE, APPEARANCE_INVERTED) || DRAW_3D_FULL_BORDER(FALSE, APPEARANCE_INVERTED)),
-                     coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver,
-                     doneShadow=false;
-            int      bgnd=0;
-            GdkColor *colors=coloredMouseOver
-                        ? qtcPalette.mouseover
-                        : btnColors,
-                     *bgndCol=GTK_STATE_INSENSITIVE==state || GTK_STATE_ACTIVE==state
-                        ? &style->bg[GTK_STATE_NORMAL]
-                        : !mnu && GTK_STATE_PRELIGHT==state && !coloredMouseOver && !opts.crHighlight
-                            ? &colors[CR_MO_FILL]
-                            : &style->base[GTK_STATE_NORMAL];
-            double   radius=(opts.crSize+1)/2.0;
-
-            bgnd=getFill(state, set/*, TRUE*/);
-
-            if(doEtch)
-                x++, y++;
-
-            clipPath(cr, x, y, opts.crSize, opts.crSize, WIDGET_RADIO_BUTTON, RADIUS_EXTERNAL, ROUNDED_ALL);
-            drawBevelGradient(cr, NULL, x+1, y+1, opts.crSize-2, opts.crSize-2, bgndCol,TRUE, FALSE, APPEARANCE_INVERTED, WIDGET_TROUGH);
-            cairo_restore(cr);
-
-            if(!mnu && coloredMouseOver && !glow)
+            if(opts.crButton)
             {
-                double radius=(opts.crSize-2)/2.0;
-
-                cairo_set_source_rgb(cr, CAIRO_COL(colors[CR_MO_FILL]));
-                cairo_arc(cr, x+radius + 1, y+radius + 1, radius, 0, 2*M_PI);
-                cairo_stroke(cr);
-                radius--;
-                cairo_arc(cr, x+radius + 2, y+radius + 2, radius, 0, 2*M_PI);
-                cairo_stroke(cr);
+                drawLightBevel(cr, style, state, area, x, y, checkSpace, checkSpace, &btnColors[getFill(state, false)],
+                               btnColors, ROUNDED_ALL, WIDGET_CHECKBOX, BORDER_FLAT,
+                               DF_DO_BORDER|(GTK_STATE_ACTIVE==state ? DF_SUNKEN : 0), list ? NULL : widget);
+                if(doEtch)
+                    x++, y++;
             }
-
-            if(!doneShadow && doEtch && !mnu && (!list || glow))
+            else
             {
-                double   radius=(opts.crSize+1)/2.0;
+                gboolean    coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver,
+                    glow=doEtch && GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver,
+                    lightBorder=DRAW_LIGHT_BORDER(FALSE, WIDGET_TROUGH, APPEARANCE_INVERTED),
+                    draw3dFull=!lightBorder && DRAW_3D_FULL_BORDER(FALSE, APPEARANCE_INVERTED),
+                    draw3d=draw3dFull || (!lightBorder && DRAW_3D_BORDER(FALSE, APPEARANCE_INVERTED));
+                GdkColor    *colors=coloredMouseOver
+                    ? qtcPalette.mouseover
+                    : btnColors,
+                    *bgndCol=/*!isList(widget) && */GTK_STATE_INSENSITIVE==state || GTK_STATE_ACTIVE==state
+                    ? &style->bg[GTK_STATE_NORMAL]
+                    : !mnu && GTK_STATE_PRELIGHT==state && !coloredMouseOver && !opts.crHighlight
+                    ? &btnColors[CR_MO_FILL]
+                    : &style->base[GTK_STATE_NORMAL];
 
-                if(glow)
-                    cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.mouseover[GLOW_MO]));
-                else
-                    cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, ETCH_RADIO_TOP_ALPHA);
+                if(doEtch)
+                    x++, y++;
 
-                if(EFFECT_NONE!=opts.buttonEffect || glow)
+                drawBevelGradient(cr, area, x+1, y+1, opts.crSize-2, opts.crSize-2, bgndCol, TRUE, FALSE, APPEARANCE_INVERTED, WIDGET_TROUGH);
+
+                if(coloredMouseOver && !glow)
                 {
-                    cairo_arc(cr, x+radius - 0.5, y+radius - 0.5, radius, 0.75*M_PI, 1.75*M_PI);
+                    cairo_new_path(cr);
+                    cairo_set_source_rgb(cr, CAIRO_COL(colors[CR_MO_FILL]));
+                    cairo_rectangle(cr, x+1.5, y+1.5, opts.crSize-3, opts.crSize-3);
+                    //cairo_rectangle(cr, x+2.5, y+2.5, opts.crSize-5, opts.crSize-5);
                     cairo_stroke(cr);
-                    if(!glow)
-                        setLowerEtchCol(cr, widget);
                 }
-                cairo_arc(cr, x+radius - 0.5, y+radius - 0.5, radius, 1.75*M_PI, 0.75*M_PI);
-                cairo_stroke(cr);
-            }
+                else
+                {
+                    cairo_new_path(cr);
+                    if(lightBorder)
+                    {
+                        cairo_set_source_rgb(cr, CAIRO_COL(btnColors[LIGHT_BORDER(APPEARANCE_INVERTED)]));
+                        cairo_rectangle(cr, x+1.5, y+1.5, opts.crSize-3, opts.crSize-3);
+                    }
+                    else
+                    {
+                        GdkColor mid=midColor(GTK_STATE_INSENSITIVE==state
+                                              ? &style->bg[GTK_STATE_NORMAL] : &style->base[GTK_STATE_NORMAL], &(colors[3]));
 
-            cairo_set_source_rgb(cr, CAIRO_COL(colors[coloredMouseOver ? 4 : BORDER_VAL(GTK_STATE_INSENSITIVE!=state)]));
-            radius=(opts.crSize-0.5)/2.0;
-            cairo_arc(cr, x+0.25+radius, y+0.25+radius, radius, 0, 2*M_PI);
-            cairo_stroke(cr);
-            if(!coloredMouseOver)
-            {
-                radius=(opts.crSize-1)/2.0;
-                cairo_set_source_rgb(cr, CAIRO_COL(btnColors[coloredMouseOver ? 3 : 4]));
-                cairo_arc(cr, x+0.75+radius, y+0.75+radius, radius,
-                            lightBorder ? 0 : 0.75*M_PI,
-                            lightBorder ? 2*M_PI : 1.75*M_PI);
-                cairo_stroke(cr);
+                        cairo_set_source_rgb(cr, CAIRO_COL(mid));
+                        cairo_move_to(cr, x+1.5, y+opts.crSize-1.5);
+                        cairo_line_to(cr, x+1.5, y+1.5);
+                        cairo_line_to(cr, x+opts.crSize-1.5, y+1.5);
+                    }
+                    cairo_stroke(cr);
+                }
+
+                if(doEtch && (!list || glow) && !mnu)
+                {
+                    if(glow && !(opts.thin&THIN_FRAMES))
+                        drawGlow(cr, area, x-1, y-1, opts.crSize+2, opts.crSize+2, ROUNDED_ALL, WIDGET_CHECKBOX);
+                    else
+                        drawEtch(cr, area, widget, x-1, y-1, opts.crSize+2, opts.crSize+2,
+                                 false, ROUNDED_ALL, WIDGET_CHECKBOX);
+                }
+
+                drawBorder(cr, style, state, area, x, y, opts.crSize, opts.crSize, colors, ROUNDED_ALL, BORDER_FLAT, WIDGET_CHECKBOX, 0);
             }
         }
 
         if(on)
         {
-            GdkColor *col=getCheckRadioCol(style, ind_state, mnu);
-            double   radius=opts.smallRadio ? 2.5 : 3.5,
-                     offset=(opts.crSize/2.0)-radius;
+            GdkPixbuf *pix=getPixbuf(getCheckRadioCol(style, ind_state, mnu), PIX_CHECK, 1.0);
+            int       pw=gdk_pixbuf_get_width(pix),
+                ph=gdk_pixbuf_get_height(pix),
+                dx=(x+(opts.crSize/2))-(pw/2),
+                dy=(y+(opts.crSize/2))-(ph/2);
 
-            cairo_set_source_rgb(cr, CAIRO_COL(*col));
-            cairo_arc(cr, x+offset+radius, y+offset+radius, radius, 0, 2*M_PI);
-            cairo_fill(cr);
+            gdk_cairo_set_source_pixbuf(cr, pix, dx, dy);
+            cairo_paint(cr);
         }
-        else if(tri)
+        else if (tri)
         {
-            int ty=y+(opts.crSize/2);
-
+            int      ty=y+(opts.crSize/2);
             GdkColor *col=getCheckRadioCol(style, ind_state, mnu);
 
             drawHLine(cr, CAIRO_COL(*col), 1.0, x+3, ty, opts.crSize-6);
             drawHLine(cr, CAIRO_COL(*col), 1.0, x+3, ty+1, opts.crSize-6);
         }
+
     }
+}
+
+void drawRadioButton(cairo_t *cr, GtkStateType state, GtkShadowType shadow, GtkStyle *style, GtkWidget *widget, const gchar *detail,
+                     GdkRectangle *area, int x, int y, int width, int height)
+{
+    if(GTK_STATE_PRELIGHT==state && (GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app))
+        state=GTK_STATE_NORMAL;
+    {
+
+        gboolean mnu=DETAIL("option"),
+            list=!mnu && isList(widget);
+
+        if((mnu && GTK_STATE_PRELIGHT==state) ||
+           (list && GTK_STATE_ACTIVE==state))
+            state=GTK_STATE_NORMAL;
+
+//     if(!mnu && GTK_STATE_INSENSITIVE!=state && DETAIL("cellradio") && isHoveredCell(widget, x, y, width, height))
+//         GTK_STATE_PRELIGHT==state;
+
+        if(!qtSettings.qt4 && mnu)
+            drawCheckBox(cr, state, shadow, style, widget, "check", area, x, y, width, height);
+        else
+        {
+            gboolean  on=GTK_SHADOW_IN==shadow,
+                tri=GTK_SHADOW_ETCHED_IN==shadow,
+                set=on||tri,
+                doEtch=DO_EFFECT;
+            int       ind_state=GTK_STATE_INSENSITIVE==state ? state : GTK_STATE_NORMAL,
+                optSpace=doEtch ? opts.crSize+2 : opts.crSize;
+            GdkColor  newColors[TOTAL_SHADES+1],
+                *btnColors;
+
+            x+=((width-optSpace)>>1);
+            y+=((height-optSpace)>>1);
+
+            if(opts.crColor && GTK_STATE_INSENSITIVE!=state && (on || tri))
+                btnColors=qtcPalette.selectedcr;
+            else if(!mnu && !list && QT_CUSTOM_COLOR_BUTTON(style))
+            {
+                qtcShadeColors(&(style->bg[state]), newColors);
+                btnColors=newColors;
+            }
+            else
+                btnColors=qtcPalette.button[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE];
+
+            if(opts.crButton)
+            {
+                drawLightBevel(cr, style, state, area, x, y, optSpace, optSpace, &btnColors[getFill(state, false)],
+                               btnColors, ROUNDED_ALL, WIDGET_RADIO_BUTTON, BORDER_FLAT,
+                               DF_DO_BORDER|(GTK_STATE_ACTIVE==state ? DF_SUNKEN : 0), list ? NULL : widget);
+                if(doEtch)
+                    x++, y++;
+            }
+            else
+            {
+                bool     glow=doEtch && GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver;
+                gboolean lightBorder=DRAW_LIGHT_BORDER(FALSE, WIDGET_TROUGH, APPEARANCE_INVERTED),
+                    draw3d=!lightBorder &&
+                    (DRAW_3D_BORDER(FALSE, APPEARANCE_INVERTED) || DRAW_3D_FULL_BORDER(FALSE, APPEARANCE_INVERTED)),
+                    coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver,
+                    doneShadow=false;
+                int      bgnd=0;
+                GdkColor *colors=coloredMouseOver
+                    ? qtcPalette.mouseover
+                    : btnColors,
+                    *bgndCol=GTK_STATE_INSENSITIVE==state || GTK_STATE_ACTIVE==state
+                    ? &style->bg[GTK_STATE_NORMAL]
+                    : !mnu && GTK_STATE_PRELIGHT==state && !coloredMouseOver && !opts.crHighlight
+                    ? &colors[CR_MO_FILL]
+                    : &style->base[GTK_STATE_NORMAL];
+                double   radius=(opts.crSize+1)/2.0;
+
+                bgnd=getFill(state, set/*, TRUE*/);
+
+                if(doEtch)
+                    x++, y++;
+
+                clipPath(cr, x, y, opts.crSize, opts.crSize, WIDGET_RADIO_BUTTON, RADIUS_EXTERNAL, ROUNDED_ALL);
+                drawBevelGradient(cr, NULL, x+1, y+1, opts.crSize-2, opts.crSize-2, bgndCol,TRUE, FALSE, APPEARANCE_INVERTED, WIDGET_TROUGH);
+                cairo_restore(cr);
+
+                if(!mnu && coloredMouseOver && !glow)
+                {
+                    double radius=(opts.crSize-2)/2.0;
+
+                    cairo_set_source_rgb(cr, CAIRO_COL(colors[CR_MO_FILL]));
+                    cairo_arc(cr, x+radius + 1, y+radius + 1, radius, 0, 2*M_PI);
+                    cairo_stroke(cr);
+                    radius--;
+                    cairo_arc(cr, x+radius + 2, y+radius + 2, radius, 0, 2*M_PI);
+                    cairo_stroke(cr);
+                }
+
+                if(!doneShadow && doEtch && !mnu && (!list || glow))
+                {
+                    double   radius=(opts.crSize+1)/2.0;
+
+                    if(glow)
+                        cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.mouseover[GLOW_MO]));
+                    else
+                        cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, ETCH_RADIO_TOP_ALPHA);
+
+                    if(EFFECT_NONE!=opts.buttonEffect || glow)
+                    {
+                        cairo_arc(cr, x+radius - 0.5, y+radius - 0.5, radius, 0.75*M_PI, 1.75*M_PI);
+                        cairo_stroke(cr);
+                        if(!glow)
+                            setLowerEtchCol(cr, widget);
+                    }
+                    cairo_arc(cr, x+radius - 0.5, y+radius - 0.5, radius, 1.75*M_PI, 0.75*M_PI);
+                    cairo_stroke(cr);
+                }
+
+                cairo_set_source_rgb(cr, CAIRO_COL(colors[coloredMouseOver ? 4 : BORDER_VAL(GTK_STATE_INSENSITIVE!=state)]));
+                radius=(opts.crSize-0.5)/2.0;
+                cairo_arc(cr, x+0.25+radius, y+0.25+radius, radius, 0, 2*M_PI);
+                cairo_stroke(cr);
+                if(!coloredMouseOver)
+                {
+                    radius=(opts.crSize-1)/2.0;
+                    cairo_set_source_rgb(cr, CAIRO_COL(btnColors[coloredMouseOver ? 3 : 4]));
+                    cairo_arc(cr, x+0.75+radius, y+0.75+radius, radius,
+                              lightBorder ? 0 : 0.75*M_PI,
+                              lightBorder ? 2*M_PI : 1.75*M_PI);
+                    cairo_stroke(cr);
+                }
+            }
+
+            if(on)
+            {
+                GdkColor *col=getCheckRadioCol(style, ind_state, mnu);
+                double   radius=opts.smallRadio ? 2.5 : 3.5,
+                    offset=(opts.crSize/2.0)-radius;
+
+                cairo_set_source_rgb(cr, CAIRO_COL(*col));
+                cairo_arc(cr, x+offset+radius, y+offset+radius, radius, 0, 2*M_PI);
+                cairo_fill(cr);
+            }
+            else if(tri)
+            {
+                int ty=y+(opts.crSize/2);
+
+                GdkColor *col=getCheckRadioCol(style, ind_state, mnu);
+
+                drawHLine(cr, CAIRO_COL(*col), 1.0, x+3, ty, opts.crSize-6);
+                drawHLine(cr, CAIRO_COL(*col), 1.0, x+3, ty+1, opts.crSize-6);
+            }
+        }
 
     }
 }
@@ -3728,32 +3901,32 @@ void drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget
     gboolean    highlightingEnabled=notebook && (opts.highlightFactor || opts.coloredMouseOver);
     gboolean    highlight=FALSE;
     int         highlightedTabIndex=qtcTabCurrentHoveredIndex(widget),
-                dark=APPEARANCE_FLAT==opts.appearance ? ORIGINAL_SHADE : FRAME_DARK_SHADOW,
-                moOffset=ROUNDED_NONE==opts.round || TAB_MO_TOP!=opts.tabMouseOver ? 1 : opts.round;
+        dark=APPEARANCE_FLAT==opts.appearance ? ORIGINAL_SHADE : FRAME_DARK_SHADOW,
+        moOffset=ROUNDED_NONE==opts.round || TAB_MO_TOP!=opts.tabMouseOver ? 1 : opts.round;
     GtkWidget   *parent=widget ? gtk_widget_get_parent(widget) : NULL;
     gboolean    firstTab=notebook ? FALSE : TRUE,
-                lastTab=notebook ? FALSE : TRUE,
-                vertical=GTK_POS_LEFT==gapSide || GTK_POS_RIGHT==gapSide,
-                active=GTK_STATE_NORMAL==state, /* Normal -> active tab? */
-                rev=(GTK_POS_TOP==gapSide || GTK_POS_BOTTOM==gapSide) && parent && reverseLayout(parent),
-                mozTab=isMozillaTab(widget),
-                glowMo=!active && notebook && opts.coloredMouseOver && TAB_MO_GLOW==opts.tabMouseOver,
-                drawOuterGlow=glowMo && !(opts.thin&THIN_FRAMES);
+        lastTab=notebook ? FALSE : TRUE,
+        vertical=GTK_POS_LEFT==gapSide || GTK_POS_RIGHT==gapSide,
+        active=GTK_STATE_NORMAL==state, /* Normal -> active tab? */
+        rev=(GTK_POS_TOP==gapSide || GTK_POS_BOTTOM==gapSide) && parent && reverseLayout(parent),
+        mozTab=isMozillaTab(widget),
+        glowMo=!active && notebook && opts.coloredMouseOver && TAB_MO_GLOW==opts.tabMouseOver,
+        drawOuterGlow=glowMo && !(opts.thin&THIN_FRAMES);
     int         mod=active ? 1 : 0,
-                highlightOffset=opts.highlightTab && opts.round>ROUND_SLIGHT ? 2 : 1,
-                highlightBorder=(opts.round>ROUND_FULL ? 4 : 3),
-                sizeAdjust=(!active || mozTab) && TAB_MO_GLOW==opts.tabMouseOver ? 1 : 0,
-                tabIndex = -1;
+        highlightOffset=opts.highlightTab && opts.round>ROUND_SLIGHT ? 2 : 1,
+        highlightBorder=(opts.round>ROUND_FULL ? 4 : 3),
+        sizeAdjust=(!active || mozTab) && TAB_MO_GLOW==opts.tabMouseOver ? 1 : 0,
+        tabIndex = -1;
     GdkColor    *col=active
-                        ? &(style->bg[GTK_STATE_NORMAL]) : &(qtcPalette.background[2]),
-                *selCol1=&qtcPalette.highlight[0],
-                *selCol2=&qtcPalette.highlight[IS_FLAT(opts.appearance) ? 0 : 3];
+        ? &(style->bg[GTK_STATE_NORMAL]) : &(qtcPalette.background[2]),
+        *selCol1=&qtcPalette.highlight[0],
+        *selCol2=&qtcPalette.highlight[IS_FLAT(opts.appearance) ? 0 : 3];
     GdkRectangle clipArea;
     EBorder     borderProfile=active || opts.borderInactiveTab
-                                ? opts.borderTab
-                                    ? BORDER_LIGHT
-                                    : BORDER_RAISED
-                                : BORDER_FLAT;
+        ? opts.borderTab
+        ? BORDER_LIGHT
+        : BORDER_RAISED
+        : BORDER_FLAT;
 
 #if !GTK_CHECK_VERSION(2, 90, 0)
     /* Hacky fix for tabs in Thunderbird */
@@ -3762,7 +3935,7 @@ void drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget
 #endif
 
     /* f'in mozilla apps dont really use Gtk widgets - they just paint to a pixmap. So, no way of knowing
-    the position of a tab! The 'best' look seems to be to round both corners. Not nice, but... */
+       the position of a tab! The 'best' look seems to be to round both corners. Not nice, but... */
     if(mozTab || GTK_APP_JAVA==qtSettings.app)
         firstTab=lastTab=TRUE;
     else if(notebook)
@@ -3770,9 +3943,9 @@ void drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget
         /* Borrowed from Qt engine... */
         GList      *children=gtk_container_get_children(GTK_CONTAINER(widget));
         int         num_children=children ? g_list_length(children) : 0,
-                    i, sdiff = 10000,
-                    first_shown=-1,
-                    last_shown=-1;
+            i, sdiff = 10000,
+            first_shown=-1,
+            last_shown=-1;
         GtkWidget *p=widget;
 
         if(children)
@@ -3781,7 +3954,7 @@ void drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget
         for (i = 0; i < num_children; i++ )
         {
             GtkWidget *page=gtk_notebook_get_nth_page(notebook, i),
-                        *tab_label=gtk_notebook_get_tab_label(notebook, page);
+                *tab_label=gtk_notebook_get_tab_label(notebook, page);
             int       diff=-1;
 
             if(tab_label)
@@ -3834,16 +4007,16 @@ void drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget
     }
 
 /*
-    gtk_style_apply_default_background(style, window, widget && !qtcWidgetNoWindow(widget),
-                                        GTK_STATE_NORMAL, area, x, y, width, height);
+  gtk_style_apply_default_background(style, window, widget && !qtcWidgetNoWindow(widget),
+  GTK_STATE_NORMAL, area, x, y, width, height);
 */
     /*
-    TODO: This is not good, should respect 'area' as passed in. However, it works for the moment - if the thunderbird hack
-            above is used. Needs to be fixed tho.
+      TODO: This is not good, should respect 'area' as passed in. However, it works for the moment - if the thunderbird hack
+      above is used. Needs to be fixed tho.
     */
 
     /* In addition to the above, doing this section only for the active mozilla tab seems to fix some drawing errors
-        with firefox3...*/
+       with firefox3...*/
     /* CPD 28/02/2008 Dont need to do any of this for firefox 3beta4 */
     if(!mozTab) /* || active) */
     {
@@ -3859,209 +4032,209 @@ void drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget
 
     switch(gapSide)
     {
-        case GTK_POS_TOP:  /* => tabs are on bottom !!! */
-        {
-            int round=active || (firstTab && lastTab) || TAB_MO_GLOW==opts.tabMouseOver || opts.roundAllTabs
-                                ? ROUNDED_BOTTOM
-                                : firstTab
-                                    ? ROUNDED_BOTTOMLEFT
-                                    : lastTab
-                                        ? ROUNDED_BOTTOMRIGHT
-                                        : ROUNDED_NONE;
+    case GTK_POS_TOP:  /* => tabs are on bottom !!! */
+    {
+        int round=active || (firstTab && lastTab) || TAB_MO_GLOW==opts.tabMouseOver || opts.roundAllTabs
+            ? ROUNDED_BOTTOM
+            : firstTab
+            ? ROUNDED_BOTTOMLEFT
+            : lastTab
+            ? ROUNDED_BOTTOMRIGHT
+            : ROUNDED_NONE;
 #if GTK_CHECK_VERSION(2, 10, 0) && !GTK_CHECK_VERSION(2, 10, 11)
-            if(!active)
-                height-=2;
+        if(!active)
+            height-=2;
 #endif
-            clipPath(cr, x, y-4, width, height+4, WIDGET_TAB_BOT, RADIUS_EXTERNAL, round);
-            fillTab(cr, style, widget, area, state, col, x+mod+sizeAdjust, y, width-(2*mod+(sizeAdjust)), height-1, TRUE,
-                    WIDGET_TAB_BOT, NULL!=notebook);
-            cairo_restore(cr);
-            drawBorder(cr, style, state, area, x+sizeAdjust, y-4, width-(2*sizeAdjust), height+4,
-                        glowMo ? qtcPalette.mouseover : qtcPalette.background, round,
-                        borderProfile, WIDGET_TAB_BOT, 0);
-            if(drawOuterGlow)
-            {
-                if(area)
-                    area->height++;
-                drawGlow(cr, area, x, y-4, width, height+5, round, WIDGET_OTHER);
-            }
-
-            if(notebook && opts.highlightTab && active)
-            {
-                drawHLine(cr, CAIRO_COL(*selCol1), 0.5, x+1, y+height-3, width-2);
-                drawHLine(cr, CAIRO_COL(*selCol1), 1.0, x+highlightOffset, y+height-2, width-(2*highlightOffset));
-
-                clipArea.y=y+height-highlightBorder;
-                clipArea.height=highlightBorder;
-                realDrawBorder(cr, style, state, &clipArea, x, y, width, height, qtcPalette.highlight, ROUNDED_BOTTOM,
-                                BORDER_FLAT, WIDGET_OTHER, 0, 3);
-            }
-
-            if(opts.colorSelTab && notebook && active)
-                colorTab(cr, x+mod+sizeAdjust, y, width-(2*mod+(sizeAdjust)), height-1, round, WIDGET_TAB_BOT, true);
-
-            if(notebook && opts.coloredMouseOver && highlight && TAB_MO_GLOW!=opts.tabMouseOver)
-                drawHighlight(cr, x+(firstTab ? moOffset : 1),
-                                y+(TAB_MO_TOP==opts.tabMouseOver ? height-2 : -1), width-(firstTab || lastTab ? moOffset : 1), 2,
-                                NULL, true, TAB_MO_TOP!=opts.tabMouseOver);
-
-            break;
-        }
-        case GTK_POS_BOTTOM: /* => tabs are on top !!! */
+        clipPath(cr, x, y-4, width, height+4, WIDGET_TAB_BOT, RADIUS_EXTERNAL, round);
+        fillTab(cr, style, widget, area, state, col, x+mod+sizeAdjust, y, width-(2*mod+(sizeAdjust)), height-1, TRUE,
+                WIDGET_TAB_BOT, NULL!=notebook);
+        cairo_restore(cr);
+        drawBorder(cr, style, state, area, x+sizeAdjust, y-4, width-(2*sizeAdjust), height+4,
+                   glowMo ? qtcPalette.mouseover : qtcPalette.background, round,
+                   borderProfile, WIDGET_TAB_BOT, 0);
+        if(drawOuterGlow)
         {
-            int round=active || (firstTab && lastTab) || TAB_MO_GLOW==opts.tabMouseOver || opts.roundAllTabs
-                                ? ROUNDED_TOP
-                                : firstTab
-                                    ? ROUNDED_TOPLEFT
-                                    : lastTab
-                                        ? ROUNDED_TOPRIGHT
-                                        : ROUNDED_NONE;
-#if GTK_CHECK_VERSION(2, 10, 0) && !GTK_CHECK_VERSION(2, 10, 11)
-            if(!active)
-            {
-                y+=2;
-                height-=2;
-            }
-#endif
-            clipPath(cr, x+mod+sizeAdjust, y, width-(2*(mod+(mozTab ? 2 *sizeAdjust : sizeAdjust))), height+5, WIDGET_TAB_TOP, RADIUS_EXTERNAL, round);
-            fillTab(cr, style, widget, area, state, col, x+mod+sizeAdjust, y+1,
-                    width-(2*(mod+(mozTab ? 2 *sizeAdjust : sizeAdjust))), height-1, TRUE, WIDGET_TAB_TOP, NULL!=notebook);
-            cairo_restore(cr);
-            drawBorder(cr, style, state, area, x+sizeAdjust, y, width-(2*(mozTab ? 2 : 1)*sizeAdjust), height+4,
-                        glowMo ? qtcPalette.mouseover : qtcPalette.background, round, borderProfile, WIDGET_TAB_TOP, 0);
-            if(drawOuterGlow)
-            {
-                if(area)
-                    area->y--, area->height+=2;
-                drawGlow(cr, area, x, y-1, width, height+5, round, WIDGET_OTHER);
-            }
-
-            if(notebook && opts.highlightTab && active)
-            {
-                drawHLine(cr, CAIRO_COL(*selCol1), 0.5, x+1, y+2, width-2);
-                drawHLine(cr, CAIRO_COL(*selCol1), 1.0, x+highlightOffset, y+1, width-(2*highlightOffset));
-
-                clipArea.y=y;
-                clipArea.height=highlightBorder;
-                realDrawBorder(cr, style, state, &clipArea, x, y, width, height,
-                                qtcPalette.highlight, ROUNDED_TOP, BORDER_FLAT, WIDGET_OTHER, 0, 3);
-            }
-
-            if(opts.colorSelTab && notebook && active)
-                colorTab(cr, x+mod+sizeAdjust, y+1, width-(2*(mod+(mozTab ? 2 *sizeAdjust : sizeAdjust))), height-1, round, WIDGET_TAB_TOP, true);
-
-            if(notebook && opts.coloredMouseOver && highlight && TAB_MO_GLOW!=opts.tabMouseOver)
-                drawHighlight(cr, x+(firstTab ? moOffset : 1), y+(TAB_MO_TOP==opts.tabMouseOver ? 0 : height-1),
-                                width-(firstTab || lastTab ? moOffset : 1), 2, NULL, true, TAB_MO_TOP==opts.tabMouseOver);
-            break;
+            if(area)
+                area->height++;
+            drawGlow(cr, area, x, y-4, width, height+5, round, WIDGET_OTHER);
         }
-        case GTK_POS_LEFT: /* => tabs are on right !!! */
+
+        if(notebook && opts.highlightTab && active)
         {
-            int round=active || (firstTab && lastTab) || TAB_MO_GLOW==opts.tabMouseOver || opts.roundAllTabs
-                                ? ROUNDED_RIGHT
-                                : firstTab
-                                    ? ROUNDED_TOPRIGHT
-                                    : lastTab
-                                        ? ROUNDED_BOTTOMRIGHT
-                                        : ROUNDED_NONE;
-#if GTK_CHECK_VERSION(2, 10, 0) && !GTK_CHECK_VERSION(2, 10, 11)
-            if(!active)
-                width-=2;
-#endif
-            clipPath(cr, x-4, y, width+4, height, WIDGET_TAB_BOT, RADIUS_EXTERNAL, round);
-            fillTab(cr, style, widget, area, state, col, x, y+mod+sizeAdjust, width-1, height-(2*(mod+sizeAdjust)), FALSE,
-                    WIDGET_TAB_BOT, NULL!=notebook);
-            cairo_restore(cr);
-            drawBorder(cr, style, state, area, x-4, y+sizeAdjust, width+4, height-(2*sizeAdjust),
-                        glowMo ? qtcPalette.mouseover : qtcPalette.background, round, borderProfile, WIDGET_TAB_BOT, 0);
-            if(drawOuterGlow)
-            {
-                if(area)
-                    area->width++;
-                drawGlow(cr, area, x-4, y, width+5, height, round, WIDGET_OTHER);
-            }
+            drawHLine(cr, CAIRO_COL(*selCol1), 0.5, x+1, y+height-3, width-2);
+            drawHLine(cr, CAIRO_COL(*selCol1), 1.0, x+highlightOffset, y+height-2, width-(2*highlightOffset));
 
-            if(notebook && opts.highlightTab && active)
-            {
-                drawVLine(cr, CAIRO_COL(*selCol1), 0.5, x+width-3, y+1, height-2);
-                drawVLine(cr, CAIRO_COL(*selCol1), 1.0, x+width-2, y+highlightOffset, height-(2*highlightOffset));
-
-                clipArea.x=x+width-highlightBorder;
-                clipArea.width=highlightBorder;
-                realDrawBorder(cr, style, state, &clipArea, x, y, width, height, qtcPalette.highlight, ROUNDED_RIGHT,
-                                BORDER_FLAT, WIDGET_OTHER, 0, 3);
-            }
-
-            if(opts.colorSelTab && notebook && active)
-                colorTab(cr, x, y+mod+sizeAdjust, width-1, height-(2*(mod+sizeAdjust)), round, WIDGET_TAB_BOT, false);
-
-            if(notebook && opts.coloredMouseOver && highlight && TAB_MO_GLOW!=opts.tabMouseOver)
-                drawHighlight(cr, x+(TAB_MO_TOP==opts.tabMouseOver ? width-2 : -1),
-                                y+(firstTab ? moOffset : 1), 2, height-(firstTab || lastTab ? moOffset : 1),
-                                NULL, false, TAB_MO_TOP!=opts.tabMouseOver);
-            break;
+            clipArea.y=y+height-highlightBorder;
+            clipArea.height=highlightBorder;
+            realDrawBorder(cr, style, state, &clipArea, x, y, width, height, qtcPalette.highlight, ROUNDED_BOTTOM,
+                           BORDER_FLAT, WIDGET_OTHER, 0, 3);
         }
-        case GTK_POS_RIGHT: /* => tabs are on left !!! */
+
+        if(opts.colorSelTab && notebook && active)
+            colorTab(cr, x+mod+sizeAdjust, y, width-(2*mod+(sizeAdjust)), height-1, round, WIDGET_TAB_BOT, true);
+
+        if(notebook && opts.coloredMouseOver && highlight && TAB_MO_GLOW!=opts.tabMouseOver)
+            drawHighlight(cr, x+(firstTab ? moOffset : 1),
+                          y+(TAB_MO_TOP==opts.tabMouseOver ? height-2 : -1), width-(firstTab || lastTab ? moOffset : 1), 2,
+                          NULL, true, TAB_MO_TOP!=opts.tabMouseOver);
+
+        break;
+    }
+    case GTK_POS_BOTTOM: /* => tabs are on top !!! */
+    {
+        int round=active || (firstTab && lastTab) || TAB_MO_GLOW==opts.tabMouseOver || opts.roundAllTabs
+            ? ROUNDED_TOP
+            : firstTab
+            ? ROUNDED_TOPLEFT
+            : lastTab
+            ? ROUNDED_TOPRIGHT
+            : ROUNDED_NONE;
+#if GTK_CHECK_VERSION(2, 10, 0) && !GTK_CHECK_VERSION(2, 10, 11)
+        if(!active)
         {
-            int round=active || (firstTab && lastTab) || TAB_MO_GLOW==opts.tabMouseOver || opts.roundAllTabs
-                                ? ROUNDED_LEFT
-                                : firstTab
-                                    ? ROUNDED_TOPLEFT
-                                    : lastTab
-                                        ? ROUNDED_BOTTOMLEFT
-                                        : ROUNDED_NONE;
-#if GTK_CHECK_VERSION(2, 10, 0) && !GTK_CHECK_VERSION(2, 10, 11)
-            if(!active)
-            {
-                x+=2;
-                width-=2;
-            }
-#endif
-            clipPath(cr, x, y, width+4, height, WIDGET_TAB_TOP, RADIUS_EXTERNAL, round);
-            fillTab(cr, style, widget, area, state, col, x+1, y+mod+sizeAdjust, width-1, height-(2*(mod+sizeAdjust)),
-                    FALSE, WIDGET_TAB_TOP, NULL!=notebook);
-            cairo_restore(cr);
-            drawBorder(cr, style, state, area, x, y+sizeAdjust, width+4, height-(2*sizeAdjust),
-                        glowMo ? qtcPalette.mouseover : qtcPalette.background, round, borderProfile, WIDGET_TAB_TOP, 0);
-            if(drawOuterGlow)
-            {
-                if(area)
-                    area->x--, area->width+=2;
-                drawGlow(cr, area, x-1, y, width+5, height, round, WIDGET_OTHER);
-            }
-            if(notebook && opts.highlightTab && active)
-            {
-                drawVLine(cr, CAIRO_COL(*selCol1), 0.5, x+2, y+1, height-2);
-                drawVLine(cr, CAIRO_COL(*selCol1), 1.0, x+1, y+highlightOffset, height-(2*highlightOffset));
-
-                clipArea.x=x;
-                clipArea.width=highlightBorder;
-                realDrawBorder(cr, style, state, &clipArea, x, y, width, height, qtcPalette.highlight, ROUNDED_LEFT,
-                                BORDER_FLAT, WIDGET_OTHER, 0, 3);
-            }
-
-            if(opts.colorSelTab && notebook && active)
-                colorTab(cr, x+1, y+mod+sizeAdjust, width-1, height-(2*(mod+sizeAdjust)), round, WIDGET_TAB_TOP, false);
-
-            if(notebook && opts.coloredMouseOver && highlight && TAB_MO_GLOW!=opts.tabMouseOver)
-                drawHighlight(cr, x+(TAB_MO_TOP==opts.tabMouseOver ? 0 : width-1),
-                                y+(firstTab ? moOffset : 1), 2, height-(firstTab || lastTab ? moOffset : 1),
-                                NULL, false, TAB_MO_TOP==opts.tabMouseOver);
-            break;
+            y+=2;
+            height-=2;
         }
+#endif
+        clipPath(cr, x+mod+sizeAdjust, y, width-(2*(mod+(mozTab ? 2 *sizeAdjust : sizeAdjust))), height+5, WIDGET_TAB_TOP, RADIUS_EXTERNAL, round);
+        fillTab(cr, style, widget, area, state, col, x+mod+sizeAdjust, y+1,
+                width-(2*(mod+(mozTab ? 2 *sizeAdjust : sizeAdjust))), height-1, TRUE, WIDGET_TAB_TOP, NULL!=notebook);
+        cairo_restore(cr);
+        drawBorder(cr, style, state, area, x+sizeAdjust, y, width-(2*(mozTab ? 2 : 1)*sizeAdjust), height+4,
+                   glowMo ? qtcPalette.mouseover : qtcPalette.background, round, borderProfile, WIDGET_TAB_TOP, 0);
+        if(drawOuterGlow)
+        {
+            if(area)
+                area->y--, area->height+=2;
+            drawGlow(cr, area, x, y-1, width, height+5, round, WIDGET_OTHER);
+        }
+
+        if(notebook && opts.highlightTab && active)
+        {
+            drawHLine(cr, CAIRO_COL(*selCol1), 0.5, x+1, y+2, width-2);
+            drawHLine(cr, CAIRO_COL(*selCol1), 1.0, x+highlightOffset, y+1, width-(2*highlightOffset));
+
+            clipArea.y=y;
+            clipArea.height=highlightBorder;
+            realDrawBorder(cr, style, state, &clipArea, x, y, width, height,
+                           qtcPalette.highlight, ROUNDED_TOP, BORDER_FLAT, WIDGET_OTHER, 0, 3);
+        }
+
+        if(opts.colorSelTab && notebook && active)
+            colorTab(cr, x+mod+sizeAdjust, y+1, width-(2*(mod+(mozTab ? 2 *sizeAdjust : sizeAdjust))), height-1, round, WIDGET_TAB_TOP, true);
+
+        if(notebook && opts.coloredMouseOver && highlight && TAB_MO_GLOW!=opts.tabMouseOver)
+            drawHighlight(cr, x+(firstTab ? moOffset : 1), y+(TAB_MO_TOP==opts.tabMouseOver ? 0 : height-1),
+                          width-(firstTab || lastTab ? moOffset : 1), 2, NULL, true, TAB_MO_TOP==opts.tabMouseOver);
+        break;
+    }
+    case GTK_POS_LEFT: /* => tabs are on right !!! */
+    {
+        int round=active || (firstTab && lastTab) || TAB_MO_GLOW==opts.tabMouseOver || opts.roundAllTabs
+            ? ROUNDED_RIGHT
+            : firstTab
+            ? ROUNDED_TOPRIGHT
+            : lastTab
+            ? ROUNDED_BOTTOMRIGHT
+            : ROUNDED_NONE;
+#if GTK_CHECK_VERSION(2, 10, 0) && !GTK_CHECK_VERSION(2, 10, 11)
+        if(!active)
+            width-=2;
+#endif
+        clipPath(cr, x-4, y, width+4, height, WIDGET_TAB_BOT, RADIUS_EXTERNAL, round);
+        fillTab(cr, style, widget, area, state, col, x, y+mod+sizeAdjust, width-1, height-(2*(mod+sizeAdjust)), FALSE,
+                WIDGET_TAB_BOT, NULL!=notebook);
+        cairo_restore(cr);
+        drawBorder(cr, style, state, area, x-4, y+sizeAdjust, width+4, height-(2*sizeAdjust),
+                   glowMo ? qtcPalette.mouseover : qtcPalette.background, round, borderProfile, WIDGET_TAB_BOT, 0);
+        if(drawOuterGlow)
+        {
+            if(area)
+                area->width++;
+            drawGlow(cr, area, x-4, y, width+5, height, round, WIDGET_OTHER);
+        }
+
+        if(notebook && opts.highlightTab && active)
+        {
+            drawVLine(cr, CAIRO_COL(*selCol1), 0.5, x+width-3, y+1, height-2);
+            drawVLine(cr, CAIRO_COL(*selCol1), 1.0, x+width-2, y+highlightOffset, height-(2*highlightOffset));
+
+            clipArea.x=x+width-highlightBorder;
+            clipArea.width=highlightBorder;
+            realDrawBorder(cr, style, state, &clipArea, x, y, width, height, qtcPalette.highlight, ROUNDED_RIGHT,
+                           BORDER_FLAT, WIDGET_OTHER, 0, 3);
+        }
+
+        if(opts.colorSelTab && notebook && active)
+            colorTab(cr, x, y+mod+sizeAdjust, width-1, height-(2*(mod+sizeAdjust)), round, WIDGET_TAB_BOT, false);
+
+        if(notebook && opts.coloredMouseOver && highlight && TAB_MO_GLOW!=opts.tabMouseOver)
+            drawHighlight(cr, x+(TAB_MO_TOP==opts.tabMouseOver ? width-2 : -1),
+                          y+(firstTab ? moOffset : 1), 2, height-(firstTab || lastTab ? moOffset : 1),
+                          NULL, false, TAB_MO_TOP!=opts.tabMouseOver);
+        break;
+    }
+    case GTK_POS_RIGHT: /* => tabs are on left !!! */
+    {
+        int round=active || (firstTab && lastTab) || TAB_MO_GLOW==opts.tabMouseOver || opts.roundAllTabs
+            ? ROUNDED_LEFT
+            : firstTab
+            ? ROUNDED_TOPLEFT
+            : lastTab
+            ? ROUNDED_BOTTOMLEFT
+            : ROUNDED_NONE;
+#if GTK_CHECK_VERSION(2, 10, 0) && !GTK_CHECK_VERSION(2, 10, 11)
+        if(!active)
+        {
+            x+=2;
+            width-=2;
+        }
+#endif
+        clipPath(cr, x, y, width+4, height, WIDGET_TAB_TOP, RADIUS_EXTERNAL, round);
+        fillTab(cr, style, widget, area, state, col, x+1, y+mod+sizeAdjust, width-1, height-(2*(mod+sizeAdjust)),
+                FALSE, WIDGET_TAB_TOP, NULL!=notebook);
+        cairo_restore(cr);
+        drawBorder(cr, style, state, area, x, y+sizeAdjust, width+4, height-(2*sizeAdjust),
+                   glowMo ? qtcPalette.mouseover : qtcPalette.background, round, borderProfile, WIDGET_TAB_TOP, 0);
+        if(drawOuterGlow)
+        {
+            if(area)
+                area->x--, area->width+=2;
+            drawGlow(cr, area, x-1, y, width+5, height, round, WIDGET_OTHER);
+        }
+        if(notebook && opts.highlightTab && active)
+        {
+            drawVLine(cr, CAIRO_COL(*selCol1), 0.5, x+2, y+1, height-2);
+            drawVLine(cr, CAIRO_COL(*selCol1), 1.0, x+1, y+highlightOffset, height-(2*highlightOffset));
+
+            clipArea.x=x;
+            clipArea.width=highlightBorder;
+            realDrawBorder(cr, style, state, &clipArea, x, y, width, height, qtcPalette.highlight, ROUNDED_LEFT,
+                           BORDER_FLAT, WIDGET_OTHER, 0, 3);
+        }
+
+        if(opts.colorSelTab && notebook && active)
+            colorTab(cr, x+1, y+mod+sizeAdjust, width-1, height-(2*(mod+sizeAdjust)), round, WIDGET_TAB_TOP, false);
+
+        if(notebook && opts.coloredMouseOver && highlight && TAB_MO_GLOW!=opts.tabMouseOver)
+            drawHighlight(cr, x+(TAB_MO_TOP==opts.tabMouseOver ? 0 : width-1),
+                          y+(firstTab ? moOffset : 1), 2, height-(firstTab || lastTab ? moOffset : 1),
+                          NULL, false, TAB_MO_TOP==opts.tabMouseOver);
+        break;
+    }
     }
 }
 
 void drawToolbarBorders(cairo_t *cr, GtkStateType state,  int x, int y, int width, int height, gboolean isActiveWindowMenubar, const char *detail)
 {
     gboolean top=FALSE,
-             bottom=FALSE,
-             left=FALSE,
-             right=FALSE,
-             all=TB_LIGHT_ALL==opts.toolbarBorders || TB_DARK_ALL==opts.toolbarBorders;
+        bottom=FALSE,
+        left=FALSE,
+        right=FALSE,
+        all=TB_LIGHT_ALL==opts.toolbarBorders || TB_DARK_ALL==opts.toolbarBorders;
     int      border=TB_DARK==opts.toolbarBorders || TB_DARK_ALL==opts.toolbarBorders ? 3 : 4;
     GdkColor *cols=isActiveWindowMenubar && (GTK_STATE_INSENSITIVE!=state || SHADE_NONE!=opts.shadeMenubars)
-                    ? menuColors(isActiveWindowMenubar) : qtcPalette.background;
+        ? menuColors(isActiveWindowMenubar) : qtcPalette.background;
 
     if(DETAIL("menubar"))
     {
@@ -4071,7 +4244,7 @@ void drawToolbarBorders(cairo_t *cr, GtkStateType state,  int x, int y, int widt
             bottom=TRUE;
     }
     else if(0==strcmp(detail,"toolbar")) /*  && (GTK_IS_TOOLBAR(widget) ||
-        WIDGET_TYPE_NAME("BonoboUIToolbar"))) */
+                                             WIDGET_TYPE_NAME("BonoboUIToolbar"))) */
     {
 //         if(GTK_IS_TOOLBAR(widget))
 //         {
@@ -4083,16 +4256,16 @@ void drawToolbarBorders(cairo_t *cr, GtkStateType state,  int x, int y, int widt
 //                 left=right=TRUE;
 //         }
 //         else
-            if(all)
-                if(width<height)
-                    left=right=bottom=TRUE;
-                else
-                    top=bottom=right=TRUE;
+        if(all)
+            if(width<height)
+                left=right=bottom=TRUE;
             else
-                if(width<height)
-                    left=right=TRUE;
-                else
-                    top=bottom=TRUE;
+                top=bottom=right=TRUE;
+        else
+            if(width<height)
+                left=right=TRUE;
+            else
+                top=bottom=TRUE;
     }
     else if(0==strcmp(detail,"dockitem_bin") || /* CPD: bit risky - what if only 1 item ??? */
             0==strcmp(detail, "handlebox_bin"))
@@ -4159,9 +4332,9 @@ void drawDefBtnIndicator(cairo_t *cr, GtkStateType state, GdkColor *btnColors, i
     if(IND_CORNER==opts.defBtnIndicator)
     {
         int      offset=sunken ? 5 : 4,
-                 etchOffset=DO_EFFECT ? 1 : 0;
+            etchOffset=DO_EFFECT ? 1 : 0;
         GdkColor *cols=qtcPalette.focus ? qtcPalette.focus : qtcPalette.highlight,
-                 *col=&cols[GTK_STATE_ACTIVE==state ? 0 : 4];
+            *col=&cols[GTK_STATE_ACTIVE==state ? 0 : 4];
 
         cairo_new_path(cr);
         cairo_set_source_rgb(cr, CAIRO_COL(*col));
@@ -4195,7 +4368,7 @@ static GdkPixbuf * setTransparency(const GdkPixbuf *pixbuf, gdouble alpha_percen
     g_return_val_if_fail(GDK_IS_PIXBUF (pixbuf), NULL);
 
     /* Returns a copy of pixbuf with it's non-completely-transparent pixels to
-        have an alpha level "alpha_percent" of their original value. */
+       have an alpha level "alpha_percent" of their original value. */
 
     target = gdk_pixbuf_add_alpha (pixbuf, FALSE, 0, 0, 0);
 
@@ -4204,10 +4377,10 @@ static GdkPixbuf * setTransparency(const GdkPixbuf *pixbuf, gdouble alpha_percen
     else
     {
         guint  width = gdk_pixbuf_get_width(target),
-               height = gdk_pixbuf_get_height(target),
-               rowstride = gdk_pixbuf_get_rowstride(target);
+            height = gdk_pixbuf_get_height(target),
+            rowstride = gdk_pixbuf_get_rowstride(target);
         guchar *data = gdk_pixbuf_get_pixels(target),
-               *current;
+            *current;
         int    x, y;
 
         for (y = 0; y < height; y++)
@@ -4227,10 +4400,10 @@ GdkPixbuf * renderIcon(GtkStyle *style, const GtkIconSource *source, GtkTextDire
                        GtkStateType state, GtkIconSize size, GtkWidget *widget, const char *detail)
 {
     int         width = 1,
-                height = 1;
+        height = 1;
     GdkPixbuf   *scaled,
-                *stated,
-                *base_pixbuf;
+        *stated,
+        *base_pixbuf;
     GdkScreen   *screen;
     GtkSettings *settings;
     gboolean    scaleMozilla=opts.mapKdeIcons && isMozilla() && GTK_ICON_SIZE_DIALOG==size;
