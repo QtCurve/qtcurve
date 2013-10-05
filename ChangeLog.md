@@ -1,3 +1,20 @@
+## 1.8.17 (WIP)
+1. Add Qt5 support!!.
+2. Require gnu99 and gnu++0x.
+3. Porting to xcb.
+4. Qt5: Remove XBar support from Qt5 (should be replaced by appmenu).
+5. Gtk2: Remove KDE3 support from Gtk2.
+6. Qt4: Fix compile without X Server. Thanks to Sven-Hendrik Haase.
+7. Add `libqtcurve-utils.so`.
+8. Move colorutils to `libqtcurve-utils`.
+9. Gtk2: Fix some warnings.
+10. Merge Gtk2 version and Qt{4,5} versions.
+11. Move xcb handling to `libqtcurve-utils`.
+12. Move KWin X11 shadow helper to `libqtcurve-utils`.
+13. Qt4: Disable transparent background from XEmbed window (e.g. in kpartplugins).
+    Changing the depth of the window (which require recreating the window)
+    breaks the XEmbed protocol.
+
 ## 1.8.15-KDE4
 1. Add Russian localization. Thanks to Juliette Tux.
 2. Workaround bug in glib >= 2.36.1 (`g_spawn_command_line_sync()`)
