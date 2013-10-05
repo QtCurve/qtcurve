@@ -1755,13 +1755,11 @@ Style::polish(QWidget *widget)
     // are not enabled
     if ((100 != opts.menuBgndOpacity && qobject_cast<QMenu*>(widget)) ||
         (100 != opts.bgndOpacity &&
-         (!widget->topLevelWidget() ||
-          Qt::Dialog != (widget->topLevelWidget()->windowFlags() &
-                         Qt::WindowType_Mask))) ||
+         (!widget->window() || Qt::Dialog != (widget->window()->windowFlags() &
+                                              Qt::WindowType_Mask))) ||
         (100 != opts.dlgOpacity &&
-         (!widget->topLevelWidget() ||
-          Qt::Dialog == (widget->topLevelWidget()->windowFlags() &
-                         Qt::WindowType_Mask)))) {
+         (!widget->window() || Qt::Dialog == (widget->window()->windowFlags() &
+                                              Qt::WindowType_Mask)))) {
         itsBlurHelper->registerWidget(widget);
     }
 
@@ -1841,7 +1839,7 @@ Style::polish(QWidget *widget)
                 QWidget *pw =
                     Qt::Dialog == (widget->windowFlags() & Qt::WindowType_Mask) ?
                     widget->parentWidget() ?
-                    widget->parentWidget()->topLevelWidget() :
+                    widget->parentWidget()->window() :
                     QApplication::activeWindow() : 0L;
 
                 if (pw && pw != widget) {
@@ -2062,13 +2060,12 @@ Style::polish(QWidget *widget)
         }
     } else if(qobject_cast<QDialog*>(widget) &&
               widget->inherits("QPrintPropertiesDialog") &&
-              widget->parentWidget() && widget->topLevelWidget() &&
-              widget->parentWidget()->topLevelWidget() &&
-              widget->topLevelWidget()->windowTitle().isEmpty() &&
-              !widget->parentWidget()->topLevelWidget()
-              ->windowTitle().isEmpty()) {
-        widget->topLevelWidget()->setWindowTitle(
-            widget->parentWidget()->topLevelWidget()->windowTitle());
+              widget->parentWidget() && widget->window() &&
+              widget->parentWidget()->window() &&
+              widget->window()->windowTitle().isEmpty() &&
+              !widget->parentWidget()->window()->windowTitle().isEmpty()) {
+        widget->window()->setWindowTitle(widget->parentWidget()->window()
+                                         ->windowTitle());
     } else if(widget->inherits("QWhatsThat")) {
         QPalette pal(widget->palette());
         QColor shadow(pal.shadow().color());
@@ -7109,7 +7106,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
                 if(!selected && (100!=opts.bgndOpacity || 100!=opts.dlgOpacity))
                 {
-                    QWidget *top=widget ? widget->topLevelWidget() : 0L;
+                    QWidget *top = widget ? widget->window() : 0L;
                     bool    isDialog=top && Qt::Dialog==(top->windowFlags() & Qt::WindowType_Mask);
 
                     // Note: opacity is divided by 150 to make dark inactive tabs more translucent
@@ -12909,26 +12906,30 @@ void Style::drawSliderGroove(QPainter *p, const QRect &groove, const QRect &hand
 }
 
 
-int Style::getOpacity(const QWidget *widget, QPainter *p) const
+int
+Style::getOpacity(const QWidget *widget, QPainter *p) const
 {
-    if(opts.bgndOpacity==opts.dlgOpacity)
+    if (opts.bgndOpacity == opts.dlgOpacity)
         return opts.bgndOpacity;
 
-    if(opts.bgndOpacity!=100 || opts.dlgOpacity!=100)
-    {
-         const QWidget *w=widget ? widget : getWidget(p);
+    if (opts.bgndOpacity != 100 || opts.dlgOpacity != 100) {
+         const QWidget *w = widget ? widget : getWidget(p);
 
-        if(!w)
+         if (!w) {
             return opts.bgndOpacity;
-        else
-            return w->topLevelWidget() && Qt::Dialog==(w->topLevelWidget()->windowFlags() & Qt::WindowType_Mask)
-                    ? opts.dlgOpacity : opts.bgndOpacity;
+         } else {
+            return (w->window() && Qt::Dialog == (w->window()->windowFlags() &
+                                                  Qt::WindowType_Mask) ?
+                    opts.dlgOpacity : opts.bgndOpacity);
+         }
     }
     return 100;
 }
 
-void Style::drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p, const QRect &r, const QStyleOption *option,
-                                        bool menu, bool horiz) const
+void
+Style::drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p,
+                                   const QRect &r, const QStyleOption *option,
+                                   bool menu, bool horiz) const
 {
     // LibreOffice - when drawMenuOrToolBarBackground is called with menuRect, this is empty!
     if(r.width()<1 || r.height()<1)

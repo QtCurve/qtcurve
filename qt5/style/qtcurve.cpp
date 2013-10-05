@@ -3434,18 +3434,19 @@ void Style::drawSliderGroove(QPainter *p, const QRect &groove, const QRect &hand
 
 int Style::getOpacity(const QWidget *widget, QPainter *p) const
 {
-    if(opts.bgndOpacity==opts.dlgOpacity)
+    if (opts.bgndOpacity == opts.dlgOpacity)
         return opts.bgndOpacity;
 
-    if(opts.bgndOpacity!=100 || opts.dlgOpacity!=100)
-    {
-        const QWidget *w=widget ? widget : getWidget(p);
+    if (opts.bgndOpacity != 100 || opts.dlgOpacity != 100) {
+        const QWidget *w = widget ? widget : getWidget(p);
 
-        if(!w)
+        if (!w) {
             return opts.bgndOpacity;
-        else
-            return w->topLevelWidget() && Qt::Dialog==(w->topLevelWidget()->windowFlags() & Qt::WindowType_Mask)
-                ? opts.dlgOpacity : opts.bgndOpacity;
+        } else {
+            return (w->window() && Qt::Dialog==(w->window()->windowFlags() &
+                                                Qt::WindowType_Mask) ?
+                    opts.dlgOpacity : opts.bgndOpacity);
+        }
     }
     return 100;
 }
