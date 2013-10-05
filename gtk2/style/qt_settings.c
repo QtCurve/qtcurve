@@ -84,10 +84,9 @@ static char *getKdeHome()
             kdeHome = env;
         } else {
             static char kdeHomeStr[MAX_CONFIG_FILENAME_LEN+1];
+            const char *home = qtcGetHome();
 
-            const char *home=qtcGetHome();
-
-            if (home && strlen(home) < (MAX_CONFIG_FILENAME_LEN-5)) {
+            if (strlen(home) < (MAX_CONFIG_FILENAME_LEN-5)) {
                 sprintf(kdeHomeStr, "%s/.kde", home);
                 kdeHome = kdeHomeStr;
             }
