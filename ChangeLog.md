@@ -25,6 +25,7 @@
 5. CMake option to disable kwin support (`-DQTC_QT4_ENABLE_KWIN=Off`)
 6. Rename come CMake options. Old options will still work.
 7. KWin 4.10 appmenu button support.
+8. Remove packging script.
 
 ## 1.8.16-gtk2
 1. fix memleak with newer versions of cairo.
