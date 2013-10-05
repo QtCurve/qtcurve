@@ -1,0 +1,2094 @@
+## 1.8.16-gtk2
+1. fix memleak with newer versions of cairo.
+
+## 1.8.15-gtk2
+1. Fix tab activation (via mouse) when configured to drag windows from all
+   empty areas and either highlight is set to 0% or coloured mousr over is set
+   to none.
+2. Check widget is realized before attempting to find menubar/statusbar in
+   GhbCompositor class. Fixes startup crash wih Handbrake when menu/statusbar
+   hiding is enabled.
+
+## 1.8.14-gtk2
+1. Fix reading of KDE settings.
+2. Fix button on editable combos with Gtk 2.24
+
+## 1.8.13-gtk2
+1. Fix builing with newer glibs - only glib.h itself can be included.
+2. Use squared menus and tooltips if using XRender
+3. Minimum 1ms delay for sub menus.
+
+## 1.8.12-gtk2
+1. Fix first shown menu not having a shadow in firefox.
+2. Fix eclipse crash due to resetting of shadows.
+3. Disable shadows for SWT where Gtk<2.12.
+
+## 1.8.11-gtk2
+1. Fix broken titlebars in GIMP, etc.
+
+## 1.8.10-gtk2
+1. Fix compilation against Gtk 2.11
+2. Implement shadows for KDE SC4.7
+
+## 1.8.9-gtk2
+1. Disable resize grips in Ubuntu 11.04
+2. Remove GimpDock font settings from gtkrc
+
+## 1.8.8-gtk2
+1. Make timer callbacks threadsafe. Fixes
+   https://bugzilla.redhat.com/show_bug.cgi?id=669155
+2. Allow scrollbar sliders to be as thin as 5 pixels. At this setting, sliders
+   will be squared.
+
+## 1.8.7-gtk2
+1. Fix some segfaults with evolution under Fedora 14.
+2. Don't force widnows style scrollbars for Firefox4 - this workaround
+   is no longer required.
+
+## 1.8.6-gtk2
+1. Fix compilation against Gtk2 older than 2.20 - yet again!
+2. Fix drawing of background underneath menubars - noticeable if menubar
+   gradient uses alpha.
+3. Fix highlighted menu items when shading poup menus.
+4. Don't use gradient alpha settings for tooltips or rulers.
+5. Fix background of popup menus when set to be shaded as per menubars, was
+   using inactive and not active titlebar colour!
+6. When drawing popup text, where shaded as per titlebar, no need to check
+   if window is active - it always is.
+7. Improve window drag code.
+
+## 1.8.5-gtk2
+1. Fix compilation against Gtk2 older than 2.20
+2. Remove some Gtk3 hacks.
+3. Dont draw frame when shadow is set to NONE.
+4. Use correct shade for highlighted menuitems when not using the highlight
+   colour, and the popup is shaded.
+5. If using custom menu colours, when drawing selected menuitems always draw as
+   such - even if not using the highlight colour.
+
+## 1.8.4-gtk2
+1. Fix issues with image based backgrounds.
+2. Don't start drag on widget tab labels.
+3. Don't remove mouse over colour for pressed combo buttons.
+4. Use `gtk_rc_parse_string` to hide shortcuts, and not GtkSettings
+5. Fix KDE style non-editable combos which have has-frame set to FALSE.
+
+## 1.8.3-gtk2
+1. Better fix for problems with Pidgin's tabs and window dragging.
+2. Fix crash when using background gradients/images and built using 'Release'
+   build type.
+3. Fix titles in GIMP's preferences dialog.
+
+## 1.8.2-gtk2
+1. Improve window drag code to take care of GtkPizza, and other, widgets.
+2. Use Gdk window to determine offsets when drawing background gradients.
+3. Use SHADOW_IN for treeviews.
+4. Fix background gradients in scrollviews.
+5. When drawing background gradients, use the background colour of the top-level
+   widget's style.
+6. Fix slight glitch with striped scrollbar sliders.
+7. Hacky fix for tabs in Thunderbird main window.
+8. Better detection of toolbar buttons in Thunderbird.
+9. Slightly clean-up code.
+10. Can only use KDE-style non-editable combo popup if also using glow focus - as
+    Gtk2 modifes the focus rect.
+11. Don't recolour checks/radios in listviews when row is selected.
+
+## 1.8.1-gtk2
+1. Alter CMake linker flags to detect undefined symbols.
+2. Fix compile with older Gtk2 versions.
+
+## 1.8.0-gtk2
+1. Add option to not display keyboard shortcurt underline until 'Alt' is
+   pressed.
+2. Add options to specify appearance of toolbar buttons.
+3. Allow to use popup menu shade factor when colouring as per menubar.
+4. Colour listview arrows on mouse-over.
+5. Fix scrollbar background gradient in flat scrollbar buttons with firefox.
+6. Use windows style scrollbars for Firefox 4
+7. Fix painting of alternate listview rows in SWT apps. For some reason even
+   cells are painted twice, once with the correct "cell_XX" setting, and then
+   with an incorrect one!
+8. Fix size of focus indicator in treeviews with SWT apps.
+9. Use list style pop-up for non-editable combos when not using Gtk-style
+   combos - matches KDE behaviour.
+10. Fix buttons in chromium's menu - mouse over colour, and text colour when
+    using darker colour schemes.
+11. Remove `QTC_CAIRO_1_10_HACK` cmake option. For cairo 1.10, an easier fix
+    is to just ensure there is no colour stop at 1.0. Thanks to Hugo Pereira
+    Da Costa for pointing this out.
+12. Allow window drag in toolbars and other areas.
+13. Implement hover and focus for scrolled windows.
+14. Add support for KDE4 StartDragDist and StartDragTime config items to
+    control when window drag starts.
+15. Fix rounded border of combo popups when configured to not draw border
+    and be square.
+16. Use configure-event, and not resize-request, to detect window size changes.
+17. Fix splitter background when highlight set to 0.
+18. Fix tab mouse-over highlight when tab has a child widget.
+
+## 1.7.2-gtk2
+1. Allow editable combo-box popup to be rounded.
+2. Fix initial treeview highlight.
+3. Fix rounded popup border when using compositing.
+4. Add vmware, vmplayer, and gtk to list of app to exclude from opacity
+   settings. This also prevents using RGBA for rounded tooltips and popup menus.
+5. Fix opacity setting of squared popup menus.
+6. Improve group-box label positioning.
+7. Fix line-style group box when text is above or below the line.
+8. Fix crash when using a tiled image for background appearance, but not for
+   menu appearance - was using wrong config item!
+9. Fix border of hovered treeview items.
+10. Allow combo popupmenus to be rounded if not using compositing.
+11. Set/clear widget masks when compositing toggled.
+12. Fix treeview line end detection.
+13. Fix treeview selection, and line, corruption.
+14. Fix treeview line dimensions.
+15. Fix size of fonts in GIMPs dock.
+16. Fix firefox scrollbar background when using flat buttons and flat
+    background.
+17. Fix clipping issues with full and filled focus types.
+18. For configs older than 1.7.2, disable usage of alpha channel to draw
+    rounded tooltips and popup menus. Too many issues with apps to enable
+    this by default.
+
+## 1.7.1-gtk2
+1. Use rgba colormap to draw rounded tooltips and popup menus - gives nicer
+   border. This may be disabled via KDE4 config dialog.
+2. Allow 'menus' of non-editable combos to be rounded. (But *only* if the app
+   can be set to use an rgba colormap)
+3. Remove resize grips - kwin handles this.
+4. Add mouse tracking to treeview lists.
+5. Indent treeview selection as per KDE.
+6. Dont use GtkStyle to draw treeview lines. Use custom code which matches
+   previous KDE 'old' style.
+7. When loading images for background/menus - check that image was loaded before
+   attempting to ascertain its width/height.
+8. Fix drawing or progressbar groove in treeview.
+
+## 1.7.0-gtk2
+1. Add option to use tiled pixmap as background for windows and menus.
+2. Draw line focus for items that cannot use glow focus.
+3. Use popup menu gradient's border setting to determine border type of menus.
+4. Add option to draw standard, raised, or joined toolbar buttons.
+5. Add option to use thinner frames, focus, etc.
+6. If not rounding, enable all 'square' options.
+7. Store background colour setting in XProperty - so that this can be used by
+   QtCurve kwin decoration. (At the moment, this is just the palette background)
+8. Add position setting for background image; top left, top middle, top right,
+   bottom left, bottom middle, bottom right, left middle, right middle, and
+   centred.
+9. Use square tooltips by default. (Problems have been reported with Pidgin and
+   rounded tooltip - but I cannot reproduce these!)
+10. Fix combo-box menu text when shading popup menus.
+11. Fix reading of QtCurve supplied default kdeglobals file.
+12. Fix rounding of troughs of progressbars within treeview.
+13. When using glow focus, dont draw glow focus and line focus on button of
+    editable combo - jsut draw line.
+14. Improve background gradient performance - only re-draw on size-request
+    if size is different from last time.
+15. Dont overwrite user supplied `CMAKE_INSTALL_PREFIX`
+16. OpenOffice.org fixes:
+
+    1. toolbar buttons when using max rounded buttons.
+    2. vertical scrollbar button detection
+    3. background of unified spin widgets and combos
+
+## 1.6.4-gtk2
+1. Fix Claws Mail listview headers.
+2. When drawing text on an option menu, look deeper into parent heirarchy to
+   determine if the label is on a GtkOptionMenu.
+3. Fix menubar borders when menubars set to be coloured as per titlebar.
+4. Allow faded groupbox frame even when not shading background.
+5. Dont draw shaded/faded background groupboxes for Mozilla, Java, or
+   OpenOffice.org
+6. Improve inner 3d part of line edits, combos, spinboxes, etc.
+
+## 1.6.3-gtk2
+1. Apply background opacity to menubars and toolbars.
+2. Always use text colours when drawing labels on a GtkOptionMenu.
+3. If using background opacity, draw rings and background gradient under
+   menubars and toolbars - this matches the KDE4 behaviour.
+4. Disable the support for 'fix parent-less dialog' option - this causes
+   too many issues with applications to be worth the fuss. If you really
+   want this enabled, use the `-DQTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT=true`
+   cmake option.
+
+## 1.6.2-gtk2
+1. Theme evolution's headers as headers, and not buttons.
+2. Set fallback icon theme to gnome instead of hicolor. This helps with some
+   missing icons in evolution.
+3. If drawing a background image, ensure that this can also be drawn onto kwin
+   border - if it has a bottom edge.
+4. Attempt to fix light text on dark background for OpenOffice.org
+5. Use same radius for all corners of progressbar.
+6. Apply menu background settings to menus of non-editable combos. (Rounding is
+   not applied due to clipping/shadow issues with Gtk2)
+7. Allow borderless rounded popup menus.
+8. Don't draw double focus on Gimp combos.
+9. Allow rounded menus when rounding is set to slight.
+
+## 1.6.1-gtk2
+1. Add option to have rounded popup menus.
+2. Allow rounded tooltips when not compositing.
+3. Use a hack to re-enable shadows for rounded tooltips.
+4. Don't map/unmap tooltips - not required?.
+5. Fix kwin titlebar blending for striped backgrounds.
+6. Use flat selection for items of editable combo - matches KDE4 better.
+7. Simplify faded menu item code.
+8. Don't use `gtk_style_apply_default_background` for resize widgets -
+   messes up translucency!
+
+## 1.6.0-gtk2
+1. Add 'glow' focus option - this is now the default. (Note, for firefox
+   the label of checkboxes and radiobuttons will have a rounded focus rect
+   drawn - this is because the 'glow' does not seem to work for firefox's
+   usage of checks and radios).
+2. Fix potential crash in rgbToHsv
+3. Use square-ish focus for view items if using squared selection.
+4. Store dialog/window opacity in an XProperty - so that kwin theme can use
+   this as the titlebar opacity.
+5. Don't hide focus rect on listview headers when mouse-overed.
+6. Fix crash due to missing `gtk_widget_get_allocation` - this was only
+   introduced in Gtk 2.18.0
+7. Group boxes need to respect 'square frames' setting.
+8. Some Java Swing fixes/workarounds:
+
+    1. always use plain slider style
+    2. dont depress sliders
+    3. slightly improve tabs
+
+9. Added option to specify tooltip background appearance.
+10. Added options to draw shaded, or faded, group boxes.
+11. Added options to specify location of group box label; inside, outside.
+12. Dont use the 'no buttons' scrollbar setting for mozilla apps. This setting
+    seems to cause odd behaviour with the horizontal scrollbar (sometimes it is
+    not displayed). Use signle top/bottom left/right buttons instead.
+13. Draw coloured mouse over for 'checked' toggle buttons.
+14. Fix look of some sunken toolbar button in firefox.
+15. Use Highlight colour for default button glow.
+16. When KDE4's 'Inactive selection changes colour' setting is enabled,
+    dont change the selection colour - use same colour, but set 50% transparent.
+17. Add "npviewer.bin" to list of apps that are brower plugin viewers - opacity
+    settings are excluded from these.
+18. Exclude opacity settings from SWT apps (e.g. eclipse), totem, and sonata.
+19. Default sub-menu popup delay to 225 - matches Gtk2 standard default.
+    The previous default of 100 seems to cause issues with Thunar.
+20. Extend background gradients into window decoration.
+21. Fix faded menuitems when using menu background gradients.
+22. If background gradient has a 'shine', then when used for backgrounds draw a
+    radial gradient top centered.
+23. Use arrows on pathbar buttons.
+24. If using compositing then use rounded and semi-transparent tooltips. (Note:
+    when using rounded tooltips, the kwin shadow dissapears.)
+25. Add option to force square tooltips.
+26. Reduce GdkGC usage - use cairo for text layout.
+27. Add a hack to work-around issues with NVIDIA and cairo 1.10. This 'fix'
+    invloves duplicating the 1st and last stop in a gradient - and may have
+    an impact on performance. To enable this, pass
+    `-DQTC_CAIRO_1_10_HACK=true` to cmake.
+28. Improve tab mouse-over code.
+
+## 1.5.2-gtk2
+1. Apply opacity settings to inactive tabs.
+2. Add config option of apps that should not use menu opacity.
+3. Add inkscape to list of apps to exclude opacity settings from.
+4. Exclude opacity settings from browser plugins - nspluginviewer,
+   plugin-container, and chrome (instance used to load plugins).
+5. Exclude opacity settings for openoffice.org - crashes otherwise!
+6. Check widget's colormap before drawing transparent.
+7. Support non-integer font sizes - patch from Alyssa Hung
+
+## 1.5.1-gtk2
+1. Fix drawing of square frames, when general setting set to round.
+2. Dont draw thumbs on circular sliders - they dont look good!
+3. Add options to set opacity for window and poup-menu backgrounds. The KDE SC4.5
+   blur-behind hint is set when the `opacity != 100`
+4. If hiding via kwin buttons, emit menubar & statusbar details when a window is
+   mapped.
+
+## 1.5.0-gtk2
+1. Add option to set progressbar colour.
+2. Add options to have squared sliders and/or scrollbar sliders even when
+   general setting set to round.
+3. Add option to use menubar colours for popup menus.
+4. Add option to set alpha values used to draw etch/shadow effect.
+5. Dont draw double shadow for coloured combo buttons.
+
+## 1.4.1-gtk2
+1. When drawing button-like checks and radios, do not drawn sunken if they are
+   in a list/tree view.
+2. Fix segfault on some systems due to `gdk_x11_get_default_xdisplay` usage.
+
+## 1.4.0-gtk2
+1. Add striped window and menu background options.
+2. Added options to not square frames and tab frames.
+3. Animate faded progressbars when animation enabled.
+4. Blend menubar and window titlebar gradients if:
+
+    1. menubar, titlebar, and inactive titlebar gradients match AND
+    2. not blending titlebar gradient AND
+    3. using window titlebar colour for menubar AND
+    4. extending window drag into menubar
+
+5. Default titlebar colours to window colours - matches KDE4 default.
+6. If using window border colours as menubar colours, and the active and
+   inactive titlebar colours are the same, then always use the active titlebar
+   text colour for the menubar.
+7. When shading menubars only when active, or using window border colours as
+   menubar colours, track the active window using a X11 event sent from the
+   QtCurve kwin decoration.
+8. Fix border of radio buttons when general round setting is set to square.
+9. Always use a 1 pixel border for toolbars - as using a border of 0 can cause
+   items of adjoining locked toolbars to be too close.
+10. Add separator to messafge dialog boxes - matches KDE.
+11. Add option to act upon titlebar buttons to hide menubar and statusbars.
+12. Fix plain/round sliders being rotated when using a custom slider width.
+
+## 1.3.0-gtk2
+1. Add option to use kwin titlebar colours as menubar shade.
+2. Add option to hide status bars via `Ctrl-Alt-S`
+3. Add option to drag windows by menubar.
+4. Better check/radio positioning.
+5. Fix background painting with some toolbars.
+6. Draw window frames square.
+7. Fix rounding of check/radio/splitter/expander highlight.
+8. Set toolbar frame width to 0 if not drawing borders.
+9. When toggling menubar, or statusbar, queue a redraw of the window.
+10. Decrease size of SWT toolbars.
+11. Disable background image and gradient for SWT apps.
+12. Only allow QtCurve's colours to be overridden if they come from
+    `QtCurveRcStyle` or GtkRcStyle. Also, in the case of root, disallow
+    'ToolTip' and 'default' styles - as if app is run via kdesu/kdesudo,
+    these could potentially be the user's colours. This should stop other
+    theme's / user's colours from interfering.
+13. If using KDE4/Qt4 colour settings, only force the colours for buttons
+    that are disabled. This fixes the coloured text on GWave's buttons.
+14. Fix shading of menubars and when using flat menubar appearance and
+    background image/gradient.
+15. Fix slider groove not always being painted when using background
+    gradient/rings.
+16. Fix drawing glitches with unified comboentries on mouse over.
+17. Improve firefox menubar text colouring.
+
+## 1.2.0-gtk2
+1. Draw etch effect on radios if using a button effect, and not using button-like
+   check/radios.
+2. If drawing square non-gtk style scrollviews, use a dark/light borders.
+3. If drawing square scrollviews, set frame width to 1 if using thin scrollbar
+   groove.
+4. Add options to draw square progress and entry fields when rounding.
+5. Add option to control whether progressbars have a border on all sides, or just
+   top/bottom.
+6. Add option to colour default buttons using highlight colour.
+7. Expand selected check/radio colour option so as to be able to specify colour.
+8. Add circular slider style.
+9. Add glow to mouse over of slider handles (not scrollbars).
+10. Add option to draw stripes on scrollbar sliders.
+11. Add a 'faded' style porgressbar stripe option.
+12. Add option to draw agua shine on custom gradients.
+13. Improve appearance of button style check and radio buttons.
+14. Add option to control whether scrollbar groove has a border or not.
+15. Dont use pixmaps to draw rounded slider, or radio buttons.
+16. Add option to increase size of check/radios - default is now 15pixels.
+    (For Mozilla apps, the old 13pixel size will be used).
+17. Fix calculation of alpha values for square rings.
+18. Fix progressbar glow central position.
+19. Draw more frames.
+20. Fix image/gradient background issues with wxWidgets applications.
+    (Use `gtk_widget_translate_coordinates` to translate widgets coordinates
+     relative to window.)
+
+## 1.1.1-gtk2
+1. Alter alpha settings of square rings.
+2. Fix progressbar glow sometimes disappearing with Firefox.
+
+## 1.1.0-gtk2
+1. Add option to not embolden progressbar text.
+2. Add option to allow coloured mouse over for toolbar buttons.
+3. Add option to border selection.
+4. Add option to draw square rings on background.
+
+## 1.0.2-gtk2
+1. Apply cygwin patches from Yaakov S - use MODULE istead of SHARED.
+2. For older mozilla apps, if menuitem style is set to fade, then use flat.
+3. Map edit-select-all.png to gtk-select-all
+4. Fix check, radio, expander, and splitter background highlighting - forgot
+   to convert configured value to a percentage!
+5. If using a background gradient, or cannot determine a widget's parent's
+   background colour - use a 10% alpha white as the etch colour.
+
+## 1.0.1-gtk2
+1. Fix crash when colouring selected checks and radios, shading sliders, and
+   non coloured default buttons.
+
+## 1.0.0-gtk2
+1. Added option to colour selected check/radios.
+2. Added option to use a smaller dot for radios.
+3. Made check/radio and splitter highlight options a configurable - i.e.
+   not based on standard hightlight.
+4. Added option to set expander highlight factor.
+5. When highlighting check/radio/splitter/expander background, round the
+   corners and use the selection gradient.
+6. Default check/radio/splitter/expander highlight set to 3%
+7. Added new splitter/handle/thumb style: single dot.
+8. Don't do coloured mouse over for buttons of editable combos, spin buttons,
+   or scrollbar buttons.
+9. Don't do regular coloured mouse over of sliders when these are set to be
+   coloured on mouse over.
+10. Allow to specify strength when colouring selected tab.
+11. Remove support for QtCurve styles (these appear as unique KDE styles in the
+    main KDE style selection dialog). Re-enable support by passing
+    `-DQTC_STYLE_SUPPORT=true` to cmake.
+12. Slightly lighter shade used for coloured mouse over of arrows.
+13. Dont draw border around rounded selection.
+14. Fix internal padding of scrolled windows where scrollbars are within window.
+15. When drawing frames, respect shadow state (in/out).
+16. Draw Inkscape and Anjuta sidebar buttons as per QtCurve's KDE style.
+17. Improve appearance of unified spin widgets under Firefox.
+18. Don't draw background of dock widgets as if they were toolbars!
+19. Only draw toolbar/menubar background if shadow type is not set to none.
+    (Removes toolbar gradient from Rhythmbox's search buttons)
+20. Reduce thickness of menu toolbar buttons (e.g. the buttons with just the arrow)
+21. Better match of line-edit and spinbutton heights to KDE4.
+22. If user is using menubar colouring, and this would require changing the text
+    colour, then need to modify the user's userChrome.css for this - regardless
+    of the `QTC_MODIFY_MOZILLA` cmake option.
+23. If editing/creating `userChrome.css` and chrome folder does not exist, then
+    create it.
+24. Theme icon view selections.
+25. Theme entry progress.
+26. Supply a default kdeglobs file (installed into QtCurve's gtk-2.0 folder) so
+    as to allow easy modifications of default settings.
+27. Added option to draw Air-like background rings in windows and/or menus.
+    Note: to use an SVG instead of the hard-coded air-like rings, edit
+    `~/.config/qtcurve/stylerc` (or `/etc/qtcurvestylerc`) and add:
+
+          bgndImage=file
+          bgndImage.file=/path/to/svg/file.svg
+          bgndImage.width=120
+          bgndImage.height=160
+
+    (Use menuBgndImage for menus)
+
+28. Added option to add a 'glow' to progressbars.
+29. Use listview header appearance setting for background of rulers.
+30. To disable background gradient, or image, for a particular app, edit
+
+    `~/.config/qtcurve/stylerc` and add:
+
+        noBgndGradientApps=inkscape,gimp
+        noBgndImageApps=inkscape,gimp
+
+    ...using `gtk` (e.g. `noBgndImageApps=gtk`) will disable for all Gtk apps.
+
+31. Removed the `-DQTC_REORDER_GTK_DIALOG_BUTTONS=true` cmake option,
+    and replaced with a config option.
+32. Draw Preview button in GIMP file dialog as a listview header.
+33. Fix crashes with 'deadbeef' (??) 0.3.1 - need to check widget pointer before
+    calling `GTK_WIDGET_???` macros.
+34. Don't max round toggle buttons that are almost square, or GIMPs
+    `GimpViewableButtons`
+35. gtkMenuStripe option replaced by noMenuStripeApps option.
+    `noMenuStripeApps=gtk` is
+    the equivalent of `gtkMenuStripe=false`
+36. Better Agua gradients for large buttons.
+
+## 0.69.2-gtk2
+1. If a scrollbar slider is maxed-out, then shade it as disabled - matches KDE.
+2. When detecting `Ctrl-Alt-M` for menubar hiding, check for uppercase M
+   as well as lower case. Also, ignore state of shift and caps-lock keys.
+3. Set default contrast to 7
+
+## 0.69.1-gtk2
+1. Fix glow-style mouse over for combos with coloured buttons.
+2. Improve appearance of plastik style mouse-over on scrollbar sliders.
+
+## 0.69.0-gtk2
+1. Add option to control whether bottom tabs should have their gradient
+   shades inverted.
+2. Config files now stored under `$XDG_CONFIG_HOME/qtcurve`
+   (e.g. `~/.config/qtcurve`)
+3. Fix some issue with 'flat' appearance.
+4. Add an experimental option to hide/unhide menubars using Ctrl-Alt-M.
+5. Respect double arrow setting for non-editable combos on more Gtk2
+   combo types. (Affects combos in pidgin.)
+6. Colour arrows on mouse over of non-editable combos on more Gtk2
+   combo types. (Affects combos in pidgin.)
+7. Fix disabled editable combos.
+8. It has been reported that under intel Xorg drivers > 2.8, that QtCurve's
+   arrows are not appearing. This seems to be due to the fact that QtCurve is
+   using cairo to draw non-antialised lines in this case. To work-around this
+   issue QtCurve has been changed to use the older Gdk to draw arrows. To
+   revert back to cairo, use the following cmake option:
+
+        -DQTC_USE_CAIRO_FOR_ARROWS=true
+
+## 0.68.1-gtk2
+1. Fix reading of 'dark inverted gradient' setting.
+2. Allow toggle buttons to be max rounded.
+3. Fix combo-box arrow position when not etched/shadowed.
+4. Fix default value for 'double Gtk combo arrow' setting.
+5. Fix https://bugzilla.novell.com/show_bug.cgi?id=529607
+
+## 0.68.0-gtk2
+1. New options:
+
+    1. Control whether icons are displayed in menus
+    2. Force alternate colours in listviews
+    3. Square selections in listviews
+
+## 0.67.5-gtk2
+1. Use same shade for all menu item separators.
+2. Fix clipping of non-V style right arrow.
+3. Dont draw 3D border around poup menus when border has been disabled, but
+   shading set to 0%
+4. Offset sunken slider thumbs to improve appearance.
+
+## 0.67.4-gtk2
+1. If drawing square scrollviews, give these a similar 3d effect to rounded ones.
+2. Move menuitem arrows 2 pixels to the left, to match KDE4 better.
+3. Fix button of non-editable combos when not etching entries.
+4. Fix spin buttons when not etching entries.
+5. Only do mouse over for entries if combos and spin widgets are unified.
+6. If not etching/shadowing, when mouse over set to 'glow' use 'thick coloured'
+7. If not etching/shadowing, decrease thinner scrollbar groove.
+8. Fix clipping of shaded button on combos when not etching/shadowing.
+9. Remove hard-coding of light border in progressbars - use gradient setting.
+10. Slightly better button metrics when not etching/shadowing.
+
+## 0.67.3-gtk2
+1. If a buttons requested size is not a multiple of 2, then shift the text 1
+   pixel lower.
+2. Fix plastik style mouse over on scrollbars.
+
+## 0.67.2-gtk2
+1. Fix text placement in pushbuttons.
+2. Set the insensitive foreground colour to the disabled text colour, and not
+   the mid colour. Fixes appearance of disabled items in Mozilla apps.
+
+## 0.67.1-gtk2
+1. Adjust Agua overlay if widget is not max rounded.
+2. Fix flat/sunken/dashed splitter handles!
+3. Fix check/radio position in Thunderbird2 menus.
+
+## 0.67.0-gtk2
+1. Add option to draw insider border of inactive tabs.
+2. Add option to draw double arrows for non-editable combos.
+3. Add option to colour the sorted listview header.
+4. Disable scrollbar buttons when at min/max - to match spin buttons.
+5. Place non-V arrows of unified spin widgets closer together.
+6. Increase the amount of rounding when round set to max.
+7. Match gradient width/height to KDE4.
+8. Only selected tabs need to fade to 100% alpha when using gradient backgrounds.
+9. Fix entry borders of standard entry widgets in Mozilla apps. (The Mozilla
+   widgets need a thinner border than the Gtk ones)
+
+## 0.66.0-gtk2
+1. Add a new 'Dark Inverted Gradient' and use this as the default gradient
+   for menu stripes.
+2. New 'Agua' style gradient - looks better under KDE4 and Gtk2.
+3. Add option to lighten/darken the background of tabs.
+4. Make inactive tabs more consistent with active tabs.
+5. Remove sunken scroll views config item, and replace with option to control
+   if entries and scroll views should be etched (sunken).
+6. Modify defaults:
+
+    1. Scrollbars outside of scrollview (Gtk/oxygen style)
+    2. Thin scrollbar groove.
+
+7. When using scrollbars outside of scrollview, reduce gap to 2 pixels
+   if sunken.
+8. Set, and use, honors-transparent-bg-hint / transparent-bg-hint. Fixes corners
+   of entry fields in Firefox 3.5
+9. Remove `userChrome.css` settings if firefox executable name is firefox-3.5
+
+## 0.65.3-gtk2
+1. When not using button-like check/radio boxes, use view text as the
+   indicator colour.
+2. Fix slight tab glitches when using glow tab mouse over and square tabs.
+3. Fix background of some widgets when using "left to right" background
+   gradients.
+4. Fix backgrounds of entry field when etching, but not rounded.
+5. Dont draw frame for entry fields within list/trees.
+
+## 0.65.2-gtk2
+1. If there is not enough space for large arrows in FireFox's menuitems,
+   use small ones.
+2. Fix incorrect scrollbar trough border.
+3. Better, non-hacky, fix for Firefox's location bar.
+4. Make Firefox's entry fields smaller.
+
+## 0.65.1-gtk2
+1. Use a border width of 1 if gradienting popupmenus.
+2. When using darkened menu stripe use popupmenu background colour as the
+   base colour.
+3. Draw menu stripe flush with the edge of menu.
+4. Match 'darken' menuStripe to KDE4.
+5. When using menu stripe, adjust separators by 20 (2 for Mozilla/Oo.o)
+   pixels left.
+6. Increase width of menu stripe for Mozilla apps.
+7. Draw menu stripe for menus associated with dialogs.
+8. Match KDE4 button text position better.
+9. Fix some issues with oxygen-style combo buttons. (QtCurve creates maps from
+   the parent -> entry, and parent -> button - these maps were not being cleared
+   when the widget was destroyed. Also, dont keep reference to last
+   moused-overed entry after its unrealized).
+10. Dont highlight background of checks/radios when this is not enabled, but
+    gradient background is.
+11. Disable background gradients for Java, Mozilla, OpenOffice, GIMP toolbox,
+    and tooltip windows.
+12. Improve background gradients when drawing parts of entries, etc.
+13. Very hackish fix to the border around the icons within firefox's location and
+    search entry fields. Disabled by default, to enable pass
+    `-DQTC_FIX_FIREFOX_LOCATION_BAR=true` to cmake. Note that enabling
+    this may cause issues with other entry fields in firefox.
+14. Adjust position of checks and radios in menus.
+15. Fix memory leak by calling parent class's fianlize method in QtCurve's.
+
+## 0.65.0-gtk2
+1. Add options to draw editable combos, and spin widgets, as edit fields with
+   embedded arrows - oxygen style.
+2. Add option to draw a light border around tab widgets, as opposed to 3d look.
+3. Added ability to specify scrollbar width (11 -> 31, default 15)
+4. Base slider dimensions off of scrollbar width, unless using
+   triangular slider.
+5. Add option to have thinner buttons.
+6. Add option to specify gradient for background of popupmenus.
+7. Enable mouse-over for entry fields.
+8. For mouse-over and focus, use same colour for top and bottom inner parts
+   of entry fields.
+9. When using filled/full focus with coloured mouse over, then mouse over takes
+   precedence.
+10. Alter default settings:
+
+    1. Place arrows of spin buttons, and editable combos, in the edit field.
+    2. Draw a light border around tab widget.
+    3. Thinner buttons.
+    4. Use soft gradient for active tab.
+    5. Use glow style highlight for tab mouse-over (this introduces gaps
+       between tabs).
+
+11. Re-add fix for icons on GEdit tabs - but only for GeditNotebook widgets.
+12. Draw entry field backgrounds.
+13. Dont use KDE4's disabled background colour.
+14. Experimental support for menu-stripe. (Needs menu stipe also enabled
+    in KDE GUI)
+15. Enable drawing of list (tree) view lines.
+16. Experimental support for drawing of background gradients.
+
+## 0.64.2-gtk2
+1. When using shaded combo buttons, use button colours for border.
+2. Disable button order userChrome.css mods for Thunderbird >= 3
+3. Added a verbose warning about the usage of `QTC_MODIFY_MOZILLA`
+4. Fix spin widget entry field when widget is on a notebook - bug was caused
+   by fix for GEdit tabs.
+5. Disable coloured slider hack for Firefox apps. This hack attempts to solve
+   the miscolured top/bottom line of sliders when they are at the top/bottom.
+
+## 0.64.1-gtk2
+1. When using shaded combo buttons, use the combo splitter setting to
+   determine if there should be a border between the shaded and unshaded parts.
+2. Make menubar items selectable right up to the top edge of the menubar.
+3. Fix clipping of close icon on GEdit tabs.
+
+## 0.64.0-gtk2
+1. Add option to not draw border around popupmenus.
+2. Add option to unify spinbuttons.
+3. Add option to set sub-menu delay (default 100ms)
+4. Use equal top/bottom padding on popupmenu separators.
+5. Add option to colour arrow part of combobox.
+6. Draw resize grip as a darkend triangle.
+7. Add a 'thick coloured border' mouse over type.
+8. Allow to darken sliders.
+9. Add new default button indicator - darken.
+10. Harmonize KDE4 & Gtk2 popupmenu overlaps.
+11. Slightly changed min width/height of when buttons can be max
+    rounded - fixes some issues with firefox.
+12. Fix scrollbar background when using thinner grooves.
+13. Under KDE4 (`KDE_SESSION_VERSION >= 4`), default hover/focus colours to the
+    KDE4 defaults.
+14. Fix firefox crashing when scrollbar slider move to top. This only occurs
+    when not using flat scrollbar buttons, and a coloured scrollbar slider.
+15. Dont draw frame around GEdits combos in its status bar - unless
+    drawStatusBarFrames is set to true.
+16. Dont attempt alter OK/Cancel button for Firefox 3.5 - seems to mess up
+    preferences dialog.
+17. Replace QtCurve's menubar mouse-over code with that from the glide engine.
+
+## 0.63.0-gtk2
+1. Add '3dfull' to gradient border options. This forces the
+   dark, as well as the light, portion to be drawn.
+2. Use a lighter shade for the dark portion of gradient border.
+3. Flat dot for radio buttons.
+4. Option to use button colour for listview headers.
+5. Use KDE4 colours for focus and mouse-over.
+6. Removal of background focus option.
+7. Softer, and much nicer, colouration of selected tab.
+8. Tab mouse over options; top (as before), below, or glow.
+9. Modified defaults:
+
+    1. Tab mouse-over highlight drawn at the bottom
+    2. Plain slider style
+    3. Align titlebars text in center
+
+10. Add appearance setting for background of flat scrollbar buttons.
+11. Add HCY colour space.
+12. Use tint and mix colour routines from KDE4's KColourUtils.
+13. Remove QtCurve's 'inactiveHighlight' option, and use KDE4s setting
+    instead.
+14. Add option to specify appearance setting of filler part of sliders.
+15. Increase number of custom gradients - now matches number of gradient
+    config items.
+16. When using glow style mouse over, use mouse over colour for arrows.
+17. Option to use a thinner groove for scrollbars (only when using flat,
+    or no, buttons).
+18. Option to only colour sliders on mouse over.
+19. Option to round all tabs.
+20. Better tab highlighting.
+21. Don't max/extra round progressbars.
+22. Use faded lines for tab and listview header mouse-over.
+23. Create icon-mapping file in a more robust manner.
+24. Set `gtk-icon-theme-name` to user's theme (or the KDE default if not set),
+    and set `gtk-fallback-icon-theme` to `highcolour`.
+    This seems to map more icons.
+25. Fix spin widget entry highlighting under Gtk 2.16
+26. Don't round rulers.
+27. Fix faded menuitems when not rounding.
+28. Fix alternate listview colours when running under KDE3
+    (`KDE_SESSION_VERSION=3`)
+29. Make buttons slightly thinner, matches KDE4 better.
+30. Fix settnig of KDE icons when QtCurve is configured by just having
+    gtk-theme-name="QtCurve" in the gtkrc file.
+31. Fix painting of scrollbar slider ends when sliders are shaded, and scrollbar
+    buttons are not flat.
+32. When not using highlight colour for menus, get OpenOffice to use the correct
+    colour for selected menubar items.
+33. Fix setting of custom shades, and gradients, when reading system config file.
+34. Don't crash when `/etc/qtcurvestylerc` is only readable by root!
+35. Use tooltip text colour to draw its border, as per KDE4.
+36. Dont draw border around rulers.
+
+## 0.62.8-gtk2
+1. Treat 'abrowser' as Firefox.
+2. Disable tab-mouse over for all tabs that are of the type
+   `GtkNoteBook.GtkFixed.GtkWindow`
+   (this is mainly for Mozilla and OO.o widgets)
+3. Fix OK/Cancel buttons for all Firefox3 dialogs.
+4. Removed `QTC_MODIFY_MOZILLA_USER_JS` cmake option, this is now set via the
+   `QTC_MODIFY_MOZILLA` option - as the KDE button order is affected by the
+   instantApply setting.
+5. Draw Mozilla's scrolled windows square - as it seems to assume they are.
+6. When determinging lower etch colour, ignore GtkBox widgets when looking up
+   parent tree.
+7. Set menu and toolbar fonts.
+8. Don't darken disabled splitter.
+
+## 0.62.7-gtk2
+1. For right-to-left progressbars, make animation go right-to-left -
+   matches KDE.
+2. Detect seamonkey as a Mozilla app.
+3. Try to determine if a Mozilla app is new, or not, by calling <app> --version
+4. Fix OO.o scrollbars when using flat scrollbar buttons.
+5. Improve Mozilla and OO.o spin widgets.
+6. Fix OO.o comboboxes.
+7. Shrink (by 2 pixels) size of Firefox toolbars - but only if
+   `-DQTC_MODIFY_MOZILLA=true` is passed to cmake. This modifies your
+   `~/.mozilla/firefox/???.default/chrome/userChrome.css`
+   file to include `/usr/share/themes/QtCurve/mozilla/QtCurve.css` file.
+8. Fix KDE button order in FireFox 3 dialogs - but only if
+   `-DQTC_MODIFY_MOZILLA=true` is passed to cmake.
+
+## 0.62.6-gtk2
+1. Alter meunbar item widths slightly to make more consistent with KDE4.
+2. If `QTC_NEW_MOZILLA` is not set, don't allow faded menuitems for
+   thunderbird - these just don't work here. In thunderbird it is not possible
+   to detect if a menuitem is on a menubar, or in a popup menu :-(
+3. Make file chooser's pathbar buttons more KDE4 like. This is not 100%, as
+   there are no ">" arrows. To seperate items a light gray "/" is drawn.
+4. Improve entry focus highlight when round>full.
+5. Don't use max round for close buttons on GEdit's tabs.
+
+## 0.62.5-gtk2
+1. Use gradient for filled slider - unless appearance is flat/raised.
+2. Slightly alter listview header size.
+3. Fix white-on-white text of disabled listviews - noticable in synaptic.
+4. If a toolbar is disabled, so should the handle be.
+
+## 0.62.4-gtk2
+1. When drawing filled slider groove, use fill colour for border as well.
+2. Better positioning of V arrows on secondary scrollbar buttons.
+3. Improve appearance of GtkCombo edit field.
+
+## 0.62.3-gtk2
+1. Fix setting of custom non-default icon themes.
+2. When creating icon map, check for icons in non-default style first,
+   and then check default.
+3. Improve appearance GtkCombo poup menu (even though this is actually
+   a deprecated widget!)
+4. When menubars have a border, adjust the menubar items accordingly.
+5. When filling the used part of a slider groove, use the slider colour
+   if set, otherwise use the highlight colour.
+
+## 0.62.2-gtk2
+1. Improve appearance of progressbars in listviews (such as in d4x)
+2. Call `kde-config` (KDE3) / `kde4-config` (KDE4) to determine location
+   of system icons for creating icon map.
+
+## 0.62.1-gtk2
+1. Use highlight colour for unselected focused view items.
+2. Fix saving/reading of custom shades.
+3. Fix reading of boolean values from kdeglobals.
+4. Fix some slight tab drawing glitches.
+5. Stop disabled menuitems from using custom menu text colour
+   if custom colours have been set.
+
+## 0.62.0-gtk2
+1. Reduce gradient code complexity - makes predefined gradients
+   work in the same vein as custom gradients.
+2. Add scrollbar/slider groove and 'sunken' appearance options.
+3. Added new soft and harsh gradients.
+4. Change defaults:
+
+    1. Soft gradient
+    2. Fade menuitems
+    3. Don't use highlight for menu.
+    4. Default highlight set to 3%
+    5. Toolbar separators set to sunken
+    6. Flat menubar appearance
+    7. Button like check/radios
+    8. Supply, and use, predefined custom shades
+    9. Plain progress
+    10. Don't highlight active tab
+    11. Sunken scrollviews
+    12. Sunken appearance set to soft
+    13. Line focus
+    14. Extra rounded (only applies to Gtk2 and KDE4 variants)
+
+5. Allow all bar flat and raised tabs to bol coloured.
+6. Only save appearance settings if different from default.
+7. If a gradient does not define the values for positions 0 and 100,
+   then add these.
+8. Better colouring of selected tab.
+9. Added new focus options - full and line.
+10. Add new round options - extra and max.
+11. Don't etch disabled items.
+12. Use text colour for focus indicator in tree/list/etc views.
+13. When specifying custom gradients, add the pssibility to have no
+    internal border - options are now none, light, 3d
+14. Only apply plastik style mouse-over scrollbars and sliders when
+    plastik is set as the mouse-over style.
+15. Only draw 1 arrow on Gtk combos.
+16. Under KDE4, read palette, and font, from kdeglobals - needed because
+    if Qt4.5 is set to 'Desktop settings aware', it will not store its palette
+    in `~/.config/TrollTech.conf`
+17. Fix Firefox issues with scrollbar slider when using flat scrolbar buttons.
+18. Call kde-config (KDE3) / kde4-config (KDE4) to determine location of
+    user's kde folder.
+
+## 0.61.5-gtk2
+1. Fix crash when drawing focus - occurs when using alt-tab in xfwm4
+
+## 0.61.4-gtk2
+1. Make squared scrollview appearance consistent when round is set to none.
+2. Fix missing pixels in squred progressbars with inverted gradient.
+3. Fix Firefox/OO.o menu text when useHighlightForMenu is set to false.
+4. Use faded lines for combo separator.
+
+## 0.61.3-gtk2
+1. Allow QtCurve's colours to be overriden if the style name
+   starts with the application name. Fixes Pidgin's tab labels.
+
+## 0.61.2-gtk2
+1. Fix setting of options if no `qtcurvestylerc` is found!
+2. Allow QtCurve's colours to be overriden - but only if stylename is
+   empty. Fixes SooperLooperGUI's background.
+3. Fix border of tabs.
+4. If `KDE_SESSION_VERSION` is not set, but `KDE_FULL_SESSION` is, then
+   use KDE/Qt3 settings.
+
+## 0.61.1-gtk2
+1. Fix setting of default style.
+2. Fix position of dark part of sunken lines.
+3. Read in custom gradients and shades from any system config file.
+
+## 0.61-gtk2
+1. Only draw coloured border for moused-over items if they are enabled!
+2. Fix slight redraw errors with scrolbar slider when using flat buttons.
+3. Add option to draw line after frameless groupbox title.
+4. Add option to use faded lines (toolbar separators, menutitem separators,
+   etc.)
+5. Fix mis-painted pixels on selected tab.
+6. Custom gradient fix where "," is used for decimal - thanks to
+   Cedric Bellegarde
+7. Default to reading KDE4 settings if `KDE_SESSION_VERSION` is not set. To
+   default to KDE3 instead, call cmake with `-DQTC_DEFAULT_TO_KDE3=true`
+8. Fix reading in of Qt4 tooltip colours.
+9. Don't allow QtCurve's colours to be overriden.
+10. Make 'filled focus' fill the complete widget for buttons and combos.
+11. Use button text colour for combo boxes.
+12. Add 'none' to toolbar handles and splitters style.
+13. Fix reading of KDE4 toolbar style.
+14. Change defaults:
+
+    1. Button effect: Shadow
+    2. Mouse over: Glow
+    3. Default button indicator: Glow
+    4. V arrows
+    5. Flat toolbars
+    6. Filled focus
+    7. Gradient selection
+    8. Flat scrollbar buttons
+    9. No combo line
+    10. Sunken toolbar handles
+    11. Only lighten popupmenus by 2%
+    12. Flat active tab
+    13. Don't shade sliders
+    14. Don't darken menubars
+    15. Use darkened background for progressbars
+
+15. Enable shadow, etch, and 'glow' effects for squared and slight rounded
+    appearance.
+16. Allow to darken popup menu background.
+
+## 0.60-gtk2
+1. Fix "trough-lower" and "tough-upper" style slider troughs.
+2. Fix reading of listview colours under KDE4.
+3. If appearance is rounded, round view selections.
+4. New focus rect options - standard, highlight, background, filled.
+5. Add the ability to specify popup menu light factor.
+6. Put more space between arrows on combos if using V arrows.
+7. Add option to use darkened background colour for menuitem selection.
+8. Add 'fade' to menuitem appearance.
+9. Option to have flat scrollbar buttons.
+10. New slider styles - plain rotated, and round rotated.
+11. Fix crash if `QTC_STYLE` is set, but is empty.
+12. Alter the way the light part of etchibng is drawn - should help with
+    darker colour schemes.
+13. Draw border around filled progress.
+14. Fix light spinbuttons on dark background.
+15. Option to have button-like checks/radios.
+16. Draw square border for for frames that pass no detail and no widget to
+    gtkDrawShadow.
+17. Use base for light part of lineedit border, and background for scrollview.
+18. Default to treating Firefox as firefox > 2.0 - cmake with
+    `-DQTC_OLD_MOZILLA=true` to revert.
+19. Draw statusbar frames, if enabled.
+20. Nicer 'V' arrows.
+21. When reading KDE settings, read (if they exist):
+
+    1. `/etc/kderc`
+    2. `/etc/kde4rc` or `/etc/kde3rc`
+    3. `/etc/kde4/kdeglobals` or `/etc/kde3/kdeglobals`
+    4. `<KDE4 prefix>/usr/share/config/kdeglobals` or
+       `<KDE3 prefix>/usr/share/config/kdeglobals`
+    5. `<KDE4 prefix>/usr/share/config/system.kdeglobals` or
+       `<KDE3 prefix>/usr/share/config/system.kdeglobals`
+    6. `$KDEHOME/share/config/kdeglobals`
+
+22. Round internal corners of plain coloured mouse over effect.
+
+## 0.59.7-gtk2
+1. Read tooltip colours from qt config file.
+
+## 0.59.6-gtk2
+1. Improve appearance of SWT scrollbars.
+2. Fix colour of tri-state checkboxes.
+
+## 0.59.5-gtk2
+1. Draw disabled icons desaturated - more KDE like.
+2. 'Fix' pixelation of firefox dialog icons. They look
+   slightly blurry, due to being scaled, but this is nicer
+   than the previous pixelated icons.
+3. Removed KDE event filter (`QTC_ADD_EVENT_FILTER` cmake option) -
+   causes way too many errors.
+
+## 0.59.4-gtk2
+1. Fix reading in of lightBorder for custom gradients.
+2. Icon path fix by Ilya Paramonov.
+
+## 0.59.3-gtk2
+1. Also check in `share/kde4/apps/kstyle/themes` for `qtc_*.themerc` files.
+2. Fix evolution calendar crash.
+3. Fix evolution listview headers.
+4. Slightly better check/radio positioning.
+
+## 0.59.2-gtk2
+1. Fix appearance of shiny glass defult buttons.
+2. Give glass default buttons a light border.
+3. New cmake option:
+
+    1. `-DQTC_NEW_MOZILLA=true`
+
+        When Firefox, and thunderbird, are being themed - treat them as if they
+        are the newer versions. This sets 'newFirefox' and 'newThunderbird'
+        to true by default.
+
+## 0.59.1-gtk2
+1. Fix crash.
+
+## 0.59-gtk2
+1. When drawing gray focus rect, draw only slightly rounded.
+2. Etch/shadow effect now applied to widget sides as well as top/bottom.
+3. Add etching to checks, radios, slider grooves, and progressbars.
+4. Option to have progress fill groove - default to true.
+5. Option to display non-editable combo splitter - defaults to true.
+6. Dont do coloured mouse over for toolbar buttons.
+7. Better coloured mouse over for checks and radios.
+8. Don't use background colour for non-coloured mouse over of
+   check/radios if highlighting text backgroud.
+9. If using Gtk2 >= 2.12, then respect the 'Gtk style scrollviews' setting.
+10. Respect KDE's shade sorted list column setting.
+11. When checking if app is firefox, check against 'firefox' as well as
+    'firefox-bin'
+12. Fix background of non-selected flat tabs.
+13. Fix tab coloured mouse-over when not rounded.
+14. Add a `QTC_STYLE` env var - used to quickly test `qtc_<name>.themerc`
+    files.
+15. New mouse over effect - glow. Only applicable if etching or shadowing.
+16. New default button indicator - glow. Only applicable if etching
+    or shadowing.
+17. Allow up to 10 custom defined gradients.
+18. Allow custom shades to be specified.
+19. Add option to specify active tab appearance.
+20. Apply 'border menuitems' only to popup menus.
+21. If lightening popup menus, and not bordering menuitems, then remove 1
+    pix border arund popup menus.
+22. Change default to not border menuitems.
+23. Assume 'xulrunner' is also Firefox.
+24. Option to have squared scrollviews.
+25. Option to specify progressbar groove appearance.
+
+## 0.58-gtk2
+1. Add a config option for selection appearance - defaults to flat.
+2. Fix entry fields and dark colour schemes.
+3. Use background colour for disabled scrollbar buttons.
+4. Make custom styles work under Qt4 as well.
+5. Make 'slight' rounding more 'slight' -  as per pre-cairo version.
+6. Help with temporary Gtk window beeing seen when QtCurve is
+   configured with `-DQTC_ADD_EVENT_FILTER=true`
+7. Fix memory leak - forgot to call cairo_destroy
+8. Lighter menu separators.
+
+## 0.57.1-gtk2
+1. Better arrows positions on scrollbar steppers B and C.
+
+## 0.57-gtk2
+1. Modify defaults:
+
+    1. Turn off shade menubar only of active window
+    2. Set default button indicator to tint
+
+2. Re-added option to highlight background of check/radio text on mouseover.
+3. Use cairo for all drawing.
+4. Highlight expander arrows on mouse over.
+
+## 0.56.3-gtk2
+1. Fix tabs on Firefox 3 beta4
+2. Fix slight re-draw errors with scrollbar slider.
+3. Nicer positioning of down/right scrollbar arrows.
+4. Fix colours of tinted default button.
+5. `QTC_MODIFY_MOZILLA` compile fix - thanks to Ben de Groot.
+6. Don't set sliders to flat just because appearance is flat.
+7. Map gtk-go-back-ltr, gtk-go-back-rtl, gtk-go-forward-ltr,
+   and gtk-go-forward-rtl.
+8. Modify gtk-about and gtk-home KDE icons mappings.
+9. Fix checkbox shadow.
+10. Don't allow Mozilla scrollbars to be disabled.
+
+## 0.56.2-gtk2
+1. Use case-insesitive string compares when checking Qt and KDE config files.
+2. Fix some issues wth Firefox 3beta4.
+3. Fix mouse over for up spin button.
+4. To aid testing with Firefox 3, edit your `qtcurvestylerc` and add the
+   following line:
+
+        newFirefox=true
+
+6. Don't indicate default button if it is disabled.
+
+## 0.56.1-gtk2
+1. Fix errors when using corner default button indicator and no coloured
+   mouse over.
+2. Fix for OpenOffice.org blanking combobox text when mouse over arrow.
+
+## 0.56-gtk2
+1. Change default settings:
+
+    1. Dont animate progressbars
+    2. Frameless groupboxes
+
+2. Correctly position corner indicator.
+3. Use mouse over colours for corner indicator.
+4. Fix for text of selected check/radios on menubars in Java swing apps.
+5. Fix for toolbar handles of Java swing apps.
+6. Fix for `GtkEntry`s within toolbars.
+7. OpenOffice.org fixes - entry fields, menubar items, checks in menus.
+8. Option to tint the default button colour.
+
+## 0.55.3-gtk2
+1. Hack around a slight menubar problem with pidgin.
+2. Dont use mouseover colour for highlighted checks and radios
+   in menus.
+3. Fix `kde4-config` usage.
+4. Draw borders for GtkViewports - fixes mising frame in compiz settings
+   manager.
+5. Read contrast setting from `TrollTech.conf` if running under KDE4.
+
+## 0.55.2-gtk2
+1. Fix look of disabled entry fields.
+2. Add warning to `-DQTC_ADD_EVENT_FILTER` option.
+3. Add cmake option: `-DQTC_REORDER_GTK_DIALOG_BUTTONS`
+   When set QtCurve will try to manually re-order the buttons of Gtk
+   dialogs. Note: This will cause errors to be printed to the console,
+   and is only an experiment!
+4. Style Gtk2.12 tooltips
+5. Improve look of edit field under firefox3
+6. Fix menubar items for Firefox 3
+7. Fix KDE4 icon mapping to match KDE4.0
+8. Use 32x32 as dialog icon size.
+9. Nicer tabs for Firefox 3
+10. Better (not perfect) scrollbar types for Firefox3. For the moment you must
+    set `QTC_NEW_MOZILLA` (any value) before starting firefox so that QtCurve
+    knows its the newer version. e.g.
+
+        QTC_NEW_MOZILLA=1 firefox
+
+11. Fixed reading of Qt4 font.
+
+## 0.55.1-gtk2
+1. Only allow coloured selected tabs if tab appearance is set to gradient.
+2. Allow triangular sliders when not rounding.
+
+## 0.55-gtk2
+1. Ability to create custom themes. See Theme details in 'README' file.
+2. Fix for 'inactiveHighlight' and KDE's apply colours to non-KDE apps.
+3. Allow 'flat' lines in scrollbar handles, toolbar handles, toolbar
+   separators, and splitters.
+4. Option for 'X' style checkmarks.
+5. Option to have colour the selcted tab.
+6. Optional diagonal progressbar sripes.
+7. Use alternating dark/light for dashed toolbar handles.
+8. New 'split' style gradient.
+9. Option to specify slider style: plain, round (only when
+   `appearance=round`), and triangular (plastik-ish)
+10. Modify default style: flat splitter lines, flat slider thumbs, no
+    toolbar separators, triangular slider, diagonal progressbar stripes.
+
+## 0.54.1-gtk2
+1. Supply a simple `mkpkg` script to create packages with `checkinstall`.
+2. Fix compilation when cmake is called with `-DQTC_MODIFY_MOZILLA=true`
+3. Don't `free()` the values returned from `gtk_widget_style_get()`, use
+   `gtk_requisition_free()` and `gtk_border_free()`
+4. Fix frameless groupboxes in Gimp 2.4
+5. After `free()`'ing memory, set var to `NULL`.
+
+## 0.54-gtk2
+1. Converted buildsystem to CMake.
+2. New option 'inactiveHighlight', if set then use a mix of highlight and
+   background colour as highlight for inactive windows/elements.
+3. Fix broken 'Thinner Menuitems' option.
+4. Better code for alternate list view background.
+5. Also read in Qt's inactive palette.
+6. If read a font setting from `/etc/qt3/qtrc`, and there is not font setting
+   in `~/.qt/qtrc` - then use the setting from `/etc/qt3/qtrc`, as opposed to
+   setting a default.
+7. When reading Qt4 settings, also read /etc/xdg/Trolltech.conf
+8. Nicer look for selected tab highlight.
+9. `realloc()` fix - thanks to 'hoodedone'
+
+## 0.53-gtk2
+1. Removed 'Shadow buttons' option, and replaced with none/shadow/etch setting -
+   default to 'none'.
+2. Added 'passwordChar' option to set character used for password entries.
+3. Option to have frameless groupboxes - Gtk like.
+4. Add config item 'gtkButtonOrder' set to 'true' to use Gtk/GNOME button order.
+5. Added config item 'mapKdeIcons' to control whether to map KDE icons or not.
+6. Modified contrast settings to be more varied.
+7. Gradient background of checks and radios, if appearance is not flat/raised.
+8. Create kde-icon map on the fly - allows icon sizes to be read from kdeglobals.
+9. KDE's "apply colours to non-KDE apps" setting seems to mess up the text on
+   progressbars, workaround this.
+10. Read alternate listview colour from KDE settings.
+11. More KDE like framed groupboxes.
+
+## 0.52.3-gtk2
+1. Fix 1st stripe on vertical progress bar.
+2. Fix very small progress bar chunks.
+3. Fix blanked out widgets in tovid.
+4. Fix DeVeDe crash when 'fix parentless dialogs' is enabled.
+
+## 0.52.2-gtk2
+1. Don't lighten border of disabled check/radio buttons.
+2. Lighten trough of disabled slider.
+
+## 0.52.1-gtk2
+1. Draw emphasis around menus when not lightening.
+2. Use button colours to border entry fields.
+3. Fix menu standard background.
+
+## 0.52-gtk2
+1. Use 'dull glass' as the default gradient - previous default is now
+   called 'Clean'.
+2. Darken slider mouse over colour if slider is not shaded.
+3. Use thinner slider mouse over sections if slider is not shaded.
+4. Improve look of small V arrows.
+5. Even duller dull glass, but much more useable.
+6. Implement 'plastik' style mouse over for square sliders.
+7. Fix bottom/right scrollbar arrow position.
+8. Fix spinbutton arrow position.
+9. Fix SWT combo arrows.
+10. Don't prelight SWT combos - they don't un-prelight when activated!
+11. For non editable combos, draw both an up and a down arrow.
+12. For editable combos - make menu more KDE list like.
+
+## 0.51-gtk2
+1. Changed shading to use HSL colour space. This can be altered by
+   editing `$XDG_CONFIG_HOME/qtcurvestylerc` and setting `shading=simple`
+   for the previous method, or `shading=hsv` to use HSV.
+2. Add options:
+
+    1. Border all of menu/toolbars.
+    2. Darker borders.
+    3. 'V' arrows.
+
+3. Fix raised listview headers.
+4. Fix glass style menuitem appearance.
+5. Modifed look of dullglass, looks "softer"
+6. Improve look of plastik mouse-over for non coloured scrollbars.
+7. For disabled buttons, use standard fill but lighten border.
+8. Use darker colours for mouse-over and default button - helps with
+   light colour schemes.
+9. Dont draw sunken panel around checked menuitems.
+10. If the app is a Java app, and its `g_get_application_name() != "unknown"`,
+    then assume its a SWT java app - in which case treat as a standard app. For
+    Swing apps some functionality is disabled.
+11. Fix tabs in thunderbird.
+
+## 0.50-gtk2
+1. Add settings for:
+
+    1. Fill used slider
+    2. Round menubar item top only
+    3. Menuitem appearance
+    4. Border menuitems
+    5. Progressbar appearance
+    6. Gradient progressbar groove
+    7. Check/radio colour
+    8. Plastik style mouse-over
+
+2. Dont colour menubar items on mouse over if not colouring menubars.
+3. When drawing menubar borders, only draw bottom line.
+4. When drawing toolbar borders, only draw top/bottom or left/right -
+   depending upon orientation.
+5. Draw checks/radios within listviews the same as standard.
+6. If run under KDE4, then draw checks in menus the same as standard
+   checks.
+7. Move upper spin button down 1 pixel.
+8. Default to KDE3/Qt3 settings when not run under KDE.
+9. Improve (slightly) appearance of java apps.
+
+## 0.49-gtk2
+1. Add settings for:
+
+    1. Tab appearance
+    2. Listview appearance
+    3. Slider appearance
+
+2. If `$KDE_SESSION_VERSION` is set to >=4, then read settings from
+   `$XDG_CONFIG_HOME/Trolltech.conf`
+3. Lighten focus rectangle.
+4. Fixed tab shift for GTK 2.10.11. Possibly should be applied to an earlier
+   version, but not sure.
+5. When run under KDE4, allow radio buttons in menus.
+6. Add `/usr/share/icons` into icon search path
+
+## 0.48.5-gtk2
+1. Fix slight slider drawing errors.
+2. Set cursor colours.
+
+## 0.48.4-gtk2
+1. Make light border consistent with KDE - thanks to Daniel Bausch
+
+## 0.48.3-gtk2
+1. Fix focus rectangles when not fully rounded.
+
+## 0.48.2-gtk2
+1. Modifed the glass variants. Dull is a bit 'duller' in the top 1/2, and
+   fades away at the bottom. Shiny is now more like dull, but with more
+   pronounced gradients.
+2. Fix borders of selected menubar item when colouring menubar.
+3. Only darken menubar colour when using selcted backgound colour, if
+   using glass gradients.
+
+## 0.48.1-gtk2
+1. Draw light border around all of progressbar.
+2. Fix look of vertical progressbars.
+3. Work-around for SWT combos.
+
+## 0.48-gtk2
+1. Fix coloured mouse over for glass styles.
+2. Re-introduce the following options:
+
+    1. Roundedness
+    2. List view lines
+    3. Striped progress bars
+    4. Drawing of statusbar frames
+
+3. Draw light border around progressbar elements when not in
+   flat/raised/inverted mode.
+4. Oval shaped sliders when fully round, otherwise rectangular
+5. Proper ythickness settings for frames.
+6. By default do not alter user's `userChrome.css` file. This now has to be
+   explicitly enabled via `--enable-mozilla-mods` `./configure` option.
+
+## 0.47-gtk2
+1. Always draw light border around glass elements.
+2. Removed the following config options:
+
+    1. Custom light border colour
+    2. Fill used slider groove - always filled.
+    3. Stripped progress - always striped
+    4. V Arrows
+    5. Check/radio background highlight
+    6. Round menubar item top only
+    7. Draw statusbar frames - never drawn.
+    8. Highlight selected text fields - always.
+    9. Standard highlight for inactive windows - always
+    10. Listview lines are either on/off, not off/dotted/solid
+    11. Scrollbars and sliders share same config options
+    12. Check radio colour setting - always text colour
+    13. Border/round menubar/items - always rounded/bordered.
+    14. Roundedness - always rounded.
+    15. Listview settings - always arrows, no lines, and header
+        follows general appearance.
+    16. Tab appearance - set from general appearace.
+
+3. Changed appearance of check/radios - now filled with base colour.
+4. Etch look for button, combos, line edits, and spin boxes.
+5. Fill check/radio background on mouse over.
+6. Remove `--enable-old-shading`
+7. Modify shade settings so that what was "Shade selected" becomes
+   "Shade blended selected", and add a new "Shade selected" that just
+   uses the selected background colour without blending.
+8. Round slider thumbs.
+9. Option to draw a shadow underneath buttons.
+10. Draw a rounded gray rectangle for focus - option to set this to
+    windows-like focus.
+11. Fix `qtcExit()->qtExit()` when compiled with event filter.
+12. Don't do check/radio mouse over for mozilla apps - doesn't work very well.
+
+## 0.46.4-gtk2
+1. Only draw gradients if `width > 0 && height > 0`
+
+## 0.46.3-gtk2
+1. Fix look of flat/raised style menuitems and progressbars.
+2. Use `pkg-config` to obtain Gtk2 libdir.
+
+## 0.46.2-gtk2
+1. Remove `rgb2Hls()` and `hls2Rgb()` unless using old style shading.
+2. Use `fileno()` to obtain file descriptor of `FILE*` stream.
+3. Fix look of slider grooves for 'flat' appearance.
+4. Fix appearance of checkboxes for 'bevelled' appearance.
+
+## 0.46.1-gtk2
+1. Fix location of arrows on secondary scrollbar buttons.
+2. New shading routine - works *much* better with dark colour
+   schemes. This is enabled for all colours be default, to
+   enable only for dark colours (i.e. where red, green,
+   and blue < 96), then configure with `--enable-old-shading`
+3. More 64-bit fixes - thanks to Will Stephenson.
+
+## 0.46-gtk2
+1. Allow negative highlight factors.
+2. Allow usage of light borders on menuitems and progressbars,
+   as well as a custom colour setting. Patch by Frederic Van Assche
+3. Dont fill in slider grooves of disabled sliders. Patch by Frederic Van Assche
+4. Use encrypted.png for gtk-dialog-authentication if password.png
+   is not found.
+5. Fix for Novell Bug 220205 - gtk-window-decorater crashes when
+   right-clicking windows decoration with qtcurve-gtk2 style
+   Thanks to Dirk Mueller.
+6. Fix for 64-bit crashes - thanks to Will Stephenson.
+
+## 0.45.3-gtk2
+1. When determinging background of popup menu for AA'ing, use
+   shade window colour, not button.
+2. Fix for "-1" warnings reported by some users.
+
+## 0.45.2-gtk2
+1. Fix coloured menubars.
+2. Fix firefox 2's "stack smashing detected" errors.
+3. Remove ok/Cancel button swapping from QtCurve.css, does not
+   work for firefox 2.x
+
+## 0.45.1-gtk2
+1. Restore pre 0.45 inactive window highlight. Option is still there to
+   re-activate.
+2. Use listview header settings for listview headers!
+
+## 0.45-gtk2
+1. Option to control whether highlighted items should use
+   the highlight colour in inactive windows.
+2. Option to control whether menubars should be shaded in
+   inactive windows.
+3. Fix non-bevelling of toggle buttons.
+
+## 0.44.3-gtk2
+1. Dont colour sliders when disabled/maxed-out.
+2. When drawing light slider border, draw around all 4 sides.
+3. Fix Firefox 2.x toolbar buttons.
+4. Evolution fix - thanks to Thomas Siegmund
+
+## 0.44.2-gtk2
+1. Restore 0.43 scrollbar trough shade.
+
+## 0.44.1-gtk2
+1. Fix appearance of filled sliders.
+2. Improve right-to-left support.
+3. Fix OO.o crash - disable it from using scrollbar styles next and none
+4. Fix missing frames when not rounded.
+5. Disable toolbar handle mouse-over, not working very well.
+6. Fix weird looking eclipse toolbars.
+
+## 0.44-gtk2
+1. Specifiable colours for check and radio indicators.
+2. Options to control whether menu items should be rounded.
+3. Options to control whether menu items should be bordered.
+4. Option to enable mouse-over for menubar items.
+5. Option to have thinner menu items.
+6. More pronounced gradients for menuitems and progressbars.
+7. Option to use large dots.
+8. Option to set scrollbar button type: kde, windows, platinum,
+   next, or none.
+9. Fix popup menu borders when not using lighter background.
+10. Fix OO.o drawing bugs.
+11. Fix GIMP 2.3 notebook crash.
+
+## 0.43.2-gtk2
+1. Fix mozilla progressbars, again...
+
+## 0.43.1-gtk2
+1. Supplied pre-compiled pixmaps.
+
+## 0.43-gtk2
+1. Fix AA'ing of menubar items when colouring the menubar.
+2. Option to draw light border around sliders.
+3. Dialog fix is now a config option, not compile option.
+4. Seperate specification of scollbar slider, and range slider, settings.
+5. Option to specify menubar text colours.
+6. New 'flat' appearance.
+7. Dont create custom gcs per widget class, use globals instead - should
+   use less resources.
+8. Options to use a coloured border for mouse-over.
+9. Mouse over for tabs!
+10. Mouse over for toolbar handles.
+11. Nicer looking check and radio buttons - using pixmaps.
+
+## 0.42.2-gtk2
+1. Slight modification to aa code.
+2. Make slider appearance consistent with KDE when slider min == slider max
+3. Fix firefox menu colours when C locale indicates to use a comma
+   as decimal separator - patch supplied by Valentine Sinitsyn
+4. Fix striped progressbar bleeding in Mozilla apps.
+5. More GIMP dialog hackery if `--enable-parentless-dialogs-fix` is
+   specified.
+6. Treat SiftFox the same as FireFox
+
+## 0.42.1-gtk2
+1. Fix slight round when none selected.
+2. Fix menu and progressbar appearance when not bevelled.
+3. Fix progress always being striped.
+
+## 0.42-gtk2
+1. Optimisation to some drawing routines.
+2. Removal of sunken gradients for progress and menubar items.
+3. Progressbar and menuitem look now set via appearance setting.
+4. Flat style check/radios match non-flat style more.
+5. Remove "Border Splitters" option.
+6. Removal of "Light Gradient" and "Gradient" -> replaced with just
+   "Gradient" (which is the previous "Light Gradient")
+7. Nicer progressbar style - options to have striped and animated.
+8. Option to have dots for slider thumb.
+9. Configurable splitter style - sunken lines, raised lines, dashes, dots.
+10. Apply `--enable-parentless-dialogs-fix` to non-modal dialogs as well.
+    These will now not get a taskbar entry.
+11. Selected/normal tab appearance selectable.
+12. Option to control the roundedness.
+13. Option to fill in the used portion of slider groove.
+14. Gradient slider and scrollbar troughs.
+15. Try to make progressbar text bold as per Qt.
+
+## 0.41.1-gtk2
+1. Compile fix.
+
+## 0.41-gtk2
+1. Dont limit the max area of glass gradient.
+2. Discover home folder via `getpwuid(geteuid())` before `$HOME`
+3. For root, check `$XDG_CONFIG_HOME` is in ~root - if not, then
+   set to `~/.config`
+4. Experimental hack to fix parentless modal dialogs (i.e. kate's
+   close warnings, most kaffeine dialogs). Disabled by default,
+   enable with `--enable-parentless-dialogs-fix`
+5. Option to have a coloured border for default button
+6. Fix "leaking" progress bars in thunderbird, etc.
+7. Don't allow to shade VMPlayer's menubar  - looks weird as it
+   does not cover the whole usual menubar area.
+8. Fix notebook crash in GIMP 2.3.x
+
+## 0.40-gtk2
+1. Better rounded tabs
+2. Configurable highlight factor - 0% to 50%
+3. Move scrollbar, and spinbutton, arrows down/left when pressed
+4. Depress combos when active
+
+## 0.39.1-gtk2
+1. Fix reading of custom slider colour
+
+## 0.39-gtk2
+1. KDE: Really theme dock window handles - i.e. no more text. Forgot
+   to actually include this in 0.37!
+2. KDE: Nice dock window resize handles.
+3. KDE: On konqueror's active tab, draw light line at bottom.
+4. ALL: Dont round the focus rect, seems to cause problems.
+5. ALL: Dont shrink focus rect for listview entries.
+6. ALL: Split into KDE and Gtk packages.
+7. ALL: Option to not gradient selected tab.
+8. ALL: Store/read config settings from `$XDG_CONFIG_HOME/qtcurvestylerc`
+9. KDE: Use a '-' for tristate checkboxes
+10. GTK: Implement tristate for checkboxes and radios
+11. ALL: Round tab widgets
+12. ALL: Round frames
+13. ALL: Rounder progress bars
+14. ALL: Wider splitters
+15. ALL: Remove non-bordered option.
+
+## 0.38-gtk2
+1. GTK1: Compile fix.
+2. GTK2: Don't turn firefox text white when mouse over!
+3. ALL: Inverted gradients option.
+
+## 0.37-gtk2
+1. KDE: Better +/- spinbuttons.
+2. ALL: Better bevelled gradients.
+3. ALL: Option to draw a coloured focus rectangle.
+4. ALL: Modified default:
+
+    1. Bevelled gradient
+    2. Coloured focus
+    3. Dotted handles/serparators
+    4. Normal arrows
+    5. No listview lines
+
+5. ALL: Make glass extend to full width and height of widgets - no 3d border.
+6. ALL: In listviews, draw focus rectangle within item.
+7. KDE: Use dots also for general handles - more consistent.
+8. KDE: Theme dock window handles - i.e. no more text.
+9. KDE: Fix/hack look of MDI window buttons.
+10. GTK2: Hackish fix for firefox and KDE's "apply colours to non-KDE apps"
+    setting.
+11. GTK: Fix for tear of menu background.
+
+## 0.36-gtk2
+1. KDE: Fix for "Search" label in ksysguard, etc.
+2. KDE: Fix pixmap based menu items - e.g. Kig's colour sub-menu.
+3. KDE: Use a slider width of 16 for kpresenter, it seems to assume
+   this regardless of the style used :-(
+4. GTK: Fix line-edits always being rounded.
+5. GTK2: Fix for OO.o??
+
+## 0.35-gtk2
+1. KDE: Prevent MainActor from using its horrible colour scheme.
+2. GTK2: Fix for larger "Help" buttons in GIMP.
+3. KDE: Extend gradients to border when border level set to none
+   for toolbars and menubars.
+4. KDE: Fix for non-rounded +/- buttons on Karbon toolbar.
+5. ALL: Remove "border" form default button options.
+6. KDE: Fix possible crash with hover widgets.
+7. GTK2: Supply a `QtCurve.css` file for FireFox 1.5.x, which will:
+
+    1. Fix Firefox 1.5.x's button order. The xml file needed to do this is
+       taken from PlastikFox - thanks to VÃ­ctor FernÃ¡ndez
+    2. Disable emboldening of text on selected tab
+    3. Use KDE's message/info/error/question icons in dialogs.
+    4. Move button/toolbar contents when pressed.
+
+8. GTK2: Custom `user.js` file to modify FireFox's behaviour:
+
+    1. Remove 'instant apply'
+    2. Use KDE's prefered email client
+
+    This can be enabeld via `--enable-mozilla-userjs` `./configure` option.
+    Disabled by default.
+
+9. GTK2: Fix check marks in FireFox menus.
+10. KDE: Use similar style for table headers as for listview headers.
+
+## 0.34-gtk2
+1. GTK: Fix for darkening of menubars.
+2. GTK: Fix progressbar text.
+3. KDE: Hack to get white selected menu item text in OO.o2. Still can't
+   do coloured menubars...
+4. ALL: Option to disable drawing of statusbar frames.
+5. KDE: Dont use dots or dashes for general handles - only for toolbar handles.
+6. GTK: Fix for not colouting flat menubars.
+7. KDE: Slight improvement to tab highlighting.
+
+## 0.33-gtk2
+1. ALL: Use lighter shading for glass.
+2. GTK2: Use default.kde as KDE icon folder.
+3. KDE: Fix for listview lines sometims drawing over arrows.
+4. KDE: Dont lighten konqueror's status bar - copied from lipstik.
+5. ALL: Allow seperate specification of menubar item and progress
+   bar looks.
+6. ALL: New gradient style: bevelled - gradient top/bot, and plain in the
+   middle. Affects listview headers, buttons, and combos.
+7. ALL: Allow setting of listview appearance.
+8. ALL: Allow setting of listview header colour - background, button, or
+   custom.
+9. ALL: Option to only round top of selected menubar items.
+10. ALL: New toolbar handle style: dashes
+11. ALL: Remove Gtk1 dependancy for debian `.deb` file
+
+## 0.32-gtk2
+1. ALL: "Thinner" looking non-selected tabs for glass styles.
+2. GTK2: Add `./configure` argument
+
+    1. `--disable-mozilla-mods`
+
+        Dont alter user's userChrome.css
+
+3. KDE: Support saving, and loading, of custom schemes.
+4. KDE: Predefiend styles are now read in from .qtcurve files
+5. ALL: New scheme with old glass look, flat toolbars, and normal arrows.
+6. KDE: Re-design of config dialog.
+7. ALL: Remove "V?" style naming.
+
+## 0.31.1-gtk2
+1. GTK2: added 2 `./configure` arguments:
+
+    1. `--disable-gtk-icons`
+
+        Dont do KDE-Gtk icon mapping
+
+    2. `--enable-kde-event-filter`
+
+        Add the event filter to intercept KDE style changes.
+
+   (Thanks to Vaclav Slavik for the `--disable-gtk-icons` patch)
+
+## 0.31-gtk2
+1. ALL: Better "glass" gradients.
+2. ALL: Dont use highlighted text colour to border selected menubar items.
+3. GTL2: Remove event filter added in 0.29, this seems to cause problems
+   for some people with some apps. So, colour, font, etc. changes
+   wont happen in Gtk2 apps until they are restarted.
+4. GTK: Dont draw dividers in listview headers, unless header is >10 pixels
+5. ALL: Gradient non-selected tabs as well as selected.
+6. GTK2: Also look in "hicolour" for icons. Search order will be:
+   <chosen theme>, crystalsvg, hicolour
+7. GTK2: Map gt-add and gtk-remove stock icons
+
+## 0.30-gtk2
+1. KDE: Shrink menu entries by 1 pixel - to align with Gtk.
+2. GTK2: If switch from coloured menus to non-coloured, remove from
+   `userChrome.css`
+3. GTK: Fix for slight redraw error on the top of toolbar buttons.
+4. GTK: Better toolbar buttons, etc.
+
+## 0.29.1-gtk2
+1. GTK1: Compile fix.
+
+## 0.29-gtk2
+1. KDE: More consistent, with Gtk, menu separators.
+2. GTK1: Dont force to flat appearance! (Only menubars are forced to flat,
+   as I havnt got round to implementing menubar shading on Gtk1)
+3. GTK2: When looking for firefox/thunderbird's `userChrome.css`, look for
+   `<blah blah>.default` and `default.<blah blah>`
+4. KDE: Move handle section into menu bar tab.
+5. ALL: Allow dotted handles - default for V6.
+6. ALL: Allow dotted (V6 default), or no toolbar separators.
+7. GTK: React to KDE style changes - i.e. update colours, fonts, options,
+   etc.
+8. GTK2: Fix for text on combos turning white on mouse over.
+9. GTK: Use same menu colour as KDE when shading!
+10. ALL: Fix for vertical toolbars.
+11. GTK2: Also look in `~/.kde` (or `$KDEHOME`) for user icons.
+12. GTK2: Only write `userChrome.css` if made changes.
+
+## 0.28-gtk2
+1. KDE: Remove some debug.
+2. KDE: If selected colour is too dark, just don't recolour OO.o
+   menubars - lightening the background colour doesn't look good.
+3. ALL: When using glass gradient, round all corners of menubar entry
+   selection.
+4. KDE: Allow vArrow to be disabled.
+
+## 0.27.1-gtk2
+1. GTK2: Allow to compile with Gtk <= 2.2
+
+## 0.27-gtk2
+1. ALL: Slightly lighter non-selected tab, and scrollbar groove, shading.
+2. KDE: Fix for sliders in kaffeine.
+3. KDE: Finally fixed 'V' arrows!
+4. GTK2: Firefox & thunderbird - edit user's userChrome.css file to set
+   KDE buton order, and adjust menu text if using a dark background.
+5. ALL: If using selected for background on menus, automatically use selected
+   text colour - as opposed to try to see if its too dark.
+6. GTK: Consistent menubar shade with KDE.
+7. GTK2: Try to set toolbar style, icon size, icons-on-buttons from KDE
+   settings.
+8. GTK2: Set alternative button order.
+9. GTK2: Map some KDE icons to GTK icons.
+10. KDE: Increase OO.o menu selection brightness if selected colour is 'too dark'
+11. GTK: Better AA'ing around edit fields.
+12. GTK: Better toolbar borders with inkscape.
+13. ALL: Only round menubar items on top.
+14. GTK: Read `/etc/qt3/qtrc`, `/etc/qt3/qtcurvestylerc`, `/etc/qt/qtrc`,
+    `/etc/qt/qtcurvestylerc` before reading `$HOME/.qt/qtrc`, etc.
+15. KDE: More consistent, with Gtk, menu check boxes.
+16. GTK2: Smaller toolbars for AbiWord
+17. ALL: Un-revert header changes. Fixed KDE table look, and seem to have
+    fixed listview redraw!
+
+## 0.26-gtk2
+1. GTK2: Fix for combobox separator not always re-drawing.
+2. GTK2: More KDE-like comboboxes
+3. GTK: Use black dashes for focus.
+4. GTK2: Fix for button of some editable comboboxes.
+5. KDE: Better combobox metrics, etc.
+6. ALL: Option to gradient toolbars.
+7. KDE: Fix for "Search" label in systemsettings toolbar.
+8. ALL: Allow custom menubar and slider colours.
+9. GTK: Fix for not drawing coloured slider when flat.
+10. ALL: Revert the header changes - had redraw problems.
+11. ALL: Fix for tab-bar highlight when using light selection colours.
+12. KDE: Fix for non-bordered gradient radio buttons.
+13. GTK: More KDE like menu sizing.
+14. KDE: Fix/hack for OO.o2.x menubars. If the selected menu colour is toodark,
+    then lighten. This is required as OO.o always draws the menu text
+    dark! It seems to have a check for plastik style though, and then
+    it draws selected popup menu items white.
+
+## 0.25-gtk2
+1. ALL: V5 - Gradient menubar.
+2. KDE: Polish disabled palette, so that all frames, etc. use the theme.
+3. KDE: When press 'Defaults' on settings dialog, set the version correctly,
+   and disable the options frame.
+4. ALL: Code cleanup.
+5. ALL: New V6 - Glass like gradients. Not default for the moment.
+6. ALL: Dont gradient non selected tabs.
+7. KDE: Respect setting of "dark lines" for list views.
+8. ALL: Better listview headers.
+9. ALL: Only round 1 side of spinbuttons.
+10. ALL: Rounded entry fields (lineedits, spinwidgets, comboboxes)
+11. ALL: Highlight entry boxes, spin widget entry, and combobox entry on focus.
+12. KDE: More consistent with Gtk toolbar separators
+13. ALL: When using light popup menu background, also use a lighter colour
+    for the background of checked menu items.
+14. GTK: Use same base shade for menus/progress bars as for KDE.
+15. GTK2: More KDE-like combobox lines
+16. GTK: Fix for some combo box variants having a 1-pixel white border.
+17. ALL: If light gradient and no border, need to add edges to buttons, etc.
+18. KDE: Only highlight spinbutton that mouse is over - Gtk like.
+
+## 0.24.2-gtk2
+1. KDE: Compile fix.
+
+## 0.24.1-gtk2
+1. GTK1: Compile fix.
+
+## 0.24-gtk2
+1. ALL: Lighter background for pressed buttons, etc.
+2. ALL: Use KDE's buttont text colour for buttons!
+3. Remove seperate V1, V2, etc style files (`.themerc`, and `gtkrc` files),
+   => needs `KControl` to switch variant.
+4. ALL: New V5 style - has the follwing differences from V4:
+
+    1. Darker menubar background
+    2. Lighter popup menu background
+    3. Flatter gradient in probress bar and selected menu items
+    4. 'V' arrows
+    5. Highlight strip on selected tabs
+    6. Shade sliders to the 'selected' colour
+
+5. KDE: Fixed (actually implememented!) drawing of spinbox +/- buttons.
+6. KDE: Fixed drawing of V arrows - sometimes were not filled in.
+7. GTK: Make default font & colours match KDE3.5's defaults.
+
+## 0.23.1-gtk2
+1. Compile fix.
+
+## 0.23-gtk2
+1. GTK: Fix colouring of check/radios.
+2. GTK: Fix bonobo toolbars - e.g. on nautilus 2.4.
+3. GTK: Draw handles on GNOME panel 2.4.
+4. GTK: Fix arrows going white when kde exports colours.
+5. GTK: Fix for some menu items in Gaim.
+6. GTK: Fix V1 style check/radios sometimes having the selected colour as
+   background
+7. GTK: Fix anti-aliasing on rounded radios when using gradient but no border.
+8. GTK2: Fix for rendering of toggle buttons in lists/cells - patch from
+   Alfons Hoogervorst
+9. ALL: Draw "pressed" background on all checked menu items, not just those
+   with icons.
+10. ALL: Highlight splitters on mouse-over
+11. ALL: New V4 (default) style, with the following:
+
+    1. Flatter gradient
+    2. Font colour used to border default buttons
+    3. No bold text on default button
+    4. Raised gradient (like buttons) for progress and menu bar selections
+    5. Rounded menubar selections
+    6. No border on splitters, use dots instead
+
+12. KDE: Polish application palette, so that all frames, etc. use the theme.
+13. KDE: Align kicker's handles better with the little arrows.
+14. KDE: Support mouse over for kicker taskbar buttons >= 3.4
+15. KDE: Mouse over for spin widgets.
+16. KDE: Increase toolbar button size - match GTK better.
+
+## 0.22-gtk2
+1. KDE: Remove scrollbar groove flicker.
+2. KDE: Remove editable combo-box flicker.
+3. ALL: New check/radio list code.
+4. KDE: Custom checklist controller.
+5. ALL: List view expanders - +/- (V1/V2), or arrows (V3)
+6. KDE: List view lines - none, dotted (V1/V2), solid (V3)
+   (GTK does not (?) support lines between elements - so this setting will
+   not affect GTK apps)
+7. KDE: Dark (V1/V2) or light (V3) list view lines. (Ditto)
+
+## 0.21-gtk2
+1. ALL: Adjust contrast settings to make lower-contrast the default.
+2. ALL: Toolbar and menubar borders: none, light, and dark (previous default)
+3: ALL: V3 now uses "light" toolbar/menubar borders.
+4. KDE: Don't AA radiobuttons on HTML pages.
+5. KDE: Squared-off splitters.
+6. GTK: Fix base/prelight colour.
+7. GTK: gcc 3.4 compile fix - thanks to Adam Gorzkiewicz
+8. KDE: Make tabs more GTK like.
+9: KDE: More GTK-like positioning of pushbutton icons - looks *much* nicer :-)
+
+## 0.20-gtk2
+1. GTK: Compile fix when compiled with KDE<3.2
+2. KDE: Slightly thinner menuitems.
+3. GTK: Match KDE's menuitem size better.
+4. GTK: Allow checks and radios to be re-coloured.
+5. ALL: Better AA for the edges of checks and radios - not perfect tho.
+6. GTK: If `$HOME` is not set, then try to ascertain from passwd entry.
+7. KDE: 5 pixel border around pushbutton contents.
+
+## 0.19-gtk2
+1. KDE: Fix for KDE not setting autoDefault() property of button - assume all
+   buttons can be default, leaving space for indicator.
+2. ALL: Optional triangle as default button indicator.
+3. GTK: Match KDE's export gtkrc colours.
+4. GTK2: Fix check/radio highlight so that it is not overridden by KDE's
+   export colours setting.
+5. ALL: Add option to enable/disable highlighting of check/radio labels.
+6. ALL: V3 - disable check/radio label highlight.
+7. ALL: V3 - use triangle as default button indicator.
+8. KDE: Fix menu button icon on konqueror's sidebar.
+9. ALL: Allow setting of slider thumbs: raised, sunken, or none.
+10. ALL: Allow setting of handles: raised or sunken.
+11. ALL: V3 - use sunken handles.
+12. KDE: Fix for korn.
+13. KDE: Fix for titlebutton on floating Qt windows - e.g. docks.
+14. KDE: Fix for amaroK - buttons in player window were too large!
+
+## 0.18-gtk2
+1. KDE: Fix for colouring of kicker's task buttons - i.e. these should have
+   highlight colour when an app is opened in the background.
+2. KDE: Use `::qt_cast<type *>(widget)` as opposed to
+   `widget->inherits("type")` whenever possible.
+3. GTK2: Compile fix.
+
+## 0.17.2-gtk2
+1. GTK: Compile fix when compiled with KDE<3.2
+
+## 0.17.1-gtk2
+1. KDE: Use Qt 3.1 for ui file - so that will compile with Qt3.2, etc...
+   (Using 3.1 as I only have 3.1 and 3.3 installed...)
+
+## 0.17-gtk2
+1. GTK: Compile fix - used C++ syntax in C code, oops...
+2. GTK2: Make focus rects more like KDE's
+3. KDE: Allow combo-boxes and scrollbars to be recoloured.
+4. ALL: If compiled with KDE3.2 then there is only 1 style "QtCurve", and
+   only 1 set of GTK gtkrc files installed. Variation (V1, V2, V3, or custom)
+   can then be selected via KControl.
+
+    (NOTE: When upgrading from KDE3.1, you may wish to uninstall the
+    previous QtCurve release - to remove the old V2 and V3 config files)
+
+5. ALL: Better non-bordered gradient radio/checks.
+6. ALL: Option to use non gradient progress/menu bar indicator.
+7. GTK: Don't shade paned widgets!
+8. ALL: V1 has flat progress bar and menuitems - i.e. no gradient effect.
+9. ALL: If no borders are selected and gradient selected, then use thin border
+   for progress bar and menuitems.
+10. KDE: Better AA'ing of edges of round buttons.
+11. GTK: Fix for background colour of selected text, thanks to David RodrÃÂ¯ÃÂ¿ÃÂ½uez GarcÃÂ¯ÃÂ¿ÃÂ½
+12. ALL: Use KDE's contrast setting.
+13. KDE: Implement tri-state checkmarks.
+14. ALL: Better bottom/right tab gradients.
+15. KDE: (Qt>=3.2) the text/icon of a selected bottom tab moves down 1 pixel.
+16. KDE: (Qt>=3.2) Only highlight text/check label if mouse is over
+    sensitive area.
+17. KDE: Mimic GTK's scrollbar highlighting. i.e. only highlight slider if
+    mouse is over slider area, and likewise for the buttons.
+18. KDE: When kicker is set to transparent (may need to restart kicker),
+    use "harsh" rounded buttons in round mode. (i.e. don't AA the corners)
+19. KDE: Modified button size code - KDE3.2's kcalc is smaller now!
+20. KDE: Don't flatten combo box arrow area when selected - more GTK like.
+21. KDE: Highlight clickable listview headers on mouse over - more GTK like.
+22. GTK: HScrollBar fix.
+23. KDE: More Gtk like shading of buttons - i.e. always dark when pressed.
+24. ALL: Slight change to look of combo-box.
+25. KDE: Fix for tabwidgets in konqueror, etc.
+
+## 0.16-gtk2
+1. ALL: Use "button text" colour for default button indicator, apart from when
+   in rounded mode (i.e. V3)
+2. ALL: V3 - Embolden font of default button.
+3. ALL: V3 - Lighter background for disabled check/radios.
+4. ALL: V3 - Correct AA colour for radio indicator.
+5. KDE: Draw triangular tabs the same as rounded - prevous versions defaulted
+   to `KStyle`.
+6. KDE: Add 10pix (2*10) border to non-default buttons.
+7. KDE: Implement masks for checks and radios - helps with khtml.
+
+## 0.15-gtk2
+1. KDE: Smaller, more Gtk-like toolbar separators.
+2. ALL: When drawing rounded, use background colour for corner pixels.
+3. ALL: V2, use a shade of the button colour for the default indicator.
+4. ALL: V3, as for V2 above, but "round" the indicator.
+5. KDE: When compiled for Qt 3.2, only highlight pixmap and text on mouse over
+   for radio and checkboxes - as these are the only sensitive parts. (Qt < 3.2
+   the whole widget is sensitive - and this can expand past text.)
+6. KDE: Fix bottom tabs - i.e. movement of text/icon. (Qt >= 3.2 !)
+7. GTK: Fix bottom tabs on V1
+8. ALL: More rounded buttons, etc.
+9. ALL: Rounded indicator boxes in rounded mode.
+10. ALL: Better radio buttons.
+11. KDE: Use rounded buttons for Kicker taskbar as well - looks OK now buttons
+    are more rounded.
+12. GTK: Fix gradient rendering bug - seemed to affect GTK1 glade buttons.
+    (When a partial button had to be re-drawn, the whole button was re-drawn
+    instead - clearing out the text!)
+13. GTK: Use "check" for check and radio's in menus - more Qt like.
+14. ALL: V3 - Gradient radio's and checks.
+
+## 0.14-gtk2
+1. GTK2: Set slider width to 16 pixels to better match KDE.
+2. GTK: Draw border around toolbar buttons 1 pixel smaller - saves overlap with
+   frame.
+3. GTK: Better tabs - GIMP 1.3's tab icons should now move. (GIMP's tabs are
+   shaded tho, hmm...)
+4. ALL: V3 style uses "pyramid" (i.e. non "V" like) arrows.
+5. KDE: Fix for menubar background if button colour != background colour.
+6. KDE: Fix for background of "Location:" on konqueror.
+7. GTK: Better lsitview headers - smaller, more KDE like.
+8. GTK: Reduce differences in V1, V2, and V3 gtkrc files to the bare minimum -
+   ready for only 1 (`KControl`) configurable style.
+9. GTK1: Fix (hack really) for range grooves. For some reason these were not
+   being drawn when first displayed. Works ok for ranges - but scrollbar
+   grooves are still messed up! The redraw only happens after you leave
+   the widget!
+
+## 0.13-gtk2
+1. ALL: New V3 style - has rounded buttons, and uses gradient effect on
+   buttons, tabs, scrollbars, etc.
+2. ALL: Code clean-up.
+
+## 0.12-gtk2
+1. KDE: Don't have flat buttons - i.e in printmgr, and kscd.
+2. KDE: Default frame width of 1.
+3. KDE: Fix mouse-over for some toolbar buttons - the on/off type.
+   Affects most KDE styles, but a real KDE fix should be in KDE3.2
+4. GTK2: Fix bug where V2 style options were being ignored.
+5. GTK2 and KDE: When highlight a depressed button, use a lighter
+   shade of the depressed colour - and not the standard
+   highlight colour.
+6. GTK: Active tab bar text is 1 pixel higher - a la KDE.
+7. KDE: Fix for borded bottom tabs.
+
+## 0.11-gtk2
+1. GTK2: Fix possible memory corruption.
+2. ALL: Square off splitter - more consistent.
+3. GTK2: Fix for 2.2.x combo-boxes.
+
+## 0.10-gtk2
+1. GTK2: Better match of menubar height with KDE.
+2. GTK:  Fix up/down/left/right arrows.
+
+## 0.09-gtk2
+1. GTK2: Fix scrollbars for 2.2.x - scrolled 1 pixel too much.
+2. GTK1: Fix lower spinbutton height. This was OK, so maybe its a Gtk
+   change. But from which version? I'm at 1.2.10
+
+## 0.08-gtk2
+1. GTK: Better menu selection.
+
+## 0.07-gtk2
+1. KDE: Reduce min-size of combo-boxes.
+2. GTK: Fixes for sodipodi - works with V1, not too good wrt V2...
+3. GTK2: Fix for GTK2.2 font setting.
+
+## 0.06-gtk2
+1. GTK: Make combo-boxes thinner.
+2. GTK: Allow ussage of GTK1 font substitution file, either
+   `/etc/X11/qt_gtk_fnt2fntrc` or `~/.qt/gtk_fnt2fntrc`, and format:
+
+        <replace from> <with>
+
+    e.g.
+
+        Arial=Helvetica
+
+    This would cause GTK1 apps to use Helvetica, even if KDE/KControl
+    has specified Arial. Idea (& patch) supplied by Adrian Schroeter.
+
+## 0.05-gtk2
+1. ALL: Don't draw lines on scrollbars if less than 20 pixels.
+2. GTK1: Allow to specify x and y thickness's in `gtkrc` file - as
+         happens in GTK2. Fixes bug with small menu entries.
+3. GTK2: Remove 1 pixel border from menus - more consistent with GTK1,
+         and KDE - not for V2.
+4. GTK: More KDE-like menu bar entries.
+5. GTK: Re-do weight ranges - would mean 48 is accecpted as "Normal"
+6. ALL: Now 2 styles:
+
+    1. QtCurve      No borders around buttons, menus, and tab bars
+    2. QtCurve V2   Has borders - more like original B???/FreeCurve
+
+7. ALL: Number of lines on toolbar handles is now 2, and 4 for scrollbars
+        and sliders.
+8. ALL: Dark scrollbar, slider, and progress background - window colour
+9. GTK1: Fix for slider background.
+10. GTK2: Fix error with overlapping check/radio highlight on frame.
+11. GTK2: Fix spinbuttons.
+
+## 0.04-gtk2
+1. KDE: Draw box around checked checkable menu item pixmaps.
+2. KDE: Only use small arrows on spinbuttons, and only if size is
+        too small for larger.
+3. KDE: Set min button size to 54 and not 70.
+4. ALL: Remove progress bar border.
+
+## 0.03-gtk2
+1. KDE: Don't highlight disabled menu items - mimics GTK behaviour.
+2. KDE: Progress bar background now matches GTK's.
+3. GTK: Progress bar gradient is now the same as menu bar items - as
+        was KDE.
+4. GTK: Progress bar contents now have 1 pixel border like KDE.
+5. GTK: Better spinbutton boxes.
+6. KDE: More GTK like spinbuttons.
+
+## 0.02-gtk2
+1. Use `gtk-config` and `pkg-config` to determine install location for
+   GTK 1 and 2 files.
+
+## 0.01-gtk2
+Initial release.
