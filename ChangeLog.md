@@ -1,3 +1,14 @@
+## 1.8.15-KDE4
+1. Add Russian localization. Thanks to Juliette Tux.
+2. Workaround bug in glib >= 2.36.1 (`g_spawn_command_line_sync()`)
+   [Debian-Bug](http://bugs.debian.org/707946)
+3. Remove KDE3 support
+4. Workaround rendering bug in Qt >= 4.8.5
+   [QtBug](https://bugreports.qt-project.org/browse/QTBUG-33512)
+5. CMake option to disable kwin support (`-DQTC_QT4_ENABLE_KWIN=Off`)
+6. Rename come CMake options. Old options will still work.
+7. KWin 4.10 appmenu button support.
+
 ## 1.8.16-gtk2
 1. fix memleak with newer versions of cairo.
 
