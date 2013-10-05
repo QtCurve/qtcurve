@@ -32,21 +32,8 @@
 #include <qglobal.h>
 #endif
 
-#ifndef _WIN32
 #include <unistd.h>
 #include <pwd.h>
-#endif
-
-#if defined _WIN32
-#include <sys/stat.h>
-#include <float.h>
-#include <direct.h>
-
-static int lstat(const char* fileName, struct stat* s)
-{
-    return stat(fileName, s);
-}
-#endif
 
 #define CONFIG_FILE               "stylerc"
 #define OLD_CONFIG_FILE           "qtcurvestylerc"
@@ -599,11 +586,7 @@ const char * qtcGetHome()
 {
     static const char *home=NULL;
 
-#ifdef _WIN32
-    home = getenv("HOMEPATH");
-#else
-    if(!home)
-    {
+    if (!home) {
         struct passwd *p=getpwuid(getuid());
 
         if(p)
@@ -619,7 +602,6 @@ const char * qtcGetHome()
         if(!home)
             home="/tmp";
     }
-#endif
     return home;
 }
 
@@ -634,9 +616,6 @@ static bool makeDir(const QString& dir, int mode)
     if (QDir::isRelativePath(dir))
         return false;
 
-#ifdef Q_WS_WIN
-    return QDir().mkpath(dir);
-#else
     QString target = dir;
     uint len = target.length();
 
@@ -671,7 +650,6 @@ static bool makeDir(const QString& dir, int mode)
         i = pos + 1;
     }
     return true;
-#endif
 }
 
 #else
@@ -713,11 +691,7 @@ const char *qtcConfDir()
            "sudo su" / "kcmshell style". The 1st would write to ~/.config, but
            if root has a XDG_ set then that would be used on the second :-(
         */
-#ifndef _WIN32
-        char *env=0==getuid() ? NULL : getenv("XDG_CONFIG_HOME");
-#else
-        char *env=0;
-#endif
+        char *env = 0 == getuid() ? NULL : getenv("XDG_CONFIG_HOME");
 
 #endif
 

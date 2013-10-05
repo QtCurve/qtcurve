@@ -34,21 +34,8 @@
 #include <qglobal.h>
 #endif
 
-#ifndef _WIN32
 #include <unistd.h>
 #include <pwd.h>
-#endif
-
-#if defined _WIN32 && defined QT_VERSION && (QT_VERSION >= 0x040000)
-#include <sys/stat.h>
-#include <float.h>
-#include <direct.h>
-
-static int lstat(const char* fileName, struct stat* s)
-{
-    return stat(fileName, s);
-}
-#endif
 
 #define CONFIG_FILE               "stylerc"
 #define OLD_CONFIG_FILE           "qtcurvestylerc"
@@ -615,98 +602,25 @@ const char * qtcGetHome()
 {
     static const char *home=NULL;
 
-#ifdef _WIN32
-    home = getenv("HOMEPATH");
-#else
-    if(!home)
-    {
-        struct passwd *p=getpwuid(getuid());
+    if (!home) {
+        struct passwd *p = getpwuid(getuid());
 
-        if(p)
-            home=p->pw_dir;
-        else
-        {
-            char *env=getenv("HOME");
+        if (p) {
+            home = p->pw_dir;
+        } else {
+            char *env = getenv("HOME");
 
-            if(env)
-                home=env;
-        }
-
-        if(!home)
-            home="/tmp";
-    }
-#endif
-    return home;
-}
-
-#ifdef __cplusplus
-
-#if defined QTC_QT_ONLY || QT_VERSION < 0x040000
-#if QT_VERSION < 0x040000
-#include <qdir.h>
-#include <qfile.h>
-#else
-#include <QtCore/QDir>
-#endif
-// Take from KStandardDirs::makeDir
-static bool makeDir(const QString& dir, int mode)
-{
-    // we want an absolute path
-    if (QDir::isRelativePath(dir))
-        return false;
-
-#ifdef Q_WS_WIN
-    return QDir().mkpath(dir);
-#else
-    QString target = dir;
-    uint len = target.length();
-
-    // append trailing slash if missing
-    if (dir.at(len - 1) != '/')
-        target += '/';
-
-    QString base;
-    uint i = 1;
-
-    while( i < len )
-    {
-        struct stat st;
-#if QT_VERSION >= 0x040000
-        int pos = target.indexOf('/', i);
-#else
-        int pos = target.find('/', i);
-#endif
-        base += target.mid(i - 1, pos - i + 1);
-        QByteArray baseEncoded = QFile::encodeName(base);
-        // bail out if we encountered a problem
-        if (stat(baseEncoded, &st) != 0)
-        {
-            // Directory does not exist....
-            // Or maybe a dangling symlink ?
-            if (lstat(baseEncoded, &st) == 0)
-                (void)unlink(baseEncoded); // try removing
-
-            if (mkdir(baseEncoded, static_cast<mode_t>(mode)) != 0)
-            {
-#if QT_VERSION >= 0x040000
-                baseEncoded.prepend("trying to create local folder ");
-                perror(baseEncoded.constData());
-#else
-                perror("trying to create QtCurve config folder ");
-#endif
-                return false; // Couldn't create it :-(
+            if (env) {
+                home = env;
             }
         }
-        i = pos + 1;
-    }
-    return true;
-#endif
-}
 
-#else
-#include <kstandarddirs.h>
-#endif
-#endif
+        if (!home) {
+            home = "/tmp";
+        }
+    }
+    return home;
+}
 
 const char *qtcConfDir()
 {
@@ -742,11 +656,7 @@ const char *qtcConfDir()
            "sudo su" / "kcmshell style". The 1st would write to ~/.config, but
            if root has a XDG_ set then that would be used on the second :-(
         */
-#ifndef _WIN32
-        char *env=0==getuid() ? NULL : getenv("XDG_CONFIG_HOME");
-#else
-        char *env=0;
-#endif
+        char *env = 0 == getuid() ? NULL : getenv("XDG_CONFIG_HOME");
 
 #endif
 
