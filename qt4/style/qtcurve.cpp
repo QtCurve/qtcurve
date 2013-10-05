@@ -5255,7 +5255,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                                 ? palette.color(QPalette::Active, QPalette::Shadow)
                                 : borderCols[option && option->version==TBAR_BORDER_VERSION_HACK ? 0 : QTC_STD_BORDER]);
             bool         isKWin=state&QtC_StateKWin,
-                         addLight=opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER && (!isKWin || qtcGetWindowBorderSize().sides>1);
+                         addLight=opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER && (!isKWin || qtcGetWindowBorderSize(false).sides>1);
 
             light.setAlphaF(1.0);
             dark.setAlphaF(1.0);
@@ -8882,7 +8882,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                 {
                     QColor light(titleCols[0]),
                            dark(borderCol);
-                    bool   addLight=opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER && (!kwin || qtcGetWindowBorderSize().sides>1);
+                    bool   addLight=opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER && (!kwin || qtcGetWindowBorderSize(false).sides>1);
 
                     if(kwin)
                     {
@@ -11835,7 +11835,7 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
     {
         if(!previewMdi)
         {
-            WindowBorders borders=qtcGetWindowBorderSize();
+            WindowBorders borders=qtcGetWindowBorderSize(false);
             bgndRect.adjust(-borders.sides, -borders.titleHeight, borders.sides, borders.bottom);
         }
         else
@@ -12945,7 +12945,7 @@ Style::drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p,
         int    opacity(getOpacity(widget, p));
 
         if(menu && BLEND_TITLEBAR)
-            rx.adjust(0, -qtcGetWindowBorderSize().titleHeight, 0, 0);
+            rx.adjust(0, -qtcGetWindowBorderSize(false).titleHeight, 0, 0);
 
         if(opacity<100)
             col.setAlphaF(opacity/100.0);
@@ -13724,7 +13724,7 @@ void Style::kdeGlobalSettingsChange(int type, int)
 void Style::borderSizesChanged()
 {
 #ifdef QTC_QT4_ENABLE_KDE
-    int old=qtcGetWindowBorderSize().titleHeight;
+    int old=qtcGetWindowBorderSize(false).titleHeight;
 
     if(old!=qtcGetWindowBorderSize(true).titleHeight)
     {

@@ -2374,7 +2374,7 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
     {
         if(!previewMdi)
         {
-            WindowBorders borders=qtcGetWindowBorderSize();
+            WindowBorders borders=qtcGetWindowBorderSize(false);
             bgndRect.adjust(-borders.sides, -borders.titleHeight, borders.sides, borders.bottom);
         }
         else
@@ -3468,7 +3468,7 @@ void Style::drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p, cons
         int    opacity(getOpacity(widget, p));
 
         if(menu && BLEND_TITLEBAR)
-            rx.adjust(0, -qtcGetWindowBorderSize().titleHeight, 0, 0);
+            rx.adjust(0, -qtcGetWindowBorderSize(false).titleHeight, 0, 0);
 
         if(opacity<100)
             col.setAlphaF(opacity/100.0);
@@ -4253,7 +4253,7 @@ void Style::kdeGlobalSettingsChange(int type, int)
 void Style::borderSizesChanged()
 {
 #ifdef QTC_QT5_ENABLE_KDE
-    int old=qtcGetWindowBorderSize().titleHeight;
+    int old=qtcGetWindowBorderSize(false).titleHeight;
 
     if(old!=qtcGetWindowBorderSize(true).titleHeight)
     {

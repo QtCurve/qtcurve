@@ -20,6 +20,7 @@
 
 #include <qtcurve-utils/color.h>
 #include <qtcurve-utils/log.h>
+#include <qtcurve-utils/dirs.h>
 
 #include "config.h"
 #include <gtk/gtk.h>

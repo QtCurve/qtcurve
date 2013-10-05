@@ -90,6 +90,58 @@ qtcUtilsAlloc0(size_t size)
     return p;
 }
 
+QTC_ALWAYS_INLINE static inline void
+qtcFree(void *p)
+{
+    if (p) {
+        free(p);
+    }
+}
+
+QTC_ALWAYS_INLINE static inline size_t
+_qtcCatStrsCalLens(int n, const char **strs, size_t *lens)
+{
+    size_t total_len = 0;
+    for (int i = 0;i < n;i++) {
+        lens[i] = strlen(strs[i]);
+        total_len += lens[i];
+    }
+    return total_len;
+}
+
+QTC_ALWAYS_INLINE static inline char*
+_qtcCatStrsFill(int n, const char **strs, size_t *lens,
+                size_t total_len, char *res)
+{
+    char *p = res;
+    for (int i = 0;i < n;i++) {
+        memcpy(p, strs[i], lens[i]);
+        p += lens[i];
+    }
+    res[total_len] = 0;
+    return res;
+}
+
+#define qtcCatStrs(strs...) ({                                          \
+            const char *__strs[] = {strs};                              \
+            int __strs_n = sizeof(__strs) / sizeof(const char*);        \
+            size_t __strs_lens[__strs_n];                               \
+            size_t __strs_total_len =                                   \
+                _qtcCatStrsCalLens(__strs_n, __strs, __strs_lens);      \
+            _qtcCatStrsFill(__strs_n, __strs, __strs_lens,              \
+                            __strs_total_len, malloc(__strs_total_len + 1)); \
+        })
+
+#define qtcFillStrs(buff, strs...) ({                                   \
+            const char *__strs[] = {strs};                              \
+            int __strs_n = sizeof(__strs) / sizeof(const char*);        \
+            size_t __strs_lens[__strs_n];                               \
+            size_t __strs_total_len =                                   \
+                _qtcCatStrsCalLens(__strs_n, __strs, __strs_lens);      \
+            _qtcCatStrsFill(__strs_n, __strs, __strs_lens, __strs_total_len, \
+                            realloc(buff, __strs_total_len + 1));       \
+        })
+
 #define qtcUtilsNewSize(type, size) ((type*)qtcUtilsAlloc0(size))
 #define qtcUtilsNew(type) qtcUtilsNewSize(type, sizeof(type))
 #define qtcUtilsNewN(type, n) qtcUtilsNewSize(type, sizeof(type) * n)

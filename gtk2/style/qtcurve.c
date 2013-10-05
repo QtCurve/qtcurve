@@ -1395,7 +1395,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
 
             if(menubar && BLEND_TITLEBAR)
             {
-                menuBarAdjust=qtcGetWindowBorderSize(FALSE).titleHeight;
+                menuBarAdjust=qtcGetWindowBorderSize(false).titleHeight;
                 if(widget && qtcMenuEmitSize(widget, height) && (opts.menubarHiding || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR))
                     qtcWindowMenuBarDBus(widget, height);
             }

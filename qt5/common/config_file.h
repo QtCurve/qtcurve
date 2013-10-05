@@ -15,31 +15,30 @@
 #define qtcSetStatusBarHidden(A, H) qtcSetBarHidden((A), (H), QTC_STATUS_FILE_PREFIX)
 
 #ifdef __cplusplus
-extern bool qtcBarHidden(const QString &app, const char *prefix);
-extern void qtcSetBarHidden(const QString &app, bool hidden, const char *prefix);
+bool qtcBarHidden(const QString &app, const char *prefix);
+void qtcSetBarHidden(const QString &app, bool hidden, const char *prefix);
 #else // __cplusplus
-extern gboolean qtcBarHidden(const char *app, const char *prefix);
-extern void qtcSetBarHidden(const char *app, bool hidden, const char *prefix);
+gboolean qtcBarHidden(const char *app, const char *prefix);
+void qtcSetBarHidden(const char *app, bool hidden, const char *prefix);
 #endif // __cplusplus
 
-extern void qtcLoadBgndImage(QtCImage *img);
+void qtcLoadBgndImage(QtCImage *img);
 
-extern const char * qtcGetHome();
-extern const char *qtcConfDir();
-extern void qtcSetRgb(color *col, const char *str);
-extern void qtcDefaultSettings(Options *opts);
-extern void qtcCheckConfig(Options *opts);
+void qtcSetRgb(color *col, const char *str);
+void qtcDefaultSettings(Options *opts);
+void qtcCheckConfig(Options *opts);
 #ifdef __cplusplus
-extern bool qtcReadConfig(const QString &file, Options *opts, Options *defOpts=0L, bool checkImages=true);
-extern WindowBorders qtcGetWindowBorderSize(bool force=false);
+bool qtcReadConfig(const QString &file, Options *opts, Options *defOpts=0L,
+                   bool checkImages=true);
 #else
-extern bool qtcReadConfig(const char *file, Options *opts, Options *defOpts);
-extern WindowBorders qtcGetWindowBorderSize(gboolean force);
+bool qtcReadConfig(const char *file, Options *opts, Options *defOpts);
 #endif
+WindowBorders qtcGetWindowBorderSize(bool force);
 
 #ifdef CONFIG_WRITE
 class KConfig;
-extern bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool exportingStyle=false);
+bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def,
+                    bool exportingStyle=false);
 #endif
 
 #endif

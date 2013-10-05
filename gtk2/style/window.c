@@ -132,7 +132,7 @@ qtcWindowClientEvent(GtkWidget *widget, GdkEventClient *event, gpointer data)
         gtk_widget_queue_draw(widget);
     } else if (gdk_x11_atom_to_xatom(event->message_type) ==
                qtc_x11_atoms[QTC_X11_ATOM_QTC_TITLEBAR_SIZE]) {
-        qtcGetWindowBorderSize(TRUE);
+        qtcGetWindowBorderSize(true);
         GtkWidget *menubar = qtcWindowGetMenuBar(widget, 0);
 
         if (menubar) {

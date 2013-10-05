@@ -19,6 +19,7 @@
  */
 
 #include <qtcurve-utils/log.h>
+#include <qtcurve-utils/dirs.h>
 
 #include "common.h"
 #include "config_file.h"
@@ -35,49 +36,27 @@
 #endif
 
 #include <unistd.h>
-#include <pwd.h>
 
 #define CONFIG_FILE               "stylerc"
 #define OLD_CONFIG_FILE           "qtcurvestylerc"
 #define VERSION_KEY               "version"
 
 #ifdef __cplusplus
-
-#if QT_VERSION >= 0x040000
 #include <QMap>
 #include <QFile>
 #include <QTextStream>
 #define TO_LATIN1(A) A.toLatin1().constData()
 #else
-#define TO_LATIN1(A) A.latin1()
-
-#include <qmap.h>
-#include <qfile.h>
-#include <qtextstream.h>
-#endif
-
-#endif // __cplusplus
-
-const char *qtcConfDir();
-
-#ifdef __cplusplus
-static QString determineFileName(const QString &file)
+static const char*
+determineFileName(const char *file)
 {
-    if(file.startsWith("/"))
+    if (file[0] == '/')
         return file;
-    return qtcConfDir()+file;
-}
-
-#else
-static const char * determineFileName(const char *file)
-{
     if('/'==file[0])
         return file;
 
-    static char *filename=NULL;
-
-    filename=realloc(filename, strlen(qtcConfDir())+strlen(file)+1);
-    sprintf(filename, "%s%s", qtcConfDir(), file);
+    static char *filename = NULL;
+    filename = qtcFillStrs(filename, qtcConfDir(), file);
     return filename;
 }
 #endif
@@ -598,110 +577,8 @@ static ETBarBtn toTBarBtn(const char *str, ETBarBtn def)
     return def;
 }
 
-const char * qtcGetHome()
-{
-    static const char *home=NULL;
-
-    if (!home) {
-        struct passwd *p = getpwuid(getuid());
-
-        if (p) {
-            home = p->pw_dir;
-        } else {
-            char *env = getenv("HOME");
-
-            if (env) {
-                home = env;
-            }
-        }
-
-        if (!home) {
-            home = "/tmp";
-        }
-    }
-    return home;
-}
-
-const char *qtcConfDir()
-{
-    static char *cfgDir=NULL;
-
-    if(!cfgDir)
-    {
-        static const char *home=NULL;
-
-#if 0
-        char *env=getenv("XDG_CONFIG_HOME");
-
-        /*
-            Check the setting of XDG_CONFIG_HOME
-            For some reason, sudo leaves the env vars set to those of the
-            caller - so XDG_CONFIG_HOME would point to the users setting, and
-            not roots.
-
-            Therefore, check that home is first part of XDG_CONFIG_HOME
-        */
-
-        if(env && 0==getuid())
-        {
-            if(!home)
-                home=qtcGetHome();
-            if(home && home!=strstr(env, home))
-                env=NULL;
-        }
-#else
-        /*
-           Hmm... for 'root' dont bother to check env var, just set to ~/.config
-           - as problems would arise if "sudo kcmshell style", and then
-           "sudo su" / "kcmshell style". The 1st would write to ~/.config, but
-           if root has a XDG_ set then that would be used on the second :-(
-        */
-        char *env = 0 == getuid() ? NULL : getenv("XDG_CONFIG_HOME");
-
-#endif
-
-        if(!env)
-        {
-            if(!home)
-                home=qtcGetHome();
-
-            cfgDir=(char *)malloc(strlen(home)+18);
-            sprintf(cfgDir, "%s/.config/qtcurve/", home);
-        }
-        else
-        {
-            cfgDir=(char *)malloc(strlen(env)+10);
-            sprintf(cfgDir, "%s/qtcurve/", env);
-        }
-
-//#if defined CONFIG_WRITE || !defined __cplusplus
-        {
-        struct stat info;
-
-        if(0!=lstat(cfgDir, &info))
-        {
-#ifdef __cplusplus
-#if defined QTC_QT_ONLY || QT_VERSION < 0x040000
-            makeDir(cfgDir, 0755);
-#else
-            KStandardDirs::makeDir(cfgDir, 0755);
-#endif
-#else
-            g_mkdir_with_parents(cfgDir, 0755);
-#endif
-        }
-        }
-//#endif
-    }
-
-    return cfgDir;
-}
-
-#ifdef __cplusplus
-WindowBorders qtcGetWindowBorderSize(bool force)
-#else
-WindowBorders qtcGetWindowBorderSize(bool force)
-#endif
+WindowBorders
+qtcGetWindowBorderSize(bool force)
 {
     static WindowBorders def={24, 18, 4, 4};
     static WindowBorders sizes={-1, -1, -1, -1};
@@ -727,12 +604,9 @@ WindowBorders qtcGetWindowBorderSize(bool force)
             f.close();
         }
 #else // __cplusplus
-        char *filename=(char *)malloc(strlen(qtcConfDir())+strlen(BORDER_SIZE_FILE)+1);
-        FILE *f=NULL;
-
-        sprintf(filename, "%s"BORDER_SIZE_FILE, qtcConfDir());
-        if((f=fopen(filename, "r")))
-        {
+        char *filename = qtcCatStrs(qtcConfDir(), BORDER_SIZE_FILE);
+        FILE *f = NULL;
+        if ((f = fopen(filename, "r"))) {
             char *line=NULL;
             size_t len;
             getline(&line, &len, f);
@@ -778,13 +652,11 @@ static bool qtcFileExists(const char *name)
     return 0==lstat(name, &info) && S_ISREG(info.st_mode);
 }
 
-static char * qtcGetBarFileName(const char *app, const char *prefix)
+static char*
+qtcGetBarFileName(const char *app, const char *prefix)
 {
-    static char *filename=NULL;
-
-    filename=(char *)realloc(filename, strlen(qtcConfDir())+strlen(prefix)+strlen(app)+1);
-    sprintf(filename, "%s%s%s", qtcConfDir(), prefix, app);
-
+    static char *filename = NULL;
+    filename = qtcFillStrs(filename, qtcConfDir(), prefix, app);
     return filename;
 }
 
@@ -1641,27 +1513,20 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
 
         if(NULL!=env)
             return qtcReadConfig(env, opts, defOpts);
-        else
-        {
-            const char *cfgDir=qtcConfDir();
-
-            if(cfgDir)
-            {
-                char *filename=(char *)malloc(strlen(cfgDir)+strlen(OLD_CONFIG_FILE)+4);
-                bool rv=false;
-
-                sprintf(filename, "%s"CONFIG_FILE, cfgDir);
-                if(!qtcFileExists(filename))
-                    sprintf(filename, "%s../"OLD_CONFIG_FILE, cfgDir);
-                rv=qtcReadConfig(filename, opts, defOpts);
-                free(filename);
-                return rv;
+        else {
+            char *filename = qtcCatStrs(qtcConfDir(), CONFIG_FILE);
+            bool rv = false;
+            if (!qtcFileExists(filename)) {
+                filename = qtcFillStrs(filename, qtcConfDir(),
+                                       OLD_CONFIG_FILE);
             }
+            rv = qtcReadConfig(filename, opts, defOpts);
+            free(filename);
+            return rv;
         }
     }
 #endif
-    else
-    {
+    else {
 #ifdef __cplusplus
         QtCConfig cfg(file);
 

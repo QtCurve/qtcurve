@@ -1506,7 +1506,7 @@ gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, GdkWin
 
             if(!flatBgnd || BGND_IMG_ON_BORDER)
             {
-                WindowBorders borders=qtcGetWindowBorderSize(FALSE);
+                WindowBorders borders=qtcGetWindowBorderSize(false);
                 xmod=borders.sides;
                 ymod=borders.titleHeight;
                 wmod=2*borders.sides;

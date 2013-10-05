@@ -3372,7 +3372,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
                  ? palette.color(QPalette::Active, QPalette::Shadow)
                  : borderCols[option && option->version==TBAR_BORDER_VERSION_HACK ? 0 : QTC_STD_BORDER]);
         bool         isKWin=state&QtC_StateKWin,
-            addLight=opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER && (!isKWin || qtcGetWindowBorderSize().sides>1);
+            addLight=opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER && (!isKWin || qtcGetWindowBorderSize(false).sides>1);
 
         light.setAlphaF(1.0);
         dark.setAlphaF(1.0);
@@ -6794,7 +6794,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
             {
                 QColor light(titleCols[0]),
                     dark(borderCol);
-                bool   addLight=opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER && (!kwin || qtcGetWindowBorderSize().sides>1);
+                bool   addLight=opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER && (!kwin || qtcGetWindowBorderSize(false).sides>1);
 
                 if(kwin)
                 {

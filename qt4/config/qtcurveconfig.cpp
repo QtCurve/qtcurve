@@ -17,6 +17,9 @@
   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
   Boston, MA 02110-1301, USA.
 */
+#include "config.h"
+
+#include <qtcurve-utils/dirs.h>
 
 #include "qtcurveconfig.h"
 #include <kwinconfig/qtcurvekwinconfig.h>
@@ -68,8 +71,6 @@
 #include <KDE/KMimeType>
 #include <KDE/KStandardDirs>
 #include <unistd.h>
-
-#include "config.h"
 
 #include <style/qtcurve.h>
 #include <common/config_file.h>

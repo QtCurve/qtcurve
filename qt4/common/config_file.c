@@ -18,6 +18,8 @@
   Boston, MA 02110-1301, USA.
  */
 
+#include <qtcurve-utils/dirs.h>
+
 #include "common.h"
 #include "config_file.h"
 #include <ctype.h>
@@ -33,42 +35,22 @@
 #endif
 
 #include <unistd.h>
-#include <pwd.h>
 
 #define CONFIG_FILE               "stylerc"
 #define OLD_CONFIG_FILE           "qtcurvestylerc"
 #define VERSION_KEY               "version"
 
 #ifdef __cplusplus
-
 #include <QMap>
 #include <QFile>
 #include <QTextStream>
 #define TO_LATIN1(A) A.toLatin1().constData()
-
-#endif // __cplusplus
-
-const char *qtcConfDir();
-
-#ifdef __cplusplus
-static QString determineFileName(const QString &file)
+static QString
+determineFileName(const QString &file)
 {
     if(file.startsWith("/"))
         return file;
     return qtcConfDir()+file;
-}
-
-#else
-static const char * determineFileName(const char *file)
-{
-    if('/'==file[0])
-        return file;
-
-    static char *filename=NULL;
-
-    filename=realloc(filename, strlen(qtcConfDir())+strlen(file)+1);
-    sprintf(filename, "%s%s", qtcConfDir(), file);
-    return filename;
 }
 #endif
 
@@ -582,159 +564,7 @@ static ETBarBtn toTBarBtn(const char *str, ETBarBtn def)
     return def;
 }
 
-const char * qtcGetHome()
-{
-    static const char *home=NULL;
-
-    if(!home)
-    {
-        struct passwd *p=getpwuid(getuid());
-
-        if(p)
-            home=p->pw_dir;
-        else
-        {
-            char *env=getenv("HOME");
-
-            if(env)
-                home=env;
-        }
-
-        if(!home)
-            home="/tmp";
-    }
-    return home;
-}
-
-#ifdef __cplusplus
-
-#if !defined QTC_QT4_ENABLE_KDE
-#include <QDir>
-// Take from KStandardDirs::makeDir
-static bool makeDir(const QString& dir, int mode)
-{
-    // we want an absolute path
-    if (QDir::isRelativePath(dir))
-        return false;
-
-    QString target = dir;
-    uint len = target.length();
-
-    // append trailing slash if missing
-    if (dir.at(len - 1) != '/')
-        target += '/';
-
-    QString base;
-    uint i = 1;
-
-    while (i < len) {
-        struct stat st;
-        int pos = target.indexOf('/', i);
-        base += target.mid(i - 1, pos - i + 1);
-        QByteArray baseEncoded = QFile::encodeName(base);
-        // bail out if we encountered a problem
-        if (stat(baseEncoded, &st) != 0) {
-            // Directory does not exist....
-            // Or maybe a dangling symlink ?
-            if (lstat(baseEncoded, &st) == 0)
-                (void)unlink(baseEncoded); // try removing
-
-            if (mkdir(baseEncoded, static_cast<mode_t>(mode)) != 0) {
-                baseEncoded.prepend("trying to create local folder ");
-                perror(baseEncoded.constData());
-                return false; // Couldn't create it :-(
-            }
-        }
-        i = pos + 1;
-    }
-    return true;
-}
-
-#else
-#include <kstandarddirs.h>
-#endif
-#endif
-
-const char *qtcConfDir()
-{
-    static char *cfgDir=NULL;
-
-    if(!cfgDir)
-    {
-        static const char *home=NULL;
-
-#if 0
-        char *env=getenv("XDG_CONFIG_HOME");
-
-        /*
-            Check the setting of XDG_CONFIG_HOME
-            For some reason, sudo leaves the env vars set to those of the
-            caller - so XDG_CONFIG_HOME would point to the users setting, and
-            not roots.
-
-            Therefore, check that home is first part of XDG_CONFIG_HOME
-        */
-
-        if(env && 0==getuid())
-        {
-            if(!home)
-                home=qtcGetHome();
-            if(home && home!=strstr(env, home))
-                env=NULL;
-        }
-#else
-        /*
-           Hmm... for 'root' dont bother to check env var, just set to ~/.config
-           - as problems would arise if "sudo kcmshell style", and then
-           "sudo su" / "kcmshell style". The 1st would write to ~/.config, but
-           if root has a XDG_ set then that would be used on the second :-(
-        */
-        char *env=0==getuid() ? NULL : getenv("XDG_CONFIG_HOME");
-
-#endif
-
-        if(!env)
-        {
-            if(!home)
-                home=qtcGetHome();
-
-            cfgDir=(char *)malloc(strlen(home)+18);
-            sprintf(cfgDir, "%s/.config/qtcurve/", home);
-        }
-        else
-        {
-            cfgDir=(char *)malloc(strlen(env)+10);
-            sprintf(cfgDir, "%s/qtcurve/", env);
-        }
-
-//#if defined CONFIG_WRITE || !defined __cplusplus
-        {
-        struct stat info;
-
-        if(0!=lstat(cfgDir, &info))
-        {
-#ifdef __cplusplus
-#if !defined QTC_QT4_ENABLE_KDE
-            makeDir(cfgDir, 0755);
-#else
-            KStandardDirs::makeDir(cfgDir, 0755);
-#endif
-#else
-            g_mkdir_with_parents(cfgDir, 0755);
-#endif
-        }
-        }
-//#endif
-    }
-
-    return cfgDir;
-}
-
-#ifdef __cplusplus
 WindowBorders qtcGetWindowBorderSize(bool force)
-#else
-WindowBorders qtcGetWindowBorderSize(bool force)
-#endif
 {
     static WindowBorders def={24, 18, 4, 4};
     static WindowBorders sizes={-1, -1, -1, -1};
