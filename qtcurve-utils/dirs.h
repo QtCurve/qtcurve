@@ -47,6 +47,21 @@ qtcIsDir(const char *path)
             access(path, R_OK | X_OK) == 0);
 }
 
+static inline boolean
+qtcIsRegFile(const char *path)
+{
+    struct stat stats;
+    return (stat(path, &stats) == 0 && S_ISREG(stats.st_mode) &&
+            access(path, R_OK) == 0);
+}
+
+static inline boolean
+qtcIsSymLink(const char *path)
+{
+    struct stat stats;
+    return lstat(path, &stats) == 0 && S_ISLNK(stats.st_mode);
+}
+
 QTC_END_DECLS
 
 #endif

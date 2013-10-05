@@ -629,12 +629,6 @@ void qtcSetBarHidden(const QString &app, bool hidden, const char *prefix)
 }
 
 #else // __cplusplus
-static bool qtcFileExists(const char *name)
-{
-    struct stat info;
-
-    return 0==lstat(name, &info) && S_ISREG(info.st_mode);
-}
 
 static char * qtcGetBarFileName(const char *app, const char *prefix)
 {
@@ -648,7 +642,7 @@ static char * qtcGetBarFileName(const char *app, const char *prefix)
 
 bool qtcBarHidden(const char *app, const char *prefix)
 {
-    return qtcFileExists(qtcGetBarFileName(app, prefix));
+    return qtcIsRegFile(qtcGetBarFileName(app, prefix));
 }
 
 void qtcSetBarHidden(const char *app, bool hidden, const char *prefix)
@@ -1470,7 +1464,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                 bool rv=false;
 
                 sprintf(filename, "%s" CONFIG_FILE, cfgDir);
-                if(!qtcFileExists(filename))
+                if(!qtcIsRegFile(filename))
                     sprintf(filename, "%s../" OLD_CONFIG_FILE, cfgDir);
                 rv=qtcReadConfig(filename, opts, defOpts);
                 free(filename);
@@ -2137,13 +2131,6 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
     return false;
 }
 
-static bool fileExists(const char *path)
-{
-    struct stat info;
-
-    return 0==lstat(path, &info) && (info.st_mode&S_IFMT)==S_IFREG;
-}
-
 static const char * getSystemConfigFile()
 {
     static const char * constFiles[]={ /*"/etc/qt4/" OLD_CONFIG_FILE, "/etc/qt3/" OLD_CONFIG_FILE, "/etc/qt/" OLD_CONFIG_FILE,*/ "/etc/" OLD_CONFIG_FILE, NULL };
@@ -2151,7 +2138,7 @@ static const char * getSystemConfigFile()
     int i;
 
     for(i=0; constFiles[i]; ++i)
-        if(fileExists(constFiles[i]))
+        if(qtcIsRegFile(constFiles[i]))
             return constFiles[i];
     return NULL;
 }

@@ -1793,7 +1793,6 @@ static void processMozillaApp(gboolean add_btn_css, gboolean add_menu_colors, ch
                     '\0'!=str[strlen(CSS_DEFAULT_ALT)]))
                  {
                     char        sub[MAX_CSS_HOME];
-                    struct stat statbuf;
 #ifdef QTC_GTK2_MODIFY_MOZILLA
                     FILE        *userJs=NULL;
                     gboolean    alterUserJs=TRUE;
@@ -1830,14 +1829,11 @@ static void processMozillaApp(gboolean add_btn_css, gboolean add_menu_colors, ch
 #endif
 
                     /* Now do userChrome.css */
-                    sprintf(sub, "%s%s%s/", cssHome, dir_ent->d_name, USER_CHROME_DIR);
+                    sprintf(sub, "%s%s%s/", cssHome, dir_ent->d_name,
+                            USER_CHROME_DIR);
 
-                    /* If chrome folder does not exist, then create it... */
-                    if(-1==lstat(sub, &statbuf) && ENOENT==errno)
-                        g_mkdir_with_parents(sub, 0755);
-
-                    if(-1!=lstat(sub, &statbuf) && S_ISDIR(statbuf.st_mode))
-                    {
+                    qtcMakePath(sub, 0755);
+                    if (qtcIsDir(sub)) {
                         strcat(sub, USER_CHROME_FILE);
                         processUserChromeCss(sub, add_btn_css, add_menu_colors);
                     }
