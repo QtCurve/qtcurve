@@ -1,4 +1,4 @@
-find_package(Qt4 REQUIRED)
+find_package(Qt4 4.6.0 REQUIRED)
 add_definitions(${QT_DEFINITIONS})
 include_directories(
   "${CMAKE_CURRENT_BINARY_DIR}"

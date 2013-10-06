@@ -1896,7 +1896,7 @@ void qtcDefaultSettings(Options *opts)
     opts->groupBox=FRAME_FADED;
     opts->gbFactor=DEF_GB_FACTOR;
     opts->gbLabel=GB_LBL_BOLD|GB_LBL_OUTSIDE;
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+#if defined CONFIG_DIALOG
     opts->stdBtnSizes=false;
     opts->titlebarButtons=TITLEBAR_BUTTON_ROUND|TITLEBAR_BUTTON_HOVER_SYMBOL;
     opts->titlebarIcon=TITLEBAR_ICON_NEXT_TO_TITLE;

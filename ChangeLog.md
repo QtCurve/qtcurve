@@ -15,6 +15,7 @@
     Changing the depth of the window (which require recreating the window)
     breaks the XEmbed protocol.
 14. Gtk2: Generate all GdkPixbuf inline csourse at compile time.
+15. Qt4: Require 4.6.0
 
 ## 1.8.15-KDE4
 1. Add Russian localization. Thanks to Juliette Tux.

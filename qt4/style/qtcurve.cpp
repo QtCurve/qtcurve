@@ -77,10 +77,7 @@
 #include <KDE/KIconEffect>
 #include <KDE/KMenu>
 #include <KDE/KAboutApplicationDialog>
-
-#if QT_VERSION >= 0x040500
 #include <KDE/KIcon>
-#endif
 
 #include <qtcurve-utils/color.h>
 

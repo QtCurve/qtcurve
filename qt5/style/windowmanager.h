@@ -233,7 +233,7 @@ private:
     QBasicTimer _dragTimer;
 
     //! target being dragged
-    /*! QWeakPointer is used in case the target gets deleted while drag
+    /*! QPointer is used in case the target gets deleted while drag
       is in progress */
     QPointer<QWidget> _target;
 
