@@ -28,31 +28,14 @@ typedef struct {
     GdkColor col;
     EPixmap pix;
     double shade;
-} QtCPixKey;
+} QtcPixKey;
 
-static GCache *pixbufCache = NULL;
-
-static gpointer
-pixbufCacheDupKey(QtCPixKey *key)
-{
-    QtCPixKey *n = g_malloc(sizeof(QtCPixKey));
-
-    n->col = key->col;
-    n->pix = key->pix;
-    n->shade = key->shade;
-    return n;
-}
-
-static void
-pixbufCacheDestKey(QtCPixKey *key)
-{
-    g_free(key);
-}
+static GHashTable *_pixbufTable = NULL;
 
 static guint
 pixbufCacheHashKey(gconstpointer k)
 {
-    QtCPixKey *key = (QtCPixKey*)k;
+    const QtcPixKey *key = k;
     int hash = ((key->pix << 24) + ((key->col.red >> 8) << 16) +
                 ((key->col.green >> 8) << 8) + (key->col.blue >> 8));
     return g_int_hash(&hash);
@@ -61,15 +44,41 @@ pixbufCacheHashKey(gconstpointer k)
 static gboolean
 pixbufCacheKeyEqual(gconstpointer k1, gconstpointer k2)
 {
-    QtCPixKey *a = (QtCPixKey*)k1,
-              *b = (QtCPixKey*)k2;
+    const QtcPixKey *a = k1;
+    const QtcPixKey *b = k2;
 
     return (a->pix == b->pix && a->col.red == b->col.red &&
             a->col.green == b->col.green && a->col.blue == b->col.blue);
 }
 
+static inline GHashTable*
+getPixbufTable()
+{
+    if (!_pixbufTable) {
+        _pixbufTable = g_hash_table_new_full(pixbufCacheHashKey,
+                                             pixbufCacheKeyEqual,
+                                             g_free, g_object_unref);
+    }
+    return _pixbufTable;
+}
+
+__attribute__((constructor)) static void
+_qtcPixcacheInit()
+{
+    getPixbufTable();
+}
+
+__attribute__((destructor)) static void
+_qtcPixcacheDone()
+{
+    if (_pixbufTable) {
+        g_hash_table_destroy(_pixbufTable);
+        _pixbufTable = NULL;
+    }
+}
+
 static GdkPixbuf*
-pixbufCacheValueNew(QtCPixKey *key)
+pixbufCacheValueNew(const QtcPixKey *key)
 {
     GdkPixbuf *res = NULL;
 
@@ -92,18 +101,17 @@ pixbufCacheValueNew(QtCPixKey *key)
 GdkPixbuf*
 getPixbuf(GdkColor *widgetColor, EPixmap p, double shade)
 {
-    QtCPixKey key;
-
-    key.col = *widgetColor;
-    key.pix = p;
-    key.shade = shade;
-
-    if (!pixbufCache)
-        pixbufCache = g_cache_new((GCacheNewFunc)pixbufCacheValueNew,
-                                  (GCacheDestroyFunc)g_object_unref,
-                                  (GCacheDupFunc)pixbufCacheDupKey,
-                                  (GCacheDestroyFunc)pixbufCacheDestKey,
-                                  pixbufCacheHashKey, g_direct_hash,
-                                  pixbufCacheKeyEqual);
-    return g_cache_insert(pixbufCache, &key);
+    const QtcPixKey key = {
+        .col = *widgetColor,
+        .pix = p,
+        .shade = shade
+    };
+    GHashTable *table = getPixbufTable();
+    GdkPixbuf *pixbuf = g_hash_table_lookup(table, &key);
+    if (pixbuf)
+        return pixbuf;
+    // TODO: Thread safe?
+    pixbuf = pixbufCacheValueNew(&key);
+    g_hash_table_insert(table, g_memdup(&key, sizeof(key)), pixbuf);
+    return pixbuf;
 }
