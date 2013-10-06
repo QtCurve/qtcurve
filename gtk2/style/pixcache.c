@@ -26,18 +26,26 @@
 
 typedef struct {
     GdkColor col;
-    EPixmap pix;
     double shade;
 } QtcPixKey;
 
 static GHashTable *_pixbufTable = NULL;
+static GdkPixbuf *_blankPixbuf = NULL;
+static GdkPixbuf*
+getBlankPixbuf()
+{
+    if (!_blankPixbuf) {
+        _blankPixbuf = gdk_pixbuf_new_from_inline(-1, blank16x16, TRUE, NULL);
+    }
+    return _blankPixbuf;
+}
 
 static guint
 pixbufCacheHashKey(gconstpointer k)
 {
     const QtcPixKey *key = k;
-    int hash = ((key->pix << 24) + ((key->col.red >> 8) << 16) +
-                ((key->col.green >> 8) << 8) + (key->col.blue >> 8));
+    int hash = (((key->col.red >> 8) << 16) + ((key->col.green >> 8) << 8) +
+                (key->col.blue >> 8));
     return g_int_hash(&hash);
 }
 
@@ -62,6 +70,7 @@ __attribute__((constructor)) static void
 _qtcPixcacheInit()
 {
     getPixbufTable();
+    getBlankPixbuf();
 }
 
 __attribute__((destructor)) static void
@@ -71,21 +80,17 @@ _qtcPixcacheDone()
         g_hash_table_destroy(_pixbufTable);
         _pixbufTable = NULL;
     }
+    if (_blankPixbuf) {
+        g_object_unref(_blankPixbuf);
+        _blankPixbuf = NULL;
+    }
 }
 
 static GdkPixbuf*
 pixbufCacheValueNew(const QtcPixKey *key)
 {
-    GdkPixbuf *res = NULL;
-
-    switch (key->pix) {
-    case PIX_CHECK:
-        res = gdk_pixbuf_new_from_inline(-1, opts.xCheck ? check_x_on :
-                                         check_on, TRUE, NULL);
-        break;
-    case PIX_BLANK:
-        return gdk_pixbuf_new_from_inline(-1, blank16x16, TRUE, NULL);
-    }
+    GdkPixbuf *res = gdk_pixbuf_new_from_inline(-1, opts.xCheck ? check_x_on :
+                                                check_on, TRUE, NULL);
     qtcAdjustPix(gdk_pixbuf_get_pixels(res), gdk_pixbuf_get_n_channels(res),
                  gdk_pixbuf_get_width(res), gdk_pixbuf_get_height(res),
                  gdk_pixbuf_get_rowstride(res),
@@ -97,9 +102,10 @@ pixbufCacheValueNew(const QtcPixKey *key)
 GdkPixbuf*
 getPixbuf(GdkColor *widgetColor, EPixmap p, double shade)
 {
+    if (p != PIX_CHECK)
+        return getBlankPixbuf();
     const QtcPixKey key = {
         .col = *widgetColor,
-        .pix = p,
         .shade = shade
     };
     GHashTable *table = getPixbufTable();
