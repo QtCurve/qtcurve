@@ -1,14 +1,18 @@
 project(QtCurve)
+
+## Setup
 cmake_minimum_required(VERSION 2.8)
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}"
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+## Version
 set(QTCURVE_VERSION_MAJOR "1")
 set(QTCURVE_VERSION_MINOR "8")
 set(QTCURVE_VERSION_PATCH "17")
 set(QTCURVE_VERSION "${QTCURVE_VERSION_MAJOR}.${QTCURVE_VERSION_MINOR}")
 set(QTCURVE_VERSION_FULL "${QTCURVE_VERSION}.${QTCURVE_VERSION_PATCH}")
 
+## Options
 function(def_compat_option new_opt old_opt)
   if("${ARGC}" GREATER 2 AND "${ARGV2}")
     set(reverse True)
@@ -32,6 +36,7 @@ option(ENABLE_QT4 "Building Qt4 theme." On)
 option(ENABLE_QT5 "Building Qt5 theme." On)
 option(ENABLE_GTK2 "Building Gtk2 theme." On)
 option(QTC_ENABLE_X11 "Enable X11" On)
+option(QTC_INSTALL_PO "Install translation files." On)
 
 def_compat_option(QTC_QT4_ENABLE_KDE QTC_QT_ONLY True)
 option(QTC_QT4_ENABLE_KDE "Building Qt4 style with KDE4 support." On)
@@ -65,6 +70,7 @@ option(QTC_GTK2_USE_CAIRO_FOR_ARROWS "Using ciaro to draw arrows." Off)
 option(QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
   "Gtk2 support for the 'fix parentless dialogs'." Off)
 
+## Common settings.
 # Only try to figure out what kde prefix is if not specified at command line.
 if(NOT DEFINED QTC_KDE4_PREFIX)
   find_package(KDE4)
@@ -91,22 +97,7 @@ if(NOT DEFINED QTC_KDE4_ICONS_PREFIX)
   set(QTC_KDE4_ICONS_PREFIX "${QTC_KDE4_PREFIX}/share/icons")
 endif()
 
-if(ENABLE_GTK2)
-  find_package(PkgConfig REQUIRED)
-  pkg_check_modules(GTK2 REQUIRED gtk+-2.0)
-  if(GTK2_THEME_PREFIX)
-    set(GTK2_PREIX "${GTK2_THEME_PREFIX}")
-  elseif(NOT GTK2_PREFIX)
-    set(GTK2_PREFIX "${CMAKE_INSTALL_PREFIX}")
-  endif()
-  if(NOT GTK2_LIBDIR)
-    set(GTK2_LIBDIR "${GTK2_PREFIX}/lib")
-  endif()
-
-  _pkgconfig_invoke(gtk+-2.0 GTK2 BIN_VERSION "" --variable=gtk_binary_version)
-  set(GTK2_THEME_DIR ${GTK2_PREFIX}/share/themes/QtCurve)
-endif()
-
+## Handle options
 macro(qtc_check_x11)
   find_package(PkgConfig)
   if(NOT PKG_CONFIG_FOUND)
@@ -122,9 +113,33 @@ macro(qtc_check_x11)
     return()
   endif()
 endmacro()
-
 if(QTC_ENABLE_X11)
   qtc_check_x11()
+endif()
+
+if(NOT ENABLE_QT4)
+  set(QTC_QT4_ENABLE_KDE Off)
+  set(QTC_QT4_ENABLE_KWIN Off)
+endif()
+
+if(NOT ENABLE_QT5)
+  set(QTC_QT5_ENABLE_KDE Off)
+  set(QTC_QT5_ENABLE_KWIN Off)
+endif()
+
+if(ENABLE_GTK2)
+  find_package(PkgConfig REQUIRED)
+  pkg_check_modules(GTK2 REQUIRED gtk+-2.0)
+  if(GTK2_THEME_PREFIX)
+    set(GTK2_PREIX "${GTK2_THEME_PREFIX}")
+  elseif(NOT GTK2_PREFIX)
+    set(GTK2_PREFIX "${CMAKE_INSTALL_PREFIX}")
+  endif()
+  if(NOT GTK2_LIBDIR)
+    set(GTK2_LIBDIR "${GTK2_PREFIX}/lib")
+  endif()
+  _pkgconfig_invoke(gtk+-2.0 GTK2 BIN_VERSION "" --variable=gtk_binary_version)
+  set(GTK2_THEME_DIR ${GTK2_PREFIX}/share/themes/QtCurve)
 endif()
 
 configure_file(config.h.in config.h @ONLY)

@@ -1,3 +1,7 @@
+if(NOT ENABLE_GTK2)
+  return()
+endif()
+
 set(qtcurve_style_common_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/../common/common.c
   ${CMAKE_CURRENT_SOURCE_DIR}/../common/config_file.c)
@@ -59,8 +63,7 @@ add_definitions(-Dopts=qtcurve_gtk2_opts)
 target_link_libraries(qtcurve-gtk2
   ${GTK2_LDFLAGS}
   ${GTK2_LIBRARIES}
-  # TODO?
-  m xcb qtcurve-utils)
+  m ${QTC_X11_LIBRARIES} qtcurve-utils)
 
 install(TARGETS qtcurve-gtk2 LIBRARY DESTINATION
   ${GTK2_LIBDIR}/gtk-2.0/${GTK2_BIN_VERSION}/engines)

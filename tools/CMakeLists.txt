@@ -1,14 +1,4 @@
-if(ENABLE_GTK2)
-  find_package(PkgConfig REQUIRED)
-  pkg_check_modules(GEN_IMG_GTK REQUIRED cairo-png)
-  set(gen_image_header_SRCS
-    gen_image_header_cairo.c)
-  set(gen_image_header_INCLUDES
-    ${GEN_IMG_GTK_INCLUDE_DIRS})
-  set(gen_image_header_LINKS ${GEN_IMG_GTK_LDFLAGS}
-    ${GEN_IMG_GTK_LIBRARIES})
-  set(gen_image_header_DEFS ${GEN_IMG_GTK_CFLAGS})
-elseif(ENABLE_QT5)
+if(ENABLE_QT5)
   set(gen_image_header_SRCS
     gen_image_header_qt.cpp)
   find_package(Qt5Core REQUIRED)
@@ -29,6 +19,16 @@ elseif(ENABLE_QT4)
     ${QT_QTGUI_LIBRARY}
     ${QT_QTCORE_LIBRARY})
   set(gen_image_header_DEFS)
+else()
+  find_package(PkgConfig REQUIRED)
+  pkg_check_modules(GEN_IMG_GTK REQUIRED cairo-png)
+  set(gen_image_header_SRCS
+    gen_image_header_cairo.c)
+  set(gen_image_header_INCLUDES
+    ${GEN_IMG_GTK_INCLUDE_DIRS})
+  set(gen_image_header_LINKS ${GEN_IMG_GTK_LDFLAGS}
+    ${GEN_IMG_GTK_LIBRARIES})
+  set(gen_image_header_DEFS ${GEN_IMG_GTK_CFLAGS})
 endif()
 
 string(REPLACE ";" " " gen_image_header_DEFS "${gen_image_header_DEFS}")

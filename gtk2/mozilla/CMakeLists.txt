@@ -1,3 +1,7 @@
+if(NOT ENABLE_GTK2)
+  return()
+endif()
+
 configure_file(QtCurve.css.in QtCurve.css)
 configure_file(QtCurve-KDEButtonOrder.css.in QtCurve-KDEButtonOrder.css)
 

@@ -15,7 +15,7 @@ if(QTC_ENABLE_X11)
   set(qtcurve_utils_LINKS
     ${qtcurve_utils_LINKS}
     ${QTC_X11_LIBRARIES})
-  include_directories(QTC_X11_INCLUDE_DIRS)
+  include_directories(${QTC_X11_INCLUDE_DIRS})
   add_definitions(${QTC_X11_CFLAGS})
 endif()
 

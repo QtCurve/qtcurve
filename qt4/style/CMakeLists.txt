@@ -1,3 +1,7 @@
+if(NOT ENABLE_QT4)
+  return()
+endif()
+
 set(qtcurve_style_common_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/../common/common.c
   ${CMAKE_CURRENT_SOURCE_DIR}/../common/config_file.c)
@@ -70,15 +74,14 @@ endif()
 target_link_libraries(qtcurve-qt4
   ${QTC_KDE_LIBS}
   ${QTC_KFILEDIALOG_LIBS}
+  ${QTC_QT4_XCB_LINK_LIBS}
   ${QT_QTGUI_LIBRARY}
   ${QT_QTCORE_LIBRARY}
   ${QT_QTSVG_LIBRARY}
   qtcurve-utils)
 
 if(Q_WS_X11)
-  target_link_libraries(qtcurve-qt4
-    ${QT_QTDBUS_LIBRARY}
-    ${X11_X11_LIB})
+  target_link_libraries(qtcurve-qt4 ${QT_QTDBUS_LIBRARY})
 endif()
 
 if(QTC_QT4_ENABLE_KDE)

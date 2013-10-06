@@ -1,3 +1,8 @@
+if(NOT QTC_INSTALL_PO)
+  # TODO
+  return()
+endif()
+
 find_program(GETTEXT_MSGFMT_EXECUTABLE msgfmt)
 
 if(NOT DEFINED QTC_LOCALE_DIR)

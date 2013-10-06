@@ -1,4 +1,4 @@
-if(NOT QTC_QT4_ENABLE_KDE OR NOT QTC_QT4_ENABLE_KWIN)
+if(NOT QTC_QT4_ENABLE_KWIN)
   return()
 endif()
 
@@ -15,6 +15,6 @@ set_target_properties(kwin_qtcurve_config_kde4 PROPERTIES
   OUTPUT_NAME "kwin_qtcurve_config")
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 target_link_libraries(kwin_qtcurve_config_kde4
-  ${KDE4_KDEUI_LIBS} ${QT_QTGUI_LIBRARY}
+  ${KDE4_KDEUI_LIBS} ${QT_QTGUI_LIBRARY} ${QTC_QT4_XCB_LINK_LIBS}
   qtcurve-utils)
 install(TARGETS kwin_qtcurve_config_kde4 DESTINATION ${PLUGIN_INSTALL_DIR})

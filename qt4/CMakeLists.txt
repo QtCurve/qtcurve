@@ -1,31 +1,40 @@
-find_package(Qt4 4.6.0 REQUIRED)
-add_definitions(${QT_DEFINITIONS})
+if(ENABLE_QT4)
+  find_package(Qt4 4.6.0 REQUIRED)
+  # search packages used by KDE
+  if(QTC_QT4_ENABLE_KDE)
+    find_package(KDE4 REQUIRED)
+    include(KDE4Defaults)
+    set(QTCURVE_STYLE_DIR "${PLUGIN_INSTALL_DIR}/plugins/styles/")
+    if(NOT DEFINED QTC_QT4_ENABLE_KWIN)
+      find_file(KWINGLOBALS_H kwinglobals.h ${KDE4_INCLUDES})
+      if(KWINGLOBALS_H)
+        set(QTC_QT4_ENABLE_KWIN On)
+      else()
+        set(QTC_QT4_ENABLE_KWIN Off)
+      endif()
+    endif()
+  else()
+    set(QTCURVE_STYLE_DIR "${QT_PLUGINS_DIR}/styles/")
+  endif()
+endif()
+
+add_definitions(${QT_DEFINITIONS} -DQTC_UTILS_QT4)
 include_directories(
   "${CMAKE_CURRENT_BINARY_DIR}"
   "${CMAKE_CURRENT_SOURCE_DIR}"
   ${QT_INCLUDE_DIR})
 
-add_definitions("-DQTC_UTILS_QT4")
-
-# search packages used by KDE
 if(QTC_QT4_ENABLE_KDE)
-  find_package(KDE4 REQUIRED)
-  include(KDE4Defaults)
-
   add_definitions(${KDE4_DEFINITIONS})
   include_directories(${KDE4_INCLUDES})
-  set(QTCURVE_STYLE_DIR "${PLUGIN_INSTALL_DIR}/plugins/styles/")
+endif()
 
-  if(NOT DEFINED QTC_QT4_ENABLE_KWIN)
-    find_file(KWINGLOBALS_H kwinglobals.h ${KDE4_INCLUDES})
-    if(KWINGLOBALS_H)
-      set(QTC_QT4_ENABLE_KWIN On)
-    else()
-      set(QTC_QT4_ENABLE_KWIN Off)
-    endif()
-  endif()
+if(QTC_ENABLE_X11)
+  include_directories(${QTC_X11_INCLUDE_DIRS})
+  add_definitions(${QTC_X11_CFLAGS})
+  set(QTC_QT4_XCB_LINK_LIBS ${QTC_X11_LIBRARIES})
 else()
-  set(QTCURVE_STYLE_DIR "${QT_PLUGINS_DIR}/styles/")
+  set(QTC_QT4_XCB_LINK_LIBS)
 endif()
 
 add_subdirectory(config)
