@@ -19,25 +19,38 @@
  ***************************************************************************/
 
 #include <stdio.h>
-#include <QImage>
-#include <QCoreApplication>
+#include <stdint.h>
+#include <string.h>
+#include <cairo.h>
 
 int
 main(int argc, char **argv)
 {
-    QCoreApplication app(argc, argv);
     if (argc < 4)
         return 1;
     const char *filename = argv[1];
     const char *varname = argv[2];
     const char *outputname = argv[3];
 
-    QImage image(QString::fromLocal8Bit(filename));
-    if (image.isNull())
+    cairo_surface_t *image = cairo_image_surface_create_from_png(filename);
+    if (cairo_surface_status(image) != CAIRO_STATUS_SUCCESS)
         return 1;
-    int height = image.height();
-    int width = image.width();
-    int size = height * width;
+    int height = cairo_image_surface_get_height(image);
+    int width = cairo_image_surface_get_width(image);
+
+    int stride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, width);
+    unsigned char *buff = malloc(stride * height);
+    cairo_surface_t *new_img =
+        cairo_image_surface_create_for_data(buff, CAIRO_FORMAT_ARGB32,
+                                            width, height, stride);
+    cairo_t *cr = cairo_create(new_img);
+    if (cairo_status(cr) != CAIRO_STATUS_SUCCESS)
+        return 1;
+    cairo_set_source_surface(cr, image, 0, 0);
+    cairo_paint(cr);
+    cairo_destroy(cr);
+    cairo_surface_flush(new_img);
+    cairo_surface_destroy(image);
 
     FILE *outputfile = fopen(outputname, "w");
     fprintf(outputfile,
@@ -48,11 +61,13 @@ main(int argc, char **argv)
     fprintf(outputfile, "static const unsigned char _%s_data[] = {", varname);
     for (int j = 0;j < height;j++) {
         for (int i = 0;i < width;i++) {
-            QRgb pixel = image.pixel(i, j);
-            unsigned int alpha = qAlpha(pixel);
-            unsigned int red = qRed(pixel) * alpha / 256;
-            unsigned int blue = qBlue(pixel) * alpha / 256;
-            unsigned int green = qGreen(pixel) * alpha / 256;
+            uint32_t pixel;
+            memcpy(&pixel, buff + (stride * j) + i * sizeof(uint32_t),
+                   sizeof(uint32_t));
+            unsigned int alpha = (pixel & 0xff000000) >> 24;
+            unsigned int red = (pixel & 0xff0000) >> 16;
+            unsigned int blue = (pixel & 0xff00) >> 8;
+            unsigned int green = (pixel & 0xff);
             fprintf(outputfile, "%u,%u,%u,%u,", blue, green, red, alpha);
         }
     }
@@ -64,7 +79,7 @@ main(int argc, char **argv)
             "    %d,\n"
             "    %d,\n"
             "    _%s_data\n"
-            "};\n", varname, size * 4, width, height, 32, varname);
+            "};\n", varname, width * height * 4, width, height, 32, varname);
     fprintf(outputfile, "#endif\n");
     fclose(outputfile);
     return 0;
