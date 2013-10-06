@@ -44,11 +44,7 @@ pixbufCacheHashKey(gconstpointer k)
 static gboolean
 pixbufCacheKeyEqual(gconstpointer k1, gconstpointer k2)
 {
-    const QtcPixKey *a = k1;
-    const QtcPixKey *b = k2;
-
-    return (a->pix == b->pix && a->col.red == b->col.red &&
-            a->col.green == b->col.green && a->col.blue == b->col.blue);
+    return memcmp(k1, k2, sizeof(QtcPixKey)) == 0;
 }
 
 static inline GHashTable*
