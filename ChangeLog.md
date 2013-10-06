@@ -14,6 +14,7 @@
 13. Qt4: Disable transparent background from XEmbed window (e.g. in kpartplugins).
     Changing the depth of the window (which require recreating the window)
     breaks the XEmbed protocol.
+14. Gtk2: Generate all GdkPixbuf inline csourse at compile time.
 
 ## 1.8.15-KDE4
 1. Add Russian localization. Thanks to Juliette Tux.

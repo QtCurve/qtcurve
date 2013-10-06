@@ -207,7 +207,7 @@ QTC_END_DECLS
 #ifndef QTC_UTILS_INTERNAL
 
 // Use __cplusplus to distinguish between gtk and qt for now.
-#ifdef __cplusplus
+#if defined QTC_UTILS_QT5 || defined QTC_UTILS_QT4
 #include <QColor>
 
 QTC_ALWAYS_INLINE static inline QColor
@@ -301,8 +301,9 @@ qtcCalcRingAlphas(const QColor *bgnd)
     const QtcColor qtc_bgnd = {bgnd->redF(), bgnd->greenF(), bgnd->blueF()};
     _qtcCalcRingAlphas(&qtc_bgnd);
 }
+#endif
 
-#else
+#if defined QTC_UTILS_GTK2
 #include <gdk/gdk.h>
 
 QTC_ALWAYS_INLINE static inline GdkColor

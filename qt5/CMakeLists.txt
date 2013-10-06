@@ -1,6 +1,7 @@
 include_directories(
   "${CMAKE_CURRENT_SOURCE_DIR}"
   "${CMAKE_CURRENT_BINARY_DIR}")
+add_definitions("-DQTC_UTILS_QT5")
 
 set(QTC5_LINK_LIBS)
 set(QTC_QT_MODULES Qt5Core Qt5Gui Qt5Widgets Qt5Svg)
