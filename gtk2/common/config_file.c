@@ -23,30 +23,11 @@
 
 #include "common.h"
 #include "config_file.h"
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-
-#ifdef __cplusplus
-#include <qglobal.h>
-#endif
-
-#include <unistd.h>
 
 #define CONFIG_FILE               "stylerc"
 #define OLD_CONFIG_FILE           "qtcurvestylerc"
 #define VERSION_KEY               "version"
 
-#ifdef __cplusplus
-#include <QMap>
-#include <QFile>
-#include <QTextStream>
-#define TO_LATIN1(A) A.toLatin1().constData()
-#else
 static const char*
 determineFileName(const char *file)
 {
@@ -59,7 +40,6 @@ determineFileName(const char *file)
     filename = qtcFillStrs(filename, qtcConfDir(), file);
     return filename;
 }
-#endif
 
 static int c2h(char ch)
 {
@@ -73,44 +53,26 @@ static int c2h(char ch)
 
 void qtcSetRgb(color *col, const char *str)
 {
-    if(str && strlen(str)>6)
-    {
-        int offset='#'==str[0] ? 1 : 0;
-#ifdef __cplusplus
-        col->setRgb(ATOH(&str[offset]), ATOH(&str[offset+2]), ATOH(&str[offset+4]));
-#else
-        col->red=ATOH(&str[offset])<<8;
-        col->green=ATOH(&str[offset+2])<<8;
-        col->blue=ATOH(&str[offset+4])<<8;
-        col->pixel=0;
-#endif
+    if (str && strlen(str)>6) {
+        int offset = '#' == str[0] ? 1 : 0;
+        col->red = ATOH(&str[offset]) << 8;
+        col->green = ATOH(&str[offset + 2]) << 8;
+        col->blue = ATOH(&str[offset + 4]) << 8;
+        col->pixel = 0;
+    } else {
+        col->red = col->green = col->blue = col->pixel = 0;
     }
-    else
-#ifdef __cplusplus
-        col->setRgb(0, 0, 0);
-#else
-        col->red=col->green=col->blue=col->pixel=0;
-#endif
 }
 
-#ifdef __cplusplus
-static bool loadImage(const QString &file, QtCPixmap *pixmap)
-#else
-static bool loadImage(const char *file, QtCPixmap *pixmap)
-#endif
+static bool
+loadImage(const char *file, QtCPixmap *pixmap)
 {
-#ifdef __cplusplus
-    // Need to store filename for config dialog!
-    QString f(determineFileName(file));
-    pixmap->file=f;
-    return pixmap->img.load(f);
-#else // __cplusplus
-    pixmap->img=gdk_pixbuf_new_from_file(determineFileName(file), NULL);
-    return NULL!=pixmap->img;
-#endif // __cplusplus
+    pixmap->img = gdk_pixbuf_new_from_file(determineFileName(file), NULL);
+    return NULL != pixmap->img;
 }
 
-static EDefBtnIndicator toInd(const char *str, EDefBtnIndicator def)
+static EDefBtnIndicator
+toInd(const char *str, EDefBtnIndicator def)
 {
     if(str && 0!=str[0])
     {
@@ -200,11 +162,7 @@ static EAppearance toAppearance(const char *str, EAppearance def, EAppAllow allo
         if(0==memcmp(str, "glass", 5) || 0==memcmp(str, "shinyglass", 10))
             return APPEARANCE_SHINY_GLASS;
         if(0==memcmp(str, "agua", 4))
-#if defined __cplusplus && !defined CONFIG_DIALOG  && defined QT_VERSION && QT_VERSION < 0x040000
-            return APPEARANCE_AGUA_MOD;
-#else
             return APPEARANCE_AGUA;
-#endif
         if(0==memcmp(str, "soft", 4))
             return APPEARANCE_SOFT_GRADIENT;
         if(0==memcmp(str, "gradient", 8) || 0==memcmp(str, "lightgradient", 13))
@@ -495,25 +453,7 @@ static EGradientBorder toGradientBorder(const char *str, bool *haveAlpha)
     return GB_3D;
 }
 
-#ifdef __cplusplus
-static EAlign toAlign(const char *str, EAlign def)
-{
-    if(str && 0!=str[0])
-    {
-        if(0==memcmp(str, "left", 4))
-            return ALIGN_LEFT;
-        if(0==memcmp(str, "center-full", 11))
-            return ALIGN_FULL_CENTER;
-        if(0==memcmp(str, "center", 6))
-            return ALIGN_CENTER;
-        if(0==memcmp(str, "right", 5))
-            return ALIGN_RIGHT;
-    }
-    return def;
-}
-#endif
-
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+#if defined CONFIG_DIALOG
 static ETitleBarIcon toTitlebarIcon(const char *str, ETitleBarIcon def)
 {
     if(str && 0!=str[0])
@@ -583,27 +523,7 @@ qtcGetWindowBorderSize(bool force)
     static WindowBorders def={24, 18, 4, 4};
     static WindowBorders sizes={-1, -1, -1, -1};
 
-    if(-1==sizes.titleHeight || force)
-    {
-#ifdef __cplusplus
-        QFile f(qtcConfDir()+QString(BORDER_SIZE_FILE));
-
-#if QT_VERSION >= 0x040000
-        if(f.open(QIODevice::ReadOnly))
-#else
-        if(f.open(IO_ReadOnly))
-#endif
-        {
-            QTextStream stream(&f);
-            QString     line;
-
-            sizes.titleHeight=stream.readLine().toInt();
-            sizes.toolTitleHeight=stream.readLine().toInt();
-            sizes.bottom=stream.readLine().toInt();
-            sizes.sides=stream.readLine().toInt();
-            f.close();
-        }
-#else // __cplusplus
+    if (-1 == sizes.titleHeight || force) {
         char *filename = qtcCatStrs(qtcConfDir(), BORDER_SIZE_FILE);
         FILE *f = NULL;
         if ((f = fopen(filename, "r"))) {
@@ -622,29 +542,12 @@ qtcGetWindowBorderSize(bool force)
             fclose(f);
         }
         free(filename);
-#endif // __cplusplus
     }
 
     return sizes.titleHeight<12 ? def : sizes;
 }
 
 #if (!defined QT_VERSION || QT_VERSION >= 0x040000) && !defined CONFIG_DIALOG
-
-#ifdef __cplusplus
-bool qtcBarHidden(const QString &app, const char *prefix)
-{
-    return QFile::exists(QFile::decodeName(qtcConfDir())+prefix+app);
-}
-
-void qtcSetBarHidden(const QString &app, bool hidden, const char *prefix)
-{
-    if(!hidden)
-        QFile::remove(QFile::decodeName(qtcConfDir())+prefix+app);
-    else
-        QFile(QFile::decodeName(qtcConfDir())+prefix+app).open(QIODevice::WriteOnly);
-}
-
-#else // __cplusplus
 
 static char*
 qtcGetBarFileName(const char *app, const char *prefix)
@@ -672,45 +575,12 @@ void qtcSetBarHidden(const char *app, bool hidden, const char *prefix)
     }
 }
 
-#endif // __cplusplus
-
-#ifdef __cplusplus
-#include <QtSvg/QSvgRenderer>
-#include <QtGui/QPainter>
-#endif // __cplusplus
-
 void qtcLoadBgndImage(QtCImage *img)
 {
     if(!img->loaded &&
         ( (img->width>16 && img->width<1024 && img->height>16 && img->height<1024) || (0==img->width && 0==img->height)) )
     {
         img->loaded=true;
-#ifdef __cplusplus
-        img->pixmap.img=QPixmap();
-        QString file(determineFileName(img->pixmap.file));
-
-        if(!file.isEmpty())
-        {
-            bool loaded=false;
-            if(0!=img->width && (file.endsWith(".svg", Qt::CaseInsensitive) || file.endsWith(".svgz", Qt::CaseInsensitive)))
-            {
-                QSvgRenderer svg(file);
-
-                if(svg.isValid())
-                {
-                    img->pixmap.img=QPixmap(img->width, img->height);
-                    img->pixmap.img.fill(Qt::transparent);
-                    QPainter painter(&img->pixmap.img);
-                    svg.render(&painter);
-                    painter.end();
-                    loaded=true;
-                }
-            }
-            if(!loaded && img->pixmap.img.load(file) && 0!=img->width &&
-               (img->pixmap.img.height()!=img->height || img->pixmap.img.width()!=img->width))
-                img->pixmap.img=img->pixmap.img.scaled(img->width, img->height, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-        }
-#else // __cplusplus
         img->pixmap.img=0L;
         if(img->pixmap.file)
         {
@@ -723,184 +593,33 @@ void qtcLoadBgndImage(QtCImage *img)
                 img->height=gdk_pixbuf_get_height(img->pixmap.img);
             }
         }
-#endif // __cplusplus
     }
 }
 
-#endif // (!defined QT_VERSION || QT_VERSION >= 0x040000) && !defined CONFIG_DIALOG
+#endif
 
-static void checkColor(EShade *s, color *c)
+static void
+checkColor(EShade *s, color *c)
 {
     if(SHADE_CUSTOM==*s && IS_BLACK(*c))
         *s=SHADE_NONE;
 }
 
-#ifdef __cplusplus
-
-class QtCConfig
+static char*
+lookupCfgHash(GHashTable **cfg, const char *key, char *val)
 {
-    public:
+    char *rv = NULL;
 
-    QtCConfig(const QString &filename);
-
-    bool            ok() const { return values.count()>0; }
-    bool            hasKey(const QString &key) { return values.contains(key); }
-    const QString & readEntry(const QString &key, const QString &def=QString::null);
-
-    private:
-
-    QMap<QString, QString> values;
-};
-
-QtCConfig::QtCConfig(const QString &filename)
-{
-    QFile f(filename);
-
-#if QT_VERSION >= 0x040000
-    if(f.open(QIODevice::ReadOnly))
-#else
-    if(f.open(IO_ReadOnly))
-#endif
-    {
-        QTextStream stream(&f);
-        QString     line;
-
-        while(!stream.atEnd())
-        {
-            line = stream.readLine();
-#if QT_VERSION >= 0x040000
-            int pos=line.indexOf('=');
-#else
-            int pos=line.find('=');
-#endif
-            if(-1!=pos)
-                values[line.left(pos)]=line.mid(pos+1);
-        }
-        f.close();
-    }
-}
-
-inline const QString & QtCConfig::readEntry(const QString &key, const QString &def)
-{
-    return values.contains(key) ? values[key] : def;
-}
-
-inline QString readStringEntry(QtCConfig &cfg, const QString &key)
-{
-    return cfg.readEntry(key);
-}
-
-static int readNumEntry(QtCConfig &cfg, const QString &key, int def)
-{
-    const QString &val(readStringEntry(cfg, key));
-
-    return val.isEmpty() ? def : val.toInt();
-}
-
-static int readVersionEntry(QtCConfig &cfg, const QString &key)
-{
-    const QString &val(readStringEntry(cfg, key));
-    int           major, minor, patch;
-
-    return !val.isEmpty() && 3==sscanf(TO_LATIN1(val), "%d.%d.%d", &major, &minor, &patch)
-            ? qtcMakeVersion(major, minor, patch)
-            : 0;
-}
-
-static bool readBoolEntry(QtCConfig &cfg, const QString &key, bool def)
-{
-    const QString &val(readStringEntry(cfg, key));
-
-    return val.isEmpty() ? def : (val=="true" ? true : false);
-}
-
-static void readDoubleList(QtCConfig &cfg, const char *key, double *list, int count)
-{
-#if (defined QT_VERSION && (QT_VERSION >= 0x040000))
-    QStringList strings(readStringEntry(cfg, key).split(',', QString::SkipEmptyParts));
-#else
-    QStringList strings(QStringList::split(',', readStringEntry(cfg, key)));
-#endif
-    bool ok(count==strings.size());
-
-    if(ok)
-    {
-        QStringList::ConstIterator it(strings.begin());
-        int                        i;
-
-        for(i=0; i<count && ok; ++i, ++it)
-            list[i]=(*it).toDouble(&ok);
+    if (!*cfg) {
+        *cfg = g_hash_table_new(g_str_hash, g_str_equal);
+    } else {
+        rv = (char*)g_hash_table_lookup(*cfg, key);
     }
 
-    if(!ok && strings.size())
-        list[0]=0;
-}
-
-#define CFG_READ_COLOR(ENTRY) \
-    { \
-        QString sVal(cfg.readEntry(#ENTRY)); \
-        if(sVal.isEmpty()) \
-            opts->ENTRY=def->ENTRY; \
-        else \
-            qtcSetRgb(&(opts->ENTRY), TO_LATIN1(sVal)); \
-    }
-
-#define CFG_READ_IMAGE(ENTRY) \
-    { \
-        opts->ENTRY.type=toImageType(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY.type); \
-        opts->ENTRY.loaded=false; \
-        opts->ENTRY.width=opts->ENTRY.height=0; \
-        opts->ENTRY.onBorder=false; \
-        opts->ENTRY.pos=PP_TR; \
-        if(IMG_FILE==opts->ENTRY.type) \
-        { \
-            QString file(cfg.readEntry(#ENTRY ".file")); \
-            if(!file.isEmpty()) \
-            { \
-                opts->ENTRY.pixmap.file=file; \
-                opts->ENTRY.width=readNumEntry(cfg, #ENTRY ".width", 0); \
-                opts->ENTRY.height=readNumEntry(cfg, #ENTRY ".height", 0); \
-                opts->ENTRY.onBorder=readBoolEntry(cfg, #ENTRY ".onBorder", false); \
-                opts->ENTRY.pos=(EPixPos)readNumEntry(cfg, #ENTRY ".pos", (int)PP_TR); \
-            } \
-            else \
-                opts->ENTRY.type=IMG_NONE; \
-        } \
-    }
-
-#if QT_VERSION >= 0x040000
-    #define CFG_READ_STRING_LIST(ENTRY) \
-        { \
-            QString val=readStringEntry(cfg, #ENTRY); \
-            Strings set=val.isEmpty() ? Strings() : Strings::fromList(val.split(",", QString::SkipEmptyParts)); \
-            opts->ENTRY=set.count() || cfg.hasKey(#ENTRY) ? set : def->ENTRY; \
-        }
-#else
-    #define CFG_READ_STRING_LIST(ENTRY) \
-        { \
-            QString val=readStringEntry(cfg, #ENTRY); \
-            Strings list=val.isEmpty() ? Strings() : Strings::split(",", val, false); \
-            opts->ENTRY=list.count() || cfg.hasKey(#ENTRY) ? list : def->ENTRY; \
-        }
-#endif
-
-#else
-
-static char * lookupCfgHash(GHashTable **cfg, char *key, char *val)
-{
-    char *rv=NULL;
-
-    if(!*cfg)
-        *cfg=g_hash_table_new(g_str_hash, g_str_equal);
-    else
-        rv=(char *)g_hash_table_lookup(*cfg, key);
-
-    if(!rv && val)
-    {
+    if (!rv && val) {
         g_hash_table_insert(*cfg, g_strdup(key), g_strdup(val));
-        rv=(char *)g_hash_table_lookup(*cfg, key);
+        rv = (char *)g_hash_table_lookup(*cfg, key);
     }
-
     return rv;
 }
 
@@ -937,41 +656,47 @@ static GHashTable * loadConfig(const char *filename)
     return cfg;
 }
 
-static void releaseConfig(GHashTable *cfg)
+static void
+releaseConfig(GHashTable *cfg)
 {
     g_hash_table_destroy(cfg);
 }
 
-static char * readStringEntry(GHashTable *cfg, char *key)
+static char*
+readStringEntry(GHashTable *cfg, const char *key)
 {
     return lookupCfgHash(&cfg, key, NULL);
 }
 
-static int readNumEntry(GHashTable *cfg, char *key, int def)
+static int
+readNumEntry(GHashTable *cfg, const char *key, int def)
 {
-    char *str=readStringEntry(cfg, key);
+    char *str = readStringEntry(cfg, key);
 
     return str ? atoi(str) : def;
 }
 
-static int readVersionEntry(GHashTable *cfg, char *key)
+static int
+readVersionEntry(GHashTable *cfg, const char *key)
 {
-    char *str=readStringEntry(cfg, key);
-    int  major, minor, patch;
+    char *str = readStringEntry(cfg, key);
+    int major, minor, patch;
 
     return str && 3==sscanf(str, "%d.%d.%d", &major, &minor, &patch)
             ? qtcMakeVersion(major, minor, patch)
             : 0;
 }
 
-static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
+static gboolean
+readBoolEntry(GHashTable *cfg, const char *key, gboolean def)
 {
     char *str=readStringEntry(cfg, key);
 
     return str ? (0==memcmp(str, "true", 4) ? true : false) : def;
 }
 
-static void readDoubleList(GHashTable *cfg, char *key, double *list, int count)
+static void
+readDoubleList(GHashTable *cfg, const char *key, double *list, int count)
 {
     char *str=readStringEntry(cfg, key);
 
@@ -1009,163 +734,193 @@ static void readDoubleList(GHashTable *cfg, char *key, double *list, int count)
     }
 }
 
-#define TO_LATIN1(A) A
+#define TO_LATIN1(A) (A)
 
-#define CFG_READ_COLOR(ENTRY) \
-    { \
-        const char *str=readStringEntry(cfg, #ENTRY); \
-    \
-        if(str && 0!=str[0]) \
-            qtcSetRgb(&(opts->ENTRY), str); \
-        else \
-            opts->ENTRY=def->ENTRY; \
-    }
-#define CFG_READ_IMAGE(ENTRY) \
-    { \
-        opts->ENTRY.type=toImageType(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY.type); \
-        opts->ENTRY.loaded=false; \
-        if(IMG_FILE==opts->ENTRY.type) \
-        { \
-            const char *file=readStringEntry(cfg, #ENTRY ".file"); \
-            if(file) \
-            { \
-                opts->ENTRY.pixmap.file=file; \
-                opts->ENTRY.width=readNumEntry(cfg, #ENTRY ".width", 0); \
-                opts->ENTRY.height=readNumEntry(cfg, #ENTRY ".height", 0); \
-                opts->ENTRY.onBorder=readBoolEntry(cfg, #ENTRY ".onBorder", false); \
-                opts->ENTRY.pos=(EPixPos)readNumEntry(cfg, #ENTRY ".pos", (int)PP_TR); \
-            } \
-            else \
-            { \
-                opts->ENTRY.type=IMG_NONE; \
-            } \
-        } \
-    }
-#define CFG_READ_STRING_LIST(ENTRY) \
-    { \
-        const gchar *str=readStringEntry(cfg, #ENTRY); \
-        if(str && 0!=str[0]) \
-            opts->ENTRY=g_strsplit(str, ",", -1); \
-        else if(def->ENTRY) \
-        { \
-            opts->ENTRY=def->ENTRY; \
-            def->ENTRY=NULL; \
-        } \
-    }
+#define CFG_READ_COLOR(ENTRY) do {                        \
+        const char *str = readStringEntry(cfg, #ENTRY);   \
+        if (str && 0 != str[0]) {                         \
+            qtcSetRgb(&(opts->ENTRY), str);               \
+        } else {                                          \
+            opts->ENTRY=def->ENTRY;                       \
+        }                                                 \
+    } while (0)
 
+#define CFG_READ_IMAGE(ENTRY) do {                                      \
+        opts->ENTRY.type =                                              \
+            toImageType(TO_LATIN1(readStringEntry(cfg, #ENTRY)),        \
+                        def->ENTRY.type);                               \
+        opts->ENTRY.loaded = false;                                     \
+        if (IMG_FILE == opts->ENTRY.type) {                             \
+            const char *file = readStringEntry(cfg, #ENTRY ".file");    \
+            if (file) {                                                 \
+                opts->ENTRY.pixmap.file = file;                         \
+                opts->ENTRY.width = readNumEntry(cfg, #ENTRY ".width", 0); \
+                opts->ENTRY.height = readNumEntry(cfg, #ENTRY ".height", 0); \
+                opts->ENTRY.onBorder = readBoolEntry(cfg, #ENTRY ".onBorder", \
+                                                     false);            \
+                opts->ENTRY.pos = (EPixPos)readNumEntry(cfg, #ENTRY ".pos", \
+                                                        (int)PP_TR);    \
+            } else {                                                    \
+                opts->ENTRY.type = IMG_NONE;                            \
+            }                                                           \
+        }                                                               \
+    } while (0)
+
+#define CFG_READ_STRING_LIST(ENTRY) do {                 \
+        const gchar *str = readStringEntry(cfg, #ENTRY); \
+        if (str && 0 != str[0]) {                        \
+            opts->ENTRY = g_strsplit(str, ",", -1);      \
+        } else if (def->ENTRY) {                         \
+            opts->ENTRY = def->ENTRY;                    \
+            def->ENTRY = NULL;                           \
+        }                                                \
+    } while (0)
+
+#define CFG_READ_BOOL(ENTRY) do {                               \
+        opts->ENTRY = readBoolEntry(cfg, #ENTRY, def->ENTRY);   \
+    } while (0)
+
+#define CFG_READ_ROUND(ENTRY) do {                                      \
+        opts->ENTRY = toRound(TO_LATIN1(readStringEntry(cfg, #ENTRY)),  \
+                              def->ENTRY);                              \
+    } while (0)
+
+#define CFG_READ_INT(ENTRY) do {                                \
+        opts->ENTRY = readNumEntry(cfg, #ENTRY, def->ENTRY);    \
+    } while (0)
+
+#define CFG_READ_INT_BOOL(ENTRY, DEF) do {                              \
+        if (readBoolEntry(cfg, #ENTRY, false)) {                        \
+            opts->ENTRY = DEF;                                          \
+        } else {                                                        \
+            opts->ENTRY = readNumEntry(cfg, #ENTRY, def->ENTRY);        \
+        }                                                               \
+    } while (0)
+
+#define CFG_READ_TB_BORDER(ENTRY) do {                                  \
+        opts->ENTRY = toTBarBorder(TO_LATIN1(readStringEntry(cfg, #ENTRY)), \
+                                   def->ENTRY);                         \
+    } while (0)
+
+#define CFG_READ_MOUSE_OVER(ENTRY) do {                                 \
+        opts->ENTRY = toMouseOver(TO_LATIN1(readStringEntry(cfg, #ENTRY)), \
+                                  def->ENTRY);                          \
+    } while (0)
+
+#define CFG_READ_APPEARANCE(ENTRY, ALLOW) do {                          \
+        opts->ENTRY = toAppearance(TO_LATIN1(readStringEntry(cfg, #ENTRY)), \
+                                   def->ENTRY, ALLOW, NULL, false);     \
+    } while (0)
+
+#define CFG_READ_APPEARANCE_PIXMAP(ENTRY, ALLOW, PIXMAP, CHECK) do {    \
+        opts->ENTRY = toAppearance(TO_LATIN1(readStringEntry(cfg, #ENTRY)), \
+                                   def->ENTRY, ALLOW, PIXMAP, CHECK);   \
+    } while (0)
+
+#define CFG_READ_STRIPE(ENTRY) do {                                     \
+        opts->ENTRY = toStripe(TO_LATIN1(readStringEntry(cfg, #ENTRY)), \
+                               def->ENTRY);                             \
+    } while (0)
+
+#define CFG_READ_SLIDER(ENTRY) do {                                     \
+        opts->ENTRY = toSlider(TO_LATIN1(readStringEntry(cfg, #ENTRY)), \
+                             def->ENTRY);                               \
+    } while (0)
+
+#define CFG_READ_DEF_BTN(ENTRY) do {                                    \
+        opts->ENTRY = toInd(TO_LATIN1(readStringEntry(cfg, #ENTRY)),    \
+                            def->ENTRY);                                \
+    } while (0)
+
+#define CFG_READ_LINE(ENTRY) do {                                       \
+        opts->ENTRY = toLine(TO_LATIN1(readStringEntry(cfg, #ENTRY)),   \
+                             def->ENTRY);                               \
+    } while (0)
+
+#define CFG_READ_SHADE(ENTRY, AD, MENU_STRIPE, COL) do {                \
+        opts->ENTRY = toShade(TO_LATIN1(readStringEntry(cfg, #ENTRY)), AD, \
+                              def->ENTRY, MENU_STRIPE, COL);            \
+    } while (0)
+
+#define CFG_READ_SCROLLBAR(ENTRY) do {                                  \
+        opts->ENTRY = toScrollbar(TO_LATIN1(readStringEntry(cfg, #ENTRY)), \
+                                  def->ENTRY);                          \
+    } while (0)
+
+#define CFG_READ_FRAME(ENTRY) do {                                      \
+        opts->ENTRY = toFrame(TO_LATIN1(readStringEntry(cfg, #ENTRY)),  \
+                              def->ENTRY);                              \
+    } while (0)
+
+#define CFG_READ_EFFECT(ENTRY) do {                                     \
+        opts->ENTRY = toEffect(TO_LATIN1(readStringEntry(cfg, #ENTRY)), \
+                               def->ENTRY);                             \
+    } while (0)
+
+#define CFG_READ_SHADING(ENTRY) do {                                    \
+        opts->ENTRY = toShading(TO_LATIN1(readStringEntry(cfg, #ENTRY)), \
+                                def->ENTRY);                            \
+    } while (0)
+
+#define CFG_READ_ECOLOR(ENTRY) do {                                     \
+        opts->ENTRY = toEColor(TO_LATIN1(readStringEntry(cfg, #ENTRY)), \
+                               def->ENTRY);                             \
+    } while (0)
+
+#define CFG_READ_FOCUS(ENTRY) do {                                      \
+        opts->ENTRY = toFocus(TO_LATIN1(readStringEntry(cfg, #ENTRY)),  \
+                              def->ENTRY);                              \
+    } while (0)
+
+#define CFG_READ_TAB_MO(ENTRY) do {                                     \
+        opts->ENTRY = toTabMo(TO_LATIN1(readStringEntry(cfg, #ENTRY)),  \
+                              def->ENTRY);                              \
+    } while (0)
+
+#define CFG_READ_GRAD_TYPE(ENTRY) do {                                  \
+        opts->ENTRY = toGradType(TO_LATIN1(readStringEntry(cfg, #ENTRY)), \
+                                 def->ENTRY);                           \
+    } while (0)
+
+#define CFG_READ_LV_LINES(ENTRY) do {                                   \
+        opts->ENTRY = toLvLines(TO_LATIN1(readStringEntry(cfg, #ENTRY)), \
+                                def->ENTRY);                            \
+    } while (0)
+
+#if defined CONFIG_DIALOG
+#define CFG_READ_TB_ICON(ENTRY) do {                                    \
+        opts->ENTRY = toTitlebarIcon(TO_LATIN1(readStringEntry(cfg, #ENTRY)), \
+                                     def->ENTRY);                       \
+    } while (0)
 #endif
 
-#define CFG_READ_BOOL(ENTRY) \
-    opts->ENTRY=readBoolEntry(cfg, #ENTRY, def->ENTRY);
+#define CFG_READ_GLOW(ENTRY) do {                                       \
+        opts->ENTRY = toGlow(TO_LATIN1(readStringEntry(cfg, #ENTRY)),   \
+                             def->ENTRY);                               \
+    } while (0)
 
-#define CFG_READ_ROUND(ENTRY) \
-    opts->ENTRY=toRound(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
+#define CFG_READ_TBAR_BTN(ENTRY) do {                                   \
+        opts->ENTRY = toTBarBtn(TO_LATIN1(readStringEntry(cfg, #ENTRY)), \
+                                def->ENTRY);                            \
+    } while (0)
 
-#define CFG_READ_INT(ENTRY) \
-    opts->ENTRY=readNumEntry(cfg, #ENTRY, def->ENTRY);
-
-#define CFG_READ_INT_BOOL(ENTRY, DEF) \
-    if(readBoolEntry(cfg, #ENTRY, false)) \
-        opts->ENTRY=DEF; \
-    else \
-        opts->ENTRY=readNumEntry(cfg, #ENTRY, def->ENTRY);
-
-#define CFG_READ_TB_BORDER(ENTRY) \
-    opts->ENTRY=toTBarBorder(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
-
-#define CFG_READ_MOUSE_OVER(ENTRY) \
-    opts->ENTRY=toMouseOver(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
-
-#define CFG_READ_APPEARANCE(ENTRY, ALLOW) \
-    opts->ENTRY=toAppearance(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY, ALLOW, NULL, false);
-
-#define CFG_READ_APPEARANCE_PIXMAP(ENTRY, ALLOW, PIXMAP, CHECK) \
-    opts->ENTRY=toAppearance(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY, ALLOW, PIXMAP, CHECK);
-
-/*
-#define CFG_READ_APPEARANCE(ENTRY) \
-    opts->ENTRY=toAppearance(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
-*/
-
-#define CFG_READ_STRIPE(ENTRY) \
-    opts->ENTRY=toStripe(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
-
-#define CFG_READ_SLIDER(ENTRY) \
-    opts->ENTRY=toSlider(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
-
-#define CFG_READ_DEF_BTN(ENTRY) \
-    opts->ENTRY=toInd(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
-
-#define CFG_READ_LINE(ENTRY) \
-    opts->ENTRY=toLine(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
-
-#define CFG_READ_SHADE(ENTRY, AD, MENU_STRIPE, COL) \
-    opts->ENTRY=toShade(TO_LATIN1(readStringEntry(cfg, #ENTRY)), AD, def->ENTRY, MENU_STRIPE, COL);
-
-#define CFG_READ_SCROLLBAR(ENTRY) \
-    opts->ENTRY=toScrollbar(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
-
-#define CFG_READ_FRAME(ENTRY) \
-    opts->ENTRY=toFrame(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
-
-#define CFG_READ_EFFECT(ENTRY) \
-    opts->ENTRY=toEffect(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
-
-#define CFG_READ_SHADING(ENTRY) \
-    opts->ENTRY=toShading(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
-
-#define CFG_READ_ECOLOR(ENTRY) \
-    opts->ENTRY=toEColor(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
-
-#define CFG_READ_FOCUS(ENTRY) \
-    opts->ENTRY=toFocus(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
-
-#define CFG_READ_TAB_MO(ENTRY) \
-    opts->ENTRY=toTabMo(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
-
-#define CFG_READ_GRAD_TYPE(ENTRY) \
-    opts->ENTRY=toGradType(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
-
-#define CFG_READ_LV_LINES(ENTRY) \
-    opts->ENTRY=toLvLines(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
-
-#ifdef __cplusplus
-#define CFG_READ_ALIGN(ENTRY) \
-    opts->ENTRY=toAlign(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
-#endif
-
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
-#define CFG_READ_TB_ICON(ENTRY) \
-    opts->ENTRY=toTitlebarIcon(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
-#endif
-
-#define CFG_READ_GLOW(ENTRY) \
-    opts->ENTRY=toGlow(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
-
-#define CFG_READ_TBAR_BTN(ENTRY) \
-    opts->ENTRY=toTBarBtn(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
-
-static void checkAppearance(EAppearance *ap, Options *opts)
+static void
+checkAppearance(EAppearance *ap, Options *opts)
 {
-    if(*ap>=APPEARANCE_CUSTOM1 && *ap<(APPEARANCE_CUSTOM1+NUM_CUSTOM_GRAD))
-    {
-#ifdef __cplusplus
-        if(opts->customGradient.end()==opts->customGradient.find(*ap))
-#else
-        if(!opts->customGradient[*ap-APPEARANCE_CUSTOM1])
-#endif
-        {
-            if(ap==&opts->appearance)
-                *ap=APPEARANCE_FLAT;
-            else
-                *ap=opts->appearance;
+    if (*ap >= APPEARANCE_CUSTOM1 &&
+        *ap < (APPEARANCE_CUSTOM1 + NUM_CUSTOM_GRAD)) {
+        if (!opts->customGradient[*ap - APPEARANCE_CUSTOM1]) {
+            if (ap == &opts->appearance) {
+                *ap = APPEARANCE_FLAT;
+            } else {
+                *ap = opts->appearance;
+            }
         }
     }
 }
 
 void qtcDefaultSettings(Options *opts);
 
-#ifndef __cplusplus
 static void copyGradients(Options *src, Options *dest)
 {
     if(src && dest && src!=dest)
@@ -1242,7 +997,6 @@ static void freeOpts(Options *opts)
             }
     }
 }
-#endif
 
 void qtcCheckConfig(Options *opts)
 {
@@ -1260,11 +1014,6 @@ void qtcCheckConfig(Options *opts)
     checkAppearance(&opts->selectionAppearance, opts);
     checkAppearance(&opts->titlebarAppearance, opts);
     checkAppearance(&opts->inactiveTitlebarAppearance, opts);
-#ifdef __cplusplus
-    checkAppearance(&opts->titlebarButtonAppearance, opts);
-    checkAppearance(&opts->selectionAppearance, opts);
-    checkAppearance(&opts->dwtAppearance, opts);
-#endif
     checkAppearance(&opts->menuStripeAppearance, opts);
     checkAppearance(&opts->progressAppearance, opts);
     checkAppearance(&opts->progressGrooveAppearance, opts);
@@ -1321,10 +1070,8 @@ void qtcCheckConfig(Options *opts)
     if(opts->splitterHighlight<MIN_HIGHLIGHT_FACTOR || opts->splitterHighlight>MAX_HIGHLIGHT_FACTOR)
         opts->splitterHighlight=DEFAULT_SPLITTER_HIGHLIGHT_FACTOR;
 
-#if !defined __cplusplus || defined CONFIG_DIALOG
     if(opts->expanderHighlight<MIN_HIGHLIGHT_FACTOR || opts->expanderHighlight>MAX_HIGHLIGHT_FACTOR)
         opts->expanderHighlight=DEFAULT_EXPANDER_HIGHLIGHT_FACTOR;
-#endif
 
     if(0==opts->menuDelay) /* Qt seems to have issues if delay is 0 - so set this to 1 :-) */
         opts->menuDelay=MIN_MENU_DELAY;
@@ -1364,13 +1111,6 @@ void qtcCheckConfig(Options *opts)
     if(!opts->gtkComboMenus)
         opts->doubleGtkComboArrow=false;
 
-#if defined __cplusplus && defined QT_VERSION && QT_VERSION < 0x040000 && !defined CONFIG_DIALOG
-    opts->crSize=CR_SMALL_SIZE;
-    if(SLIDER_CIRCULAR==opts->sliderStyle)
-        opts->sliderStyle=SLIDER_ROUND;
-    if(STRIPE_FADE==opts->stripedProgress)
-        opts->stripedProgress=STRIPE_PLAIN;
-#endif
     /* For now, only 2 sizes... */
     if(opts->crSize!=CR_SMALL_SIZE && opts->crSize!=CR_LARGE_SIZE)
         opts->crSize=CR_SMALL_SIZE;
@@ -1381,10 +1121,6 @@ void qtcCheckConfig(Options *opts)
         opts->colorMenubarMouseOver=true;
 */
 
-#if defined __cplusplus && defined QT_VERSION && QT_VERSION < 0x040000 && !defined CONFIG_DIALOG
-    if(opts->round>ROUND_FULL)
-        opts->round=ROUND_FULL;
-#endif
 #ifndef CONFIG_DIALOG
     if(MO_GLOW==opts->coloredMouseOver && EFFECT_NONE==opts->buttonEffect)
         opts->coloredMouseOver=MO_COLORED_THICK;
@@ -1447,14 +1183,6 @@ void qtcCheckConfig(Options *opts)
     if(opts->shadePopupMenu && SHADE_NONE==opts->shadeMenubars)
         opts->shadePopupMenu=false;
 
-#ifdef __cplusplus
-
-#if defined QT_VERSION && QT_VERSION >= 0x040000
-    if(!(opts->titlebarButtons&TITLEBAR_BUTTON_ROUND))
-#endif
-        opts->titlebarButtonAppearance=MODIFY_AGUA(opts->titlebarButtonAppearance);
-    opts->dwtAppearance=MODIFY_AGUA(opts->dwtAppearance);
-#endif
     if(opts->windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR &&
         (opts->windowBorder&WINDOW_BORDER_BLEND_TITLEBAR || SHADE_WINDOW_BORDER==opts->shadeMenubars))
         opts->windowBorder-=WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR;
@@ -1472,34 +1200,8 @@ void qtcCheckConfig(Options *opts)
         opts->toolbarSeparators=LINE_DOTS;
 }
 
-#ifdef __cplusplus
-bool qtcReadConfig(const QString &file, Options *opts, Options *defOpts, bool checkImages)
-#else
 bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
-#endif
 {
-#ifdef __cplusplus
-    if(file.isEmpty())
-    {
-        const char *env=getenv("QTCURVE_CONFIG_FILE");
-
-        if(NULL!=env)
-            return qtcReadConfig(env, opts, defOpts);
-        else
-        {
-            const char *cfgDir=qtcConfDir();
-
-            if(cfgDir)
-            {
-                QString filename(QFile::decodeName(cfgDir)+CONFIG_FILE);
-
-                if(!QFile::exists(filename))
-                    filename=QFile::decodeName(cfgDir)+"../"OLD_CONFIG_FILE;
-                return qtcReadConfig(filename, opts, defOpts);
-            }
-        }
-    }
-#else
     bool checkImages=true;
     if(!file)
     {
@@ -1518,37 +1220,15 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             return rv;
         }
     }
-#endif
     else {
-#ifdef __cplusplus
-        QtCConfig cfg(file);
-
-        if(cfg.ok())
-        {
-#else
         GHashTable *cfg=loadConfig(file);
 
         if(cfg)
         {
-#endif
             int     i;
 
             opts->version=readVersionEntry(cfg, VERSION_KEY);
 
-#ifdef __cplusplus
-            Options newOpts;
-
-            if(defOpts)
-                newOpts=*defOpts;
-            else
-                qtcDefaultSettings(&newOpts);
-
-            Options *def=&newOpts;
-
-            if(opts!=def)
-                opts->customGradient=def->customGradient;
-
-#else
             Options newOpts;
             Options *def=&newOpts;
 #ifdef QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
@@ -1564,7 +1244,6 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                 qtcDefaultSettings(&newOpts);
             if(opts!=def)
                 copyGradients(def, opts);
-#endif
 
             /* Check if the config file expects old default values... */
             if(opts->version<qtcMakeVersion(1, 6))
@@ -1576,11 +1255,9 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                 opts->gbFactor=0;
                 def->focus=FOCUS_LINE;
                 def->crHighlight=3;
-            }
-            else
-            {
-                CFG_READ_FRAME(groupBox)
-                CFG_READ_INT(gbLabel)
+            } else {
+                CFG_READ_FRAME(groupBox);
+                CFG_READ_INT(gbLabel);
             }
 
             if(opts->version<qtcMakeVersion(1, 5))
@@ -1611,7 +1288,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                     (readBoolEntry(cfg, "squareEntry", def->square&SQUARE_ENTRY)? SQUARE_ENTRY : SQUARE_NONE);
             }
             else
-                CFG_READ_INT(square)
+                CFG_READ_INT(square);
             if(opts->version<qtcMakeVersion(1, 7))
             {
                 def->tbarBtns=TBTN_STANDARD;
@@ -1620,7 +1297,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             }
             else
             {
-                CFG_READ_INT(thin)
+                CFG_READ_INT(thin);
             }
             if(opts->version<qtcMakeVersion(1, 6))
                 opts->square|=SQUARE_TOOLTIPS;
@@ -1635,12 +1312,6 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                 def->splitters=LINE_FLAT;
                 def->handles=LINE_SUNKEN;
                 def->crHighlight=0;
-#ifdef __cplusplus
-                def->dwtAppearance=APPEARANCE_FLAT;
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
-                def->dwtSettings=0;
-#endif
-#endif
                 def->inactiveTitlebarAppearance=APPEARANCE_CUSTOM2;
             }
             if(opts->version<qtcMakeVersion(0, 67))
@@ -1651,7 +1322,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                 def->etchEntry=true;
                 def->gtkScrollViews=false;
                 def->thinSbarGroove=false;
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+#if defined CONFIG_DIALOG
                 def->titlebarButtons=TITLEBAR_BUTTON_HOVER_FRAME;
                 def->titlebarIcon=TITLEBAR_ICON_MENU_BUTTON;
 #endif
@@ -1669,9 +1340,6 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             {
                 def->tabMouseOver=TAB_MO_TOP;
                 def->sliderStyle=SLIDER_TRIANGULAR;
-#ifdef __cplusplus
-                def->titlebarAlignment=ALIGN_LEFT;
-#endif
             }
             if(opts->version<qtcMakeVersion(0, 62))
             {
@@ -1722,15 +1390,15 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                     memcpy(opts->customShades, def->customShades, sizeof(double)*QTC_NUM_STD_SHADES);
             }
 
-            CFG_READ_INT(gbFactor)
-            CFG_READ_INT(passwordChar)
-            CFG_READ_ROUND(round)
-            CFG_READ_INT(highlightFactor)
-            CFG_READ_INT(menuDelay)
-            CFG_READ_INT(sliderWidth)
-            CFG_READ_INT(tabBgnd)
-            CFG_READ_TB_BORDER(toolbarBorders)
-            CFG_READ_APPEARANCE(appearance, APP_ALLOW_BASIC)
+            CFG_READ_INT(gbFactor);
+            CFG_READ_INT(passwordChar);
+            CFG_READ_ROUND(round);
+            CFG_READ_INT(highlightFactor);
+            CFG_READ_INT(menuDelay);
+            CFG_READ_INT(sliderWidth);
+            CFG_READ_INT(tabBgnd);
+            CFG_READ_TB_BORDER(toolbarBorders);
+            CFG_READ_APPEARANCE(appearance, APP_ALLOW_BASIC);
             if(opts->version<qtcMakeVersion(1, 8))
             {
                 opts->tbarBtnAppearance=APPEARANCE_NONE;
@@ -1738,179 +1406,159 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             }
             else
             {
-                CFG_READ_APPEARANCE(tbarBtnAppearance, APP_ALLOW_NONE)
+                CFG_READ_APPEARANCE(tbarBtnAppearance, APP_ALLOW_NONE);
                 CFG_READ_EFFECT(tbarBtnEffect);
             }
-            CFG_READ_APPEARANCE_PIXMAP(bgndAppearance, APP_ALLOW_STRIPED, &(opts->bgndPixmap), checkImages)
-            CFG_READ_GRAD_TYPE(bgndGrad)
-            CFG_READ_GRAD_TYPE(menuBgndGrad)
-            CFG_READ_INT_BOOL(lighterPopupMenuBgnd, def->lighterPopupMenuBgnd)
-            CFG_READ_APPEARANCE_PIXMAP(menuBgndAppearance, APP_ALLOW_STRIPED, &(opts->menuBgndPixmap), checkImages)
+            CFG_READ_APPEARANCE_PIXMAP(bgndAppearance, APP_ALLOW_STRIPED,
+                                       &(opts->bgndPixmap), checkImages);
+            CFG_READ_GRAD_TYPE(bgndGrad);
+            CFG_READ_GRAD_TYPE(menuBgndGrad);
+            CFG_READ_INT_BOOL(lighterPopupMenuBgnd, def->lighterPopupMenuBgnd);
+            CFG_READ_APPEARANCE_PIXMAP(menuBgndAppearance, APP_ALLOW_STRIPED,
+                                       &(opts->menuBgndPixmap), checkImages);
 
             if(APPEARANCE_FLAT==opts->menuBgndAppearance && 0==opts->lighterPopupMenuBgnd && opts->version<qtcMakeVersion(1, 7))
                 opts->menuBgndAppearance=APPEARANCE_RAISED;
 
 #ifdef QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-            CFG_READ_BOOL(fixParentlessDialogs)
-            CFG_READ_STRING_LIST(noDlgFixApps)
+            CFG_READ_BOOL(fixParentlessDialogs);
+            CFG_READ_STRING_LIST(noDlgFixApps);
 #endif
-            CFG_READ_STRIPE(stripedProgress)
-            CFG_READ_SLIDER(sliderStyle)
-            CFG_READ_BOOL(animatedProgress)
-            CFG_READ_BOOL(embolden)
-            CFG_READ_DEF_BTN(defBtnIndicator)
-            CFG_READ_LINE(sliderThumbs)
-            CFG_READ_LINE(handles)
-            CFG_READ_BOOL(highlightTab)
-            CFG_READ_INT_BOOL(colorSelTab, DEF_COLOR_SEL_TAB_FACTOR)
-            CFG_READ_BOOL(roundAllTabs)
-            CFG_READ_TAB_MO(tabMouseOver)
-            CFG_READ_SHADE(shadeSliders, true, false, &opts->customSlidersColor)
-            CFG_READ_SHADE(shadeMenubars, true, false, &opts->customMenubarsColor)
-            CFG_READ_SHADE(shadeCheckRadio, false, false, &opts->customCheckRadioColor)
-            CFG_READ_SHADE(sortedLv, true, false, &opts->customSortedLvColor)
-            CFG_READ_SHADE(crColor,  true, false, &opts->customCrBgndColor)
-            CFG_READ_SHADE(progressColor, false, false, &opts->customProgressColor)
-            CFG_READ_APPEARANCE(menubarAppearance, APP_ALLOW_BASIC)
-            CFG_READ_APPEARANCE(menuitemAppearance, APP_ALLOW_FADE)
-            CFG_READ_APPEARANCE(toolbarAppearance, APP_ALLOW_BASIC)
-            CFG_READ_APPEARANCE(selectionAppearance, APP_ALLOW_BASIC)
-#ifdef __cplusplus
-            CFG_READ_APPEARANCE(dwtAppearance, APP_ALLOW_BASIC)
-#endif
-            CFG_READ_LINE(toolbarSeparators)
-            CFG_READ_LINE(splitters)
-            CFG_READ_BOOL(customMenuTextColor)
-            CFG_READ_MOUSE_OVER(coloredMouseOver)
-            CFG_READ_BOOL(menubarMouseOver)
-            CFG_READ_BOOL(useHighlightForMenu)
-            CFG_READ_BOOL(shadeMenubarOnlyWhenActive)
-            CFG_READ_TBAR_BTN(tbarBtns)
+            CFG_READ_STRIPE(stripedProgress);
+            CFG_READ_SLIDER(sliderStyle);
+            CFG_READ_BOOL(animatedProgress);
+            CFG_READ_BOOL(embolden);
+            CFG_READ_DEF_BTN(defBtnIndicator);
+            CFG_READ_LINE(sliderThumbs);
+            CFG_READ_LINE(handles);
+            CFG_READ_BOOL(highlightTab);
+            CFG_READ_INT_BOOL(colorSelTab, DEF_COLOR_SEL_TAB_FACTOR);
+            CFG_READ_BOOL(roundAllTabs);
+            CFG_READ_TAB_MO(tabMouseOver);
+            CFG_READ_SHADE(shadeSliders, true, false, &opts->customSlidersColor);
+            CFG_READ_SHADE(shadeMenubars, true, false, &opts->customMenubarsColor);
+            CFG_READ_SHADE(shadeCheckRadio, false, false, &opts->customCheckRadioColor);
+            CFG_READ_SHADE(sortedLv, true, false, &opts->customSortedLvColor);
+            CFG_READ_SHADE(crColor,  true, false, &opts->customCrBgndColor);
+            CFG_READ_SHADE(progressColor, false, false, &opts->customProgressColor);
+            CFG_READ_APPEARANCE(menubarAppearance, APP_ALLOW_BASIC);
+            CFG_READ_APPEARANCE(menuitemAppearance, APP_ALLOW_FADE);
+            CFG_READ_APPEARANCE(toolbarAppearance, APP_ALLOW_BASIC);
+            CFG_READ_APPEARANCE(selectionAppearance, APP_ALLOW_BASIC);
+            CFG_READ_LINE(toolbarSeparators);
+            CFG_READ_LINE(splitters);
+            CFG_READ_BOOL(customMenuTextColor);
+            CFG_READ_MOUSE_OVER(coloredMouseOver);
+            CFG_READ_BOOL(menubarMouseOver);
+            CFG_READ_BOOL(useHighlightForMenu);
+            CFG_READ_BOOL(shadeMenubarOnlyWhenActive);
+            CFG_READ_TBAR_BTN(tbarBtns);
             if(opts->version<qtcMakeVersion(0, 63))
             {
                 if(IS_BLACK(opts->customSlidersColor))
-                    CFG_READ_COLOR(customSlidersColor)
+                    CFG_READ_COLOR(customSlidersColor);
                 if(IS_BLACK(opts->customMenubarsColor))
-                    CFG_READ_COLOR(customMenubarsColor)
+                    CFG_READ_COLOR(customMenubarsColor);
                 if(IS_BLACK(opts->customCheckRadioColor))
-                    CFG_READ_COLOR(customCheckRadioColor)
+                    CFG_READ_COLOR(customCheckRadioColor);
             }
-            CFG_READ_COLOR(customMenuSelTextColor)
-            CFG_READ_COLOR(customMenuNormTextColor)
-            CFG_READ_SCROLLBAR(scrollbarType)
-            CFG_READ_EFFECT(buttonEffect)
-            CFG_READ_APPEARANCE(lvAppearance, APP_ALLOW_BASIC)
-            CFG_READ_APPEARANCE(tabAppearance, APP_ALLOW_BASIC)
-            CFG_READ_APPEARANCE(activeTabAppearance, APP_ALLOW_BASIC)
-            CFG_READ_APPEARANCE(sliderAppearance, APP_ALLOW_BASIC)
-            CFG_READ_APPEARANCE(progressAppearance, APP_ALLOW_BASIC)
-            CFG_READ_APPEARANCE(progressGrooveAppearance, APP_ALLOW_BASIC)
-            CFG_READ_APPEARANCE(grooveAppearance, APP_ALLOW_BASIC)
-            CFG_READ_APPEARANCE(sunkenAppearance, APP_ALLOW_BASIC)
-            CFG_READ_APPEARANCE(sbarBgndAppearance, APP_ALLOW_BASIC)
+            CFG_READ_COLOR(customMenuSelTextColor);
+            CFG_READ_COLOR(customMenuNormTextColor);
+            CFG_READ_SCROLLBAR(scrollbarType);
+            CFG_READ_EFFECT(buttonEffect);
+            CFG_READ_APPEARANCE(lvAppearance, APP_ALLOW_BASIC);
+            CFG_READ_APPEARANCE(tabAppearance, APP_ALLOW_BASIC);
+            CFG_READ_APPEARANCE(activeTabAppearance, APP_ALLOW_BASIC);
+            CFG_READ_APPEARANCE(sliderAppearance, APP_ALLOW_BASIC);
+            CFG_READ_APPEARANCE(progressAppearance, APP_ALLOW_BASIC);
+            CFG_READ_APPEARANCE(progressGrooveAppearance, APP_ALLOW_BASIC);
+            CFG_READ_APPEARANCE(grooveAppearance, APP_ALLOW_BASIC);
+            CFG_READ_APPEARANCE(sunkenAppearance, APP_ALLOW_BASIC);
+            CFG_READ_APPEARANCE(sbarBgndAppearance, APP_ALLOW_BASIC);
             if(opts->version<qtcMakeVersion(1, 6))
                 opts->tooltipAppearance=APPEARANCE_FLAT;
             else
             {
-                CFG_READ_APPEARANCE(tooltipAppearance, APP_ALLOW_BASIC)
+                CFG_READ_APPEARANCE(tooltipAppearance, APP_ALLOW_BASIC);
             }
 
             if(opts->version<qtcMakeVersion(0, 63))
                 opts->sliderFill=IS_FLAT(opts->appearance) ? opts->grooveAppearance : APPEARANCE_GRADIENT;
             else
             {
-                CFG_READ_APPEARANCE(sliderFill, APP_ALLOW_BASIC)
+                CFG_READ_APPEARANCE(sliderFill, APP_ALLOW_BASIC);
             }
-            CFG_READ_ECOLOR(progressGrooveColor)
-            CFG_READ_FOCUS(focus)
-            CFG_READ_BOOL(lvButton)
-            CFG_READ_LV_LINES(lvLines)
-            CFG_READ_BOOL(drawStatusBarFrames)
-            CFG_READ_BOOL(fillSlider)
-            CFG_READ_BOOL(roundMbTopOnly)
-            CFG_READ_BOOL(borderMenuitems)
-            CFG_READ_BOOL(darkerBorders)
-            CFG_READ_BOOL(vArrows)
-            CFG_READ_BOOL(xCheck)
-            CFG_READ_BOOL(fadeLines)
-            CFG_READ_GLOW(glowProgress)
-            CFG_READ_BOOL(colorMenubarMouseOver)
-            CFG_READ_INT_BOOL(crHighlight, opts->highlightFactor)
-            CFG_READ_BOOL(crButton)
-            CFG_READ_BOOL(smallRadio)
-            CFG_READ_BOOL(fillProgress)
-            CFG_READ_BOOL(comboSplitter)
-            CFG_READ_BOOL(highlightScrollViews)
-            CFG_READ_BOOL(etchEntry)
-            CFG_READ_INT_BOOL(splitterHighlight, opts->highlightFactor)
-            CFG_READ_INT(crSize)
-            CFG_READ_BOOL(flatSbarButtons)
-            CFG_READ_BOOL(borderSbarGroove)
-            CFG_READ_BOOL(borderProgress)
-            CFG_READ_BOOL(popupBorder)
-            CFG_READ_BOOL(unifySpinBtns)
-            CFG_READ_BOOL(unifySpin)
-            CFG_READ_BOOL(unifyCombo)
-            CFG_READ_BOOL(borderTab)
-            CFG_READ_BOOL(borderInactiveTab)
-            CFG_READ_BOOL(thinSbarGroove)
-            CFG_READ_BOOL(colorSliderMouseOver)
-            CFG_READ_BOOL(menuIcons)
-            CFG_READ_BOOL(forceAlternateLvCols)
-            CFG_READ_BOOL(invertBotTab)
-            CFG_READ_INT_BOOL(menubarHiding, HIDE_KEYBOARD)
-            CFG_READ_INT_BOOL(statusbarHiding, HIDE_KEYBOARD)
-            CFG_READ_BOOL(boldProgress)
-            CFG_READ_BOOL(coloredTbarMo)
-            CFG_READ_BOOL(borderSelection)
-            CFG_READ_BOOL(stripedSbar)
-            CFG_READ_INT_BOOL(windowDrag, WM_DRAG_MENUBAR)
-            CFG_READ_BOOL(shadePopupMenu)
-            CFG_READ_BOOL(hideShortcutUnderline)
+            CFG_READ_ECOLOR(progressGrooveColor);
+            CFG_READ_FOCUS(focus);
+            CFG_READ_BOOL(lvButton);
+            CFG_READ_LV_LINES(lvLines);
+            CFG_READ_BOOL(drawStatusBarFrames);
+            CFG_READ_BOOL(fillSlider);
+            CFG_READ_BOOL(roundMbTopOnly);
+            CFG_READ_BOOL(borderMenuitems);
+            CFG_READ_BOOL(darkerBorders);
+            CFG_READ_BOOL(vArrows);
+            CFG_READ_BOOL(xCheck);
+            CFG_READ_BOOL(fadeLines);
+            CFG_READ_GLOW(glowProgress);
+            CFG_READ_BOOL(colorMenubarMouseOver);
+            CFG_READ_INT_BOOL(crHighlight, opts->highlightFactor);
+            CFG_READ_BOOL(crButton);
+            CFG_READ_BOOL(smallRadio);
+            CFG_READ_BOOL(fillProgress);
+            CFG_READ_BOOL(comboSplitter);
+            CFG_READ_BOOL(highlightScrollViews);
+            CFG_READ_BOOL(etchEntry);
+            CFG_READ_INT_BOOL(splitterHighlight, opts->highlightFactor);
+            CFG_READ_INT(crSize);
+            CFG_READ_BOOL(flatSbarButtons);
+            CFG_READ_BOOL(borderSbarGroove);
+            CFG_READ_BOOL(borderProgress);
+            CFG_READ_BOOL(popupBorder);
+            CFG_READ_BOOL(unifySpinBtns);
+            CFG_READ_BOOL(unifySpin);
+            CFG_READ_BOOL(unifyCombo);
+            CFG_READ_BOOL(borderTab);
+            CFG_READ_BOOL(borderInactiveTab);
+            CFG_READ_BOOL(thinSbarGroove);
+            CFG_READ_BOOL(colorSliderMouseOver);
+            CFG_READ_BOOL(menuIcons);
+            CFG_READ_BOOL(forceAlternateLvCols);
+            CFG_READ_BOOL(invertBotTab);
+            CFG_READ_INT_BOOL(menubarHiding, HIDE_KEYBOARD);
+            CFG_READ_INT_BOOL(statusbarHiding, HIDE_KEYBOARD);
+            CFG_READ_BOOL(boldProgress);
+            CFG_READ_BOOL(coloredTbarMo);
+            CFG_READ_BOOL(borderSelection);
+            CFG_READ_BOOL(stripedSbar);
+            CFG_READ_INT_BOOL(windowDrag, WM_DRAG_MENUBAR);
+            CFG_READ_BOOL(shadePopupMenu);
+            CFG_READ_BOOL(hideShortcutUnderline);
 
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
-            CFG_READ_BOOL(stdBtnSizes)
-            CFG_READ_INT(titlebarButtons)
-            CFG_READ_TB_ICON(titlebarIcon)
+#if defined CONFIG_DIALOG
+            CFG_READ_BOOL(stdBtnSizes);
+            CFG_READ_INT(titlebarButtons);
+            CFG_READ_TB_ICON(titlebarIcon);
 #endif
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
-            CFG_READ_BOOL(xbar)
-            CFG_READ_INT(dwtSettings)
-#endif
-            CFG_READ_INT(bgndOpacity)
-            CFG_READ_INT(menuBgndOpacity)
-            CFG_READ_INT(dlgOpacity)
-            CFG_READ_SHADE(menuStripe, true, true, &opts->customMenuStripeColor)
-            CFG_READ_APPEARANCE(menuStripeAppearance, APP_ALLOW_BASIC)
+            CFG_READ_INT(bgndOpacity);
+            CFG_READ_INT(menuBgndOpacity);
+            CFG_READ_INT(dlgOpacity);
+            CFG_READ_SHADE(menuStripe, true, true, &opts->customMenuStripeColor);
+            CFG_READ_APPEARANCE(menuStripeAppearance, APP_ALLOW_BASIC);
             if(opts->version<qtcMakeVersion(0, 63) && IS_BLACK(opts->customMenuStripeColor))
-                CFG_READ_COLOR(customMenuStripeColor)
+                CFG_READ_COLOR(customMenuStripeColor);
             CFG_READ_SHADE(comboBtn, true, false, &opts->customComboBtnColor);
-            CFG_READ_BOOL(gtkScrollViews)
-            CFG_READ_BOOL(doubleGtkComboArrow)
-            CFG_READ_BOOL(stdSidebarButtons)
-            CFG_READ_BOOL(toolbarTabs)
-            CFG_READ_BOOL(gtkComboMenus)
-#ifdef __cplusplus
-            CFG_READ_ALIGN(titlebarAlignment)
-            CFG_READ_EFFECT(titlebarEffect)
-            CFG_READ_BOOL(centerTabText)
-/*
-#else
-            CFG_READ_BOOL(setDialogButtonOrder)
-*/
-#endif
-#if !defined __cplusplus || defined CONFIG_DIALOG
-            CFG_READ_INT(expanderHighlight)
-            CFG_READ_BOOL(mapKdeIcons)
-#endif
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
-            CFG_READ_BOOL(gtkButtonOrder)
-#endif
-#if !defined __cplusplus || (defined CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000))
-            CFG_READ_BOOL(reorderGtkButtons)
-#endif
-            CFG_READ_APPEARANCE(titlebarAppearance, APP_ALLOW_NONE)
-            CFG_READ_APPEARANCE(inactiveTitlebarAppearance, APP_ALLOW_NONE)
+            CFG_READ_BOOL(gtkScrollViews);
+            CFG_READ_BOOL(doubleGtkComboArrow);
+            CFG_READ_BOOL(stdSidebarButtons);
+            CFG_READ_BOOL(toolbarTabs);
+            CFG_READ_BOOL(gtkComboMenus);
+            CFG_READ_INT(expanderHighlight);
+            CFG_READ_BOOL(mapKdeIcons);
+            CFG_READ_BOOL(gtkButtonOrder);
+            CFG_READ_BOOL(reorderGtkButtons);
+            CFG_READ_APPEARANCE(titlebarAppearance, APP_ALLOW_NONE);
+            CFG_READ_APPEARANCE(inactiveTitlebarAppearance, APP_ALLOW_NONE);
 
             if(APPEARANCE_BEVELLED==opts->titlebarAppearance)
                 opts->titlebarAppearance=APPEARANCE_GRADIENT;
@@ -1922,33 +1570,17 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                 opts->inactiveTitlebarAppearance=APPEARANCE_GRADIENT;
             else if(APPEARANCE_RAISED==opts->inactiveTitlebarAppearance)
                 opts->inactiveTitlebarAppearance=APPEARANCE_FLAT;
-#ifdef __cplusplus
-            CFG_READ_APPEARANCE(titlebarButtonAppearance, APP_ALLOW_BASIC)
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
-            if(opts->xbar && opts->menubarHiding)
-                opts->xbar=false;
-#endif
-#endif
-            CFG_READ_SHADING(shading)
-            CFG_READ_IMAGE(bgndImage)
-            CFG_READ_IMAGE(menuBgndImage)
-            CFG_READ_STRING_LIST(noMenuStripeApps)
-#if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
-            CFG_READ_STRING_LIST(noBgndGradientApps)
-            CFG_READ_STRING_LIST(noBgndOpacityApps)
-            CFG_READ_STRING_LIST(noMenuBgndOpacityApps)
-            CFG_READ_STRING_LIST(noBgndImageApps)
+            CFG_READ_SHADING(shading);
+            CFG_READ_IMAGE(bgndImage);
+            CFG_READ_IMAGE(menuBgndImage);
+            CFG_READ_STRING_LIST(noMenuStripeApps);
+            CFG_READ_STRING_LIST(noBgndGradientApps);
+            CFG_READ_STRING_LIST(noBgndOpacityApps);
+            CFG_READ_STRING_LIST(noMenuBgndOpacityApps);
+            CFG_READ_STRING_LIST(noBgndImageApps);
 #ifdef CONFIG_DIALOG
             if(opts->version<qtcMakeVersion(1, 7, 2))
                 opts->noMenuBgndOpacityApps << "gtk";
-#endif
-#endif
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
-            CFG_READ_STRING_LIST(menubarApps)
-            CFG_READ_STRING_LIST(statusbarApps)
-            CFG_READ_STRING_LIST(useQtFileDialogApps)
-            CFG_READ_STRING_LIST(windowDragWhiteList)
-            CFG_READ_STRING_LIST(windowDragBlackList)
 #endif
             readDoubleList(cfg, "customShades", opts->customShades, QTC_NUM_STD_SHADES);
             readDoubleList(cfg, "customAlphas", opts->customAlphas, NUM_STD_ALPHAS);
