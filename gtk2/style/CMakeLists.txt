@@ -8,6 +8,22 @@ include_directories(
 
 add_definitions(${GTK2_CFLAGS})
 
+set(GDK_PIXBUF_CSRC)
+find_program(GDK_PIXBUF_CSRC gdk-pixbuf-csource)
+if(NOT GDK_PIXBUF_CSRC)
+  message(FATAL_ERROR "Cannot find gdk-pixbuf-csource.")
+endif()
+
+foreach(pngname check_on check_x_on)
+  add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${pngname}-png.h"
+    COMMAND "${GDK_PIXBUF_CSRC}" --static --raw "--name=${pngname}"
+    "${PROJECT_SOURCE_DIR}/data/${pngname}.png"
+    > "${CMAKE_CURRENT_BINARY_DIR}/${pngname}-png.h"
+    DEPENDS "${GDK_PIXBUF_CSRC}" "${PROJECT_SOURCE_DIR}/data/${pngname}.png")
+  add_custom_target(qtc_gtk2_${pngname}_hdr
+    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/${pngname}-png.h")
+endforeach()
+
 set(qtcurve_SRCS
   qtcurve.c
   qt_settings.c
@@ -33,6 +49,7 @@ set_target_properties(qtcurve-gtk2 PROPERTIES
   LINK_FLAGS "-Wl,--no-undefined"
   LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   OUTPUT_NAME "qtcurve")
+add_dependencies(qtcurve-gtk2 qtc_gtk2_check_on_hdr qtc_gtk2_check_x_on_hdr)
 
 # The following fixes odd segfaults with evolution under Fedora 14.
 # See https://bugzilla.redhat.com/show_bug.cgi?id=676837

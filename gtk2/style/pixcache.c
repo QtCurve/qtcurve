@@ -19,7 +19,8 @@
  */
 
 #include "pixcache.h"
-#include "pixmaps.h"
+#include "check_on-png.h"
+#include "check_x_on-png.h"
 #include "qt_settings.h"
 
 typedef struct
