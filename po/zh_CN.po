@@ -2494,7 +2494,7 @@ msgid ""
 "alpha value set. This behaviour maybe overridden, and alpha values always "
 "used, by checking the option above.</p>"
 msgstr ""
-"<i><p>QtCurve使用“深暗/光亮”边框来实现蚀刻和阴影效果。默认情况下，QtCurve会视"
+"<i><p>QtCurve使用“深暗/光亮”边框来实现蚀刻和阴影效果。默认情况下，QtCurve会试"
 "图通过亮化（或暗化）父窗口来实现它——如果没有父窗口，则会使用带有α值的白色或黑"
 "色。这种行为可能会被重写，而α值会通过检测上面的选项一直使用。</p>"
 
