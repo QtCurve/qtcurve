@@ -1581,84 +1581,6 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             readDoubleList(cfg, "customShades", opts->customShades, QTC_NUM_STD_SHADES);
             readDoubleList(cfg, "customAlphas", opts->customAlphas, NUM_STD_ALPHAS);
 
-#ifdef __cplusplus
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
-            if(opts->titlebarButtons&TITLEBAR_BUTTON_COLOR || opts->titlebarButtons&TITLEBAR_BUTTON_ICON_COLOR)
-            {
-#if (defined QT_VERSION && (QT_VERSION >= 0x040000))
-                QStringList cols(readStringEntry(cfg, "titlebarButtonColors").split(',', QString::SkipEmptyParts));
-#else
-                QStringList cols(QStringList::split(',', readStringEntry(cfg, "titlebarButtonColors")));
-#endif
-                if(cols.count() && 0==(cols.count()%NUM_TITLEBAR_BUTTONS) && cols.count()<=(NUM_TITLEBAR_BUTTONS*3))
-                {
-                    QStringList::ConstIterator it(cols.begin()),
-                                               end(cols.end());
-
-                    for(int i=0; it!=end; ++it, ++i)
-                    {
-                        QColor col;
-                        qtcSetRgb(&col, TO_LATIN1((*it)));
-                        opts->titlebarButtonColors[i]=col;
-                    }
-                    if(cols.count()<(NUM_TITLEBAR_BUTTONS+1))
-                        opts->titlebarButtons&=~TITLEBAR_BUTTON_ICON_COLOR;
-                }
-                else
-                {
-                    opts->titlebarButtons&=~TITLEBAR_BUTTON_COLOR;
-                    opts->titlebarButtons&=~TITLEBAR_BUTTON_ICON_COLOR;
-                }
-            }
-#endif
-
-            for(i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+NUM_CUSTOM_GRAD); ++i)
-            {
-                QString gradKey;
-
-                gradKey.sprintf("customgradient%d", (i-APPEARANCE_CUSTOM1)+1);
-
-#if (defined QT_VERSION && (QT_VERSION >= 0x040000))
-                QStringList vals(readStringEntry(cfg, gradKey).split(',', QString::SkipEmptyParts));
-#else
-                QStringList vals(QStringList::split(',', readStringEntry(cfg, gradKey)));
-#endif
-
-                if(vals.size())
-                    opts->customGradient.erase((EAppearance)i);
-
-                if(vals.size()>=5)
-                {
-                    QStringList::ConstIterator it(vals.begin()),
-                                               end(vals.end());
-                    bool                       ok(true),
-                                               haveAlpha(false);
-                    Gradient                   grad;
-                    int                        j;
-
-                    grad.border=toGradientBorder(TO_LATIN1((*it)), &haveAlpha);
-                    ok=vals.size()%(haveAlpha ? 3 : 2);
-
-                    for(++it, j=0; it!=end && ok; ++it, ++j)
-                    {
-                        double pos=(*it).toDouble(&ok),
-                               val=ok ? (*(++it)).toDouble(&ok) : 0.0,
-                               alpha=haveAlpha && ok ? (*(++it)).toDouble(&ok) : 1.0;
-
-                        ok=ok && (pos>=0 && pos<=1.0) && (val>=0.0 && val<=2.0) && (alpha>=0.0 && alpha<=1.0);
-
-                        if(ok)
-                            grad.stops.insert(GradientStop(pos, val, alpha));
-                    }
-
-                    if(ok)
-                    {
-                        opts->customGradient[(EAppearance)i]=grad;
-                        opts->customGradient[(EAppearance)i].stops=grad.stops.fix();
-                    }
-                }
-            }
-#else
             for(i=0; i<NUM_CUSTOM_GRAD; ++i)
             {
                 char gradKey[18];
@@ -1791,11 +1713,9 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                     }
                 }
             }
-#endif
 
             qtcCheckConfig(opts);
 
-#ifndef __cplusplus
             if(!defOpts)
             {
                 int i;
@@ -1806,22 +1726,14 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             }
             releaseConfig(cfg);
             freeOpts(defOpts);
-#endif
             return true;
         }
         else
         {
-#ifdef __cplusplus
-            if(defOpts)
-                *opts=*defOpts;
-            else
-                qtcDefaultSettings(opts);
-#else
             if(defOpts)
                 copyOpts(defOpts, opts);
             else
                 qtcDefaultSettings(opts);
-#endif
             return true;
         }
     }
@@ -1844,7 +1756,6 @@ static const char * getSystemConfigFile()
 void qtcDefaultSettings(Options *opts)
 {
     /* Set hard-coded defaults... */
-#ifndef __cplusplus
     int i;
 
     for(i=0; i<NUM_CUSTOM_GRAD; ++i)
@@ -1853,11 +1764,6 @@ void qtcDefaultSettings(Options *opts)
     opts->customGradient[APPEARANCE_CUSTOM2]=malloc(sizeof(Gradient));
     qtcSetupGradient(opts->customGradient[APPEARANCE_CUSTOM1], GB_3D,3,0.0,1.2,0.5,1.0,1.0,1.0);
     qtcSetupGradient(opts->customGradient[APPEARANCE_CUSTOM2], GB_3D,3,0.0,0.9,0.5,1.0,1.0,1.0);
-#else
-    // Setup titlebar gradients...
-    qtcSetupGradient(&(opts->customGradient[APPEARANCE_CUSTOM1]), GB_3D,3,0.0,1.2,0.5,1.0,1.0,1.0);
-    qtcSetupGradient(&(opts->customGradient[APPEARANCE_CUSTOM2]), GB_3D,3,0.0,0.9,0.5,1.0,1.0,1.0);
-#endif
     opts->customShades[0]=1.16;
     opts->customShades[1]=1.07;
     opts->customShades[2]=0.9;
@@ -1877,18 +1783,9 @@ void qtcDefaultSettings(Options *opts)
     opts->selectionAppearance=APPEARANCE_HARSH_GRADIENT;
     opts->fadeLines=true;
     opts->glowProgress=GLOW_NONE;
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
     opts->round=ROUND_EXTRA;
     opts->gtkButtonOrder=false;
-#else
-    opts->round=ROUND_FULL;
-#endif
-#ifdef __cplusplus
-    opts->dwtAppearance=APPEARANCE_CUSTOM1;
-#endif
-#if !defined __cplusplus || (defined CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000))
     opts->reorderGtkButtons=false;
-#endif
     opts->bgndImage.type=IMG_NONE;
     opts->bgndImage.width=opts->bgndImage.height=0;
     opts->bgndImage.onBorder=false;
@@ -1941,11 +1838,7 @@ void qtcDefaultSettings(Options *opts)
     opts->splitters=LINE_1DOT;
 #ifdef QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     opts->fixParentlessDialogs=false;
-#ifdef __cplusplus
-    opts->noDlgFixApps << "kate" << "plasma" << "plasma-desktop" << "plasma-netbook";
-#else
     opts->noDlgFixApps=NULL;
-#endif
 #endif
     opts->customMenuTextColor=false;
     opts->coloredMouseOver=MO_GLOW;
@@ -2018,29 +1911,6 @@ void qtcDefaultSettings(Options *opts)
     opts->toolbarTabs=false;
     opts->bgndOpacity = opts->dlgOpacity = opts->menuBgndOpacity = 100;
     opts->gtkComboMenus=false;
-#ifdef __cplusplus
-    opts->customMenubarsColor.setRgb(0, 0, 0);
-    opts->customSlidersColor.setRgb(0, 0, 0);
-    opts->customMenuNormTextColor.setRgb(0, 0, 0);
-    opts->customMenuSelTextColor.setRgb(0, 0, 0);
-    opts->customCheckRadioColor.setRgb(0, 0, 0);
-    opts->customComboBtnColor.setRgb(0, 0, 0);
-    opts->customMenuStripeColor.setRgb(0, 0, 0);
-    opts->customProgressColor.setRgb(0, 0, 0);
-    opts->titlebarAlignment=ALIGN_FULL_CENTER;
-    opts->titlebarEffect=EFFECT_SHADOW;
-    opts->centerTabText=false;
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
-    opts->xbar=false;
-    opts->dwtSettings=DWT_BUTTONS_AS_PER_TITLEBAR|DWT_ROUND_TOP_ONLY;
-    opts->menubarApps << "amarok" << "arora" << "kaffeine" << "kcalc" << "smplayer" << "VirtualBox";
-    opts->statusbarApps << "kde";
-    opts->useQtFileDialogApps << "googleearth-bin";
-    opts->noMenuBgndOpacityApps << "inkscape" << "sonata" << "totem" << "vmware" << "vmplayer" << "gtk";
-    opts->noBgndOpacityApps << "smplayer" << "kaffeine" << "dragon" << "kscreenlocker" << "inkscape" << "sonata" << "totem" << "vmware" << "vmplayer";
-#endif
-    opts->noMenuStripeApps << "gtk" << "soffice.bin";
-#else
     opts->noBgndGradientApps=NULL;
     opts->noBgndOpacityApps=g_strsplit("inkscape,sonata,totem,vmware,vmplayer",",", -1);;
     opts->noBgndImageApps=NULL;
@@ -2057,17 +1927,11 @@ void qtcDefaultSettings(Options *opts)
     opts->customComboBtnColor.red=opts->customCheckRadioColor.green=opts->customCheckRadioColor.blue=0;
     opts->customMenuStripeColor.red=opts->customMenuStripeColor.green=opts->customMenuStripeColor.blue=0;
     opts->customProgressColor.red=opts->customProgressColor.green=opts->customProgressColor.blue=0;
-#endif
 
-#if !defined __cplusplus || defined CONFIG_DIALOG
     opts->mapKdeIcons=true;
     opts->expanderHighlight=DEFAULT_EXPANDER_HIGHLIGHT_FACTOR;
-#endif
     opts->titlebarAppearance=APPEARANCE_CUSTOM1;
     opts->inactiveTitlebarAppearance=APPEARANCE_CUSTOM1;
-#ifdef __cplusplus
-    opts->titlebarButtonAppearance=APPEARANCE_GRADIENT;
-#endif
     /* Read system config file... */
     {
     static const char * systemFilename=NULL;
