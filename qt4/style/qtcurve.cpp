@@ -762,6 +762,9 @@ inline int numButtons(EScrollbar type)
 }
 
 // TODO make this better.
+// Port to Qt5 and gtk2
+// Check if this breaks anything
+// document
 static inline int
 sizeNumButtons(EScrollbar type)
 {
@@ -3405,7 +3408,11 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
         case PM_ToolBarHandleExtent:
             return LINE_1DOT==opts.handles ? 7 : 8;
         case PM_ScrollBarSliderMin:
-            return opts.sliderWidth+1;
+            // TODO make this better.
+            // Check if this breaks anything
+            // Port to Qt5 and gtk2
+            // document
+            return qMax(opts.sliderWidth, 20) + 1;
         case PM_SliderThickness:
             return (SLIDER_CIRCULAR==opts.sliderStyle
                         ? CIRCULAR_SLIDER_SIZE+6
@@ -9740,11 +9747,19 @@ QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, con
             {
                 int scrollBarExtent(pixelMetric(PM_ScrollBarExtent, option, widget)),
                     scrollBarSliderMinimum(pixelMetric(PM_ScrollBarSliderMin, option, widget));
+                // TODO: document this
+                // Check if this breaks anything
+                // Port to qt5 and gtk2
+                int scrollBarLen =
+                    (qMax(scrollBarExtent, 13) *
+                     sizeNumButtons(opts.scrollbarType) +
+                     scrollBarSliderMinimum);
 
-                if (scrollBar->orientation == Qt::Horizontal)
-                    newSize = QSize(scrollBarExtent * sizeNumButtons(opts.scrollbarType) + scrollBarSliderMinimum, scrollBarExtent);
-                else
-                    newSize = QSize(scrollBarExtent, scrollBarExtent * sizeNumButtons(opts.scrollbarType) + scrollBarSliderMinimum);
+                if (scrollBar->orientation == Qt::Horizontal) {
+                    newSize = QSize(scrollBarLen, scrollBarExtent);
+                } else {
+                    newSize = QSize(scrollBarExtent, scrollBarLen);
+                }
             }
             break;
         case CT_LineEdit:
