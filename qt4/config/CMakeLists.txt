@@ -1,17 +1,38 @@
+set(kstyle_qtcurve_config_PART_SRCS
+  qtcurveconfig.cpp
+  imagepropertiesdialog.cpp)
+set(kstyle_qtcurve_config_export_SRCS
+  exportthemedialog.cpp)
+set(kstyle_qtcurve_config_PART_HDRS
+  qtcurveconfig.h
+  imagepropertiesdialog.h)
+set(kstyle_qtcurve_config_export_HDRS
+  exportthemedialog.h)
+set(kstyle_qtcurve_config_UIS
+  qtcurveconfigbase.ui
+  stylepreview.ui
+  imageproperties.ui)
+translate_add_sources(
+  ${kstyle_qtcurve_config_PART_SRCS}
+  ${kstyle_qtcurve_config_export_SRCS}
+  ${kstyle_qtcurve_config_PART_HDRS}
+  ${kstyle_qtcurve_config_export_HDRS}
+  ${kstyle_qtcurve_config_UIS}
+  QtCurveui.rc)
+
 if(NOT QTC_QT4_ENABLE_KDE)
   return()
 endif()
 
 set(kstyle_qtcurve_config_common_SRCS
-  ${CMAKE_CURRENT_SOURCE_DIR}/../common/common.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/../common/config_file.c)
+  ../common/common.c
+  ../common/config_file.c)
 
 set_source_files_properties(${kstyle_qtcurve_config_common_SRCS}
   PROPERTIES LANGUAGE CXX)
 
 set(kstyle_qtcurve_config_PART_SRCS
-  qtcurveconfig.cpp
-  imagepropertiesdialog.cpp
+  ${kstyle_qtcurve_config_PART_SRCS}
   ../kwinconfig/qtcurvekwinconfig.cpp
   ../kwin/qtcurveconfig.cpp
   ../kwin/qtcurveshadowconfiguration.cpp
@@ -20,16 +41,14 @@ set(kstyle_qtcurve_config_PART_SRCS
 if(QTC_QT4_STYLE_SUPPORT)
   set(kstyle_qtcurve_config_PART_SRCS
     ${kstyle_qtcurve_config_PART_SRCS}
-    exportthemedialog.cpp)
+    ${kstyle_qtcurve_config_export_SRCS})
 endif()
 
 add_definitions(-DCONFIG_WRITE -DCONFIG_DIALOG)
 
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 kde4_add_ui_files(kstyle_qtcurve_config_PART_SRCS
-  qtcurveconfigbase.ui
-  stylepreview.ui
-  imageproperties.ui
+  ${kstyle_qtcurve_config_UIS}
   ../kwinconfig/qtcurvekwinconfigwidget.ui)
 kde4_add_plugin(kstyle_qtcurve_config_kde4
   ${kstyle_qtcurve_config_PART_SRCS})

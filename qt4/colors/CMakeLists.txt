@@ -1,3 +1,5 @@
+# translate_add_sources(QtCurve.colors QtCurveAgua.colors)
+
 if(NOT QTC_QT4_ENABLE_KDE)
   return()
 endif()

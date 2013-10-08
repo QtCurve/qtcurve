@@ -1,3 +1,8 @@
+# translate_add_sources(
+#   QtCurve.css.in
+#   QtCurve-KDEButtonOrder.css.in
+#   preferences-rev.xml)
+
 if(NOT ENABLE_GTK2)
   return()
 endif()

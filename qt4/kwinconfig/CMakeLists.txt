@@ -1,13 +1,24 @@
+set(kwin_qtcurve_config_PART_SRCS
+  qtcurvekwinconfig.cpp)
+set(kwin_qtcurve_config_PART_HDRS
+  qtcurvekwinconfig.h)
+set(kwin_qtcurve_config_PART_UIS
+  qtcurvekwinconfigwidget.ui)
+
+translate_add_sources(${kwin_qtcurve_config_PART_SRCS}
+  ${kwin_qtcurve_config_PART_HDRS}
+  ${kwin_qtcurve_config_PART_UIS})
+
 if(NOT QTC_QT4_ENABLE_KWIN)
   return()
 endif()
 
 set(kwin_qtcurve_config_PART_SRCS
-  qtcurvekwinconfig.cpp
+  ${kwin_qtcurve_config_PART_SRCS}
   ../kwin/qtcurveconfig.cpp
   ../kwin/qtcurveshadowconfiguration.cpp)
 kde4_add_ui_files(kwin_qtcurve_config_PART_SRCS
-  qtcurvekwinconfigwidget.ui)
+  ${kwin_qtcurve_config_PART_UIS})
 kde4_add_plugin(kwin_qtcurve_config_kde4 ${kwin_qtcurve_config_PART_SRCS})
 set_target_properties(kwin_qtcurve_config_kde4 PROPERTIES
   LINK_FLAGS "-Wl,--no-undefined"

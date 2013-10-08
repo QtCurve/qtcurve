@@ -1,10 +1,29 @@
+set(qtcurve_SRCS
+  qtcurve.cpp
+  windowmanager.cpp
+  blurhelper.cpp
+  utils.cpp
+  shortcuthandler.cpp)
+set(qtcurve_MOC_HDRS
+  qtcurve.h
+  windowmanager.h
+  blurhelper.h
+  shortcuthandler.h)
+set(qtcurve_X11_SRCS
+  macmenu.cpp
+  shadowhelper.cpp)
+set(qtcurve_X11_MOC_HDRS
+  macmenu.h
+  macmenu-dbus.h
+  shadowhelper.h)
+
 if(NOT ENABLE_QT4)
   return()
 endif()
 
 set(qtcurve_style_common_SRCS
-  ${CMAKE_CURRENT_SOURCE_DIR}/../common/common.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/../common/config_file.c)
+  ../common/common.c
+  ../common/config_file.c)
 set_source_files_properties(${qtcurve_style_common_SRCS}
   PROPERTIES LANGUAGE CXX)
 

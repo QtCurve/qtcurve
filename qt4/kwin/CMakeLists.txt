@@ -1,8 +1,3 @@
-if(NOT QTC_QT4_ENABLE_KWIN)
-  return()
-endif()
-
-# add_subdirectory(config)
 set(kwin3_qtcurve_PART_SRCS
   qtcurvehandler.cpp
   qtcurveclient.cpp
@@ -13,6 +8,25 @@ set(kwin3_qtcurve_PART_SRCS
   qtcurveshadowconfiguration.cpp
   tileset.cpp
   qtcurvetogglebutton.cpp)
+set(kwin3_qtcurve_PART_HDRS
+  qtcurvehandler.h
+  qtcurveclient.h
+  qtcurvebutton.h
+  qtcurvedbus.h
+  qtcurvesizegrip.h
+  qtcurveshadowcache.h
+  qtcurveconfig.h
+  qtcurveshadowconfiguration.h
+  tileset.h
+  qtcurvetogglebutton.h)
+
+translate_add_sources(${kwin3_qtcurve_PART_SRCS}
+  ${kwin3_qtcurve_PART_HDRS} qtcurve.desktop)
+
+if(NOT QTC_QT4_ENABLE_KWIN)
+  return()
+endif()
+
 include_directories(
   "${CMAKE_CURRENT_BINARY_DIR}"
   ${QT_QTGUI_INCLUDE_DIR}

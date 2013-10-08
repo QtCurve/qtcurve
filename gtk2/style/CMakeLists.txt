@@ -1,10 +1,50 @@
+set(qtcurve_SRCS
+  qtcurve.c
+  qt_settings.c
+  drawing.c
+  helpers.c
+  pixcache.c
+  animation.c
+  combobox.c
+  entry.c
+  menu.c
+  scrollbar.c
+  scrolledwindow.c
+  tab.c
+  treeview.c
+  widgetmap.c
+  window.c
+  wmmove.c
+  shadowhelper.c)
+set(qtcurve_HDRS
+  animation.h
+  combobox.h
+  compatability.h
+  drawing.h
+  entry.h
+  helpers.h
+  menu.h
+  pixcache.h
+  qt_settings.h
+  qtcurve.h
+  scrollbar.h
+  scrolledwindow.h
+  shadowhelper.h
+  tab.h
+  treeview.h
+  widgetmap.h
+  window.h
+  wmmove.h)
+
+translate_add_sources(${qtcurve_SRCS} ${qtcurve_HDRS})
+
 if(NOT ENABLE_GTK2)
   return()
 endif()
 
 set(qtcurve_style_common_SRCS
-  ${CMAKE_CURRENT_SOURCE_DIR}/../common/common.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/../common/config_file.c)
+  ../common/common.c
+  ../common/config_file.c)
 
 include_directories(
   ${GTK2_INCLUDE_DIRS}
@@ -28,25 +68,7 @@ foreach(pngname check_on check_x_on blank16x16)
     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/${pngname}-png.h")
 endforeach()
 
-set(qtcurve_SRCS
-  qtcurve.c
-  qt_settings.c
-  drawing.c
-  helpers.c
-  pixcache.c
-  animation.c
-  combobox.c
-  entry.c
-  menu.c
-  scrollbar.c
-  scrolledwindow.c
-  tab.c
-  treeview.c
-  widgetmap.c
-  window.c
-  wmmove.c
-  shadowhelper.c
-  ${qtcurve_style_common_SRCS})
+set(qtcurve_SRCS ${qtcurve_SRCS} ${qtcurve_style_common_SRCS})
 add_library(qtcurve-gtk2 MODULE ${qtcurve_SRCS})
 
 set_target_properties(qtcurve-gtk2 PROPERTIES

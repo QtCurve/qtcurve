@@ -3,8 +3,8 @@ if(NOT ENABLE_QT5)
 endif()
 
 set(qtcurve_style_common_SRCS
-  ${CMAKE_CURRENT_SOURCE_DIR}/../common/common.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/../common/config_file.c)
+  ../common/common.c
+  ../common/config_file.c)
 set_source_files_properties(${qtcurve_style_common_SRCS} PROPERTIES LANGUAGE CXX)
 
 foreach(pngname check_on check_x_on dialog_error dialog_information
