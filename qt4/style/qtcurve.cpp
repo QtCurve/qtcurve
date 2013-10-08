@@ -761,6 +761,13 @@ inline int numButtons(EScrollbar type)
     }
 }
 
+// TODO make this better.
+static inline int
+sizeNumButtons(EScrollbar type)
+{
+    return qtcMax(numButtons(type), 2);
+}
+
 static inline void drawRect(QPainter *p, const QRect &r)
 {
     p->drawRect(r.x(), r.y(), r.width()-1, r.height()-1);
@@ -9735,9 +9742,9 @@ QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, con
                     scrollBarSliderMinimum(pixelMetric(PM_ScrollBarSliderMin, option, widget));
 
                 if (scrollBar->orientation == Qt::Horizontal)
-                    newSize = QSize(scrollBarExtent * numButtons(opts.scrollbarType) + scrollBarSliderMinimum, scrollBarExtent);
+                    newSize = QSize(scrollBarExtent * sizeNumButtons(opts.scrollbarType) + scrollBarSliderMinimum, scrollBarExtent);
                 else
-                    newSize = QSize(scrollBarExtent, scrollBarExtent * numButtons(opts.scrollbarType) + scrollBarSliderMinimum);
+                    newSize = QSize(scrollBarExtent, scrollBarExtent * sizeNumButtons(opts.scrollbarType) + scrollBarSliderMinimum);
             }
             break;
         case CT_LineEdit:
