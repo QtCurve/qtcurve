@@ -55,7 +55,7 @@ typedef struct {
     const unsigned char *data;
 } QtcPixmap;
 
-#define qtcContainerOf(ptr, type, member)             \
+#define qtcContainerOf(ptr, type, member)               \
     ((type*)(((void*)(ptr)) - offsetof(type, member)))
 
 #if (defined(__GNUC__) && (__GNUC__ > 2))
@@ -80,8 +80,6 @@ typedef struct {
 #define QTC_ALWAYS_INLINE __attribute__((always_inline))
 #define QTC_UNUSED(x) ((void)(x))
 
-QTC_BEGIN_DECLS
-
 QTC_ALWAYS_INLINE static inline void*
 qtcUtilsAlloc0(size_t size)
 {
@@ -96,6 +94,26 @@ qtcFree(void *p)
     if (p) {
         free(p);
     }
+}
+
+#define qtcUtilsNewSize(type, size) ((type*)qtcUtilsAlloc0(size))
+#define qtcUtilsNew(type) qtcUtilsNewSize(type, sizeof(type))
+#define qtcUtilsNewN(type, n) qtcUtilsNewSize(type, sizeof(type) * n)
+
+QTC_ALWAYS_INLINE static inline double
+qtcLimit(double d, double l)
+{
+    if (d <= 0)
+        return 0;
+    if (d >= l)
+        return l;
+    return d;
+}
+
+QTC_ALWAYS_INLINE static inline boolean
+qtcEqual(double d1, double d2)
+{
+    return (fabs(d1 - d2) < 0.0001);
 }
 
 QTC_ALWAYS_INLINE static inline size_t
@@ -122,47 +140,58 @@ _qtcCatStrsFill(int n, const char **strs, size_t *lens,
     return res;
 }
 
+#define _qtcCatStrs(var, strs...) do {                                  \
+        const char *__strs[] = {strs};                                  \
+        int __strs_n = sizeof(__strs) / sizeof(const char*);            \
+        size_t __strs_lens[__strs_n];                                   \
+        size_t __strs_total_len =                                       \
+            _qtcCatStrsCalLens(__strs_n, __strs, __strs_lens);          \
+        var = _qtcCatStrsFill(__strs_n, __strs, __strs_lens,            \
+                              __strs_total_len, malloc(__strs_total_len + 1)); \
+    } while (0)
+
+#define _qtcFillStrs(var, buff, strs...) do {                           \
+        const char *__strs[] = {strs};                                  \
+        int __strs_n = sizeof(__strs) / sizeof(const char*);            \
+        size_t __strs_lens[__strs_n];                                   \
+        size_t __strs_total_len =                                       \
+            _qtcCatStrsCalLens(__strs_n, __strs, __strs_lens);          \
+        var = _qtcCatStrsFill(__strs_n, __strs, __strs_lens, __strs_total_len, \
+                              realloc(buff, __strs_total_len + 1));     \
+    } while (0)
+
+#ifndef __cplusplus
 #define qtcCatStrs(strs...) ({                                          \
-            const char *__strs[] = {strs};                              \
-            int __strs_n = sizeof(__strs) / sizeof(const char*);        \
-            size_t __strs_lens[__strs_n];                               \
-            size_t __strs_total_len =                                   \
-                _qtcCatStrsCalLens(__strs_n, __strs, __strs_lens);      \
-            _qtcCatStrsFill(__strs_n, __strs, __strs_lens,              \
-                            __strs_total_len, malloc(__strs_total_len + 1)); \
+            char *__cat_str_res;                                        \
+            _qtcCatStrs(__cat_str_res, strs);                           \
+            __cat_str_res;                                              \
         })
 
 #define qtcFillStrs(buff, strs...) ({                                   \
-            const char *__strs[] = {strs};                              \
-            int __strs_n = sizeof(__strs) / sizeof(const char*);        \
-            size_t __strs_lens[__strs_n];                               \
-            size_t __strs_total_len =                                   \
-                _qtcCatStrsCalLens(__strs_n, __strs, __strs_lens);      \
-            _qtcCatStrsFill(__strs_n, __strs, __strs_lens, __strs_total_len, \
-                            realloc(buff, __strs_total_len + 1));       \
+            char *__fill_str_res;                                       \
+            _qtcFillStrs(__fill_str_res, buff, strs);                   \
+            __fill_str_res;                                             \
         })
+#else
 
-#define qtcUtilsNewSize(type, size) ((type*)qtcUtilsAlloc0(size))
-#define qtcUtilsNew(type) qtcUtilsNewSize(type, sizeof(type))
-#define qtcUtilsNewN(type, n) qtcUtilsNewSize(type, sizeof(type) * n)
-
-QTC_ALWAYS_INLINE static inline double
-qtcLimit(double d, double l)
+template<typename... ArgTypes>
+static inline char*
+qtcCatStrs(ArgTypes... strs...)
 {
-    if (d <= 0)
-        return 0;
-    if (d >= l)
-        return l;
-    return d;
+    char *res;
+    _qtcCatStrs(res, strs...);
+    return res;
 }
 
-QTC_ALWAYS_INLINE static inline boolean
-qtcEqual(double d1, double d2)
+template<typename... ArgTypes>
+static inline char*
+qtcFillStrs(char *buff, ArgTypes... strs...)
 {
-    return (fabs(d1 - d2) < 0.0001);
+    char *res;
+    _qtcFillStrs(res, buff, strs...);
+    return res;
 }
-
-QTC_END_DECLS
+#endif
 
 #ifdef __cplusplus
 template<typename T>
@@ -185,18 +214,17 @@ qtcBound(const T &a, const T &b, const T &c)
 }
 
 #else
-#define qtcMax(a, b)                            \
-    ({                                          \
-        typeof(a) _a = (a);                     \
-        typeof(b) _b = (b);                     \
-        (_a > _b) ? _a : _b;                    \
-    })
-#define qtcMin(a, b)                            \
-    ({                                          \
-        typeof(a) _a = (a);                     \
-        typeof(b) _b = (b);                     \
-        (_a < _b) ? _a : _b;                    \
-    })
+#define qtcMax(a, b) ({                         \
+            typeof(a) _a = (a);                 \
+            typeof(b) _b = (b);                 \
+            (_a > _b) ? _a : _b;                \
+        })
+#define qtcMin(a, b) ({                         \
+            typeof(a) _a = (a);                 \
+            typeof(b) _b = (b);                 \
+            (_a < _b) ? _a : _b;                \
+        })
+
 #define qtcBound(a, b, c) qtcMax(a, qtcMin(b, c))
 
 #endif

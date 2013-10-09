@@ -71,6 +71,17 @@ qtcX11GetAtom(const char *name, boolean create)
     qtcX11GetAtoms(1, &atom, &name, create);
     return atom;
 }
+
+void qtcX11SetWMClass(xcb_window_t win, const char *wmclass, size_t len);
+int32_t qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom);
+void qtcX11MapRaised(xcb_window_t win);
+boolean qtcX11CompositingActive();
+boolean qtcX11HasAlpha(xcb_window_t win);
+boolean qtcX11IsEmbed(xcb_window_t win);
+
+QTC_END_DECLS
+
+#ifndef __cplusplus
 #define qtcX11Call(name, args...)                               \
     ({                                                          \
         xcb_connection_t *conn = qtcX11GetConn();               \
@@ -81,14 +92,32 @@ qtcX11GetAtom(const char *name, boolean create)
         xcb_connection_t *conn = qtcX11GetConn();       \
         xcb_##name(conn, args).sequence;                \
     })
+#else
 
-void qtcX11SetWMClass(xcb_window_t win, const char *wmclass, size_t len);
-int32_t qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom);
-void qtcX11MapRaised(xcb_window_t win);
-boolean qtcX11CompositingActive();
-boolean qtcX11HasAlpha(xcb_window_t win);
-boolean qtcX11IsEmbed(xcb_window_t win);
+template<typename Ret, typename Cookie, typename... Args, typename... Args2>
+static inline Ret*
+_qtcX11Call(Cookie (*func)(xcb_connection_t*, Args...),
+            Ret *(reply_func)(xcb_connection_t*, Cookie, xcb_generic_error_t**),
+            Args2... args...)
+{
+    xcb_connection_t *conn = qtcX11GetConn();
+    Cookie cookie = func(conn, args...);
+    return reply_func(conn, cookie, 0);
+}
+#define qtcX11Call(name, args...)                       \
+    (_qtcX11Call(xcb_##name, xcb_##name##_reply, args))
 
-QTC_END_DECLS
+template<typename... Args, typename... Args2>
+static inline unsigned int
+_qtcX11CallVoid(xcb_void_cookie_t (*func)(xcb_connection_t*, Args...),
+                Args2... args...)
+{
+    xcb_connection_t *conn = qtcX11GetConn();
+    return func(conn, args...).sequence;
+}
+#define qtcX11CallVoid(name, args...)           \
+    (_qtcX11CallVoid(xcb_##name, args))
+
+#endif
 
 #endif
