@@ -1,11 +1,11 @@
 ## 1.8.17 (WIP)
-1. Add Qt5 support!!.
+1. **Add Qt5 support!!**.
 2. Gtk2: Workaround bug in glib >= 2.36.1 (`g_spawn_command_line_sync()`)
 
    [Debian-Bug](http://bugs.debian.org/707946)
    [QtCurve-Bug](https://github.com/QtCurve/qtcurve-gtk2/pull/1)
 
-3. Require gnu99 and gnu++0x.
+3. Require gnu99 and c++0x.
 4. Porting to xcb.
 5. Qt5: Remove XBar support from Qt5 (should be replaced by appmenu).
 6. Gtk2: Remove KDE3 support from Gtk2.
