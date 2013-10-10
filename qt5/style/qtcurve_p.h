@@ -213,24 +213,6 @@ getIconPixmap(const QIcon &icon, const QSize &size, int flags,
                          QIcon::Normal : QIcon::Disabled, state);
 }
 
-static inline int
-numButtons(EScrollbar type)
-{
-    switch (type) {
-    default:
-    case SCROLLBAR_KDE:
-        return 3;
-        break;
-    case SCROLLBAR_WINDOWS:
-    case SCROLLBAR_PLATINUM:
-    case SCROLLBAR_NEXT:
-        return 2;
-        break;
-    case SCROLLBAR_NONE:
-        return 0;
-    }
-}
-
 static inline void
 drawRect(QPainter *p, const QRect &r)
 {

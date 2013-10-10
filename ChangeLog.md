@@ -16,6 +16,8 @@
     breaks the XEmbed protocol.
 14. Gtk2: Generate all GdkPixbuf inline csourse at compile time.
 15. Qt4: Require 4.6.0
+16. Qt4, Qt5: Longer scrollbar in order to be more friendly to applications
+    (e.g. choqok) that use this size hint.
 
 ## 1.8.15-KDE4
 1. Add Russian localization. Thanks to Juliette Tux.

@@ -1797,7 +1797,10 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
     case PM_ToolBarHandleExtent:
         return LINE_1DOT==opts.handles ? 7 : 8;
     case PM_ScrollBarSliderMin:
-        return opts.sliderWidth+1;
+        // Leave a minimum of 21 pixels (which is the size used by Oxygen)
+        // See https://github.com/QtCurve/qtcurve-qt4/issues/7
+        // and https://bugs.kde.org/show_bug.cgi?id=317690
+        return qtcMax(opts.sliderWidth, 20) + 1;
     case PM_SliderThickness:
         return (SLIDER_CIRCULAR==opts.sliderStyle
                 ? CIRCULAR_SLIDER_SIZE+6
@@ -7637,15 +7640,22 @@ QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, con
         }
         break;
     case CT_ScrollBar:
-        if (const QStyleOptionSlider *scrollBar = qstyleoption_cast<const QStyleOptionSlider *>(option))
-        {
-            int scrollBarExtent(pixelMetric(PM_ScrollBarExtent, option, widget)),
-                scrollBarSliderMinimum(pixelMetric(PM_ScrollBarSliderMin, option, widget));
+        if (const QStyleOptionSlider *scrollBar =
+            qstyleoption_cast<const QStyleOptionSlider*>(option)) {
+            int scrollBarExtent =
+                pixelMetric(PM_ScrollBarExtent, option, widget);
+            // See https://github.com/QtCurve/qtcurve-qt4/issues/7
+            // and https://bugs.kde.org/show_bug.cgi?id=317690.
+            int scrollBarLen =
+                (qtcMax(scrollBarExtent, 13) *
+                 qtcScrollbarButtonNumSize(opts.scrollbarType) +
+                 pixelMetric(PM_ScrollBarSliderMin, option, widget));
 
-            if (scrollBar->orientation == Qt::Horizontal)
-                newSize = QSize(scrollBarExtent * numButtons(opts.scrollbarType) + scrollBarSliderMinimum, scrollBarExtent);
-            else
-                newSize = QSize(scrollBarExtent, scrollBarExtent * numButtons(opts.scrollbarType) + scrollBarSliderMinimum);
+            if (scrollBar->orientation == Qt::Horizontal) {
+                newSize = QSize(scrollBarLen, scrollBarExtent);
+            } else {
+                newSize = QSize(scrollBarExtent, scrollBarLen);
+            }
         }
         break;
     case CT_LineEdit:
@@ -8099,7 +8109,7 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
             bool  horizontal(Qt::Horizontal==scrollBar->orientation);
             int   sbextent(pixelMetric(PM_ScrollBarExtent, scrollBar, widget)),
                 sliderMaxLength(((scrollBar->orientation == Qt::Horizontal) ?
-                                 scrollBar->rect.width() : scrollBar->rect.height()) - (sbextent * numButtons(opts.scrollbarType))),
+                                 scrollBar->rect.width() : scrollBar->rect.height()) - (sbextent * qtcScrollbarButtonNum(opts.scrollbarType))),
                 sliderMinLength(pixelMetric(PM_ScrollBarSliderMin, scrollBar, widget)),
                 sliderLength;
 

@@ -743,34 +743,6 @@ class StylePlugin : public QStylePlugin
 
 Q_EXPORT_PLUGIN2(Style, StylePlugin)
 
-inline int numButtons(EScrollbar type)
-{
-    switch(type)
-    {
-        default:
-        case SCROLLBAR_KDE:
-            return 3;
-            break;
-        case SCROLLBAR_WINDOWS:
-        case SCROLLBAR_PLATINUM:
-        case SCROLLBAR_NEXT:
-            return 2;
-            break;
-        case SCROLLBAR_NONE:
-            return 0;
-    }
-}
-
-// TODO make this better.
-// Port to Qt5 and gtk2
-// Check if this breaks anything
-// document
-static inline int
-sizeNumButtons(EScrollbar type)
-{
-    return qtcMax(numButtons(type), 2);
-}
-
 static inline void drawRect(QPainter *p, const QRect &r)
 {
     p->drawRect(r.x(), r.y(), r.width()-1, r.height()-1);
@@ -1788,7 +1760,7 @@ Style::polish(QWidget *widget)
               is of type plasma because it conflicts with some widgets embedded
               into the SysTray. Ideally one would rather find a "generic" reason,
               not to handle them
-              TODO: maybe it is because of xembed.
+              TODO
             */
             if (APP_PLASMA == theThemedApp && !widget->inherits("QDialog"))
                 break;
@@ -3408,11 +3380,10 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
         case PM_ToolBarHandleExtent:
             return LINE_1DOT==opts.handles ? 7 : 8;
         case PM_ScrollBarSliderMin:
-            // TODO make this better.
-            // Check if this breaks anything
-            // Port to Qt5 and gtk2
-            // document
-            return qMax(opts.sliderWidth, 20) + 1;
+            // Leave a minimum of 21 pixels (which is the size used by Oxygen)
+            // See https://github.com/QtCurve/qtcurve-qt4/issues/7
+            // and https://bugs.kde.org/show_bug.cgi?id=317690
+            return qtcMax(opts.sliderWidth, 20) + 1;
         case PM_SliderThickness:
             return (SLIDER_CIRCULAR==opts.sliderStyle
                         ? CIRCULAR_SLIDER_SIZE+6
@@ -9743,17 +9714,16 @@ QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, con
             }
             break;
         case CT_ScrollBar:
-            if (const QStyleOptionSlider *scrollBar = qstyleoption_cast<const QStyleOptionSlider *>(option))
-            {
-                int scrollBarExtent(pixelMetric(PM_ScrollBarExtent, option, widget)),
-                    scrollBarSliderMinimum(pixelMetric(PM_ScrollBarSliderMin, option, widget));
-                // TODO: document this
-                // Check if this breaks anything
-                // Port to qt5 and gtk2
+            if (const QStyleOptionSlider *scrollBar =
+                qstyleoption_cast<const QStyleOptionSlider*>(option)) {
+                int scrollBarExtent =
+                    pixelMetric(PM_ScrollBarExtent, option, widget);
+                // See https://github.com/QtCurve/qtcurve-qt4/issues/7
+                // and https://bugs.kde.org/show_bug.cgi?id=317690.
                 int scrollBarLen =
-                    (qMax(scrollBarExtent, 13) *
-                     sizeNumButtons(opts.scrollbarType) +
-                     scrollBarSliderMinimum);
+                    (qtcMax(scrollBarExtent, 13) *
+                     qtcScrollbarButtonNumSize(opts.scrollbarType) +
+                     pixelMetric(PM_ScrollBarSliderMin, option, widget));
 
                 if (scrollBar->orientation == Qt::Horizontal) {
                     newSize = QSize(scrollBarLen, scrollBarExtent);
@@ -10209,7 +10179,7 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
                 bool  horizontal(Qt::Horizontal==scrollBar->orientation);
                 int   sbextent(pixelMetric(PM_ScrollBarExtent, scrollBar, widget)),
                       sliderMaxLength(((scrollBar->orientation == Qt::Horizontal) ?
-                                      scrollBar->rect.width() : scrollBar->rect.height()) - (sbextent * numButtons(opts.scrollbarType))),
+                                      scrollBar->rect.width() : scrollBar->rect.height()) - (sbextent * qtcScrollbarButtonNum(opts.scrollbarType))),
                       sliderMinLength(pixelMetric(PM_ScrollBarSliderMin, scrollBar, widget)),
                       sliderLength;
 

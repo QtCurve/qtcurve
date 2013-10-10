@@ -23,11 +23,54 @@
 #ifndef QTC_UTILS_OPTIONS_H
 #define QTC_UTILS_OPTIONS_H
 
+#include "utils.h"
+
 typedef enum {
-    SHADING_SIMPLE=0,
-    SHADING_HSL=1,
-    SHADING_HSV=2,
-    SHADING_HCY=3
+    SHADING_SIMPLE,
+    SHADING_HSL,
+    SHADING_HSV,
+    SHADING_HCY
 } EShading;
+
+typedef enum {
+    SCROLLBAR_KDE,
+    SCROLLBAR_WINDOWS,
+    SCROLLBAR_PLATINUM,
+    SCROLLBAR_NEXT,
+    SCROLLBAR_NONE
+} EScrollbar;
+
+/**
+ * Number of scrollbar buttons.
+ **/
+QTC_ALWAYS_INLINE static inline int
+qtcScrollbarButtonNum(EScrollbar type)
+{
+    switch (type) {
+    default:
+    case SCROLLBAR_KDE:
+        return 3;
+    case SCROLLBAR_WINDOWS:
+    case SCROLLBAR_PLATINUM:
+    case SCROLLBAR_NEXT:
+        return 2;
+    case SCROLLBAR_NONE:
+        return 0;
+    }
+}
+
+/**
+ * Number of scrollbar button we leave space for.
+ * Some applications (e.g. choqok) use the minimum size of scrollbar to
+ * determine the height of input area. Setting a lower limit on this makes
+ * sure that the calculated minimum size is not too small.
+ * See https://github.com/QtCurve/qtcurve-qt4/issues/7
+ * and https://bugs.kde.org/show_bug.cgi?id=317690
+ **/
+QTC_ALWAYS_INLINE static inline int
+qtcScrollbarButtonNumSize(EScrollbar type)
+{
+    return qtcMax(qtcScrollbarButtonNum(type), 2);
+}
 
 #endif

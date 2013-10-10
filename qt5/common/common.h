@@ -751,15 +751,6 @@ typedef enum
 
 typedef enum
 {
-    SCROLLBAR_KDE,
-    SCROLLBAR_WINDOWS,
-    SCROLLBAR_PLATINUM,
-    SCROLLBAR_NEXT,
-    SCROLLBAR_NONE
-} EScrollbar;
-
-typedef enum
-{
     FRAME_NONE,
     FRAME_PLAIN,
     FRAME_LINE,
