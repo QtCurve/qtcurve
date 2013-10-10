@@ -1,35 +1,44 @@
 ## 1.8.17 (WIP)
 1. Add Qt5 support!!.
-2. Require gnu99 and gnu++0x.
-3. Porting to xcb.
-4. Qt5: Remove XBar support from Qt5 (should be replaced by appmenu).
-5. Gtk2: Remove KDE3 support from Gtk2.
-6. Qt4: Fix compile without X Server. Thanks to Sven-Hendrik Haase.
-7. Add `libqtcurve-utils.so`.
-8. Move colorutils to `libqtcurve-utils`.
-9. Gtk2: Fix some warnings.
-10. Merge Gtk2 version and Qt{4,5} versions.
-11. Move xcb handling to `libqtcurve-utils`.
-12. Move KWin X11 shadow helper to `libqtcurve-utils`.
-13. Qt4: Disable transparent background from XEmbed window (e.g. in kpartplugins).
+2. Gtk2: Workaround bug in glib >= 2.36.1 (`g_spawn_command_line_sync()`)
+
+   [Debian-Bug](http://bugs.debian.org/707946)
+   [QtCurve-Bug](https://github.com/QtCurve/qtcurve-gtk2/pull/1)
+
+3. Require gnu99 and gnu++0x.
+4. Porting to xcb.
+5. Qt5: Remove XBar support from Qt5 (should be replaced by appmenu).
+6. Gtk2: Remove KDE3 support from Gtk2.
+7. Qt4: Fix compile without X Server. Thanks to Sven-Hendrik Haase.
+8. Add `libqtcurve-utils.so`.
+9. Move colorutils to `libqtcurve-utils`.
+10. Gtk2: Fix some warnings.
+11. Merge Gtk2 version and Qt{4,5} versions.
+12. Move xcb handling to `libqtcurve-utils`.
+13. Move KWin X11 shadow helper to `libqtcurve-utils`.
+14. Qt4: Disable transparent background from XEmbed window (e.g. in kpartplugins).
     Changing the depth of the window (which require recreating the window)
     breaks the XEmbed protocol.
-14. Gtk2: Generate all GdkPixbuf inline csourse at compile time.
-15. Qt4: Require 4.6.0
-16. Qt4, Qt5: Longer scrollbar in order to be more friendly to applications
+15. Gtk2: Generate all GdkPixbuf inline csourse at compile time.
+16. Qt4: Require 4.6.0
+17. Qt4, Qt5: Longer scrollbar in order to be more friendly to applications
     (e.g. choqok) that use this size hint.
+
+    [KDE-Bug](https://bugs.kde.org/show_bug.cgi?id=317690)
+    [QtCurve-Bug](https://github.com/QtCurve/qtcurve-qt4/issues/7)
 
 ## 1.8.15-KDE4
 1. Add Russian localization. Thanks to Juliette Tux.
-2. Workaround bug in glib >= 2.36.1 (`g_spawn_command_line_sync()`)
-   [Debian-Bug](http://bugs.debian.org/707946)
-3. Remove KDE3 support
-4. Workaround rendering bug in Qt >= 4.8.5
-   [QtBug](https://bugreports.qt-project.org/browse/QTBUG-33512)
-5. CMake option to disable kwin support (`-DQTC_QT4_ENABLE_KWIN=Off`)
-6. Rename come CMake options. Old options will still work.
-7. KWin 4.10 appmenu button support.
-8. Remove packging script.
+2. Remove KDE3 support
+3. Workaround rendering bug in Qt >= 4.8.5
+
+   [Qt-Bug](https://bugreports.qt-project.org/browse/QTBUG-33512)
+   [QtCurve-Bug](https://github.com/QtCurve/qtcurve-qt4/issues/3)
+
+4. CMake option to disable kwin support (`-DQTC_QT4_ENABLE_KWIN=Off`)
+5. Rename come CMake options. Old options will still work.
+6. KWin 4.10 appmenu button support.
+7. Remove packging script.
 
 ## 1.8.16-gtk2
 1. fix memleak with newer versions of cairo.
