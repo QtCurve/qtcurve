@@ -9,7 +9,5 @@
 
 * 'fix' for kdialog/kdefilepicker skipping taskbar, etc.
 
-* Embedding of pixmaps
-
 * Plasma/NVIDIA
     Borders of selected tab are 1 pixel to long.

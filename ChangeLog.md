@@ -27,6 +27,8 @@
     [KDE-Bug](https://bugs.kde.org/show_bug.cgi?id=317690)
     [QtCurve-Bug](https://github.com/QtCurve/qtcurve-qt4/issues/7)
 
+18. Gtk2: Generate gdkpixbuf headers at compile time.
+
 ## 1.8.15-KDE4
 1. Add Russian localization. Thanks to Juliette Tux.
 2. Remove KDE3 support
@@ -39,6 +41,8 @@
 5. Rename come CMake options. Old options will still work.
 6. KWin 4.10 appmenu button support.
 7. Remove packging script.
+8. Generate `shadow.h` and `*pixmap.h` at compile time. Remove the need of
+   Qt3 tools.
 
 ## 1.8.16-gtk2
 1. fix memleak with newer versions of cairo.

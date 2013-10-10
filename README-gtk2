@@ -88,25 +88,3 @@ Usage:
 
 If 'QTCURVE_DEBUG' is set before an application is run, QtCurve will output the
 applications name and the current icon path.
-
-Creating Distribution Packages
-------------------------------
-CMake (as of v2.4.x) does not support building rpm or deb packages, and a simple
-checkinstall will not work. CMake 2.6 should support rpm and deb packages, but until
-then I have supplied a simple shell script to build a package with checkinstall.
-To use this:
-
-1. Install QtCurve as described above
-2. From within the 'build' folder from step 2 above, call ../common/mkpkg
-3. Answer the checkinstall questions.
-
-
-pixmaps.h
----------
-
-To regenerate this, run the following:
-
-    gdk-pixbuf-csource --raw --name check_on check_on.png >> pixmaps.h
-    gdk-pixbuf-csource --raw --name check_x_on check_x_on.png >> pixmaps.h
-    
-    for n in `seq 0 7` ; do gdk-pixbuf-csource --raw --name shadow$n shadow$n.png >> shadow.h ; done
