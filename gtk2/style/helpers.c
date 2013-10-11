@@ -155,12 +155,11 @@ isSortColumn(GtkWidget *button)
             for (GList *child = children;child && !found;
                  child = g_list_next(child)) {
                 if (GTK_IS_ARROW(child->data)) {
-                    GValue val = {0};
-                    g_value_init(&val, G_TYPE_INT);
-                    g_object_get_property(child->data, "arrow-type", &val);
-                    if (GTK_ARROW_NONE != g_value_get_int(&val))
+                    gint val;
+                    g_object_get(child->data, "arrow-type", &val, NULL);
+                    if (GTK_ARROW_NONE != val) {
                         found = TRUE;
-                    g_value_unset(&val);
+                    }
                 }
             }
 
@@ -484,15 +483,17 @@ gboolean isOnComboBox(GtkWidget *w, int level)
     return FALSE;
 }
 
-gboolean isOnCombo(GtkWidget *w, int level)
+gboolean
+isOnCombo(GtkWidget *w, int level)
 {
-    if(w)
-    {
-        if(QTC_IS_COMBO(w))
+    if (w) {
+        if (QTC_IS_COMBO(w)) {
             return TRUE;
-        else if(level<4)
+        } else if(level < 4) {
             return isOnCombo(gtk_widget_get_parent(w), ++level);
+        }
     }
+    return FALSE;
 }
 
 #if !GTK_CHECK_VERSION(2, 90, 0)
@@ -1396,17 +1397,18 @@ gboolean treeViewCellIsLast(GtkTreeView *treeView, GtkTreePath *path)
     return FALSE;
 }
 
-GtkTreePath * treeViewPathParent(GtkTreeView *treeView, GtkTreePath *path)
+GtkTreePath*
+treeViewPathParent(GtkTreeView *treeView, GtkTreePath *path)
 {
-    if(path)
-    {
-        GtkTreePath *parent=gtk_tree_path_copy(path);
-        if(gtk_tree_path_up(parent))
+    QTC_UNUSED(treeView);
+    if (path) {
+        GtkTreePath *parent = gtk_tree_path_copy(path);
+        if (gtk_tree_path_up(parent)) {
             return parent;
-        else
+        } else {
             gtk_tree_path_free(parent);
+        }
     }
-
     return NULL;
 }
 
@@ -1731,18 +1733,18 @@ void generateColors()
     }
 
     qtcPalette.sidebar=NULL;
-    if(!opts.stdSidebarButtons)
-        if(SHADE_BLEND_SELECTED == opts.shadeSliders)
-             qtcPalette.sidebar=qtcPalette.slider;
-        else if(IND_COLORED == opts.defBtnIndicator)
-            qtcPalette.sidebar=qtcPalette.defbtn;
-        else
-        {
+    if (!opts.stdSidebarButtons) {
+        if (SHADE_BLEND_SELECTED == opts.shadeSliders) {
+             qtcPalette.sidebar = qtcPalette.slider;
+        } else if (IND_COLORED == opts.defBtnIndicator) {
+            qtcPalette.sidebar = qtcPalette.defbtn;
+        } else {
             GdkColor mid=midColor(&qtcPalette.highlight[ORIGINAL_SHADE], &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]);
 
             qtcPalette.sidebar=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
             qtcShadeColors(&mid, qtcPalette.sidebar);
         }
+    }
 
     qtcPalette.progress=NULL;
     switch(opts.progressColor)

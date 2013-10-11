@@ -30,11 +30,9 @@
 static gboolean
 qtcComboBoxCellViewHasBgnd(GtkWidget *view)
 {
-    GValue val = {0};
-
-    g_value_init(&val, G_TYPE_BOOLEAN);
-    g_object_get_property(G_OBJECT(view), "background-set", &val);
-    return g_value_get_boolean(&val);
+    gboolean val;
+    g_object_get(view, "background-set", &val, NULL);
+    return val;
 }
 
 static void
@@ -213,8 +211,7 @@ qtcComboBoxSetup(GtkWidget *frame, GtkWidget *combo)
 gboolean
 qtcComboHasFrame(GtkWidget *widget)
 {
-    GValue val = {0};
-    g_value_init(&val, G_TYPE_BOOLEAN);
-    g_object_get_property(G_OBJECT(widget), "has-frame", &val);
-    return g_value_get_boolean(&val);
+    gboolean val;
+    g_object_get(widget, "has-frame", &val, NULL);
+    return val;
 }

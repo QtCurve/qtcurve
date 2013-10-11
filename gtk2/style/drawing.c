@@ -3122,9 +3122,7 @@ void drawMenuItem(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *w
             cairo_pattern_destroy(pt);
             if(ROUNDED)
                 unsetCairoClipping(cr);
-        }
-        else if(!opts.borderMenuitems && !mb)
-        {
+        } else if (!opts.borderMenuitems && !mb) {
             /*For now dont round combos - getting weird effects with shadow/clipping :-( */
             /*...but these work ok if we have an rgba colormap, so in that case we dont care if its a combo...*/
             gboolean isCombo=!(opts.square&SQUARE_POPUP_MENUS) && widget && isComboMenu(gtk_widget_get_parent(widget)) &&
@@ -3651,14 +3649,20 @@ void drawCheckBox(cairo_t *cr, GtkStateType state, GtkShadowType shadow, GtkStyl
                                DF_DO_BORDER|(GTK_STATE_ACTIVE==state ? DF_SUNKEN : 0), list ? NULL : widget);
                 if(doEtch)
                     x++, y++;
-            }
-            else
-            {
-                gboolean    coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver,
-                    glow=doEtch && GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver,
-                    lightBorder=DRAW_LIGHT_BORDER(FALSE, WIDGET_TROUGH, APPEARANCE_INVERTED),
-                    draw3dFull=!lightBorder && DRAW_3D_FULL_BORDER(FALSE, APPEARANCE_INVERTED),
-                    draw3d=draw3dFull || (!lightBorder && DRAW_3D_BORDER(FALSE, APPEARANCE_INVERTED));
+            } else {
+                gboolean coloredMouseOver =
+                    GTK_STATE_PRELIGHT==state && opts.coloredMouseOver;
+                gboolean glow = (doEtch && GTK_STATE_PRELIGHT == state &&
+                                 MO_GLOW == opts.coloredMouseOver);
+                gboolean lightBorder = DRAW_LIGHT_BORDER(FALSE, WIDGET_TROUGH,
+                                                         APPEARANCE_INVERTED);
+                /* gboolean draw3dFull = */
+                /*     (!lightBorder && */
+                /*      DRAW_3D_FULL_BORDER(FALSE, APPEARANCE_INVERTED)); */
+                /* gboolean draw3d = */
+                /*     draw3dFull || */
+                /*     (!lightBorder && */
+                /*      DRAW_3D_BORDER(FALSE, APPEARANCE_INVERTED)); */
                 GdkColor    *colors=coloredMouseOver
                     ? qtcPalette.mouseover
                     : btnColors,
@@ -3792,12 +3796,16 @@ void drawRadioButton(cairo_t *cr, GtkStateType state, GtkShadowType shadow, GtkS
             else
             {
                 bool     glow=doEtch && GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver;
-                gboolean lightBorder=DRAW_LIGHT_BORDER(FALSE, WIDGET_TROUGH, APPEARANCE_INVERTED),
-                    draw3d=!lightBorder &&
-                    (DRAW_3D_BORDER(FALSE, APPEARANCE_INVERTED) || DRAW_3D_FULL_BORDER(FALSE, APPEARANCE_INVERTED)),
-                    coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver,
-                    doneShadow=false;
-                int      bgnd=0;
+                gboolean lightBorder = DRAW_LIGHT_BORDER(FALSE, WIDGET_TROUGH,
+                                                         APPEARANCE_INVERTED);
+                /* gboolean draw3d = */
+                /*     (!lightBorder && */
+                /*      (DRAW_3D_BORDER(FALSE, APPEARANCE_INVERTED) || */
+                /*       DRAW_3D_FULL_BORDER(FALSE, APPEARANCE_INVERTED))); */
+                gboolean coloredMouseOver =
+                    GTK_STATE_PRELIGHT == state && opts.coloredMouseOver;
+                gboolean doneShadow = false;
+                int bgnd = 0;
                 GdkColor *colors=coloredMouseOver
                     ? qtcPalette.mouseover
                     : btnColors,
@@ -3888,16 +3896,21 @@ void drawRadioButton(cairo_t *cr, GtkStateType state, GtkShadowType shadow, GtkS
     }
 }
 
-void drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget, const gchar *detail,
-             GdkRectangle *area, int x, int y, int width, int height, GtkPositionType gapSide)
+void
+drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
+        const gchar *detail, GdkRectangle *area, int x, int y, int width,
+        int height, GtkPositionType gapSide)
 {
+    QTC_UNUSED(detail);
     GtkNotebook *notebook=GTK_IS_NOTEBOOK(widget) ? GTK_NOTEBOOK(widget) : NULL;
     gboolean    highlightingEnabled=notebook && (opts.highlightFactor || opts.coloredMouseOver);
     gboolean    highlight=FALSE;
-    int         highlightedTabIndex=qtcTabCurrentHoveredIndex(widget),
-        dark=APPEARANCE_FLAT==opts.appearance ? ORIGINAL_SHADE : FRAME_DARK_SHADOW,
-        moOffset=ROUNDED_NONE==opts.round || TAB_MO_TOP!=opts.tabMouseOver ? 1 : opts.round;
-    GtkWidget   *parent=widget ? gtk_widget_get_parent(widget) : NULL;
+    int highlightedTabIndex = qtcTabCurrentHoveredIndex(widget);
+    /* int dark = ((APPEARANCE_FLAT == opts.appearance) ? */
+    /*             ORIGINAL_SHADE : FRAME_DARK_SHADOW); */
+    int moOffset = ((ROUNDED_NONE == opts.round ||
+                     TAB_MO_TOP != opts.tabMouseOver) ? 1 : opts.round);
+    GtkWidget *parent=widget ? gtk_widget_get_parent(widget) : NULL;
     gboolean    firstTab=notebook ? FALSE : TRUE,
         lastTab=notebook ? FALSE : TRUE,
         vertical=GTK_POS_LEFT==gapSide || GTK_POS_RIGHT==gapSide,
@@ -3911,10 +3924,11 @@ void drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget
         highlightBorder=(opts.round>ROUND_FULL ? 4 : 3),
         sizeAdjust=(!active || mozTab) && TAB_MO_GLOW==opts.tabMouseOver ? 1 : 0,
         tabIndex = -1;
-    GdkColor    *col=active
-        ? &(style->bg[GTK_STATE_NORMAL]) : &(qtcPalette.background[2]),
-        *selCol1=&qtcPalette.highlight[0],
-        *selCol2=&qtcPalette.highlight[IS_FLAT(opts.appearance) ? 0 : 3];
+    GdkColor *col = (active ? &(style->bg[GTK_STATE_NORMAL]) :
+                     &(qtcPalette.background[2]));
+    GdkColor *selCol1 = &qtcPalette.highlight[0];
+    /* GdkColor *selCol2 = */
+    /*     &qtcPalette.highlight[IS_FLAT(opts.appearance) ? 0 : 3]; */
     GdkRectangle clipArea;
     EBorder     borderProfile=active || opts.borderInactiveTab
         ? opts.borderTab
@@ -4366,33 +4380,34 @@ static GdkPixbuf * setTransparency(const GdkPixbuf *pixbuf, gdouble alpha_percen
 
     target = gdk_pixbuf_add_alpha (pixbuf, FALSE, 0, 0, 0);
 
-    if (alpha_percent == 1.0)
+    if (alpha_percent == 1.0) {
         return target;
-    else
-    {
-        guint  width = gdk_pixbuf_get_width(target),
-            height = gdk_pixbuf_get_height(target),
-            rowstride = gdk_pixbuf_get_rowstride(target);
-        guchar *data = gdk_pixbuf_get_pixels(target),
-            *current;
-        int    x, y;
-
-        for (y = 0; y < height; y++)
-            for (x = 0; x < width; x++)
-            {
+    } else {
+        guint width = gdk_pixbuf_get_width(target);
+        guint height = gdk_pixbuf_get_height(target);
+        guint rowstride = gdk_pixbuf_get_rowstride(target);
+        guchar *data = gdk_pixbuf_get_pixels(target);
+        guchar *current;
+        for (unsigned y = 0;y < height;y++) {
+            for (unsigned x = 0;x < width;x++) {
                 /* The "4" is the number of chars per pixel, in this case, RGBA,
                    the 3 means "skip to the alpha" */
                 current = data + (y * rowstride) + (x * 4) + 3;
-                *(current) = (guchar) (*(current) * alpha_percent);
+                *(current) = (guchar)(*(current) * alpha_percent);
             }
+        }
     }
 
     return target;
 }
 
-GdkPixbuf * renderIcon(GtkStyle *style, const GtkIconSource *source, GtkTextDirection direction,
-                       GtkStateType state, GtkIconSize size, GtkWidget *widget, const char *detail)
+GdkPixbuf*
+renderIcon(GtkStyle *style, const GtkIconSource *source,
+           GtkTextDirection direction, GtkStateType state, GtkIconSize size,
+           GtkWidget *widget, const char *detail)
 {
+    QTC_UNUSED(direction);
+    QTC_UNUSED(detail);
     int         width = 1,
         height = 1;
     GdkPixbuf   *scaled,
