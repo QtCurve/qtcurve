@@ -34,4 +34,6 @@ if(QTC_ENABLE_X11)
 else()
   set(QTC_QT5_XCB_LINK_LIBS)
 endif()
+
+add_subdirectory(common)
 add_subdirectory(style)

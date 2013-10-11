@@ -17,6 +17,9 @@ set(qtcurve_X11_MOC_HDRS
   macmenu-dbus.h
   shadowhelper.h)
 
+translate_add_sources(${qtcurve_SRCS} ${qtcurve_MOC_HDRS}
+  ${qtcurve_X11_SRCS} ${qtcurve_X11_MOC_HDRS})
+
 if(NOT ENABLE_QT4)
   return()
 endif()

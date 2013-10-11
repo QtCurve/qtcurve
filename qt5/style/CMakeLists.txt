@@ -1,3 +1,27 @@
+set(qtcurve_SRCS
+  qtcurve.cpp
+  qtcurve_api.cpp
+  qtcurve_utils.cpp
+  debug.cpp
+  windowmanager.cpp
+  blurhelper.cpp
+  utils.cpp
+  shortcuthandler.cpp)
+set(qtcurve_MOC_HDRS
+  qtcurve.h
+  qtcurve_p.h
+  qtcurve_plugin.h
+  windowmanager.h
+  blurhelper.h
+  shortcuthandler.h)
+set(qtcurve_X11_SRCS
+  shadowhelper.cpp)
+set(qtcurve_X11_MOC_HDRS
+  shadowhelper.h)
+
+translate_add_sources(${qtcurve_SRCS} ${qtcurve_MOC_HDRS}
+  ${qtcurve_X11_SRCS} ${qtcurve_X11_MOC_HDRS})
+
 if(NOT ENABLE_QT5)
   return()
 endif()
@@ -17,30 +41,11 @@ foreach(pngname check_on check_x_on dialog_error dialog_information
     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/${pngname}-png.h")
 endforeach()
 
-set(qtcurve_SRCS
-  qtcurve.cpp
-  qtcurve_api.cpp
-  qtcurve_utils.cpp
-  debug.cpp
-  windowmanager.cpp
-  blurhelper.cpp
-  utils.cpp
-  shortcuthandler.cpp
-  ${qtcurve_style_common_SRCS})
-set(qtcurve_MOC_HDRS
-  qtcurve.h
-  qtcurve_plugin.h
-  windowmanager.h
-  blurhelper.h
-  shortcuthandler.h)
+set(qtcurve_SRCS ${qtcurve_SRCS} ${qtcurve_style_common_SRCS})
 
 if(QTC_ENABLE_X11)
-  set(qtcurve_SRCS
-    shadowhelper.cpp
-    ${qtcurve_SRCS})
-  set(qtcurve_MOC_HDRS
-    shadowhelper.h
-    ${qtcurve_MOC_HDRS})
+  set(qtcurve_SRCS ${qtcurve_X11_SRCS} ${qtcurve_SRCS})
+  set(qtcurve_MOC_HDRS ${qtcurve_X11_MOC_HDRS} ${qtcurve_MOC_HDRS})
 endif()
 
 add_definitions(-DQT_PLUGIN)
