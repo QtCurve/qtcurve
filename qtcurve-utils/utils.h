@@ -236,6 +236,9 @@ QTC_DECLARE_ATOMIC(And, and, uint32_t);
 QTC_DECLARE_ATOMIC(Or, or, uint32_t);
 QTC_DECLARE_ATOMIC(Xor, xor, uint32_t);
 
+void *qtcBSearch(const void *key, const void *base, size_t nmemb, size_t size,
+                 int (*compar)(const void*, const void*));
+
 QTC_END_DECLS
 
 #define qtcAtomicAdd(atomic, val)               \
