@@ -131,12 +131,12 @@ typedef struct
 {
     GdkColor        colors[PAL_NUMPALS][COLOR_NUMCOLORS]; /*,
                     inactiveSelectCol;*/
-    char            *fonts[FONT_NUM_TOTAL],
-                    *icons,
+    char *fonts[FONT_NUM_TOTAL];
+    char *icons;
 #ifdef QTC_GTK2_STYLE_SUPPORT
-                    *styleName,
+    char *styleName;
 #endif
-                    *appName;
+    const char *appName;
     GtkToolbarStyle toolbarStyle;
     QtIcons         iconSizes;
     gboolean        buttonIcons,
@@ -181,7 +181,7 @@ extern QtData     qtSettings;
 
 gboolean qtSettingsInit();
 void qtSettingsSetColors(GtkStyle *style, GtkRcStyle *rc_style);
-char *getAppName();
+const char *getAppName();
 bool runCommand(const char* cmd, char** result);
 
 #endif

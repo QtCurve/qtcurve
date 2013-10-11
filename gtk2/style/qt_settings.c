@@ -338,6 +338,7 @@ static int getMozillaVersion(int pid)
     return ver;
 }
 
+#ifdef QTC_GTK2_STYLE_SUPPORT
 static char * themeFileSub(const char *prefix, const char *name, char **tmpStr, const char *sub)
 {
     *tmpStr=realloc(*tmpStr, strlen(prefix)+1+strlen(sub)+1+strlen(name)+strlen(THEME_SUFFIX)+1);
@@ -364,56 +365,57 @@ static char * themeFile(const char *prefix, const char *name, char **tmpStr)
 
     return f;
 }
+#endif
 
-static void parseQtColors(char *line, int p)
-{
-    int  n=-1;
-    char *l=strtok(line, "#");
+/* static void parseQtColors(char *line, int p) */
+/* { */
+/*     int  n=-1; */
+/*     char *l=strtok(line, "#"); */
 
-    while(l)
-    {
-        if(strlen(l)>=7)
-            switch(n)
-            {
-                case 0:
-                    qtcSetRgb(&qtSettings.colors[p][COLOR_WINDOW_TEXT], l);
-                    break;
-                case 1:
-                    qtcSetRgb(&qtSettings.colors[p][COLOR_BUTTON], l);
-                    break;
-                case 5:
-                    qtcSetRgb(&qtSettings.colors[p][COLOR_MID], l);
-                    break;
-                case 6:
-                    qtcSetRgb(&qtSettings.colors[p][COLOR_TEXT], l);
-                    break;
-                case 8:
-                    qtcSetRgb(&qtSettings.colors[p][COLOR_BUTTON_TEXT], l);
-                    break;
-                case 9:
-                    qtcSetRgb(&qtSettings.colors[p][COLOR_BACKGROUND], l);
-                    break;
-                case 10:
-                    qtcSetRgb(&qtSettings.colors[p][COLOR_WINDOW], l);
-                    break;
-                case 12:
-                    qtcSetRgb(&qtSettings.colors[p][COLOR_SELECTED], l);
-                    break;
-                case 13:
-                    qtcSetRgb(&qtSettings.colors[p][COLOR_TEXT_SELECTED], l);
-                    break;
-                default:
-                    break;
-            }
-        else if(n>-1)
-            break;
+/*     while(l) */
+/*     { */
+/*         if(strlen(l)>=7) */
+/*             switch(n) */
+/*             { */
+/*                 case 0: */
+/*                     qtcSetRgb(&qtSettings.colors[p][COLOR_WINDOW_TEXT], l); */
+/*                     break; */
+/*                 case 1: */
+/*                     qtcSetRgb(&qtSettings.colors[p][COLOR_BUTTON], l); */
+/*                     break; */
+/*                 case 5: */
+/*                     qtcSetRgb(&qtSettings.colors[p][COLOR_MID], l); */
+/*                     break; */
+/*                 case 6: */
+/*                     qtcSetRgb(&qtSettings.colors[p][COLOR_TEXT], l); */
+/*                     break; */
+/*                 case 8: */
+/*                     qtcSetRgb(&qtSettings.colors[p][COLOR_BUTTON_TEXT], l); */
+/*                     break; */
+/*                 case 9: */
+/*                     qtcSetRgb(&qtSettings.colors[p][COLOR_BACKGROUND], l); */
+/*                     break; */
+/*                 case 10: */
+/*                     qtcSetRgb(&qtSettings.colors[p][COLOR_WINDOW], l); */
+/*                     break; */
+/*                 case 12: */
+/*                     qtcSetRgb(&qtSettings.colors[p][COLOR_SELECTED], l); */
+/*                     break; */
+/*                 case 13: */
+/*                     qtcSetRgb(&qtSettings.colors[p][COLOR_TEXT_SELECTED], l); */
+/*                     break; */
+/*                 default: */
+/*                     break; */
+/*             } */
+/*         else if(n>-1) */
+/*             break; */
 
-        n++;
-        if(n>13)
-            break;
-        l=strtok(NULL, "#");
-    }
-}
+/*         n++; */
+/*         if(n>13) */
+/*             break; */
+/*         l=strtok(NULL, "#"); */
+/*     } */
+/* } */
 
 typedef enum
 {
@@ -486,17 +488,20 @@ static ColorType getColorType(const char *line)
 
 static GdkColor readColor(const char *line)
 {
-    char     *eq=strchr(line, '=');
+    char *eq = strchr(line, '=');
     GdkColor col;
+    int red;
+    int green;
+    int blue;
 
-    if(eq && ++eq && *eq!='\0' && 3==sscanf(eq, "%d,%d,%d", (int *)&col.red, (int *)&col.green, (int *)&col.blue))
-    {
-        col.red=toGtkColor(col.red);
-        col.green=toGtkColor(col.green);
-        col.blue=toGtkColor(col.blue);
+    if (eq && ++eq && *eq != '\0' &&
+        sscanf(eq, "%d,%d,%d", &red, &green, &blue) == 3) {
+        col.red = toGtkColor(red);
+        col.green = toGtkColor(green);
+        col.blue = toGtkColor(blue);
+    } else {
+        col.red = col.blue = col.green = 0;
     }
-    else
-        col.red=col.blue=col.green=0;
     return col;
 }
 
@@ -913,20 +918,21 @@ static void readKdeGlobals(const char *rc, int rd, bool first, bool kde4)
                     switch(section)
                     {
                         case SECT_KDE4_COL_BUTTON:
-                            switch(colorType)
-                            {
-                                case BackgroundNormal:
-                                    qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON]=color;
-                                    break;
-                                case ForegroundNormal:
-                                    qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON_TEXT]=color;
-                                    break;
-                                case DecorationFocus:
-                                    qtSettings.colors[PAL_ACTIVE][COLOR_FOCUS]=color;
-                                    break;
-                                case DecorationHover:
-                                    qtSettings.colors[PAL_ACTIVE][COLOR_HOVER]=color;
-                                    break;
+                            switch(colorType) {
+                            case BackgroundNormal:
+                                qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON]=color;
+                                break;
+                            case ForegroundNormal:
+                                qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON_TEXT]=color;
+                                break;
+                            case DecorationFocus:
+                                qtSettings.colors[PAL_ACTIVE][COLOR_FOCUS]=color;
+                                break;
+                            case DecorationHover:
+                                qtSettings.colors[PAL_ACTIVE][COLOR_HOVER]=color;
+                                break;
+                            default:
+                                break;
                             }
                             break;
                         case SECT_KDE4_COL_SEL:
@@ -1154,166 +1160,166 @@ static void readKdeGlobals(const char *rc, int rd, bool first, bool kde4)
         setFont(&fonts[FONT_TOOLBAR], FONT_TOOLBAR);
 }
 
-static void readQtRc(const char *rc, int rd, gboolean absolute, gboolean setDefaultFont)
-{
-    const char    *home=absolute ? NULL : qtcGetHome();
-    int           found=0;
-    char          line[MAX_CONFIG_INPUT_LINE_LEN+1];
-    QtFontDetails font;
+/* static void */
+/* readQtRc(const char *rc, int rd, gboolean absolute, gboolean setDefaultFont) */
+/* { */
+/*     const char    *home=absolute ? NULL : qtcGetHome(); */
+/*     int           found=0; */
+/*     char          line[MAX_CONFIG_INPUT_LINE_LEN+1]; */
+/*     QtFontDetails font; */
 
-    initFont(&font, TRUE);
+/*     initFont(&font, TRUE); */
 
-    if(absolute || NULL!=home)
-    {
-        char fname[256];
-        FILE *f;
+/*     if(absolute || NULL!=home) */
+/*     { */
+/*         char fname[256]; */
+/*         FILE *f; */
 
-        if(!absolute)
-            sprintf(fname, "%s/%s", home, rc);
+/*         if(!absolute) */
+/*             sprintf(fname, "%s/%s", home, rc); */
 
-        f=fopen(absolute ? rc : fname, "r");
+/*         f=fopen(absolute ? rc : fname, "r"); */
 
-        if(f)
-        {
-            int section=SECT_NONE;
+/*         if(f) */
+/*         { */
+/*             int section=SECT_NONE; */
 
-            if(qtSettings.debug)
-                printf(DEBUG_PREFIX"Reading qtrc - %s\n", absolute ? rc : fname);
+/*             if(qtSettings.debug) */
+/*                 printf(DEBUG_PREFIX"Reading qtrc - %s\n", absolute ? rc : fname); */
 
-            while(found!=rd && NULL!=fgets(line, MAX_CONFIG_INPUT_LINE_LEN, f))
-                if(line[0]=='[')
-                {
-                    if(0==strncmp_i(line, "[Palette]", 9))
-                        section=SECT_PALETTE;
-                    else if(0==strncmp_i(line, "[General]", 9))
-                        section=SECT_GENERAL;
-                    else if(0==strncmp_i(line, "[KDE]", 5))
-                        section=SECT_KDE;
-                    else
-                        section=SECT_NONE;
-                }
-                else if(rd&RD_CONTRAST && !(found&RD_CONTRAST) && SECT_KDE==section && 0==strncmp_i(line, "contrast=", 9))
-                {
-                    opts.contrast=readInt(line, 9);
-                    if(opts.contrast>10 || opts.contrast<0)
-                        opts.contrast=7;
-                    found|=RD_CONTRAST;
-                }
-                else if(SECT_PALETTE==section && rd&RD_ACT_PALETTE && !(found&RD_ACT_PALETTE) &&
-                        0==strncmp_i(line, "active=", 7))
-                {
-                    parseQtColors(line, PAL_ACTIVE);
-                    found|=RD_ACT_PALETTE;
-                }
-                else if(SECT_PALETTE==section && rd&RD_DIS_PALETTE && !(found&RD_DIS_PALETTE) &&
-                        0==strncmp_i(line, "disabled=", 7))
-                {
-                    parseQtColors(line, PAL_DISABLED);
-                    found|=RD_DIS_PALETTE;
-                }
-#ifdef READ_INACTIVE_PAL
-                else if(SECT_PALETTE==section && rd&RD_INACT_PALETTE && !(found&RD_INACT_PALETTE) &&
-                        0==strncmp_i(line, "inactive=", 9))
-                {
-                    parseQtColors(line, PAL_INACTIVE);
-                    found|=RD_INACT_PALETTE;
-                }
-#endif
-#ifdef QTC_GTK2_STYLE_SUPPORT
-                else if (SECT_GENERAL==section && rd&RD_STYLE && !(found&RD_STYLE) && 0==strncmp_i(line, "style=", 6))
-                {
-                    int len=strlen(line);
-                    qtSettings.styleName=realloc(qtSettings.styleName, strlen(&line[6])+1);
-                    if('\n'==line[len-1])
-                        line[len-1]='\0';
-                    strcpy(qtSettings.styleName, &line[6]);
-                    found|=RD_STYLE;
-                }
-#endif
-                else if (SECT_GENERAL==section && rd&RD_FONT && !(found&RD_FONT) && 0==strncmp_i(line, "font=", 5))
-                {
-                    parseFontLine(line, &font);
-                    found|=RD_FONT;
-                }
-                else if(found==rd)
-                    break;
+/*             while(found!=rd && NULL!=fgets(line, MAX_CONFIG_INPUT_LINE_LEN, f)) */
+/*                 if(line[0]=='[') */
+/*                 { */
+/*                     if(0==strncmp_i(line, "[Palette]", 9)) */
+/*                         section=SECT_PALETTE; */
+/*                     else if(0==strncmp_i(line, "[General]", 9)) */
+/*                         section=SECT_GENERAL; */
+/*                     else if(0==strncmp_i(line, "[KDE]", 5)) */
+/*                         section=SECT_KDE; */
+/*                     else */
+/*                         section=SECT_NONE; */
+/*                 } */
+/*                 else if(rd&RD_CONTRAST && !(found&RD_CONTRAST) && SECT_KDE==section && 0==strncmp_i(line, "contrast=", 9)) */
+/*                 { */
+/*                     opts.contrast=readInt(line, 9); */
+/*                     if(opts.contrast>10 || opts.contrast<0) */
+/*                         opts.contrast=7; */
+/*                     found|=RD_CONTRAST; */
+/*                 } */
+/*                 else if(SECT_PALETTE==section && rd&RD_ACT_PALETTE && !(found&RD_ACT_PALETTE) && */
+/*                         0==strncmp_i(line, "active=", 7)) */
+/*                 { */
+/*                     parseQtColors(line, PAL_ACTIVE); */
+/*                     found|=RD_ACT_PALETTE; */
+/*                 } */
+/*                 else if(SECT_PALETTE==section && rd&RD_DIS_PALETTE && !(found&RD_DIS_PALETTE) && */
+/*                         0==strncmp_i(line, "disabled=", 7)) */
+/*                 { */
+/*                     parseQtColors(line, PAL_DISABLED); */
+/*                     found|=RD_DIS_PALETTE; */
+/*                 } */
+/* #ifdef READ_INACTIVE_PAL */
+/*                 else if(SECT_PALETTE==section && rd&RD_INACT_PALETTE && !(found&RD_INACT_PALETTE) && */
+/*                         0==strncmp_i(line, "inactive=", 9)) */
+/*                 { */
+/*                     parseQtColors(line, PAL_INACTIVE); */
+/*                     found|=RD_INACT_PALETTE; */
+/*                 } */
+/* #endif */
+/* #ifdef QTC_GTK2_STYLE_SUPPORT */
+/*                 else if (SECT_GENERAL==section && rd&RD_STYLE && !(found&RD_STYLE) && 0==strncmp_i(line, "style=", 6)) */
+/*                 { */
+/*                     int len=strlen(line); */
+/*                     qtSettings.styleName=realloc(qtSettings.styleName, strlen(&line[6])+1); */
+/*                     if('\n'==line[len-1]) */
+/*                         line[len-1]='\0'; */
+/*                     strcpy(qtSettings.styleName, &line[6]); */
+/*                     found|=RD_STYLE; */
+/*                 } */
+/* #endif */
+/*                 else if (SECT_GENERAL==section && rd&RD_FONT && !(found&RD_FONT) && 0==strncmp_i(line, "font=", 5)) */
+/*                 { */
+/*                     parseFontLine(line, &font); */
+/*                     found|=RD_FONT; */
+/*                 } */
+/*                 else if(found==rd) */
+/*                     break; */
 
-            fclose(f);
-        }
-    }
+/*             fclose(f); */
+/*         } */
+/*     } */
 
-    if(rd&RD_ACT_PALETTE && !(found&RD_ACT_PALETTE))
-    {
-        strncpy(line, DEFAULT_KDE_ACT_PAL, MAX_CONFIG_INPUT_LINE_LEN);
-        line[MAX_CONFIG_INPUT_LINE_LEN]='\0';
-        parseQtColors(line, PAL_ACTIVE);
-    }
+/*     if(rd&RD_ACT_PALETTE && !(found&RD_ACT_PALETTE)) */
+/*     { */
+/*         strncpy(line, DEFAULT_KDE_ACT_PAL, MAX_CONFIG_INPUT_LINE_LEN); */
+/*         line[MAX_CONFIG_INPUT_LINE_LEN]='\0'; */
+/*         parseQtColors(line, PAL_ACTIVE); */
+/*     } */
 
-    if(rd&RD_DIS_PALETTE && !(found&RD_DIS_PALETTE))
-    {
-        strncpy(line, DEFAULT_KDE_DIS_PAL, MAX_CONFIG_INPUT_LINE_LEN);
-        line[MAX_CONFIG_INPUT_LINE_LEN]='\0';
-        parseQtColors(line, PAL_DISABLED);
-    }
+/*     if(rd&RD_DIS_PALETTE && !(found&RD_DIS_PALETTE)) */
+/*     { */
+/*         strncpy(line, DEFAULT_KDE_DIS_PAL, MAX_CONFIG_INPUT_LINE_LEN); */
+/*         line[MAX_CONFIG_INPUT_LINE_LEN]='\0'; */
+/*         parseQtColors(line, PAL_DISABLED); */
+/*     } */
 
-    if(rd&RD_ACT_PALETTE)
-    {
-        qtSettings.colors[PAL_ACTIVE][COLOR_FOCUS]=
-        qtSettings.colors[PAL_ACTIVE][COLOR_HOVER]=
-            qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED];
-    }
-/*
-    if(rd&RD_DIS_PALETTE)
-    {
-        qtSettings.colors[PAL_DISABLED][COLOR_FOCUS]=
-        qtSettings.colors[PAL_DISABLED][COLOR_HOVER]=
-            qtSettings.colors[PAL_DISABLED][COLOR_SELECTED];
-    }
-*/
-#ifdef READ_INACTIVE_PAL
-    if(rd&RD_INACT_PALETTE && !(found&RD_INACT_PALETTE))
-    {
-        strncpy(line, DEFAULT_KDE_INACT_PAL, MAX_CONFIG_INPUT_LINE_LEN);
-        line[MAX_CONFIG_INPUT_LINE_LEN]='\0';
-        parseQtColors(line, PAL_INACTIVE);
-    }
+/*     if(rd&RD_ACT_PALETTE) */
+/*     { */
+/*         qtSettings.colors[PAL_ACTIVE][COLOR_FOCUS]= */
+/*         qtSettings.colors[PAL_ACTIVE][COLOR_HOVER]= */
+/*             qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED]; */
+/*     } */
+/* /\* */
+/*     if(rd&RD_DIS_PALETTE) */
+/*     { */
+/*         qtSettings.colors[PAL_DISABLED][COLOR_FOCUS]= */
+/*         qtSettings.colors[PAL_DISABLED][COLOR_HOVER]= */
+/*             qtSettings.colors[PAL_DISABLED][COLOR_SELECTED]; */
+/*     } */
+/* *\/ */
+/* #ifdef READ_INACTIVE_PAL */
+/*     if(rd&RD_INACT_PALETTE && !(found&RD_INACT_PALETTE)) */
+/*     { */
+/*         strncpy(line, DEFAULT_KDE_INACT_PAL, MAX_CONFIG_INPUT_LINE_LEN); */
+/*         line[MAX_CONFIG_INPUT_LINE_LEN]='\0'; */
+/*         parseQtColors(line, PAL_INACTIVE); */
+/*     } */
 
-/*
-    if(rd&RD_INACT_PALETTE)
-    {
-        qtSettings.colors[PAL_INACTIVE][COLOR_FOCUS]=
-        qtSettings.colors[PAL_INACTIVE][COLOR_HOVER]=
-            qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED];
-    }
-*/
-#endif
+/* /\* */
+/*     if(rd&RD_INACT_PALETTE) */
+/*     { */
+/*         qtSettings.colors[PAL_INACTIVE][COLOR_FOCUS]= */
+/*         qtSettings.colors[PAL_INACTIVE][COLOR_HOVER]= */
+/*             qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED]; */
+/*     } */
+/* *\/ */
+/* #endif */
 
-    //if(rd&RD_FONT && (found&RD_FONT || (!qtSettings.fonts[FONT_GENERAL] && setDefaultFont)))  /* No need to check if read in */
-    if(rd&RD_FONT && found&RD_FONT)
-        setFont(&font, FONT_GENERAL);
-}
+/*     //if(rd&RD_FONT && (found&RD_FONT || (!qtSettings.fonts[FONT_GENERAL] && setDefaultFont)))  /\* No need to check if read in *\/ */
+/*     if(rd&RD_FONT && found&RD_FONT) */
+/*         setFont(&font, FONT_GENERAL); */
+/* } */
 
 static int qt_refs=0;
 
 static const char * kdeIconsPrefix()
 {
-    static char *kdeIcons=NULL;
+    static const char *kdeIcons = NULL;
 
-    if(!kdeIcons) {
-        if (runCommand("kde4-config --expandvars --install icon", &kdeIcons)) {
-            int len=strlen(kdeIcons);
-
-            if(len>1 && kdeIcons[len-1]=='\n')
-                kdeIcons[len-1]='\0';
+    if (!kdeIcons) {
+        char *res = NULL;
+        if (runCommand("kde4-config --expandvars --install icon", &res)) {
+            int len = strlen(res);
+            if (len > 1 && res[len - 1]=='\n') {
+                res[len - 1]='\0';
+            }
+            kdeIcons = res;
         } else {
-            kdeIcons = 0L;
+            kdeIcons = (QTC_KDE4_ICONS_PREFIX &&
+                        strlen(QTC_KDE4_ICONS_PREFIX) > 2 ?
+                        QTC_KDE4_ICONS_PREFIX : DEFAULT_ICON_PREFIX);
         }
     }
-
-    if(!kdeIcons)
-        kdeIcons = (QTC_KDE4_ICONS_PREFIX && strlen(QTC_KDE4_ICONS_PREFIX) > 2 ?
-                    QTC_KDE4_ICONS_PREFIX : DEFAULT_ICON_PREFIX);
-
     return kdeIcons;
 }
 
@@ -1324,12 +1330,12 @@ static char *getIconPath()
     const char  *kdePrefix=kdeIconsPrefix(),
                 *defIcons=defaultIcons();
     gboolean    nonDefIcons=qtSettings.icons && strcmp(qtSettings.icons, defIcons);
-    int         len=strlen("pixmap_path \""),
-                kdeHomeLen=kdeHome ? strlen(kdeHome) : 0,
-                kdeIconPrefixLen=strlen(kdePrefix),
-                iconLen=qtSettings.icons ? strlen(qtSettings.icons) : 0,
-                defIconsLen=strlen(defIcons);
-    gboolean    addDefaultPrefix=strcmp(kdePrefix, DEFAULT_ICON_PREFIX);
+    unsigned len = strlen("pixmap_path \"");
+    unsigned kdeHomeLen = kdeHome ? strlen(kdeHome) : 0;
+    unsigned kdeIconPrefixLen = strlen(kdePrefix);
+    unsigned iconLen = qtSettings.icons ? strlen(qtSettings.icons) : 0;
+    unsigned defIconsLen = strlen(defIcons);
+    gboolean addDefaultPrefix = strcmp(kdePrefix, DEFAULT_ICON_PREFIX);
 
     if(nonDefIcons)
     {
@@ -1553,9 +1559,10 @@ static char * getAppNameFromPid(int pid)
     return app_name;
 }
 
-char * getAppName()
+const char *
+getAppName()
 {
-    static char *name=0L;
+    static const char *name = 0L;
 
     if(!name)
     {
@@ -1604,6 +1611,8 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
 #ifdef QTC_GTK2_MODIFY_MOZILLA
     gboolean    remove_btn_css=FALSE,
                 add_css=TRUE;
+#else
+    QTC_UNUSED(add_btn_css);
 #endif
     struct stat st;
     size_t      file_size=0,
@@ -1767,7 +1776,7 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
         free(menu_text_str);
 }
 
-static void processMozillaApp(gboolean add_btn_css, gboolean add_menu_colors, char *app, gboolean under_moz)
+static void processMozillaApp(gboolean add_btn_css, gboolean add_menu_colors, const char *app, gboolean under_moz)
 {
     const char *home=qtcGetHome();
 
@@ -1941,10 +1950,9 @@ gboolean qtSettingsInit()
 
         if(abs(now-lastRead)>1)
         {
-            char        *locale=setlocale(LC_NUMERIC, NULL),
-                        *path=NULL,
-                        *tmpStr=NULL,
-                        *rcFile=NULL;
+            char *locale = setlocale(LC_NUMERIC, NULL);
+            char *path = NULL;
+            char *tmpStr = NULL;
             GtkSettings *settings=NULL;
             int         mozVersion=0x30000, /* Set to 3.0 by default... */
                         i;
@@ -2954,17 +2962,16 @@ void qtSettingsSetColors(GtkStyle *style, GtkRcStyle *rc_style)
 
 bool runCommand(const char* cmd, char** result)
 {
-    FILE* fp = popen(cmd, "r");
-    if(fp)
-    {
-        gulong bufSize=512;
-        size_t currentOffset=0;
-        *result=(char*)(g_malloc(bufSize));
-        while(fgets(*result+currentOffset, bufSize-currentOffset, fp) && result[strlen(*result)-1] != '\n')
-        {
-            currentOffset = bufSize-1;
+    FILE *fp = popen(cmd, "r");
+    if (fp) {
+        gulong bufSize = 512;
+        size_t currentOffset = 0;
+        *result = (char*)(malloc(bufSize));
+        while(fgets(*result + currentOffset, bufSize - currentOffset, fp) &&
+              (*result)[strlen(*result) - 1] != '\n') {
+            currentOffset = bufSize - 1;
             bufSize *= 2;
-            *result = (char*)(g_realloc(*result, bufSize));
+            *result = (char*)(realloc(*result, bufSize));
         }
         pclose(fp);
         return true;
