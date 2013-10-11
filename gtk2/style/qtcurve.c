@@ -102,8 +102,14 @@ static void gtkDrawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, G
 static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area,
                           GtkWidget *widget, const gchar *detail, gint x, gint y, gint width, gint height, GtkOrientation orientation);
 
-static void qtcLogHandler(const gchar *domain, GLogLevelFlags level, const gchar *msg, gpointer data)
+static void
+qtcLogHandler(const gchar *domain, GLogLevelFlags level, const gchar *msg,
+              gpointer data)
 {
+    QTC_UNUSED(domain);
+    QTC_UNUSED(level);
+    QTC_UNUSED(msg);
+    QTC_UNUSED(data);
 }
 
 static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area,
@@ -133,8 +139,9 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
 
         if(topLevel && GTK_IS_DIALOG(topLevel) && !g_object_get_data(G_OBJECT(topLevel), BUTTON_HACK))
         {
-            // gtk_dialog_set_alternative_button_order will cause errors to be logged, but dont want these
-            // so register ur own error handler, and then unregister afterwards...
+            // gtk_dialog_set_alternative_button_order will cause errors to be
+            // logged, but dont want these so register ur own error handler,
+            // and then unregister afterwards...
             guint id=g_log_set_handler("Gtk", G_LOG_LEVEL_CRITICAL, qtcLogHandler, NULL);
             g_object_set_data(G_OBJECT(topLevel), BUTTON_HACK, (gpointer)1);
 
@@ -428,6 +435,7 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
 static void gtkDrawHandle(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area,
                           GtkWidget *widget, const gchar *detail, gint x, gint y, gint width, gint height, GtkOrientation orientation)
 {
+    QTC_UNUSED(orientation);
     gboolean paf=WIDGET_TYPE_NAME("PanelAppletFrame");
     CAIRO_BEGIN
 
@@ -494,6 +502,7 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
                          GtkWidget *widget, const gchar *detail, GtkArrowType arrow_type, gboolean fill, gint x, gint y,
                          gint width, gint height)
 {
+    QTC_UNUSED(fill);
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %s  ", __FUNCTION__, state, shadow, arrow_type, x, y, width, height,
                                            detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 10);
@@ -618,25 +627,29 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
             y++;
         }
 
-        if(sbar)
-            switch(stepper)
-            {
-                case STEPPER_B:
-                    if(opts.flatSbarButtons || !opts.vArrows)
-                        if(GTK_ARROW_RIGHT==arrow_type)
-                            x--;
-                        else
-                            y--;
-                    break;
-                case STEPPER_C:
-                    if(opts.flatSbarButtons || !opts.vArrows)
-                        if(GTK_ARROW_LEFT==arrow_type)
-                            x++;
-                        else
-                            y++;
-                default:
-                    break;
+        if (sbar) {
+            switch (stepper) {
+            case STEPPER_B:
+                if (opts.flatSbarButtons || !opts.vArrows) {
+                    if (GTK_ARROW_RIGHT == arrow_type) {
+                        x--;
+                    } else {
+                        y--;
+                    }
+                }
+                break;
+            case STEPPER_C:
+                if (opts.flatSbarButtons || !opts.vArrows) {
+                    if (GTK_ARROW_LEFT == arrow_type) {
+                        x++;
+                    } else {
+                        y++;
+                    }
+                }
+            default:
+                break;
             }
+        }
 
         if(isSpinButton && isFixedWidget(widget) && isFakeGtk())
             x--;
@@ -1284,18 +1297,16 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
                                           cy + STYLE->ythickness-1, 1, cheight-3,
                                       &btnColors[0], area, NULL, TRUE, TRUE, FALSE);
                 }
-            }
-            else if((button || togglebutton) && (combo || combo_entry))
-            {
-                int vx=x+(width - (1 + (combo_entry ? 24 : 20))),
-                    vwidth=width-(vx-x),
-                    darkLine=BORDER_VAL(GTK_STATE_INSENSITIVE!=state);
+            } else if((button || togglebutton) && (combo || combo_entry)) {
+                int vx = x + (width - (1 + (combo_entry ? 24 : 20)));
+                /* int vwidth = width - (vx - x); */
+                int darkLine = BORDER_VAL(GTK_STATE_INSENSITIVE != state);
 
-                if(rev)
-                {
-                    vx=x+LARGE_ARR_WIDTH;
-                    if(combo_entry)
-                        vx+=2;
+                if (rev) {
+                    vx = x + LARGE_ARR_WIDTH;
+                    if (combo_entry) {
+                        vx += 2;
+                    }
                 }
 
                 if(DO_EFFECT)
@@ -1352,7 +1363,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
         gboolean list=isList(widget),
                  pbar=list || GTK_IS_PROGRESS_BAR(widget),
                  scale=!pbar && GTK_IS_SCALE(widget);
-        int      border=BORDER_VAL(GTK_STATE_INSENSITIVE!=state || !scale);
+        /* int border = BORDER_VAL(GTK_STATE_INSENSITIVE != state || !scale); */
         gboolean horiz=GTK_IS_RANGE(widget)
                         ? GTK_ORIENTATION_HORIZONTAL==qtcRangeGetOrientation(widget)
                         : width>height;
@@ -1390,7 +1401,8 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
             gboolean    drawGradient=GTK_SHADOW_NONE!=shadow && !IS_FLAT(app),
                         fillBackground=menubar && SHADE_NONE!=opts.shadeMenubars;
 
-            if((menubar && opts.windowDrag || (opts.windowDrag>WM_DRAG_MENUBAR)))
+            if ((menubar && opts.windowDrag) ||
+                opts.windowDrag > WM_DRAG_MENUBAR)
                 qtcWMMoveSetup(widget);
 
             if(menubar && BLEND_TITLEBAR)
@@ -1601,7 +1613,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                          isSpin=!combo && isSpinButton(widget),
                          rev=reverseLayout(widget) || (combo && parent && reverseLayout(parent));
             GtkWidget    *btn=NULL;
-            GtkStateType savedState=state;
+            /* GtkStateType savedState = state; */
 
 #if GTK_CHECK_VERSION(2, 16, 0)
 #if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
@@ -2103,7 +2115,7 @@ static GdkPixbuf * gtkRenderIcon(GtkStyle *style, const GtkIconSource *source, G
 static void gtkDrawTab(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area,
                        GtkWidget *widget, const gchar *detail, gint x, gint y, gint width, gint height)
 {
-    QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
+    /* QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style; */
     GdkColor     *arrowColor=MO_ARROW(false, &qtSettings.colors[GTK_STATE_INSENSITIVE==state
                                                                             ? PAL_DISABLED : PAL_ACTIVE]
                                                                    [COLOR_BUTTON_TEXT]);
@@ -2131,10 +2143,13 @@ static void gtkDrawTab(GtkStyle *style, GdkWindow *window, GtkStateType state, G
         drawArrow(window, style, arrowColor, area,  GTK_ARROW_DOWN, x, y+(height>>1), FALSE, TRUE);
 }
 
-static void gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area,
-                          GtkWidget *widget, const gchar *detail, gint x, gint y, gint width,  gint height, GtkPositionType gapSide,
-                          gint gapX, gint gapWidth)
+static void
+gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state,
+              GtkShadowType shadow, GdkRectangle *area, GtkWidget *widget,
+              const gchar *detail, gint x, gint y, gint width, gint height,
+              GtkPositionType gapSide, gint gapX, gint gapWidth)
 {
+    QTC_UNUSED(shadow);
     CAIRO_BEGIN
     FN_CHECK
 
@@ -2289,10 +2304,13 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
     CAIRO_END
 }
 
-static void gtkDrawShadowGap(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area,
-                             GtkWidget *widget, const gchar *detail, gint x, gint y, gint width, gint height, GtkPositionType gapSide,
-                             gint gapX, gint gapWidth)
+static void
+gtkDrawShadowGap(GtkStyle *style, GdkWindow *window, GtkStateType state,
+                 GtkShadowType shadow, GdkRectangle *area, GtkWidget *widget,
+                 const gchar *detail, gint x, gint y, gint width, gint height,
+                 GtkPositionType gapSide, gint gapX, gint gapWidth)
 {
+    QTC_UNUSED(detail);
     CAIRO_BEGIN
     sanitizeSize(window, &width, &height);
     drawShadowGap(cr, style, shadow, state, widget, area, x, y, width, height, gapSide, gapX, gapWidth);
@@ -2801,8 +2819,12 @@ void qtcurve_style_class_init(QtCurveStyleClass *klass)
 static GtkRcStyleClass *parent_rc_class;
 GType qtcurve_type_rc_style = 0;
 
-static guint qtcurve_rc_style_parse(GtkRcStyle *rc_style, GtkSettings *settings, GScanner *scanner)
+static guint
+qtcurve_rc_style_parse(GtkRcStyle *rc_style, GtkSettings *settings,
+                       GScanner *scanner)
 {
+    QTC_UNUSED(rc_style);
+    QTC_UNUSED(settings);
     static GQuark scope_id = 0;
     guint old_scope,
           token;
@@ -2896,6 +2918,7 @@ GType qtcurve_type_style = 0;
 
 static void qtcurve_style_init(QtCurveStyle *style)
 {
+    QTC_UNUSED(style);
     qtcShadowInitialize();
 }
 
@@ -2920,6 +2943,7 @@ void qtcurve_style_register_type(GTypeModule *module)
 
 static void qtcurve_rc_style_init(QtCurveRcStyle *qtcurve_rc)
 {
+    QTC_UNUSED(qtcurve_rc);
 #ifdef INCREASE_SB_SLIDER
     lastSlider.widget=NULL;
 #endif
@@ -3005,7 +3029,10 @@ G_MODULE_EXPORT GtkRcStyle * theme_create_rc_style()
  */
 G_MODULE_EXPORT const gchar * g_module_check_init(GModule *module);
 
-const gchar* g_module_check_init(GModule *module)
+const gchar*
+g_module_check_init(GModule *module)
 {
-    return gtk_check_version(GTK_MAJOR_VERSION, GTK_MINOR_VERSION, GTK_MICRO_VERSION - GTK_INTERFACE_AGE);
+    QTC_UNUSED(module);
+    return gtk_check_version(GTK_MAJOR_VERSION, GTK_MINOR_VERSION,
+                             GTK_MICRO_VERSION - GTK_INTERFACE_AGE);
 }
