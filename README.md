@@ -7,14 +7,44 @@
     make
     make install
 
-## CMake configure options
-1. `QTC_QT4_ENABLE_KDE`:
+## CMake configure arguments
+1. `ENABLE_QT4`:
+
+    Building QtCurve Qt4 theme.
+
+    (Default: `On`)
+
+2. `ENABLE_QT5`:
+
+    Building QtCurve Qt5 theme.
+
+    (Default: `On`)
+
+3. `ENABLE_GTK2`:
+
+    Building QtCurve Gtk2 theme.
+
+    (Default: `On`)
+
+4. `QTC_ENABLE_X11`:
+
+    Enable X11 support.
+
+    (Default: `On`)
+
+5. `QTC_INSTALL_PO`:
+
+    Install `*.po` translation files.
+
+    (Default: `On`)
+
+6. `QTC_QT4_ENABLE_KDE`:
 
     Compile QtCurve qt4 style with KDE support and dependencies.
 
     (Default: `On`)
 
-2. `QTC_QT4_ENABLE_KWIN`:
+7. `QTC_QT4_ENABLE_KWIN`:
 
     Compile QtCurve qt4 kwin style. This will only have effect when KDE support
     is turned on.
@@ -22,7 +52,28 @@
     (Default: `On` if kwin header is found and KDE support is on,
     `Off` otherwise)
 
-3. `QTC_QT4_OLD_NVIDIA_ARROW_FIX`:
+8. `QTC_KDE4_PREFIX`:
+
+    The install prefix of KDE4.
+
+    (Default: the value returned by `kde4-config` or `${CMAKE_INSTALL_PREFIX}`
+    if `kde4-config` is not found.)
+
+9. `QTC_KDE4_ICONS_PREFIX`:
+
+    The path of KDE4 icons.
+
+    (Default: `${QTC_KDE4_PREFIX}/share/icons`)
+
+## Deprecated and temporary options.
+These compile options were used to turn on/off some experimental features or
+work around for certain hardware/software/drivers. It is not guaranteed that
+any of the non-default value of these options can work and some of these
+options may crash certain applications. They may also be removed at any time
+(especially the ones to work around old hardware or driver bugs) and are not
+recommanded to turn on in distribution packages.
+
+1. `QTC_QT4_OLD_NVIDIA_ARROW_FIX`:
 
     Due to QtCurve mixing AA-drawing, with non-AA drawing (specifically for
     arrows) - sometimes the arrows would not draw correctly under NVidia. To
@@ -32,7 +83,7 @@
 
     (Default: `Off`)
 
-4. `QTC_QT4_STYLE_SUPPORT`:
+2. `QTC_QT4_STYLE_SUPPORT`:
 
     Support QtCurve style files. These are stored as
     `<kde prefix>/share/apps/kstyle/themes/qtc_<stylename>.themerc`
@@ -40,20 +91,104 @@
 
     (Default: `Off`)
 
-5. `QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT`:
+3. `QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT`:
 
     Enable support for the 'fixParentlessDialogs' config option. NOTE: This is
     known to break some applications - hence is disabled by default!
 
     (Default: `Off`)
 
-6. `QTC_QT4_KWIN_MAX_BUTTON_HACK`:
+4. `QTC_QT4_KWIN_MAX_BUTTON_HACK`:
 
     Hack to force kwin drawing maximize buttons for windows that can be
     minimised. This is a 100% hack, that may not work or compile, and may even
     crash kwin.
 
-    (Default `Off`)
+    (Default: `Off`)
+
+5. `QTC_GTK2_OLD_MOZILLA`:
+
+    When Firefox is being themed - treat it as if it is < 3.0
+    Thunderbird is *always* treated as being of an old Mozilla style.
+
+    (Default: `Off`)
+
+6. `QTC_GTK2_MODIFY_MOZILLA`:
+
+    1. Modify `userChrome.css`
+
+        1. setting KDE button order
+        2. shrink size of toolbars
+
+    2. Edit `user.js`
+
+        1. disable instant apply
+
+    **Note**: This sometimes causes issues with newer versions of these
+    applications. Should such issues occur, you should recompile
+    QtCurve without this option - and you will have to remove BY HAND
+    the changes that QtCurve has made. This will entail removing lines
+    from `userChrom.css` that indicate 'Added by QtCurve'. `userChrome.css`
+    is usually in a folder such as:
+    `~/.mozilla/firefox/xxxxxxx.default/chrome/userChrome.css` or
+    `~/.thunderbird/xxxxxxx.default/chrome/userChrome.css`
+    Where xxxxxxx is a series of random characters.
+
+    (Default: `Off`)
+
+7. `QTC_GTK2_USE_CAIRO_FOR_ARROWS`:
+
+    Use Cairo, and not Gdk, to draw the non-antialised arrows. It has been
+    reported that for intel Xorg drivers >2.8, that drawing these non-antialised
+    arrows with cairo results in nothing being drawn! As of 0.69.0, the default
+    is to use Gdk.
+
+    (Default: `Off`)
+
+8. `QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT`:
+
+    Enable support for the 'fixParentlessDialogs' config option.
+
+    **NOTE**: This is known to break some applications.
+
+    (Default: `Off`)
+
+## Backward compatible options
+These options are provided to have better backward compatibility with the
+configure options before the merging of repositories. They **WILL** be removed
+in a few major releases.
+
+1. `QTC_QT_ONLY`:
+
+    The opposite of `QTC_QT4_ENABLE_KDE`.
+
+2. `QTC_OLD_NVIDIA_ARROW_FIX`:
+
+    Alias of `QTC_QT4_OLD_NVIDIA_ARROW_FIX`.
+
+3. `QTC_STYLE_SUPPORT`:
+
+    Alias of `QTC_QT4_STYLE_SUPPORT`.
+
+4. `QTC_KWIN_MAX_BUTTON_HACK`:
+
+    Alias of `QTC_QT4_KWIN_MAX_BUTTON_HACK`.
+
+5. `QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT`:
+
+    Alias of `QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT`.
+
+6. `QTC_MODIFY_MOZILLA`:
+
+    Alias of `QTC_GTK2_MODIFY_MOZILLA`.
+
+7. `QTC_OLD_MOZILLA`:
+
+    Alias of `QTC_GTK2_OLD_MOZILLA`.
+
+8. `QTC_USE_CAIRO_FOR_ARROWS`:
+
+    Alias of `QTC_GTK2_USE_CAIRO_FOR_ARROWS`.
 
 ## Tips for compiling with `clang`/`clang++`
 As of clang version 3.3, `clang++` does not seem to be compatible with the c++
@@ -103,7 +238,7 @@ or copy to `<kde install prefix>/share/apps/kstyle/themes/`
 
 When KDE's style panel is restarted, your new theme should appear in the list.
 
-NOTE: As of QtCurve 1.0.0 style support has been disabled by default (enable
+**NOTE**: As of QtCurve 1.0.0 style support has been disabled by default (enable
 via `QTC_QT4_STYLE_SUPPORT`) and this is not supported by Qt5.
 
 ## Testing
