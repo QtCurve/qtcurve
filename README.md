@@ -55,6 +55,15 @@
 
     (Default `Off`)
 
+## Tips for compiling with `clang`/`clang++`
+As of clang version 3.3, `clang++` does not seem to be compatible with the c++
+standard library headers shipped with gcc in c++0x mode. If you have problems
+compiling the Qt4/Qt5 themes with `clang++`, one possible solution is to use
+`libc++` instead of `libstdc++`. The following command should configure
+CMake to use `clang`/`clang++` and `libc++` correctly,
+
+    CC=clang CXX=clang++ CPP=clang++ CXXFLAGS="${CXXFLAGS} -stdlib=libc++" LDFLAGS="${LDFLAGS} -lc++abi" cmake .. <other compile options...>
+
 ## Creating Distribution Packages
 Support for creating `deb` or `rpm` package have been removed. Please make
 package in the same way as any other cmake packages.
