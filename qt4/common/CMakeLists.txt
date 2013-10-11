@@ -1,6 +1,6 @@
 set(qtc_qt_common_SRCS
-  common.c
-  config_file.c)
+  common.cpp
+  config_file.cpp)
 set(qtc_qt_common_HDRS
   common.h
   config_file.h)

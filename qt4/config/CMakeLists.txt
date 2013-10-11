@@ -25,11 +25,8 @@ if(NOT QTC_QT4_ENABLE_KDE)
 endif()
 
 set(kstyle_qtcurve_config_common_SRCS
-  ../common/common.c
-  ../common/config_file.c)
-
-set_source_files_properties(${kstyle_qtcurve_config_common_SRCS}
-  PROPERTIES LANGUAGE CXX)
+  ../common/common.cpp
+  ../common/config_file.cpp)
 
 set(kstyle_qtcurve_config_PART_SRCS
   ${kstyle_qtcurve_config_PART_SRCS}

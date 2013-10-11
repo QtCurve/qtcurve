@@ -3,9 +3,8 @@ if(NOT ENABLE_QT5)
 endif()
 
 set(qtcurve_style_common_SRCS
-  ../common/common.c
-  ../common/config_file.c)
-set_source_files_properties(${qtcurve_style_common_SRCS} PROPERTIES LANGUAGE CXX)
+  ../common/common.cpp
+  ../common/config_file.cpp)
 
 foreach(pngname check_on check_x_on dialog_error dialog_information
     dialog_warning)
