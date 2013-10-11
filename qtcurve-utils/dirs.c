@@ -41,7 +41,7 @@ qtcMakePath(const char *path, int mode)
         opath[len - 1] = '\0';
         len--;
     }
-    char *p = strspn(opath, "/");
+    char *p = opath + strspn(opath, "/");
     if (!p)
         return;
     p += 1;
