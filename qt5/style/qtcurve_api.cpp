@@ -1641,7 +1641,7 @@ void Style::timerEvent(QTimerEvent *event)
 
 int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const
 {
-    switch((int)metric) {
+    switch((unsigned)metric) {
     case PM_ToolTipLabelFrameWidth:
         return !ROUNDED || opts.square&SQUARE_TOOLTIPS ? BASE_STYLE::pixelMetric(metric, option, widget) : 3;
     case PM_MdiSubWindowFrameWidth:
@@ -2091,7 +2091,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
     const QPalette &palette(option->palette);
     bool reverse(Qt::RightToLeft==option->direction);
 
-    switch ((int)element) {
+    switch ((unsigned)element) {
 #ifdef QTC_QT5_ENABLE_KDE
     case PE_IndicatorTabClose: {
         int         size(pixelMetric(QStyle::PM_SmallIconSize));
@@ -3717,7 +3717,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
     const QPalette &palette(option->palette);
     bool reverse(Qt::RightToLeft==option->direction);
 
-    switch((int)element)
+    switch((unsigned)element)
     {
     case CE_QtC_SetOptions:
         if (const PreviewOption *preview = qstyleoption_cast<const PreviewOption *>(option))
