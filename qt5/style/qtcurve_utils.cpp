@@ -407,11 +407,11 @@ adjustToolbarButtons(const QWidget *widget, const QToolBar *toolbar,
                                                         d, geo.y()));
 
         if (haveLeft && haveRight) {
-            leftAdjust =- constAdjust;
+            leftAdjust = -constAdjust;
             rightAdjust = constAdjust;
             round = ROUNDED_NONE;
         } else if (haveLeft) {
-            leftAdjust =- constAdjust;
+            leftAdjust = -constAdjust;
             round = ROUNDED_RIGHT;
         } else if (haveRight) {
             rightAdjust = constAdjust;
@@ -424,11 +424,11 @@ adjustToolbarButtons(const QWidget *widget, const QToolBar *toolbar,
             qobject_cast<QToolButton*>(toolbar->childAt(geo.x(),
                                                         geo.bottom() + d));
         if (haveTop && haveBot) {
-            topAdjust =- constAdjust;
+            topAdjust = -constAdjust;
             bottomAdjust = constAdjust;
             round = ROUNDED_NONE;
         } else if (haveTop) {
-            topAdjust =- constAdjust;
+            topAdjust = -constAdjust;
             round = ROUNDED_BOTTOM;
         } else if(haveBot) {
             bottomAdjust = constAdjust;

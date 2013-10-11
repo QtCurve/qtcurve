@@ -611,16 +611,12 @@ static void checkColor(EShade *s, color *c)
 }
 
 class QtCConfig {
-    public:
-
+public:
     QtCConfig(const QString &filename);
-
-    bool            ok() const { return values.count()>0; }
-    bool            hasKey(const QString &key) { return values.contains(key); }
-    const QString & readEntry(const QString &key, const QString &def=QString::null);
-
-    private:
-
+    bool ok() const {return values.count() > 0;}
+    bool hasKey(const QString &key) {return values.contains(key);}
+    QString readEntry(const QString &key, const QString &def=QString::null);
+private:
     QMap<QString, QString> values;
 };
 
@@ -643,7 +639,8 @@ QtCConfig::QtCConfig(const QString &filename)
     }
 }
 
-inline const QString & QtCConfig::readEntry(const QString &key, const QString &def)
+inline QString
+QtCConfig::readEntry(const QString &key, const QString &def)
 {
     return values.contains(key) ? values[key] : def;
 }

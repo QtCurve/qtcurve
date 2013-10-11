@@ -8673,11 +8673,14 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
             }
             break;
         case CC_Slider:
-            if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider *>(option))
-            {
-                QRect groove(subControlRect(CC_Slider, option, SC_SliderGroove, widget)),
-                      handle(subControlRect(CC_Slider, option, SC_SliderHandle, widget)),
-                      ticks(subControlRect(CC_Slider, option, SC_SliderTickmarks, widget));
+            if (const QStyleOptionSlider *slider =
+                qstyleoption_cast<const QStyleOptionSlider*>(option)) {
+                QRect groove(subControlRect(CC_Slider, option,
+                                            SC_SliderGroove, widget));
+                QRect handle(subControlRect(CC_Slider, option,
+                                            SC_SliderHandle, widget));
+                // QRect ticks(subControlRect(CC_Slider, option,
+                //                            SC_SliderTickmarks, widget));
                 bool  horizontal(slider->orientation == Qt::Horizontal),
                       ticksAbove(slider->tickPosition & QSlider::TicksAbove),
                       ticksBelow(slider->tickPosition & QSlider::TicksBelow);
@@ -9188,15 +9191,22 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                                    atMin(maxed || scrollbar->sliderValue==scrollbar->minimum),
                                    atMax(maxed || scrollbar->sliderValue==scrollbar->maximum)/*,
                                    inStack(0!=opts.tabBgnd && inStackWidget(widget))*/;
-                QRect              subline(subControlRect(control, option, SC_ScrollBarSubLine, widget)),
-                                   addline(subControlRect(control, option, SC_ScrollBarAddLine, widget)),
-                                   subpage(subControlRect(control, option, SC_ScrollBarSubPage, widget)),
-                                   addpage(subControlRect(control, option, SC_ScrollBarAddPage, widget)),
-                                   slider(subControlRect(control, option, SC_ScrollBarSlider, widget)),
-                                   first(subControlRect(control, option, SC_ScrollBarFirst, widget)),
-                                   last(subControlRect(control, option, SC_ScrollBarLast, widget)),
-                                   subline2(addline),
-                                   sbRect(scrollbar->rect);
+                QRect subline(subControlRect(control, option,
+                                             SC_ScrollBarSubLine, widget));
+                QRect addline(subControlRect(control, option,
+                                             SC_ScrollBarAddLine, widget));
+                QRect subpage(subControlRect(control, option,
+                                             SC_ScrollBarSubPage, widget));
+                QRect addpage(subControlRect(control, option,
+                                             SC_ScrollBarAddPage, widget));
+                QRect slider(subControlRect(control, option,
+                                            SC_ScrollBarSlider, widget));
+                QRect first(subControlRect(control, option,
+                                           SC_ScrollBarFirst, widget));
+                QRect last(subControlRect(control, option,
+                                          SC_ScrollBarLast, widget));
+                QRect subline2(addline);
+                // QRect sbRect(scrollbar->rect);
                 QStyleOptionSlider opt(*scrollbar);
 
                 // For OO.o 3.2 need to fill widget background!

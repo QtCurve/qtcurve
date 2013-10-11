@@ -41,7 +41,6 @@ void QtCurveShadowConfiguration::defaults()
 {
     itsHOffset = 0;
     itsVOffset = 5;
-        
     if(QPalette::Active==itsColorGroup)
     {
         itsSize = 35;
@@ -59,7 +58,6 @@ void QtCurveShadowConfiguration::defaults()
 void QtCurveShadowConfiguration::setColorType(ColorType ct)
 {
     itsColorType=ct;
-    
     switch(itsColorType)
     {
         default:

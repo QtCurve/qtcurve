@@ -130,7 +130,6 @@ private:
 
 private:
     int                    itsBorderSize,
-                           itsBotBorderSize,
                            itsTitleHeight,
                            itsTitleHeightTool,
                            itsTimeStamp;

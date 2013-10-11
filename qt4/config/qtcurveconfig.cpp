@@ -404,7 +404,6 @@ QSize CGradientPreview::minimumSizeHint() const
 
 void CGradientPreview::paintEvent(QPaintEvent *)
 {
-    QRect    r(rect());
     QPainter p(this);
 
     if(!style)

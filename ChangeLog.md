@@ -28,6 +28,7 @@
     [QtCurve-Bug](https://github.com/QtCurve/qtcurve-qt4/issues/7)
 
 18. Gtk2: Generate gdkpixbuf headers at compile time.
+19. Fix compiling with `clang++` and `libc++`.
 
 ## 1.8.15-KDE4
 1. Add Russian localization. Thanks to Juliette Tux.
