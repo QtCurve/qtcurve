@@ -2080,193 +2080,187 @@ drawTriangularSlider(cairo_t *cr, GtkStyle *style, GtkStateType state,
                      int width, int height)
 {
     QTC_UNUSED(area);
-    GdkColor newColors[TOTAL_SHADES+1],
-        *btnColors;
+    GdkColor newColors[TOTAL_SHADES + 1];
+    GdkColor *btnColors = NULL;
 
     /* Fix Java swing sliders looking pressed */
-    if(GTK_STATE_ACTIVE==state)
-        state=GTK_STATE_PRELIGHT;
+    if (GTK_STATE_ACTIVE == state)
+        state = GTK_STATE_PRELIGHT;
 
-    if(useButtonColor(detail))
-    {
-        if(GTK_STATE_INSENSITIVE==state)
-            btnColors=qtcPalette.background;
-        else if(QT_CUSTOM_COLOR_BUTTON(style))
-        {
+    if (useButtonColor(detail)) {
+        if (GTK_STATE_INSENSITIVE == state) {
+            btnColors = qtcPalette.background;
+        } else if (QT_CUSTOM_COLOR_BUTTON(style)) {
             qtcShadeColors(&(style->bg[state]), newColors);
-            btnColors=newColors;
+            btnColors = newColors;
+        } else {
+            GtkWidget *widget = NULL; /* Keep SET_BTN_COLS happy */
+            SET_BTN_COLS(FALSE, TRUE, FALSE, state);
         }
-        else
-        {
-            GtkWidget *widget=NULL; /* Keep SET_BTN_COLS happy */
-            SET_BTN_COLS(FALSE, TRUE, FALSE, state)
-                }
     }
 
-    {
-        gboolean     coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver && !opts.colorSliderMouseOver,
-            horiz=height>width || DETAIL("hscale");
-        int          bgnd=getFillReal(state, FALSE, SHADE_DARKEN==opts.shadeSliders),
-            xo=horiz ? 8 : 0,
-            yo=horiz ? 0 : 8,
-            size=15,
-            light=APPEARANCE_DULL_GLASS==opts.sliderAppearance ? 1 : 0;
-        GdkColor     *colors=btnColors,
-            *borderCols=GTK_STATE_PRELIGHT==state && (MO_GLOW==opts.coloredMouseOver ||
-                                                      MO_COLORED==opts.coloredMouseOver)
-            ? qtcPalette.mouseover : btnColors;
-        GtkArrowType direction=horiz ? GTK_ARROW_DOWN : GTK_ARROW_RIGHT;
-        gboolean     drawLight=MO_PLASTIK!=opts.coloredMouseOver || !coloredMouseOver;
-        int          borderVal=qtcPalette.mouseover==borderCols ? SLIDER_MO_BORDER_VAL : BORDER_VAL(GTK_STATE_INSENSITIVE==state);
-
-        if(MO_GLOW==opts.coloredMouseOver && DO_EFFECT)
-            x++, y++, xo++, yo++;
-
-        cairo_new_path(cr);
-        cairo_save(cr);
-
-        switch(direction)
-        {
-        case GTK_ARROW_UP:
-        default:
-        case GTK_ARROW_DOWN:
-            y+=2;
-            {
-                GdkPoint pts[]={{x, y}, {x, y+2}, {x+2, y}, {x+8, y}, {x+10, y+2}, {x+10, y+9}, {x+5, y+14}, {x, y+9}};
-                plotPoints(cr, pts, 8);
-            }
-            break;
-        case GTK_ARROW_RIGHT:
-        case GTK_ARROW_LEFT:
-            x+=2;
-            {
-                GdkPoint pts[]={{x, y}, {x+2, y}, {x, y+2}, {x, y+8}, {x+2, y+10}, {x+9, y+10}, {x+14, y+5}, {x+9, y}};
-                plotPoints(cr, pts, 8);
-            }
-        }
-
-        cairo_clip(cr);
-
-        if(IS_FLAT(opts.sliderAppearance))
-        {
-            drawAreaColor(cr, NULL, &colors[bgnd], x+1, y+1, width-2, height-2);
-
-            if(MO_PLASTIK==opts.coloredMouseOver && coloredMouseOver)
-            {
-                int col=SLIDER_MO_SHADE,
-                    len=SLIDER_MO_LEN;
-
-                if(horiz)
-                {
-                    drawAreaColor(cr, NULL, &qtcPalette.mouseover[col], x+1, y+1, len, size-2);
-                    drawAreaColor(cr, NULL, &qtcPalette.mouseover[col], x+width-(1+len), y+1, len, size-2);
-                }
-                else
-                {
-                    drawAreaColor(cr, NULL, &qtcPalette.mouseover[col], x+1, y+1, size-2, len);
-                    drawAreaColor(cr, NULL, &qtcPalette.mouseover[col], x+1, y+height-(1+len), size-2, len);
-                }
+    gboolean coloredMouseOver = (GTK_STATE_PRELIGHT == state &&
+                                 opts.coloredMouseOver &&
+                                 !opts.colorSliderMouseOver);
+    gboolean horiz = height > width || DETAIL("hscale");
+    int bgnd = getFillReal(state, FALSE, SHADE_DARKEN == opts.shadeSliders);
+    int xo = horiz ? 8 : 0;
+    int yo = horiz ? 0 : 8;
+    int size = 15;
+    int light = APPEARANCE_DULL_GLASS == opts.sliderAppearance ? 1 : 0;
+    GdkColor *colors = btnColors;
+    GdkColor *borderCols = ((GTK_STATE_PRELIGHT == state &&
+                            (MO_GLOW==opts.coloredMouseOver ||
+                             MO_COLORED==opts.coloredMouseOver)) ?
+                            qtcPalette.mouseover : btnColors);
+    GtkArrowType direction=horiz ? GTK_ARROW_DOWN : GTK_ARROW_RIGHT;
+    gboolean drawLight=MO_PLASTIK!=opts.coloredMouseOver || !coloredMouseOver;
+    int borderVal=qtcPalette.mouseover==borderCols ? SLIDER_MO_BORDER_VAL : BORDER_VAL(GTK_STATE_INSENSITIVE==state);
+    if (MO_GLOW == opts.coloredMouseOver && DO_EFFECT) {
+        x++;
+        y++;
+        xo++;
+        yo++;
+    }
+    cairo_new_path(cr);
+    cairo_save(cr);
+    switch (direction) {
+    case GTK_ARROW_UP:
+    default:
+    case GTK_ARROW_DOWN: {
+        y += 2;
+        GdkPoint pts[] = {{x, y}, {x, y + 2}, {x + 2, y}, {x + 8, y},
+                          {x + 10, y + 2}, {x + 10, y + 9}, {x + 5, y + 14},
+                          {x, y + 9}};
+        plotPoints(cr, pts, 8);
+    }
+        break;
+    case GTK_ARROW_RIGHT:
+    case GTK_ARROW_LEFT: {
+        x+=2;
+        GdkPoint pts[] = {{x, y}, {x + 2, y}, {x, y + 2}, {x, y + 8},
+                          {x + 2, y + 10}, {x + 9, y + 10}, {x + 14, y + 5},
+                          {x + 9, y}};
+        plotPoints(cr, pts, 8);
+    }
+    }
+    cairo_clip(cr);
+    if (IS_FLAT(opts.sliderAppearance)) {
+        drawAreaColor(cr, NULL, &colors[bgnd], x+1, y+1, width-2, height-2);
+        if (MO_PLASTIK == opts.coloredMouseOver && coloredMouseOver) {
+            int col = SLIDER_MO_SHADE;
+            int len = SLIDER_MO_LEN;
+            if (horiz) {
+                drawAreaColor(cr, NULL, &qtcPalette.mouseover[col], x + 1,
+                              y + 1, len, size-2);
+                drawAreaColor(cr, NULL, &qtcPalette.mouseover[col],
+                              x + width - (1 + len), y + 1, len, size - 2);
+            } else {
+                drawAreaColor(cr, NULL, &qtcPalette.mouseover[col], x + 1,
+                              y + 1, size - 2, len);
+                drawAreaColor(cr, NULL, &qtcPalette.mouseover[col], x + 1,
+                              y + height - (1 + len), size - 2, len);
             }
         }
-        else
-        {
-            drawBevelGradient(cr, NULL, x, y, horiz ? width-1 : size, horiz ? size : height-1, &colors[bgnd],
-                              horiz, FALSE, MODIFY_AGUA(opts.sliderAppearance), WIDGET_OTHER);
-
-            if(MO_PLASTIK==opts.coloredMouseOver && coloredMouseOver)
-            {
-                int col=SLIDER_MO_SHADE,
-                    len=SLIDER_MO_LEN;
-
-                if(horiz)
-                {
-                    drawBevelGradient(cr, NULL, x+1, y+1, len, size-2, &qtcPalette.mouseover[col],
-                                      horiz, FALSE, MODIFY_AGUA(opts.sliderAppearance), WIDGET_OTHER);
-                    drawBevelGradient(cr, NULL, x+width-(1+len), y+1, len, size-2, &qtcPalette.mouseover[col],
-                                      horiz, FALSE, MODIFY_AGUA(opts.sliderAppearance), WIDGET_OTHER);
-                }
-                else
-                {
-                    drawBevelGradient(cr, NULL, x+1, y+1, size-2, len, &qtcPalette.mouseover[col],
-                                      horiz, FALSE, MODIFY_AGUA(opts.sliderAppearance), WIDGET_OTHER);
-                    drawBevelGradient(cr, NULL, x+1, y+height-(1+len), size-2, len, &qtcPalette.mouseover[col],
-                                      horiz, FALSE, MODIFY_AGUA(opts.sliderAppearance), WIDGET_OTHER);
-                }
+    } else {
+        drawBevelGradient(cr, NULL, x, y, horiz ? width - 1 : size,
+                          horiz ? size : height-1, &colors[bgnd], horiz, FALSE,
+                          MODIFY_AGUA(opts.sliderAppearance), WIDGET_OTHER);
+        if (MO_PLASTIK == opts.coloredMouseOver && coloredMouseOver) {
+            int col = SLIDER_MO_SHADE;
+            int len = SLIDER_MO_LEN;
+            if (horiz) {
+                drawBevelGradient(cr, NULL, x + 1, y + 1, len, size - 2,
+                                  &qtcPalette.mouseover[col], horiz, FALSE,
+                                  MODIFY_AGUA(opts.sliderAppearance),
+                                  WIDGET_OTHER);
+                drawBevelGradient(cr, NULL, x + width - (1 + len), y + 1, len,
+                                  size - 2, &qtcPalette.mouseover[col], horiz,
+                                  FALSE, MODIFY_AGUA(opts.sliderAppearance),
+                                  WIDGET_OTHER);
+            } else {
+                drawBevelGradient(cr, NULL, x + 1, y + 1, size - 2, len,
+                                  &qtcPalette.mouseover[col], horiz, FALSE,
+                                  MODIFY_AGUA(opts.sliderAppearance),
+                                  WIDGET_OTHER);
+                drawBevelGradient(cr, NULL, x + 1, y + height - (1 + len),
+                                  size - 2, len, &qtcPalette.mouseover[col],
+                                  horiz, FALSE,
+                                  MODIFY_AGUA(opts.sliderAppearance),
+                                  WIDGET_OTHER);
             }
         }
-
-        unsetCairoClipping(cr);
-
-        { /* C-Scope */
-            double   xd=x+0.5,
-                yd=y+0.5,
-                radius=2.5,
-                xdg=xd-1,
-                ydg=yd-1,
-                radiusg=radius+1;
-            gboolean glowMo=MO_GLOW==opts.coloredMouseOver && coloredMouseOver && DO_EFFECT;
-
-            cairo_new_path(cr);
-            if(glowMo)
-                cairo_set_source_rgba(cr, CAIRO_COL(borderCols[GLOW_MO]), GLOW_ALPHA(FALSE));
-            else
-                cairo_set_source_rgb(cr, CAIRO_COL(borderCols[borderVal]));
-            switch(direction)
-            {
-            case GTK_ARROW_UP:
-            default:
-            case GTK_ARROW_DOWN:
-                if(glowMo)
-                {
-                    cairo_move_to(cr, xdg+radiusg, ydg);
-                    cairo_arc(cr, xdg+12-radiusg, ydg+radiusg, radiusg, M_PI * 1.5, M_PI * 2);
-                    cairo_line_to(cr, xdg+12, ydg+10.5);
-                    cairo_line_to(cr, xdg+6, ydg+16.5);
-                    cairo_line_to(cr, xdg, ydg+10.5);
-                    cairo_arc(cr, xdg+radiusg, ydg+radiusg, radiusg, M_PI, M_PI * 1.5);
-                    cairo_stroke(cr);
-                    cairo_set_source_rgb(cr, CAIRO_COL(borderCols[borderVal]));
-                }
-                cairo_move_to(cr, xd+radius, yd);
-                cairo_arc(cr, xd+10-radius, yd+radius, radius, M_PI * 1.5, M_PI * 2);
-                cairo_line_to(cr, xd+10, yd+9);
-                cairo_line_to(cr, xd+5, yd+14);
-                cairo_line_to(cr, xd, yd+9);
-                cairo_arc(cr, xd+radius, yd+radius, radius, M_PI, M_PI * 1.5);
-                cairo_stroke(cr);
-                if(drawLight)
-                {
-                    drawVLine(cr, CAIRO_COL(colors[light]), 1.0, xd+1, yd+2, 7);
-                    drawHLine(cr, CAIRO_COL(colors[light]), 1.0, xd+2, yd+1, 6);
-                }
-                break;
-            case GTK_ARROW_RIGHT:
-            case GTK_ARROW_LEFT:
-                if(glowMo)
-                {
-                    cairo_move_to(cr, xdg, ydg+12-radiusg);
-                    cairo_arc(cr, xdg+radiusg, ydg+radiusg, radiusg, M_PI, M_PI * 1.5);
-                    cairo_line_to(cr, xdg+10.5, ydg);
-                    cairo_line_to(cr, xdg+16.5, ydg+6);
-                    cairo_line_to(cr, xdg+10.5, ydg+12);
-                    cairo_arc(cr, xdg+radiusg, ydg+12-radiusg, radiusg, M_PI * 0.5, M_PI);
-                    cairo_stroke(cr);
-                    cairo_set_source_rgb(cr, CAIRO_COL(borderCols[borderVal]));
-                }
-                cairo_move_to(cr, xd, yd+10-radius);
-                cairo_arc(cr, xd+radius, yd+radius, radius, M_PI, M_PI * 1.5);
-                cairo_line_to(cr, xd+9, yd);
-                cairo_line_to(cr, xd+14, yd+5);
-                cairo_line_to(cr, xd+9, yd+10);
-                cairo_arc(cr, xd+radius, yd+10-radius, radius, M_PI * 0.5, M_PI);
-                cairo_stroke(cr);
-                if(drawLight)
-                {
-                    drawHLine(cr, CAIRO_COL(colors[light]), 1.0, xd+2, yd+1, 7);
-                    drawVLine(cr, CAIRO_COL(colors[light]), 1.0, xd+1, yd+2, 6);
-                }
-            }
-        } /* C-Scope */
+    }
+    unsetCairoClipping(cr);
+    double xd = x + 0.5;
+    double yd = y + 0.5;
+    double radius = 2.5;
+    double xdg = xd - 1;
+    double ydg = yd - 1;
+    double radiusg = radius + 1;
+    gboolean glowMo = (MO_GLOW == opts.coloredMouseOver &&
+                       coloredMouseOver && DO_EFFECT);
+    cairo_new_path(cr);
+    if (glowMo) {
+        cairo_set_source_rgba(cr, CAIRO_COL(borderCols[GLOW_MO]),
+                              GLOW_ALPHA(FALSE));
+    } else {
+        cairo_set_source_rgb(cr, CAIRO_COL(borderCols[borderVal]));
+    }
+    switch (direction) {
+    case GTK_ARROW_UP:
+    default:
+    case GTK_ARROW_DOWN:
+        if (glowMo) {
+            cairo_move_to(cr, xdg + radiusg, ydg);
+            cairo_arc(cr, xdg + 12 - radiusg, ydg + radiusg, radiusg,
+                      M_PI * 1.5, M_PI * 2);
+            cairo_line_to(cr, xdg + 12, ydg + 10.5);
+            cairo_line_to(cr, xdg + 6, ydg + 16.5);
+            cairo_line_to(cr, xdg, ydg + 10.5);
+            cairo_arc(cr, xdg + radiusg, ydg + radiusg, radiusg,
+                      M_PI, M_PI * 1.5);
+            cairo_stroke(cr);
+            cairo_set_source_rgb(cr, CAIRO_COL(borderCols[borderVal]));
+        }
+        cairo_move_to(cr, xd + radius, yd);
+        cairo_arc(cr, xd + 10 - radius, yd + radius, radius,
+                  M_PI * 1.5, M_PI * 2);
+        cairo_line_to(cr, xd + 10, yd + 9);
+        cairo_line_to(cr, xd + 5, yd + 14);
+        cairo_line_to(cr, xd, yd + 9);
+        cairo_arc(cr, xd + radius, yd + radius, radius, M_PI, M_PI * 1.5);
+        cairo_stroke(cr);
+        if (drawLight) {
+            drawVLine(cr, CAIRO_COL(colors[light]), 1.0, xd + 1, yd + 2, 7);
+            drawHLine(cr, CAIRO_COL(colors[light]), 1.0, xd + 2, yd + 1, 6);
+        }
+        break;
+    case GTK_ARROW_RIGHT:
+    case GTK_ARROW_LEFT:
+        if (glowMo) {
+            cairo_move_to(cr, xdg, ydg + 12-radiusg);
+            cairo_arc(cr, xdg + radiusg, ydg + radiusg,
+                      radiusg, M_PI, M_PI * 1.5);
+            cairo_line_to(cr, xdg + 10.5, ydg);
+            cairo_line_to(cr, xdg + 16.5, ydg + 6);
+            cairo_line_to(cr, xdg + 10.5, ydg + 12);
+            cairo_arc(cr, xdg + radiusg, ydg + 12 - radiusg,
+                      radiusg, M_PI * 0.5, M_PI);
+            cairo_stroke(cr);
+            cairo_set_source_rgb(cr, CAIRO_COL(borderCols[borderVal]));
+        }
+        cairo_move_to(cr, xd, yd + 10 - radius);
+        cairo_arc(cr, xd + radius, yd + radius, radius, M_PI, M_PI * 1.5);
+        cairo_line_to(cr, xd + 9, yd);
+        cairo_line_to(cr, xd + 14, yd + 5);
+        cairo_line_to(cr, xd + 9, yd + 10);
+        cairo_arc(cr, xd + radius, yd + 10 - radius, radius, M_PI * 0.5, M_PI);
+        cairo_stroke(cr);
+        if (drawLight) {
+            drawHLine(cr, CAIRO_COL(colors[light]), 1.0, xd + 2, yd + 1, 7);
+            drawVLine(cr, CAIRO_COL(colors[light]), 1.0, xd + 1, yd + 2, 6);
+        }
     }
 }
 #define SBAR_BTN_SIZE opts.sliderWidth

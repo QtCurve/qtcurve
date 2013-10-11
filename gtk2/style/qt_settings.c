@@ -2565,21 +2565,19 @@ gboolean qtSettingsInit()
             }
 
             /* Set cursor colours... */
-            { /* C-Scope */
-                static const char *constStrFormat="style \""RC_SETTING"Crsr\" "
-                                                    "{ GtkWidget::cursor-color=\"#%02X%02X%02X\" "
-                                                      "GtkWidget::secondary-cursor-color=\"#%02X%02X%02X\" } "
-                                                    "class \"*\" style \""RC_SETTING"Crsr\"";
-                tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
+            static const char *constStrFormat="style \""RC_SETTING"Crsr\" "
+                "{ GtkWidget::cursor-color=\"#%02X%02X%02X\" "
+                "GtkWidget::secondary-cursor-color=\"#%02X%02X%02X\" } "
+                "class \"*\" style \""RC_SETTING"Crsr\"";
+            tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
 
-                sprintf(tmpStr, constStrFormat, qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].red>>8,
-                                                qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].green>>8,
-                                                qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].blue>>8,
-                                                qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].red>>8,
-                                                qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].green>>8,
-                                                qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].blue>>8);
-                gtk_rc_parse_string(tmpStr);
-            } /* C-Scope */
+            sprintf(tmpStr, constStrFormat, qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].red>>8,
+                    qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].green>>8,
+                    qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].blue>>8,
+                    qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].red>>8,
+                    qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].green>>8,
+                    qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].blue>>8);
+            gtk_rc_parse_string(tmpStr);
 
             if(!opts.gtkScrollViews && NULL!=gtk_check_version(2, 12, 0))
                 opts.gtkScrollViews=true;
