@@ -61,6 +61,7 @@ int qtcX11DefaultScreenNo();
 xcb_screen_t *qtcX11DefaultScreen();
 xcb_window_t qtcX11RootWindow();
 void qtcX11Flush();
+void qtcX11FlushXlib();
 uint32_t qtcX11GenerateId();
 void qtcX11GetAtoms(size_t n, xcb_atom_t *atoms,
                     const char *const names[], boolean create);
@@ -90,7 +91,12 @@ QTC_END_DECLS
 #define qtcX11CallVoid(name, args...)                   \
     ({                                                  \
         xcb_connection_t *conn = qtcX11GetConn();       \
-        xcb_##name(conn, args).sequence;                \
+        xcb_##name(conn, args);                         \
+    })
+#define qtcX11CallVoidChecked(name, args...)            \
+    ({                                                  \
+        xcb_connection_t *conn = qtcX11GetConn();       \
+        xcb_##name##_checked(conn, args);               \
     })
 #else
 
@@ -108,15 +114,18 @@ _qtcX11Call(Cookie (*func)(xcb_connection_t*, Args...),
     (_qtcX11Call(xcb_##name, xcb_##name##_reply, args))
 
 template<typename... Args, typename... Args2>
-static inline unsigned int
+static inline xcb_void_cookie_t
 _qtcX11CallVoid(xcb_void_cookie_t (*func)(xcb_connection_t*, Args...),
                 Args2... args...)
 {
     xcb_connection_t *conn = qtcX11GetConn();
-    return func(conn, args...).sequence;
+    return func(conn, args...);
 }
 #define qtcX11CallVoid(name, args...)           \
     (_qtcX11CallVoid(xcb_##name, args))
+
+#define qtcX11CallVoidChecked(name, args...)            \
+    (_qtcX11CallVoid(xcb_##name##_checked, args))
 
 #endif
 

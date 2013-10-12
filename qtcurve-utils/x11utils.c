@@ -22,10 +22,12 @@
 
 #include "x11utils.h"
 #include "x11shadow_p.h"
+#include "log.h"
 
 #include <xcb/xcb_image.h>
 #include <X11/Xlib-xcb.h>
 
+static Display *qtc_disp = NULL;
 static xcb_connection_t *qtc_xcb_conn = NULL;
 static int qtc_default_screen_no = 0;
 static xcb_window_t qtc_root_window = {0};
@@ -60,6 +62,14 @@ QTC_EXPORT xcb_window_t
 qtcX11RootWindow()
 {
     return qtc_root_window;
+}
+
+QTC_EXPORT void
+qtcX11FlushXlib()
+{
+    if (qtc_disp) {
+        XFlush(qtc_disp);
+    }
 }
 
 QTC_EXPORT int
@@ -122,6 +132,7 @@ qtcX11InitXlib(Display *disp)
 {
     if (qtcUnlikely(qtc_xcb_conn) || !disp)
         return;
+    qtc_disp = disp;
     qtcX11InitXcb(XGetXCBConnection(disp), DefaultScreen(disp));
 }
 
