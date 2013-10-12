@@ -64,9 +64,9 @@ void qtcX11Flush();
 void qtcX11FlushXlib();
 uint32_t qtcX11GenerateId();
 void qtcX11GetAtoms(size_t n, xcb_atom_t *atoms,
-                    const char *const names[], boolean create);
+                    const char *const names[], bool create);
 QTC_ALWAYS_INLINE static inline xcb_atom_t
-qtcX11GetAtom(const char *name, boolean create)
+qtcX11GetAtom(const char *name, bool create)
 {
     xcb_atom_t atom;
     qtcX11GetAtoms(1, &atom, &name, create);
@@ -76,9 +76,9 @@ qtcX11GetAtom(const char *name, boolean create)
 void qtcX11SetWMClass(xcb_window_t win, const char *wmclass, size_t len);
 int32_t qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom);
 void qtcX11MapRaised(xcb_window_t win);
-boolean qtcX11CompositingActive();
-boolean qtcX11HasAlpha(xcb_window_t win);
-boolean qtcX11IsEmbed(xcb_window_t win);
+bool qtcX11CompositingActive();
+bool qtcX11HasAlpha(xcb_window_t win);
+bool qtcX11IsEmbed(xcb_window_t win);
 
 QTC_END_DECLS
 

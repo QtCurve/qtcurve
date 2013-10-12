@@ -33,12 +33,12 @@ typedef enum {
 } QtcLogLevel;
 
 QtcLogLevel _qtcCheckLogLevel();
-boolean _qtcCheckLogColor();
+bool _qtcCheckLogColor();
 
 static inline QtcLogLevel
 qtcCheckLogLevel()
 {
-    static boolean inited = false;
+    static bool inited = false;
     static QtcLogLevel level = QTC_LOG_ERROR;
     if (!inited) {
         level = _qtcCheckLogLevel();
@@ -47,11 +47,11 @@ qtcCheckLogLevel()
     return level;
 }
 
-static inline boolean
+static inline bool
 qtcCheckLogColor()
 {
-    static boolean inited = false;
-    static boolean color = false;
+    static bool inited = false;
+    static bool color = false;
     if (!inited) {
         color = _qtcCheckLogColor();
         inited = true;

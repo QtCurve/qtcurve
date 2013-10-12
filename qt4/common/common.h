@@ -37,21 +37,13 @@
 */
 #define INCREASE_SB_SLIDER
 
-#ifdef __cplusplus
 #include <qconfig.h>
 #include <qapplication.h>
 #include <map>
 #include <set>
 #include <QString>
-#else // __cplusplus
-#include <glib.h>
-#endif // __cplusplus
 
-#ifdef __cplusplus
 #define IS_BLACK(A) (0==(A).red() && 0==(A).green() && 0==(A).blue())
-#else
-#define IS_BLACK(A) (0==(A).red && 0==(A).green && 0==(A).blue)
-#endif
 
 #ifdef __cplusplus
 #include <qpixmap.h>
@@ -64,7 +56,6 @@ typedef QSet<QString> Strings;
 #else // __cplusplus
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
-typedef gboolean bool;
 typedef GdkColor color;
 typedef gchar ** Strings;
 #endif // __cplusplus

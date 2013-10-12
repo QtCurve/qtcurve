@@ -939,19 +939,19 @@ GdkColor * getParentBgCol(GtkWidget *widget)
                : NULL;
 }
 
-int getOpacity(GtkWidget *widget)
+int
+getOpacity(GtkWidget *widget)
 {
-    if(opts.bgndOpacity == opts.dlgOpacity)
+    if (opts.bgndOpacity == opts.dlgOpacity)
         return opts.bgndOpacity;
 
-    if(opts.bgndOpacity!=100 || opts.dlgOpacity!=100)
-    {
-        if(!widget)
+    if (opts.bgndOpacity != 100 || opts.dlgOpacity != 100) {
+        if (!widget) {
             return opts.bgndOpacity;
-        else
-        {
-            GtkWidget *top=gtk_widget_get_toplevel(widget);
-            return top && GTK_IS_DIALOG(top) ? opts.dlgOpacity : opts.bgndOpacity;
+        } else {
+            GtkWidget *top = gtk_widget_get_toplevel(widget);
+            return (top && GTK_IS_DIALOG(top) ? opts.dlgOpacity :
+                    opts.bgndOpacity);
         }
     }
     return 100;

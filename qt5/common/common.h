@@ -64,7 +64,6 @@ typedef QSet<QString> Strings;
 #else // __cplusplus
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
-typedef gboolean bool;
 typedef GdkColor color;
 typedef gchar ** Strings;
 #endif // __cplusplus

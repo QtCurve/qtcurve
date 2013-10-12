@@ -1481,17 +1481,18 @@ gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, GdkWin
 
         if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d  ", __FUNCTION__, x, y, width, height), debugDisplayWidget(widget, 20);
 
-        if(!mapToTopLevel(window, widget, &wx, &wy, &ww, &wh)) //, FALSE))
+        if (!mapToTopLevel(window, widget, &wx, &wy, &ww, &wh)) {
             return FALSE;
-        else
-        {
-            GdkRectangle  clip;
-            GtkWidget     *topLevel=gtk_widget_get_toplevel(widget);
-            int           opacity=!topLevel || !GTK_IS_DIALOG(topLevel) ? opts.bgndOpacity : opts.dlgOpacity,
-                xmod=0, ymod=0, wmod=0, hmod=0;
-            double        alpha=1.0;
-            gboolean      useAlpha=opacity<100 && isRgbaWidget(topLevel) && compositingActive(topLevel),
-                flatBgnd=IS_FLAT_BGND(opts.bgndAppearance);
+        } else {
+            GdkRectangle clip;
+            GtkWidget *topLevel = gtk_widget_get_toplevel(widget);
+            int opacity = (!topLevel || !GTK_IS_DIALOG(topLevel) ?
+                           opts.bgndOpacity : opts.dlgOpacity);
+            int xmod=0, ymod=0, wmod=0, hmod=0;
+            double alpha=1.0;
+            gboolean useAlpha = (opacity < 100 && isRgbaWidget(topLevel) &&
+                                 compositingActive(topLevel));
+            gboolean flatBgnd = IS_FLAT_BGND(opts.bgndAppearance);
             GdkColor      *col=NULL;
             GtkStyle      *topStyle=gtk_widget_get_style(topLevel);
 

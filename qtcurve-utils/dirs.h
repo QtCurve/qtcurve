@@ -39,7 +39,7 @@ char *qtcGetConfFile(const char *file, char *buff);
 #define _qtcGetConfFile(file, buff, ...)        \
     (qtcGetConfFile)(file, buff)
 
-static inline boolean
+static inline bool
 qtcIsDir(const char *path)
 {
     struct stat stats;
@@ -47,7 +47,7 @@ qtcIsDir(const char *path)
             access(path, R_OK | X_OK) == 0);
 }
 
-static inline boolean
+static inline bool
 qtcIsRegFile(const char *path)
 {
     struct stat stats;
@@ -55,7 +55,7 @@ qtcIsRegFile(const char *path)
             access(path, R_OK) == 0);
 }
 
-static inline boolean
+static inline bool
 qtcIsSymLink(const char *path)
 {
     struct stat stats;

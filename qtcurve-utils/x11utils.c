@@ -155,8 +155,8 @@ qtcX11GenerateId()
 }
 
 QTC_EXPORT void
-qtcX11GetAtoms(size_t n, xcb_atom_t *atoms,
-               const char *const names[], boolean create)
+qtcX11GetAtoms(size_t n, xcb_atom_t *atoms, const char *const names[],
+               bool create)
 {
     xcb_connection_t *conn = qtc_xcb_conn;
     xcb_intern_atom_cookie_t cookies[n];
@@ -210,7 +210,7 @@ qtcX11MapRaised(xcb_window_t win)
     qtcX11CallVoid(map_window, win);
 }
 
-QTC_EXPORT boolean
+QTC_EXPORT bool
 qtcX11CompositingActive()
 {
     xcb_get_selection_owner_reply_t *reply =
@@ -218,12 +218,12 @@ qtcX11CompositingActive()
                    qtc_x11_atoms[QTC_X11_ATOM_NET_WM_CM_S_DEFAULT]);
     if (!reply)
         return false;
-    boolean res = (reply->owner != 0);
+    bool res = (reply->owner != 0);
     free(reply);
     return res;
 }
 
-QTC_EXPORT boolean
+QTC_EXPORT bool
 qtcX11HasAlpha(xcb_window_t win)
 {
     if (!qtcX11CompositingActive())
@@ -233,12 +233,12 @@ qtcX11HasAlpha(xcb_window_t win)
     xcb_get_geometry_reply_t *reply = qtcX11Call(get_geometry, win);
     if (!reply)
         return false;
-    boolean res = (reply->depth == 32);
+    bool res = (reply->depth == 32);
     free(reply);
     return res;
 }
 
-QTC_EXPORT boolean
+QTC_EXPORT bool
 qtcX11IsEmbed(xcb_window_t win)
 {
     xcb_atom_t xembed_atom = qtc_x11_atoms[QTC_X11_ATOM_XEMBED_INFO];
@@ -247,7 +247,7 @@ qtcX11IsEmbed(xcb_window_t win)
                    xembed_atom, 0, 1);
     if (!reply)
         return false;
-    boolean res = xcb_get_property_value_length(reply) > 0;
+    bool res = xcb_get_property_value_length(reply) > 0;
     free(reply);
     return res;
 }

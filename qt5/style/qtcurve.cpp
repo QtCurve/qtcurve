@@ -959,26 +959,25 @@ void Style::polishScrollArea(QAbstractScrollArea *scrollArea, bool isKFilePlaces
 QIcon Style::standardIcon(StandardPixmap pix, const QStyleOption *option,
                           const QWidget *widget) const
 {
-    switch(pix)
-    {
-//         case SP_TitleBarMenuButton:
-//         case SP_TitleBarMinButton:
-//         case SP_TitleBarMaxButton:
-//         case SP_TitleBarContextHelpButton:
+    switch (pix) {
+    // case SP_TitleBarMenuButton:
+    // case SP_TitleBarMinButton:
+    // case SP_TitleBarMaxButton:
+    // case SP_TitleBarContextHelpButton:
     case SP_TitleBarNormalButton:
     case SP_TitleBarShadeButton:
     case SP_TitleBarUnshadeButton:
     case SP_DockWidgetCloseButton:
-    case SP_TitleBarCloseButton:
-    {
+    case SP_TitleBarCloseButton: {
         QPixmap pm(13, 13);
 
         pm.fill(Qt::transparent);
 
         QPainter painter(&pm);
 
-        drawIcon(&painter, Qt::color1, QRect(0, 0, pm.width(), pm.height()), false, pix2Icon(pix),
-                 SP_TitleBarShadeButton==pix || SP_TitleBarUnshadeButton==pix);
+        drawIcon(&painter, Qt::color1, QRect(0, 0, pm.width(), pm.height()),
+                 false, pix2Icon(pix), SP_TitleBarShadeButton == pix ||
+                 SP_TitleBarUnshadeButton == pix);
         return QIcon(pm);
     }
     case SP_ToolBarHorizontalExtensionButton:
@@ -1070,10 +1069,10 @@ QIcon Style::standardIcon(StandardPixmap pix, const QStyleOption *option,
     case SP_DirIcon:
     case SP_DirClosedIcon:
         return KIcon("folder");
-//         case SP_DirLinkIcon:
+    // case SP_DirLinkIcon:
     case SP_FileIcon:
         return KIcon("application-x-zerosize");
-//         case SP_FileLinkIcon:
+    // case SP_FileLinkIcon:
     case SP_FileDialogStart:
         return KIcon(Qt::RightToLeft==QApplication::layoutDirection() ? "go-edn" : "go-first");
     case SP_FileDialogEnd:
@@ -1084,10 +1083,10 @@ QIcon Style::standardIcon(StandardPixmap pix, const QStyleOption *option,
         return KIcon("folder-new");
     case SP_FileDialogDetailedView:
         return KIcon("view-list-details");
-//         case SP_FileDialogInfoView:
-//             return KIcon("dialog-ok");
-//         case SP_FileDialogContentsView:
-//             return KIcon("dialog-ok");
+    // case SP_FileDialogInfoView:
+    //     return KIcon("dialog-ok");
+    // case SP_FileDialogContentsView:
+    //     return KIcon("dialog-ok");
     case SP_FileDialogListView:
         return KIcon("view-list-icons");
     case SP_FileDialogBack:
@@ -1108,8 +1107,8 @@ QIcon Style::standardIcon(StandardPixmap pix, const QStyleOption *option,
         return KIcon("dialog-ok-apply");
     case SP_DialogResetButton:
         return KIcon("document-revert");
-//         case SP_DialogDiscardButton:
-//              return KIcon("dialog-cancel");
+    // case SP_DialogDiscardButton:
+    //     return KIcon("dialog-cancel");
     case SP_DialogYesButton:
         return KIcon("dialog-ok");
     case SP_DialogNoButton:
@@ -1128,8 +1127,8 @@ QIcon Style::standardIcon(StandardPixmap pix, const QStyleOption *option,
         return KIcon(Qt::RightToLeft==QApplication::layoutDirection() ? "go-previous" : "go-next");
     case SP_DirHomeIcon:
         return KIcon("user-home");
-//         case SP_CommandLink:
-//         case SP_VistaShield:
+    // case SP_CommandLink:
+    // case SP_VistaShield:
     case SP_BrowserReload:
         return KIcon("view-refresh");
     case SP_BrowserStop:

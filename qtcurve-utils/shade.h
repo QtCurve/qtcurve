@@ -61,7 +61,7 @@ static const double qtc_intern_shades[2][11][QTC_NUM_STD_SHADES]= {{
 #define QTC_DISABLED_BORDER QTC_STD_BORDER /* (3) */
 
 QTC_ALWAYS_INLINE static inline double
-qtcShadeGetIntern(int c, int s, boolean darker, EShading shading)
+qtcShadeGetIntern(int c, int s, bool darker, EShading shading)
 {
     if (c > 10 || c < 0 || s >= QTC_NUM_STD_SHADES || s < 0)
         return 1.0;

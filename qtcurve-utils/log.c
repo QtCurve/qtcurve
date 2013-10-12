@@ -26,9 +26,9 @@
 #include <stdarg.h>
 
 static QtcLogLevel log_level = QTC_LOG_ERROR;
-static boolean output_color = false;
+static bool output_color = false;
 
-static inline boolean
+static inline bool
 _qtcEnvTrue(const char *env)
 {
     if (env && *env &&
@@ -39,7 +39,7 @@ _qtcEnvTrue(const char *env)
     return false;
 }
 
-static inline boolean
+static inline bool
 _qtcEnvFalse(const char *env)
 {
     if (env && *env &&
@@ -94,7 +94,7 @@ _qtcCheckLogColorReal()
 static inline void
 _qtcLogInit()
 {
-    static boolean log_inited = false;
+    static bool log_inited = false;
     if (qtcUnlikely(!log_inited)) {
         _qtcCheckLogLevelReal();
         _qtcCheckLogColorReal();
@@ -109,7 +109,7 @@ _qtcCheckLogLevel()
     return log_level;
 }
 
-QTC_EXPORT boolean
+QTC_EXPORT bool
 _qtcCheckLogColor()
 {
     _qtcLogInit();

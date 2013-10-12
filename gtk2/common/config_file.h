@@ -14,7 +14,7 @@
 #define qtcSetStatusBarHidden(A, H)                     \
     qtcSetBarHidden((A), (H), QTC_STATUS_FILE_PREFIX)
 
-gboolean qtcBarHidden(const char *app, const char *prefix);
+bool qtcBarHidden(const char *app, const char *prefix);
 void qtcSetBarHidden(const char *app, bool hidden, const char *prefix);
 void qtcLoadBgndImage(QtCImage *img);
 

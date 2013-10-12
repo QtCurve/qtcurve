@@ -26,15 +26,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-
-typedef int32_t boolean;
-#ifndef __cplusplus
-#  ifndef true
-#    define true (1)
-#  endif
-#  ifndef false
-#    define false (0)
-#  endif
+#ifndef __cplucplus
+#  include <stdbool.h>
 #endif
 
 typedef struct {
@@ -110,7 +103,7 @@ qtcLimit(double d, double l)
     return d;
 }
 
-QTC_ALWAYS_INLINE static inline boolean
+QTC_ALWAYS_INLINE static inline bool
 qtcEqual(double d1, double d2)
 {
     return (fabs(d1 - d2) < 0.0001);
