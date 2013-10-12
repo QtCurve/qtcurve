@@ -104,12 +104,6 @@ void ShadowHelper::objectDeleted(QObject* object)
 }
 
 //_______________________________________________________
-bool ShadowHelper::isMenu(QWidget* widget) const
-{
-    return qobject_cast<QMenu*>(widget);
-}
-
-//_______________________________________________________
 bool ShadowHelper::acceptWidget(QWidget* widget) const
 {
     if (widget->property(netWMSkipShadowPropertyName).toBool())

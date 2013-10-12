@@ -61,9 +61,6 @@ protected Q_SLOTS:
     void installX11ShadowsReal(int);
 
 protected:
-    //! true if widget is a menu
-    bool isMenu(QWidget*) const;
-
     //! accept widget
     bool acceptWidget(QWidget*) const;
 

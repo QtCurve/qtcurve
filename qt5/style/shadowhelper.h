@@ -60,9 +60,6 @@ protected:
     //! unregister widget
     void objectDeleted(QObject*);
 
-    //! true if widget is a menu
-    bool isMenu(QWidget*) const;
-
     //! accept widget
     bool acceptWidget(QWidget*) const;
 
