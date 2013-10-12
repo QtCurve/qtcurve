@@ -57,7 +57,8 @@ public:
 
 protected Q_SLOTS:
     //! unregister widget
-    void objectDeleted( QObject* );
+    void objectDeleted(QObject*);
+    void installX11ShadowsReal(int);
 
 protected:
     //! true if widget is a menu

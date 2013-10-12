@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "x11shadow_p.h"
+#include "log.h"
 #include <xcb/xcb_image.h>
 #include <shadow0-png.h>
 #include <shadow1-png.h>
@@ -86,6 +87,7 @@ qtcX11ShadowInstall(xcb_window_t win)
     uint32_t data[8 + 4];
     memcpy(data, shadow_pixmaps, sizeof(shadow_pixmaps));
     data[8] = data[9] = data[10] = data[11] = shadow_size - 4;
+    qtcX11FlushXlib();
     qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, win,
                    qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_SHADOW],
                    XCB_ATOM_CARDINAL, 32, 12, data);

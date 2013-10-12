@@ -34,6 +34,7 @@
 #include <QEvent>
 
 #include <qtcurve-utils/x11shadow.h>
+#include <qtcurve-utils/log.h>
 
 namespace QtCurve {
 const char *const ShadowHelper::netWMForceShadowPropertyName =
@@ -45,8 +46,9 @@ const char *const ShadowHelper::netWMSkipShadowPropertyName =
 bool ShadowHelper::registerWidget(QWidget* widget, bool force)
 {
     // make sure widget is not already registered
-    if (_widgets.contains(widget))
+    if (_widgets.contains(widget)) {
         return false;
+    }
 
     // check if widget qualifies
     if (!(force || acceptWidget(widget))) {
@@ -82,7 +84,6 @@ void ShadowHelper::unregisterWidget( QWidget* widget )
 //_______________________________________________________
 bool ShadowHelper::eventFilter(QObject* object, QEvent* event)
 {
-
     // check event type
     if (event->type() != QEvent::WinIdChange)
         return false;
@@ -113,10 +114,9 @@ bool ShadowHelper::isMenu(QWidget *widget) const
 //_______________________________________________________
 bool ShadowHelper::acceptWidget(QWidget* widget) const
 {
-
     if (widget->property(netWMSkipShadowPropertyName).toBool())
         return false;
-    if(widget->property(netWMForceShadowPropertyName).toBool())
+    if (widget->property(netWMForceShadowPropertyName).toBool())
         return true;
 
     // menus
@@ -155,11 +155,28 @@ bool ShadowHelper::installX11Shadows( QWidget* widget )
       that have winId matching some other -random- window
     */
     if (!(widget->testAttribute(Qt::WA_WState_Created) ||
-          widget->internalWinId()))
+          widget->internalWinId())) {
         return false;
+    }
 
-    qtcX11ShadowInstall(widget->winId());
+    // Use XCB to set window property recieves BadWindow errors here,
+    // probably because of some pending event/requests in Xlib/Qt main loop
+    // Pending this request to the main loop solves the problem. Calling
+    // XFlush() before xcb_change_property() doesn't solve the problem
+    // for unknown reason. Not sure whether this is the right solution for
+    // the problem but it is unlikely to cause any problem either.
+    // Hopefully this is not necessary for Qt5 version since xcb is used in
+    // Qt5 internally.
+    QMetaObject::invokeMethod(this, "installX11ShadowsReal",
+                              Qt::QueuedConnection,
+                              Q_ARG(int, widget->winId()));
     return true;
+}
+
+void
+ShadowHelper::installX11ShadowsReal(int wid)
+{
+    qtcX11ShadowInstall(wid);
 }
 
 //_______________________________________________________
