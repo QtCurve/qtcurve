@@ -568,10 +568,10 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
     }
     else
     {
-        int      isSpinButton = DETAIL("spinbutton"),
-                 isMenuItem = DETAIL("menuitem"),
-                 a_width=LARGE_ARR_WIDTH,
-                 a_height=LARGE_ARR_HEIGHT;
+        int isSpinButton = DETAIL("spinbutton");
+        int isMenuItem = DETAIL("menuitem");
+        /* int a_width = LARGE_ARR_WIDTH; */
+        /* int a_height = LARGE_ARR_HEIGHT; */
         gboolean sbar=isSbarDetail(detail),
                  smallArrows=isSpinButton && !opts.unifySpin;
         int      stepper=sbar ? getStepper(
@@ -593,20 +593,19 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 y+=1;
         }
 #endif
-        if(isSpinButton)
-        {
-//             if(GTK_ARROW_UP==arrow_type)
-//                 y++;
-            a_height = SMALL_ARR_HEIGHT;
-            a_width = SMALL_ARR_WIDTH;
-        }
-        else if(GTK_ARROW_LEFT==arrow_type || GTK_ARROW_RIGHT==arrow_type || DETAIL("menuitem"))
-        {
-            a_width = LARGE_ARR_HEIGHT;
-            a_height = LARGE_ARR_WIDTH;
-
-            if(isMozilla() && opts.vArrows && a_height && height<a_height)
-                smallArrows=true;
+        if (isSpinButton)  {
+            /* if (GTK_ARROW_UP == arrow_type) */
+            /*     y++; */
+            /* a_height = SMALL_ARR_HEIGHT; */
+            /* a_width = SMALL_ARR_WIDTH; */
+        } else if (GTK_ARROW_LEFT == arrow_type ||
+                   GTK_ARROW_RIGHT == arrow_type || DETAIL("menuitem")) {
+            /* a_width = LARGE_ARR_HEIGHT; */
+            /* a_height = LARGE_ARR_WIDTH; */
+            if (isMozilla() && opts.vArrows /* && a_height */ &&
+                height < LARGE_ARR_WIDTH) {
+                smallArrows = true;
+            }
         }
 
         x+=width>>1;
@@ -688,8 +687,11 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
     }
 }
 
-static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area, GtkWidget *widget,
-                    const gchar *detail, gint x, gint y, gint width, gint height, gboolean btnDown)
+static void
+drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
+        GtkShadowType shadow, GdkRectangle *area, GtkWidget *widget,
+        const gchar *detail, gint x, gint y, gint width, gint height,
+        gboolean btnDown)
 {
     gboolean sbar=isSbarDetail(detail),
              pbar=DETAIL("bar"), //  && GTK_IS_PROGRESS_BAR(widget),
@@ -718,10 +720,9 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
                     GTK_STATE_ACTIVE==state || (2==bgnd || 3==bgnd);
     GtkWidget *parent=NULL;
 
-    if(button && GTK_IS_TOGGLE_BUTTON(widget))
-    {
-        button=FALSE;
-        togglebutton=TRUE;
+    if (button && GTK_IS_TOGGLE_BUTTON(widget)) {
+        button = FALSE;
+        togglebutton = TRUE;
     }
 
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %s  ", __FUNCTION__, btnDown, state, shadow, x, y, width, height,

@@ -3763,12 +3763,13 @@ void drawRadioButton(cairo_t *cr, GtkStateType state, GtkShadowType shadow, GtkS
             drawCheckBox(cr, state, shadow, style, widget, "check", area, x, y, width, height);
         else
         {
-            gboolean  on=GTK_SHADOW_IN==shadow,
-                tri=GTK_SHADOW_ETCHED_IN==shadow,
-                set=on||tri,
-                doEtch=DO_EFFECT;
-            int       ind_state=GTK_STATE_INSENSITIVE==state ? state : GTK_STATE_NORMAL,
-                optSpace=doEtch ? opts.crSize+2 : opts.crSize;
+            gboolean on = GTK_SHADOW_IN == shadow;
+            gboolean tri = GTK_SHADOW_ETCHED_IN == shadow;
+            /* gboolean set = on || tri; */
+            gboolean doEtch = DO_EFFECT;
+            int ind_state =
+                GTK_STATE_INSENSITIVE == state ? state : GTK_STATE_NORMAL;
+            int optSpace = doEtch ? opts.crSize + 2 : opts.crSize;
             GdkColor  newColors[TOTAL_SHADES+1],
                 *btnColors;
 
@@ -3805,18 +3806,18 @@ void drawRadioButton(cairo_t *cr, GtkStateType state, GtkShadowType shadow, GtkS
                 gboolean coloredMouseOver =
                     GTK_STATE_PRELIGHT == state && opts.coloredMouseOver;
                 gboolean doneShadow = false;
-                int bgnd = 0;
-                GdkColor *colors=coloredMouseOver
-                    ? qtcPalette.mouseover
-                    : btnColors,
-                    *bgndCol=GTK_STATE_INSENSITIVE==state || GTK_STATE_ACTIVE==state
-                    ? &style->bg[GTK_STATE_NORMAL]
-                    : !mnu && GTK_STATE_PRELIGHT==state && !coloredMouseOver && !opts.crHighlight
-                    ? &colors[CR_MO_FILL]
-                    : &style->base[GTK_STATE_NORMAL];
-                double   radius=(opts.crSize+1)/2.0;
+                /* int bgnd = 0; */
+                GdkColor *colors =
+                    (coloredMouseOver ? qtcPalette.mouseover : btnColors);
+                GdkColor *bgndCol =
+                    (GTK_STATE_INSENSITIVE == state ||
+                     GTK_STATE_ACTIVE == state ? &style->bg[GTK_STATE_NORMAL] :
+                     !mnu && GTK_STATE_PRELIGHT == state &&
+                     !coloredMouseOver && !opts.crHighlight ?
+                     &colors[CR_MO_FILL] : &style->base[GTK_STATE_NORMAL]);
+                double radius = (opts.crSize + 1) / 2.0;
 
-                bgnd=getFill(state, set/*, TRUE*/);
+                /* bgnd=getFill(state, set/\*, TRUE*\/); */
 
                 if(doEtch)
                     x++, y++;
@@ -3954,7 +3955,7 @@ drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
             i, sdiff = 10000,
             first_shown=-1,
             last_shown=-1;
-        GtkWidget *p=widget;
+        /* GtkWidget *p=widget; */
 
         if(children)
             g_list_free(children);
@@ -3975,7 +3976,7 @@ drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
             {
                 sdiff = diff;
                 tabIndex=i;
-                p=tab_label;
+                /* p=tab_label; */
             }
 
             if(page && gtk_widget_get_visible(page))

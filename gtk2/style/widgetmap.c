@@ -18,6 +18,7 @@
   Boston, MA 02110-1301, USA.
  */
 
+#include <qtcurve-utils/gtkutils.h>
 #include <gtk/gtk.h>
 #include "compatability.h"
 
@@ -61,43 +62,48 @@ GtkWidget * qtcWidgetMapGetWidget(GtkWidget *widget, int map)
 
 static void qtcWidgetMapCleanup(GtkWidget *widget)
 {
-    if(g_object_get_data(G_OBJECT(widget), MAP_ID(0)) || g_object_get_data(G_OBJECT(widget), MAP_ID(1)))
-    {
-        g_signal_handler_disconnect(G_OBJECT(widget),
-                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WIDGET_MAP_HACK_DESTROY_ID"));
-        g_signal_handler_disconnect(G_OBJECT(widget),
-                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WIDGET_MAP_HACK_UNREALIZE_ID"));
-        g_signal_handler_disconnect(G_OBJECT(widget),
-                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WIDGET_MAP_HACK_STYLE_SET_ID"));
-        g_object_steal_data(G_OBJECT(widget), MAP_ID(0));
-        g_object_steal_data(G_OBJECT(widget), MAP_ID(1));
+    GObject *obj = G_OBJECT(widget);
+    if (g_object_get_data(obj, MAP_ID(0)) ||
+        g_object_get_data(obj, MAP_ID(1))) {
+        qtcDisconnectFromData(obj, "QTC_WIDGET_MAP_HACK_DESTROY_ID");
+        qtcDisconnectFromData(obj, "QTC_WIDGET_MAP_HACK_UNREALIZE_ID");
+        qtcDisconnectFromData(obj, "QTC_WIDGET_MAP_HACK_STYLE_SET_ID");
+        g_object_steal_data(obj, MAP_ID(0));
+        g_object_steal_data(obj, MAP_ID(1));
         qtcWidgetMapRemoveHash(widget);
     }
 }
 
-static gboolean qtcWidgetMapStyleSet(GtkWidget *widget, GtkStyle *previous_style, gpointer user_data)
+static gboolean
+qtcWidgetMapStyleSet(GtkWidget *widget, GtkStyle *prev_style, gpointer data)
 {
+    QTC_UNUSED(prev_style);
+    QTC_UNUSED(data);
     qtcWidgetMapCleanup(widget);
     return FALSE;
 }
- 
-static gboolean qtcWidgetMapDestroy(GtkWidget *widget, GdkEvent *event, gpointer user_data)
+
+static gboolean
+qtcWidgetMapDestroy(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
+    QTC_UNUSED(event);
+    QTC_UNUSED(user_data);
     qtcWidgetMapCleanup(widget);
     return FALSE;
 }
 
 void qtcWidgetMapSetup(GtkWidget *from, GtkWidget *to, int map)
 {
-    if (from && to && !g_object_get_data(G_OBJECT(from), MAP_ID(map)))
-    {
-        g_object_set_data(G_OBJECT(from), MAP_ID(map), (gpointer)1);
-        g_object_set_data(G_OBJECT(from), "QTC_WIDGET_MAP_HACK_DESTROY_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(from), "destroy-event", G_CALLBACK(qtcWidgetMapDestroy), NULL));
-        g_object_set_data(G_OBJECT(from), "QTC_WIDGET_MAP_HACK_UNREALIZE_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(from), "unrealize", G_CALLBACK(qtcWidgetMapDestroy), NULL));
-        g_object_set_data(G_OBJECT(from), "QTC_WIDGET_MAP_HACK_STYLE_SET_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(from), "style-set", G_CALLBACK(qtcWidgetMapStyleSet), NULL));
+    GObject *from_obj;
+    if (from && to && (from_obj = G_OBJECT(from)) &&
+        !g_object_get_data(from_obj, MAP_ID(map))) {
+        g_object_set_data(from_obj, MAP_ID(map), (gpointer)1);
+        qtcConnectToData(from_obj, "QTC_WIDGET_MAP_HACK_DESTROY_ID",
+                         "destroy-event", qtcWidgetMapDestroy, NULL);
+        qtcConnectToData(from_obj, "QTC_WIDGET_MAP_HACK_UNREALIZE_ID",
+                         "unrealize", qtcWidgetMapDestroy, NULL);
+        qtcConnectToData(from_obj, "QTC_WIDGET_MAP_HACK_STYLE_SET_ID",
+                         "style-set", qtcWidgetMapStyleSet, NULL);
         qtcWidgetMapLookupHash(from, to, map);
-    }  
+    }
 }

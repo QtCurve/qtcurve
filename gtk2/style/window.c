@@ -247,10 +247,10 @@ qtcWindowDelayedUpdate(gpointer user_data)
 }
 
 static gboolean
-qtcWindowConfigure(GtkWidget *widget, GdkEventConfigure *event,
-                   gpointer user_data)
+qtcWindowConfigure(GtkWidget *widget, GdkEventConfigure *event, gpointer data)
 {
-    QtCWindow *window = (QtCWindow*)user_data;
+    QTC_UNUSED(widget);
+    QtCWindow *window = (QtCWindow*)data;
 
     if (window && (event->width != window->width ||
                    event->height != window->height)) {
@@ -456,28 +456,36 @@ qtcWindowSetProperties(GtkWidget *w, unsigned short opacity)
     qtcX11Flush();
 }
 
-static gboolean qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
+static gboolean
+qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
-    if(GDK_CONTROL_MASK&event->state && GDK_MOD1_MASK&event->state && !event->is_modifier &&
-       0==(event->state&0xFF00)) // Ensure only ctrl/alt/shift/capsLock are pressed...
-    {
-        gboolean toggled=FALSE;
-        if(opts.menubarHiding&HIDE_KEYBOARD && (QTC_KEY_m==event->keyval || QTC_KEY_M==event->keyval))
-            toggled=qtcWindowToggleMenuBar(widget);
-
-        if(opts.statusbarHiding&HIDE_KEYBOARD && (QTC_KEY_s==event->keyval || QTC_KEY_S==event->keyval))
-            toggled=qtcWindowToggleStatusBar(widget);
-
-        if(toggled)
+    QTC_UNUSED(user_data);
+    // Ensure only ctrl/alt/shift/capsLock are pressed...
+    if (GDK_CONTROL_MASK & event->state && GDK_MOD1_MASK & event->state &&
+        !event->is_modifier && 0 == (event->state & 0xFF00)) {
+        gboolean toggled = FALSE;
+        if (opts.menubarHiding & HIDE_KEYBOARD &&
+            (QTC_KEY_m == event->keyval || QTC_KEY_M == event->keyval)) {
+            toggled = qtcWindowToggleMenuBar(widget);
+        }
+        if (opts.statusbarHiding & HIDE_KEYBOARD &&
+            (QTC_KEY_s == event->keyval || QTC_KEY_S == event->keyval)) {
+            toggled = qtcWindowToggleStatusBar(widget);
+        }
+        if (toggled) {
             gtk_widget_queue_draw(widget);
+        }
     }
     return FALSE;
 }
 
-static gboolean qtcWindowMap(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
+static gboolean
+qtcWindowMap(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
-    int opacity = GPOINTER_TO_INT(g_object_get_data(
-                                      G_OBJECT(widget), "QTC_WINDOW_OPACITY"));
+    QTC_UNUSED(event);
+    QTC_UNUSED(user_data);
+    int opacity = GPOINTER_TO_INT(
+        g_object_get_data(G_OBJECT(widget), "QTC_WINDOW_OPACITY"));
     qtcWindowSetProperties(widget, (unsigned short)opacity);
 
     if(opts.menubarHiding&HIDE_KWIN)
