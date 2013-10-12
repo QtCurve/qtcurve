@@ -95,7 +95,7 @@ pixbufCacheValueNew(const QtcPixKey *key)
                  gdk_pixbuf_get_width(res), gdk_pixbuf_get_height(res),
                  gdk_pixbuf_get_rowstride(res),
                  key->col.red >> 8, key->col.green >> 8,
-                 key->col.blue >> 8, key->shade);
+                 key->col.blue >> 8, key->shade, QTC_PIXEL_GDK);
     return res;
 }
 

@@ -13472,7 +13472,7 @@ QPixmap * Style::getPixmap(const QColor col, EPixmap p, double shade) const
 
             qtcAdjustPix(img.bits(), 4, img.width(), img.height(),
                          img.bytesPerLine(), col.red(), col.green(),
-                         col.blue(), shade);
+                         col.blue(), shade, QTC_PIXEL_QT);
             *pix = QPixmap::fromImage(img);
         }
         itsPixmapCache.insert(key, pix, pix->depth()/8);

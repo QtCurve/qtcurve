@@ -1160,14 +1160,13 @@ typedef struct {
 #endif // __cplusplus
 #endif // QT_VERSION && (QT_VERSION >= 0x040000) && defined QTC_QT4_ENABLE_KDE
 
-extern void qtcAdjustPix(unsigned char *data, int numChannels, int w, int h, int stride, int ro, int go, int bo, double shade);
-extern void qtcSetupGradient(Gradient *grad, EGradientBorder border, int numStops, ...);
-extern const Gradient * qtcGetGradient(EAppearance app, const Options *opts);
+void qtcSetupGradient(Gradient *grad, EGradientBorder border, int numStops, ...);
+const Gradient * qtcGetGradient(EAppearance app, const Options *opts);
 
 #ifdef __cplusplus
-extern EAppearance qtcWidgetApp(EWidget w, const Options *opts, bool active=true);
+EAppearance qtcWidgetApp(EWidget w, const Options *opts, bool active=true);
 #else
-extern EAppearance qtcWidgetApp(EWidget w, const Options *opts);
+EAppearance qtcWidgetApp(EWidget w, const Options *opts);
 #endif
 
 typedef enum

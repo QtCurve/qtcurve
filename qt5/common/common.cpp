@@ -9,47 +9,6 @@
 #include <stdlib.h>
 #endif
 
-void qtcAdjustPix(unsigned char *data, int numChannels, int w, int h, int stride, int ro, int go, int bo, double shade)
-{
-    int width=w*numChannels,
-        offset=0,
-        row,
-        r=(int)((ro*shade)+0.5),
-        g=(int)((go*shade)+0.5),
-        b=(int)((bo*shade)+0.5);
-
-    for(row=0; row<h; ++row)
-    {
-        int column;
-
-        for(column=0; column<width; column+=numChannels)
-        {
-            unsigned char source=data[offset+column+1];
-
-#ifdef  __cplusplus
-#if Q_BYTE_ORDER == Q_BIG_ENDIAN
-            /* ARGB */
-            data[offset+column+1] = qtcBound(0, r - source, 255);
-            data[offset+column+2] = qtcBound(0, g - source, 255);
-            data[offset+column+3] = qtcBound(0, b - source, 255);
-#else
-            /* BGRA */
-            data[offset+column] = qtcBound(0, b - source, 255);
-            data[offset+column+1] = qtcBound(0, g - source, 255);
-            data[offset+column+2] = qtcBound(0, r - source, 255);
-#endif
-#else
-            /* GdkPixbuf is RGBA */
-            data[offset+column] = qtcBound(0, r - source, 255);
-            data[offset+column+1] = qtcBound(0, g - source, 255);
-            data[offset+column+2] = qtcBound(0, b - source, 255);
-#endif
-
-        }
-        offset+=stride;
-    }
-}
-
 void qtcSetupGradient(Gradient *grad, EGradientBorder border, int numStops, ...)
 {
     va_list  ap;

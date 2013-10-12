@@ -4005,7 +4005,9 @@ QPixmap * Style::getPixmap(const QColor col, EPixmap p, double shade) const
             if (img.depth()<32)
                 img=img.convertToFormat(QImage::Format_ARGB32);
 
-            qtcAdjustPix(img.bits(), 4, img.width(), img.height(), img.bytesPerLine(), col.red(), col.green(), col.blue(), shade);
+            qtcAdjustPix(img.bits(), 4, img.width(), img.height(),
+                         img.bytesPerLine(), col.red(), col.green(),
+                         col.blue(), shade, QTC_PIXEL_QT);
             *pix=QPixmap::fromImage(img);
         }
         itsPixmapCache.insert(key, pix, pix->depth()/8);

@@ -201,6 +201,20 @@ void _qtcColorMix(const QtcColor *c1, const QtcColor *c2,
 void _qtcShade(const QtcColor *ca, QtcColor *cb, double k, EShading shading);
 double _qtcShineAlpha(const QtcColor *bgnd);
 void _qtcCalcRingAlphas(const QtcColor *bgnd);
+typedef enum {
+    QTC_PIXEL_ARGB,
+    QTC_PIXEL_BGRA,
+    QTC_PIXEL_RGBA,
+    QTC_PIXEL_GDK = QTC_PIXEL_RGBA,
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+    QTC_PIXEL_QT = QTC_PIXEL_ARGB,
+#else
+    QTC_PIXEL_QT = QTC_PIXEL_BGRA,
+#endif
+} QtcPixelByteOrder;
+void qtcAdjustPix(unsigned char *data, int numChannels, int w, int h,
+                  int stride, int ro, int go, int bo, double shade,
+                  QtcPixelByteOrder byte_order);
 
 QTC_END_DECLS
 

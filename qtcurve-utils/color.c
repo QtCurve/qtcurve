@@ -372,3 +372,46 @@ _qtcCalcRingAlphas(const QtcColor *bgnd)
     qtc_ring_alpha[1] = v * 0.14;
     qtc_ring_alpha[2] = v * 0.55;
 }
+
+QTC_EXPORT void
+qtcAdjustPix(unsigned char *data, int numChannels, int w, int h, int stride,
+             int ro, int go, int bo, double shade,
+             QtcPixelByteOrder byte_order)
+{
+    int width = w * numChannels;
+    int offset = 0;
+    int r = (int)(ro * shade + 0.5);
+    int g = (int)(go * shade + 0.5);
+    int b = (int)(bo * shade + 0.5);
+
+    for (int row = 0;row < h;row++) {
+        for (int column = 0;column < width;column += numChannels) {
+            unsigned char source = data[offset + column + 1];
+            int new_r = qtcBound(0, r - source, 255);
+            int new_g = qtcBound(0, g - source, 255);
+            int new_b = qtcBound(0, b - source, 255);
+            switch (byte_order) {
+            case QTC_PIXEL_ARGB:
+                /* ARGB */
+                data[offset + column + 1] = new_r;
+                data[offset + column + 2] = new_g;
+                data[offset + column + 3] = new_b;
+                break;
+            case QTC_PIXEL_BGRA:
+                /* BGRA */
+                data[offset + column] = new_b;
+                data[offset + column + 1] = new_g;
+                data[offset + column + 2] = new_r;
+                break;
+            default:
+            case QTC_PIXEL_RGBA:
+                /* GdkPixbuf is RGBA */
+                data[offset + column] = new_r;
+                data[offset + column + 1] = new_g;
+                data[offset + column + 2] = new_b;
+                break;
+            }
+        }
+        offset += stride;
+    }
+}

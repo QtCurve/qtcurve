@@ -857,7 +857,6 @@ typedef struct {
 #define tint(COLA, COLB, FACTOR) qtcColorTint((COLA), (COLB), (FACTOR))
 #define midColor(COLA, COLB) qtcColorMix((COLA), (COLB), 0.5)
 
-void qtcAdjustPix(unsigned char *data, int numChannels, int w, int h, int stride, int ro, int go, int bo, double shade);
 void qtcSetupGradient(Gradient *grad, EGradientBorder border, int numStops, ...);
 const Gradient *qtcGetGradient(EAppearance app, const Options *opts);
 
