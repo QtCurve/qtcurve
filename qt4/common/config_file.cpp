@@ -1192,84 +1192,6 @@ bool qtcReadConfig(const QString &file, Options *opts, Options *defOpts, bool ch
                 opts->square|=SQUARE_POPUP_MENUS;
             if(opts->version<qtcMakeVersion(1, 2))
                 def->crSize=CR_SMALL_SIZE;
-            if(opts->version<qtcMakeVersion(1, 0))
-            {
-                def->roundAllTabs=false;
-                def->smallRadio=false;
-                def->splitters=LINE_FLAT;
-                def->handles=LINE_SUNKEN;
-                def->crHighlight=0;
-                def->dwtAppearance=APPEARANCE_FLAT;
-                def->dwtSettings=0;
-                def->inactiveTitlebarAppearance=APPEARANCE_CUSTOM2;
-            }
-            if(opts->version<qtcMakeVersion(0, 67))
-                def->doubleGtkComboArrow=false;
-            if(opts->version<qtcMakeVersion(0, 66))
-            {
-                def->menuStripeAppearance=APPEARANCE_GRADIENT;
-                def->etchEntry=true;
-                def->gtkScrollViews=false;
-                def->thinSbarGroove=false;
-                def->titlebarButtons=TITLEBAR_BUTTON_HOVER_FRAME;
-                def->titlebarIcon=TITLEBAR_ICON_MENU_BUTTON;
-            }
-            if(opts->version<qtcMakeVersion(0, 65))
-            {
-                def->tabMouseOver=TAB_MO_BOTTOM;
-                def->activeTabAppearance=APPEARANCE_FLAT;
-                def->unifySpin=false;
-                def->unifyCombo=false;
-                def->borderTab=false;
-                def->thin=0;
-            }
-            if(opts->version<qtcMakeVersion(0, 63))
-            {
-                def->tabMouseOver=TAB_MO_TOP;
-                def->sliderStyle=SLIDER_TRIANGULAR;
-                def->titlebarAlignment=ALIGN_LEFT;
-            }
-            if(opts->version<qtcMakeVersion(0, 62))
-            {
-                def->titlebarAppearance=APPEARANCE_GRADIENT;
-                def->inactiveTitlebarAppearance=APPEARANCE_GRADIENT;
-                def->round=ROUND_FULL;
-                def->appearance=APPEARANCE_DULL_GLASS;
-                def->sliderAppearance=APPEARANCE_DULL_GLASS;
-                def->menuitemAppearance=APPEARANCE_DULL_GLASS;
-                def->useHighlightForMenu=true;
-                def->tabAppearance=APPEARANCE_GRADIENT;
-                def->highlightFactor=5;
-                def->toolbarSeparators=LINE_NONE;
-                def->menubarAppearance=APPEARANCE_SOFT_GRADIENT;
-                def->crButton=false;
-                def->customShades[0]=0;
-                def->stripedProgress=STRIPE_DIAGONAL;
-                def->sunkenAppearance=APPEARANCE_INVERTED;
-                def->focus=FOCUS_FILLED;
-            }
-            if(opts->version<qtcMakeVersion(0, 61))
-            {
-                def->coloredMouseOver=MO_PLASTIK;
-                def->buttonEffect=EFFECT_NONE;
-                def->defBtnIndicator=IND_TINT;
-                def->vArrows=false;
-                def->toolbarAppearance=APPEARANCE_GRADIENT;
-                def->focus=FOCUS_STANDARD;
-                def->selectionAppearance=APPEARANCE_FLAT;
-                def->flatSbarButtons=false;
-                def->comboSplitter=true;
-                def->handles=LINE_DOTS;
-                def->lighterPopupMenuBgnd=15;
-                def->activeTabAppearance=APPEARANCE_GRADIENT;
-                def->gbLabel=GB_LBL_BOLD;
-                def->groupBox=FRAME_NONE;
-                def->shadeSliders=SHADE_BLEND_SELECTED;
-                def->progressGrooveColor=ECOLOR_BASE;
-                def->shadeMenubars=SHADE_DARKEN;
-                opts->highlightTab=true;
-            }
-
             if(opts!=def)
             {
                 opts->customShades[0]=0;
@@ -1342,15 +1264,6 @@ bool qtcReadConfig(const QString &file, Options *opts, Options *defOpts, bool ch
             CFG_READ_BOOL(useHighlightForMenu);
             CFG_READ_BOOL(shadeMenubarOnlyWhenActive);
             CFG_READ_TBAR_BTN(tbarBtns);
-            if(opts->version<qtcMakeVersion(0, 63))
-            {
-                if(IS_BLACK(opts->customSlidersColor))
-                    CFG_READ_COLOR(customSlidersColor);
-                if(IS_BLACK(opts->customMenubarsColor))
-                    CFG_READ_COLOR(customMenubarsColor);
-                if(IS_BLACK(opts->customCheckRadioColor))
-                    CFG_READ_COLOR(customCheckRadioColor);
-            }
             CFG_READ_COLOR(customMenuSelTextColor);
             CFG_READ_COLOR(customMenuNormTextColor);
             CFG_READ_SCROLLBAR(scrollbarType);
@@ -1371,12 +1284,7 @@ bool qtcReadConfig(const QString &file, Options *opts, Options *defOpts, bool ch
                 CFG_READ_APPEARANCE(tooltipAppearance, APP_ALLOW_BASIC);
             }
 
-            if(opts->version<qtcMakeVersion(0, 63))
-                opts->sliderFill=IS_FLAT(opts->appearance) ? opts->grooveAppearance : APPEARANCE_GRADIENT;
-            else
-            {
-                CFG_READ_APPEARANCE(sliderFill, APP_ALLOW_BASIC);
-            }
+            CFG_READ_APPEARANCE(sliderFill, APP_ALLOW_BASIC);
             CFG_READ_ECOLOR(progressGrooveColor);
             CFG_READ_FOCUS(focus);
             CFG_READ_BOOL(lvButton);
@@ -1434,8 +1342,6 @@ bool qtcReadConfig(const QString &file, Options *opts, Options *defOpts, bool ch
             CFG_READ_INT(dlgOpacity);
             CFG_READ_SHADE(menuStripe, true, true, &opts->customMenuStripeColor);
             CFG_READ_APPEARANCE(menuStripeAppearance, APP_ALLOW_BASIC);
-            if(opts->version<qtcMakeVersion(0, 63) && IS_BLACK(opts->customMenuStripeColor))
-                CFG_READ_COLOR(customMenuStripeColor);
             CFG_READ_SHADE(comboBtn, true, false, &opts->customComboBtnColor);
             CFG_READ_BOOL(gtkScrollViews);
             CFG_READ_BOOL(doubleGtkComboArrow);
