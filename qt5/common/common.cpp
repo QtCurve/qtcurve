@@ -9,13 +9,6 @@
 #include <stdlib.h>
 #endif
 
-static unsigned char checkBounds(int num)
-{
-    return num < 0   ? 0   :
-           num > 255 ? 255 :
-                       num;
-}
-
 void qtcAdjustPix(unsigned char *data, int numChannels, int w, int h, int stride, int ro, int go, int bo, double shade)
 {
     int width=w*numChannels,
@@ -36,20 +29,20 @@ void qtcAdjustPix(unsigned char *data, int numChannels, int w, int h, int stride
 #ifdef  __cplusplus
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN
             /* ARGB */
-            data[offset+column+1] = checkBounds(r-source);
-            data[offset+column+2] = checkBounds(g-source);
-            data[offset+column+3] = checkBounds(b-source);
+            data[offset+column+1] = qtcBound(0, r - source, 255);
+            data[offset+column+2] = qtcBound(0, g - source, 255);
+            data[offset+column+3] = qtcBound(0, b - source, 255);
 #else
             /* BGRA */
-            data[offset+column] = checkBounds(b-source);
-            data[offset+column+1] = checkBounds(g-source);
-            data[offset+column+2] = checkBounds(r-source);
+            data[offset+column] = qtcBound(0, b - source, 255);
+            data[offset+column+1] = qtcBound(0, g - source, 255);
+            data[offset+column+2] = qtcBound(0, r - source, 255);
 #endif
 #else
             /* GdkPixbuf is RGBA */
-            data[offset+column] = checkBounds(r-source);
-            data[offset+column+1] = checkBounds(g-source);
-            data[offset+column+2] = checkBounds(b-source);
+            data[offset+column] = qtcBound(0, r - source, 255);
+            data[offset+column+1] = qtcBound(0, g - source, 255);
+            data[offset+column+2] = qtcBound(0, b - source, 255);
 #endif
 
         }
