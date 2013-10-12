@@ -28,33 +28,11 @@
 static QtcLogLevel log_level = QTC_LOG_ERROR;
 static bool output_color = false;
 
-static inline bool
-_qtcEnvTrue(const char *env)
-{
-    if (env && *env &&
-        (strcasecmp(env, "1") == 0 || strcasecmp(env, "t") == 0 ||
-         strcasecmp(env, "true") == 0 || strcasecmp(env, "on") == 0)) {
-        return true;
-    }
-    return false;
-}
-
-static inline bool
-_qtcEnvFalse(const char *env)
-{
-    if (env && *env &&
-        (strcasecmp(env, "0") == 0 || strcasecmp(env, "f") == 0 ||
-         strcasecmp(env, "false") == 0 || strcasecmp(env, "off") == 0)) {
-        return true;
-    }
-    return false;
-}
-
 static inline void
 _qtcCheckLogLevelReal()
 {
     const char *env_debug = getenv("QTCURVE_DEBUG");
-    if (_qtcEnvTrue(env_debug)) {
+    if (qtcStrToBool(env_debug, false)) {
         log_level = QTC_LOG_DEBUG;
         return;
     }
@@ -71,7 +49,7 @@ _qtcCheckLogLevelReal()
             log_level = QTC_LOG_ERROR;
         }
     }
-    if (_qtcEnvFalse(env_debug) && log_level <= QTC_LOG_DEBUG) {
+    if (qtcStrToBool(env_debug, true) && log_level <= QTC_LOG_DEBUG) {
         log_level = QTC_LOG_INFO;
     }
 }
@@ -80,9 +58,9 @@ static inline void
 _qtcCheckLogColorReal()
 {
     const char *env_color = getenv("QTCURVE_LOG_COLOR");
-    if (_qtcEnvTrue(env_color)) {
+    if (qtcStrToBool(env_color, false)) {
         output_color = true;
-    } else if (_qtcEnvFalse(env_color)) {
+    } else if (qtcStrToBool(env_color, true)) {
         output_color = false;
     } else if (isatty(2)) {
         output_color = true;
