@@ -181,7 +181,7 @@ MacMenu::activate(QMenuBar *menu)
     }
     // register the menu via dbus
     QStringList entries;
-    for (QAction *action: const_(menu->actions())) {
+    for (QAction *action: menu->actions()) {
         if (action->isSeparator()) {
             entries << "<XBAR_SEPARATOR/>";
         } else {

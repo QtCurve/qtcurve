@@ -191,7 +191,7 @@ namespace QtCurve
             clear(widget);
         } else {
             QVector<unsigned long> data;
-            for (const QRect &rect: const_(region.rects())) {
+            for (const QRect &rect: region.rects()) {
                 data << rect.x() << rect.y() << rect.width() << rect.height();
             }
 

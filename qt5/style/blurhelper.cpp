@@ -167,7 +167,7 @@ BlurHelper::update(QWidget *widget) const
         clear(widget);
     } else {
         QVector<unsigned long> data;
-        for (const QRect &rect: const_(region.rects())) {
+        for (const QRect &rect: region.rects()) {
             data << rect.x() << rect.y() << rect.width() << rect.height();
         }
         qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE,
