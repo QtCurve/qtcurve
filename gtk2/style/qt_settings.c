@@ -49,10 +49,8 @@
 #include <sys/types.h>
 #include <math.h>
 
-#define strcmp_i(A, B) strncmp_i(A, B, -1)
-
 QtCPalette qtcPalette;
-Options    opts;
+Options opts;
 
 #define MAX_APP_NAME_LEN 32
 
@@ -142,28 +140,6 @@ static GdkColor setGdkColor(int r, int g, int b)
 /*
 #define DEBUG
 */
-
-static int strncmp_i(const char *s1, const char *s2, int num)
-{
-    char c1,
-         c2;
-    int  i;
-
-    for(i=0; -1==num || i<num; ++i)
-    {
-        c1=*s1++;
-        c2=*s2++;
-        if(!c1 || !c2)
-            break;
-        if(isupper(c1))
-            c1=tolower (c1);
-        if(isupper(c2))
-            c2=tolower (c2);
-        if(c1!=c2)
-            break;
-    }
-    return (int)c2-(int)c1;
-}
 
 #define DEFAULT_KDE_ACT_PAL \
 "active=#000000^e#dddfe4^e#ffffff^e#ffffff^e#555555^e#c7c7c7^e#000000^e#ffffff^e#000000^e#ffffff^e#efefef^e#000000^e#678db2^e#ffffff^e#0000ee^e#52188b^e"
@@ -473,15 +449,15 @@ typedef enum
 
 static ColorType getColorType(const char *line)
 {
-    if(0==strncmp_i(line, "BackgroundAlternate=", 20))
+    if(0==strncasecmp(line, "BackgroundAlternate=", 20))
         return BackgroundAlternate;
-    if(0==strncmp_i(line, "BackgroundNormal=", 17))
+    if(0==strncasecmp(line, "BackgroundNormal=", 17))
         return BackgroundNormal;
-    if(0==strncmp_i(line, "ForegroundNormal=", 17))
+    if(0==strncasecmp(line, "ForegroundNormal=", 17))
         return ForegroundNormal;
-    if(0==strncmp_i(line, "DecorationFocus=", 16))
+    if(0==strncasecmp(line, "DecorationFocus=", 16))
         return DecorationFocus;
-    if(0==strncmp_i(line, "DecorationHover=", 16))
+    if(0==strncasecmp(line, "DecorationHover=", 16))
         return DecorationHover;
     return UnknownColor;
 }
@@ -517,7 +493,7 @@ static double readDouble(const char *line, int offset)
 
 static gboolean readBool(const char *line, int offset)
 {
-    return line[offset]!='\0' ? 0==strncmp_i(&line[offset], "true", 4) : false;
+    return line[offset]!='\0' ? 0==strncasecmp(&line[offset], "true", 4) : false;
 }
 
 typedef struct
@@ -686,12 +662,12 @@ static void readKwinrc()
         while(NULL!=fgets(line, MAX_CONFIG_INPUT_LINE_LEN, f))
             if(line[0]=='[')
             {
-                if(0==strncmp_i(line, "[Compositing]", 13))
+                if(0==strncasecmp(line, "[Compositing]", 13))
                     section=SECT_KWIN_COMPOS;
                 else
                     section=SECT_NONE;
             }
-            else if (SECT_KWIN_COMPOS==section && 0==strncmp_i(line, "Backend=", 8))
+            else if (SECT_KWIN_COMPOS==section && 0==strncasecmp(line, "Backend=", 8))
             {
                 if (strstr(line, "=XRender"))
                     opts.square|=SQUARE_POPUP_MENUS|SQUARE_TOOLTIPS;
@@ -775,33 +751,33 @@ static void readKdeGlobals(const char *rc, int rd, bool first, bool kde4)
         while(found!=rd && NULL!=fgets(line, MAX_CONFIG_INPUT_LINE_LEN, f))
             if(line[0]=='[')
             {
-                if(0==strncmp_i(line, "[Icons]", 7))
+                if(0==strncasecmp(line, "[Icons]", 7))
                     section=SECT_ICONS;
-                else if(0==strncmp_i(line, "[Toolbar style]", 15))
+                else if(0==strncasecmp(line, "[Toolbar style]", 15))
                     section=SECT_TOOLBAR_STYLE;
-                else if(0==strncmp_i(line, "[MainToolbarIcons]", 18))
+                else if(0==strncasecmp(line, "[MainToolbarIcons]", 18))
                     section=SECT_MAIN_TOOLBAR_ICONS;
-                else if(0==strncmp_i(line, "[SmallIcons]", 12))
+                else if(0==strncasecmp(line, "[SmallIcons]", 12))
                     section=SECT_SMALL_ICONS;
-                else if(kde4 && 0==strncmp_i(line, "[Colors:View]", 13))
+                else if(kde4 && 0==strncasecmp(line, "[Colors:View]", 13))
                     section=SECT_KDE4_COL_VIEW;
-                else if(kde4 && 0==strncmp_i(line, "[Colors:Button]", 15))
+                else if(kde4 && 0==strncasecmp(line, "[Colors:Button]", 15))
                     section=SECT_KDE4_COL_BUTTON;
-                else if(kde4 && 0==strncmp_i(line, "[Colors:Selection]", 18))
+                else if(kde4 && 0==strncasecmp(line, "[Colors:Selection]", 18))
                     section=SECT_KDE4_COL_SEL;
-                else if(kde4 && 0==strncmp_i(line, "[Colors:Tooltip]", 16))
+                else if(kde4 && 0==strncasecmp(line, "[Colors:Tooltip]", 16))
                     section=SECT_KDE4_COL_TOOLTIP;
-                else if(kde4 && 0==strncmp_i(line, "[Colors:Window]", 15))
+                else if(kde4 && 0==strncasecmp(line, "[Colors:Window]", 15))
                     section=SECT_KDE4_COL_WINDOW;
-                else if(kde4 && 0==strncmp_i(line, "[ColorEffects:Disabled]", 23))
+                else if(kde4 && 0==strncasecmp(line, "[ColorEffects:Disabled]", 23))
                     section=SECT_KDE4_EFFECT_DISABLED;
-                else if(kde4 && 0==strncmp_i(line, "[ColorEffects:Inactive]", 23))
+                else if(kde4 && 0==strncasecmp(line, "[ColorEffects:Inactive]", 23))
                     section=SECT_KDE4_EFFECT_INACTIVE;
-                else if(/*kde4 && */0==strncmp_i(line, "[General]", 9))
+                else if(/*kde4 && */0==strncasecmp(line, "[General]", 9))
                     section=SECT_GENERAL;
-                else if(kde4 && 0==strncmp_i(line, "[KDE]", 5))
+                else if(kde4 && 0==strncasecmp(line, "[KDE]", 5))
                     section=SECT_KDE;
-                else if(kde4 && 0==strncmp_i(line, "[WM]", 4))
+                else if(kde4 && 0==strncasecmp(line, "[WM]", 4))
                     section=SECT_KDE4_COL_WM;
                 else
                 {
@@ -813,7 +789,7 @@ static void readKdeGlobals(const char *rc, int rd, bool first, bool kde4)
                 }
             }
             else if (SECT_ICONS==section && rd&RD_ICONS && !(found&RD_ICONS) &&
-                     0==strncmp_i(line, "Theme=", 6))
+                     0==strncasecmp(line, "Theme=", 6))
             {
                 char *eq=strstr(line, "=");
 
@@ -829,7 +805,7 @@ static void readKdeGlobals(const char *rc, int rd, bool first, bool kde4)
                 found|=RD_ICONS;
             }
             else if (SECT_SMALL_ICONS==section && rd&RD_SMALL_ICON_SIZE && !(found&RD_SMALL_ICON_SIZE) &&
-                     0==strncmp_i(line, "Size=", 5))
+                     0==strncasecmp(line, "Size=", 5))
             {
                 int size=readInt(line, 5);
 
@@ -843,52 +819,52 @@ static void readKdeGlobals(const char *rc, int rd, bool first, bool kde4)
             }
             else if (SECT_TOOLBAR_STYLE==section && rd&RD_TOOLBAR_STYLE &&
                         !(found&RD_TOOLBAR_STYLE) &&
-                        ( (!kde4 && 0==strncmp_i(line, "IconText=", 9)) ||
-                        (kde4 && 0==strncmp_i(line, "ToolButtonStyle=", 16))))
+                        ( (!kde4 && 0==strncasecmp(line, "IconText=", 9)) ||
+                        (kde4 && 0==strncasecmp(line, "ToolButtonStyle=", 16))))
             {
                 char *eq=strstr(line, "=");
 
                 if(eq && ++eq)
                 {
-                    if(0==strncmp_i(eq, "IconOnly", 8))
+                    if(0==strncasecmp(eq, "IconOnly", 8))
                         qtSettings.toolbarStyle=GTK_TOOLBAR_ICONS;
-                    else if(0==strncmp_i(eq, "TextOnly", 8))
+                    else if(0==strncasecmp(eq, "TextOnly", 8))
                         qtSettings.toolbarStyle=GTK_TOOLBAR_TEXT;
-                    else if( (!kde4 && 0==strncmp_i(eq, "IconTextRight", 13)) ||
-                                (kde4 && 0==strncmp_i(eq, "TextBesideIcon", 14)) )
+                    else if( (!kde4 && 0==strncasecmp(eq, "IconTextRight", 13)) ||
+                                (kde4 && 0==strncasecmp(eq, "TextBesideIcon", 14)) )
                         qtSettings.toolbarStyle=GTK_TOOLBAR_BOTH_HORIZ;
-                    else if( (!kde4 && 0==strncmp_i(eq, "IconTextBottom", 14)) ||
-                                (kde4 && 0==strncmp_i(eq, "TextUnderIcon", 13)))
+                    else if( (!kde4 && 0==strncasecmp(eq, "IconTextBottom", 14)) ||
+                                (kde4 && 0==strncasecmp(eq, "TextUnderIcon", 13)))
                         qtSettings.toolbarStyle=GTK_TOOLBAR_BOTH;
                     found|=RD_TOOLBAR_STYLE;
                 }
             }
             else if (SECT_MAIN_TOOLBAR_ICONS==section && rd&RD_TOOLBAR_ICON_SIZE &&
-                        !(found&RD_TOOLBAR_ICON_SIZE) && 0==strncmp_i(line, "Size=", 5))
+                        !(found&RD_TOOLBAR_ICON_SIZE) && 0==strncasecmp(line, "Size=", 5))
             {
                 qtSettings.iconSizes.tbSize=readInt(line, 5);
                 found|=RD_TOOLBAR_ICON_SIZE;
             }
             else if (SECT_KDE==section && rd&RD_BUTTON_ICONS && !(found&RD_BUTTON_ICONS) &&
-                        0==strncmp_i(line, "ShowIconsOnPushButtons=", 23))
+                        0==strncasecmp(line, "ShowIconsOnPushButtons=", 23))
             {
                 qtSettings.buttonIcons=readBool(line, 23);
                 found|=RD_BUTTON_ICONS;
             }
 //             else if (SECT_KDE==section && rd&RD_DRAG_DIST && !(found&RD_DRAG_DIST) &&
-//                         0==strncmp_i(line, "StartDragDist=", 14))
+//                         0==strncasecmp(line, "StartDragDist=", 14))
 //             {
 //                 qtSettings.startDragDist=readInt(line, 14);
 //                 found|=RD_DRAG_DIST;
 //             }
             else if (SECT_KDE==section && rd&RD_DRAG_TIME && !(found&RD_DRAG_TIME) &&
-                        0==strncmp_i(line, "StartDragTime=", 14))
+                        0==strncasecmp(line, "StartDragTime=", 14))
             {
                 qtSettings.startDragTime=readInt(line, 14);
                 found|=RD_DRAG_TIME;
             }
             else if(rd&RD_LIST_COLOR && !(found&RD_LIST_COLOR) &&
-                    !kde4 && SECT_GENERAL==section && 0==strncmp_i(line, "alternateBackground=", 20))
+                    !kde4 && SECT_GENERAL==section && 0==strncasecmp(line, "alternateBackground=", 20))
             {
                 qtSettings.colors[PAL_ACTIVE][COLOR_LV]=readColor(line);
                 found|=RD_LIST_COLOR;
@@ -896,13 +872,13 @@ static void readKdeGlobals(const char *rc, int rd, bool first, bool kde4)
             else if(kde4 && SECT_KDE4_COL_WM==section && rd&RD_KDE4_PAL && !(found&RD_KDE4_PAL))
             {
                 colorsFound|=section;
-                if(0==strncmp_i(line, "activeBackground=", 17))
+                if(0==strncasecmp(line, "activeBackground=", 17))
                     qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER]=readColor(line);
-                else if(0==strncmp_i(line, "activeForeground=", 17))
+                else if(0==strncasecmp(line, "activeForeground=", 17))
                     qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER_TEXT]=readColor(line);
-                else if(0==strncmp_i(line, "inactiveBackground=", 19))
+                else if(0==strncasecmp(line, "inactiveBackground=", 19))
                     qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW_BORDER]=readColor(line);
-                else if(0==strncmp_i(line, "inactiveForeground=", 19))
+                else if(0==strncasecmp(line, "inactiveForeground=", 19))
                     qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW_BORDER_TEXT]=readColor(line);
             }
             else if(kde4 && section>=SECT_KDE4_COL_BUTTON && section<=SECT_KDE4_COL_WINDOW &&
@@ -967,25 +943,25 @@ static void readKdeGlobals(const char *rc, int rd, bool first, bool kde4)
                 }
             }
             else if (kde4 && SECT_GENERAL==section && rd&RD_FONT && !(found&RD_FONT) &&
-                     0==strncmp_i(line, "font=", 5))
+                     0==strncasecmp(line, "font=", 5))
             {
                 parseFontLine(line, &fonts[FONT_GENERAL]);
                 found|=RD_FONT;
             }
             else if (SECT_GENERAL==section && rd&RD_MENU_FONT && !(found&RD_MENU_FONT) &&
-                     0==strncmp_i(line, "menuFont=", 9))
+                     0==strncasecmp(line, "menuFont=", 9))
             {
                 parseFontLine(line, &fonts[FONT_MENU]);
                 found|=RD_MENU_FONT;
             }
             else if (SECT_GENERAL==section && rd&RD_TB_FONT && !(found&RD_TB_FONT) &&
-                     0==strncmp_i(line, "toolBarFont=", 12))
+                     0==strncasecmp(line, "toolBarFont=", 12))
             {
                 parseFontLine(line, &fonts[FONT_TOOLBAR]);
                 found|=RD_TB_FONT;
             }
             else if(kde4 && rd&RD_CONTRAST && !(found&RD_CONTRAST) && SECT_KDE==section &&
-                    0==strncmp_i(line, "contrast=", 9))
+                    0==strncasecmp(line, "contrast=", 9))
             {
                 opts.contrast=readInt(line, 9);
                 if(opts.contrast>10 || opts.contrast<0)
@@ -994,7 +970,7 @@ static void readKdeGlobals(const char *rc, int rd, bool first, bool kde4)
             }
 #ifdef QTC_GTK2_STYLE_SUPPORT
             else if(kde4 && SECT_GENERAL==section && rd&RD_STYLE && !(found&RD_STYLE) &&
-                     0==strncmp_i(line, "widgetStyle=", 12))
+                     0==strncasecmp(line, "widgetStyle=", 12))
             {
                 int len=strlen(line);
                 qtSettings.styleName=realloc(qtSettings.styleName, strlen(&line[12])+1);
@@ -1009,27 +985,27 @@ static void readKdeGlobals(const char *rc, int rd, bool first, bool kde4)
             {
                 colorsFound|=section;
                 Effect eff=SECT_KDE4_EFFECT_DISABLED==section ? EFF_DISABLED : EFF_INACTIVE;
-                if(0==strncmp_i(line, "Color=", 6))
+                if(0==strncasecmp(line, "Color=", 6))
                     effects[eff].col=readColor(line);
-                else if(0==strncmp_i(line, "ColorAmount=", 12))
+                else if(0==strncasecmp(line, "ColorAmount=", 12))
                     effects[eff].color.amount=readDouble(line, 12);
-                else if(0==strncmp_i(line, "ColorEffect=", 12))
+                else if(0==strncasecmp(line, "ColorEffect=", 12))
                     effects[eff].color.effect=readInt(line, 12);
-                else if(0==strncmp_i(line, "ContrastAmount=", 15))
+                else if(0==strncasecmp(line, "ContrastAmount=", 15))
                     effects[eff].contrast.amount=readDouble(line, 15);
-                else if(0==strncmp_i(line, "ContrastEffect=", 15))
+                else if(0==strncasecmp(line, "ContrastEffect=", 15))
                     effects[eff].contrast.effect=readInt(line, 15);
-                else if(0==strncmp_i(line, "IntensityAmount=", 16))
+                else if(0==strncasecmp(line, "IntensityAmount=", 16))
                     effects[eff].intensity.amount=readDouble(line, 16);
-                else if(0==strncmp_i(line, "IntensityEffect=", 16))
+                else if(0==strncasecmp(line, "IntensityEffect=", 16))
                     effects[eff].intensity.effect=readInt(line, 16);
-                else if(0==strncmp_i(line, "Enable=", 7))
+                else if(0==strncasecmp(line, "Enable=", 7))
                     effects[eff].enabled=readBool(line, 7);
-                else if(0==strncmp_i(line, "ChangeSelectionColor=", 21))
+                else if(0==strncasecmp(line, "ChangeSelectionColor=", 21))
                     qtSettings.inactiveChangeSelectionColor=readBool(line, 21);
             }
             else if(SECT_GENERAL==section && rd&RD_LIST_SHADE && !(found&RD_LIST_SHADE) &&
-                    0==strncmp_i(line, "shadeSortColumn=", 16))
+                    0==strncasecmp(line, "shadeSortColumn=", 16))
             {
                 qtSettings.shadeSortedList=readBool(line, 16);
                 found|=RD_LIST_SHADE;
@@ -1190,16 +1166,16 @@ static void readKdeGlobals(const char *rc, int rd, bool first, bool kde4)
 /*             while(found!=rd && NULL!=fgets(line, MAX_CONFIG_INPUT_LINE_LEN, f)) */
 /*                 if(line[0]=='[') */
 /*                 { */
-/*                     if(0==strncmp_i(line, "[Palette]", 9)) */
+/*                     if(0==strncasecmp(line, "[Palette]", 9)) */
 /*                         section=SECT_PALETTE; */
-/*                     else if(0==strncmp_i(line, "[General]", 9)) */
+/*                     else if(0==strncasecmp(line, "[General]", 9)) */
 /*                         section=SECT_GENERAL; */
-/*                     else if(0==strncmp_i(line, "[KDE]", 5)) */
+/*                     else if(0==strncasecmp(line, "[KDE]", 5)) */
 /*                         section=SECT_KDE; */
 /*                     else */
 /*                         section=SECT_NONE; */
 /*                 } */
-/*                 else if(rd&RD_CONTRAST && !(found&RD_CONTRAST) && SECT_KDE==section && 0==strncmp_i(line, "contrast=", 9)) */
+/*                 else if(rd&RD_CONTRAST && !(found&RD_CONTRAST) && SECT_KDE==section && 0==strncasecmp(line, "contrast=", 9)) */
 /*                 { */
 /*                     opts.contrast=readInt(line, 9); */
 /*                     if(opts.contrast>10 || opts.contrast<0) */
@@ -1207,27 +1183,27 @@ static void readKdeGlobals(const char *rc, int rd, bool first, bool kde4)
 /*                     found|=RD_CONTRAST; */
 /*                 } */
 /*                 else if(SECT_PALETTE==section && rd&RD_ACT_PALETTE && !(found&RD_ACT_PALETTE) && */
-/*                         0==strncmp_i(line, "active=", 7)) */
+/*                         0==strncasecmp(line, "active=", 7)) */
 /*                 { */
 /*                     parseQtColors(line, PAL_ACTIVE); */
 /*                     found|=RD_ACT_PALETTE; */
 /*                 } */
 /*                 else if(SECT_PALETTE==section && rd&RD_DIS_PALETTE && !(found&RD_DIS_PALETTE) && */
-/*                         0==strncmp_i(line, "disabled=", 7)) */
+/*                         0==strncasecmp(line, "disabled=", 7)) */
 /*                 { */
 /*                     parseQtColors(line, PAL_DISABLED); */
 /*                     found|=RD_DIS_PALETTE; */
 /*                 } */
 /* #ifdef READ_INACTIVE_PAL */
 /*                 else if(SECT_PALETTE==section && rd&RD_INACT_PALETTE && !(found&RD_INACT_PALETTE) && */
-/*                         0==strncmp_i(line, "inactive=", 9)) */
+/*                         0==strncasecmp(line, "inactive=", 9)) */
 /*                 { */
 /*                     parseQtColors(line, PAL_INACTIVE); */
 /*                     found|=RD_INACT_PALETTE; */
 /*                 } */
 /* #endif */
 /* #ifdef QTC_GTK2_STYLE_SUPPORT */
-/*                 else if (SECT_GENERAL==section && rd&RD_STYLE && !(found&RD_STYLE) && 0==strncmp_i(line, "style=", 6)) */
+/*                 else if (SECT_GENERAL==section && rd&RD_STYLE && !(found&RD_STYLE) && 0==strncasecmp(line, "style=", 6)) */
 /*                 { */
 /*                     int len=strlen(line); */
 /*                     qtSettings.styleName=realloc(qtSettings.styleName, strlen(&line[6])+1); */
@@ -1237,7 +1213,7 @@ static void readKdeGlobals(const char *rc, int rd, bool first, bool kde4)
 /*                     found|=RD_STYLE; */
 /*                 } */
 /* #endif */
-/*                 else if (SECT_GENERAL==section && rd&RD_FONT && !(found&RD_FONT) && 0==strncmp_i(line, "font=", 5)) */
+/*                 else if (SECT_GENERAL==section && rd&RD_FONT && !(found&RD_FONT) && 0==strncasecmp(line, "font=", 5)) */
 /*                 { */
 /*                     parseFontLine(line, &font); */
 /*                     found|=RD_FONT; */
