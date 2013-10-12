@@ -50,7 +50,7 @@ class QtCurveConfig
         SHADE_LIGHT,
         SHADE_SHADOW
     };
-    
+
     QtCurveConfig()               { defaults(); }
 
     void defaults();

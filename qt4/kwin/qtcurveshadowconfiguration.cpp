@@ -98,7 +98,7 @@ void QtCurveShadowConfiguration::load(KConfig *cfg)
     READ_ENTRY(VOffset)
     READ_ENTRY(ColorType)
     READ_ENTRY(ShadowType)
-    
+
     if(CT_CUSTOM==itsColorType)
         READ_ENTRY(Color)
     if(itsSize<MIN_SIZE || itsSize>MAX_SIZE)
@@ -126,7 +126,7 @@ void QtCurveShadowConfiguration::save(KConfig *cfg)
     WRITE_ENTRY(VOffset)
     WRITE_ENTRY(ColorType)
     WRITE_ENTRY(ShadowType)
-    
+
     if(CT_CUSTOM!=itsColorType)
         group.deleteEntry("Color");
     else

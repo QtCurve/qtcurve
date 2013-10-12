@@ -59,7 +59,7 @@ class QtCurveShadowCache
     {
         return active ? activeShadowConfiguration_.color() : inactiveShadowConfiguration_.color();
     }
-    
+
     void invalidateCaches()
     {
         shadowCache_.clear();

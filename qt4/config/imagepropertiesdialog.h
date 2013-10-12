@@ -41,7 +41,7 @@ class CImagePropertiesDialog : public KDialog,  public Ui::ImageProperties
         SCALE  = 0x02,
         BORDER = 0x04
     };
-    
+
     CImagePropertiesDialog(const QString &title, QWidget *parent, int props);
 
     bool  run();

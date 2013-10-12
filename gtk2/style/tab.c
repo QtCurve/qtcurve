@@ -44,12 +44,12 @@ static QtCTab * qtcTabLookupHash(void *hash, gboolean create)
     if(!rv && create)
     {
         int p;
-            
+
         rv=(QtCTab *)malloc(sizeof(QtCTab));
         rv->numRects=gtk_notebook_get_n_pages(GTK_NOTEBOOK(hash));
         rv->rects=(GdkRectangle *)malloc(sizeof(GdkRectangle) * rv->numRects);
         rv->id=-1;
-        
+
         for(p=0; p<rv->numRects; ++p)
         {
             rv->rects[p].x=rv->rects[p].y=0;
@@ -67,7 +67,7 @@ static void qtcTabRemoveHash(void *hash)
     if(qtcTabHashTable)
     {
         QtCTab *tab=GTK_IS_NOTEBOOK(hash) ? qtcTabLookupHash(hash, FALSE) : NULL;
-        
+
         if(tab)
             free(tab->rects);
         g_hash_table_remove(qtcTabHashTable, hash);
@@ -90,7 +90,7 @@ void qtcTabUpdateRect(GtkWidget *widget, int tabIndex, int x, int y, int width, 
         if(tabIndex>=tab->numRects)
         {
             int p;
-            
+
             tab->rects=realloc(tab->rects, sizeof(GdkRectangle)*(tabIndex+8));
             for(p=tab->numRects; p<tabIndex+8; ++p)
             {
@@ -351,7 +351,7 @@ GdkRectangle qtcTabGetTabbarRect(GtkNotebook *notebook)
     // check tab visibility
     if(!(gtk_notebook_get_show_tabs(notebook) && gtk_container_get_children(GTK_CONTAINER(notebook))))
         return empty;
-    
+
     // get full rect
     rect=qtcWidgetGetAllocation(GTK_WIDGET(notebook));
 

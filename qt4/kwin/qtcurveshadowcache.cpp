@@ -317,7 +317,7 @@ void QtCurveShadowCache::renderGradient(QPainter &p, const QRectF &rect, const Q
         // vertical lines
         QRectF          rect(hoffset, size+voffset, 2*size-hoffset, 4);
         QLinearGradient lg(hoffset, 0.0, 2*size+hoffset, 0.0);
-        
+
         for(int i = 0; i<stops.size(); i++)
         {
             QColor c(stops[i].second);

@@ -127,8 +127,8 @@ void QtCurveToggleButton::drawButton(QPainter *painter)
     QPainterPath path;
 
     bgnd.setAlphaF(itsHover ? 0.9 : 0.4);
-    
-    
+
+
     if(round)
         path.addEllipse(ellipse);
     else

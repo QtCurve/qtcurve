@@ -69,7 +69,7 @@ MacMenu::manage(QMenuBar *menu)
 {
     if (!menu) // ...
         return;
-    
+
     // we only accept menus that are placed on a QMainWindow - for the moment, and probably ever
     QWidget *dad = menu->parentWidget();
     if (!(dad && dad->isWindow() && dad->inherits("QMainWindow") && dad->layout() && dad->layout()->menuBar() == menu))
@@ -77,7 +77,7 @@ MacMenu::manage(QMenuBar *menu)
 
 //     if ((dad = dad->parentWidget()) && dad->inherits("QMdiSubWindow"))
 //         return;
-    
+
 
     if (!instance)
     {
@@ -146,7 +146,7 @@ void
 MacMenu::activate(QMenuBar *menu)
 {
     menu->removeEventFilter(this);
-    
+
     // and WOWWWW - no more per window menubars...
     menu->setFixedSize(0,0);
     //NOTICE i used to set the menu's parent->layout()->setMenuBar(0) to get rid of the free space
@@ -154,11 +154,11 @@ MacMenu::activate(QMenuBar *menu)
     // so now the stylehint for the free space below checks the menubar height and returns
     // a negative value so that final result will be 1 px heigh...
     menu->updateGeometry();
-    
+
     // we need to hold a copy of this list to handle action removes
     // (as we get the event after the action has been removed from the widget...)
     actions[menu] = menu->actions();
-    
+
     // find a nice header
     QString title = menu->window()->windowTitle();
     const QStringList appArgs = QCoreApplication::arguments();

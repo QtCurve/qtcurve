@@ -38,7 +38,7 @@ public:
 protected:
     bool eventFilter(QObject *o, QEvent *ev);
 };
-    
+
 class MacMenu : public QObject
 {
    Q_OBJECT

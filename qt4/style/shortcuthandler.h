@@ -35,11 +35,11 @@ class ShortcutHandler : public QObject
     Q_OBJECT
 
     public:
-        
+
     explicit ShortcutHandler(QObject *parent = 0);
     virtual ~ShortcutHandler();
 
-    bool hasSeenAlt(const QWidget *widget) const; 
+    bool hasSeenAlt(const QWidget *widget) const;
     bool isAltDown() const { return itsAltDown; }
     bool showShortcut(const QWidget *widget) const;
 

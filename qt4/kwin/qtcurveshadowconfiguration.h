@@ -50,7 +50,7 @@ class QtCurveShadowConfiguration
         SH_ACTIVE   = 0,
         SH_INACTIVE = 1
     };
-    
+
     enum Constants
     {
         MIN_SIZE   = 10,
@@ -58,7 +58,7 @@ class QtCurveShadowConfiguration
         MIN_OFFSET = 0,
         MAX_OFFSET = 20
     };
-    
+
     QtCurveShadowConfiguration(QPalette::ColorGroup);
 
     virtual ~QtCurveShadowConfiguration() { }

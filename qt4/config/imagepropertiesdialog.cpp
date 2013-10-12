@@ -92,7 +92,7 @@ bool CImagePropertiesDialog::run()
     set(oldFile, oldWidth, oldHeight, oldPos, oldOnBorder);
     return false;
 }
-         
+
 void CImagePropertiesDialog::set(const QString &file, int width, int height, int pos, bool onWindowBorder)
 {
     if(properties&SCALE)

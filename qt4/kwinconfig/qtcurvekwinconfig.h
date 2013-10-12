@@ -66,9 +66,9 @@ class QtCurveKWinConfig : public QWidget, public Ui::QtCurveKWinConfigWidget
     void setNote(const QString &txt);
     void load(KConfig *config);
     void save(KConfig *config);
-    
+
     private:
-    
+
     void setShadows();
     void setWidgets(const KWinQtCurve::QtCurveConfig &cfg);
     void setWidgetStates();

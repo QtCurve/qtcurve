@@ -43,7 +43,7 @@ bool ShortcutHandler::hasSeenAlt(const QWidget *widget) const
         return itsOpenMenus.count() && itsOpenMenus.last()==widget;
 //     {
 //         const QWidget *w=widget;
-//         
+//
 //         while(w)
 //         {
 //             if(itsSeenAlt.contains((QWidget *)w))

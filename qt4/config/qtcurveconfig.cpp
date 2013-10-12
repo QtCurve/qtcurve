@@ -937,13 +937,13 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
 
     expanderHighlight->setRange(MIN_HIGHLIGHT_FACTOR, MAX_HIGHLIGHT_FACTOR);
     expanderHighlight->setValue(DEFAULT_EXPANDER_HIGHLIGHT_FACTOR);
-   
+
     menuDelay->setRange(MIN_MENU_DELAY, MAX_MENU_DELAY);
     menuDelay->setValue(DEFAULT_MENU_DELAY);
 
     gbFactor->setRange(MIN_GB_FACTOR, MAX_GB_FACTOR);
     gbFactor->setValue(DEF_GB_FACTOR);
-    
+
     bgndOpacity->setRange(0, 100, 5);
     bgndOpacity->setValue(100);
     dlgOpacity->setRange(0, 100, 5);
@@ -974,7 +974,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     menuBgndImageDlg=new CImagePropertiesDialog(i18n("Menu Image"), this,
                                                 CImagePropertiesDialog::POS|
                                                 CImagePropertiesDialog::SCALE);
-                           
+
     connect(lighterPopupMenuBgnd, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(tabBgnd, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(menuDelay, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
@@ -1273,7 +1273,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
 }
 
 QtCurveConfig::~QtCurveConfig()
-{   
+{
     // Remove QTCURVE_PREVIEW_CONFIG setting, so that main kcmstyle preview does not revert to
     // default settings!
     qputenv(QTCURVE_PREVIEW_CONFIG, "");
@@ -1301,7 +1301,7 @@ void QtCurveConfig::save()
     if(IMG_FILE==opts.bgndImage.type)
     {
         opts.bgndImage.pixmap.file=installThemeFile(bgndImageDlg->fileName(), BGND_FILE IMAGE_FILE);
-//         printf("SAVE BGND:%s\n", opts.bgndImage.pixmap.file.toLatin1().constData()); 
+//         printf("SAVE BGND:%s\n", opts.bgndImage.pixmap.file.toLatin1().constData());
     }
     else
         removeInstalledThemeFile(BGND_FILE IMAGE_FILE);
@@ -1312,7 +1312,7 @@ void QtCurveConfig::save()
     if(IMG_FILE==opts.menuBgndImage.type)
     {
         opts.menuBgndImage.pixmap.file=installThemeFile(menuBgndImageDlg->fileName(), BGND_FILE MENU_FILE IMAGE_FILE);
-//         printf("SAVE MENU:%s\n", opts.menuBgndImage.pixmap.file.toLatin1().constData()); 
+//         printf("SAVE MENU:%s\n", opts.menuBgndImage.pixmap.file.toLatin1().constData());
     }
     else
         removeInstalledThemeFile(BGND_FILE MENU_FILE IMAGE_FILE);
@@ -1571,7 +1571,7 @@ void QtCurveConfig::xbarChanged()
     }
     updateChanged();
 }
- 
+
 void QtCurveConfig::windowBorder_colorTitlebarOnlyChanged()
 {
     if(!windowBorder_colorTitlebarOnly->isChecked())
@@ -1778,7 +1778,7 @@ void QtCurveConfig::setupPresets(const Options &currentStyle, const Options &def
     deleteButton->setGuiItem(KGuiItem(i18n("Delete"), "edit-delete"));
     importButton->setGuiItem(KGuiItem(i18n("Import..."), "document-import"));
     exportButton->setGuiItem(KGuiItem(i18n("Export..."), "document-export"));
-    
+
     deleteButton->setEnabled(false);
 
     currentText=i18n("(Current)");
@@ -1804,9 +1804,9 @@ void QtCurveConfig::setupPresets(const Options &currentStyle, const Options &def
     connect(deleteButton, SIGNAL(clicked(bool)), SLOT(deletePreset()));
     connect(importButton, SIGNAL(clicked(bool)), SLOT(importPreset()));
     connect(exportButton, SIGNAL(clicked(bool)), SLOT(exportPreset()));
-    
+
     int index=-1;
- 
+
     for(int i=0; i<presetsCombo->count() && -1==index; ++i)
         if(presetsCombo->itemText(i)==currentText)
             index=i;
@@ -1818,7 +1818,7 @@ void QtCurveConfig::setupPresets(const Options &currentStyle, const Options &def
 void QtCurveConfig::setupPreview()
 {
     QVBoxLayout *layout = new QVBoxLayout(previewFrame);
-    
+
     workSpace = new CWorkspace(previewFrame);
     layout->setMargin(0);
     layout->addWidget(workSpace);
@@ -2095,7 +2095,7 @@ void QtCurveConfig::exportKDE3()
         {
             KConfigGroup k4General(KGlobal::config(), "General");
             KConfigGroup k4wm(KGlobal::config(), "WM");
-            
+
             // Mainly for K3B...
             wm.writeEntry("activeBackground", k4wm.readEntry("activeBackground",
                                                              palette().color(QPalette::Active, QPalette::Window)));
@@ -2149,7 +2149,7 @@ void QtCurveConfig::exportQt()
                                      QPalette::LinkVisited,
                                      QPalette::NColorRoles
                                     };
-        
+
         for (i = 0; roles[i] != QPalette::NColorRoles; i++)
         {
             act << p.color(QPalette::Active, roles[i]).name();
@@ -2200,13 +2200,13 @@ void QtCurveConfig::updatePreview()
     qputenv(QTCURVE_PREVIEW_CONFIG, "");
     if (!style)
         return;
-    
+
     // Very hacky way to pass preview options to style!!!
     QtCurve::Style::PreviewOption styleOpt;
     styleOpt.opts=previewStyle;
-    
+
     style->drawControl((QStyle::ControlElement)QtCurve::Style::CE_QtC_SetOptions, &styleOpt, 0L, this);
-       
+
     setStyleRecursive(mdiWindow ? (QWidget *)previewFrame : (QWidget *)stylePreview, style);
 }
 
@@ -2260,7 +2260,7 @@ void QtCurveConfig::previewControlPressed()
         mdiWindow = workSpace->addSubWindow(stylePreview, Qt::Window);
         mdiWindow->move(4, 4);
         mdiWindow->showMaximized();
-        previewControlButton->setText(i18n("Detach"));        
+        previewControlButton->setText(i18n("Detach"));
     }
     connect(stylePreview, SIGNAL(closePressed()), SLOT(previewControlPressed()));
     updatePreview();
@@ -2272,7 +2272,7 @@ void QtCurveConfig::setupGradientsTab()
 
     for(int i=0; i<appearance->count(); ++i)
         menu->addAction(appearance->itemText(i))->setProperty(constGradValProp, i);
-    
+
     for(int i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+NUM_CUSTOM_GRAD); ++i)
         gradCombo->insertItem(i-APPEARANCE_CUSTOM1, i18n("Custom gradient %1", (i-APPEARANCE_CUSTOM1)+1));
 
@@ -2433,7 +2433,7 @@ void QtCurveConfig::updateChanged()
     // Check if we have a floating preview!
     if(!mdiWindow && settingsChanged(previewStyle))
         updatePreview();
-            
+
     if (settingsChanged())
         emit changed(true);
 }
@@ -2451,7 +2451,7 @@ void QtCurveConfig::reorderGtkButtonsChanged()
         gtkButtonOrder->setChecked(false);
     updateChanged();
 }
-    
+
 void QtCurveConfig::focusChanged()
 {
     if(ROUND_MAX==round->currentIndex() && FOCUS_LINE!=focus->currentIndex() && !(EFFECT_NONE!=buttonEffect->currentIndex() && FOCUS_GLOW==focus->currentIndex()))
@@ -2483,7 +2483,7 @@ void QtCurveConfig::setPreset()
         qtcReadConfig(p.fileName, &p.opts, &presets[defaultText].opts, false);
 
     setWidgetOptions(p.opts);
-    
+
     if(defaultText==presetsCombo->currentText())
         kwin->defaults();
     else if(currentText==presetsCombo->currentText())
@@ -2575,7 +2575,7 @@ QString QtCurveConfig::getPresetName(const QString &cap, QString label, QString 
 {
     QRegExp          exp("\\w+[^\\0042\\0044\\0045\\0046\\0047\\0052\\0057\\0077\\0137\\0140]*");
     QRegExpValidator validator(exp, this);
- 
+
     while(true)
     {
         if(name.isEmpty())
@@ -3186,7 +3186,7 @@ void QtCurveConfig::setOptions(Options &opts)
     if(IMG_FILE==opts.bgndImage.type)
     {
         opts.bgndImage.pixmap.file=getThemeFile(bgndImageDlg->fileName());
-//         printf("SET OP BGND:%s\n", opts.menuBgndImage.pixmap.file.toLatin1().constData()); 
+//         printf("SET OP BGND:%s\n", opts.menuBgndImage.pixmap.file.toLatin1().constData());
         opts.bgndImage.width=bgndImageDlg->imgWidth();
         opts.bgndImage.height=bgndImageDlg->imgHeight();
         opts.bgndImage.onBorder=bgndImageDlg->onWindowBorder();
@@ -3202,7 +3202,7 @@ void QtCurveConfig::setOptions(Options &opts)
     if(IMG_FILE==opts.menuBgndImage.type)
     {
         opts.menuBgndImage.pixmap.file=getThemeFile(menuBgndImageDlg->fileName());
-//         printf("SET OP MENU:%s\n", opts.menuBgndImage.pixmap.file.toLatin1().constData()); 
+//         printf("SET OP MENU:%s\n", opts.menuBgndImage.pixmap.file.toLatin1().constData());
         opts.menuBgndImage.width=menuBgndImageDlg->imgWidth();
         opts.menuBgndImage.height=menuBgndImageDlg->imgHeight();
         opts.menuBgndImage.onBorder=false; // Not used!!!
@@ -3452,7 +3452,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     else
     {
         QColor col(palette().color(QPalette::Active, QPalette::Button));
-    
+
         titlebarButtons_colorClose->setColor(col);
         titlebarButtons_colorMin->setColor(col);
         titlebarButtons_colorMax->setColor(col);
@@ -3510,7 +3510,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
         titlebarButtons_colorShadeInactiveIcon->setColor(col);
         titlebarButtons_colorAllDesktopsInactiveIcon->setColor(col);
     }
-    
+
     titlebarButtons_button->setChecked(opts.titlebarButtons&TITLEBAR_BUTTON_STD_COLOR);
     titlebarButtons_custom->setChecked(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR);
     titlebarButtons_customIcon->setChecked(opts.titlebarButtons&TITLEBAR_BUTTON_ICON_COLOR);
@@ -3811,7 +3811,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          getSquareFlags()!=opts.square ||
 
          diffTitleBarButtonColors(opts) ||
-         
+
          customMenuTextColor->isChecked()!=opts.customMenuTextColor ||
          (SHADE_CUSTOM==opts.shadeSliders &&
                customSlidersColor->color()!=opts.customSlidersColor) ||
