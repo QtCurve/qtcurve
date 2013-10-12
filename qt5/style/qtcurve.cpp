@@ -948,11 +948,11 @@ void Style::polishScrollArea(QAbstractScrollArea *scrollArea, bool isKFilePlaces
     // change viewport autoFill background.
     // do the same for children if the background role is QPalette::Window
     viewport->setAutoFillBackground(false);
-    QList<QWidget*> children(viewport->findChildren<QWidget*>());
-    foreach(QWidget* child, children)
-    {
-        if(child->parent() == viewport && QPalette::Window==child->backgroundRole())
+    for (QWidget *child: const_(viewport->findChildren<QWidget*>())) {
+        if (child->parent() == viewport &&
+            QPalette::Window == child->backgroundRole()) {
             child->setAutoFillBackground(false);
+        }
     }
 }
 

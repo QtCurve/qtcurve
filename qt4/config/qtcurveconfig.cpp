@@ -185,16 +185,14 @@ static void removeThemeImages(const QString &themeFile)
 
 static void setStyleRecursive(QWidget *w, QStyle *s)
 {
-    if(!w)
+    if (!w) {
         return;
+    }
     w->setStyle(s);
-
-    const QObjectList children = w->children();
-
-    foreach (QObject *child, children)
-    {
-        if (child && child->isWidgetType())
-            setStyleRecursive((QWidget *) child, s);
+    for (QObject *child: w->children()) {
+        if (child && child->isWidgetType()) {
+            setStyleRecursive((QWidget*)child, s);
+        }
     }
 }
 

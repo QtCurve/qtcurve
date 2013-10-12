@@ -104,7 +104,7 @@ protected:
 
     //! update blur region for all pending widgets
     void update() {
-        foreach (const WidgetPointer &widget, _pendingWidgets) {
+        for (const WidgetPointer &widget: const_(_pendingWidgets)) {
             if (widget) {
                 update(widget.data());
             }

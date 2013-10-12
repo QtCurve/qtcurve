@@ -384,37 +384,32 @@ static inline QList<QStatusBar *> getStatusBars(QWidget *w)
     return w ? w->findChildren<QStatusBar *>() : QList<QStatusBar *>();
 }
 
-static QToolBar * getToolBarChild(QWidget *w)
+static QToolBar*
+getToolBarChild(QWidget *w)
 {
-    const QObjectList children = w->children();
-
-    foreach (QObject* child, children)
-    {
-        if (child->isWidgetType())
-        {
-            if(qobject_cast<QToolBar *>(child))
-                return static_cast<QToolBar *>(child);
-            QToolBar *tb=getToolBarChild((QWidget *) child);
-            if(tb)
+    for (QObject *child: w->children()) {
+        if (child->isWidgetType()) {
+            if (qobject_cast<QToolBar*>(child))
+                return static_cast<QToolBar*>(child);
+            QToolBar *tb = getToolBarChild((QWidget*)child);
+            if (tb) {
                 return tb;
+            }
         }
     }
-
     return 0L;
 }
 
-static void setStyleRecursive(QWidget *w, QStyle *s, int minSize)
+static void
+setStyleRecursive(QWidget *w, QStyle *s, int minSize)
 {
     w->setStyle(s);
     if (qobject_cast<QToolButton*>(w))
         w->setMinimumSize(1, minSize);
-
-    const QObjectList children = w->children();
-
-    foreach (QObject *child, children)
-    {
-        if (child->isWidgetType())
-            setStyleRecursive((QWidget *) child, s, minSize);
+    for (QObject *child: w->children()) {
+        if (child->isWidgetType()) {
+            setStyleRecursive((QWidget*)child, s, minSize);
+        }
     }
 }
 
@@ -2398,11 +2393,11 @@ void Style::polishScrollArea(QAbstractScrollArea *scrollArea, bool isKFilePlaces
     // change viewport autoFill background.
     // do the same for children if the background role is QPalette::Window
     viewport->setAutoFillBackground(false);
-    QList<QWidget*> children(viewport->findChildren<QWidget*>());
-    foreach(QWidget* child, children)
-    {
-        if(child->parent() == viewport && QPalette::Window==child->backgroundRole())
+    for (QWidget *child: const_(viewport->findChildren<QWidget*>())) {
+        if (child->parent() == viewport &&
+            QPalette::Window == child->backgroundRole()) {
             child->setAutoFillBackground(false);
+        }
     }
 }
 
@@ -3203,10 +3198,14 @@ void Style::timerEvent(QTimerEvent *event)
     if (event->timerId() == itsProgressBarAnimateTimer)
     {
         itsAnimateStep = itsTimer.elapsed() / (1000 / constProgressBarFps);
-        foreach (QProgressBar *bar, itsProgressBars)
-            if ((opts.animatedProgress && 0==itsAnimateStep%2 && bar->value()!=bar->minimum() && bar->value()!=bar->maximum()) ||
-                (0==bar->minimum() && 0==bar->maximum()))
+        for (QProgressBar *bar: const_(itsProgressBars)) {
+            if ((opts.animatedProgress && 0 == itsAnimateStep % 2 &&
+                 bar->value() != bar->minimum() &&
+                 bar->value() != bar->maximum()) ||
+                (0 == bar->minimum() && 0 == bar->maximum())) {
                 bar->update();
+            }
+        }
     }
 
     event->ignore();

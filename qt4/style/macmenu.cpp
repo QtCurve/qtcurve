@@ -16,6 +16,8 @@ This library is distributed in the hope that it will be useful,
    Boston, MA 02110-1301, USA.
  */
 
+#include <qtcurve-utils/utils.h>
+
 #include <QActionEvent>
 #include <QApplication>
 #include <QDBusConnectionInterface>
@@ -177,19 +179,19 @@ MacMenu::activate(QMenuBar *menu)
         if (title.isEmpty())
             title = "QApplication";
     }
-    
     // register the menu via dbus
     QStringList entries;
-    foreach (QAction* action, menu->actions())
-        if (action->isSeparator())
+    for (QAction *action: const_(menu->actions())) {
+        if (action->isSeparator()) {
             entries << "<XBAR_SEPARATOR/>";
-        else
+        } else {
             entries << action->text();
+        }
+    }
     XBAR_SEND( MSG("registerMenu") << service << (qlonglong)menu << title << entries );
     // TODO cause of now async call, the following should - maybe - attached to the above?!!
     if (menu->isActiveWindow())
         XBAR_SEND( MSG("requestFocus") << (qlonglong)menu );
-    
     // take care of several widget events!
     menu->installEventFilter(this);
     if (menu->window())
@@ -359,15 +361,18 @@ MacMenu::hover(qlonglong key, int idx,  int x, int y)
     }
 }
 
-static QMenuBar *bar4menu(QMenu *menu)
+static QMenuBar*
+bar4menu(QMenu *menu)
 {
     if (!menu->menuAction())
         return 0;
     if (menu->menuAction()->associatedWidgets().isEmpty())
         return 0;
-    foreach (QWidget *w, menu->menuAction()->associatedWidgets())
-        if (qobject_cast<QMenuBar*>(w))
-            return static_cast<QMenuBar *>(w);
+    for (QWidget *w: menu->menuAction()->associatedWidgets()) {
+        if (qobject_cast<QMenuBar*>(w)) {
+            return static_cast<QMenuBar*>(w);
+        }
+    }
     return 0;
 }
 
@@ -375,7 +380,6 @@ void
 MacMenu::menuClosed()
 {
     QObject * _sender = sender();
-    
     if (!_sender)
         return;
 

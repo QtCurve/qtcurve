@@ -156,28 +156,26 @@ void WindowManager::initializeWhiteList( const QStringList &list )
     _whiteList.insert( ExceptionId( "ViewSliders@kmix" ) );
     _whiteList.insert( ExceptionId( "Sidebar_Widget@konqueror" ) );
 
-    foreach( const QString& exception, list )
-    {
-        ExceptionId id( exception );
-        if( !id.className().isEmpty() )
-        { _whiteList.insert( exception ); }
+    for (const QString& exception: list) {
+        ExceptionId id(exception);
+        if (!id.className().isEmpty()) {
+            _whiteList.insert(exception);
+        }
     }
 }
 
-//_____________________________________________________________
-void WindowManager::initializeBlackList( const QStringList &list )
+void
+WindowManager::initializeBlackList(const QStringList &list)
 {
-
     _blackList.clear();
-    _blackList.insert( ExceptionId( "CustomTrackView@kdenlive" ) );
-    _blackList.insert( ExceptionId( "MuseScore" ) );
-    foreach( const QString& exception, list )
-    {
-        ExceptionId id( exception );
-        if( !id.className().isEmpty() )
-        { _blackList.insert( exception ); }
+    _blackList.insert(ExceptionId("CustomTrackView@kdenlive"));
+    _blackList.insert(ExceptionId("MuseScore"));
+    for (const QString &exception: list) {
+        ExceptionId id(exception);
+        if (!id.className().isEmpty()) {
+            _blackList.insert(exception);
+        }
     }
-
 }
 
 //_____________________________________________________________
@@ -398,19 +396,19 @@ bool WindowManager::isBlackListed( QWidget* widget )
 
     // list-based blacklisted widgets
     QString appName( qApp->applicationName() );
-    foreach( const ExceptionId& id, _blackList )
-    {
-        if( !id.appName().isEmpty() && id.appName() != appName ) continue;
-        if( id.className() == "*" && !id.appName().isEmpty() )
-        {
+    for (const ExceptionId &id: const_(_blackList)) {
+        if (!id.appName().isEmpty() && id.appName() != appName)
+            continue;
+        if (id.className() == "*" && !id.appName().isEmpty()) {
             // if application name matches and all classes are selected
             // disable the grabbing entirely
-            setEnabled( false );
+            setEnabled(false);
             return true;
         }
-        if( widget->inherits( id.className().toLatin1() ) ) return true;
+        if (widget->inherits(id.className().toLatin1())) {
+            return true;
+        }
     }
-
     return false;
 }
 
@@ -419,10 +417,12 @@ bool WindowManager::isWhiteListed( QWidget* widget ) const
 {
 
     QString appName( qApp->applicationName() );
-    foreach( const ExceptionId& id, _whiteList )
-    {
-        if( !id.appName().isEmpty() && id.appName() != appName ) continue;
-        if( widget->inherits( id.className().toLatin1() ) ) return true;
+    for (const ExceptionId &id: _whiteList) {
+        if (!id.appName().isEmpty() && id.appName() != appName)
+            continue;
+        if (widget->inherits(id.className().toLatin1())) {
+            return true;
+        }
     }
 
     return false;

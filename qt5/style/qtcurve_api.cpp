@@ -1630,10 +1630,14 @@ void Style::timerEvent(QTimerEvent *event)
 {
     if (event->timerId() == itsProgressBarAnimateTimer) {
         itsAnimateStep = itsTimer.elapsed() / (1000 / constProgressBarFps);
-        foreach (QProgressBar *bar, itsProgressBars)
-            if ((opts.animatedProgress && 0==itsAnimateStep%2 && bar->value()!=bar->minimum() && bar->value()!=bar->maximum()) ||
-                (0==bar->minimum() && 0==bar->maximum()))
+        for (QProgressBar *bar: const_(itsProgressBars)) {
+            if ((opts.animatedProgress && 0 == itsAnimateStep % 2 &&
+                 bar->value() != bar->minimum() &&
+                 bar->value() != bar->maximum()) ||
+                (0 == bar->minimum() && 0 == bar->maximum())) {
                 bar->update();
+            }
+        }
     }
 
     event->ignore();

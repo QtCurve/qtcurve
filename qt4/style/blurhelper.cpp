@@ -153,11 +153,8 @@ namespace QtCurve
     //___________________________________________________________
     void BlurHelper::trimBlurRegion( QWidget* parent, QWidget* widget, QRegion& region ) const
     {
-
-
         // loop over children
-        foreach( QObject* childObject, widget->children() )
-        {
+        for (QObject* childObject: widget->children()) {
             QWidget* child( qobject_cast<QWidget*>( childObject ) );
             if( !(child && child->isVisible()) ) continue;
 
@@ -190,15 +187,13 @@ namespace QtCurve
         { return; }
 
         const QRegion region( blurRegion( widget ) );
-        if( region.isEmpty() ) {
-
-            clear( widget );
-
+        if (region.isEmpty()) {
+            clear(widget);
         } else {
-
             QVector<unsigned long> data;
-            foreach( const QRect& rect, region.rects() )
-            { data << rect.x() << rect.y() << rect.width() << rect.height(); }
+            for (const QRect &rect: const_(region.rects())) {
+                data << rect.x() << rect.y() << rect.width() << rect.height();
+            }
 
             XChangeProperty(
                 QX11Info::display(), widget->winId(), _atom, XA_CARDINAL, 32, PropModeReplace,

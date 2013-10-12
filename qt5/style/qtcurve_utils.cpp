@@ -180,9 +180,7 @@ scrollViewFrame(QWidget *widget)
 QToolBar*
 getToolBarChild(QWidget *w)
 {
-    const QObjectList children = w->children();
-
-    foreach (QObject *child, children) {
+    for (QObject *child: w->children()) {
         if (child->isWidgetType()) {
             if (qobject_cast<QToolBar*>(child))
                 return static_cast<QToolBar*>(child);
@@ -203,8 +201,7 @@ setStyleRecursive(QWidget *w, QStyle *s, int minSize)
     if (qobject_cast<QToolButton*>(w))
         w->setMinimumSize(1, minSize);
 
-    const QObjectList children = w->children();
-    foreach (QObject *child, children) {
+    for (QObject *child: w->children()) {
         if (child->isWidgetType()) {
             setStyleRecursive((QWidget*)child, s, minSize);
         }

@@ -229,4 +229,13 @@ qtcMin(const T1 &a, const T2 &b)
 #endif
 #define qtcBound(a, b, c) qtcMax(a, qtcMin(b, c))
 
+#ifdef __cplusplus
+template<class T>
+const T&
+const_(const T &t)
+{
+    return t;
+}
+#endif
+
 #endif

@@ -132,7 +132,7 @@ BlurHelper::trimBlurRegion(QWidget *parent, QWidget *widget,
                            QRegion &region) const
 {
     // loop over children
-    foreach (QObject *childObject, widget->children()) {
+    for (QObject *childObject: widget->children()) {
         QWidget *child(qobject_cast<QWidget*>(childObject));
         if (!(child && child->isVisible()))
             continue;
@@ -167,7 +167,7 @@ BlurHelper::update(QWidget *widget) const
         clear(widget);
     } else {
         QVector<unsigned long> data;
-        foreach (const QRect &rect, region.rects()) {
+        for (const QRect &rect: const_(region.rects())) {
             data << rect.x() << rect.y() << rect.width() << rect.height();
         }
         qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE,
