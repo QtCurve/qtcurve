@@ -9,7 +9,9 @@ set(qtcurve_utils_SRCS
   map.c
   fd_utils.c
   process.c
-  ini-parse.c)
+  ini-parse.c
+  conf-desc.c
+  conf-file.c)
 set(qtcurve_utils_LINKS
   m rt dl ${LIBEXECINFO_LIBRARIES} pthread)
 
