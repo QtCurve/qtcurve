@@ -47,10 +47,6 @@ BlurHelper::BlurHelper(QObject *parent):
     QObject(parent),
     _enabled(false)
 {
-#ifdef QTC_ENABLE_X11
-    // create atom
-    _atom = qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_BLUR_BEHIND_REGION];
-#endif
 }
 
 void
@@ -165,10 +161,12 @@ BlurHelper::update(QWidget *widget) const
     if (region.isEmpty()) {
         clear(widget);
     } else {
-        QVector<unsigned long> data;
+        QVector<uint32_t> data;
         for (const QRect &rect: region.rects()) {
             data << rect.x() << rect.y() << rect.width() << rect.height();
         }
+        xcb_atom_t _atom =
+            qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_BLUR_BEHIND_REGION];
         qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE,
                        widget->winId(), _atom, XCB_ATOM_CARDINAL,
                        32, data.size(), data.constData());
@@ -186,6 +184,8 @@ void
 BlurHelper::clear(QWidget *widget) const
 {
 #ifdef QTC_ENABLE_X11
+    xcb_atom_t _atom =
+        qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_BLUR_BEHIND_REGION];
     qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE,
                    widget->winId(), _atom, XCB_ATOM_CARDINAL,
                    32, 0, (const void*)0);

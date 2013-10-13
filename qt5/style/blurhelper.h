@@ -142,12 +142,6 @@ private:
 
     //! delayed update timer
     QBasicTimer _timer;
-
-#ifdef QTC_ENABLE_X11
-    //! blur atom
-    xcb_atom_t _atom;
-#endif
-
 };
 
 bool
