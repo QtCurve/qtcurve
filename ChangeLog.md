@@ -33,6 +33,7 @@
     (More than 3 years from now)
 21. Qt4: Fix/Workaround QMdiSubWindow not drawn correctly with translucent
     background.
+22. Move all Xlib calls to `libqtcurve-utils`.
 
 ## 1.8.15-KDE4
 1. Add Russian localization. Thanks to Juliette Tux.
