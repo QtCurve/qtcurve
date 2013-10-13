@@ -27,27 +27,24 @@ class QMenuBar;
 class QAction;
 class QActionEvent;
 
-
-namespace Bespin
-{
-
-class FullscreenWatcher : public QObject
-{
+namespace Bespin {
+class FullscreenWatcher: public QObject {
 public:
-    FullscreenWatcher() : QObject() {};
+    FullscreenWatcher(): QObject()
+    {
+    }
 protected:
     bool eventFilter(QObject *o, QEvent *ev);
 };
 
-class MacMenu : public QObject
-{
-   Q_OBJECT
+class MacMenu: public QObject {
+    Q_OBJECT
 public:
     static void manage(QMenuBar *menu);
     static void release(QMenuBar *menu);
     static bool isActive();
     void popup(qlonglong key, int idx, int x, int y);
-    void hover(qlonglong key, int idx,  int x, int y);
+    void hover(qlonglong key, int idx, int x, int y);
     void popDown(qlonglong key);
     void raise(qlonglong key);
 public slots:
@@ -69,14 +66,13 @@ private:
     typedef QList<QMenuBar_p> MenuList;
     MenuList items;
     QMenuBar *menuBar(qlonglong key);
-    QMap< QMenuBar_p, QList<QAction*> > actions;
+    QMap<QMenuBar_p, QList<QAction*> > actions;
     bool usingMacMenu;
     QString service;
 private slots:
     void menuClosed();
-    void _release(QObject *);
+    void _release(QObject*);
 };
-
 } // namespace
 
-#endif //MAC_MENU_H
+#endif // MAC_MENU_H

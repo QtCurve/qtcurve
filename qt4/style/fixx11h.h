@@ -22,9 +22,8 @@ DEALINGS IN THE SOFTWARE.
 
 ****************************************************************************/
 
-
-//#ifdef    don't do this, this file is supposed to be included
-//#define   multiple times
+// #ifdef    don't do this, this file is supposed to be included
+// #define   multiple times
 
 #include <QtGlobal>
 
@@ -57,9 +56,7 @@ DEALINGS IN THE SOFTWARE.
 
 */
 
-namespace X
-{
-
+namespace X {
 // template --->
 // Affects: Should be without side effects.
 #ifdef Unsorted
@@ -90,11 +87,11 @@ const XID None = XNone;
 #ifndef FIXX11H_Bool
 #define FIXX11H_Bool
 #ifdef _XTYPEDEF_BOOL /* Xdefs.h has typedef'ed Bool already */
- #undef Bool
+#undef Bool
 #else
- typedef Bool XBool;
- #undef Bool
- typedef XBool Bool;
+typedef Bool XBool;
+#undef Bool
+typedef XBool Bool;
 #endif
 #endif
 #undef Bool
@@ -266,16 +263,18 @@ const int NormalState = XNormalState;
 #ifndef FIXX11H_index
 #define FIXX11H_index
 inline
-const char* Xindex( const char* s, int c )
-    {
-    return index( s, c );
-    }
+const char*
+Xindex(const char *s, int c)
+{
+    return index(s, c);
+}
 #undef index
 inline
-const char* index( const char* s, int c )
-    {
-    return Xindex( s, c );
-    }
+const char*
+index(const char *s, int c)
+{
+    return Xindex(s, c);
+}
 #endif
 #undef index
 #endif
@@ -286,16 +285,18 @@ const char* index( const char* s, int c )
 #ifndef FIXX11H_rindex
 #define FIXX11H_rindex
 inline
-const char* Xrindex( const char* s, int c )
-    {
-    return rindex( s, c );
-    }
+const char*
+Xrindex(const char *s, int c)
+{
+    return rindex(s, c);
+}
 #undef rindex
 inline
-const char* rindex( const char* s, int c )
-    {
-    return Xrindex( s, c );
-    }
+const char*
+rindex(const char *s, int c)
+{
+    return Xrindex(s, c);
+}
 #endif
 #undef rindex
 #endif

@@ -44,171 +44,224 @@ namespace QtCurve {
 class WindowManager: public QObject {
     Q_OBJECT
 public:
-    explicit WindowManager( QObject* );
-    virtual ~WindowManager( void ) {}
-    //! initialize
+    explicit WindowManager(QObject*);
+    virtual ~WindowManager(void)
+    {
+    }
+    // ! initialize
     /*! read relevant options from OxygenStyleConfigData */
     void initialize(int windowDrag, const QStringList &whiteList=QStringList(),
                     const QStringList &blackList=QStringList());
-    //! register widget
+    // ! register widget
     void registerWidget(QWidget*);
-    //! unregister widget
+    // ! unregister widget
     void unregisterWidget(QWidget*);
-    //! event filter [reimplemented]
+    // ! event filter [reimplemented]
     virtual bool eventFilter(QObject*, QEvent*);
 protected:
-    //! timer event,
+    // ! timer event,
     /*! used to start drag if button is pressed for a long enough time */
     void timerEvent(QTimerEvent*);
-    //! mouse press event
+    // ! mouse press event
     bool mousePressEvent(QObject*, QEvent*);
-    //! mouse move event
+    // ! mouse move event
     bool mouseMoveEvent(QObject*, QEvent*);
-    //! mouse release event
+    // ! mouse release event
     bool mouseReleaseEvent(QObject*, QEvent*);
-    //!@name configuration
-    //@{
-    //! enable state
-    bool enabled() const {return _enabled;}
-    //! enable state
-    void setEnabled(bool value) {_enabled = value;}
-    //! returns true if window manager is used for moving
-    bool useWMMoveResize() const
-        {return supportWMMoveResize() && _useWMMoveResize;}
-    //! use window manager for moving, when available
-    void setUseWMMoveResize(bool value) {_useWMMoveResize = value;}
-    //! drag mode
-    int dragMode() const {return _dragMode;}
-    //! drag mode
-    void setDragMode(int value) {_dragMode = value;}
-    //! drag distance (pixels)
-    void setDragDistance(int value) {_dragDistance = value;}
-    //! drag delay (msec)
-    void setDragDelay(int value) {_dragDelay = value;}
+    // !@name configuration
+    // @{
+    // ! enable state
+    bool
+    enabled() const
+    {
+        return _enabled;
+    }
+    // ! enable state
+    void
+    setEnabled(bool value)
+    {
+        _enabled = value;
+    }
+    // ! returns true if window manager is used for moving
+    bool
+    useWMMoveResize() const
+    {
+        return supportWMMoveResize() && _useWMMoveResize;
+    }
+    // ! use window manager for moving, when available
+    void
+    setUseWMMoveResize(bool value)
+    {
+        _useWMMoveResize = value;
+    }
+    // ! drag mode
+    int
+    dragMode() const
+    {
+        return _dragMode;
+    }
+    // ! drag mode
+    void
+    setDragMode(int value)
+    {
+        _dragMode = value;
+    }
+    // ! drag distance (pixels)
+    void
+    setDragDistance(int value)
+    {
+        _dragDistance = value;
+    }
+    // ! drag delay (msec)
+    void
+    setDragDelay(int value)
+    {
+        _dragDelay = value;
+    }
 
-    //! set list of whiteListed widgets
+    // ! set list of whiteListed widgets
     /*!
       white list is read from options and is used to adjust
       per-app window dragging issues
     */
     void initializeWhiteList(const QStringList &list);
 
-    //! set list of blackListed widgets
+    // ! set list of blackListed widgets
     /*!
       black list is read from options and is used to adjust
       per-app window dragging issues
     */
     void initializeBlackList(const QStringList &list);
-    //@}
-    //! returns true if widget is dragable
+    // @}
+    // ! returns true if widget is dragable
     bool isDragable(QWidget*);
-    //! returns true if widget is dragable
+    // ! returns true if widget is dragable
     bool isBlackListed(QWidget*);
-    //! returns true if widget is dragable
+    // ! returns true if widget is dragable
     bool isWhiteListed(QWidget*) const;
-    //! returns true if drag can be started from current widget
+    // ! returns true if drag can be started from current widget
     bool canDrag(QWidget*);
-    //! returns true if drag can be started from current widget and position
+    // ! returns true if drag can be started from current widget and position
     /*! child at given position is passed as second argument */
     bool canDrag(QWidget*, QWidget*, const QPoint&);
-    //! reset drag
+    // ! reset drag
     void resetDrag();
-    //! start drag
+    // ! start drag
     void startDrag(QWidget*, const QPoint&);
-    //! returns true if window manager is used for moving
+    // ! returns true if window manager is used for moving
     /*! right now this is true only for X11 */
     bool supportWMMoveResize() const;
-    //! utility function
+    // ! utility function
     bool isDockWidgetTitle(const QWidget*) const;
-    //!@name lock
-    //@{
-    void setLocked(bool value) {_locked = value;}
-    //! lock
-    bool isLocked() const {return _locked;}
-    //@}
+    // !@name lock
+    // @{
+    void
+    setLocked(bool value)
+    {
+        _locked = value;
+    }
+    // ! lock
+    bool
+    isLocked() const
+    {
+        return _locked;
+    }
+    // @}
 private:
-    //! enability
+    // ! enability
     bool _enabled;
-    //! use WM moveResize
+    // ! use WM moveResize
     bool _useWMMoveResize;
-    //! drag mode
+    // ! drag mode
     int _dragMode;
-    //! drag distance
+    // ! drag distance
     /*! this is copied from kwin::geometry */
     int _dragDistance;
-    //! drag delay
+    // ! drag delay
     /*! this is copied from kwin::geometry */
     int _dragDelay;
-    //! wrapper for exception id
+    // ! wrapper for exception id
     class ExceptionId: public QPair<QString, QString> {
-    public:
-        ExceptionId(const QString& value)
-            {
-                const QStringList args(value.split( "@" ));
-                if (args.isEmpty())
-                    return;
-                second = args[0].trimmed();
-                if (args.size() > 1) {
-                    first = args[1].trimmed();
-                }
+public:
+        ExceptionId(const QString &value)
+        {
+            const QStringList args(value.split("@"));
+            if (args.isEmpty()) {
+                return;
             }
-        const QString &appName() const {return first;}
-        const QString &className() const {return second;}
+            second = args[0].trimmed();
+            if (args.size() > 1) {
+                first = args[1].trimmed();
+            }
+        }
+        const QString&
+        appName() const
+        {
+            return first;
+        }
+        const QString&
+        className() const
+        {
+            return second;
+        }
     };
-    //! exception set
+    // ! exception set
     typedef QSet<ExceptionId> ExceptionSet;
-    //! list of white listed special widgets
+    // ! list of white listed special widgets
     /*!
       it is read from options and is used to adjust
       per-app window dragging issues
     */
     ExceptionSet _whiteList;
-    //! list of black listed special widgets
+    // ! list of black listed special widgets
     /*!
       it is read from options and is used to adjust
       per-app window dragging issues
     */
     ExceptionSet _blackList;
-    //! drag point
+    // ! drag point
     QPoint _dragPoint;
     QPoint _globalDragPoint;
-    //! drag timer
+    // ! drag timer
     QBasicTimer _dragTimer;
-    //! target being dragged
+    // ! target being dragged
     /*! QWeakPointer is used in case the target gets deleted while drag
       is in progress */
     QWeakPointer<QWidget> _target;
-    //! true if drag is about to start
+    // ! true if drag is about to start
     bool _dragAboutToStart;
-    //! true if drag is in progress
+    // ! true if drag is in progress
     bool _dragInProgress;
-    //! true if drag is locked
+    // ! true if drag is locked
     bool _locked;
-    //! cursor override
+    // ! cursor override
     /*! used to keep track of application cursor being overridden when
       dragging in non-WM mode */
     bool _cursorOverride;
-    //! provide application-wise event filter
+    // ! provide application-wise event filter
     /*!
       it us used to unlock dragging and make sure event look is properly
       restored after a drag has occurred
     */
     class AppEventFilter: public QObject {
-    public:
+public:
         AppEventFilter(WindowManager *parent):
-            QObject(parent), _parent(parent) {}
+            QObject(parent),
+            _parent(parent)
+        {
+        }
         virtual bool eventFilter(QObject*, QEvent*);
-    protected:
-        //! application-wise event.
+protected:
+        // ! application-wise event.
         /*! needed to catch end of XMoveResize events */
         bool appMouseEvent(QObject*, QEvent*);
-    private:
-        //! parent
+private:
+        // ! parent
         WindowManager *_parent;
     };
-    //! application event filter
+    // ! application event filter
     AppEventFilter *_appEventFilter;
-    //! allow access of all private members to the app event filter
+    // ! allow access of all private members to the app event filter
     friend class AppEventFilter;
 };
 }

@@ -51,84 +51,97 @@ namespace QtCurve {
 class BlurHelper: public QObject {
     Q_OBJECT
 public:
-    //! constructor
+    // ! constructor
     BlurHelper(QObject*);
-    //! destructor
-    virtual ~BlurHelper() {}
-    //! enable state
-    void setEnabled(bool value) {_enabled = value;}
-    //! enabled
-    bool enabled() const {return _enabled;}
-    //! register widget
+    // ! destructor
+    virtual
+    ~BlurHelper()
+    {
+    }
+    // ! enable state
+    void
+    setEnabled(bool value)
+    {
+        _enabled = value;
+    }
+    // ! enabled
+    bool
+    enabled() const
+    {
+        return _enabled;
+    }
+    // ! register widget
     void registerWidget(QWidget*);
-    //! register widget
+    // ! register widget
     void unregisterWidget(QWidget*);
-    //! event filter
+    // ! event filter
     virtual bool eventFilter(QObject*, QEvent*);
 protected:
-    //! timer event
+    // ! timer event
     /*! used to perform delayed blur region update of pending widgets */
     virtual void
     timerEvent(QTimerEvent *event)
-        {
-            if (event->timerId() == _timer.timerId()) {
-                _timer.stop();
-                update();
-            } else {
-                QObject::timerEvent(event);
-            }
+    {
+        if (event->timerId() == _timer.timerId()) {
+            _timer.stop();
+            update();
+        } else {
+            QObject::timerEvent(event);
         }
-    //! get list of blur-behind regions matching a given widget
+    }
+    // ! get list of blur-behind regions matching a given widget
     QRegion blurRegion(QWidget*) const;
-    //! trim blur region to remove unnecessary areas (recursive)
+    // ! trim blur region to remove unnecessary areas (recursive)
     void trimBlurRegion(QWidget*, QWidget*, QRegion&) const;
-    //! update blur region for all pending widgets
+    // ! update blur region for all pending widgets
     /*! a timer is used to allow some buffering of the update requests */
-    void delayedUpdate()
-        {
-            if (!_timer.isActive()) {
-                _timer.start(10, this);
+    void
+    delayedUpdate()
+    {
+        if (!_timer.isActive()) {
+            _timer.start(10, this);
+        }
+    }
+    // ! update blur region for all pending widgets
+    void
+    update()
+    {
+        for (const WidgetPointer &widget : const_(_pendingWidgets)) {
+            if (widget) {
+                update(widget.data());
             }
         }
-    //! update blur region for all pending widgets
-    void update()
-        {
-            for (const WidgetPointer &widget: const_(_pendingWidgets)) {
-                if (widget) {
-                    update(widget.data());
-                }
-            }
-            _pendingWidgets.clear();
-        }
-    //! update blur regions for given widget
+        _pendingWidgets.clear();
+    }
+    // ! update blur regions for given widget
     void update(QWidget*) const;
-    //! clear blur regions for given widget
+    // ! clear blur regions for given widget
     void clear(QWidget*) const;
-    //! returns true if a given widget is opaque
+    // ! returns true if a given widget is opaque
     bool
     isOpaque(const QWidget *widget) const
-        {
-          return
+    {
+        return
             (!widget->isWindow()) &&
             ((widget->autoFillBackground() &&
               widget->palette().color(widget->backgroundRole()).alpha() ==
               0xff) || widget->testAttribute(Qt::WA_OpaquePaintEvent));
-        }
-    //! true if widget is a transparent window
+    }
+    // ! true if widget is a transparent window
     /*! some additional checks are performed to make sure stuff like plasma
       tooltips don't get their blur region overwritten */
     inline bool isTransparent(const QWidget *widget) const;
 private:
-    //! enability
+    // ! enability
     bool _enabled;
-    //! list of widgets for which blur region must be updated
+    // ! list of widgets for which blur region must be updated
     typedef QPointer<QWidget> WidgetPointer;
     typedef QHash<QWidget*, WidgetPointer> WidgetSet;
     WidgetSet _pendingWidgets;
-    //! delayed update timer
+    // ! delayed update timer
     QBasicTimer _timer;
 #ifdef Q_WS_X11
-    //! blur atom
+    // ! blur atom
     Atom _atom;
 #endif
 };
