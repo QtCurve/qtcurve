@@ -30,7 +30,6 @@
 #include <common/config_file.h>
 #include "check_on-png.h"
 #include "check_x_on-png.h"
-#include "debug.h"
 
 #ifndef QTC_QT5_ENABLE_KDE
 #include "dialog_error-png.h"
@@ -38,6 +37,7 @@
 #include "dialog_information-png.h"
 #endif
 
+#include <QFormLayout>
 #include <QAbstractItemView>
 #include <QDialog>
 #include <QSplitter>

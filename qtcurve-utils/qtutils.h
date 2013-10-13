@@ -18,13 +18,41 @@
  *   51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.              *
  ***************************************************************************/
 
-#include <QDebug>
+#ifndef __QTC_UTILS_QT_UTILS_H__
+#define __QTC_UTILS_QT_UTILS_H__
 
-#ifndef _QTC_DEBUG_H_
-#define _QTC_DEBUG_H_
+#include "utils.h"
+#include <QtGlobal>
+#include <QObject>
+#include <config.h>
 
-namespace QtCurve {
-extern bool qtcDebugEnabled;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && defined QTC_QT5_ENABLE_KDE) || \
+    (QT_VERSION < QT_VERSION_CHECK(5, 0, 0) && defined QTC_QT4_ENABLE_KDE)
+#define _QTC_QT_ENABLE_KDE 1
+#else
+#define _QTC_QT_ENABLE_KDE 0
+#endif
+
+#define qtcCheckKDEType(obj, type) (qtcCheckKDETypeFull(obj, type, #type))
+#define qtcCheckKDEType0(obj, type) (qtcCheckKDETypeFull0(obj, type, #type))
+
+template <class T, class T2> static inline bool
+qtcCheckType0(T2 *obj)
+{
+    return obj && qobject_cast<const T*>(obj);
 }
+template <class T2> static inline bool
+qtcCheckType0(T2 *obj, const char *name)
+{
+    return obj && obj->inherits(name);
+}
+
+#if _QTC_QT_ENABLE_KDE
+#define qtcCheckKDETypeFull(obj, type, name) (qobject_cast<const type*>(obj))
+#define qtcCheckKDETypeFull0(obj, type, name) (qtcCheckType0<type>(obj))
+#else
+#define qtcCheckKDETypeFull(obj, type, name) (obj->inherits(name))
+#define qtcCheckKDETypeFull0(obj, type, name) (qtcCheckType0(obj, name))
+#endif
 
 #endif

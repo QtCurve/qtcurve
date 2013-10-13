@@ -2,7 +2,6 @@ set(qtcurve_SRCS
   qtcurve.cpp
   qtcurve_api.cpp
   qtcurve_utils.cpp
-  debug.cpp
   windowmanager.cpp
   blurhelper.cpp
   utils.cpp

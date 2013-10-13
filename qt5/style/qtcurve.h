@@ -21,7 +21,6 @@
   Boston, MA 02110-1301, USA.
 */
 
-#include <QProgressBar>
 #include <QTime>
 #include <QPalette>
 #include <QMap>
@@ -30,8 +29,6 @@
 #include <QCache>
 #include <QColor>
 #include <QStyleOption>
-#include <QBitmap>
-#include <QFormLayout>
 #include <QtGlobal>
 typedef qulonglong QtcKey;
 #include <common/common.h>
@@ -56,6 +53,8 @@ class QDBusInterface;
 class QMainWindow;
 class QStatusBar;
 class QAbstractScrollArea;
+class QProgressBar;
+class QFormLayout;
 
 namespace QtCurve {
 class WindowManager;

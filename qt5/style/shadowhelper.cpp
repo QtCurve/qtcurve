@@ -26,7 +26,6 @@
 
 #include "shadowhelper.h"
 #include "utils.h"
-#include "debug.h"
 
 #include <QDockWidget>
 #include <QMenu>

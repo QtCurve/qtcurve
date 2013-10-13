@@ -18,9 +18,10 @@
  *   51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.              *
  ***************************************************************************/
 
+#include <qtcurve-utils/qtutils.h>
+
 #include "qtcurve_p.h"
 #include "utils.h"
-#include "debug.h"
 #include "shortcuthandler.h"
 #include "windowmanager.h"
 #include "blurhelper.h"
@@ -32,6 +33,8 @@
 #include <sys/time.h>
 #endif
 
+#include <QFormLayout>
+#include <QProgressBar>
 #include <QToolButton>
 #include <QAbstractItemView>
 #include <QDialog>

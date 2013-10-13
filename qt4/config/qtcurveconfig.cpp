@@ -40,7 +40,9 @@
 #include <QTreeWidget>
 #include <QPainter>
 #include <QSettings>
-#include <QtDBus>
+#include <QDBusConnection>
+#include <QDBusMessage>
+#include <QTextStream>
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QStyleFactory>

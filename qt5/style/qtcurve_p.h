@@ -32,28 +32,6 @@
 
 class QToolBar;
 
-#define qtcCheckKDEType(obj, type) (qtcCheckKDETypeFull(obj, type, #type))
-#define qtcCheckKDEType0(obj, type) (qtcCheckKDETypeFull0(obj, type, #type))
-
-template <class T, class T2> static inline bool
-qtcCheckType0(T2 *obj)
-{
-    return obj && qobject_cast<const T*>(obj);
-}
-template <class T2> static inline bool
-qtcCheckType0(T2 *obj, const char *name)
-{
-    return obj && obj->inherits(name);
-}
-
-#ifdef QTC_QT5_ENABLE_KDE
-#define qtcCheckKDETypeFull(obj, type, name) (qobject_cast<const type*>(obj))
-#define qtcCheckKDETypeFull0(obj, type, name) (qtcCheckType0<type>(obj))
-#else
-#define qtcCheckKDETypeFull(obj, type, name) (obj->inherits(name))
-#define qtcCheckKDETypeFull0(obj, type, name) (qtcCheckType0(obj, name))
-#endif
-
 namespace QtCurve {
 
 extern QString appName;

@@ -20,7 +20,6 @@
 
 #include "qtcurve_p.h"
 #include "utils.h"
-#include "debug.h"
 
 #include <QToolBar>
 #include <QToolButton>

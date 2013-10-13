@@ -22,7 +22,7 @@ add_definitions(${QT_DEFINITIONS} -DQTC_UTILS_QT4)
 include_directories(
   "${CMAKE_CURRENT_BINARY_DIR}"
   "${CMAKE_CURRENT_SOURCE_DIR}"
-  ${QT_INCLUDE_DIR})
+  "${QT_INCLUDE_DIR}")
 
 if(QTC_QT4_ENABLE_KDE)
   add_definitions(${KDE4_DEFINITIONS})

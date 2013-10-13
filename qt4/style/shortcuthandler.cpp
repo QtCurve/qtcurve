@@ -19,14 +19,15 @@
 */
 
 #include "shortcuthandler.h"
-#include <QtGui>
+#include <QWidget>
+#include <QMenu>
+#include <QEvent>
+#include <QKeyEvent>
+#include <QMenuBar>
 
-namespace QtCurve
-{
-
-ShortcutHandler::ShortcutHandler(QObject *parent)
-               : QObject(parent)
-               , itsAltDown(false)
+namespace QtCurve {
+ShortcutHandler::ShortcutHandler(QObject *parent) : QObject(parent),
+                                                    itsAltDown(false)
 {
 }
 
@@ -36,24 +37,21 @@ ShortcutHandler::~ShortcutHandler()
 
 bool ShortcutHandler::hasSeenAlt(const QWidget *widget) const
 {
-    if(widget && !widget->isEnabled())
+    if (widget && !widget->isEnabled())
         return false;
 
-    if(qobject_cast<const QMenu *>(widget))
+    if (qobject_cast<const QMenu*>(widget)) {
         return itsOpenMenus.count() && itsOpenMenus.last()==widget;
-//     {
-//         const QWidget *w=widget;
-//
-//         while(w)
-//         {
-//             if(itsSeenAlt.contains((QWidget *)w))
-//                 return true;
-//             w=w->parentWidget();
-//         }
-//     }
-    else
-        return itsOpenMenus.isEmpty() && itsSeenAlt.contains((QWidget *)(widget->window()));
-
+        // const QWidget *w = widget;
+        // while (w) {
+        //     if (itsSeenAlt.contains((QWidget*)w))
+        //         return true;
+        //     w = w->parentWidget();
+        // }
+    } else {
+        return (itsOpenMenus.isEmpty() &&
+                itsSeenAlt.contains((QWidget*)(widget->window())));
+    }
     return false;
 }
 

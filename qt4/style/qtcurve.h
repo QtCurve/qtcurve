@@ -21,7 +21,6 @@
   Boston, MA 02110-1301, USA.
 */
 
-#include <QProgressBar>
 #include <QTime>
 #include <QPalette>
 #include <QMap>
@@ -30,10 +29,6 @@
 #include <QCache>
 #include <QColor>
 #include <QStyleOption>
-#include <QBitmap>
-#if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
-#include <QFormLayout>
-#endif
 #include <Q_UINT64>
 typedef qulonglong QtcKey;
 #include <common/common.h>
@@ -50,28 +45,6 @@ typedef qulonglong QtcKey;
 #define BASE_STYLE QCommonStyle
 // #endif
 
-#define qtcCheckKDEType(obj, type) (qtcCheckKDETypeFull(obj, type, #type))
-#define qtcCheckKDEType0(obj, type) (qtcCheckKDETypeFull0(obj, type, #type))
-
-template <class T, class T2> static inline bool
-qtcCheckType0(T2 *obj)
-{
-    return obj && qobject_cast<const T*>(obj);
-}
-template <class T2> static inline bool
-qtcCheckType0(T2 *obj, const char *name)
-{
-    return obj && obj->inherits(name);
-}
-
-#ifdef QTC_QT4_ENABLE_KDE
-#define qtcCheckKDETypeFull(obj, type, name) (qobject_cast<const type*>(obj))
-#define qtcCheckKDETypeFull0(obj, type, name) (qtcCheckType0<type>(obj))
-#else
-#define qtcCheckKDETypeFull(obj, type, name) (obj->inherits(name))
-#define qtcCheckKDETypeFull0(obj, type, name) (qtcCheckType0(obj, name))
-#endif
-
 class QStyleOptionSlider;
 class QLabel;
 class QMenuBar;
@@ -80,6 +53,8 @@ class QDBusInterface;
 class QMainWindow;
 class QStatusBar;
 class QAbstractScrollArea;
+class QProgressBar;
+class QFormLayout;
 
 namespace QtCurve {
 
@@ -150,11 +125,10 @@ class Style : public QCommonStyle {
 #else
     Style();
 #endif
-
     ~Style();
 
     void init(bool initial);
-    void freeColor(QSet<QColor *> &freedColors, QColor **cols);
+    void freeColor(QSet<QColor*> &freedColors, QColor **cols);
     void freeColors();
 
     Options & options() { return opts; }
@@ -356,8 +330,8 @@ private:
     mutable bool                       itsActive;
     mutable const QWidget              *itsSbWidget;
     mutable QLabel                     *itsClickedLabel;
-    QSet<QProgressBar *>               itsProgressBars;
-    QSet<QWidget *>                    itsTransparentWidgets;
+    QSet<QProgressBar*>               itsProgressBars;
+    QSet<QWidget*>                    itsTransparentWidgets;
     int                                itsProgressBarAnimateTimer,
         itsAnimateStep;
     QTime                              itsTimer;

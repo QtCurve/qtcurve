@@ -34,6 +34,7 @@
 #include <common/common.h>
 #include "utils.h"
 
+#include <QProgressBar>
 #include <QApplication>
 #include <QComboBox>
 #include <QDialog>
