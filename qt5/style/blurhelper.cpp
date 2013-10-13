@@ -38,7 +38,7 @@
 #include <QToolBar>
 
 #ifdef QTC_ENABLE_X11
-#  include <qtcurve-utils/x11utils.h>
+#  include <qtcurve-utils/x11blur.h>
 #endif
 
 namespace QtCurve {
@@ -165,12 +165,7 @@ BlurHelper::update(QWidget *widget) const
         for (const QRect &rect: region.rects()) {
             data << rect.x() << rect.y() << rect.width() << rect.height();
         }
-        xcb_atom_t _atom =
-            qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_BLUR_BEHIND_REGION];
-        qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE,
-                       widget->winId(), _atom, XCB_ATOM_CARDINAL,
-                       32, data.size(), data.constData());
-        qtcX11Flush();
+        qtcX11BlurTrigger(widget->winId(), true, data.size(), data.constData());
     }
 
     // force update
@@ -184,12 +179,7 @@ void
 BlurHelper::clear(QWidget *widget) const
 {
 #ifdef QTC_ENABLE_X11
-    xcb_atom_t _atom =
-        qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_BLUR_BEHIND_REGION];
-    qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE,
-                   widget->winId(), _atom, XCB_ATOM_CARDINAL,
-                   32, 0, (const void*)0);
-    qtcX11Flush();
+    qtcX11BlurTrigger(widget->winId(), false, 0, 0);
 #endif
 }
 }

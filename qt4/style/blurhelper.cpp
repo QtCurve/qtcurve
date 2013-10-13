@@ -38,28 +38,17 @@
 #include <QToolBar>
 
 #ifdef Q_WS_X11
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#include "fixx11h.h"
-#include <QX11Info>
+#  include <qtcurve-utils/x11blur.h>
 #endif
 
 namespace QtCurve
 {
 
     //___________________________________________________________
-    BlurHelper::BlurHelper( QObject* parent ):
-        QObject( parent ),
-        _enabled( false )
+    BlurHelper::BlurHelper(QObject *parent):
+        QObject(parent),
+        _enabled(false)
     {
-
-        #ifdef Q_WS_X11
-
-        // create atom
-        _atom = XInternAtom( QX11Info::display(), "_KDE_NET_WM_BLUR_BEHIND_REGION", False);
-
-        #endif
-
     }
 
     //___________________________________________________________
@@ -190,15 +179,12 @@ namespace QtCurve
         if (region.isEmpty()) {
             clear(widget);
         } else {
-            QVector<unsigned long> data;
+            QVector<uint32_t> data;
             for (const QRect &rect: region.rects()) {
                 data << rect.x() << rect.y() << rect.width() << rect.height();
             }
-
-            XChangeProperty(
-                QX11Info::display(), widget->winId(), _atom, XA_CARDINAL, 32, PropModeReplace,
-                reinterpret_cast<const unsigned char *>(data.constData()), data.size() );
-
+            qtcX11BlurTrigger(widget->winId(), true, data.size(),
+                              data.constData());
         }
 
         // force update
@@ -209,12 +195,11 @@ namespace QtCurve
 
     }
 
-
     //___________________________________________________________
     void BlurHelper::clear( QWidget* widget ) const
     {
         #ifdef Q_WS_X11
-        XChangeProperty( QX11Info::display(), widget->winId(), _atom, XA_CARDINAL, 32, PropModeReplace, 0, 0 );
+        qtcX11BlurTrigger(widget->winId(), false, 0, 0);
         #endif
 
     }

@@ -20,6 +20,7 @@
 
 #include <qtcurve-utils/gtkutils.h>
 #include <qtcurve-utils/x11qtc.h>
+#include <qtcurve-utils/x11blur.h>
 #include <qtcurve-utils/color.h>
 #include <qtcurve-utils/log.h>
 
@@ -1174,21 +1175,12 @@ enableBlurBehind(GtkWidget *w, gboolean enable)
 
             if (oldValue == 0 || (enable && oldValue != 1) ||
                 (!enable && oldValue != 2)) {
-                xcb_atom_t atom =
-                    qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_BLUR_BEHIND_REGION];
                 int value = enable ? 1 : 2;
-                xcb_window_t wid =
-                    GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel)));
-
                 g_object_set_data(G_OBJECT(w), QTC_MENUBAR_SIZE,
                                   GINT_TO_POINTER(value));
-                if (enable) {
-                    qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE,
-                                   wid, atom, XCB_ATOM_CARDINAL, 32, 0, 0);
-                } else {
-                    qtcX11CallVoid(delete_property, wid, atom);
-                }
-                qtcX11Flush();
+                xcb_window_t wid =
+                    GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel)));
+                qtcX11BlurTrigger(wid, enable, 0, NULL);
             }
         }
     }

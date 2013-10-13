@@ -231,4 +231,21 @@ const_(const T &t)
 }
 #endif
 
+#define QTC_DEF_LOCAL_BUFF(type, name, stack_size, size)                \
+    size_t __##qtc_local_buff##name##_size = (size);                    \
+    type __##qtc_local_buff##name[stack_size];                          \
+    type *name;                                                         \
+    type *__##qtc_local_buff_to_free##name;                             \
+    if (qtcUnlikely(__##qtc_local_buff##name##_size > stack_size)) {    \
+        __##qtc_local_buff_to_free##name =                              \
+            (type*)malloc(sizeof(type) * __##qtc_local_buff##name##_size); \
+            name = __##qtc_local_buff_to_free##name;                    \
+    } else {                                                            \
+        __##qtc_local_buff_to_free##name = NULL;                        \
+            name = __##qtc_local_buff##name;                            \
+    }
+
+#define QTC_FREE_LOCAL_BUFF(name)               \
+    qtcFree(__##qtc_local_buff_to_free##name)
+
 #endif

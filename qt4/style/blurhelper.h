@@ -43,10 +43,6 @@
 #include <QRegion>
 #include <QToolBar>
 
-#ifdef Q_WS_X11
-#include <X11/Xdefs.h>
-#endif
-
 namespace QtCurve {
 class BlurHelper: public QObject {
     Q_OBJECT
@@ -140,10 +136,6 @@ private:
     WidgetSet _pendingWidgets;
     // ! delayed update timer
     QBasicTimer _timer;
-#ifdef Q_WS_X11
-    // ! blur atom
-    Atom _atom;
-#endif
 };
 bool
 BlurHelper::isTransparent(const QWidget *widget) const
