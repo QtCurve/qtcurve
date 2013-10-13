@@ -19,7 +19,7 @@
 */
 
 #include <qtcurve-utils/gtkutils.h>
-#include <qtcurve-utils/x11utils.h>
+#include <qtcurve-utils/x11wmmove.h>
 
 #include <gdk/gdkx.h>
 #include <stdlib.h>
@@ -110,30 +110,10 @@ gtk_widget_get_window(GtkWidget *widget)
 static void
 qtcWMMoveTrigger(GtkWidget *w, int x, int y)
 {
-    qtcX11CallVoid(ungrab_pointer, XCB_TIME_CURRENT_TIME);
-    union {
-        char _buff[32];
-        xcb_client_message_event_t ev;
-    } buff;
-    memset(&buff, 0, sizeof(buff));
-    //...Taken from bespin...
-    // stolen... errr "adapted!" from QSizeGrip
     GtkWindow *topLevel = GTK_WINDOW(gtk_widget_get_toplevel(w));
     xcb_window_t wid =
         GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel)));
-    xcb_client_message_event_t *xev = &buff.ev;
-    xev->response_type = XCB_CLIENT_MESSAGE;
-    xev->format = 32;
-    xev->window = wid;
-    xev->type = qtc_x11_atoms[QTC_X11_ATOM_NET_WM_MOVERESIZE];
-    xev->data.data32[0] = x;
-    xev->data.data32[1] = y;
-    xev->data.data32[2] = 8; // NET::Move
-    xev->data.data32[3] = XCB_KEY_BUT_MASK_BUTTON_1;
-    qtcX11CallVoid(send_event, false, qtcX11RootWindow(),
-                   XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY |
-                   XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT, (const char*)xev);
-    qtcX11Flush();
+    qtcX11MoveTrigger(wid, x, y);
     qtcWMMoveDragEnd(w);
 }
 

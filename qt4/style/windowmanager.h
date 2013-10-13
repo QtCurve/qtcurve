@@ -88,12 +88,6 @@ protected:
     {
         return supportWMMoveResize() && _useWMMoveResize;
     }
-    // ! use window manager for moving, when available
-    void
-    setUseWMMoveResize(bool value)
-    {
-        _useWMMoveResize = value;
-    }
     // ! drag mode
     int
     dragMode() const

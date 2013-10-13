@@ -11,7 +11,8 @@ if(QTC_ENABLE_X11)
   set(qtcurve_utils_SRCS
     ${qtcurve_utils_SRCS}
     x11shadow.c
-    x11utils.c)
+    x11utils.c
+    x11wmmove.c)
   set(qtcurve_utils_LINKS
     ${qtcurve_utils_LINKS}
     ${QTC_X11_LIBRARIES})

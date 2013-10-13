@@ -31,6 +31,7 @@
 // IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
 
+#include "config.h"
 #include "windowmanager.h"
 #include "qtcurve.h"
 #include <common/common.h>
@@ -65,11 +66,7 @@
 #endif
 
 #ifdef QTC_ENABLE_X11
-#  ifndef QTC_QT5_ENABLE_KDE
-#    include <qtcurve-utils/x11utils.h>
-#  else
-#    include <NETRootInfo>
-#  endif
+#  include <qtcurve-utils/x11wmmove.h>
 #endif
 
 namespace QtCurve {
@@ -94,29 +91,25 @@ WindowManager::WindowManager( QObject* parent ):
     _locked( false ),
     _cursorOverride( false )
 {
-
     // install application wise event filter
     _appEventFilter = new AppEventFilter( this );
     qApp->installEventFilter( _appEventFilter );
-
 }
 
 //_____________________________________________________________
 void WindowManager::initialize( int windowDrag, const QStringList &whiteList, const QStringList &blackList )
 {
-
     setEnabled( windowDrag );
     setDragMode( windowDrag );
 //CPD: Why???        setUseWMMoveResize( OxygenStyleConfigData::useWMMoveResize() );
 
 #ifdef QTC_QT5_ENABLE_KDE
-    setDragDistance( KGlobalSettings::dndEventDelay() );
+    setDragDistance(KGlobalSettings::dndEventDelay());
 #endif
-    setDragDelay( QApplication::startDragTime() );
+    setDragDelay(QApplication::startDragTime());
 
-    initializeWhiteList( whiteList );
-    initializeBlackList( blackList );
-
+    initializeWhiteList(whiteList);
+    initializeBlackList(blackList);
 }
 
 //_____________________________________________________________
@@ -617,46 +610,18 @@ void WindowManager::resetDrag( void )
 }
 
 //____________________________________________________________
-void WindowManager::startDrag( QWidget* widget, const QPoint& position )
+void WindowManager::startDrag(QWidget* widget, const QPoint &position)
 {
     Q_UNUSED(position);
-    if( !( enabled() && widget ) ) return;
-    if( QWidget::mouseGrabber() ) return;
+    if (!(enabled() && widget) || QWidget::mouseGrabber())
+        return;
 
     // ungrab pointer
     if (useWMMoveResize()) {
 #ifdef QTC_ENABLE_X11
-        qtcX11CallVoid(ungrab_pointer, 0L);
-#ifndef QTC_QT5_ENABLE_KDE
-        union {
-            char _buff[32];
-            xcb_client_message_event_t ev;
-        } buff;
-        memset(&buff, 0, sizeof(buff));
-        //...Taken from bespin...
-        // stolen... errr "adapted!" from QSizeGrip
-        xcb_client_message_event_t *xev = &buff.ev;
-        xev->response_type = XCB_CLIENT_MESSAGE;
-        xev->format = 32;
-        xev->window = widget->window()->winId();
-        xev->type = qtc_x11_atoms[QTC_X11_ATOM_NET_WM_MOVERESIZE];
-        xev->data.data32[0] = position.x();
-        xev->data.data32[1] = position.y();
-        xev->data.data32[2] = 8; // NET::Move
-        xev->data.data32[3] = XCB_KEY_BUT_MASK_BUTTON_1;
-        qtcX11CallVoid(send_event, false, qtcX11RootWindow(),
-                       XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY |
-                       XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT,
-                       (const char*)xev);
-        qtcX11Flush();
-#else
-        qtcX11Flush();
-        NETRootInfo rootInfo(QX11Info::display(), NET::WMMoveResize);
-        rootInfo.moveResizeRequest(widget->window()->winId(),
-                                   position.x(), position.y(), NET::Move);
+        qtcX11MoveTrigger(widget->window()->winId(),
+                          position.x(), position.y());
 #endif
-#endif
-
     }
 
     if(!useWMMoveResize()) {
@@ -667,9 +632,7 @@ void WindowManager::startDrag( QWidget* widget, const QPoint& position )
     }
 
     _dragInProgress = true;
-
     return;
-
 }
 
 //____________________________________________________________
