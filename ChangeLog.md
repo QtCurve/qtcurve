@@ -31,6 +31,8 @@
 19. Fix compiling with `clang++` and `libc++`.
 20. Remove configure file support for pre-1.0 releases.
     (More than 3 years from now)
+21. Qt4: Fix/Workaround MdiWindow not drawn correctly with translucent
+    background.
 
 ## 1.8.15-KDE4
 1. Add Russian localization. Thanks to Juliette Tux.

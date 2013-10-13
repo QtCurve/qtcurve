@@ -1857,7 +1857,17 @@ Style::polish(QWidget *widget)
         }
     }
 
-    if(itsIsPreview && qobject_cast<QMdiSubWindow *>(widget))
+    // Translucent main window seems to cause QMdiSubWindow to not draw its
+    // background. Not sure what exactly the problem is but drawing the
+    // background ourselves by setting Qt::WA_StyledBackground
+    // as well as handling it in drawPrimitive seems to fix/workaround
+    // the problem.
+    // TODO:
+    // Figuring out what's wrong.
+    // Check what oxygen does to QMdiSubWindow
+    // Check Qt5 version
+    if (// itsIsPreview &&
+        qobject_cast<QMdiSubWindow*>(widget))
         widget->setAttribute(Qt::WA_StyledBackground);
 
     if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuWidget())
@@ -2245,16 +2255,16 @@ Style::polish(QWidget *widget)
     }
 
 #ifdef Q_WS_X11
-    QWidget *window=widget->window();
+    QWidget *window = widget->window();
 
-    if((100!=opts.bgndOpacity && Qt::Window==(window->windowFlags() & Qt::WindowType_Mask)) ||
-       (100!=opts.dlgOpacity && Qt::Dialog==(window->windowFlags() & Qt::WindowType_Mask)) )
-    {
+    if ((100 != opts.bgndOpacity &&
+         Qt::Window == (window->windowFlags() & Qt::WindowType_Mask)) ||
+        (100 != opts.dlgOpacity &&
+         Qt::Dialog == (window->windowFlags() & Qt::WindowType_Mask))) {
         widget->removeEventFilter(this);
         Utils::addEventFilter(widget, this);
 
-        if(widget->inherits("KFilePlacesView"))
-        {
+        if (widget->inherits("KFilePlacesView")) {
             widget->setAutoFillBackground(false);
             widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
         }
@@ -2447,7 +2457,8 @@ void Style::unpolish(QWidget *widget)
             widget->setBackgroundRole(QPalette::Window);
     }
 
-    if(itsIsPreview && qobject_cast<QMdiSubWindow *>(widget))
+    if (// itsIsPreview &&
+        qobject_cast<QMdiSubWindow *>(widget))
         widget->setAttribute(Qt::WA_StyledBackground, false);
 
     if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuWidget())
@@ -3917,7 +3928,8 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
            ((!widget->testAttribute(Qt::WA_NoSystemBackground) &&
              ((widget->windowFlags() & Qt::WindowType_Mask) &
               (Qt::Window|Qt::Dialog)) && widget->isWindow()) ||
-            (itsIsPreview && qobject_cast<const QMdiSubWindow*>(widget)))) {
+            (// itsIsPreview &&
+             qobject_cast<const QMdiSubWindow*>(widget)))) {
             bool isDialog = qobject_cast<const QDialog*>(widget);
 
             if (CUSTOM_BGND || itsIsPreview ||
@@ -8819,13 +8831,14 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                                         ? palette.color(QPalette::Active, QPalette::Shadow)
                                         : titleCols[kwin && option->version==TBAR_BORDER_VERSION_HACK ? 0 : QTC_STD_BORDER]);
 
-                if(!kwin && widget && BLEND_TITLEBAR && qobject_cast<const QMdiSubWindow *>(widget))
-                {
-                    const QWidget *w=NULL;
-                    if(qobject_cast<const QMainWindow *>(widget))
-                        w=widget;
-                    else if (static_cast<const QMdiSubWindow *>(widget)->widget())
-                        w=qobject_cast<const QMainWindow *>(static_cast<const QMdiSubWindow *>(widget)->widget());
+                if (!kwin && widget && BLEND_TITLEBAR &&
+                    qobject_cast<const QMdiSubWindow*>(widget)) {
+                    const QWidget *w = NULL;
+                    if (qobject_cast<const QMainWindow*>(widget)) {
+                        w = widget;
+                    } else if (static_cast<const QMdiSubWindow *>(widget)->widget()) {
+                        w = qobject_cast<const QMainWindow *>(static_cast<const QMdiSubWindow *>(widget)->widget());
+                    }
                     if(w)
                     {
                         const QMenuBar *menuBar=static_cast<const QMainWindow *>(w)->menuBar();
