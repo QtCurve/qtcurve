@@ -19,6 +19,8 @@
  ***************************************************************************/
 
 #include "x11shadow_p.h"
+#include "x11wmmove.h"
+#include "x11blur.h"
 #include "log.h"
 #include <xcb/xcb_image.h>
 #include <X11/Xlib.h>
@@ -120,5 +122,60 @@ qtcX11ShadowUninstall(xcb_window_t win)
 {
     qtcX11CallVoid(delete_property, win,
                    qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_SHADOW]);
+    qtcX11Flush();
+}
+
+// WM Move
+QTC_EXPORT void
+qtcX11MoveTrigger(xcb_window_t wid, uint32_t x, uint32_t y)
+{
+    qtcX11FlushXlib();
+    qtcX11CallVoid(ungrab_pointer, XCB_TIME_CURRENT_TIME);
+    union {
+        char _buff[32];
+        xcb_client_message_event_t ev;
+    } buff;
+    memset(&buff, 0, sizeof(buff));
+    //...Taken from bespin...
+    // stolen... errr "adapted!" from QSizeGrip
+    // Well now it is "ported"
+    xcb_client_message_event_t *xev = &buff.ev;
+    xev->response_type = XCB_CLIENT_MESSAGE;
+    xev->format = 32;
+    xev->window = wid;
+    xev->type = qtc_x11_atoms[QTC_X11_ATOM_NET_WM_MOVERESIZE];
+    xev->data.data32[0] = x;
+    xev->data.data32[1] = y;
+    xev->data.data32[2] = 8; // NET::Move
+    xev->data.data32[3] = XCB_KEY_BUT_MASK_BUTTON_1;
+    qtcX11CallVoid(send_event, false, qtcX11RootWindow(),
+                   XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY |
+                   XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT, (const char*)xev);
+    qtcX11Flush();
+}
+
+// Blur
+QTC_EXPORT void
+qtcX11BlurTrigger(xcb_window_t wid, bool enable, unsigned prop_num,
+                  const uint32_t *props)
+{
+    Display *disp = qtcX11GetDisp();
+    xcb_atom_t atom = qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_BLUR_BEHIND_REGION];
+    if (enable) {
+        if (disp) {
+            QTC_DEF_LOCAL_BUFF(unsigned long, xlib_props, 256, prop_num);
+            for (unsigned i = 0;i < prop_num;i++) {
+                xlib_props[i] = props[i];
+            }
+            XChangeProperty(disp, wid, atom, XA_CARDINAL, 32, PropModeReplace,
+                            (unsigned char*)xlib_props, prop_num);
+            QTC_FREE_LOCAL_BUFF(xlib_props);
+        } else {
+            qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, wid, atom,
+                           XCB_ATOM_CARDINAL, 32, prop_num, props);
+        }
+    } else {
+        qtcX11CallVoid(delete_property, wid, atom);
+    }
     qtcX11Flush();
 }

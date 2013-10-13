@@ -10,10 +10,8 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 if(QTC_ENABLE_X11)
   set(qtcurve_utils_SRCS
     ${qtcurve_utils_SRCS}
-    x11shadow.c
     x11utils.c
-    x11wmmove.c
-    x11blur.c)
+    x11helpers.c)
   set(qtcurve_utils_LINKS
     ${qtcurve_utils_LINKS}
     ${QTC_X11_LIBRARIES})
