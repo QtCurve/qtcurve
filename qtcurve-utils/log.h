@@ -30,6 +30,7 @@ typedef enum {
     QTC_LOG_INFO,
     QTC_LOG_WARN,
     QTC_LOG_ERROR,
+    QTC_LOG_FORCE
 } QtcLogLevel;
 
 QtcLogLevel _qtcCheckLogLevel();
@@ -72,7 +73,7 @@ void _qtcLogV(QtcLogLevel level, const char *fname, int line, const char *func,
 
 #define qtcLog(__level, fmt, args...) do {                              \
         QtcLogLevel level = (__level);                                  \
-        if (level < 0 || level > QTC_LOG_ERROR || level < qtcLogLevel)  \
+        if (level < 0 || level > QTC_LOG_FORCE || level < qtcLogLevel)  \
             break;                                                      \
         _qtcLog(level, __FILE__, __LINE__, __FUNCTION__, fmt, ##args);  \
     } while (0)
@@ -85,6 +86,8 @@ void _qtcLogV(QtcLogLevel level, const char *fname, int line, const char *func,
     qtcLog(QTC_LOG_WARN, fmt, ##args)
 #define qtcError(fmt, args...)                  \
     qtcLog(QTC_LOG_ERROR, fmt, ##args)
+#define qtcForceLog(fmt, args...)               \
+    qtcLog(QTC_LOG_FORCE, fmt, ##args)
 
 QTC_END_DECLS
 

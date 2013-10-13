@@ -121,7 +121,7 @@ _qtcLogV(QtcLogLevel level, const char *fname, int line, const char *func,
          const char *fmt, va_list ap)
 {
     _qtcLogInit();
-    if (qtcUnlikely(level < log_level || level < 0 || level > QTC_LOG_ERROR))
+    if (qtcUnlikely(level < log_level || level < 0 || level > QTC_LOG_FORCE))
         return;
 
     static const char *color_codes[] = {
@@ -129,6 +129,7 @@ _qtcLogV(QtcLogLevel level, const char *fname, int line, const char *func,
         [QTC_LOG_INFO] = "\e[01;34m",
         [QTC_LOG_WARN] = "\e[01;33m",
         [QTC_LOG_ERROR] = "\e[01;31m",
+        [QTC_LOG_FORCE] = "\e[01;35m",
     };
 
     static const char *log_prefixes[] = {
@@ -136,6 +137,7 @@ _qtcLogV(QtcLogLevel level, const char *fname, int line, const char *func,
         [QTC_LOG_INFO] = "qtcInfo-",
         [QTC_LOG_WARN] = "qtcWarn-",
         [QTC_LOG_ERROR] = "qtcError-",
+        [QTC_LOG_FORCE] = "qtcLog-",
     };
 
     const char *color_prefix =
