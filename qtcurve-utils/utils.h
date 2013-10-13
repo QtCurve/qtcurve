@@ -184,6 +184,11 @@ qtcFillStrs(char *buff, ArgTypes... strs...)
 #endif
 
 #ifdef __cplusplus
+
+#include <utility>
+#define _QTC_COMP_TYPE(T1, T2)                                  \
+    decltype(0 ? std::declval<T1>() : std::declval<T2>())
+
 template<typename T>
 QTC_ALWAYS_INLINE static inline const T&
 qtcMax(const T &a, const T &b)
@@ -197,28 +202,30 @@ qtcMin(const T &a, const T &b)
     return (a < b) ? a : b;
 }
 template<typename T1, typename T2>
-QTC_ALWAYS_INLINE static inline decltype(T1(0) > T2(0) ? T1(0) : T2(0))
+QTC_ALWAYS_INLINE static inline _QTC_COMP_TYPE(T1, T2)
 qtcMax(const T1 &a, const T2 &b)
 {
     return (a > b) ? a : b;
 }
 template<typename T1, typename T2>
-QTC_ALWAYS_INLINE static inline decltype(T1(0) < T2(0) ? T1(0) : T2(0))
+QTC_ALWAYS_INLINE static inline _QTC_COMP_TYPE(T1, T2)
 qtcMin(const T1 &a, const T2 &b)
 {
     return (a < b) ? a : b;
 }
 #else
-#define qtcMax(a, b) ({                         \
-            typeof(a) _a = (a);                 \
-            typeof(b) _b = (b);                 \
-            (_a > _b) ? _a : _b;                \
-        })
-#define qtcMin(a, b) ({                         \
-            typeof(a) _a = (a);                 \
-            typeof(b) _b = (b);                 \
-            (_a < _b) ? _a : _b;                \
-        })
+#define qtcMax(a, b)                            \
+    ({                                          \
+        typeof(a) _a = (a);                     \
+        typeof(b) _b = (b);                     \
+        (_a > _b) ? _a : _b;                    \
+    })
+#define qtcMin(a, b)                            \
+    ({                                          \
+        typeof(a) _a = (a);                     \
+        typeof(b) _b = (b);                     \
+        (_a < _b) ? _a : _b;                    \
+    })
 #endif
 #define qtcBound(a, b, c) qtcMax(a, qtcMin(b, c))
 
