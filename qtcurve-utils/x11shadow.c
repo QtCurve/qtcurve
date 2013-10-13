@@ -21,6 +21,8 @@
 #include "x11shadow_p.h"
 #include "log.h"
 #include <xcb/xcb_image.h>
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
 #include <shadow0-png.h>
 #include <shadow1-png.h>
 #include <shadow2-png.h>
@@ -37,6 +39,8 @@
 
 static uint32_t shadow_pixmaps[8];
 static int shadow_size = 0;
+static uint32_t shadow_data_xcb[8 + 4];
+static unsigned long shadow_data_xlib[8 + 4];
 
 static xcb_pixmap_t
 qtcX11ShadowCreatePixmap(const QtcPixmap *data)
@@ -68,6 +72,14 @@ qtcX11ShadowInit()
     shadow_pixmaps[5] = qtcX11ShadowCreatePixmap(&qtc_shadow5);
     shadow_pixmaps[6] = qtcX11ShadowCreatePixmap(&qtc_shadow6);
     shadow_pixmaps[7] = qtcX11ShadowCreatePixmap(&qtc_shadow7);
+
+    memcpy(shadow_data_xcb, shadow_pixmaps, sizeof(shadow_pixmaps));
+    for (int i = 0;i < 8;i++) {
+        shadow_data_xlib[i] = shadow_pixmaps[i];
+    }
+    for (int i = 8;i < 12;i++) {
+        shadow_data_xlib[i] = shadow_data_xcb[i] = shadow_size - 4;
+    }
 }
 
 // Necessary?
@@ -84,14 +96,23 @@ qtcX11ShadowDestroy()
 QTC_EXPORT void
 qtcX11ShadowInstall(xcb_window_t win)
 {
-    uint32_t data[8 + 4];
-    memcpy(data, shadow_pixmaps, sizeof(shadow_pixmaps));
-    data[8] = data[9] = data[10] = data[11] = shadow_size - 4;
-    qtcX11FlushXlib();
-    qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, win,
-                   qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_SHADOW],
-                   XCB_ATOM_CARDINAL, 32, 12, data);
-    qtcX11Flush();
+    Display *disp = qtcX11GetDisp();
+    xcb_atom_t atom = qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_SHADOW];
+    // Use XCB to set window property recieves BadWindow errors for menus in
+    // Qt4 kpartsplugin here, probably because of the order of some pending
+    // event/requests in Xlib. Calling XFlush() before xcb_change_property()
+    // doesn't solve the problem for unknown reason but using XChangeProperty
+    // works.
+    // NOTE: XChangeProperty want `unsigned long` for format 32. So we need
+    // two seperate data buffers.
+    if (disp) {
+        XChangeProperty(disp, win, atom, XA_CARDINAL, 32, PropModeReplace,
+                        (unsigned char*)shadow_data_xlib, 12);
+    } else {
+        qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, win,
+                       atom, XCB_ATOM_CARDINAL, 32, 12, shadow_data_xcb);
+        qtcX11Flush();
+    }
 }
 
 QTC_EXPORT void

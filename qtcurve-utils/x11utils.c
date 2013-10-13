@@ -142,6 +142,12 @@ qtcX11GetConn()
     return qtc_xcb_conn;
 }
 
+QTC_EXPORT Display*
+qtcX11GetDisp()
+{
+    return qtc_disp;
+}
+
 QTC_EXPORT void
 qtcX11Flush()
 {

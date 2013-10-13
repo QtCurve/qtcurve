@@ -57,6 +57,7 @@ typedef struct _XDisplay Display;
 void qtcX11InitXcb(xcb_connection_t *conn, int screen_no);
 void qtcX11InitXlib(Display *disp);
 xcb_connection_t *qtcX11GetConn();
+Display *qtcX11GetDisp();
 int qtcX11DefaultScreenNo();
 xcb_screen_t *qtcX11DefaultScreen();
 xcb_window_t qtcX11RootWindow();

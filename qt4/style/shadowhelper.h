@@ -63,7 +63,6 @@ public:
 protected Q_SLOTS:
     // ! unregister widget
     void objectDeleted(QObject*);
-    void installX11ShadowsReal(int);
 
 protected:
     // ! accept widget

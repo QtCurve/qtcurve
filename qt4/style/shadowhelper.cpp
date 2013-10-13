@@ -136,7 +136,7 @@ bool ShadowHelper::acceptWidget(QWidget* widget) const
 }
 
 //_______________________________________________________
-bool ShadowHelper::installX11Shadows( QWidget* widget )
+bool ShadowHelper::installX11Shadows(QWidget* widget)
 {
     // check widget and shadow
     if (!widget)
@@ -153,24 +153,8 @@ bool ShadowHelper::installX11Shadows( QWidget* widget )
         return false;
     }
 
-    // Use XCB to set window property recieves BadWindow errors here,
-    // probably because of some pending event/requests in Xlib/Qt main loop
-    // Pending this request to the main loop solves the problem. Calling
-    // XFlush() before xcb_change_property() doesn't solve the problem
-    // for unknown reason. Not sure whether this is the right solution for
-    // the problem but it is unlikely to cause any problem either.
-    // Hopefully this is not necessary for Qt5 version since xcb is used in
-    // Qt5 internally.
-    QMetaObject::invokeMethod(this, "installX11ShadowsReal",
-                              Qt::QueuedConnection,
-                              Q_ARG(int, widget->winId()));
+    qtcX11ShadowInstall(widget->winId());
     return true;
-}
-
-void
-ShadowHelper::installX11ShadowsReal(int wid)
-{
-    qtcX11ShadowInstall(wid);
 }
 
 //_______________________________________________________
