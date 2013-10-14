@@ -175,16 +175,16 @@ add_subdirectory(qt4)
 add_subdirectory(qt5)
 add_subdirectory(gtk2)
 
-if(QTC_QT4_KWIN_MAX_BUTTON_HACK)
+if(ENABLE_QT4 AND QTC_QT4_KWIN_MAX_BUTTON_HACK)
   message(WARNING
     "You have enabled the hack to force drawing of maximise "
     "buttons for windows that can be minimised. This is a 100% "
     "hack, that may not work or compile, and may even crash kwin.")
 endif()
 
-if(QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT OR
-    QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT OR
-    QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT)
+if((ENABLE_QT4 AND QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT) OR
+    (ENABLE_QT5 AND QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT) OR
+    (ENABLE_GTK2 AND QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT))
   message(WARNING
     "You have enabled support for the 'fix parentless dialogs' option. "
     "This is known to BREAK some applications. Please "
@@ -192,41 +192,29 @@ if(QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT OR
     "this enabled. Please reconsider DISABLING this option.")
 endif()
 
-if(QTC_GTK2_OLD_MOZILLA)
-  message("**************************************************************\n"
-    "Information: Defaulting to treating Firefox as Firefox < 3.0\n"
-    "**************************************************************\n")
-else()
-  message("**************************************************************\n"
-    "Information: Defaulting to treating Firefox as Firefox >= 3.0\n"
-    "**************************************************************\n")
-endif()
-if(QTC_GTK2_MODIFY_MOZILLA)
-  message("**************************************************************\n"
-    "**************************************************************\n"
-    "Warning: You have enabled the option for QtCurve to modify the\n"
-    "         configuration files of Mozilla applications (Firefox, \n"
-    "         Thunderbird, Seamonkey). Note: This sometimes causes\n"
-    "         issues with newer versions of these applications. Should\n"
-    "         such issues occur, you should recompile QtCurve without\n"
-    "         this option - and you will have to remove BY HAND the \n"
-    "         changes that QtCurve has made. This will entail removing\n"
-    "         lines from userChrom.css that indicate 'Added by QtCurve'\n"
-    "         userChrome.css is usually in a folder such as:\n"
-    "             ~/.mozilla/firefox/xxxxxxx.default/chrome/userChrome.css\n"
-    "             ~/.thunderbird/xxxxxxx.default/chrome/userChrome.css\n"
-    "         Where xxxxxxx is a series of random characters.\n"
-    "**************************************************************\n"
-    "**************************************************************\n")
+if(ENABLE_GTK2 AND QTC_GTK2_OLD_MOZILLA)
+  message(WARNING
+    "Defaulting to treating Firefox as Firefox < 3.0. "
+    "This option is deprecated and will be removed soon.")
 endif()
 
-if(QTC_GTK2_USE_CAIRO_FOR_ARROWS)
-  message("**************************************************************\n"
-    "Warning: Using cairo to draw arrows - this has been reported to \n"
-    "         fail with intel Xorg driver > 2.8\n"
-    "**************************************************************\n")
-else()
-  message("**************************************************************\n"
-    "Information: Using Gdk to draw arrows.\n"
-    "**************************************************************\n")
+if(ENABLE_GTK2 AND QTC_GTK2_MODIFY_MOZILLA)
+  message(WARNING
+    "You have enabled the option for QtCurve to modify the configuration "
+    "files of Mozilla applications (Firefox, Thunderbird, Seamonkey). "
+    "Note: This sometimes causes issues with newer versions of these "
+    "applications. Should such issues occur, you should recompile QtCurve "
+    "without this option - and you will have to remove BY HAND the changes "
+    "that QtCurve has made. This will entail removing lines from "
+    "userChrom.css that indicate 'Added by QtCurve' userChrome.css is usually "
+    "in a folder such as: \n"
+    "`~/.mozilla/firefox/xxxxxxx.default/chrome/userChrome.css` or \n"
+    "`~/.thunderbird/xxxxxxx.default/chrome/userChrome.css`. \n"
+    "where xxxxxxx is a series of random characters.")
+endif()
+
+if(ENABLE_GTK2 AND QTC_GTK2_USE_CAIRO_FOR_ARROWS)
+  message(WARNING
+    "Using cairo to draw arrows - this has been reported to fail with intel "
+    "Xorg driver > 2.8")
 endif()
