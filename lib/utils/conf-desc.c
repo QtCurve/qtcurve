@@ -22,6 +22,7 @@
 #include "conf-desc.h"
 #include "ini-parse.h"
 #include "log.h"
+#include "map.h"
 
 // New and find
 static inline QtcConfFileDesc*
@@ -140,27 +141,37 @@ _qtcConfDescLoadDescFileGroup(QtcConfFileDesc *conf_desc, QtcIniGroup *ini_grp)
     }
 }
 
-static void
-_qtcConfDescLoadOption(QtcConfGroupDesc *group_desc, QtcIniGroup *ini_grp,
-                       const char *opt_name)
+static int
+_qtcConfLoadType(const char *str)
 {
-    size_t opt_name_len = strlen(opt_name);
-    if (qtcUnlikely(!opt_name_len)) {
-        qtcError("Option name cannot have zero length.\n");
-        return;
-    }
-    QtcConfOptionDesc *opt_desc =
-        qtcConfOptionDescFind(group_desc, opt_name, opt_name_len);
-    if (!opt_desc) {
-        opt_desc = qtcConfOptionDescNew(group_desc, opt_name, opt_name_len);
-    }
+    QTC_DEF_ENUM(conf_type_map, true, {"Str", QTC_CONF_STR},
+                 {"Int", QTC_CONF_INT}, {"Enum", QTC_CONF_ENUM},
+                 {"Float", QTC_CONF_FLOAT}, {"Bool", QTC_CONF_BOOL},
+                 {"Color", QTC_CONF_COLOR}, {"StrList", QTC_CONF_STR_LIST},
+                 {"IntList", QTC_CONF_INT_LIST},
+                 {"FloatList", QTC_CONF_FLOAT_LIST});
+    return qtcEnumSearch(&conf_type_map, str);
+}
+
+static void
+_qtcConfDescLoadOption(QtcConfOptionDesc *opt_desc, QtcIniGroup *ini_grp)
+{
     // TODO set option properties
+    opt_desc->desc = qtcIniGroupDupValue(ini_grp, "Desc");
+    opt_desc->long_desc = qtcIniGroupDupValue(ini_grp, "LongDesc");
+    opt_desc->sub_group = qtcIniGroupDupValue(ini_grp, "SubGroup");
+    if (qtcIniGroupGetBool(ini_grp, "Advanced", false)) {
+        opt_desc->flags |= QTC_CONF_OP_ADVANCED;
+    }
+    QtcConfValueDesc *vdesc = &opt_desc->vdesc;
+    vdesc->type = _qtcConfLoadType(qtcIniGroupGetValue(ini_grp, "Type"));
 }
 
 static void
 _qtcConfDescLoadGroupProps(QtcConfGroupDesc *group_desc, QtcIniGroup *ini_grp)
 {
-    // TODO set group properties
+    group_desc->desc = qtcIniGroupDupValue(ini_grp, "Desc");
+    group_desc->long_desc = qtcIniGroupDupValue(ini_grp, "LongDesc");
 }
 
 static void
@@ -184,7 +195,13 @@ _qtcConfDescLoadGroup(QtcConfFileDesc *conf_desc, QtcIniGroup *ini_grp)
     }
     if (ini_grp_name[group_name_len]) {
         const char *opt_name = ini_grp_name + group_name_len + 1;
-        _qtcConfDescLoadOption(group_desc, ini_grp, opt_name);
+        size_t opt_name_len = strlen(opt_name);
+        if (qtcUnlikely(!opt_name_len)) {
+            qtcError("Option name cannot have zero length.\n");
+            return;
+        }
+        _qtcConfDescLoadOption(
+            qtcConfOptionDescNew(group_desc, opt_name, opt_name_len), ini_grp);
     } else {
         _qtcConfDescLoadGroupProps(group_desc, ini_grp);
     }
@@ -220,18 +237,32 @@ qtcConfDescLoad(const char *fname)
 }
 
 static void
-qtcConfGroupDescFree(QtcConfGroupDesc *group)
+qtcConfOptionDescFree(QtcConfOptionDesc *option)
 {
     // TODO
+    free(option);
+}
+
+static void
+qtcConfGroupDescFree(QtcConfGroupDesc *group)
+{
+    for (int i = 0;i < group->option_num;i++) {
+        qtcConfOptionDescFree(group->option_list[i]);
+    }
+    qtcFree(group->desc);
+    qtcFree(group->long_desc);
+    qtcFree(group->option_list);
+    free(group->name);
     free(group);
 }
 
 QTC_EXPORT void
 qtcConfDescFree(QtcConfFileDesc *desc)
 {
-    free(desc->domain);
     for (int i = 0;i < desc->group_num;i++) {
         qtcConfGroupDescFree(desc->group_list[i]);
     }
+    qtcFree(desc->group_list);
+    free(desc->domain);
     free(desc);
 }
