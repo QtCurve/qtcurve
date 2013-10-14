@@ -84,20 +84,32 @@ bool qtcX11IsEmbed(xcb_window_t win);
 QTC_END_DECLS
 
 #ifndef __cplusplus
-#define qtcX11Call(name, args...)                               \
-    ({                                                          \
-        xcb_connection_t *conn = qtcX11GetConn();               \
-        xcb_##name##_reply(conn, xcb_##name(conn, args), 0);    \
+#define qtcX11Call(name, args...)                                       \
+    ({                                                                  \
+        xcb_connection_t *conn = qtcX11GetConn();                       \
+        xcb_##name##_reply_t *res = NULL;                               \
+        if (qtcLikely(conn)) {                                          \
+            res = xcb_##name##_reply(conn, xcb_##name(conn, args), 0);  \
+        }                                                               \
+        res;                                                            \
     })
 #define qtcX11CallVoid(name, args...)                   \
     ({                                                  \
         xcb_connection_t *conn = qtcX11GetConn();       \
-        xcb_##name(conn, args);                         \
+        xcb_void_cookie_t res = {0};                    \
+        if (qtcLikely(conn)) {                          \
+            res = xcb_##name(conn, args);               \
+        }                                               \
+        res;                                            \
     })
 #define qtcX11CallVoidChecked(name, args...)            \
     ({                                                  \
         xcb_connection_t *conn = qtcX11GetConn();       \
-        xcb_##name##_checked(conn, args);               \
+        xcb_void_cookie_t res = {0};                    \
+        if (qtcLikely(conn)) {                          \
+            xcb_##name##_checked(conn, args);           \
+        }                                               \
+        res;                                            \
     })
 #else
 
@@ -108,6 +120,8 @@ _qtcX11Call(Cookie (*func)(xcb_connection_t*, Args...),
             Args2... args...)
 {
     xcb_connection_t *conn = qtcX11GetConn();
+    if (qtcUnlikely(!conn))
+        return NULL;
     Cookie cookie = func(conn, args...);
     return reply_func(conn, cookie, 0);
 }
@@ -120,6 +134,8 @@ _qtcX11CallVoid(xcb_void_cookie_t (*func)(xcb_connection_t*, Args...),
                 Args2... args...)
 {
     xcb_connection_t *conn = qtcX11GetConn();
+    if (qtcUnlikely(!conn))
+        return xcb_void_cookie_t();
     return func(conn, args...);
 }
 #define qtcX11CallVoid(name, args...)           \

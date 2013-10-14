@@ -95,7 +95,6 @@ screen_of_display(xcb_connection_t *c, int screen)
             return iter.data;
         }
     }
-
     return NULL;
 }
 
@@ -104,6 +103,9 @@ qtcX11GetScreen(int screen_no)
 {
     if (screen_no == -1 || screen_no == qtc_default_screen_no) {
         return qtc_default_screen;
+    }
+    if (qtcUnlikely(!qtc_xcb_conn)) {
+        return NULL;
     }
     return screen_of_display(qtc_xcb_conn, screen_no);
 }
@@ -155,13 +157,18 @@ qtcX11GetDisp()
 QTC_EXPORT void
 qtcX11Flush()
 {
-    xcb_flush(qtc_xcb_conn);
+    if (qtcLikely(qtc_xcb_conn)) {
+        xcb_flush(qtc_xcb_conn);
+    }
 }
 
 QTC_EXPORT uint32_t
 qtcX11GenerateId()
 {
-    return xcb_generate_id(qtc_xcb_conn);
+    if (qtcLikely(qtc_xcb_conn)) {
+        return xcb_generate_id(qtc_xcb_conn);
+    }
+    return 0;
 }
 
 QTC_EXPORT void
@@ -169,12 +176,15 @@ qtcX11GetAtoms(size_t n, xcb_atom_t *atoms, const char *const names[],
                bool create)
 {
     xcb_connection_t *conn = qtc_xcb_conn;
+    memset(atoms, 0, sizeof(xcb_atom_t) * n);
+    if (qtcUnlikely(!conn)) {
+        return;
+    }
     xcb_intern_atom_cookie_t cookies[n];
     for (size_t i = 0;i < n;i++) {
         cookies[i] = xcb_intern_atom(conn, !create,
                                      strlen(names[i]), names[i]);
     }
-    memset(atoms, 0, sizeof(xcb_atom_t) * n);
     for (size_t i = 0;i < n;i++) {
         xcb_intern_atom_reply_t *r =
             xcb_intern_atom_reply(conn, cookies[i], 0);

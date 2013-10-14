@@ -106,7 +106,7 @@ QtCurveSizeGrip::embed()
             } else {
                 break;
             }
-            free(reply);
+            qtcFree(reply);
         }
         qtcX11CallVoid(reparent_window, winId(), current, 0, 0);
         qtcX11Flush();

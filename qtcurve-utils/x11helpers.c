@@ -88,6 +88,9 @@ qtcX11ShadowInit()
 void
 qtcX11ShadowDestroy()
 {
+    if (!qtcX11GetConn()) {
+        return;
+    }
     for (unsigned int i = 0;
          i < sizeof(shadow_pixmaps) / sizeof(shadow_pixmaps[0]);i++) {
         qtcX11CallVoid(free_pixmap, shadow_pixmaps[i]);
