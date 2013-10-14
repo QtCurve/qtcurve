@@ -39,6 +39,8 @@ endif()
 
 string(REPLACE ";" " " gen_image_header_DEFS "${gen_image_header_DEFS}")
 
+# INCLUDE_DIRECTORIES property was added in cmake 2.8.8
+# Released in Apr. 2012
 if("${CMAKE_VERSION}" VERSION_LESS 2.8.8)
   include_directories(${gen_image_header_INCLUDES})
 endif()
