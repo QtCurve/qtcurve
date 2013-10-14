@@ -136,7 +136,7 @@ _qtcCatStrsFill(int n, const char **strs, size_t *lens,
 #define _qtcCatStrs(var, strs...) do {                                  \
         const char *__strs[] = {strs};                                  \
         int __strs_n = sizeof(__strs) / sizeof(const char*);            \
-        size_t __strs_lens[__strs_n];                                   \
+        size_t __strs_lens[sizeof(__strs) / sizeof(const char*)];       \
         size_t __strs_total_len =                                       \
             _qtcCatStrsCalLens(__strs_n, __strs, __strs_lens);          \
         var = _qtcCatStrsFill(__strs_n, __strs, __strs_lens,            \
@@ -146,7 +146,7 @@ _qtcCatStrsFill(int n, const char **strs, size_t *lens,
 #define _qtcFillStrs(var, buff, strs...) do {                           \
         const char *__strs[] = {strs};                                  \
         int __strs_n = sizeof(__strs) / sizeof(const char*);            \
-        size_t __strs_lens[__strs_n];                                   \
+        size_t __strs_lens[sizeof(__strs) / sizeof(const char*)];       \
         size_t __strs_total_len =                                       \
             _qtcCatStrsCalLens(__strs_n, __strs, __strs_lens);          \
         var = _qtcCatStrsFill(__strs_n, __strs, __strs_lens, __strs_total_len, \
