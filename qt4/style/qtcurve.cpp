@@ -1484,8 +1484,8 @@ void Style::polish(QApplication *app)
     else if("Kde4ToolkitLibrary"==appName)
         theThemedApp=APP_OPERA;
 
-    qtcDebug("QtCurve: Application name: \"%s\"\n",
-             appName.toLatin1().constData());
+    qtcInfo("QtCurve: Application name: \"%s\"\n",
+            appName.toLatin1().constData());
 
     if(APP_REKONQ==theThemedApp)
         opts.statusbarHiding=0;
@@ -1829,7 +1829,6 @@ Style::polish(QWidget *widget)
                 }
             // The window has already been created.
             if (qtcX11IsEmbed(widget->winId())) {
-                qtcDebug("XEmbed Window Found, do not recreate.\n");
                 break;
             }
 

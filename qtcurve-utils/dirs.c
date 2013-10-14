@@ -80,7 +80,6 @@ qtcConfDir()
     if (!conf_dir) {
         conf_dir = _qtcConfDir();
         qtcMakePath(conf_dir, 0700);
-        qtcInfo("%s\n", conf_dir);
     }
     return conf_dir;
 }
@@ -101,7 +100,6 @@ qtcGetHome()
         if (qtcUnlikely(!qtc_home)) {
             qtc_home = strdup("/tmp/");
         }
-        qtcInfo("%s\n", qtc_home);
     }
     return qtc_home;
 }
@@ -116,7 +114,6 @@ qtcGetXDGDataHome()
         } else {
             qtc_xdg_data_home = qtcCatStrs(qtcGetHome(), ".local/share/");
         }
-        qtcInfo("%s\n", qtc_xdg_data_home);
     }
     return qtc_xdg_data_home;
 }
@@ -131,7 +128,6 @@ qtcGetXDGConfigHome()
         } else {
             qtc_xdg_config_home = qtcCatStrs(qtcGetHome(), ".config/");
         }
-        qtcInfo("%s\n", qtc_xdg_config_home);
     }
     return qtc_xdg_config_home;
 }

@@ -1162,26 +1162,19 @@ gboolean isRgbaWidget(GtkWidget *widget)
 void
 enableBlurBehind(GtkWidget *w, gboolean enable)
 {
-    qtcDebug("%p, %d\n", w, enable);
     GtkWindow *topLevel = GTK_WINDOW(gtk_widget_get_toplevel(w));
-
     if (topLevel) {
-        GdkDisplay *display = gtk_widget_get_display(GTK_WIDGET(topLevel));
+        int oldValue =
+            GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w),
+                                              BLUR_BEHIND_OBJECT));
 
-        if (display) {
-            int oldValue =
-                GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w),
-                                                  BLUR_BEHIND_OBJECT));
-
-            if (oldValue == 0 || (enable && oldValue != 1) ||
-                (!enable && oldValue != 2)) {
-                int value = enable ? 1 : 2;
-                g_object_set_data(G_OBJECT(w), QTC_MENUBAR_SIZE,
-                                  GINT_TO_POINTER(value));
-                xcb_window_t wid =
-                    GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel)));
-                qtcX11BlurTrigger(wid, enable, 0, NULL);
-            }
+        if (oldValue == 0 || (enable && oldValue != 1) ||
+            (!enable && oldValue != 2)) {
+            g_object_set_data(G_OBJECT(w), QTC_MENUBAR_SIZE,
+                              GINT_TO_POINTER(enable ? 1 : 2));
+            xcb_window_t wid =
+                GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel)));
+            qtcX11BlurTrigger(wid, enable, 0, NULL);
         }
     }
 }

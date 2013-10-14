@@ -514,7 +514,6 @@ qtcWindowMap(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 gboolean
 qtcWindowSetup(GtkWidget *widget, int opacity)
 {
-    qtcDebug("%p, %d\n", widget, opacity);
     GObject *obj = NULL;
     if (widget && (obj = G_OBJECT(widget)) &&
         !g_object_get_data(obj, "QTC_WINDOW_HACK_SET")) {
