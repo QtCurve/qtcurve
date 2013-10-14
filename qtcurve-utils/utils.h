@@ -153,7 +153,13 @@ _qtcCatStrsFill(int n, const char **strs, size_t *lens,
                               realloc(buff, __strs_total_len + 1));     \
     } while (0)
 
-#ifndef __cplusplus
+#if defined __cplusplus && defined __GNUC__ && !defined __clang__
+#if __GNUC__ <= 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 8)
+#define __QTC_CAT_STR_NO_TEMPLATE
+#endif
+#endif
+
+#if !defined __cplusplus || defined __QTC_CAT_STR_NO_TEMPLATE
 #define qtcCatStrs(strs...) ({                                          \
             char *__cat_str_res;                                        \
             _qtcCatStrs(__cat_str_res, strs);                           \
