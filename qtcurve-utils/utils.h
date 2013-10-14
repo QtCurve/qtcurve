@@ -154,7 +154,7 @@ _qtcCatStrsFill(int n, const char **strs, size_t *lens,
     } while (0)
 
 #if defined __cplusplus && defined __GNUC__ && !defined __clang__
-#if __GNUC__ <= 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 8)
+#if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 8)
 #define __QTC_CAT_STR_NO_TEMPLATE
 #endif
 #endif
@@ -191,9 +191,22 @@ qtcFillStrs(char *buff, ArgTypes... strs...)
 
 #ifdef __cplusplus
 
+#define __QTC_USE_DECLTYPE
+#if defined __cplusplus && defined __GNUC__ && !defined __clang__
+#if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 8) ||           \
+    (__GNUC__ == 4 && __GNUC_MINOR__ == 8 && __GNUC_PATCHLEVEL__ < 1)
+#undef __QTC_USE_DECLTYPE
+#endif
+#endif
+
+#ifdef __QTC_USE_DECLTYPE
 #include <utility>
 #define _QTC_COMP_TYPE(T1, T2)                                  \
     decltype(0 ? std::declval<T1>() : std::declval<T2>())
+#else
+#define _QTC_COMP_TYPE(T1, T2)                  \
+    __typeof__(0 ? T1() : T2())
+#endif
 
 template<typename T>
 QTC_ALWAYS_INLINE static inline const T&
