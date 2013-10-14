@@ -1,3 +1,9 @@
+if(ENABLE_QT4 OR ENABLE_QT5)
+  set(qt_dump_png_SRCS
+    qt_dump_png.c)
+  add_executable(qt-dump-png ${qt_dump_png_SRCS})
+endif()
+
 if(ENABLE_QT5)
   set(gen_image_header_SRCS
     gen_image_header_qt.cpp)
@@ -33,14 +39,12 @@ endif()
 
 string(REPLACE ";" " " gen_image_header_DEFS "${gen_image_header_DEFS}")
 
+if("${CMAKE_VERSION}" VERSION_LESS 2.8.8)
+  include_directories(${gen_image_header_INCLUDES})
+endif()
+
 add_executable(gen-image-header ${gen_image_header_SRCS})
 set_target_properties(gen-image-header PROPERTIES
   INCLUDE_DIRECTORIES "${gen_image_header_INCLUDES}"
   COMPILE_FLAGS "${gen_image_header_DEFS}")
 target_link_libraries(gen-image-header ${gen_image_header_LINKS})
-
-if(ENABLE_QT4 OR ENABLE_QT5)
-  set(qt_dump_png_SRCS
-    qt_dump_png.c)
-  add_executable(qt-dump-png ${qt_dump_png_SRCS})
-endif()
