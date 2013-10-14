@@ -181,7 +181,7 @@ MacMenu::activate(QMenuBar *menu)
     }
     // register the menu via dbus
     QStringList entries;
-    for (QAction *action: menu->actions()) {
+    foreach (QAction *action, menu->actions()) {
         if (action->isSeparator()) {
             entries << "<XBAR_SEPARATOR/>";
         } else {
@@ -368,7 +368,7 @@ bar4menu(QMenu *menu)
         return 0;
     if (menu->menuAction()->associatedWidgets().isEmpty())
         return 0;
-    for (QWidget *w: menu->menuAction()->associatedWidgets()) {
+    foreach (QWidget *w, menu->menuAction()->associatedWidgets()) {
         if (qobject_cast<QMenuBar*>(w)) {
             return static_cast<QMenuBar*>(w);
         }

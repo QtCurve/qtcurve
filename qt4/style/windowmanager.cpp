@@ -150,7 +150,7 @@ namespace QtCurve {
         _whiteList.insert( ExceptionId( "ViewSliders@kmix" ) );
         _whiteList.insert( ExceptionId( "Sidebar_Widget@konqueror" ) );
 
-        for (const QString& exception: list) {
+        foreach (const QString& exception, list) {
             ExceptionId id(exception);
             if (!id.className().isEmpty()) {
                 _whiteList.insert(exception);
@@ -165,7 +165,7 @@ namespace QtCurve {
         _blackList.clear();
         _blackList.insert( ExceptionId( "CustomTrackView@kdenlive" ) );
         _blackList.insert( ExceptionId( "MuseScore" ) );
-        for (const QString& exception: list) {
+        foreach (const QString& exception, list) {
             ExceptionId id(exception);
             if (!id.className().isEmpty()) {
                 _blackList.insert(exception);
@@ -392,7 +392,7 @@ namespace QtCurve {
 
         // list-based blacklisted widgets
         QString appName( qApp->applicationName() );
-        for (const ExceptionId &id: const_(_blackList)) {
+        foreach (const ExceptionId &id, const_(_blackList)) {
             if (!id.appName().isEmpty() && id.appName() != appName)
                 continue;
             if (id.className() == "*" && !id.appName().isEmpty()) {
@@ -413,7 +413,7 @@ namespace QtCurve {
     {
 
         QString appName(qApp->applicationName());
-        for (const ExceptionId &id: const_(_whiteList)) {
+        foreach (const ExceptionId &id, const_(_whiteList)) {
             if (!id.appName().isEmpty() && id.appName() != appName)
                 continue;
             if (widget->inherits(id.className().toLatin1())) {

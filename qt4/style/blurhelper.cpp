@@ -143,7 +143,7 @@ namespace QtCurve
     void BlurHelper::trimBlurRegion( QWidget* parent, QWidget* widget, QRegion& region ) const
     {
         // loop over children
-        for (QObject* childObject: widget->children()) {
+        foreach (QObject* childObject, widget->children()) {
             QWidget* child( qobject_cast<QWidget*>( childObject ) );
             if( !(child && child->isVisible()) ) continue;
 
@@ -180,7 +180,7 @@ namespace QtCurve
             clear(widget);
         } else {
             QVector<uint32_t> data;
-            for (const QRect &rect: region.rects()) {
+            foreach (const QRect &rect, region.rects()) {
                 data << rect.x() << rect.y() << rect.width() << rect.height();
             }
             qtcX11BlurTrigger(widget->winId(), true, data.size(),

@@ -425,7 +425,7 @@ static inline QList<QStatusBar*> getStatusBars(QWidget *w)
 static QToolBar*
 getToolBarChild(QWidget *w)
 {
-    for (QObject *child: w->children()) {
+    foreach (QObject *child, w->children()) {
         if (child->isWidgetType()) {
             if (qobject_cast<QToolBar*>(child))
                 return static_cast<QToolBar*>(child);
@@ -444,7 +444,7 @@ setStyleRecursive(QWidget *w, QStyle *s, int minSize)
     w->setStyle(s);
     if (qobject_cast<QToolButton*>(w))
         w->setMinimumSize(1, minSize);
-    for (QObject *child: w->children()) {
+    foreach (QObject *child, w->children()) {
         if (child->isWidgetType()) {
             setStyleRecursive((QWidget*)child, s, minSize);
         }
@@ -2439,7 +2439,7 @@ void Style::polishScrollArea(QAbstractScrollArea *scrollArea, bool isKFilePlaces
     // change viewport autoFill background.
     // do the same for children if the background role is QPalette::Window
     viewport->setAutoFillBackground(false);
-    for (QWidget *child: viewport->findChildren<QWidget*>()) {
+    foreach (QWidget *child, viewport->findChildren<QWidget*>()) {
         if (child->parent() == viewport &&
             QPalette::Window == child->backgroundRole()) {
             child->setAutoFillBackground(false);
@@ -3245,7 +3245,7 @@ void Style::timerEvent(QTimerEvent *event)
     if (event->timerId() == itsProgressBarAnimateTimer)
     {
         itsAnimateStep = itsTimer.elapsed() / (1000 / constProgressBarFps);
-        for (QProgressBar *bar: const_(itsProgressBars)) {
+        foreach (QProgressBar *bar, const_(itsProgressBars)) {
             if ((opts.animatedProgress && 0 == itsAnimateStep % 2 &&
                  bar->value() != bar->minimum() &&
                  bar->value() != bar->maximum()) ||
@@ -8473,8 +8473,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                         c = 0;
 
                         // skip the stuff above the exposed rectangle
-                        for (i = 1; i < lv->items.size(); ++i)
-                        {
+                        for (i = 1;i < lv->items.size();++i) {
                             QStyleOptionQ3ListViewItem child = lv->items.at(i);
                             if (child.height + y > 0)
                                 break;

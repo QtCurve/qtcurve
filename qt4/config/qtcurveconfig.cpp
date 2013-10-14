@@ -191,7 +191,7 @@ static void setStyleRecursive(QWidget *w, QStyle *s)
         return;
     }
     w->setStyle(s);
-    for (QObject *child: w->children()) {
+    foreach (QObject *child, w->children()) {
         if (child && child->isWidgetType()) {
             setStyleRecursive((QWidget*)child, s);
         }

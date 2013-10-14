@@ -102,7 +102,7 @@ protected:
     void
     update()
     {
-        for (const WidgetPointer &widget : const_(_pendingWidgets)) {
+        foreach (const WidgetPointer &widget, const_(_pendingWidgets)) {
             if (widget) {
                 update(widget.data());
             }
