@@ -196,4 +196,55 @@ const_(const T &t)
 #define QTC_FREE_LOCAL_BUFF(name)               \
     qtcFree(__##qtc_local_buff_to_free##name)
 
+#ifdef __QTC_ATOMIC_USE_SYNC_FETCH
+# undef __QTC_ATOMIC_USE_SYNC_FETCH
+#endif
+
+#if defined __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+#  define __QTC_ATOMIC_USE_SYNC_FETCH
+#elif defined __has_builtin
+#if (__has_builtin(__sync_fetch_and_add) &&     \
+     __has_builtin(__sync_fetch_and_and) &&     \
+     __has_builtin(__sync_fetch_and_xor) &&     \
+     __has_builtin(__sync_fetch_and_or))
+#  define __QTC_ATOMIC_USE_SYNC_FETCH
+#endif
+#endif
+
+#ifdef __QTC_ATOMIC_USE_SYNC_FETCH
+#define QTC_DECLARE_ATOMIC(name1, name2, type)                  \
+    type (qtcAtomic##name1)(volatile type *atomic, type val);   \
+    QTC_ALWAYS_INLINE  static inline type                       \
+    __qtcAtomic##name1(volatile type *atomic, type val)         \
+    {                                                           \
+        return __sync_fetch_and_##name2(atomic, val);           \
+    }
+#else
+#define QTC_DECLARE_ATOMIC(name1, name2, type)                  \
+    type (qtcAtomic##name1)(volatile type *atomic, type val);   \
+    QTC_ALWAYS_INLINE static inline type                        \
+    __qtcAtomic##name1(volatile type *atomic, type val)         \
+    {                                                           \
+        return (qtcAtomic##name1)(atomic, val);                 \
+    }
+#endif
+
+QTC_BEGIN_DECLS
+
+QTC_DECLARE_ATOMIC(Add, add, int32_t);
+QTC_DECLARE_ATOMIC(And, and, uint32_t);
+QTC_DECLARE_ATOMIC(Or, or, uint32_t);
+QTC_DECLARE_ATOMIC(Xor, xor, uint32_t);
+
+QTC_END_DECLS
+
+#define qtcAtomicAdd(atomic, val)               \
+    __qtcAtomicAdd(atomic, val)
+#define qtcAtomicAnd(atomic, val)               \
+    __qtcAtomicAnd(atomic, val)
+#define qtcAtomicOr(atomic, val)                \
+    __qtcAtomicOr(atomic, val)
+#define qtcAtomicXor(atomic, val)               \
+    __qtcAtomicXor(atomic, val)
+
 #endif
