@@ -74,7 +74,7 @@ _qtcMakeVersionReal(int a, int b, int c)
     _qtcMakeVersionV(a, b,##arg, 0)
 
 QTC_ALWAYS_INLINE static inline void*
-qtcUtilsAlloc0(size_t size)
+qtcAlloc0(size_t size)
 {
     void *p = malloc(size);
     memset(p, 0, size);
@@ -89,9 +89,9 @@ qtcFree(void *p)
     }
 }
 
-#define qtcUtilsNewSize(type, size) ((type*)qtcUtilsAlloc0(size))
-#define qtcUtilsNew(type) qtcUtilsNewSize(type, sizeof(type))
-#define qtcUtilsNewN(type, n) qtcUtilsNewSize(type, sizeof(type) * n)
+#define qtcNewSize(type, size) ((type*)qtcAlloc0(size))
+#define qtcNew(type) qtcNewSize(type, sizeof(type))
+#define qtcNewN(type, n) qtcNewSize(type, sizeof(type) * n)
 
 QTC_ALWAYS_INLINE static inline double
 qtcLimit(double d, double l)
