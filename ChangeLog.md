@@ -1,4 +1,4 @@
-## 1.8.17 (WIP)
+## 1.8.17 (RC)
 1. **Add Qt5 support!!**.
 2. Gtk2: Workaround bug in glib >= 2.36.1 (`g_spawn_command_line_sync()`)
 
@@ -34,6 +34,8 @@
 21. Qt4: Fix/Workaround QMdiSubWindow not drawn correctly with translucent
     background.
 22. Move all Xlib calls to `libqtcurve-utils`.
+23. Make it possible to disable X11 dependency when compiling
+    `libqtcurve-utils` and `Qt4` and `Qt5` styles.
 
 ## 1.8.15-KDE4
 1. Add Russian localization. Thanks to Juliette Tux.
