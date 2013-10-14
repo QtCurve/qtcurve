@@ -256,6 +256,42 @@ qtcIniEntrySetValue(QtcIniEntry *entry, const char *value)
     return entry;
 }
 
+static inline const char*
+qtcIniGroupGetValueWithLen(QtcIniGroup *grp, const char *name, size_t len)
+{
+    QtcIniEntry *ety = qtcIniGroupFindEntryWithLen(grp, name, len);
+    return ety ? ety->value : NULL;
+}
+static inline const char*
+qtcIniGroupGetValue(QtcIniGroup *grp, const char *name)
+{
+    return qtcIniGroupGetValueWithLen(grp, name, strlen(name));
+}
+
+static inline char*
+qtcIniGroupDupValueWithLen(QtcIniGroup *grp, const char *name, size_t len)
+{
+    const char *val = qtcIniGroupGetValueWithLen(grp, name, len);
+    return val ? strdup(val) : NULL;
+}
+static inline char*
+qtcIniGroupDupValue(QtcIniGroup *grp, const char *name)
+{
+    return qtcIniGroupDupValueWithLen(grp, name, strlen(name));
+}
+
+static inline bool
+qtcIniGroupGetBoolWithLen(QtcIniGroup *grp, const char *name,
+                          size_t len, bool def)
+{
+    return qtcStrToBool(qtcIniGroupGetValueWithLen(grp, name, len), def);
+}
+static inline bool
+qtcIniGroupGetBool(QtcIniGroup *grp, const char *name, bool def)
+{
+    return qtcStrToBool(qtcIniGroupGetValue(grp, name), def);
+}
+
 QTC_END_DECLS
 
 #endif
