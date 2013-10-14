@@ -33,6 +33,9 @@
 #include "qtcurve.h"
 #include <common/config_file.h>
 
+#include <unistd.h>
+#include <sys/types.h>
+
 #ifdef QTC_ENABLE_X11
 #include <gdk/gdkx.h>
 #include <qtcurve-utils/x11utils.h>
