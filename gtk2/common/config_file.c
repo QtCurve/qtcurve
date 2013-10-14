@@ -20,6 +20,7 @@
 
 #include <qtcurve-utils/log.h>
 #include <qtcurve-utils/dirs.h>
+#include <qtcurve-utils/strs.h>
 
 #include "common.h"
 #include "config_file.h"

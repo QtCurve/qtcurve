@@ -157,7 +157,7 @@ set(CMAKE_SHARED_LINKER_FLAGS
   "-Wl,--as-needed -Wl,--no-undefined ${CMAKE_SHARED_LINKER_FLAGS}")
 set(CMAKE_MODULE_LINKER_FLAGS
   "-Wl,--as-needed -Wl,--no-undefined ${CMAKE_MODULE_LINKER_FLAGS}")
-add_definitions("-D_GNU_SOURCE")
+add_definitions("-D_GNU_SOURCE -pthread")
 
 if(NOT DEFINED LIB_INSTALL_DIR)
   set(LIB_INSTALL_DIR lib)
