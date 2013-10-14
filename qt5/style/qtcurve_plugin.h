@@ -6,10 +6,10 @@
 #include "qtcurve.h"
 
 #ifdef QTC_ENABLE_X11
-#include <QDBusConnection>
-#include <QDBusInterface>
-#include <QX11Info>
-#include <qtcurve-utils/x11utils.h>
+#  include <QDBusConnection>
+#  include <QDBusInterface>
+#  include <QX11Info>
+#  include <qtcurve-utils/x11utils.h>
 #endif
 
 namespace QtCurve {

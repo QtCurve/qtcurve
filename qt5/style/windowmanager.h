@@ -88,7 +88,7 @@ protected:
 
     //! returns true if window manager is used for moving
     bool useWMMoveResize( void ) const
-        { return supportWMMoveResize() && _useWMMoveResize; }
+        { return _useWMMoveResize; }
 
     //! drag mode
     int dragMode( void ) const
@@ -143,10 +143,6 @@ protected:
 
     //! start drag
     void startDrag( QWidget*, const QPoint& );
-
-    //! returns true if window manager is used for moving
-    /*! right now this is true only for X11 */
-    bool supportWMMoveResize( void ) const;
 
     //! utility function
     bool isDockWidgetTitle( const QWidget* ) const;

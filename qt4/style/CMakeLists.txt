@@ -52,7 +52,7 @@ set(qtcurve_MOC_HDRS
   blurhelper.h
   shortcuthandler.h)
 
-if(Q_WS_X11)
+if(QTC_ENABLE_X11)
   set(qtcurve_SRCS
     ${qtcurve_SRCS}
     macmenu.cpp
@@ -100,7 +100,7 @@ target_link_libraries(qtcurve-qt4
   ${QT_QTSVG_LIBRARY}
   qtcurve-utils)
 
-if(Q_WS_X11)
+if(QTC_ENABLE_X11)
   target_link_libraries(qtcurve-qt4 ${QT_QTDBUS_LIBRARY})
 endif()
 

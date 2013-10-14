@@ -52,10 +52,8 @@
 #include <kde_file.h>
 #include <common/common.h>
 
-#ifdef QTC_ENABLE_X11
 #include <QX11Info>
 #include <qtcurve-utils/x11utils.h>
-#endif
 
 static time_t getTimeStamp(const QString &item)
 {
@@ -104,9 +102,7 @@ QtCurveHandler::QtCurveHandler()
               , itsStyle(NULL)
               , itsDBus(NULL)
 {
-#ifdef QTC_ENABLE_X11
     qtcX11InitXlib(QX11Info::display());
-#endif
     handler = this;
     setStyle();
     reset(0);

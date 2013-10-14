@@ -53,9 +53,9 @@
 #include <QTextStream>
 
 #ifdef QTC_ENABLE_X11
-#include "shadowhelper.h"
-#include <qtcurve-utils/x11qtc.h>
-#include <sys/time.h>
+#  include "shadowhelper.h"
+#  include <qtcurve-utils/x11qtc.h>
+#  include <sys/time.h>
 #endif
 
 namespace QtCurve {

@@ -71,7 +71,7 @@ namespace QtCurve {
     WindowManager::WindowManager( QObject* parent ):
         QObject( parent ),
         _enabled( true ),
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
         _useWMMoveResize( true ),
 #else
         _useWMMoveResize( false ),
@@ -633,19 +633,6 @@ namespace QtCurve {
         _dragInProgress = true;
         return;
     }
-
-    //____________________________________________________________
-    bool WindowManager::supportWMMoveResize( void ) const
-    {
-
-        #ifdef Q_WS_X11
-        return true;
-        #endif
-
-        return false;
-
-    }
-
     //____________________________________________________________
     bool WindowManager::isDockWidgetTitle( const QWidget* widget ) const
     {

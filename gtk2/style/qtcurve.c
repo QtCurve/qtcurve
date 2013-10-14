@@ -36,10 +36,8 @@
 #include <unistd.h>
 #include <sys/types.h>
 
-#ifdef QTC_ENABLE_X11
 #include <gdk/gdkx.h>
 #include <qtcurve-utils/x11utils.h>
-#endif
 
 #define MO_ARROW(MENU, COL) (!MENU && MO_NONE!=opts.coloredMouseOver && GTK_STATE_PRELIGHT==state \
                                     ? &qtcPalette.mouseover[ARROW_MO_SHADE] : (COL))
@@ -3012,9 +3010,7 @@ void qtcurve_rc_style_register_type(GTypeModule *module)
 
 G_MODULE_EXPORT void theme_init(GTypeModule *module)
 {
-#ifdef QTC_ENABLE_X11
     qtcX11InitXlib(GDK_DISPLAY_XDISPLAY(gdk_display_get_default()));
-#endif
     qtcurve_rc_style_register_type(module);
     qtcurve_style_register_type(module);
 }

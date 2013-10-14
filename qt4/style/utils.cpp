@@ -20,15 +20,13 @@
 
 #include "config.h"
 #ifdef QTC_ENABLE_X11
-#include <qtcurve-utils/x11utils.h>
+#  include <QX11Info>
+#  include <qtcurve-utils/x11utils.h>
 #endif
 #include <qtcurve-utils/log.h>
 
 #include "utils.h"
 #include <stdio.h>
-#ifdef Q_WS_X11
-#include <QX11Info>
-#endif
 
 #ifndef QTC_QT4_ENABLE_KDE
 #  undef KDE_IS_VERSION
@@ -44,11 +42,11 @@ bool
 compositingActive()
 {
 #if !defined QTC_QT4_ENABLE_KDE || !KDE_IS_VERSION(4, 4, 0)
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
     return qtcX11CompositingActive();
-#else // Q_WS_X11
+#else
     return false;
-#endif // Q_WS_X11
+#endif
 #else // QTC_QT4_ENABLE_KDE
     return KWindowSystem::compositingActive();
 #endif // QTC_QT4_ENABLE_KDE
@@ -56,16 +54,16 @@ compositingActive()
 bool
 hasAlphaChannel(const QWidget *widget)
 {
-#ifdef Q_WS_X11
     if (compositingActive()) {
+#ifdef QTC_ENABLE_X11
         return (32 == (widget ? widget->x11Info().depth() :
                        QX11Info().appDepth()));
+#else
+        return true;
+#endif
     } else {
         return false;
     }
-#else
-    return compositingActive();
-#endif
 }
 }
 }

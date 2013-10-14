@@ -18,6 +18,7 @@
   Boston, MA 02110-1301, USA.
 */
 
+#include "config.h"
 #include <qtcurve-utils/log.h>
 #include <qtcurve-utils/qtutils.h>
 
@@ -63,9 +64,15 @@
 #include <QPainter>
 #include <QMainWindow>
 #include <QTextStream>
-#ifdef Q_WS_X11
-#include <QDBusConnection>
-#include <QDBusInterface>
+
+#ifdef QTC_ENABLE_X11
+#  include <QDBusConnection>
+#  include <QDBusInterface>
+#  include "macmenu.h"
+#  include "shadowhelper.h"
+#  include <sys/time.h>
+#  include <QX11Info>
+#  include <qtcurve-utils/x11qtc.h>
 #endif
 
 #include <common/config_file.h>
@@ -73,26 +80,15 @@
 #include "check_x_on-png.h"
 
 #ifndef QTC_QT4_ENABLE_KDE
-#include "dialog_error-png.h"
-#include "dialog_warning-png.h"
-#include "dialog_information-png.h"
+#  include "dialog_error-png.h"
+#  include "dialog_warning-png.h"
+#  include "dialog_information-png.h"
 #endif
 
 // WebKit seems to just use the values from ::pixelMetric to get button sizes. So, in pixelMetric we add some extra padding to PM_ButtonMargin
 // if we're max rounding - this gives a nicer border. However, dont want this on real buttons - so in sizeFromContents we remove this padding
 // in CT_PushButton and CT_ComboBox
 #define MAX_ROUND_BTN_PAD (ROUND_MAX==opts.round ? 3 : 0)
-
-#ifdef Q_WS_X11
-#include "macmenu.h"
-#include "shadowhelper.h"
-#include <sys/time.h>
-#endif
-
-#ifdef QTC_ENABLE_X11
-#include <QX11Info>
-#include <qtcurve-utils/x11qtc.h>
-#endif
 
 #ifdef QTC_QT4_ENABLE_KDE
 #include <KDE/KApplication>
@@ -116,10 +112,9 @@
 #include <KDE/KMenu>
 #include <KDE/KAboutApplicationDialog>
 #include <KDE/KIcon>
+#endif // QTC_QT4_ENABLE_KDE
 
 #include <qtcurve-utils/color.h>
-
-#endif // QTC_QT4_ENABLE_KDE
 
 // TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
 #define FIX_DISABLED_ICONS
@@ -606,7 +601,7 @@ static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
 
 #define SB_SUB2 ((QStyle::SubControl)(QStyle::SC_ScrollBarGroove << 1))
 
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
 static bool
 canAccessId(const QWidget *w)
 {
@@ -1007,7 +1002,7 @@ Style::Style()
         itsTitlebarHeight(0),
         itsPos(-1, -1),
         itsHoverWidget(0L),
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
         itsDBus(0),
         itsShadowHelper(new ShadowHelper(this)),
 #endif
@@ -1084,7 +1079,7 @@ void Style::init(bool initial)
         qtcReadConfig(QString(), &opts);
 #endif
 
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
         if(initial)
         {
             QDBusConnection::sessionBus().connect(QString(), "/KGlobalSettings", "org.kde.KGlobalSettings",
@@ -1377,7 +1372,7 @@ void Style::init(bool initial)
 Style::~Style()
 {
     freeColors();
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
     if(itsDBus)
         delete itsDBus;
 #endif
@@ -1755,7 +1750,7 @@ Style::polish(QWidget *widget)
     }
 
     itsWindowManager->registerWidget(widget);
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
     itsShadowHelper->registerWidget(widget);
 #endif
 
@@ -1796,14 +1791,14 @@ Style::polish(QWidget *widget)
             if (APP_PLASMA == theThemedApp && !widget->inherits("QDialog"))
                 break;
 
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
             Utils::addEventFilter(widget, this);
 #endif
             int opacity =
                 (Qt::Dialog == (widget->windowFlags() & Qt::WindowType_Mask) ?
                  opts.dlgOpacity : opts.bgndOpacity);
 
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
             if (APP_KONSOLE == theThemedApp && 100 != opacity &&
                 widget->testAttribute(Qt::WA_TranslucentBackground) &&
                 widget->inherits("Konsole::MainWindow")) {
@@ -1811,26 +1806,28 @@ Style::polish(QWidget *widget)
                 // So, just set titlebar opacity...
                 setOpacityProp(widget, (unsigned short)opacity);
                 break;
-            } else
+            }
 #endif
-                if (100 == opacity || !widget->isWindow() ||
-                    Qt::Desktop == widget->windowType() ||
-                    widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
-                    widget->testAttribute(Qt::WA_TranslucentBackground) ||
-                    widget->testAttribute(Qt::WA_NoSystemBackground) ||
-                    widget->testAttribute(Qt::WA_PaintOnScreen) ||
-                    widget->inherits("KScreenSaver") ||
-                    widget->inherits("QTipLabel") ||
-                    widget->inherits("QSplashScreen") ||
-                    widget->windowFlags().testFlag(Qt::FramelessWindowHint) ||
-                    !(widget->testAttribute(Qt::WA_WState_Created) ||
-                      widget->internalWinId())) {
-                    break;
-                }
+            if (100 == opacity || !widget->isWindow() ||
+                Qt::Desktop == widget->windowType() ||
+                widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
+                widget->testAttribute(Qt::WA_TranslucentBackground) ||
+                widget->testAttribute(Qt::WA_NoSystemBackground) ||
+                widget->testAttribute(Qt::WA_PaintOnScreen) ||
+                widget->inherits("KScreenSaver") ||
+                widget->inherits("QTipLabel") ||
+                widget->inherits("QSplashScreen") ||
+                widget->windowFlags().testFlag(Qt::FramelessWindowHint) ||
+                !(widget->testAttribute(Qt::WA_WState_Created) ||
+                  widget->internalWinId())) {
+                break;
+            }
+#ifdef QTC_ENABLE_X11
             // The window has already been created.
             if (qtcX11IsEmbed(widget->winId())) {
                 break;
             }
+#endif
 
             // whenever you set the translucency flag, Qt will
             // create a new widget under the hood, replacing the old
@@ -1913,7 +1910,7 @@ Style::polish(QWidget *widget)
         if(itsSaveMenuBarStatus && qtcMenuBarHidden(appName))
         {
             static_cast<QMainWindow*>(widget)->menuWidget()->setHidden(true);
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
             if(BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR)
                 emitMenuSize(static_cast<QMainWindow*>(widget)->menuWidget(), 0);
 #endif
@@ -1936,7 +1933,7 @@ Style::polish(QWidget *widget)
                 if(itsSaveStatusBarStatus && qtcStatusBarHidden(appName))
                     (*it)->setHidden(true);
             }
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
             setSbProp(widget);
             emitStatusBarState(sb.first());
 #endif
@@ -2031,7 +2028,7 @@ Style::polish(QWidget *widget)
     }
     else if(qobject_cast<QMenuBar*>(widget))
     {
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
         if (opts.xbar &&
             (!((APP_QTDESIGNER==theThemedApp || APP_KDEVELOP==theThemedApp) && widget->inherits("QDesignerMenuBar"))))
             Bespin::MacMenu::manage((QMenuBar*)widget);
@@ -2289,7 +2286,7 @@ Style::polish(QWidget *widget)
         widget->layout()->setMargin(0);
     }
 
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
     QWidget *window = widget->window();
 
     if ((100 != opts.bgndOpacity &&
@@ -2465,7 +2462,7 @@ void Style::unpolish(QWidget *widget)
     }
 
     itsWindowManager->unregisterWidget(widget);
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
     itsShadowHelper->unregisterWidget(widget);
 #endif
     itsBlurHelper->unregisterWidget(widget);
@@ -2564,7 +2561,7 @@ void Style::unpolish(QWidget *widget)
         widget->removeEventFilter(this);
     else if(qobject_cast<QMenuBar*>(widget))
     {
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
         if(opts.xbar)
             Bespin::MacMenu::release((QMenuBar*)widget);
 #endif
@@ -2684,7 +2681,7 @@ void Style::unpolish(QWidget *widget)
         qobject_cast<QToolBar*>(widget) ||
         (widget && qobject_cast<QToolBar*>(widget->parent())))
         widget->setBackgroundRole(QPalette::Button);
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
     QWidget *window=widget->window();
 
     if((100!=opts.bgndOpacity && Qt::Window==(window->windowFlags() & Qt::WindowType_Mask)) ||
@@ -2844,7 +2841,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                     widget->setMask(windowMask(widget->rect(), opts.round>ROUND_SLIGHT));
                 return false;
             }
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
             else if((BLEND_TITLEBAR || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR || opts.menubarHiding&HIDE_KWIN) &&
                     qobject_cast<QMenuBar*>(object))
             {
@@ -2888,7 +2885,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                qtcStatusBarHidden(appName))
                 static_cast<QStatusBar*>(object)->setHidden(true);
             break;
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
         case QEvent::PaletteChange:
         {
             QWidget *widget=qobject_cast<QWidget*>(object);
@@ -3087,7 +3084,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                     widget->setMask(windowMask(widget->rect(), opts.round>ROUND_SLIGHT));
                 return false;
             }
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
             else if((BLEND_TITLEBAR || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR || opts.menubarHiding&HIDE_KWIN) &&
                     qobject_cast<QMenuBar*>(object))
             {
@@ -3112,7 +3109,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
         case QEvent::Destroy:
         case QEvent::Hide:
         {
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
             if((BLEND_TITLEBAR || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR || opts.menubarHiding&HIDE_KWIN) &&
                 qobject_cast<QMenuBar*>(object))
             {
@@ -3640,7 +3637,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
         case SH_TitleBar_AutoRaise:
             return 1;
         case SH_MainWindow_SpaceBelowMenuBar:
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
             if(opts.xbar)
                 if (const QMenuBar *menubar = qobject_cast<const QMenuBar*>(widget))
                     if (0==menubar->height() && !menubar->actions().isEmpty())
@@ -5592,7 +5589,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             QPainterPath path=rounded ? buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, MENU_AND_TOOLTIP_RADIUS) : QPainterPath();
             QColor       col=palette.toolTipBase().color();
 
-            #ifdef Q_WS_X11
+            #ifdef QTC_ENABLE_X11
             if(widget && widget->window())
                 itsShadowHelper->registerWidget(widget->window());
             #endif
@@ -13787,7 +13784,7 @@ void Style::borderSizesChanged()
 #endif
 }
 
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
 static QMainWindow * getWindow(unsigned int xid)
 {
     QWidgetList                tlw=QApplication::topLevelWidgets();
@@ -13815,7 +13812,7 @@ static bool diffTime(struct timeval *lastTime)
 
 void Style::toggleMenuBar(unsigned int xid)
 {
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
     static unsigned int   lastXid  = 0;
     static struct timeval lastTime = {0, 0};
 
@@ -13833,7 +13830,7 @@ void Style::toggleMenuBar(unsigned int xid)
 
 void Style::toggleStatusBar(unsigned int xid)
 {
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
     static unsigned int   lastXid  = 0;
     static struct timeval lastTime = {0, 0};
 
@@ -13851,7 +13848,7 @@ void Style::toggleStatusBar(unsigned int xid)
 
 void Style::compositingToggled()
 {
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
     QWidgetList                tlw=QApplication::topLevelWidgets();
     QWidgetList::ConstIterator it(tlw.begin()),
                                end(tlw.end());
@@ -13900,7 +13897,7 @@ void Style::toggleStatusBar(QMainWindow *window)
         {
             act->trigger();
             triggeredAction=true;
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
             //emitStatusBarState(true); // TODO: ???
 #endif
         }
@@ -13920,14 +13917,14 @@ void Style::toggleStatusBar(QMainWindow *window)
             for(; it!=end; ++it)
                 (*it)->setHidden((*it)->isVisible());
 
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
             emitStatusBarState(sb.first());
 #endif
         }
     }
 }
 
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
 void Style::emitMenuSize(QWidget *w, unsigned short size, bool force)
 {
     if (w && canAccessId(w->window())) {

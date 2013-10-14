@@ -43,10 +43,6 @@
 #include <QRegion>
 #include <QToolBar>
 
-#ifdef QTC_ENABLE_X11
-#include <xcb/xcb.h>
-#endif
-
 namespace QtCurve {
 class BlurHelper: public QObject {
     Q_OBJECT

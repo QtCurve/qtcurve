@@ -636,17 +636,6 @@ void WindowManager::startDrag(QWidget* widget, const QPoint &position)
 }
 
 //____________________________________________________________
-bool WindowManager::supportWMMoveResize( void ) const
-{
-
-#ifdef QTC_ENABLE_X11
-    return true;
-#else
-    return false;
-#endif
-}
-
-//____________________________________________________________
 bool WindowManager::isDockWidgetTitle( const QWidget* widget ) const
 {
 

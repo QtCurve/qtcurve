@@ -27,6 +27,7 @@
 // IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
 
+#include <config.h>
 #include "blurhelper.h"
 
 #include <QEvent>
@@ -37,7 +38,7 @@
 #include <QPushButton>
 #include <QToolBar>
 
-#ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
 #  include <qtcurve-utils/x11blur.h>
 #endif
 
@@ -166,7 +167,7 @@ namespace QtCurve
     void BlurHelper::update( QWidget* widget ) const
     {
 
-        #ifdef Q_WS_X11
+        #ifdef QTC_ENABLE_X11
 
         /*
         directly from bespin code. Supposibly prevent playing with some 'pseudo-widgets'
@@ -195,12 +196,11 @@ namespace QtCurve
 
     }
 
-    //___________________________________________________________
-    void BlurHelper::clear( QWidget* widget ) const
+    void BlurHelper::clear(QWidget* widget) const
     {
-        #ifdef Q_WS_X11
+#ifdef QTC_ENABLE_X11
         qtcX11BlurTrigger(widget->winId(), false, 0, 0);
-        #endif
+#endif
 
     }
 

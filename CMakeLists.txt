@@ -131,6 +131,11 @@ if(NOT ENABLE_QT5)
   set(QTC_QT5_ENABLE_KWIN Off)
 endif()
 
+if(NOT QTC_ENABLE_X11 AND ENABLE_GTK2)
+  message(WARNING "Gtk2 style require QTC_ENABLE_X11 to be enabled.")
+  set(ENABLE_GTK2 Off)
+endif()
+
 if(ENABLE_GTK2)
   find_package(PkgConfig REQUIRED)
   pkg_check_modules(GTK2 REQUIRED gtk+-2.0)
