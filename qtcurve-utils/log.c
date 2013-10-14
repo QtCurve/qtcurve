@@ -121,7 +121,8 @@ _qtcLogV(QtcLogLevel level, const char *fname, int line, const char *func,
          const char *fmt, va_list ap)
 {
     _qtcLogInit();
-    if (qtcUnlikely(level < log_level || level < 0 || level > QTC_LOG_FORCE))
+    if (qtcUnlikely(level < log_level || ((int)level) < 0 ||
+                    level > QTC_LOG_FORCE))
         return;
 
     static const char *color_codes[] = {

@@ -72,10 +72,11 @@ void _qtcLogV(QtcLogLevel level, const char *fname, int line, const char *func,
               const char *fmt, va_list ap);
 
 #define qtcLog(__level, fmt, args...) do {                              \
-        QtcLogLevel level = (__level);                                  \
-        if (level < 0 || level > QTC_LOG_FORCE || level < qtcLogLevel)  \
+        unsigned level = (__level);                                     \
+        if (level > QTC_LOG_FORCE || level < qtcLogLevel)               \
             break;                                                      \
-        _qtcLog(level, __FILE__, __LINE__, __FUNCTION__, fmt, ##args);  \
+        _qtcLog((QtcLogLevel)level, __FILE__, __LINE__, __FUNCTION__,   \
+                fmt, ##args);                                           \
     } while (0)
 
 #define qtcDebug(fmt, args...)                  \
