@@ -859,7 +859,7 @@ typedef struct {
 void qtcSetupGradient(Gradient *grad, EGradientBorder border, int numStops, ...);
 const Gradient *qtcGetGradient(EAppearance app, const Options *opts);
 
-extern EAppearance qtcWidgetApp(EWidget w, const Options *opts);
+EAppearance qtcWidgetApp(EWidget w, const Options *opts);
 
 typedef enum {
     RADIUS_SELECTION,

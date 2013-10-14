@@ -136,7 +136,7 @@ qtcX11MoveTrigger(xcb_window_t wid, uint32_t x, uint32_t y)
         xcb_client_message_event_t ev;
     } buff;
     memset(&buff, 0, sizeof(buff));
-    //...Taken from bespin...
+    // ...Taken from bespin...
     // stolen... errr "adapted!" from QSizeGrip
     // Well now it is "ported"
     xcb_client_message_event_t *xev = &buff.ev;

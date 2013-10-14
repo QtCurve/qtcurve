@@ -30,7 +30,8 @@ QTC_BEGIN_DECLS
 
 #define QTC_NUM_STD_SHADES (6)
 /* 3d effect - i.e. buttons, etc */
-static const double qtc_intern_shades[2][11][QTC_NUM_STD_SHADES]= {{
+static const double qtc_intern_shades[2][11][QTC_NUM_STD_SHADES] = {
+    {
         /* HSV & HSL */
         {1.05, 1.04, 0.90, 0.800, 0.830, 0.82},
         {1.06, 1.04, 0.90, 0.790, 0.831, 0.78},
@@ -55,7 +56,8 @@ static const double qtc_intern_shades[2][11][QTC_NUM_STD_SHADES]= {{
         {1.16, 1.06, 0.91, 0.788, 0.846, 0.66},
         {1.18, 1.07, 0.91, 0.789, 0.848, 0.64},
         {1.20, 1.07, 0.91, 0.790, 0.850, 0.62}
-    }};
+    }
+};
 
 #define QTC_STD_BORDER (5)
 #define QTC_DISABLED_BORDER QTC_STD_BORDER /* (3) */
@@ -63,12 +65,14 @@ static const double qtc_intern_shades[2][11][QTC_NUM_STD_SHADES]= {{
 QTC_ALWAYS_INLINE static inline double
 qtcShadeGetIntern(int c, int s, bool darker, EShading shading)
 {
-    if (c > 10 || c < 0 || s >= QTC_NUM_STD_SHADES || s < 0)
+    if (c > 10 || c < 0 || s >= QTC_NUM_STD_SHADES || s < 0) {
         return 1.0;
+    }
     double shade =
         qtc_intern_shades[SHADING_SIMPLE == shading ? 1 : 0][c][s];
-    if (darker && (QTC_STD_BORDER == s || QTC_DISABLED_BORDER == s))
+    if (darker && (QTC_STD_BORDER == s || QTC_DISABLED_BORDER == s)) {
         return shade - 0.1;
+    }
     return shade;
 }
 

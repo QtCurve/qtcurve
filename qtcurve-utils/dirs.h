@@ -35,7 +35,7 @@ void qtcMakePath(const char *path, int mode);
 char *qtcGetConfFile(const char *file, char *buff);
 
 #define qtcGetConfFile(file, buff...)           \
-    _qtcGetConfFile(file, ##buff, NULL)
+    _qtcGetConfFile(file,##buff, NULL)
 #define _qtcGetConfFile(file, buff, ...)        \
     (qtcGetConfFile)(file, buff)
 

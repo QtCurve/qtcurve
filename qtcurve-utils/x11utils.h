@@ -101,7 +101,7 @@ QTC_END_DECLS
     })
 #else
 
-template<typename Ret, typename Cookie, typename... Args, typename... Args2>
+template <typename Ret, typename Cookie, typename... Args, typename... Args2>
 static inline Ret*
 _qtcX11Call(Cookie (*func)(xcb_connection_t*, Args...),
             Ret *(reply_func)(xcb_connection_t*, Cookie, xcb_generic_error_t**),
@@ -114,7 +114,7 @@ _qtcX11Call(Cookie (*func)(xcb_connection_t*, Args...),
 #define qtcX11Call(name, args...)                       \
     (_qtcX11Call(xcb_##name, xcb_##name##_reply, args))
 
-template<typename... Args, typename... Args2>
+template <typename... Args, typename... Args2>
 static inline xcb_void_cookie_t
 _qtcX11CallVoid(xcb_void_cookie_t (*func)(xcb_connection_t*, Args...),
                 Args2... args...)

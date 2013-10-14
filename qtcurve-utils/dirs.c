@@ -32,8 +32,9 @@ static char *qtc_conf_dir = NULL;
 QTC_EXPORT void
 qtcMakePath(const char *path, int mode)
 {
-    if (qtcIsDir(path))
+    if (qtcIsDir(path)) {
         return;
+    }
     size_t len = strlen(path);
     char opath[len + 1];
     memcpy(opath, path, len + 1);
@@ -42,8 +43,9 @@ qtcMakePath(const char *path, int mode)
         len--;
     }
     char *p = opath + strspn(opath, "/");
-    if (!p)
+    if (!p) {
         return;
+    }
     p += 1;
     for (;*p;p++) {
         if (*p == '/') {
@@ -135,8 +137,9 @@ qtcGetXDGConfigHome()
 QTC_EXPORT char*
 (qtcGetConfFile)(const char *file, char *buff)
 {
-    if (file[0] == '/')
+    if (file[0] == '/') {
         return qtcFillStrs(buff, file);
+    }
     return qtcFillStrs(buff, qtcConfDir(), file);
 }
 

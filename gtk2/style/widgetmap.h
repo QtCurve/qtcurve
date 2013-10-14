@@ -21,7 +21,7 @@
   Boston, MA 02110-1301, USA.
  */
 
-extern void qtcWidgetMapSetup(GtkWidget *from, GtkWidget *to, int map);
-extern GtkWidget * qtcWidgetMapGetWidget(GtkWidget *widget, int map);
+void qtcWidgetMapSetup(GtkWidget *from, GtkWidget *to, int map);
+GtkWidget * qtcWidgetMapGetWidget(GtkWidget *widget, int map);
 
 #endif

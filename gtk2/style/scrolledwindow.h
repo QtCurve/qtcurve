@@ -21,9 +21,9 @@
   Boston, MA 02110-1301, USA.
  */
 
-extern void qtcScrolledWindowRegisterChild(GtkWidget *child);
-extern void qtcScrolledWindowSetup(GtkWidget *widget);
-extern gboolean qtcScrolledWindowHasFocus(GtkWidget *widget);
-extern gboolean qtcScrolledWindowHovered(GtkWidget *widget);
+void qtcScrolledWindowRegisterChild(GtkWidget *child);
+void qtcScrolledWindowSetup(GtkWidget *widget);
+gboolean qtcScrolledWindowHasFocus(GtkWidget *widget);
+gboolean qtcScrolledWindowHovered(GtkWidget *widget);
 
 #endif

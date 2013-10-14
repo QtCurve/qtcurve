@@ -56,10 +56,12 @@ static const double _qtc_yc[3] = {0.34375, 0.5, 0.15625};
 QTC_ALWAYS_INLINE static inline double
 qtcColorNormalize(double a)
 {
-    if (a >= 1.0)
+    if (a >= 1.0) {
         return 1;
-    if (qtcUnlikely(a < 0.0))
+    }
+    if (qtcUnlikely(a < 0.0)) {
         return 0;
+    }
     return a;
 }
 

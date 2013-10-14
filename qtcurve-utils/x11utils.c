@@ -102,18 +102,21 @@ screen_of_display(xcb_connection_t *c, int screen)
 QTC_EXPORT xcb_screen_t*
 qtcX11GetScreen(int screen_no)
 {
-    if (screen_no == -1 || screen_no == qtc_default_screen_no)
+    if (screen_no == -1 || screen_no == qtc_default_screen_no) {
         return qtc_default_screen;
+    }
     return screen_of_display(qtc_xcb_conn, screen_no);
 }
 
 QTC_EXPORT void
 qtcX11InitXcb(xcb_connection_t *conn, int screen_no)
 {
-    if (qtcUnlikely(qtc_xcb_conn) || !conn)
+    if (qtcUnlikely(qtc_xcb_conn) || !conn) {
         return;
-    if (screen_no < 0)
+    }
+    if (screen_no < 0) {
         screen_no = 0;
+    }
     qtc_xcb_conn = conn;
     qtc_default_screen_no = screen_no;
     qtc_default_screen = screen_of_display(conn, screen_no);
@@ -130,8 +133,9 @@ qtcX11InitXcb(xcb_connection_t *conn, int screen_no)
 QTC_EXPORT void
 qtcX11InitXlib(Display *disp)
 {
-    if (qtcUnlikely(qtc_xcb_conn) || !disp)
+    if (qtcUnlikely(qtc_xcb_conn) || !disp) {
         return;
+    }
     qtc_disp = disp;
     qtcX11InitXcb(XGetXCBConnection(disp), DefaultScreen(disp));
 }
@@ -196,8 +200,9 @@ qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom)
     int32_t res = -1;
     xcb_get_property_reply_t *reply =
         qtcX11Call(get_property, 0, win, atom, XCB_ATOM_CARDINAL, 0, 1);
-    if (!reply)
+    if (!reply) {
         return -1;
+    }
     if (xcb_get_property_value_length(reply) > 0) {
         uint32_t val = *(int32_t*)xcb_get_property_value(reply);
         if (val < 512) {
@@ -222,8 +227,9 @@ qtcX11CompositingActive()
     xcb_get_selection_owner_reply_t *reply =
         qtcX11Call(get_selection_owner,
                    qtc_x11_atoms[QTC_X11_ATOM_NET_WM_CM_S_DEFAULT]);
-    if (!reply)
+    if (!reply) {
         return false;
+    }
     bool res = (reply->owner != 0);
     free(reply);
     return res;
@@ -232,13 +238,16 @@ qtcX11CompositingActive()
 QTC_EXPORT bool
 qtcX11HasAlpha(xcb_window_t win)
 {
-    if (!qtcX11CompositingActive())
+    if (!qtcX11CompositingActive()) {
         return false;
-    if (!win)
+    }
+    if (!win) {
         return true;
+    }
     xcb_get_geometry_reply_t *reply = qtcX11Call(get_geometry, win);
-    if (!reply)
+    if (!reply) {
         return false;
+    }
     bool res = (reply->depth == 32);
     free(reply);
     return res;
@@ -251,8 +260,9 @@ qtcX11IsEmbed(xcb_window_t win)
     xcb_get_property_reply_t *reply =
         qtcX11Call(get_property, 0, win, xembed_atom,
                    xembed_atom, 0, 1);
-    if (!reply)
+    if (!reply) {
         return false;
+    }
     bool res = xcb_get_property_value_length(reply) > 0;
     free(reply);
     return res;

@@ -21,6 +21,6 @@
   Boston, MA 02110-1301, USA.
  */
 
-extern void qtcScrollbarSetup(GtkWidget *widget);
+void qtcScrollbarSetup(GtkWidget *widget);
 
 #endif

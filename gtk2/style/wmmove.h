@@ -21,7 +21,6 @@
   Boston, MA 02110-1301, USA.
  */
 
-extern void qtcWMMoveSetup(GtkWidget *widget);
+void qtcWMMoveSetup(GtkWidget *widget);
 
 #endif
-

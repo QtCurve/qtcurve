@@ -71,7 +71,7 @@ _qtcMakeVersionReal(int a, int b, int c)
 #define _qtcMakeVersionV(a, b, c, ...)          \
     _qtcMakeVersionReal(a, b, c)
 #define qtcMakeVersion(a, b, arg...)            \
-    _qtcMakeVersionV(a, b, ##arg, 0)
+    _qtcMakeVersionV(a, b,##arg, 0)
 
 QTC_ALWAYS_INLINE static inline void*
 qtcUtilsAlloc0(size_t size)
@@ -96,10 +96,12 @@ qtcFree(void *p)
 QTC_ALWAYS_INLINE static inline double
 qtcLimit(double d, double l)
 {
-    if (d <= 0)
+    if (d <= 0) {
         return 0;
-    if (d >= l)
+    }
+    if (d >= l) {
         return l;
+    }
     return d;
 }
 
@@ -133,23 +135,27 @@ _qtcCatStrsFill(int n, const char **strs, size_t *lens,
     return res;
 }
 
-#define _qtcCatStrs(var, strs...) do {                                  \
+#define _qtcCatStrs(var, strs...)                                       \
+    do {                                                                \
         const char *__strs[] = {strs};                                  \
         int __strs_n = sizeof(__strs) / sizeof(const char*);            \
         size_t __strs_lens[sizeof(__strs) / sizeof(const char*)];       \
         size_t __strs_total_len =                                       \
             _qtcCatStrsCalLens(__strs_n, __strs, __strs_lens);          \
         var = _qtcCatStrsFill(__strs_n, __strs, __strs_lens,            \
-                              __strs_total_len, malloc(__strs_total_len + 1)); \
+                              __strs_total_len,                         \
+                              malloc(__strs_total_len + 1));            \
     } while (0)
 
-#define _qtcFillStrs(var, buff, strs...) do {                           \
+#define _qtcFillStrs(var, buff, strs...)                                \
+    do {                                                                \
         const char *__strs[] = {strs};                                  \
         int __strs_n = sizeof(__strs) / sizeof(const char*);            \
         size_t __strs_lens[sizeof(__strs) / sizeof(const char*)];       \
         size_t __strs_total_len =                                       \
             _qtcCatStrsCalLens(__strs_n, __strs, __strs_lens);          \
-        var = _qtcCatStrsFill(__strs_n, __strs, __strs_lens, __strs_total_len, \
+        var = _qtcCatStrsFill(__strs_n, __strs, __strs_lens,            \
+                              __strs_total_len,                         \
                               realloc(buff, __strs_total_len + 1));     \
     } while (0)
 
@@ -160,18 +166,21 @@ _qtcCatStrsFill(int n, const char **strs, size_t *lens,
 #endif
 
 #if !defined __cplusplus || defined __QTC_CAT_STR_NO_TEMPLATE
-#define qtcCatStrs(strs...) ({                                          \
-            char *__cat_str_res;                                        \
-            _qtcCatStrs(__cat_str_res, strs);                           \
-            __cat_str_res;                                              \
-        })
-#define qtcFillStrs(buff, strs...) ({                                   \
-            char *__fill_str_res;                                       \
-            _qtcFillStrs(__fill_str_res, buff, strs);                   \
-            __fill_str_res;                                             \
-        })
+#define qtcCatStrs(strs...)                     \
+    ({                                          \
+        char *__cat_str_res;                    \
+        _qtcCatStrs(__cat_str_res, strs);       \
+        __cat_str_res;                          \
+    })
+
+#define qtcFillStrs(buff, strs...)                      \
+    ({                                                  \
+        char *__fill_str_res;                           \
+        _qtcFillStrs(__fill_str_res, buff, strs);       \
+        __fill_str_res;                                 \
+    })
 #else
-template<typename... ArgTypes>
+template <typename... ArgTypes>
 QTC_ALWAYS_INLINE static inline char*
 qtcCatStrs(ArgTypes... strs...)
 {
@@ -179,7 +188,7 @@ qtcCatStrs(ArgTypes... strs...)
     _qtcCatStrs(res, strs...);
     return res;
 }
-template<typename... ArgTypes>
+template <typename... ArgTypes>
 QTC_ALWAYS_INLINE static inline char*
 qtcFillStrs(char *buff, ArgTypes... strs...)
 {
@@ -193,7 +202,7 @@ qtcFillStrs(char *buff, ArgTypes... strs...)
 
 #define __QTC_USE_DECLVAL
 #if defined __cplusplus && defined __GNUC__ && !defined __clang__
-#if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 8) ||           \
+#if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 8) ||            \
     (__GNUC__ == 4 && __GNUC_MINOR__ == 8 && __GNUC_PATCHLEVEL__ < 1)
 #undef __QTC_USE_DECLVAL
 #endif
@@ -208,25 +217,25 @@ qtcFillStrs(char *buff, ArgTypes... strs...)
     decltype(0 ? T1() : T2())
 #endif
 
-template<typename T>
+template <typename T>
 QTC_ALWAYS_INLINE static inline const T&
 qtcMax(const T &a, const T &b)
 {
     return (a > b) ? a : b;
 }
-template<typename T>
+template <typename T>
 QTC_ALWAYS_INLINE static inline const T&
 qtcMin(const T &a, const T &b)
 {
     return (a < b) ? a : b;
 }
-template<typename T1, typename T2>
+template <typename T1, typename T2>
 QTC_ALWAYS_INLINE static inline _QTC_COMP_TYPE(T1, T2)
 qtcMax(const T1 &a, const T2 &b)
 {
     return (a > b) ? a : b;
 }
-template<typename T1, typename T2>
+template <typename T1, typename T2>
 QTC_ALWAYS_INLINE static inline _QTC_COMP_TYPE(T1, T2)
 qtcMin(const T1 &a, const T2 &b)
 {
@@ -249,7 +258,7 @@ qtcMin(const T1 &a, const T2 &b)
 #define qtcBound(a, b, c) qtcMax(a, qtcMin(b, c))
 
 #ifdef __cplusplus
-template<class T>
+template <class T>
 const T&
 const_(const T &t)
 {

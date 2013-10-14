@@ -71,24 +71,26 @@ __attribute__((format(printf, 5, 0)))
 void _qtcLogV(QtcLogLevel level, const char *fname, int line, const char *func,
               const char *fmt, va_list ap);
 
-#define qtcLog(__level, fmt, args...) do {                              \
+#define qtcLog(__level, fmt, args...)                                   \
+    do {                                                                \
         unsigned level = (__level);                                     \
-        if (level > QTC_LOG_FORCE || level < qtcLogLevel)               \
+        if (level > QTC_LOG_FORCE || level < qtcLogLevel) {             \
             break;                                                      \
+        }                                                               \
         _qtcLog((QtcLogLevel)level, __FILE__, __LINE__, __FUNCTION__,   \
-                fmt, ##args);                                           \
+                fmt,##args);                                            \
     } while (0)
 
 #define qtcDebug(fmt, args...)                  \
-    qtcLog(QTC_LOG_DEBUG, fmt, ##args)
+    qtcLog(QTC_LOG_DEBUG, fmt,##args)
 #define qtcInfo(fmt, args...)                   \
-    qtcLog(QTC_LOG_INFO, fmt, ##args)
+    qtcLog(QTC_LOG_INFO, fmt,##args)
 #define qtcWarn(fmt, args...)                   \
-    qtcLog(QTC_LOG_WARN, fmt, ##args)
+    qtcLog(QTC_LOG_WARN, fmt,##args)
 #define qtcError(fmt, args...)                  \
-    qtcLog(QTC_LOG_ERROR, fmt, ##args)
+    qtcLog(QTC_LOG_ERROR, fmt,##args)
 #define qtcForceLog(fmt, args...)               \
-    qtcLog(QTC_LOG_FORCE, fmt, ##args)
+    qtcLog(QTC_LOG_FORCE, fmt,##args)
 
 QTC_END_DECLS
 

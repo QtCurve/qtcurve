@@ -50,7 +50,7 @@ qtcColorHCYFromColor(const QtcColor *color, QtcColorHCY *hcy)
     if (0.0 == hcy->y || 1.0 == hcy->y) {
         hcy->c = 0.0;
     } else {
-        hcy->c = qtcMax((hcy->y - n) / hcy->y, (p - hcy->y) / (1 - hcy->y) );
+        hcy->c = qtcMax((hcy->y - n) / hcy->y, (p - hcy->y) / (1 - hcy->y));
     }
 }
 
@@ -258,12 +258,15 @@ h2c(double h, double m1, double m2)
 {
     h = qtcColorWrap(h, 6.0);
 
-    if (h < 1.0)
+    if (h < 1.0) {
         return qtcColorMixF(m1, m2, h);
-    if (h < 3.0)
+    }
+    if (h < 3.0) {
         return m2;
-    if (h < 4.0)
+    }
+    if (h < 4.0) {
         return qtcColorMixF(m1, m2, 4.0 - h);
+    }
     return m1;
 }
 
@@ -327,8 +330,9 @@ _qtcShade(const QtcColor *ca, QtcColor *cb, double k, EShading shading)
         v *= k;
         if (v > 1.0) {
             s -= v - 1.0;
-            if (s < 0)
+            if (s < 0) {
                 s = 0;
+            }
             v = 1.0;
         }
         qtcHsvToRgb(&r, &g, &b, h, s, v);
