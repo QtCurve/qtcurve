@@ -8,7 +8,8 @@ set(qtcurve_utils_SRCS
   timer.c
   map.c
   fd_utils.c
-  process.c)
+  process.c
+  ini-parse.c)
 set(qtcurve_utils_LINKS
   m rt dl ${LIBEXECINFO_LIBRARIES} pthread)
 
