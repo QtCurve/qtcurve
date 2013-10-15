@@ -60,7 +60,7 @@ _qtcCheckLogColorReal()
     const char *env_color = getenv("QTCURVE_LOG_COLOR");
     if (qtcStrToBool(env_color, false)) {
         output_color = true;
-    } else if (qtcStrToBool(env_color, true)) {
+    } else if (!qtcStrToBool(env_color, true)) {
         output_color = false;
     } else if (isatty(2)) {
         output_color = true;
