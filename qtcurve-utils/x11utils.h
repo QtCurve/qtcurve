@@ -60,7 +60,16 @@ xcb_connection_t *qtcX11GetConn();
 Display *qtcX11GetDisp();
 int qtcX11DefaultScreenNo();
 xcb_screen_t *qtcX11DefaultScreen();
-xcb_window_t qtcX11RootWindow();
+xcb_screen_t *qtcX11GetScreen(int scrn_no);
+#define _qtcX11GetScreen(dummy, scrn_no, ...)   \
+    (qtcX11GetScreen)(scrn_no)
+#define qtcX11GetScreen(scrn_no...)             \
+    _qtcX11GetScreen(0, ##scrn_no, -1)
+xcb_window_t qtcX11RootWindow(int scrn_no);
+#define _qtcX11RootWindow(dummy, scrn_no, ...)  \
+    (qtcX11RootWindow)(scrn_no)
+#define qtcX11RootWindow(scrn_no...)            \
+    _qtcX11RootWindow(0, ##scrn_no, -1)
 void qtcX11Flush();
 void qtcX11FlushXlib();
 uint32_t qtcX11GenerateId();

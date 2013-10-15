@@ -29,7 +29,7 @@
 
 static Display *qtc_disp = NULL;
 static xcb_connection_t *qtc_xcb_conn = NULL;
-static int qtc_default_screen_no = 0;
+static int qtc_default_screen_no = -1;
 static xcb_window_t qtc_root_window = {0};
 static xcb_screen_t *qtc_default_screen = NULL;
 QTC_EXPORT xcb_atom_t qtc_x11_atoms[_QTC_X11_ATOM_NUMBER];
@@ -59,9 +59,11 @@ static const char *const qtc_x11_atom_names[_QTC_X11_ATOM_NUMBER] = {
 };
 
 QTC_EXPORT xcb_window_t
-qtcX11RootWindow()
+(qtcX11RootWindow)(int scrn_no)
 {
-    return qtc_root_window;
+    if (scrn_no < 0 || scrn_no == qtc_default_screen_no)
+        return qtc_root_window;
+    return qtcX11GetScreen()->root;
 }
 
 QTC_EXPORT void
@@ -99,7 +101,7 @@ screen_of_display(xcb_connection_t *c, int screen)
 }
 
 QTC_EXPORT xcb_screen_t*
-qtcX11GetScreen(int screen_no)
+(qtcX11GetScreen)(int screen_no)
 {
     if (screen_no == -1 || screen_no == qtc_default_screen_no) {
         return qtc_default_screen;
