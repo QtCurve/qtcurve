@@ -1822,8 +1822,13 @@ Style::polish(QWidget *widget)
                   widget->internalWinId())) {
                 break;
             }
-#ifdef QTC_ENABLE_X11
             // The window has already been created.
+#ifdef QTC_ENABLE_X11
+            // When setting WA_TranslucentBackground Qt4 may recreate
+            // the underlaying X window. This can break the XEmbed protocol
+            // and cause the embeded window to be "floating" (e.g. in
+            // kpartsplugin). Luckily, we can detect this by looking for
+            // _XEMBED_INFO property on the window.
             if (qtcX11IsEmbed(widget->winId())) {
                 break;
             }
@@ -1873,6 +1878,20 @@ Style::polish(QWidget *widget)
         case Qt::Tool:
             // this we exclude as it is used for dragging of icons etc
         default:
+            // Not setting translucent background on QGLWidget seems to cause
+            // crashing in amarok. (Oxygen-Transparent has the same issue).
+            // Not Sure whether this is the right fix, what causes the crash
+            // and how it interfere with XEmbed etc.
+            // Need explore on the issue more but setting this property
+            // doesn't seems to cause any rendering problem (AFAIK).
+            // Keep it for now.
+            // TODO:
+            //     Find out the real problem (or at least reproduce the crash
+            //     with a simpler program)
+            //     Check Qt5
+            if (widget->inherits("QGLWidget")) {
+                setTranslucentBackground(widget);
+            }
             break;
         }
         if (qobject_cast<QSlider*>(widget))
