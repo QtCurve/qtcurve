@@ -36,6 +36,7 @@
 22. Move all Xlib calls to `libqtcurve-utils`.
 23. Make it possible to disable X11 dependency when compiling
     `libqtcurve-utils` and `Qt4` and `Qt5` styles.
+24. Qt4: Workaround amarok crash (also affect Oxygen-Transparent).
 
 ## 1.8.15-KDE4
 1. Add Russian localization. Thanks to Juliette Tux.
