@@ -378,14 +378,15 @@ void Style::polish(QWidget *widget)
         itsBlurHelper->registerWidget(widget);
     }
 
-    // Sometimes get background errors with QToolBox (e.g. in Bespin config), and setting WA_StyledBackground seems to
-    // fix this,..
+    // Sometimes get background errors with QToolBox (e.g. in Bespin config),
+    // and setting WA_StyledBackground seems to fix this,..
     if (CUSTOM_BGND || FRAME_SHADED == opts.groupBox ||
         FRAME_FADED == opts.groupBox) {
         switch (widget->windowFlags() & Qt::WindowType_Mask) {
         case Qt::Window:
         case Qt::Dialog: {
-            // For non-transparent widgets, only need to set WA_StyledBackground - and PE_Widget will be called to
+            // For non-transparent widgets, only need to set
+            // WA_StyledBackground - and PE_Widget will be called to
             // render background...
             widget->setAttribute(Qt::WA_StyledBackground);
 
@@ -414,53 +415,32 @@ void Style::polish(QWidget *widget)
                 // So, just set titlebar opacity...
                 setOpacityProp(widget, (unsigned short)opacity);
                 break;
-            } else
+            }
 #endif
-                if (100 == opacity || !widget->isWindow() ||
-                    Qt::Desktop == widget->windowType() ||
-                    widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
-                    widget->testAttribute(Qt::WA_TranslucentBackground) ||
-                    widget->testAttribute(Qt::WA_NoSystemBackground) ||
-                    widget->testAttribute(Qt::WA_PaintOnScreen) ||
-                    widget->inherits("KScreenSaver") ||
-                    widget->inherits("QTipLabel") ||
-                    widget->inherits("QSplashScreen") ||
-                    widget->windowFlags().testFlag(Qt::FramelessWindowHint) ||
-                    !(widget->testAttribute(Qt::WA_WState_Created) ||
-                      widget->internalWinId())) {
-                    break;
-                }
-
+#if 0
+            // Qt5 xcb backend doesn't support recreating X window now
+            // disabling this part for now.
+            if (100 == opacity || !widget->isWindow() ||
+                Qt::Desktop == widget->windowType() ||
+                widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
+                widget->testAttribute(Qt::WA_TranslucentBackground) ||
+                widget->testAttribute(Qt::WA_NoSystemBackground) ||
+                widget->testAttribute(Qt::WA_PaintOnScreen) ||
+                widget->inherits("KScreenSaver") ||
+                widget->inherits("QTipLabel") ||
+                widget->inherits("QSplashScreen") ||
+                widget->windowFlags().testFlag(Qt::FramelessWindowHint) ||
+                !(widget->testAttribute(Qt::WA_WState_Created) ||
+                  widget->internalWinId())) {
+                break;
+            }
             // whenever you set the translucency flag, Qt will create a new
             // widget under the hood, replacing the old
             // ...unfortunately some properties are lost,
             // among them the window icon.
             QIcon icon(widget->windowIcon());
-
             setTranslucentBackground(widget);
             widget->setWindowIcon(icon);
-            // WORKAROUND: somehow the window gets repositioned to <1, <1 and
-            // thus always appears in the upper left corner
-            // we just move it faaaaar away so kwin will take back control
-            // and apply smart placement or whatever
-            if (!widget->isVisible()) {
-                QWidget *pw = (Qt::Dialog == (widget->windowFlags() &
-                                             Qt::WindowType_Mask) ?
-                               widget->parentWidget() ?
-                               widget->parentWidget()->window() :
-                               QApplication::activeWindow() : 0L);
-
-                if (pw && pw != widget) {
-                    widget->adjustSize();
-                    widget->move(pw->pos() +
-                                 QPoint((pw->size().width() -
-                                         widget->size().width()) / 2,
-                                        (pw->size().height() -
-                                         widget->size().height()) / 2));
-                } else {
-                    widget->move(900000, 900000);
-                }
-            }
 
             // PE_Widget is not called for transparent widgets,
             // so need event filter here...
@@ -468,6 +448,7 @@ void Style::polish(QWidget *widget)
             itsTransparentWidgets.insert(widget);
             connect(widget, &QWidget::destroyed,
                     this, &Style::widgetDestroyed);
+#endif
             break;
         }
         case Qt::Popup:
