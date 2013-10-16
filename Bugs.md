@@ -10,3 +10,5 @@
 4. Transparent background make chromium render incorrectly.
 5. Cannot make QMainWindow in Qt5 transparent because of upstream bug.
    [Qt-Bug](https://bugreports.qt-project.org/browse/QTBUG-34064)
+6. Menubar does not have translucent background!
+7. Should remove konqueror menubar hack (oxygen is fine without it).
