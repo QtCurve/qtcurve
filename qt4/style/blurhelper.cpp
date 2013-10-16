@@ -163,45 +163,41 @@ namespace QtCurve
 
     }
 
-    //___________________________________________________________
-    void BlurHelper::update( QWidget* widget ) const
-    {
-
-        #ifdef QTC_ENABLE_X11
-
-        /*
-        directly from bespin code. Supposibly prevent playing with some 'pseudo-widgets'
-        that have winId matching some other -random- window
-        */
-        if( !(widget->testAttribute(Qt::WA_WState_Created) || widget->internalWinId() ))
-        { return; }
-
-        const QRegion region( blurRegion( widget ) );
-        if (region.isEmpty()) {
-            clear(widget);
-        } else {
-            QVector<uint32_t> data;
-            foreach (const QRect &rect, region.rects()) {
-                data << rect.x() << rect.y() << rect.width() << rect.height();
-            }
-            qtcX11BlurTrigger(widget->winId(), true, data.size(),
-                              data.constData());
-        }
-
-        // force update
-        if( widget->isVisible() )
-        { widget->update(); }
-
-        #endif
-
-    }
-
-    void BlurHelper::clear(QWidget* widget) const
-    {
+void
+BlurHelper::update(QWidget *widget) const
+{
 #ifdef QTC_ENABLE_X11
-        qtcX11BlurTrigger(widget->winId(), false, 0, 0);
-#endif
-
+    // Do not create native window if there isn't one yet.
+    if (!(widget->testAttribute(Qt::WA_WState_Created) ||
+          widget->internalWinId())) {
+        return;
     }
+    const QRegion region(blurRegion(widget));
+    if (region.isEmpty()) {
+        clear(widget);
+    } else {
+        QVector<uint32_t> data;
+        foreach (const QRect &rect, region.rects()) {
+            data << rect.x() << rect.y() << rect.width() << rect.height();
+        }
+        qtcX11BlurTrigger(widget->winId(), true, data.size(), data.constData());
+    }
+    // force update
+    if (widget->isVisible()) {
+        widget->update();
+    }
+#else
+    QTC_UNUSED(widget);
+#endif
+}
 
+void
+BlurHelper::clear(QWidget* widget) const
+{
+#ifdef QTC_ENABLE_X11
+    qtcX11BlurTrigger(widget->winId(), false, 0, 0);
+#else
+    QTC_UNUSED(widget);
+#endif
+}
 }

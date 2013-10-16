@@ -53,10 +53,6 @@ option(QTC_QT5_OLD_NVIDIA_ARROW_FIX "Qt5 old nvidia arrow fix." Off)
 def_compat_option(QTC_QT4_STYLE_SUPPORT QTC_STYLE_SUPPORT)
 option(QTC_QT4_STYLE_SUPPORT
   "Qt4 support for creating a style for each QtCurve theme." Off)
-def_compat_option(QTC_QT4_KWIN_MAX_BUTTON_HACK QTC_KWIN_MAX_BUTTON_HACK)
-option(QTC_QT4_KWIN_MAX_BUTTON_HACK
-  "Qt4 hack to force kwin drawing maximize buttons for minimizable windows."
-  Off)
 def_compat_option(QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
   QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT)
 option(QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
@@ -174,13 +170,6 @@ add_subdirectory(po)
 add_subdirectory(qt4)
 add_subdirectory(qt5)
 add_subdirectory(gtk2)
-
-if(ENABLE_QT4 AND QTC_QT4_KWIN_MAX_BUTTON_HACK)
-  message(WARNING
-    "You have enabled the hack to force drawing of maximise "
-    "buttons for windows that can be minimised. This is a 100% "
-    "hack, that may not work or compile, and may even crash kwin.")
-endif()
 
 if((ENABLE_QT4 AND QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT) OR
     (ENABLE_QT5 AND QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT) OR

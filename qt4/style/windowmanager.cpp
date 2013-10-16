@@ -621,6 +621,8 @@ namespace QtCurve {
 #ifdef QTC_ENABLE_X11
             qtcX11MoveTrigger(widget->window()->winId(),
                               position.x(), position.y());
+#else
+            QTC_UNUSED(position);
 #endif
         }
 

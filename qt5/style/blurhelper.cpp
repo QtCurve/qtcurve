@@ -149,14 +149,11 @@ void
 BlurHelper::update(QWidget *widget) const
 {
 #ifdef QTC_ENABLE_X11
-    /*
-      directly from bespin code. Supposibly prevent playing with some
-      'pseudo-widgets' that have winId matching some other -random- window
-    */
+    // Do not create native window if there isn't one yet.
     if (!(widget->testAttribute(Qt::WA_WState_Created) ||
-          widget->internalWinId()))
+          widget->internalWinId())) {
         return;
-
+    }
     const QRegion region(blurRegion(widget));
     if (region.isEmpty()) {
         clear(widget);
@@ -172,6 +169,8 @@ BlurHelper::update(QWidget *widget) const
     if (widget->isVisible()) {
         widget->update();
     }
+#else
+    QTC_UNUSED(widget);
 #endif
 }
 
@@ -180,6 +179,8 @@ BlurHelper::clear(QWidget *widget) const
 {
 #ifdef QTC_ENABLE_X11
     qtcX11BlurTrigger(widget->winId(), false, 0, 0);
+#else
+    QTC_UNUSED(widget);
 #endif
 }
 }

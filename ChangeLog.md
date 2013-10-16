@@ -42,6 +42,10 @@
 
     [Qt-Bug](https://bugreports.qt-project.org/browse/QTBUG-34108)
 
+26. Qt: Remove konsole background and konqueror menubar hack since they doesn't
+    seems useful and produce problems.
+27. Qt4: Remove Kwin maximum button hack.
+
 ## 1.8.15-KDE4
 1. Add Russian localization. Thanks to Juliette Tux.
 2. Remove KDE3 support

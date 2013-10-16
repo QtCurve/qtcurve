@@ -100,22 +100,14 @@ recommanded to turn on in distribution packages.
 
     (Default: `Off`)
 
-4. `QTC_QT4_KWIN_MAX_BUTTON_HACK`:
-
-    Hack to force kwin drawing maximize buttons for windows that can be
-    minimised. This is a 100% hack, that may not work or compile, and may even
-    crash kwin.
-
-    (Default: `Off`)
-
-5. `QTC_GTK2_OLD_MOZILLA`:
+4. `QTC_GTK2_OLD_MOZILLA`:
 
     When Firefox is being themed - treat it as if it is < 3.0
     Thunderbird is *always* treated as being of an old Mozilla style.
 
     (Default: `Off`)
 
-6. `QTC_GTK2_MODIFY_MOZILLA`:
+5. `QTC_GTK2_MODIFY_MOZILLA`:
 
     1. Modify `userChrome.css`
 
@@ -138,7 +130,7 @@ recommanded to turn on in distribution packages.
 
     (Default: `Off`)
 
-7. `QTC_GTK2_USE_CAIRO_FOR_ARROWS`:
+6. `QTC_GTK2_USE_CAIRO_FOR_ARROWS`:
 
     Use Cairo, and not Gdk, to draw the non-antialised arrows. It has been
     reported that for intel Xorg drivers >2.8, that drawing these non-antialised
@@ -147,7 +139,7 @@ recommanded to turn on in distribution packages.
 
     (Default: `Off`)
 
-8. `QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT`:
+7. `QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT`:
 
     Enable support for the 'fixParentlessDialogs' config option.
 
@@ -172,23 +164,19 @@ in a few major releases.
 
     Alias of `QTC_QT4_STYLE_SUPPORT`.
 
-4. `QTC_KWIN_MAX_BUTTON_HACK`:
-
-    Alias of `QTC_QT4_KWIN_MAX_BUTTON_HACK`.
-
-5. `QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT`:
+4. `QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT`:
 
     Alias of `QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT`.
 
-6. `QTC_MODIFY_MOZILLA`:
+5. `QTC_MODIFY_MOZILLA`:
 
     Alias of `QTC_GTK2_MODIFY_MOZILLA`.
 
-7. `QTC_OLD_MOZILLA`:
+6. `QTC_OLD_MOZILLA`:
 
     Alias of `QTC_GTK2_OLD_MOZILLA`.
 
-8. `QTC_USE_CAIRO_FOR_ARROWS`:
+7. `QTC_USE_CAIRO_FOR_ARROWS`:
 
     Alias of `QTC_GTK2_USE_CAIRO_FOR_ARROWS`.
 

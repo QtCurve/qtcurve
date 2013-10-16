@@ -59,6 +59,7 @@ hasAlphaChannel(const QWidget *widget)
         return (32 == (widget ? widget->x11Info().depth() :
                        QX11Info().appDepth()));
 #else
+        QTC_UNUSED(widget);
         return true;
 #endif
     } else {
