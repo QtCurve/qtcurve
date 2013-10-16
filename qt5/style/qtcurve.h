@@ -336,7 +336,6 @@ private:
                              const QColor *use) const;
     QColor menuStripeCol() const;
     QPixmap *getPixmap(const QColor col, EPixmap p, double shade=1.0) const;
-    int konqMenuBarSize(const QMenuBar *menu) const;
     const QColor &checkRadioCol(const QStyleOption *opt) const;
     QColor shade(const QColor &a, double k) const;
     void shade(const color &ca, color *cb, double k) const;

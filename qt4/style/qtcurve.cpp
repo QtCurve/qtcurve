@@ -1734,14 +1734,6 @@ Style::polish(QWidget *widget)
 
     bool enableMouseOver(opts.highlightFactor || opts.coloredMouseOver);
 
-    // 'Fix' konqueror's large menubar...
-    if (!opts.xbar && APP_KONQUEROR == theThemedApp &&
-        qobject_cast<QToolButton*>(widget) &&
-        qtcCheckType0<QMenuBar>(widget->parentWidget())) {
-        widget->parentWidget()->setMaximumSize(
-            32768, konqMenuBarSize((QMenuBar*)widget->parentWidget()));
-    }
-
     if (EFFECT_NONE != opts.buttonEffect && !USE_CUSTOM_ALPHAS(opts) &&
         isNoEtchWidget(widget)) {
         theNoEtchWidgets.insert(static_cast<const QWidget*>(widget));
@@ -9972,14 +9964,6 @@ QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, con
                 newSize=size+QSize((windowsItemHMargin * 4)+2, windowsItemVMargin);
 #endif
             break;
-        case CT_MenuBar:
-            if(APP_KONQUEROR==theThemedApp && widget && qobject_cast<const QMenuBar*>(widget))
-            {
-                int height=konqMenuBarSize((const QMenuBar*)widget);
-                if(!opts.xbar || (size.height()>height))
-                    newSize.setHeight(height);
-            }
-            break;
         default:
             break;
     }
@@ -13543,20 +13527,6 @@ QPixmap * Style::getPixmap(const QColor col, EPixmap p, double shade) const
     }
 
     return pix;
-}
-
-int Style::konqMenuBarSize(const QMenuBar *menu) const
-{
-    const QFontMetrics   fm(menu->fontMetrics());
-    QSize                sz(100, fm.height());
-
-    QStyleOptionMenuItem opt;
-    opt.fontMetrics = fm;
-    opt.state = QStyle::State_Enabled;
-    opt.menuRect = menu->rect();
-    opt.text = "File";
-    sz = sizeFromContents(QStyle::CT_MenuBarItem, &opt, sz, menu);
-    return sz.height()+6;
 }
 
 const QColor & Style::getTabFill(bool current, bool highlight, const QColor *use) const

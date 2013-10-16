@@ -4015,27 +4015,10 @@ QPixmap * Style::getPixmap(const QColor col, EPixmap p, double shade) const
     return pix;
 }
 
-int Style::konqMenuBarSize(const QMenuBar *menu) const
-{
-    const QFontMetrics   fm(menu->fontMetrics());
-    QSize                sz(100, fm.height());
-
-    QStyleOptionMenuItem opt;
-    opt.fontMetrics = fm;
-    opt.state = QStyle::State_Enabled;
-    opt.menuRect = menu->rect();
-    opt.text = "File";
-    sz = sizeFromContents(QStyle::CT_MenuBarItem, &opt, sz, menu);
-    return sz.height()+6;
-}
-
 const QColor & Style::getTabFill(bool current, bool highlight, const QColor *use) const
 {
-    return current
-        ? use[ORIGINAL_SHADE]
-        : highlight
-        ? use[SHADE_2_HIGHLIGHT]
-        : use[2];
+    return (current ? use[ORIGINAL_SHADE] : highlight ?
+            use[SHADE_2_HIGHLIGHT] : use[2]);
 }
 
 QColor Style::menuStripeCol() const
