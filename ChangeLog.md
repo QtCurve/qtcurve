@@ -38,7 +38,7 @@
     `libqtcurve-utils` and `Qt4` and `Qt5` styles.
 24. Qt4: Workaround amarok crash (also affect Oxygen-Transparent).
 25. Qt4: Figured out the real reason for the window positioning problem
-    when setting `Qt::TranslucentBackground` and a better workaround/fix.
+    when setting `Qt::WA_TranslucentBackground` and a better workaround/fix.
 
     [Qt-Bug](https://bugreports.qt-project.org/browse/QTBUG-34108)
 
