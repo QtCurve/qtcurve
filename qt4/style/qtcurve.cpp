@@ -1790,16 +1790,6 @@ Style::polish(QWidget *widget)
                 (Qt::Dialog == (widget->windowFlags() & Qt::WindowType_Mask) ?
                  opts.dlgOpacity : opts.bgndOpacity);
 
-#ifdef QTC_ENABLE_X11
-            if (APP_KONSOLE == theThemedApp && 100 != opacity &&
-                widget->testAttribute(Qt::WA_TranslucentBackground) &&
-                widget->inherits("Konsole::MainWindow")) {
-                // Background translucency does not work for konsole :-(
-                // So, just set titlebar opacity...
-                setOpacityProp(widget, (unsigned short)opacity);
-                break;
-            }
-#endif
             if (100 == opacity || !widget->isWindow() ||
                 Qt::Desktop == widget->windowType() ||
                 widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
