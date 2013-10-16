@@ -1839,31 +1839,28 @@ Style::polish(QWidget *widget)
             // ...unfortunately some properties are lost, among them the
             // window icon.
             QIcon icon(widget->windowIcon());
-
-            setTranslucentBackground(widget);
-            widget->setWindowIcon(icon);
-            // WORKAROUND: somehow the window gets repositioned to <1, <1 and
-            // thus always appears in the upper left corner. We just move it
-            // faaaaar away so kwin will take back control and apply smart
-            // placement or whatever
-            if (!widget->isVisible()) {
-                QWidget *pw =
-                    Qt::Dialog == (widget->windowFlags() & Qt::WindowType_Mask) ?
-                    widget->parentWidget() ?
-                    widget->parentWidget()->window() :
-                    QApplication::activeWindow() : 0L;
-
-                if (pw && pw != widget) {
-                    widget->adjustSize();
-                    widget->move(pw->pos() +
-                                 QPoint((pw->size().width() -
-                                         widget->size().width()) / 2,
-                                        (pw->size().height() -
-                                         widget->size().height()) / 2));
-                } else {
-                    widget->move(900000, 900000);
-                }
+            // Qt tries to move the window to its original position
+            // when recreating the window, however, this causes
+            // Qt::WA_Moved attribute to be set and therefore
+            // USPosition and PPosition to be set in WM_NORMAL_HINTS
+            // which breaks window manager auto positioning.
+            // Should file a bug to Qt. Meanwhile as a better workaround
+            // than moving the window to random position, we disable
+            // auto mapping when recreating the window and clear the Moved
+            // flag before showing the window ourselves.
+            bool was_visible = widget->isVisible();
+            bool moved = widget->testAttribute(Qt::WA_Moved);
+            if (was_visible) {
+                widget->hide();
             }
+            setTranslucentBackground(widget);
+            if (!moved) {
+                widget->setAttribute(Qt::WA_Moved, false);
+            }
+            if (was_visible) {
+                widget->show();
+            }
+            widget->setWindowIcon(icon);
 
             // PE_Widget is not called for transparent widgets,
             // so need event filter here...
