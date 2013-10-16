@@ -1844,10 +1844,11 @@ Style::polish(QWidget *widget)
             // Qt::WA_Moved attribute to be set and therefore
             // USPosition and PPosition to be set in WM_NORMAL_HINTS
             // which breaks window manager auto positioning.
-            // Should file a bug to Qt. Meanwhile as a better workaround
-            // than moving the window to random position, we disable
-            // auto mapping when recreating the window and clear the Moved
-            // flag before showing the window ourselves.
+            // As a better workaround than moving the window to random
+            // position, we disable auto mapping when recreating the window
+            // and clear the Moved flag before showing the window ourselves.
+            // Upstream bug report:
+            //     https://bugreports.qt-project.org/browse/QTBUG-34108
             bool was_visible = widget->isVisible();
             bool moved = widget->testAttribute(Qt::WA_Moved);
             if (was_visible) {

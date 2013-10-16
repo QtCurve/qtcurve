@@ -37,6 +37,10 @@
 23. Make it possible to disable X11 dependency when compiling
     `libqtcurve-utils` and `Qt4` and `Qt5` styles.
 24. Qt4: Workaround amarok crash (also affect Oxygen-Transparent).
+25. Qt4: Figured out the real reason for the window positioning problem
+    when setting `Qt::TranslucentBackground` and a better workaround/fix.
+
+    [Qt-Bug](https://bugreports.qt-project.org/browse/QTBUG-34108)
 
 ## 1.8.15-KDE4
 1. Add Russian localization. Thanks to Juliette Tux.
