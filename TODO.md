@@ -22,6 +22,8 @@
 6. GTK/KDE have different disabled text behaviour when contrast
    setting changed!
 
-7. Make `QTC_ENABLE_X11` work
+7. Gtk3?????
 
-8. Gtk3?????
+8. Qt MdiSubWindow shadow and blur.
+
+9. Redo configure system and interface.
