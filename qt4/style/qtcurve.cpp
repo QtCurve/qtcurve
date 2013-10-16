@@ -274,7 +274,6 @@ static enum
     APP_KWIN,
     APP_SYSTEMSETTINGS,
     APP_SKYPE,
-    APP_KONQUEROR,
     APP_KONTACT,
     APP_ARORA,
     APP_REKONQ,
@@ -284,7 +283,6 @@ static enum
     APP_KDEVELOP,
     APP_K3B,
     APP_OPENOFFICE,
-    APP_KONSOLE,
     APP_OTHER
 } theThemedApp=APP_OTHER;
 
@@ -1452,8 +1450,6 @@ void Style::polish(QApplication *app)
         theThemedApp=APP_PLASMA;
     else if("krunner"==appName || "krunner_lock"==appName || "kscreenlocker"==appName)
         theThemedApp=APP_KRUNNER;
-    else if("konqueror"==appName)
-        theThemedApp=APP_KONQUEROR;
     else if("kontact"==appName)
         theThemedApp=APP_KONTACT;
     else if("k3b"==appName)
@@ -1474,8 +1470,6 @@ void Style::polish(QApplication *app)
         theThemedApp=APP_OPENOFFICE;
     else if("kdmgreet"==appName)
         opts.forceAlternateLvCols=false;
-    else if("konsole"==appName)
-        theThemedApp=APP_KONSOLE;
     else if("Kde4ToolkitLibrary"==appName)
         theThemedApp=APP_OPERA;
 

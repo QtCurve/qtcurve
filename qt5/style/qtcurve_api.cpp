@@ -81,8 +81,6 @@ Style::polish(QApplication *app)
     } else if ("krunner" == appName || "krunner_lock" == appName ||
                "kscreenlocker" == appName) {
         theThemedApp = APP_KRUNNER;
-    } else if ("konqueror" == appName) {
-        theThemedApp = APP_KONQUEROR;
     } else if ("kontact" == appName) {
         theThemedApp = APP_KONTACT;
     } else if ("k3b" == appName) {
@@ -93,8 +91,6 @@ Style::polish(QApplication *app)
         theThemedApp = APP_ARORA;
     } else if("rekonq" == appName) {
         theThemedApp = APP_REKONQ;
-    } else if("Designer" == QCoreApplication::applicationName()) {
-        theThemedApp = APP_QTDESIGNER;
     } else if("QtCreator" == QCoreApplication::applicationName()) {
         theThemedApp = APP_QTCREATOR;
     } else if("kdevelop" == appName || "kdevelop.bin" == appName) {
@@ -103,8 +99,6 @@ Style::polish(QApplication *app)
         theThemedApp = APP_OPENOFFICE;
     } else if("kdmgreet" == appName) {
         opts.forceAlternateLvCols=false;
-    } else if("konsole" == appName) {
-        theThemedApp = APP_KONSOLE;
     } else if("Kde4ToolkitLibrary" == appName) {
         theThemedApp = APP_OPERA;
     }
