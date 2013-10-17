@@ -118,15 +118,9 @@ bool blendOOMenuHighlight(const QPalette &pal, const QColor &highlight);
 bool isNoEtchWidget(const QWidget *widget);
 
 #ifdef QTC_ENABLE_X11
-static inline bool
-canAccessId(const QWidget *w)
-{
-    return w && w->testAttribute(Qt::WA_WState_Created) && w->internalWinId();
-}
 void setOpacityProp(QWidget *w, unsigned short opacity);
 void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage);
 void setSbProp(QWidget *w);
-
 #endif
 
 static inline void

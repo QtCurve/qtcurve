@@ -21,8 +21,9 @@
 #include "qtcurve_p.h"
 
 #ifdef QTC_ENABLE_X11
-#include <QDBusConnection>
-#include <QDBusInterface>
+#  include <QDBusConnection>
+#  include <QDBusInterface>
+#  include <qtcurve-utils/qtutils.h>
 #endif
 #include "windowmanager.h"
 #include "blurhelper.h"
@@ -4260,7 +4261,8 @@ static QMainWindow *getWindow(unsigned int xid)
     QWidgetList::ConstIterator end(tlw.end());
 
     for (;it != end;++it) {
-        if (qobject_cast<QMainWindow *>(*it) && (*it)->winId() == xid) {
+        if (qobject_cast<QMainWindow *>(*it) &&
+            qtcCanAccessWid(*it) && (*it)->winId() == xid) {
             return static_cast<QMainWindow*>(*it);
         }
     }
@@ -4394,7 +4396,7 @@ void Style::toggleStatusBar(QMainWindow *window)
 #ifdef QTC_ENABLE_X11
 void Style::emitMenuSize(QWidget *w, unsigned short size, bool force)
 {
-    if (w && canAccessId(w->window())) {
+    if (qtcCanAccessWid(w->window())) {
         static const char *constMenuSizeProperty = "qtcMenuSize";
 
         unsigned short oldSize=2000;

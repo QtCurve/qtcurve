@@ -610,31 +610,30 @@ namespace QtCurve {
 
     }
 
-    //____________________________________________________________
-    void WindowManager::startDrag(QWidget* widget, const QPoint& position)
-    {
-        if (!(enabled() && widget) || QWidget::mouseGrabber())
-            return;
-
-        // ungrab pointer
-        if (useWMMoveResize()) {
-#ifdef QTC_ENABLE_X11
-            qtcX11MoveTrigger(widget->window()->winId(),
-                              position.x(), position.y());
-#else
-            QTC_UNUSED(position);
-#endif
-        }
-
-        if (!useWMMoveResize()) {
-            if (!_cursorOverride) {
-                qApp->setOverrideCursor(Qt::SizeAllCursor);
-                _cursorOverride = true;
-            }
-        }
-        _dragInProgress = true;
+void
+WindowManager::startDrag(QWidget *widget, const QPoint &position)
+{
+    if (!(enabled() && widget) || QWidget::mouseGrabber()) {
         return;
     }
+    // ungrab pointer
+    if (useWMMoveResize()) {
+#ifdef QTC_ENABLE_X11
+        qtcX11MoveTrigger(widget->window()->winId(),
+                          position.x(), position.y());
+#else
+        QTC_UNUSED(position);
+#endif
+    }
+    if (!useWMMoveResize()) {
+        if (!_cursorOverride) {
+            qApp->setOverrideCursor(Qt::SizeAllCursor);
+            _cursorOverride = true;
+        }
+    }
+    _dragInProgress = true;
+    return;
+}
     //____________________________________________________________
     bool WindowManager::isDockWidgetTitle( const QWidget* widget ) const
     {
