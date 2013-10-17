@@ -39,6 +39,7 @@
 
 #ifdef QTC_ENABLE_X11
 #  include <qtcurve-utils/x11blur.h>
+#  include <qtcurve-utils/qtutils.h>
 #endif
 
 namespace QtCurve {
@@ -150,8 +151,7 @@ BlurHelper::update(QWidget *widget) const
 {
 #ifdef QTC_ENABLE_X11
     // Do not create native window if there isn't one yet.
-    if (!(widget->testAttribute(Qt::WA_WState_Created) ||
-          widget->internalWinId())) {
+    if (!qtcCanAccessWid(widget)) {
         return;
     }
     const QRegion region(blurRegion(widget));

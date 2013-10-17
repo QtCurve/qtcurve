@@ -24,6 +24,7 @@
 #include "utils.h"
 #include <QtGlobal>
 #include <QObject>
+#include <QWidget>
 #include <config.h>
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && defined QTC_QT5_ENABLE_KDE) || \
@@ -54,5 +55,11 @@ qtcCheckType0(T2 *obj, const char *name)
 #define qtcCheckKDETypeFull(obj, type, name) (obj->inherits(name))
 #define qtcCheckKDETypeFull0(obj, type, name) (qtcCheckType0(obj, name))
 #endif
+
+QTC_ALWAYS_INLINE static inline bool
+qtcCanAccessWid(const QWidget *w)
+{
+    return w && w->testAttribute(Qt::WA_WState_Created) && w->internalWinId();
+}
 
 #endif

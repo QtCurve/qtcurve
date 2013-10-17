@@ -34,6 +34,7 @@
 #include <QEvent>
 
 #include <qtcurve-utils/x11shadow.h>
+#include <qtcurve-utils/qtutils.h>
 
 namespace QtCurve {
 const char *const ShadowHelper::netWMForceShadowPropertyName =
@@ -60,8 +61,7 @@ bool ShadowHelper::registerWidget(QWidget* widget, bool force)
       need to install shadow directly when widget "created" state is already set
       since WinID changed is never called when this is the case
     */
-    if (widget->testAttribute(Qt::WA_WState_Created) &&
-        installX11Shadows(widget)) {
+    if (installX11Shadows(widget)) {
         _widgets.insert(widget, widget->winId());
     }
 
@@ -132,23 +132,13 @@ bool ShadowHelper::acceptWidget(QWidget* widget) const
     return false;
 }
 
-//_______________________________________________________
-bool ShadowHelper::installX11Shadows( QWidget* widget )
+bool
+ShadowHelper::installX11Shadows(QWidget *widget)
 {
-    // check widget and shadow
-    if (!widget)
+    // TODO?: also check for NET_WM_SUPPORTED atom, before installing shadow
+    if (!qtcCanAccessWid(widget)) {
         return false;
-
-    // TODO: also check for NET_WM_SUPPORTED atom, before installing shadow
-
-    /*
-      From bespin code. Supposibly prevent playing with some 'pseudo-widgets'
-      that have winId matching some other -random- window
-    */
-    if (!(widget->testAttribute(Qt::WA_WState_Created) ||
-          widget->internalWinId()))
-        return false;
-
+    }
     qtcX11ShadowInstall(widget->winId());
     return true;
 }
@@ -156,8 +146,8 @@ bool ShadowHelper::installX11Shadows( QWidget* widget )
 //_______________________________________________________
 void ShadowHelper::uninstallX11Shadows(QWidget *widget) const
 {
-    if (!(widget && widget->testAttribute(Qt::WA_WState_Created)))
-        return;
-    qtcX11ShadowUninstall(widget->winId());
+    if (qtcCanAccessWid(widget)) {
+        qtcX11ShadowUninstall(widget->winId());
+    }
 }
 }

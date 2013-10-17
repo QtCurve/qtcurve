@@ -55,6 +55,7 @@
 #ifdef QTC_ENABLE_X11
 #  include "shadowhelper.h"
 #  include <qtcurve-utils/x11qtc.h>
+#  include <qtcurve-utils/qtutils.h>
 #  include <sys/time.h>
 #endif
 
@@ -98,7 +99,7 @@ bool isNoEtchWidget(const QWidget *widget)
 
 void setOpacityProp(QWidget *w, unsigned short opacity)
 {
-    if (w && canAccessId(w)) {
+    if (qtcCanAccessWid(w->window())) {
         qtcX11SetOpacity(w->window()->winId(), opacity);
         qtcX11Flush();
     }
@@ -106,7 +107,7 @@ void setOpacityProp(QWidget *w, unsigned short opacity)
 
 void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
 {
-    if (w && canAccessId(w)) {
+    if (qtcCanAccessWid(w)) {
         uint32_t prop = (((IS_FLAT_BGND(app) ?
                            (unsigned short)(haveBgndImage ?
                                             APPEARANCE_RAISED :
@@ -121,7 +122,7 @@ void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
 
 void setSbProp(QWidget *w)
 {
-    if (w && canAccessId(w->window())) {
+    if (qtcCanAccessWid(w->window())) {
         static const char *constStatusBarProperty = "qtcStatusBar";
         QVariant prop(w->property(constStatusBarProperty));
 

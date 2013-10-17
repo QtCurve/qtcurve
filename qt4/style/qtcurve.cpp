@@ -600,16 +600,10 @@ static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
 #define SB_SUB2 ((QStyle::SubControl)(QStyle::SC_ScrollBarGroove << 1))
 
 #ifdef QTC_ENABLE_X11
-static bool
-canAccessId(const QWidget *w)
-{
-    return w && w->testAttribute(Qt::WA_WState_Created) && w->internalWinId();
-}
-
 void
 setOpacityProp(QWidget *w, unsigned short opacity)
 {
-    if (w && canAccessId(w)) {
+    if (qtcCanAccessWid(w->window())) {
         qtcX11SetOpacity(w->window()->winId(), opacity);
         qtcX11Flush();
     }
@@ -618,7 +612,7 @@ setOpacityProp(QWidget *w, unsigned short opacity)
 void
 setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
 {
-    if (w && canAccessId(w)) {
+    if (qtcCanAccessWid(w)) {
         unsigned long prop =
             ((IS_FLAT_BGND(app) ? (unsigned short)(haveBgndImage ?
                                                    APPEARANCE_RAISED :
@@ -634,7 +628,7 @@ setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
 void
 setSbProp(QWidget *w)
 {
-    if (w && canAccessId(w->window())) {
+    if (qtcCanAccessWid(w->window())) {
         static const char *constStatusBarProperty = "qtcStatusBar";
         QVariant prop(w->property(constStatusBarProperty));
 
@@ -1794,8 +1788,7 @@ Style::polish(QWidget *widget)
                 widget->inherits("QTipLabel") ||
                 widget->inherits("QSplashScreen") ||
                 widget->windowFlags().testFlag(Qt::FramelessWindowHint) ||
-                !(widget->testAttribute(Qt::WA_WState_Created) ||
-                  widget->internalWinId())) {
+                !qtcCanAccessWid(widget)) {
                 break;
             }
             // The window has already been created.
@@ -13762,10 +13755,11 @@ static QMainWindow * getWindow(unsigned int xid)
     QWidgetList::ConstIterator it(tlw.begin()),
                                end(tlw.end());
 
-    for(; it!=end; ++it)
-    {
-        if(qobject_cast<QMainWindow*>(*it) && (*it)->winId()==xid)
+    for(;it != end;++it) {
+        if (qobject_cast<QMainWindow*>(*it) &&
+            qtcCanAccessWid(*it) && (*it)->winId() == xid) {
             return static_cast<QMainWindow*>(*it);
+        }
     }
     return 0L;
 }
@@ -13898,7 +13892,7 @@ void Style::toggleStatusBar(QMainWindow *window)
 #ifdef QTC_ENABLE_X11
 void Style::emitMenuSize(QWidget *w, unsigned short size, bool force)
 {
-    if (w && canAccessId(w->window())) {
+    if (qtcCanAccessWid(w->window())) {
         static const char *constMenuSizeProperty="qtcMenuSize";
         unsigned short oldSize = 2000;
         if (!force) {
@@ -13932,7 +13926,8 @@ void Style::emitStatusBarState(QStatusBar *sb)
     {
         if(!itsDBus)
             itsDBus=new QDBusInterface("org.kde.kwin", "/QtCurve", "org.kde.QtCurve");
-        itsDBus->call(QDBus::NoBlock, "statusBarState", (unsigned int)sb->window()->winId(), sb->isVisible());
+        itsDBus->call(QDBus::NoBlock, "statusBarState",
+                      (unsigned int)sb->window()->winId(), sb->isVisible());
     }
 }
 

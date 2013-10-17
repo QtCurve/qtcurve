@@ -22,15 +22,13 @@
 #include "utils.h"
 #ifdef QTC_ENABLE_X11
 #  include <qtcurve-utils/x11utils.h>
+#  include <qtcurve-utils/qtutils.h>
 #  include <QApplication>
 #  include <QDesktopWidget>
 #endif
 #include <stdio.h>
 
-#ifndef QTC_QT5_ENABLE_KDE
-#  undef KDE_IS_VERSION
-#  define KDE_IS_VERSION(A, B, C) 0
-#else
+#ifdef QTC_QT5_ENABLE_KDE
 #  include <kdeversion.h>
 #  include <KDE/KWindowSystem>
 #endif
@@ -56,7 +54,13 @@ bool compositingActive()
 bool hasAlphaChannel(const QWidget *widget)
 {
 #ifdef QTC_ENABLE_X11
-    return qtcX11HasAlpha(widget ? widget->window()->winId() : 0);
+    QWidget *window;
+    if (!(widget && (window = widget->window())))
+        return false;
+    if (!qtcCanAccessWid(window)) {
+        return window->testAttribute(Qt::WA_TranslucentBackground);
+    }
+    return qtcX11HasAlpha(window->winId());
 #else
     Q_UNUSED(widget);
     return compositingActive();
