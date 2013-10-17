@@ -197,16 +197,6 @@ qtcX11GetAtoms(size_t n, xcb_atom_t *atoms, const char *const names[],
     }
 }
 
-QTC_EXPORT void
-qtcX11SetWMClass(xcb_window_t win, const char *wmclass, size_t len)
-{
-    if (qtcUnlikely(!win))
-        return;
-    qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, win,
-                   XCB_ATOM_WM_CLASS, XCB_ATOM_STRING, 8, len, wmclass);
-    qtcX11Flush();
-}
-
 QTC_EXPORT int32_t
 qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom)
 {

@@ -81,7 +81,6 @@ qtcX11GetAtom(const char *name, bool create)
     return atom;
 }
 
-void qtcX11SetWMClass(xcb_window_t win, const char *wmclass, size_t len);
 int32_t qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom);
 void qtcX11MapRaised(xcb_window_t win);
 bool qtcX11CompositingActive();
