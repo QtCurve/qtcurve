@@ -99,36 +99,34 @@ bool isNoEtchWidget(const QWidget *widget)
 
 void setOpacityProp(QWidget *w, unsigned short opacity)
 {
-    if (qtcCanAccessWid(w->window())) {
-        qtcX11SetOpacity(w->window()->winId(), opacity);
+    if (WId wid = qtcGetQWidgetWid(w->window())) {
+        qtcX11SetOpacity(wid, opacity);
         qtcX11Flush();
     }
 }
 
 void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
 {
-    if (qtcCanAccessWid(w)) {
+    if (WId wid = qtcGetQWidgetWid(w->window())) {
         uint32_t prop = (((IS_FLAT_BGND(app) ?
-                           (unsigned short)(haveBgndImage ?
-                                            APPEARANCE_RAISED :
-                                            APPEARANCE_FLAT) :
-                           app) & 0xFF) |
+                           (unsigned short)(haveBgndImage ? APPEARANCE_RAISED :
+                                            APPEARANCE_FLAT) : app) & 0xFF) |
                          (w->palette().background().color().rgb() &
                           0x00FFFFFF) << 8);
-        qtcX11SetBgnd(w->window()->winId(), prop);
+        qtcX11SetBgnd(wid, prop);
         qtcX11Flush();
     }
 }
 
 void setSbProp(QWidget *w)
 {
-    if (qtcCanAccessWid(w->window())) {
+    if (WId wid = qtcGetQWidgetWid(w->window())) {
         static const char *constStatusBarProperty = "qtcStatusBar";
         QVariant prop(w->property(constStatusBarProperty));
 
         if (!prop.isValid() || !prop.toBool()) {
             w->setProperty(constStatusBarProperty, true);
-            qtcX11SetStatusBar(w->window()->winId());
+            qtcX11SetStatusBar(wid);
             qtcX11Flush();
         }
     }

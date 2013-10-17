@@ -62,7 +62,7 @@ bool ShadowHelper::registerWidget(QWidget* widget, bool force)
       since WinID changed is never called when this is the case
     */
     if (installX11Shadows(widget)) {
-        _widgets.insert(widget, widget->winId());
+        _widgets.insert(widget, widget->internalWinId());
     }
 
     connect(widget, &QWidget::destroyed,
@@ -90,7 +90,7 @@ bool ShadowHelper::eventFilter(QObject *object, QEvent *event)
 
     // install shadows and update winId
     if (installX11Shadows(widget)) {
-        _widgets.insert(widget, widget->winId());
+        _widgets.insert(widget, widget->internalWinId());
     }
 
     return false;
@@ -136,18 +136,18 @@ bool
 ShadowHelper::installX11Shadows(QWidget *widget)
 {
     // TODO?: also check for NET_WM_SUPPORTED atom, before installing shadow
-    if (!qtcCanAccessWid(widget)) {
-        return false;
+    if (WId wid = qtcGetQWidgetWid(widget)) {
+        qtcX11ShadowInstall(wid);
+        return true;
     }
-    qtcX11ShadowInstall(widget->winId());
-    return true;
+    return false;
 }
 
 //_______________________________________________________
 void ShadowHelper::uninstallX11Shadows(QWidget *widget) const
 {
-    if (qtcCanAccessWid(widget)) {
-        qtcX11ShadowUninstall(widget->winId());
+    if (WId wid = qtcGetQWidgetWid(widget)) {
+        qtcX11ShadowUninstall(wid);
     }
 }
 }

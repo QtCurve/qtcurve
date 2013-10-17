@@ -57,12 +57,14 @@ namespace QtCurve
     void BlurHelper::registerWidget( QWidget* widget )
     { Utils::addEventFilter(widget, this); }
 
-    //___________________________________________________________
-    void BlurHelper::unregisterWidget( QWidget* widget )
-    {
-        widget->removeEventFilter( this );
-        if( isTransparent( widget ) ) clear( widget );
+void
+BlurHelper::unregisterWidget(QWidget *widget)
+{
+    widget->removeEventFilter(this);
+    if (isTransparent(widget)) {
+        clear(qtcGetQWidgetWid(widget));
     }
+}
 
     //___________________________________________________________
     bool BlurHelper::eventFilter( QObject* object, QEvent* event )
@@ -169,18 +171,19 @@ BlurHelper::update(QWidget *widget) const
 {
 #ifdef QTC_ENABLE_X11
     // Do not create native window if there isn't one yet.
-    if (!qtcCanAccessWid(widget)) {
+    WId wid = qtcGetQWidgetWid(widget);
+    if (!wid) {
         return;
     }
     const QRegion region(blurRegion(widget));
     if (region.isEmpty()) {
-        clear(widget);
+        clear(wid);
     } else {
         QVector<uint32_t> data;
         foreach (const QRect &rect, region.rects()) {
             data << rect.x() << rect.y() << rect.width() << rect.height();
         }
-        qtcX11BlurTrigger(widget->winId(), true, data.size(), data.constData());
+        qtcX11BlurTrigger(wid, true, data.size(), data.constData());
     }
     // force update
     if (widget->isVisible()) {
@@ -192,10 +195,10 @@ BlurHelper::update(QWidget *widget) const
 }
 
 void
-BlurHelper::clear(QWidget* widget) const
+BlurHelper::clear(WId wid) const
 {
 #ifdef QTC_ENABLE_X11
-    qtcX11BlurTrigger(widget->winId(), false, 0, 0);
+    qtcX11BlurTrigger(wid, false, 0, 0);
 #else
     QTC_UNUSED(widget);
 #endif

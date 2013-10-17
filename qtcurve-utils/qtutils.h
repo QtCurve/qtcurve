@@ -56,10 +56,12 @@ qtcCheckType0(T2 *obj, const char *name)
 #define qtcCheckKDETypeFull0(obj, type, name) (qtcCheckType0(obj, name))
 #endif
 
-QTC_ALWAYS_INLINE static inline bool
-qtcCanAccessWid(const QWidget *w)
+QTC_ALWAYS_INLINE static inline WId
+qtcGetQWidgetWid(const QWidget *w)
 {
-    return w && w->testAttribute(Qt::WA_WState_Created) && w->internalWinId();
+    if (!(w && w->testAttribute(Qt::WA_WState_Created)))
+        return (WId)0;
+    return w->internalWinId();
 }
 
 #endif

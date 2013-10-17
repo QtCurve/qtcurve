@@ -200,6 +200,8 @@ qtcX11GetAtoms(size_t n, xcb_atom_t *atoms, const char *const names[],
 QTC_EXPORT void
 qtcX11SetWMClass(xcb_window_t win, const char *wmclass, size_t len)
 {
+    if (qtcUnlikely(!win))
+        return;
     qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, win,
                    XCB_ATOM_WM_CLASS, XCB_ATOM_STRING, 8, len, wmclass);
     qtcX11Flush();
@@ -208,6 +210,8 @@ qtcX11SetWMClass(xcb_window_t win, const char *wmclass, size_t len)
 QTC_EXPORT int32_t
 qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom)
 {
+    if (qtcUnlikely(!win))
+        return -1;
     int32_t res = -1;
     xcb_get_property_reply_t *reply =
         qtcX11Call(get_property, 0, win, atom, XCB_ATOM_CARDINAL, 0, 1);
@@ -227,6 +231,8 @@ qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom)
 QTC_EXPORT void
 qtcX11MapRaised(xcb_window_t win)
 {
+    if (qtcUnlikely(!win))
+        return;
     static const uint32_t val = XCB_STACK_MODE_ABOVE;
     qtcX11CallVoid(configure_window, win, XCB_CONFIG_WINDOW_STACK_MODE, &val);
     qtcX11CallVoid(map_window, win);
@@ -249,6 +255,8 @@ qtcX11CompositingActive()
 QTC_EXPORT bool
 qtcX11HasAlpha(xcb_window_t win)
 {
+    if (qtcUnlikely(!win))
+        return false;
     if (!qtcX11CompositingActive()) {
         return false;
     }
@@ -267,6 +275,8 @@ qtcX11HasAlpha(xcb_window_t win)
 QTC_EXPORT bool
 qtcX11IsEmbed(xcb_window_t win)
 {
+    if (qtcUnlikely(!win))
+        return false;
     xcb_atom_t xembed_atom = qtc_x11_atoms[QTC_X11_ATOM_XEMBED_INFO];
     xcb_get_property_reply_t *reply =
         qtcX11Call(get_property, 0, win, xembed_atom,

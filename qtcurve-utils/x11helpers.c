@@ -102,6 +102,8 @@ qtcX11ShadowDestroy()
 QTC_EXPORT void
 qtcX11ShadowInstall(xcb_window_t win)
 {
+    if (qtcUnlikely(!win))
+        return;
     Display *disp = qtcX11GetDisp();
     xcb_atom_t atom = qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_SHADOW];
     // Use XCB to set window property recieves BadWindow errors for menus in
@@ -124,6 +126,8 @@ qtcX11ShadowInstall(xcb_window_t win)
 QTC_EXPORT void
 qtcX11ShadowUninstall(xcb_window_t win)
 {
+    if (qtcUnlikely(!win))
+        return;
     qtcX11CallVoid(delete_property, win,
                    qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_SHADOW]);
     qtcX11Flush();
@@ -133,6 +137,8 @@ qtcX11ShadowUninstall(xcb_window_t win)
 QTC_EXPORT void
 qtcX11MoveTrigger(xcb_window_t wid, uint32_t x, uint32_t y)
 {
+    if (qtcUnlikely(!wid))
+        return;
     qtcX11FlushXlib();
     qtcX11CallVoid(ungrab_pointer, XCB_TIME_CURRENT_TIME);
     union {
@@ -163,6 +169,9 @@ QTC_EXPORT void
 qtcX11BlurTrigger(xcb_window_t wid, bool enable, unsigned prop_num,
                   const uint32_t *props)
 {
+    if (qtcUnlikely(!wid)) {
+        return;
+    }
     Display *disp = qtcX11GetDisp();
     xcb_atom_t atom = qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_BLUR_BEHIND_REGION];
     if (enable) {
@@ -187,6 +196,8 @@ qtcX11BlurTrigger(xcb_window_t wid, bool enable, unsigned prop_num,
 QTC_EXPORT void
 qtcX11GetSizeHint(xcb_window_t wid, QtcX11SizeHint *hint)
 {
+    if (qtcUnlikely(!wid))
+        return;
     memset(hint, 0, sizeof(QtcX11SizeHint));
     xcb_get_property_reply_t *reply =
         qtcX11Call(get_property, 0, wid, XCB_ATOM_WM_NORMAL_HINTS,
@@ -222,6 +233,8 @@ qtcX11GetSizeHint(xcb_window_t wid, QtcX11SizeHint *hint)
 QTC_EXPORT void
 qtcX11SetSizeHint(xcb_window_t wid, const QtcX11SizeHint *hint)
 {
+    if (qtcUnlikely(!wid))
+        return;
     Display *disp = qtcX11GetDisp();
     if (disp) {
         unsigned long xlib_hint[QTC_X11_SIZE_HINTS_ELEMENTS];

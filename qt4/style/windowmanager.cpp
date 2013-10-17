@@ -619,7 +619,7 @@ WindowManager::startDrag(QWidget *widget, const QPoint &position)
     // ungrab pointer
     if (useWMMoveResize()) {
 #ifdef QTC_ENABLE_X11
-        qtcX11MoveTrigger(widget->window()->winId(),
+        qtcX11MoveTrigger(widget->window()->internalWinId(),
                           position.x(), position.y());
 #else
         QTC_UNUSED(position);

@@ -4254,15 +4254,17 @@ void Style::borderSizesChanged()
 }
 
 #ifdef QTC_ENABLE_X11
-static QMainWindow *getWindow(unsigned int xid)
+static QMainWindow*
+getWindow(unsigned int xid)
 {
+    if (qtcUnlikely(xid))
+        return NULL;
     QWidgetList tlw = QApplication::topLevelWidgets();
     QWidgetList::ConstIterator it(tlw.begin());
     QWidgetList::ConstIterator end(tlw.end());
 
     for (;it != end;++it) {
-        if (qobject_cast<QMainWindow *>(*it) &&
-            qtcCanAccessWid(*it) && (*it)->winId() == xid) {
+        if (qobject_cast<QMainWindow*>(*it) && qtcGetQWidgetWid(*it) == xid) {
             return static_cast<QMainWindow*>(*it);
         }
     }
@@ -4396,32 +4398,30 @@ void Style::toggleStatusBar(QMainWindow *window)
 #ifdef QTC_ENABLE_X11
 void Style::emitMenuSize(QWidget *w, unsigned short size, bool force)
 {
-    if (qtcCanAccessWid(w->window())) {
+    if (WId wid = qtcGetQWidgetWid(w->window())) {
         static const char *constMenuSizeProperty = "qtcMenuSize";
-
-        unsigned short oldSize=2000;
+        unsigned short oldSize = 2000;
 
         if (!force) {
             QVariant prop(w->property(constMenuSizeProperty));
-
             if (prop.isValid()) {
                 bool ok;
                 oldSize = prop.toUInt(&ok);
                 if (!ok) {
-                    oldSize=2000;
+                    oldSize = 2000;
                 }
             }
         }
 
         if (oldSize != size) {
             w->setProperty(constMenuSizeProperty, size);
-            qtcX11SetMenubarSize(w->window()->winId(), size);
+            qtcX11SetMenubarSize(wid, size);
             qtcX11Flush();
             if(!itsDBus)
                 itsDBus = new QDBusInterface("org.kde.kwin", "/QtCurve",
                                              "org.kde.QtCurve");
             itsDBus->call(QDBus::NoBlock, "menuBarSize",
-                          (unsigned int)w->window()->winId(), (int)size);
+                          (unsigned int)wid, (int)size);
         }
     }
 }
@@ -4433,7 +4433,8 @@ void Style::emitStatusBarState(QStatusBar *sb)
             itsDBus = new QDBusInterface("org.kde.kwin", "/QtCurve",
                                          "org.kde.QtCurve");
         itsDBus->call(QDBus::NoBlock, "statusBarState",
-                      (unsigned int)sb->window()->winId(), sb->isVisible());
+                      (unsigned int)qtcGetQWidgetWid(sb->window()),
+                      sb->isVisible());
     }
 }
 

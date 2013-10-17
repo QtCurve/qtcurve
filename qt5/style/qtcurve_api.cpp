@@ -406,7 +406,7 @@ void Style::polish(QWidget *widget)
                 widget->inherits("QTipLabel") ||
                 widget->inherits("QSplashScreen") ||
                 widget->windowFlags().testFlag(Qt::FramelessWindowHint) ||
-                !qtcCanAccessWid(widget)) {
+                !qtcGetQWidgetWid(widget)) {
                 break;
             }
             // whenever you set the translucency flag, Qt will create a new

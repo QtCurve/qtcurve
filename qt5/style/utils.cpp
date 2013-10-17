@@ -57,10 +57,10 @@ bool hasAlphaChannel(const QWidget *widget)
     QWidget *window;
     if (!(widget && (window = widget->window())))
         return false;
-    if (!qtcCanAccessWid(window)) {
-        return window->testAttribute(Qt::WA_TranslucentBackground);
+    if (WId wid = qtcGetQWidgetWid(window)) {
+        return qtcX11HasAlpha(wid);
     }
-    return qtcX11HasAlpha(window->winId());
+    return window->testAttribute(Qt::WA_TranslucentBackground);
 #else
     Q_UNUSED(widget);
     return compositingActive();

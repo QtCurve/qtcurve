@@ -112,7 +112,7 @@ protected:
     void update(QWidget*) const;
 
     //! clear blur regions for given widget
-    void clear(QWidget*) const;
+    void clear(WId) const;
 
     //! returns true if a given widget is opaque
     bool isOpaque(const QWidget *widget) const {
