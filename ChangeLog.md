@@ -31,7 +31,7 @@
 19. Fix compiling with `clang++` and `libc++`.
 20. Remove configure file support for pre-1.0 releases.
     (More than 3 years from now)
-21. Qt4: Fix/Workaround QMdiSubWindow not drawn correctly with translucent
+21. Qt: Fix/Workaround QMdiSubWindow not drawn correctly with translucent
     background.
 22. Move all Xlib calls to `libqtcurve-utils`.
 23. Make it possible to disable X11 dependency when compiling

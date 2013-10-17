@@ -6,7 +6,7 @@
 3. Transparent dialog break Qt MDI window.
    Partially fixed by drawing background ourselves.
    Need to figure out what Oxygen Transparent is doing, what's wrong with
-   preview window and what we need to do in Qt5.
+   preview window (preview window magically looks good now).
 4. Transparent background make chromium render incorrectly.
 5. Cannot make QMainWindow in Qt5 transparent because of upstream bug.
    [Qt-Bug](https://bugreports.qt-project.org/browse/QTBUG-34064)
