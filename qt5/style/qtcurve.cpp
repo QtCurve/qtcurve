@@ -2354,8 +2354,9 @@ void Style::drawBackgroundImage(QPainter *p, bool isWindow, const QRect &r) cons
 
 void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType type) const
 {
-    bool          isWindow(BGND_MENU!=type),
-        previewMdi(isWindow && itsIsPreview && qobject_cast<const QMdiSubWindow *>(widget));
+    bool isWindow(BGND_MENU != type);
+    bool previewMdi(isWindow && itsIsPreview &&
+                    qobject_cast<const QMdiSubWindow*>(widget));
     const QWidget *window = itsIsPreview ? widget : widget->window();
     int           opacity = BGND_MENU==type
         ? opts.menuBgndOpacity

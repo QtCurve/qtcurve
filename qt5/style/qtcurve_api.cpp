@@ -448,7 +448,8 @@ void Style::polish(QWidget *widget)
         }
     }
 
-    if (itsIsPreview && qobject_cast<QMdiSubWindow*>(widget))
+    if (// itsIsPreview &&
+        qobject_cast<QMdiSubWindow*>(widget))
         widget->setAttribute(Qt::WA_StyledBackground);
 
     if (opts.menubarHiding && qobject_cast<QMainWindow *>(widget) &&
@@ -892,7 +893,8 @@ void Style::unpolish(QWidget *widget)
             widget->setBackgroundRole(QPalette::Window);
     }
 
-    if(itsIsPreview && qobject_cast<QMdiSubWindow *>(widget))
+    if (// itsIsPreview &&
+        qobject_cast<QMdiSubWindow*>(widget))
         widget->setAttribute(Qt::WA_StyledBackground, false);
 
     if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuWidget())
@@ -2073,11 +2075,12 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
     }
 #endif
     case PE_Widget:
-        if(widget && widget->testAttribute(Qt::WA_StyledBackground) &&
-           ( (!widget->testAttribute(Qt::WA_NoSystemBackground) &&
-              ((widget->windowFlags()&Qt::WindowType_Mask) & (Qt::Window|Qt::Dialog)) && widget->isWindow()) ||
-             (itsIsPreview && qobject_cast<const QMdiSubWindow *>(widget)) ) )
-        {
+        if (widget && widget->testAttribute(Qt::WA_StyledBackground) &&
+            ((!widget->testAttribute(Qt::WA_NoSystemBackground) &&
+              ((widget->windowFlags() & Qt::WindowType_Mask) &
+               (Qt::Window | Qt::Dialog)) && widget->isWindow()) ||
+             (// itsIsPreview &&
+              qobject_cast<const QMdiSubWindow*>(widget)))) {
             bool isDialog=qobject_cast<const QDialog *>(widget);
 
             if(CUSTOM_BGND || itsIsPreview || (isDialog && opts.dlgOpacity!=100) || (!isDialog && opts.bgndOpacity!=100))

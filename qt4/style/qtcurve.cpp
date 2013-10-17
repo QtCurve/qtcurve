@@ -3944,7 +3944,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
         if(widget && widget->testAttribute(Qt::WA_StyledBackground) &&
            ((!widget->testAttribute(Qt::WA_NoSystemBackground) &&
              ((widget->windowFlags() & Qt::WindowType_Mask) &
-              (Qt::Window|Qt::Dialog)) && widget->isWindow()) ||
+              (Qt::Window | Qt::Dialog)) && widget->isWindow()) ||
             (// itsIsPreview &&
              qobject_cast<const QMdiSubWindow*>(widget)))) {
             bool isDialog = qobject_cast<const QDialog*>(widget);
@@ -8852,11 +8852,11 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                     const QWidget *w = NULL;
                     if (qobject_cast<const QMainWindow*>(widget)) {
                         w = widget;
-                    } else if (static_cast<const QMdiSubWindow*>(widget)
-                               ->widget()) {
+                    } else if (static_cast<const QMdiSubWindow*>(
+                                   widget)->widget()) {
                         w = qobject_cast<const QMainWindow*>(
-                            static_cast<const QMdiSubWindow*>(widget)
-                            ->widget());
+                            static_cast<const QMdiSubWindow*>(
+                                widget)->widget());
                     }
                     if(w)
                     {
@@ -11837,8 +11837,9 @@ void Style::drawBackgroundImage(QPainter *p, bool isWindow, const QRect &r) cons
 
 void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType type) const
 {
-    bool          isWindow(BGND_MENU!=type),
-                  previewMdi(isWindow && itsIsPreview && qobject_cast<const QMdiSubWindow*>(widget));
+    bool isWindow(BGND_MENU != type);
+    bool previewMdi(isWindow && itsIsPreview &&
+                    qobject_cast<const QMdiSubWindow*>(widget));
     const QWidget *window = itsIsPreview ? widget : widget->window();
     int           opacity = BGND_MENU==type
                                 ? opts.menuBgndOpacity

@@ -224,7 +224,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     bool settingsChanged(const Options &opts);
     bool settingsChanged() { return settingsChanged(presets[currentText].opts); }
 
-    private:
+private:
 
     Options                previewStyle;
     CWorkspace             *workSpace;
