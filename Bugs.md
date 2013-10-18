@@ -10,5 +10,7 @@
 4. Transparent background make chromium render incorrectly.
 5. Cannot make QMainWindow in Qt5 transparent because of upstream bug.
    [Qt-Bug](https://bugreports.qt-project.org/browse/QTBUG-34064)
-6. Menubar does not have translucent background!
+6. Menubar in qt does not have translucent background!
 7. Remove most application hacks if not all.
+8. PyQt5, Musescore and (occasionally) QtCreator seg fault on exit in a QtDBus
+   destructor even when QtCurve is not linked to QtDBus.

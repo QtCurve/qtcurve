@@ -1,4 +1,4 @@
-## 1.8.17 (RC)
+## 1.8.17
 1. **Add Qt5 support!!**.
 2. Gtk2: Workaround bug in glib >= 2.36.1 (`g_spawn_command_line_sync()`)
 
