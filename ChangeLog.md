@@ -45,6 +45,7 @@
 26. Qt: Remove konsole background and konqueror menubar hack since they doesn't
     seems useful and produce problems.
 27. Qt4: Remove Kwin maximum button hack.
+28. Qt: Always assume QMdiSubWindow has alpha channel.
 
 ## 1.8.15-KDE4
 1. Add Russian localization. Thanks to Juliette Tux.
