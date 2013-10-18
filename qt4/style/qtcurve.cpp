@@ -11858,8 +11858,10 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
     QRect         bgndRect(widget->rect()),
                   imgRect(bgndRect);
 
-    if(100!=opacity && !QtCurve::Utils::hasAlphaChannel(window))
-        opacity=100;
+    if (100 != opacity && !(qobject_cast<const QMdiSubWindow*>(widget) ||
+                            Utils::hasAlphaChannel(window))) {
+        opacity = 100;
+    }
 
     p->setClipRegion(widget->rect(), Qt::IntersectClip);
 
