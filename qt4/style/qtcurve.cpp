@@ -2817,13 +2817,15 @@ bool Style::eventFilter(QObject *object, QEvent *event)
         case QEvent::Move:
             return false; // just for performance - they can occur really often
         case QEvent::Resize:
-            if(!(opts.square&SQUARE_POPUP_MENUS) && object->inherits("QComboBoxPrivateContainer"))
-            {
-                QWidget *widget=static_cast<QWidget*>(object);
-                if(Utils::hasAlphaChannel(widget))
+            if (!(opts.square & SQUARE_POPUP_MENUS) &&
+                object->inherits("QComboBoxPrivateContainer")) {
+                QWidget *widget = static_cast<QWidget*>(object);
+                if (Utils::hasAlphaChannel(widget)) {
                    widget->clearMask();
-                else
-                    widget->setMask(windowMask(widget->rect(), opts.round>ROUND_SLIGHT));
+                } else {
+                    widget->setMask(windowMask(widget->rect(),
+                                               opts.round > ROUND_SLIGHT));
+                }
                 return false;
             }
 #ifdef QTC_ENABLE_X11
@@ -3059,14 +3061,15 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                     itsTimer.start();
                     itsProgressBarAnimateTimer = startTimer(1000 / constProgressBarFps);
                 }
-            }
-            else if(!(opts.square&SQUARE_POPUP_MENUS) && object->inherits("QComboBoxPrivateContainer"))
-            {
-                QWidget *widget=static_cast<QWidget*>(object);
-                if(Utils::hasAlphaChannel(widget))
+            } else if(!(opts.square & SQUARE_POPUP_MENUS) &&
+                      object->inherits("QComboBoxPrivateContainer")) {
+                QWidget *widget = static_cast<QWidget*>(object);
+                if (Utils::hasAlphaChannel(widget)) {
                     widget->clearMask();
-                else
-                    widget->setMask(windowMask(widget->rect(), opts.round>ROUND_SLIGHT));
+                } else {
+                    widget->setMask(windowMask(widget->rect(),
+                                               opts.round > ROUND_SLIGHT));
+                }
                 return false;
             }
 #ifdef QTC_ENABLE_X11
@@ -3523,14 +3526,18 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
     {
         case SH_ToolTip_Mask:
         case SH_Menu_Mask:
-            if((SH_ToolTip_Mask==hint && (opts.square&SQUARE_TOOLTIPS)) ||
-               (SH_Menu_Mask==hint && (opts.square&SQUARE_POPUP_MENUS)))
+            if ((SH_ToolTip_Mask == hint && (opts.square & SQUARE_TOOLTIPS)) ||
+                (SH_Menu_Mask == hint && (opts.square & SQUARE_POPUP_MENUS))) {
                 return BASE_STYLE::styleHint(hint, option, widget, returnData);
-            else
-            {
-                if(!Utils::hasAlphaChannel(widget) && (!widget || widget->isWindow()))
-                    if(QStyleHintReturnMask *mask = qstyleoption_cast<QStyleHintReturnMask*>(returnData))
-                        mask->region = windowMask(option->rect, opts.round>ROUND_SLIGHT);
+            } else {
+                if (!Utils::hasAlphaChannel(widget) &&
+                    (!widget || widget->isWindow())) {
+                    if (QStyleHintReturnMask *mask =
+                        qstyleoption_cast<QStyleHintReturnMask*>(returnData)) {
+                        mask->region = windowMask(option->rect,
+                                                  opts.round > ROUND_SLIGHT);
+                    }
+                }
                 return true;
             }
         case SH_ComboBox_ListMouseTracking:
@@ -5569,8 +5576,10 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
         // case PE_IndicatorProgressChunk:
         case PE_PanelTipLabel:
         {
-            bool         haveAlpha=Utils::hasAlphaChannel(widget)  && APP_OPERA!=theThemedApp,
-                         rounded=!(opts.square&SQUARE_TOOLTIPS) && APP_OPERA!=theThemedApp;
+            bool haveAlpha = (Utils::hasAlphaChannel(widget) &&
+                              APP_OPERA != theThemedApp);
+            bool rounded = (!(opts.square & SQUARE_TOOLTIPS) &&
+                            APP_OPERA != theThemedApp);
             QPainterPath path=rounded ? buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, MENU_AND_TOOLTIP_RADIUS) : QPainterPath();
             QColor       col=palette.toolTipBase().color();
 
@@ -11854,8 +11863,7 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
 
     p->setClipRegion(widget->rect(), Qt::IntersectClip);
 
-    if(isWindow)
-    {
+    if (isWindow) {
         if(!previewMdi)
         {
             WindowBorders borders=qtcGetWindowBorderSize(false);

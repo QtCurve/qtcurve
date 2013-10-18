@@ -1197,7 +1197,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 widget->clearMask();
             } else {
                 widget->setMask(windowMask(widget->rect(),
-                                           opts.round>ROUND_SLIGHT));
+                                           opts.round > ROUND_SLIGHT));
             }
             return false;
         }
@@ -1442,10 +1442,9 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 itsTimer.start();
                 itsProgressBarAnimateTimer = startTimer(1000 / constProgressBarFps);
             }
-        }
-        else if(!(opts.square&SQUARE_POPUP_MENUS) && object->inherits("QComboBoxPrivateContainer"))
-        {
-            QWidget *widget=static_cast<QWidget *>(object);
+        } else if(!(opts.square & SQUARE_POPUP_MENUS) &&
+                  object->inherits("QComboBoxPrivateContainer")) {
+            QWidget *widget = static_cast<QWidget*>(object);
             if (Utils::hasAlphaChannel(widget)) {
                 widget->clearMask();
             } else {
@@ -1876,14 +1875,18 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
     switch (hint) {
     case SH_ToolTip_Mask:
     case SH_Menu_Mask:
-        if((SH_ToolTip_Mask==hint && (opts.square&SQUARE_TOOLTIPS)) ||
-           (SH_Menu_Mask==hint && (opts.square&SQUARE_POPUP_MENUS)))
+        if ((SH_ToolTip_Mask == hint && (opts.square & SQUARE_TOOLTIPS)) ||
+            (SH_Menu_Mask == hint && (opts.square & SQUARE_POPUP_MENUS))) {
             return BASE_STYLE::styleHint(hint, option, widget, returnData);
-        else
-        {
-            if(!Utils::hasAlphaChannel(widget) && (!widget || widget->isWindow()))
-                if(QStyleHintReturnMask *mask = qstyleoption_cast<QStyleHintReturnMask *>(returnData))
-                    mask->region = windowMask(option->rect, opts.round>ROUND_SLIGHT);
+        } else {
+            if (!Utils::hasAlphaChannel(widget) &&
+                (!widget || widget->isWindow())) {
+                if (QStyleHintReturnMask *mask =
+                    qstyleoption_cast<QStyleHintReturnMask*>(returnData)) {
+                    mask->region = windowMask(option->rect,
+                                              opts.round > ROUND_SLIGHT);
+                }
+            }
             return true;
         }
     case SH_ComboBox_ListMouseTracking:
@@ -2081,9 +2084,9 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
                (Qt::Window | Qt::Dialog)) && widget->isWindow()) ||
              (// itsIsPreview &&
               qobject_cast<const QMdiSubWindow*>(widget)))) {
-            bool isDialog=qobject_cast<const QDialog *>(widget);
+            bool isDialog = qobject_cast<const QDialog*>(widget);
 
-            if(CUSTOM_BGND || itsIsPreview || (isDialog && opts.dlgOpacity!=100) || (!isDialog && opts.bgndOpacity!=100))
+            if (CUSTOM_BGND || itsIsPreview || (isDialog && opts.dlgOpacity!=100) || (!isDialog && opts.bgndOpacity!=100))
                 drawBackground(painter, widget, isDialog ? BGND_DIALOG : BGND_WINDOW);
         }
         break;
@@ -3643,10 +3646,11 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
         break;
         // TODO: This is the only part left from QWindowsStyle - but I dont think its actually used!
         // case PE_IndicatorProgressChunk:
-    case PE_PanelTipLabel:
-    {
-        bool         haveAlpha=Utils::hasAlphaChannel(widget)  && APP_OPERA!=theThemedApp,
-            rounded=!(opts.square&SQUARE_TOOLTIPS) && APP_OPERA!=theThemedApp;
+    case PE_PanelTipLabel: {
+        bool haveAlpha = (Utils::hasAlphaChannel(widget) &&
+                          APP_OPERA != theThemedApp);
+        bool rounded = (!(opts.square & SQUARE_TOOLTIPS) &&
+                        APP_OPERA != theThemedApp);
         QPainterPath path=rounded ? buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, MENU_AND_TOOLTIP_RADIUS) : QPainterPath();
         QColor       col=palette.toolTipBase().color();
 
