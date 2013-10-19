@@ -20,7 +20,6 @@
 
 #include <qtcurve-utils/gtkutils.h>
 
-#include <string.h>
 #include "compatability.h"
 #include <common/common.h>
 

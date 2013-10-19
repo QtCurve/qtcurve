@@ -26,7 +26,6 @@
 #include <qtcurve-utils/log.h>
 
 #include "utils.h"
-#include <stdio.h>
 
 #ifndef QTC_QT4_ENABLE_KDE
 #  undef KDE_IS_VERSION

@@ -20,13 +20,11 @@
 
 #include <qtcurve-utils/gtkutils.h>
 
-#include <stdlib.h>
 #include "compatability.h"
 
-typedef struct
-{
-    int          id,
-                 numRects;
+typedef struct {
+    int id;
+    int numRects;
     GdkRectangle *rects;
 } QtCTab;
 

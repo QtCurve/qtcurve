@@ -26,9 +26,6 @@
 
 #include "helpers.h"
 #include "qt_settings.h"
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
 #include <gdk/gdkx.h>
 
 void

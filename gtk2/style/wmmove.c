@@ -22,13 +22,11 @@
 #include <qtcurve-utils/x11wmmove.h>
 
 #include <gdk/gdkx.h>
-#include <stdlib.h>
 #include "compatability.h"
 #include "helpers.h"
 #include "qt_settings.h"
 #include "menu.h"
 #include "tab.h"
-#include <string.h>
 
 extern Options opts;
 

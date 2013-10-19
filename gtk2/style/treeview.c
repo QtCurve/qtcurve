@@ -20,7 +20,6 @@
 
 #include <qtcurve-utils/gtkutils.h>
 
-#include <stdlib.h>
 #include "compatability.h"
 
 #if GTK_CHECK_VERSION(2, 12, 0)

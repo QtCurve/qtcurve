@@ -31,7 +31,6 @@
 #include "qtcurveclient.h"
 #include <common/common.h>
 
-#include <stdio.h>
 namespace KWinQtCurve {
 
 static int

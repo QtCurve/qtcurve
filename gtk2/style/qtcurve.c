@@ -22,22 +22,15 @@
 
 #include <qtcurve-utils/color.h>
 #include <qtcurve-utils/gtkutils.h>
+#include <qtcurve-utils/x11utils.h>
 
 #include <gmodule.h>
 #include <gdk/gdk.h>
-#include <math.h>
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
+#include <gdk/gdkx.h>
+#include <cairo.h>
 #include "compatability.h"
 #include "qtcurve.h"
 #include <common/config_file.h>
-
-#include <unistd.h>
-#include <sys/types.h>
-
-#include <gdk/gdkx.h>
-#include <qtcurve-utils/x11utils.h>
 
 #define MO_ARROW(MENU, COL) (!MENU && MO_NONE!=opts.coloredMouseOver && GTK_STATE_PRELIGHT==state \
                                     ? &qtcPalette.mouseover[ARROW_MO_SHADE] : (COL))
@@ -59,7 +52,6 @@
 #include "pixcache.h"
 #include "shadowhelper.h"
 #include "config.h"
-#include <cairo.h>
 
 static GtkStyleClass *parent_class=NULL;
 

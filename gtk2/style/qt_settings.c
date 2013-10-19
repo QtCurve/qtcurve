@@ -18,57 +18,44 @@
   Boston, MA 02110-1301, USA.
  */
 
+#include "config.h"
+
 #include <qtcurve-utils/color.h>
 #include <qtcurve-utils/log.h>
 #include <qtcurve-utils/dirs.h>
 
-#include "config.h"
 #include <gtk/gtk.h>
-#include <gdk/gdk.h>
 #include <common/common.h>
 #include <common/config_file.h>
 #include "qt_settings.h"
 #include "helpers.h"
-#include <time.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/unistd.h>
 #include <fcntl.h>
-#include <unistd.h>
-#include <stdio.h>
 #include <dirent.h>
-#include <errno.h>
 #include <locale.h>
 #include <gmodule.h>
 #include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <pwd.h>
-#include <sys/types.h>
-#include <math.h>
 
 QtCPalette qtcPalette;
 Options opts;
 
 #define MAX_APP_NAME_LEN 32
 
-#define KDE_CFG_DIR         "/share/config/"
-#define KDE4_SYS_CFG_DIR    "/share/kde4/config/"
-#define KDEGLOBALS_FILE     "kdeglobals"
+#define KDE_CFG_DIR "/share/config/"
+#define KDE4_SYS_CFG_DIR "/share/kde4/config/"
+#define KDEGLOBALS_FILE "kdeglobals"
 #define KDEGLOBALS_SYS_FILE "system.kdeglobals"
 
-static char *getKdeHome()
+static char*
+getKdeHome()
 {
     static char *kdeHome = NULL;
 
-    if(!kdeHome) {
+    if (!kdeHome) {
         if (runCommand("kde4-config --expandvars --localprefix", &kdeHome)) {
             int len = strlen(kdeHome);
 
-            if (len>1 && kdeHome[len-1] == '\n') {
-                kdeHome[len-1]='\0';
+            if (len > 1 && kdeHome[len - 1] == '\n') {
+                kdeHome[len - 1] = '\0';
             }
         } else {
             kdeHome = NULL;
@@ -78,13 +65,13 @@ static char *getKdeHome()
     if (!kdeHome) {
         char *env = getenv(getuid() ? "KDEHOME" : "KDEROOTHOME");
 
-        if(env) {
+        if (env) {
             kdeHome = env;
         } else {
-            static char kdeHomeStr[MAX_CONFIG_FILENAME_LEN+1];
+            static char kdeHomeStr[MAX_CONFIG_FILENAME_LEN + 1];
             const char *home = qtcGetHome();
 
-            if (strlen(home) < (MAX_CONFIG_FILENAME_LEN-5)) {
+            if (strlen(home) < (MAX_CONFIG_FILENAME_LEN - 5)) {
                 sprintf(kdeHomeStr, "%s/.kde", home);
                 kdeHome = kdeHomeStr;
             }
@@ -94,67 +81,69 @@ static char *getKdeHome()
     return kdeHome;
 }
 
-static const char * kdeFile(const char *f)
+static const char*
+kdeFile(const char *f)
 {
-    static char kg[MAX_CONFIG_FILENAME_LEN+1]={'\0'};
+    static char kg[MAX_CONFIG_FILENAME_LEN + 1] = {'\0'};
 
-    char *kdehome=getKdeHome();
+    char *kdehome = getKdeHome();
 
-    if(kdehome && strlen(kdehome)<(MAX_CONFIG_FILENAME_LEN-(strlen(KDE_CFG_DIR)+strlen(f))))
-        sprintf(kg, "%s"KDE_CFG_DIR"%s", kdehome, f);
+    if (kdehome && strlen(kdehome) <
+        (MAX_CONFIG_FILENAME_LEN - (strlen(KDE_CFG_DIR) + strlen(f)))) {
+        sprintf(kg, "%s" KDE_CFG_DIR "%s", kdehome, f);
+    }
 
     return kg;
 }
 
-static const char * kdeGlobals()
+static const char*
+kdeGlobals()
 {
     return kdeFile(KDEGLOBALS_FILE);
 }
 
-static const char * kwinrc()
+static const char*
+kwinrc()
 {
     return kdeFile("kwinrc");
 }
 
-#define HICOLOR_ICONS           "hicolor"
-#define HICOLOR_LEN             7
-#define ICON_FOLDER             "/share/icons/"
-#define ICON_FOLDER_SLEN        13
-#define DEFAULT_ICON_PREFIX     "/usr/share/icons"
+#define HICOLOR_ICONS "hicolor"
+#define HICOLOR_LEN 7
+#define ICON_FOLDER "/share/icons/"
+#define ICON_FOLDER_SLEN 13
+#define DEFAULT_ICON_PREFIX "/usr/share/icons"
 #define DEFAULT_ICON_PREFIX_LEN 16
 
-#if 0
-static gboolean drawBackgroundPng(const char *png);
-#endif
-
-static GdkColor setGdkColor(int r, int g, int b)
+static GdkColor
+setGdkColor(int r, int g, int b)
 {
     GdkColor col;
 
-    col.red=toGtkColor(r);
-    col.green=toGtkColor(g);
-    col.blue=toGtkColor(b);
+    col.red = toGtkColor(r);
+    col.green = toGtkColor(g);
+    col.blue = toGtkColor(b);
     return col;
 }
 
-/*
-#define DEBUG
-*/
+#define DEFAULT_KDE_ACT_PAL                                           \
+    "active=#000000^e#dddfe4^e#ffffff^e#ffffff^e#555555^e#c7c7c7^e"   \
+    "#000000^e#ffffff^e#000000^e#ffffff^e#efefef^e#000000^e#678db2^e" \
+    "#ffffff^e#0000ee^e#52188b^e"
 
-#define DEFAULT_KDE_ACT_PAL \
-"active=#000000^e#dddfe4^e#ffffff^e#ffffff^e#555555^e#c7c7c7^e#000000^e#ffffff^e#000000^e#ffffff^e#efefef^e#000000^e#678db2^e#ffffff^e#0000ee^e#52188b^e"
-
-#define DEFAULT_KDE_DIS_PAL \
-"disabled=#000000^e#dddfe4^e#ffffff^e#ffffff^e#555555^e#c7c7c7^e#c7c7c7^e#ffffff^e#000000^e#ffffff^e#efefef^e#000000^e#678db2^e#ffffff^e#0000ee^e#52188b^e"
+#define DEFAULT_KDE_DIS_PAL                                           \
+    "disabled=#000000^e#dddfe4^e#ffffff^e#ffffff^e#555555^e#c7c7c7^e" \
+    "#c7c7c7^e#ffffff^e#000000^e#ffffff^e#efefef^e#000000^e#678db2^e" \
+    "#ffffff^e#0000ee^e#52188b^e"
 
 #ifdef READ_INACTIVE_PAL
-#define DEFAULT_KDE_INACT_PAL \
-"inactive=#000000^e#dddfe4^e#ffffff^e#ffffff^e#555555^e#c7c7c7^e#000000^e#ffffff^e#000000^e#ffffff^e#efefef^e#000000^e#678db2^e#ffffff^e#0000ee^e#52188b^e"
+#define DEFAULT_KDE_INACT_PAL                                         \
+    "inactive=#000000^e#dddfe4^e#ffffff^e#ffffff^e#555555^e#c7c7c7^e" \
+    "#000000^e#ffffff^e#000000^e#ffffff^e#efefef^e#000000^e#678db2^e" \
+    "#ffffff^e#0000ee^e#52188b^e"
 #endif
 
-#define DEFAULT_KDE_FONT      "Sans Serif"
-// Seems to be 9pt on KUbuntu, but 10.0 on openSUSE ???
-//#define DEFAULT_KDE_FONT_SIZE (qtSettings.qt4 ? 9.0 : 10.0)
+#define DEFAULT_KDE_FONT "Sans Serif"
 #define DEFAULT_KDE_FONT_SIZE 10.0
 #define MAX_LINE_LEN 1024
 
@@ -163,31 +152,33 @@ QtData qtSettings;
 #define defaultIcons() ("oxygen")
 
 enum {
-    SECT_NONE                 =0x000001,
-    SECT_PALETTE              =0x000002,
-    SECT_GENERAL              =0x000004,
-    SECT_KDE                  =0x000008,
-    SECT_ICONS                =0x000010,
-    SECT_TOOLBAR_STYLE        =0x000020,
-    SECT_MAIN_TOOLBAR_ICONS   =0x000040,
-    SECT_SMALL_ICONS          =0x000080,
+    SECT_NONE = 0x000001,
+    SECT_PALETTE = 0x000002,
+    SECT_GENERAL = 0x000004,
+    SECT_KDE = 0x000008,
+    SECT_ICONS = 0x000010,
+    SECT_TOOLBAR_STYLE = 0x000020,
+    SECT_MAIN_TOOLBAR_ICONS = 0x000040,
+    SECT_SMALL_ICONS = 0x000080,
 
-    SECT_KDE4_COL_BUTTON      =0x000100,
-    SECT_KDE4_COL_SEL         =0x000200,
-    SECT_KDE4_COL_TOOLTIP     =0x000400,
-    SECT_KDE4_COL_VIEW        =0x000800,
-    SECT_KDE4_COL_WINDOW      =0x001000,
+    SECT_KDE4_COL_BUTTON = 0x000100,
+    SECT_KDE4_COL_SEL = 0x000200,
+    SECT_KDE4_COL_TOOLTIP = 0x000400,
+    SECT_KDE4_COL_VIEW = 0x000800,
+    SECT_KDE4_COL_WINDOW = 0x001000,
 
-    SECT_KDE4_EFFECT_DISABLED =0x002000,
-    SECT_KDE4_EFFECT_INACTIVE =0x004000,
+    SECT_KDE4_EFFECT_DISABLED = 0x002000,
+    SECT_KDE4_EFFECT_INACTIVE = 0x004000,
 
-    SECT_KDE4_COL_WM          =0x008000,
+    SECT_KDE4_COL_WM = 0x008000,
 
-    SECT_KWIN_COMPOS          =0x010000
+    SECT_KWIN_COMPOS = 0x010000
 };
 
-#define ALL_KDE4_PAL_SETTINGS (SECT_KDE4_COL_BUTTON|SECT_KDE4_COL_SEL|SECT_KDE4_COL_TOOLTIP|SECT_KDE4_COL_VIEW| \
-                               SECT_KDE4_COL_WINDOW|SECT_KDE4_EFFECT_DISABLED|SECT_KDE4_EFFECT_INACTIVE|SECT_KDE4_COL_WM)
+#define ALL_KDE4_PAL_SETTINGS                                           \
+    (SECT_KDE4_COL_BUTTON | SECT_KDE4_COL_SEL | SECT_KDE4_COL_TOOLTIP | \
+     SECT_KDE4_COL_VIEW | SECT_KDE4_COL_WINDOW |                        \
+     SECT_KDE4_EFFECT_DISABLED | SECT_KDE4_EFFECT_INACTIVE | SECT_KDE4_COL_WM)
 /*
   Qt uses the following predefined weights:
     Light    = 25,
@@ -199,202 +190,97 @@ enum {
   ...need to categorize mid way, i.e. 0->37 = light, 38->56 = normal, etc...
 */
 
-enum
-{
-    WEIGHT_NORMAL   = 38,   /* Less than this = light */
+enum {
+    WEIGHT_NORMAL = 38, /* Less than this = light */
     WEIGHT_DEMIBOLD = 57,
-    WEIGHT_BOLD     = 69,
-    WEIGHT_BLACK    = 81
+    WEIGHT_BOLD = 69,
+    WEIGHT_BLACK = 81
 };
 
-static const char * weightStr(int w)
+static const char*
+weightStr(int w)
 {
-    if(w<WEIGHT_NORMAL)
+    if (w < WEIGHT_NORMAL) {
         return "light";
-    else if(w<WEIGHT_DEMIBOLD)
+    } else if (w < WEIGHT_DEMIBOLD) {
         return "";
-    else if(w<WEIGHT_BOLD)
+    } else if (w < WEIGHT_BOLD) {
         return "demibold";
-    else if(w<WEIGHT_BLACK)
+    } else if (w < WEIGHT_BLACK) {
         return "bold";
-    else
+    } else {
         return "black";
+    }
 }
 
-static const char * italicStr(int i)
+static const char*
+italicStr(int i)
 {
     return i ? "Italic" : "";
 }
 
-enum
-{
-    RD_ACT_PALETTE       = 0x000001,
-    RD_DIS_PALETTE       = 0x000002,
-    RD_INACT_PALETTE     = 0x000004,
-    RD_FONT              = 0x000008,
-    RD_CONTRAST          = 0x000010,
-    RD_ICONS             = 0x000020,
-    RD_TOOLBAR_STYLE     = 0x000040,
+enum {
+    RD_ACT_PALETTE = 0x000001,
+    RD_DIS_PALETTE = 0x000002,
+    RD_INACT_PALETTE = 0x000004,
+    RD_FONT = 0x000008,
+    RD_CONTRAST = 0x000010,
+    RD_ICONS = 0x000020,
+    RD_TOOLBAR_STYLE = 0x000040,
     RD_TOOLBAR_ICON_SIZE = 0x000080,
-    RD_BUTTON_ICONS      = 0x000100,
-    RD_SMALL_ICON_SIZE   = 0x000200,
-    RD_LIST_COLOR        = 0x000400,
+    RD_BUTTON_ICONS = 0x000100,
+    RD_SMALL_ICON_SIZE = 0x000200,
+    RD_LIST_COLOR = 0x000400,
 #ifdef QTC_GTK2_STYLE_SUPPORT
-    RD_STYLE             = 0x000800,
+    RD_STYLE = 0x000800,
 #else
-    RD_STYLE             = 0x000000,
+    RD_STYLE = 0x000000,
 #endif
-    RD_LIST_SHADE        = 0x001000,
-    RD_KDE4_PAL          = 0x002000,
+    RD_LIST_SHADE = 0x001000,
+    RD_KDE4_PAL = 0x002000,
 
-    RD_MENU_FONT         = 0x004000,
-    RD_TB_FONT           = 0x008000,
+    RD_MENU_FONT = 0x004000,
+    RD_TB_FONT = 0x008000,
 
-    RD_DRAG_DIST         = 0x010000,
-    RD_DRAG_TIME         = 0x020000
+    RD_DRAG_DIST = 0x010000,
+    RD_DRAG_TIME = 0x020000
 };
 
-/*
- Try to determine if a mozilla app is >= v3.  Tested with:
-
-Mozilla Firefox 3.0.8, Copyright (c) 1998 - 2009 mozilla.org
- Thunderbird 2.0.0.21, Copyright (c) 1998-2009 mozilla.org
- Thunderbird 3.0b2, Copyright (c) 1998-2009 mozilla.org
-Mozilla XULRunner 1.9.0.8 - 2009032711
-
-To get the verison number:
-1. Get the command-line from /proc/<pid>/cmdline - so Linux specific
-2. Append --version to this, and call the application
-3. Look for the fist '.' in the returned string
-4. Look at the character to the left of that, if it is a digit and >2  then
-   we assume this is a new mozilla app...
-
-...what a pain...
-*/
-
-static int getMozillaVersion(int pid)
-{
-    char cmdline[MAX_LINE_LEN+11];
-    int  ver=0,
-         procFile=-1;
-
-    sprintf(cmdline, "/proc/%d/cmdline", pid);
-
-    if(-1!=(procFile=open(cmdline, O_RDONLY)))
-    {
-        if(read(procFile, cmdline, MAX_LINE_LEN)>2)
-        {
-            char *version=0L;
-            strcat(cmdline, " --version");
-            if(runCommand(cmdline, &version))
-            {
-                char *dot=strchr(version, '.');
-
-                if(dot && dot!=version && isdigit(dot[-1]))
-                {
-                    char *minor=&dot[1];
-                    char *major=0L;
-                    int  i=0;
-
-                    for(i=-1; (&dot[i])!=version; i--)
-                        if(!isdigit(dot[i]))
-                        {
-                            major=&dot[i+1];
-                            break;
-                        }
-                    ver=major && minor
-                        ? qtcMakeVersion(strtol(major, NULL, 10), strtol(minor, NULL, 10))
-                        : qtcMakeVersion(dot[-1]-'0', 0);
-                }
-            }
-        }
-        close(procFile);
-    }
-
-    return ver;
-}
-
 #ifdef QTC_GTK2_STYLE_SUPPORT
-static char * themeFileSub(const char *prefix, const char *name, char **tmpStr, const char *sub)
+static char*
+themeFileSub(const char *prefix, const char *name, char **tmpStr,
+             const char *sub)
 {
-    *tmpStr=realloc(*tmpStr, strlen(prefix)+1+strlen(sub)+1+strlen(name)+strlen(THEME_SUFFIX)+1);
+    *tmpStr = realloc(*tmpStr, strlen(prefix) + 1 + strlen(sub) + 1 +
+                      strlen(name) + strlen(THEME_SUFFIX) + 1);
 
-    if(*tmpStr)
-    {
+    if (*tmpStr) {
         struct stat st;
 
         sprintf(*tmpStr, "%s/%s/%s%s", prefix, sub, name, THEME_SUFFIX);
 
-        if(0==stat(*tmpStr, &st))
+        if (0 == stat(*tmpStr, &st)) {
             return *tmpStr;
+        }
     }
 
     return NULL;
 }
 
-static char * themeFile(const char *prefix, const char *name, char **tmpStr)
+static char*
+themeFile(const char *prefix, const char *name, char **tmpStr)
 {
-    char *f=themeFileSub(prefix, name, tmpStr, THEME_DIR);
+    char *f = themeFileSub(prefix, name, tmpStr, THEME_DIR);
 
-    if(!f)
-        f=themeFileSub(prefix, name, tmpStr, THEME_DIR4);
+    if (!f) {
+        f = themeFileSub(prefix, name, tmpStr, THEME_DIR4);
+    }
 
     return f;
 }
 #endif
 
-/* static void parseQtColors(char *line, int p) */
-/* { */
-/*     int  n=-1; */
-/*     char *l=strtok(line, "#"); */
-
-/*     while(l) */
-/*     { */
-/*         if(strlen(l)>=7) */
-/*             switch(n) */
-/*             { */
-/*                 case 0: */
-/*                     qtcSetRgb(&qtSettings.colors[p][COLOR_WINDOW_TEXT], l); */
-/*                     break; */
-/*                 case 1: */
-/*                     qtcSetRgb(&qtSettings.colors[p][COLOR_BUTTON], l); */
-/*                     break; */
-/*                 case 5: */
-/*                     qtcSetRgb(&qtSettings.colors[p][COLOR_MID], l); */
-/*                     break; */
-/*                 case 6: */
-/*                     qtcSetRgb(&qtSettings.colors[p][COLOR_TEXT], l); */
-/*                     break; */
-/*                 case 8: */
-/*                     qtcSetRgb(&qtSettings.colors[p][COLOR_BUTTON_TEXT], l); */
-/*                     break; */
-/*                 case 9: */
-/*                     qtcSetRgb(&qtSettings.colors[p][COLOR_BACKGROUND], l); */
-/*                     break; */
-/*                 case 10: */
-/*                     qtcSetRgb(&qtSettings.colors[p][COLOR_WINDOW], l); */
-/*                     break; */
-/*                 case 12: */
-/*                     qtcSetRgb(&qtSettings.colors[p][COLOR_SELECTED], l); */
-/*                     break; */
-/*                 case 13: */
-/*                     qtcSetRgb(&qtSettings.colors[p][COLOR_TEXT_SELECTED], l); */
-/*                     break; */
-/*                 default: */
-/*                     break; */
-/*             } */
-/*         else if(n>-1) */
-/*             break; */
-
-/*         n++; */
-/*         if(n>13) */
-/*             break; */
-/*         l=strtok(NULL, "#"); */
-/*     } */
-/* } */
-
-typedef enum
-{
+typedef enum {
     BackgroundAlternate,
     BackgroundNormal,
     DecorationFocus,
@@ -1136,146 +1022,6 @@ static void readKdeGlobals(const char *rc, int rd, bool first, bool kde4)
         setFont(&fonts[FONT_TOOLBAR], FONT_TOOLBAR);
 }
 
-/* static void */
-/* readQtRc(const char *rc, int rd, gboolean absolute, gboolean setDefaultFont) */
-/* { */
-/*     const char    *home=absolute ? NULL : qtcGetHome(); */
-/*     int           found=0; */
-/*     char          line[MAX_CONFIG_INPUT_LINE_LEN+1]; */
-/*     QtFontDetails font; */
-
-/*     initFont(&font, TRUE); */
-
-/*     if(absolute || NULL!=home) */
-/*     { */
-/*         char fname[256]; */
-/*         FILE *f; */
-
-/*         if(!absolute) */
-/*             sprintf(fname, "%s/%s", home, rc); */
-
-/*         f=fopen(absolute ? rc : fname, "r"); */
-
-/*         if(f) */
-/*         { */
-/*             int section=SECT_NONE; */
-
-/*             if(qtSettings.debug) */
-/*                 printf(DEBUG_PREFIX"Reading qtrc - %s\n", absolute ? rc : fname); */
-
-/*             while(found!=rd && NULL!=fgets(line, MAX_CONFIG_INPUT_LINE_LEN, f)) */
-/*                 if(line[0]=='[') */
-/*                 { */
-/*                     if(0==strncasecmp(line, "[Palette]", 9)) */
-/*                         section=SECT_PALETTE; */
-/*                     else if(0==strncasecmp(line, "[General]", 9)) */
-/*                         section=SECT_GENERAL; */
-/*                     else if(0==strncasecmp(line, "[KDE]", 5)) */
-/*                         section=SECT_KDE; */
-/*                     else */
-/*                         section=SECT_NONE; */
-/*                 } */
-/*                 else if(rd&RD_CONTRAST && !(found&RD_CONTRAST) && SECT_KDE==section && 0==strncasecmp(line, "contrast=", 9)) */
-/*                 { */
-/*                     opts.contrast=readInt(line, 9); */
-/*                     if(opts.contrast>10 || opts.contrast<0) */
-/*                         opts.contrast=7; */
-/*                     found|=RD_CONTRAST; */
-/*                 } */
-/*                 else if(SECT_PALETTE==section && rd&RD_ACT_PALETTE && !(found&RD_ACT_PALETTE) && */
-/*                         0==strncasecmp(line, "active=", 7)) */
-/*                 { */
-/*                     parseQtColors(line, PAL_ACTIVE); */
-/*                     found|=RD_ACT_PALETTE; */
-/*                 } */
-/*                 else if(SECT_PALETTE==section && rd&RD_DIS_PALETTE && !(found&RD_DIS_PALETTE) && */
-/*                         0==strncasecmp(line, "disabled=", 7)) */
-/*                 { */
-/*                     parseQtColors(line, PAL_DISABLED); */
-/*                     found|=RD_DIS_PALETTE; */
-/*                 } */
-/* #ifdef READ_INACTIVE_PAL */
-/*                 else if(SECT_PALETTE==section && rd&RD_INACT_PALETTE && !(found&RD_INACT_PALETTE) && */
-/*                         0==strncasecmp(line, "inactive=", 9)) */
-/*                 { */
-/*                     parseQtColors(line, PAL_INACTIVE); */
-/*                     found|=RD_INACT_PALETTE; */
-/*                 } */
-/* #endif */
-/* #ifdef QTC_GTK2_STYLE_SUPPORT */
-/*                 else if (SECT_GENERAL==section && rd&RD_STYLE && !(found&RD_STYLE) && 0==strncasecmp(line, "style=", 6)) */
-/*                 { */
-/*                     int len=strlen(line); */
-/*                     qtSettings.styleName=realloc(qtSettings.styleName, strlen(&line[6])+1); */
-/*                     if('\n'==line[len-1]) */
-/*                         line[len-1]='\0'; */
-/*                     strcpy(qtSettings.styleName, &line[6]); */
-/*                     found|=RD_STYLE; */
-/*                 } */
-/* #endif */
-/*                 else if (SECT_GENERAL==section && rd&RD_FONT && !(found&RD_FONT) && 0==strncasecmp(line, "font=", 5)) */
-/*                 { */
-/*                     parseFontLine(line, &font); */
-/*                     found|=RD_FONT; */
-/*                 } */
-/*                 else if(found==rd) */
-/*                     break; */
-
-/*             fclose(f); */
-/*         } */
-/*     } */
-
-/*     if(rd&RD_ACT_PALETTE && !(found&RD_ACT_PALETTE)) */
-/*     { */
-/*         strncpy(line, DEFAULT_KDE_ACT_PAL, MAX_CONFIG_INPUT_LINE_LEN); */
-/*         line[MAX_CONFIG_INPUT_LINE_LEN]='\0'; */
-/*         parseQtColors(line, PAL_ACTIVE); */
-/*     } */
-
-/*     if(rd&RD_DIS_PALETTE && !(found&RD_DIS_PALETTE)) */
-/*     { */
-/*         strncpy(line, DEFAULT_KDE_DIS_PAL, MAX_CONFIG_INPUT_LINE_LEN); */
-/*         line[MAX_CONFIG_INPUT_LINE_LEN]='\0'; */
-/*         parseQtColors(line, PAL_DISABLED); */
-/*     } */
-
-/*     if(rd&RD_ACT_PALETTE) */
-/*     { */
-/*         qtSettings.colors[PAL_ACTIVE][COLOR_FOCUS]= */
-/*         qtSettings.colors[PAL_ACTIVE][COLOR_HOVER]= */
-/*             qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED]; */
-/*     } */
-/* /\* */
-/*     if(rd&RD_DIS_PALETTE) */
-/*     { */
-/*         qtSettings.colors[PAL_DISABLED][COLOR_FOCUS]= */
-/*         qtSettings.colors[PAL_DISABLED][COLOR_HOVER]= */
-/*             qtSettings.colors[PAL_DISABLED][COLOR_SELECTED]; */
-/*     } */
-/* *\/ */
-/* #ifdef READ_INACTIVE_PAL */
-/*     if(rd&RD_INACT_PALETTE && !(found&RD_INACT_PALETTE)) */
-/*     { */
-/*         strncpy(line, DEFAULT_KDE_INACT_PAL, MAX_CONFIG_INPUT_LINE_LEN); */
-/*         line[MAX_CONFIG_INPUT_LINE_LEN]='\0'; */
-/*         parseQtColors(line, PAL_INACTIVE); */
-/*     } */
-
-/* /\* */
-/*     if(rd&RD_INACT_PALETTE) */
-/*     { */
-/*         qtSettings.colors[PAL_INACTIVE][COLOR_FOCUS]= */
-/*         qtSettings.colors[PAL_INACTIVE][COLOR_HOVER]= */
-/*             qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED]; */
-/*     } */
-/* *\/ */
-/* #endif */
-
-/*     //if(rd&RD_FONT && (found&RD_FONT || (!qtSettings.fonts[FONT_GENERAL] && setDefaultFont)))  /\* No need to check if read in *\/ */
-/*     if(rd&RD_FONT && found&RD_FONT) */
-/*         setFont(&font, FONT_GENERAL); */
-/* } */
-
 static int qt_refs=0;
 
 static const char * kdeIconsPrefix()
@@ -1930,8 +1676,7 @@ gboolean qtSettingsInit()
             char *path = NULL;
             char *tmpStr = NULL;
             GtkSettings *settings=NULL;
-            int         mozVersion=0x30000, /* Set to 3.0 by default... */
-                        i;
+            int i;
 
             setlocale(LC_NUMERIC, "C");
             qtSettings.icons=NULL;
@@ -2059,19 +1804,8 @@ gboolean qtSettingsInit()
                                              (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(*menu_col) ),
                              add_btn_css=FALSE;
 
-                    mozVersion=getMozillaVersion(getpid());
-#ifdef QTC_GTK2_MODIFY_MOZILLA
-                    if(mozVersion<qtcMakeVersion(3, 0) && !opts.gtkButtonOrder)
-                       add_btn_css=TRUE;
-#endif
-
-                    if(qtSettings.debug)
-                        printf(DEBUG_PREFIX"Mozilla app version:%X\n", mozVersion);
-                    if(firefox)
-                    {
-                        processMozillaApp(mozVersion<qtcMakeVersion(3, 5) && !opts.gtkButtonOrder, add_menu_colors, "firefox", TRUE);
-                        if(mozVersion>=qtcMakeVersion(3, 5) && 0==strcmp(qtSettings.appName, "firefox-3.5"))
-                            processMozillaApp(FALSE, add_menu_colors, "firefox-3.5", TRUE);
+                    if (firefox) {
+                        processMozillaApp(0, add_menu_colors, "firefox", TRUE);
                     }
                     else if(thunderbird)
                         processMozillaApp(add_btn_css, add_menu_colors, "thunderbird", FALSE);
@@ -2084,10 +1818,10 @@ gboolean qtSettingsInit()
                                     ? GTK_APP_NEW_MOZILLA :
 #endif
                                     GTK_APP_MOZILLA;
-                    if(GTK_APP_MOZILLA==qtSettings.app && mozVersion>qtcMakeVersion(2, 0))
+                    if (GTK_APP_MOZILLA == qtSettings.app)
                         qtSettings.app=GTK_APP_NEW_MOZILLA;
                     if(GTK_APP_NEW_MOZILLA!=qtSettings.app && APPEARANCE_FADE==opts.menuitemAppearance &&
-                       (thunderbird || mozThunderbird || (seamonkey && mozVersion<qtcMakeVersion(2, 0))))
+                       (thunderbird || mozThunderbird))
                         opts.menuitemAppearance=APPEARANCE_FLAT;
                 }
                 else if(0==strcmp(qtSettings.appName, "soffice.bin"))

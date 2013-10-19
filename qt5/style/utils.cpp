@@ -26,7 +26,6 @@
 #  include <QApplication>
 #  include <QDesktopWidget>
 #endif
-#include <stdio.h>
 
 #ifdef QTC_QT5_ENABLE_KDE
 #  include <kdeversion.h>

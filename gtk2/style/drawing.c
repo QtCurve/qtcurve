@@ -31,10 +31,6 @@
 #include "entry.h"
 #include "tab.h"
 #include "animation.h"
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
-
 
 #if GTK_CHECK_VERSION(2, 90, 0)
 static cairo_rectangle_int_t

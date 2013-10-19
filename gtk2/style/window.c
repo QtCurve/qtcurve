@@ -24,14 +24,12 @@
 
 #include <gdk/gdkkeysyms.h>
 #include <gdk/gdkx.h>
-#include <stdlib.h>
 #include "compatability.h"
 #include <common/common.h>
 #include <common/config_file.h>
 #include "qt_settings.h"
 #include "window.h"
 #include "menu.h"
-#include <string.h>
 
 extern Options opts;
 
