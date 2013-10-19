@@ -2272,7 +2272,7 @@ gboolean qtSettingsInit()
             }
 
             /* Set cursor colours... */
-            static const char *constStrFormat="style \""RC_SETTING"Crsr\" "
+            const char *constStrFormat="style \""RC_SETTING"Crsr\" "
                 "{ GtkWidget::cursor-color=\"#%02X%02X%02X\" "
                 "GtkWidget::secondary-cursor-color=\"#%02X%02X%02X\" } "
                 "class \"*\" style \""RC_SETTING"Crsr\"";
@@ -2289,50 +2289,46 @@ gboolean qtSettingsInit()
             if(!opts.gtkScrollViews && NULL!=gtk_check_version(2, 12, 0))
                 opts.gtkScrollViews=true;
 
-            { /* C-Scope */
             bool doEffect=EFFECT_NONE!=opts.buttonEffect;
             int  thickness=2;
 
-            {
-                {
-                static const char *constStrFormat="style \""RC_SETTING"Etch2\" " \
-                                        "{ xthickness = 3 ythickness = %d} " \
-                                        "class \"*Button\" style \""RC_SETTING"Etch2\"" \
-                                        "class \"*GtkOptionMenu\" style \""RC_SETTING"Etch2\"";
+            constStrFormat =
+                "style \"" RC_SETTING "Etch2\" "
+                "{ xthickness = 3 ythickness = %d} "
+                "class \"*Button\" style \"" RC_SETTING "Etch2\""
+                "class \"*GtkOptionMenu\" style \"" RC_SETTING "Etch2\"";
 
-                tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+2);
-                sprintf(tmpStr, constStrFormat, (opts.thin&THIN_BUTTONS) || !doEffect ? 1 : 2);
+            tmpStr = (char*)realloc(tmpStr, strlen(constStrFormat) + 2);
+            sprintf(tmpStr, constStrFormat, (opts.thin & THIN_BUTTONS) ||
+                    !doEffect ? 1 : 2);
+            gtk_rc_parse_string(tmpStr);
+
+            constStrFormat =
+                "style \"" RC_SETTING "EtchE\" { xthickness = %d "
+                "ythickness = %d } style \"" RC_SETTING "EtchS\" "
+                "{ xthickness = %d ythickness = %d } widget_class "
+                "\"*Toolbar*GtkSpinButton\" style \"" RC_SETTING "EtchE\" "
+                "class \"*GtkEntry\" style  \"" RC_SETTING "EtchE\" "
+                "widget_class \"*Toolbar*Entry\" style \"" RC_SETTING "EtchE\" "
+                "class \"*GtkSpinButton\" style \"" RC_SETTING "EtchS\" ";
+
+            int thick = /*opts.etchEntry && doEffect ?*/ 4 /*: 3*/;
+            tmpStr = (char*)realloc(tmpStr, strlen(constStrFormat) + 8);
+            sprintf(tmpStr, constStrFormat, thick, thick, thick, thick);
+            gtk_rc_parse_string(tmpStr);
+
+            if (isMozilla()) {
+                constStrFormat =
+                    "style \""RC_SETTING"EtchEM\" { xthickness = %d "
+                    "ythickness = %d } widget_class "
+                    "\"*GtkFixed*GtkSpinButton\" style \"" RC_SETTING
+                    "EtchEM\" widget_class \"*GtkFixed*Entry\" style \""
+                    RC_SETTING "EtchEM\" ";
+
+                int thick = opts.etchEntry && doEffect ? 3 : 2;
+                tmpStr = (char*)realloc(tmpStr, strlen(constStrFormat) + 4);
+                sprintf(tmpStr, constStrFormat, thick, thick);
                 gtk_rc_parse_string(tmpStr);
-                }
-
-                {
-                static const char *constStrFormat="style \""RC_SETTING"EtchE\" "
-                                        "{ xthickness = %d ythickness = %d } "
-                                        "style \""RC_SETTING"EtchS\" "
-                                        "{ xthickness = %d ythickness = %d } "
-                                        "widget_class \"*Toolbar*GtkSpinButton\" style \""RC_SETTING"EtchE\" "
-                                        "class \"*GtkEntry\" style  \""RC_SETTING"EtchE\" "
-                                        "widget_class \"*Toolbar*Entry\" style \""RC_SETTING"EtchE\" "
-                                        "class \"*GtkSpinButton\" style \""RC_SETTING"EtchS\" ";
-
-                int thick=/*opts.etchEntry && doEffect ?*/ 4 /*: 3*/;
-                tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+8);
-                sprintf(tmpStr, constStrFormat, thick, thick, thick, thick);
-                gtk_rc_parse_string(tmpStr);
-                }
-
-                if(isMozilla())
-                {
-                    static const char *constStrFormat="style \""RC_SETTING"EtchEM\" "
-                        "{ xthickness = %d ythickness = %d } "
-                        "widget_class \"*GtkFixed*GtkSpinButton\" style \""RC_SETTING"EtchEM\" "
-                        "widget_class \"*GtkFixed*Entry\" style \""RC_SETTING"EtchEM\" ";
-
-                    int thick=opts.etchEntry && doEffect ? 3 : 2;
-                    tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+4);
-                    sprintf(tmpStr, constStrFormat, thick, thick);
-                    gtk_rc_parse_string(tmpStr);
-                }
             }
 
             if(!opts.gtkScrollViews)
@@ -2351,50 +2347,44 @@ gboolean qtSettingsInit()
             else if(opts.etchEntry)
                 thickness=3;
 
-            { /* C-Scope */
-                static const char *constStrFormat="style \""RC_SETTING"SVt\" "
-                                                    "{ xthickness = %d ythickness = %d } "
-                                                      "class \"*GtkScrolledWindow\" style \""RC_SETTING"SVt\"";
+            constStrFormat =
+                "style \"" RC_SETTING "SVt\" { xthickness = %d "
+                "ythickness = %d } class \"*GtkScrolledWindow\" style \""
+                RC_SETTING "SVt\"";
+            tmpStr = (char*)realloc(tmpStr, strlen(constStrFormat) + 1);
+            sprintf(tmpStr, constStrFormat, thickness, thickness);
+            gtk_rc_parse_string(tmpStr);
 
-                tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
-                sprintf(tmpStr, constStrFormat, thickness, thickness);
-                gtk_rc_parse_string(tmpStr);
-            } /* C-Scope */
+            constStrFormat =
+                "style \"" RC_SETTING "Pbar\" { xthickness = %d "
+                "ythickness = %d } widget_class \"*GtkProgressBar\" style \""
+                RC_SETTING "Pbar\"";
+            int pthickness = (opts.fillProgress ?
+                              doEffect && opts.borderProgress ? 1 : 0 :
+                              doEffect ? 2 : 1);
+            tmpStr = (char*)realloc(tmpStr, strlen(constStrFormat) + 1);
+            sprintf(tmpStr, constStrFormat, pthickness, pthickness);
+            gtk_rc_parse_string(tmpStr);
 
-            { /* C-Scope */
-                static const char *constStrFormat="style \""RC_SETTING"Pbar\" "
-                                                    "{ xthickness = %d ythickness = %d } "
-                                                      "widget_class \"*GtkProgressBar\" style \""RC_SETTING"Pbar\"";
-                int pthickness=opts.fillProgress
-                                ? doEffect && opts.borderProgress
-                                    ? 1
-                                    : 0
-                                : doEffect
-                                    ? 2
-                                    : 1;
+            constStrFormat =
+                "style \"" RC_SETTING "TT\" { xthickness = 4 "
+                "ythickness = 4 bg[NORMAL] = \"#%02X%02X%02X\" "
+                "fg[NORMAL] = \"#%02X%02X%02X\"} widget \"gtk-tooltips*\" "
+                "style \"" RC_SETTING "TT\" widget \"gtk-tooltip*\" style \""
+                RC_SETTING "TT\"";
 
-                tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
-                sprintf(tmpStr, constStrFormat, pthickness, pthickness);
-                gtk_rc_parse_string(tmpStr);
-            } /* C-Scope */
-            } /* C-Scope 'doEffect' */
-
-            { /* C-Scope */
-                static const char *constStrFormat="style \""RC_SETTING"TT\" "
-                                                    "{ xthickness = 4 ythickness = 4 bg[NORMAL] = \"#%02X%02X%02X\" fg[NORMAL] = \"#%02X%02X%02X\"} "
-                                                    "widget \"gtk-tooltips*\" style \""RC_SETTING"TT\" "
-                                                    "widget \"gtk-tooltip*\" style \""RC_SETTING"TT\"";
-
-                tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
-                sprintf(tmpStr, constStrFormat,
-                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP].red),
-                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP].green),
-                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP].blue),
-                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT].red),
-                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT].green),
-                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT].blue));
-                gtk_rc_parse_string(tmpStr);
-            } /* C-Scope */
+            tmpStr = (char*)realloc(tmpStr, strlen(constStrFormat) + 1);
+            sprintf(tmpStr, constStrFormat,
+                    toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP].red),
+                    toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP].green),
+                    toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP].blue),
+                    toQtColor(
+                        qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT].red),
+                    toQtColor(
+                        qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT].green),
+                    toQtColor(
+                        qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT].blue));
+            gtk_rc_parse_string(tmpStr);
 
             if( EFFECT_NONE==opts.buttonEffect)
                 gtk_rc_parse_string("style \""RC_SETTING"Cmb\" { xthickness = 4 ythickness = 2 }"
@@ -2419,36 +2409,40 @@ gboolean qtSettingsInit()
                 gtk_rc_parse_string("style \""RC_SETTING"M\" { xthickness=1 ythickness=1 }\n"
                                     "class \"*GtkMenu\" style \""RC_SETTING"M\"");
 
-            { /* C-Scope */
-                static const char *constStrFormat="style \""RC_SETTING"Tree\" "
-                                                    "{ GtkTreeView::odd-row-color = \"#%02X%02X%02X\" GtkTreeView::even-row-color = \"#%02X%02X%02X\"} "
-                                                    "widget \"*GtkTreeView*\" style \""RC_SETTING"Tree\"";
-                int alt=haveAlternateListViewCol() ? COLOR_LV : COLOR_BACKGROUND;
+            constStrFormat =
+                "style \"" RC_SETTING "Tree\" { GtkTreeView::odd-row-color = "
+                "\"#%02X%02X%02X\" GtkTreeView::even-row-color = "
+                "\"#%02X%02X%02X\"} widget \"*GtkTreeView*\" style \""
+                RC_SETTING "Tree\"";
+            int alt = haveAlternateListViewCol() ? COLOR_LV : COLOR_BACKGROUND;
 
-                tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
-                sprintf(tmpStr, constStrFormat,
-                        toQtColor(qtSettings.colors[PAL_ACTIVE][alt].red),
-                        toQtColor(qtSettings.colors[PAL_ACTIVE][alt].green),
-                        toQtColor(qtSettings.colors[PAL_ACTIVE][alt].blue),
-                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_BACKGROUND].red),
-                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_BACKGROUND].green),
-                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_BACKGROUND].blue));
-                gtk_rc_parse_string(tmpStr);
-            } /* C-Scope */
+            tmpStr = (char*)realloc(tmpStr, strlen(constStrFormat) + 1);
+            sprintf(tmpStr, constStrFormat,
+                    toQtColor(qtSettings.colors[PAL_ACTIVE][alt].red),
+                    toQtColor(qtSettings.colors[PAL_ACTIVE][alt].green),
+                    toQtColor(qtSettings.colors[PAL_ACTIVE][alt].blue),
+                    toQtColor(
+                        qtSettings.colors[PAL_ACTIVE][COLOR_BACKGROUND].red),
+                    toQtColor(
+                        qtSettings.colors[PAL_ACTIVE][COLOR_BACKGROUND].green),
+                    toQtColor(
+                        qtSettings.colors[PAL_ACTIVE][COLOR_BACKGROUND].blue));
+            gtk_rc_parse_string(tmpStr);
 
-            if(!opts.useHighlightForMenu)
-            {
-                static const char *constStrFormat="style \""RC_SETTING"Mnu\" "
-                                                  "{ text[ACTIVE] = \"#%02X%02X%02X\" "
-                                                  " text[SELECTED] = \"#%02X%02X%02X\" } "
-                                                  " class \"*MenuItem\" style \""RC_SETTING"Mnu\""
-                                                  " widget_class \"*MenuBar*MenuItem\" style \""RC_SETTING"Mnu\""
-                                                  " widget_class \"*.GtkAccelMenuItem\" style \""RC_SETTING"Mnu\""
-                                                  " widget_class \"*.GtkRadioMenuItem\" style \""RC_SETTING"Mnu\""
-                                                  " widget_class \"*.GtkCheckMenuItem\" style \""RC_SETTING"Mnu\""
-                                                  " widget_class \"*.GtkImageMenuItem\" style \""RC_SETTING"Mnu\"";
+            if (!opts.useHighlightForMenu) {
+                constStrFormat =
+                    "style \"" RC_SETTING "Mnu\" { text[ACTIVE] = "
+                    "\"#%02X%02X%02X\"  text[SELECTED] = \"#%02X%02X%02X\" } "
+                    " class \"*MenuItem\" style \"" RC_SETTING "Mnu\""
+                    " widget_class \"*MenuBar*MenuItem\" style \"" RC_SETTING
+                    "Mnu\" widget_class \"*.GtkAccelMenuItem\" style \""
+                    RC_SETTING "Mnu\" widget_class \"*.GtkRadioMenuItem\" "
+                    "style \"" RC_SETTING "Mnu\" widget_class "
+                    "\"*.GtkCheckMenuItem\" style \"" RC_SETTING "Mnu\""
+                    " widget_class \"*.GtkImageMenuItem\" style \"" RC_SETTING
+                    "Mnu\"";
 
-                tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
+                tmpStr = (char*)realloc(tmpStr, strlen(constStrFormat) + 1);
                 sprintf(tmpStr, constStrFormat,
                         toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].red),
                         toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].green),
@@ -2469,16 +2463,17 @@ gboolean qtSettingsInit()
             if(TAB_MO_GLOW==opts.tabMouseOver)
                 gtk_rc_parse_string("style \""RC_SETTING"Tab\" { GtkNotebook::tab-overlap = 0 } class \"*GtkNotebook\" style \""RC_SETTING"Tab\"");
 
-            if(!opts.useHighlightForMenu && GTK_APP_OPEN_OFFICE==qtSettings.app)
-            {
-                static const char *constStrFormat="style \""RC_SETTING"OOMnu\" "
-                                                  "{ bg[SELECTED] = \"#%02X%02X%02X\" } "
-                                                  " class \"*Menu*\" style \""RC_SETTING"OOMnu\" "
-                                                  " widget_class \"*Menu*\" style \""RC_SETTING"OOMnu\" ";
+            if (!opts.useHighlightForMenu &&
+                GTK_APP_OPEN_OFFICE == qtSettings.app) {
+                constStrFormat =
+                    "style \"" RC_SETTING "OOMnu\" "
+                    "{ bg[SELECTED] = \"#%02X%02X%02X\" } "
+                    " class \"*Menu*\" style \"" RC_SETTING "OOMnu\" "
+                    " widget_class \"*Menu*\" style \""RC_SETTING"OOMnu\" ";
 
 
                 qtcShadeColors(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], qtcPalette.background);
-                tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
+                tmpStr = (char*)realloc(tmpStr, strlen(constStrFormat)+1);
                 sprintf(tmpStr, constStrFormat,
                         toQtColor(qtcPalette.background[4].red),
                         toQtColor(qtcPalette.background[4].green),
@@ -2486,43 +2481,43 @@ gboolean qtSettingsInit()
                 gtk_rc_parse_string(tmpStr);
             }
 
-            if(DEFAULT_SLIDER_WIDTH!=opts.sliderWidth)
-            {
-                static const char *constStrFormat="style \""RC_SETTING"SbarW\" "
-                                                  "{ GtkRange::slider_width = %d GtkRange::stepper_size = %d "
-                                                  "  GtkScrollbar::min_slider_length = %d } "
-                                                  " class \"*\" style \""RC_SETTING"SbarW\" ";
+            if (DEFAULT_SLIDER_WIDTH != opts.sliderWidth) {
+                constStrFormat =
+                    "style \"" RC_SETTING "SbarW\" "
+                    "{ GtkRange::slider_width = %d GtkRange::stepper_size = %d "
+                    "  GtkScrollbar::min_slider_length = %d } "
+                    " class \"*\" style \"" RC_SETTING "SbarW\" ";
 
-                tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+16);
-                sprintf(tmpStr, constStrFormat, opts.sliderWidth, opts.sliderWidth, opts.sliderWidth+1);
+                tmpStr = (char*)realloc(tmpStr, strlen(constStrFormat) + 16);
+                sprintf(tmpStr, constStrFormat, opts.sliderWidth,
+                        opts.sliderWidth, opts.sliderWidth+1);
                 gtk_rc_parse_string(tmpStr);
             }
 
-            {
-                gboolean customSliderW=DEFAULT_SLIDER_WIDTH!=opts.sliderWidth;
-                int      length=(SLIDER_CIRCULAR==opts.sliderStyle
-                                    ? CIRCULAR_SLIDER_SIZE
-                                    : SLIDER_TRIANGULAR==opts.sliderStyle
-                                        ? 11
-                                        : SLIDER_PLAIN_ROTATED==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle
-                                            ? (customSliderW ? SLIDER_SIZE -2 : 13)
-                                            : (customSliderW ? SLIDER_SIZE +6 : 21) ) + SLIDER_GLOW,
-                         width = (SLIDER_CIRCULAR==opts.sliderStyle
-                                    ? CIRCULAR_SLIDER_SIZE
-                                    : SLIDER_TRIANGULAR==opts.sliderStyle
-                                        ? 18
-                                        : SLIDER_PLAIN_ROTATED==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle
-                                            ? (customSliderW ? SLIDER_SIZE +6 : 21)
-                                            : (customSliderW ? SLIDER_SIZE -2 : 13) ) + SLIDER_GLOW;
+            gboolean customSliderW=DEFAULT_SLIDER_WIDTH!=opts.sliderWidth;
+            int length = (SLIDER_CIRCULAR==opts.sliderStyle ?
+                          CIRCULAR_SLIDER_SIZE :
+                          SLIDER_TRIANGULAR == opts.sliderStyle ? 11 :
+                          SLIDER_PLAIN_ROTATED == opts.sliderStyle ||
+                          SLIDER_ROUND_ROTATED == opts.sliderStyle ?
+                          (customSliderW ? SLIDER_SIZE - 2 : 13) :
+                          (customSliderW ? SLIDER_SIZE + 6 : 21)) + SLIDER_GLOW;
+            int width = (SLIDER_CIRCULAR == opts.sliderStyle ?
+                         CIRCULAR_SLIDER_SIZE :
+                         SLIDER_TRIANGULAR == opts.sliderStyle ? 18 :
+                         SLIDER_PLAIN_ROTATED == opts.sliderStyle ||
+                         SLIDER_ROUND_ROTATED == opts.sliderStyle ?
+                         (customSliderW ? SLIDER_SIZE + 6 : 21) :
+                         (customSliderW ? SLIDER_SIZE - 2 : 13)) + SLIDER_GLOW;
 
-                static const char *constStrFormat="style \""RC_SETTING"Sldr\" "
-                                                  "{GtkScale::slider_length = %d GtkScale::slider_width = %d} "
-                                                  "class \"*\" style \""RC_SETTING"Sldr\"";
+            constStrFormat =
+                "style \"" RC_SETTING "Sldr\" "
+                "{GtkScale::slider_length = %d GtkScale::slider_width = %d} "
+                "class \"*\" style \"" RC_SETTING "Sldr\"";
 
-                tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+8);
-                sprintf(tmpStr, constStrFormat, length, width);
-                gtk_rc_parse_string(tmpStr);
-            }
+            tmpStr = (char*)realloc(tmpStr, strlen(constStrFormat) + 8);
+            sprintf(tmpStr, constStrFormat, length, width);
+            gtk_rc_parse_string(tmpStr);
 
             if(!opts.menuIcons)
                 gtk_rc_parse_string("gtk-menu-images=0");
@@ -2547,12 +2542,12 @@ gboolean qtSettingsInit()
             if(isMozilla())
                 opts.crSize=CR_SMALL_SIZE;
 
-            if(opts.crSize!=CR_LARGE_SIZE)
-            {
-                static const char *constStrFormat="style \""RC_SETTING"CRSize\" "
-                                                  "{ GtkCheckButton::indicator_size = %d }"
-                                                  " class \"*\" style \""RC_SETTING"CRSize\" ";
-                tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+16);
+            if (opts.crSize != CR_LARGE_SIZE) {
+                constStrFormat =
+                    "style \"" RC_SETTING "CRSize\" "
+                    "{ GtkCheckButton::indicator_size = %d }"
+                    " class \"*\" style \"" RC_SETTING "CRSize\" ";
+                tmpStr = (char*)realloc(tmpStr, strlen(constStrFormat) + 16);
                 sprintf(tmpStr, constStrFormat, opts.crSize);
                 gtk_rc_parse_string(tmpStr);
             }
