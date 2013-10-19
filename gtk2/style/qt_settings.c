@@ -1812,12 +1812,9 @@ gboolean qtSettingsInit()
                     else if(mozThunderbird)
                         processMozillaApp(add_btn_css, add_menu_colors, "mozilla-thunderbird", FALSE);
 
-                    qtSettings.app=
-#ifndef QTC_GTK2_OLD_MOZILLA
-                        firefox || NULL!=getenv("QTC_NEW_MOZILLA")
-                                    ? GTK_APP_NEW_MOZILLA :
-#endif
-                                    GTK_APP_MOZILLA;
+                    qtSettings.app = (firefox ||
+                                      NULL!=getenv("QTC_NEW_MOZILLA") ?
+                                      GTK_APP_NEW_MOZILLA : GTK_APP_MOZILLA);
                     if (GTK_APP_MOZILLA == qtSettings.app)
                         qtSettings.app=GTK_APP_NEW_MOZILLA;
                     if(GTK_APP_NEW_MOZILLA!=qtSettings.app && APPEARANCE_FADE==opts.menuitemAppearance &&

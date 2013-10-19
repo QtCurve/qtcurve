@@ -62,9 +62,6 @@ option(QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
 
 def_compat_option(QTC_GTK2_MODIFY_MOZILLA QTC_MODIFY_MOZILLA)
 option(QTC_GTK2_MODIFY_MOZILLA "Modify Mozilla Gtk2 with js and css." Off)
-def_compat_option(QTC_GTK2_OLD_MOZILLA QTC_OLD_MOZILLA)
-option(QTC_GTK2_OLD_MOZILLA
-  "Defaulting to treating Firefox(Gtk2) as Firefox < 3.0." Off)
 def_compat_option(QTC_GTK2_USE_CAIRO_FOR_ARROWS QTC_USE_CAIRO_FOR_ARROWS)
 option(QTC_GTK2_USE_CAIRO_FOR_ARROWS "Using ciaro to draw arrows." Off)
 option(QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
@@ -179,12 +176,6 @@ if((ENABLE_QT4 AND QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT) OR
     "This is known to BREAK some applications. Please "
     "DO NOT report errors to application authors when you have "
     "this enabled. Please reconsider DISABLING this option.")
-endif()
-
-if(ENABLE_GTK2 AND QTC_GTK2_OLD_MOZILLA)
-  message(WARNING
-    "Defaulting to treating Firefox as Firefox < 3.0. "
-    "This option is deprecated and will be removed soon.")
 endif()
 
 if(ENABLE_GTK2 AND QTC_GTK2_MODIFY_MOZILLA)
