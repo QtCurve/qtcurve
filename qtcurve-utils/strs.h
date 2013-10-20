@@ -22,6 +22,7 @@
 #define _QTC_UTILS_STRS_H_
 
 #include "utils.h"
+#include <stdarg.h>
 
 QTC_ALWAYS_INLINE static inline size_t
 _qtcCatStrsCalLens(int n, const char **strs, size_t *lens)
@@ -125,5 +126,68 @@ qtcSetStr(char *dest, const char *src)
 {
     return qtcSetStrWithLen(dest, src, strlen(src));
 }
+
+QTC_BEGIN_DECLS
+
+__attribute__((format(printf, 4, 5)))
+char *_qtcSPrintf(char *buff, size_t *size, bool allocated,
+                  const char *fmt, ...);
+__attribute__((format(printf, 4, 0)))
+char *_qtcSPrintfV(char *buff, size_t *size, bool allocated,
+                   const char *fmt, va_list ap);
+
+#define qtcSPrintfV(buff, size, fmt, ap)        \
+    _qtcSPrintfV(buff, size, true, fmt, ap)
+#define qtcSPrintf(buff, size, fmt, ap, args...)        \
+    _qtcSPrintf(buff, size, true, fmt, ap, ##args)
+
+__attribute__((format(printf, 3, 0)))
+QTC_ALWAYS_INLINE static inline char*
+qtcASNPrintfV(char *buff, size_t size, const char *fmt, va_list ap)
+{
+    return qtcSPrintfV(buff, &size, fmt, ap);
+}
+
+__attribute__((format(printf, 3, 4)))
+QTC_ALWAYS_INLINE static inline char*
+qtcASNPrintf(char *buff, size_t size, const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    char *res = qtcASNPrintfV(buff, size, fmt, ap);
+    va_end(ap);
+    return res;
+}
+
+#define qtcASPrintfV(fmt, ap)                   \
+    qtcASNPrintfV(NULL, 0, fmt, ap)
+#define qtcASPrintf(fmt, args...)               \
+    qtcASNPrintf(NULL, 0, fmt, ##args)
+
+QTC_END_DECLS
+
+#define _QTC_LOCAL_BUFF_PRINTF(res, name, fmt, args...) do {            \
+        if (!__##qtc_local_buff_to_free##name) {                        \
+            size_t _size = sizeof(__##qtc_local_buff##name);            \
+            res = _qtcSPrintf(name, &_size, false, fmt, ##args);        \
+            if (res != name) {                                          \
+                __##qtc_local_buff##name##_size = _size;                \
+                name = res;                                             \
+                __##qtc_local_buff_to_free##name = res;                 \
+            }                                                           \
+            break;                                                      \
+        }                                                               \
+        res = _qtcSPrintf(name, &__##qtc_local_buff##name##_size, true, \
+                          fmt, ##args);                                 \
+        name = res;                                                     \
+        __##qtc_local_buff_to_free##name = res;                         \
+    } while (0)
+
+#define QTC_LOCAL_BUFF_PRINTF(name, fmt, args...)               \
+    ({                                                          \
+        char *__res;                                            \
+        _QTC_LOCAL_BUFF_PRINTF(__res, name, fmt, ##args);       \
+        __res;                                                  \
+    })
 
 #endif

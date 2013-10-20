@@ -187,11 +187,23 @@ const_(const T &t)
     if (qtcUnlikely(__##qtc_local_buff##name##_size > stack_size)) {    \
         __##qtc_local_buff_to_free##name =                              \
             (type*)malloc(sizeof(type) * __##qtc_local_buff##name##_size); \
-            name = __##qtc_local_buff_to_free##name;                    \
+        name = __##qtc_local_buff_to_free##name;                        \
     } else {                                                            \
         __##qtc_local_buff_to_free##name = NULL;                        \
-            name = __##qtc_local_buff##name;                            \
+        name = __##qtc_local_buff##name;                                \
     }
+
+#define QTC_LOCAL_BUFF_RESIZE(name, size) do {                          \
+        size_t new_size = (size);                                       \
+        if (new_size < __##qtc_local_buff##name##_size ||               \
+            new_size * sizeof(*name) < sizeof(__##qtc_local_buff##name)) \
+            break;                                                      \
+        __##qtc_local_buff##name##_size = new_size;                     \
+        __##qtc_local_buff_to_free##name =                              \
+            (type*)remalloc(__##qtc_local_buff_to_free##name,           \
+                            sizeof(*name) * new_size);                  \
+        name = __##qtc_local_buff_to_free##name;                        \
+    } while (0)
 
 #define QTC_FREE_LOCAL_BUFF(name)               \
     qtcFree(__##qtc_local_buff_to_free##name)
@@ -270,6 +282,9 @@ void qtcStrMapInit(QtcStrMap *map);
 static inline void
 qtcStrMapInitKeys(QtcStrMap *map, const char **keys)
 {
+    if (map->inited) {
+        return;
+    }
     for (unsigned i = 0;i < map->num;i++) {
         map->items[i].key = keys[i];
     }
@@ -321,6 +336,21 @@ qtcStrToBool(const char *str, bool def)
         }
     }
     return def;
+}
+
+QTC_ALWAYS_INLINE static inline uintptr_t
+qtcGetPadding(uintptr_t len, uintptr_t align)
+{
+    uintptr_t left;
+    if ((left = len % align))
+        return align - left;
+    return 0;
+}
+
+QTC_ALWAYS_INLINE static inline uintptr_t
+qtcAlignTo(uintptr_t len, uintptr_t align)
+{
+    return len + qtcGetPadding(len, align);
 }
 
 #endif

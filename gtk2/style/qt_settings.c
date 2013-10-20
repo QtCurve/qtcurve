@@ -23,6 +23,7 @@
 #include <qtcurve-utils/color.h>
 #include <qtcurve-utils/log.h>
 #include <qtcurve-utils/dirs.h>
+#include <qtcurve-utils/strs.h>
 
 #include <gtk/gtk.h>
 #include <common/common.h>

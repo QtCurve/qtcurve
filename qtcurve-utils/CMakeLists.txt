@@ -2,7 +2,8 @@ set(qtcurve_utils_SRCS
   color.c
   dirs.c
   log.c
-  utils.c)
+  utils.c
+  strs.c)
 set(qtcurve_utils_LINKS
   m)
 

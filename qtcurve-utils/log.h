@@ -22,6 +22,7 @@
 #define _QTC_UTILS_LOG_H_
 
 #include "utils.h"
+#include <stdarg.h>
 
 QTC_BEGIN_DECLS
 
