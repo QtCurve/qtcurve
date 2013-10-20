@@ -178,10 +178,10 @@ qtcX11BlurTrigger(xcb_window_t wid, bool enable, unsigned prop_num,
         if (disp) {
             QTC_DEF_LOCAL_BUFF(unsigned long, xlib_props, 256, prop_num);
             for (unsigned i = 0;i < prop_num;i++) {
-                xlib_props[i] = props[i];
+                xlib_props.p[i] = props[i];
             }
             XChangeProperty(disp, wid, atom, XA_CARDINAL, 32, PropModeReplace,
-                            (unsigned char*)xlib_props, prop_num);
+                            (unsigned char*)xlib_props.p, prop_num);
             QTC_FREE_LOCAL_BUFF(xlib_props);
         } else {
             qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, wid, atom,

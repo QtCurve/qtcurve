@@ -166,28 +166,23 @@ qtcASNPrintf(char *buff, size_t size, const char *fmt, ...)
 
 QTC_END_DECLS
 
-#define _QTC_LOCAL_BUFF_PRINTF(res, name, fmt, args...) do {            \
-        if (!__##qtc_local_buff_to_free##name) {                        \
-            size_t _size = sizeof(__##qtc_local_buff##name);            \
-            res = _qtcSPrintf(name, &_size, false, fmt, ##args);        \
-            if (res != name) {                                          \
-                __##qtc_local_buff##name##_size = _size;                \
-                name = res;                                             \
-                __##qtc_local_buff_to_free##name = res;                 \
+#define _QTC_LOCAL_BUFF_PRINTF(name, fmt, args...) do {                 \
+        if (!(name).p == (name).static_p) {                             \
+            size_t _size = (name).l;                                    \
+            char *__res = _qtcSPrintf((name).p, &_size, false, fmt, ##args); \
+            if (__res != (name).p) {                                    \
+                (name).l = _size;                                       \
+                (name).p = __res;                                       \
             }                                                           \
             break;                                                      \
         }                                                               \
-        res = _qtcSPrintf(name, &__##qtc_local_buff##name##_size, true, \
-                          fmt, ##args);                                 \
-        name = res;                                                     \
-        __##qtc_local_buff_to_free##name = res;                         \
+        (name).p = _qtcSPrintf((name).p, &(name).l, true, fmt, ##args); \
     } while (0)
 
-#define QTC_LOCAL_BUFF_PRINTF(name, fmt, args...)               \
-    ({                                                          \
-        char *__res;                                            \
-        _QTC_LOCAL_BUFF_PRINTF(__res, name, fmt, ##args);       \
-        __res;                                                  \
+#define QTC_LOCAL_BUFF_PRINTF(name, fmt, args...)       \
+    ({                                                  \
+        _QTC_LOCAL_BUFF_PRINTF(name, fmt, ##args);      \
+        (name).p;                                       \
     })
 
 #endif

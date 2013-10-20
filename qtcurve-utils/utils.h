@@ -179,34 +179,45 @@ const_(const T &t)
 }
 #endif
 
-#define QTC_DEF_LOCAL_BUFF(type, name, stack_size, size)                \
-    size_t __##qtc_local_buff##name##_size = (size);                    \
-    type __##qtc_local_buff##name[stack_size];                          \
-    type *name;                                                         \
-    type *__##qtc_local_buff_to_free##name;                             \
-    if (qtcUnlikely(__##qtc_local_buff##name##_size > stack_size)) {    \
-        __##qtc_local_buff_to_free##name =                              \
-            (type*)malloc(sizeof(type) * __##qtc_local_buff##name##_size); \
-        name = __##qtc_local_buff_to_free##name;                        \
-    } else {                                                            \
-        __##qtc_local_buff_to_free##name = NULL;                        \
-        name = __##qtc_local_buff##name;                                \
+#define QTC_BUFF_TYPE(type)                     \
+    struct {                                    \
+        union {                                 \
+            type *p;                            \
+            void *_p;                           \
+        };                                      \
+        size_t l;                               \
+        type *static_p;                         \
+        size_t static_l;                        \
     }
 
-#define QTC_LOCAL_BUFF_RESIZE(name, size) do {                          \
-        size_t new_size = (size);                                       \
-        if (new_size < __##qtc_local_buff##name##_size ||               \
-            new_size * sizeof(*name) < sizeof(__##qtc_local_buff##name)) \
+#define QTC_DEF_LOCAL_BUFF(type, name, stack_size, size)                \
+    type __##qtc_local_buff##name[stack_size];                          \
+    QTC_BUFF_TYPE(type) name = {                                        \
+        {__##qtc_local_buff##name},                                     \
+        sizeof(__##qtc_local_buff##name) / sizeof(type),                \
+        __##qtc_local_buff##name,                                       \
+        sizeof(__##qtc_local_buff##name) / sizeof(type)                 \
+    };                                                                  \
+    QTC_RESIZE_LOCAL_BUFF(name, size)
+
+#define QTC_RESIZE_LOCAL_BUFF(name, size) do {                          \
+        size_t __new_size = (size);                                     \
+        if (__new_size <= (name).l || __new_size <= (name).static_l)    \
             break;                                                      \
-        __##qtc_local_buff##name##_size = new_size;                     \
-        __##qtc_local_buff_to_free##name =                              \
-            (type*)remalloc(__##qtc_local_buff_to_free##name,           \
-                            sizeof(*name) * new_size);                  \
-        name = __##qtc_local_buff_to_free##name;                        \
+        (name).l = __new_size;                                          \
+        size_t __alloc_size = sizeof(*(name).p) * __new_size;           \
+        if ((name).p == (name).static_p) {                              \
+            (name)._p = malloc(__alloc_size);                           \
+        } else {                                                        \
+            (name)._p = realloc((name)._p, __alloc_size);               \
+        }                                                               \
     } while (0)
 
-#define QTC_FREE_LOCAL_BUFF(name)               \
-    qtcFree(__##qtc_local_buff_to_free##name)
+#define QTC_FREE_LOCAL_BUFF(name) do {          \
+        if ((name).p != (name).static_p) {      \
+            free((name)._p);                    \
+        }                                       \
+    } while (0)
 
 #ifdef __QTC_ATOMIC_USE_SYNC_FETCH
 # undef __QTC_ATOMIC_USE_SYNC_FETCH
