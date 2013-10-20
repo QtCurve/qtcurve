@@ -69,7 +69,7 @@ qtcBSearch(const void *key, const void *base, size_t nmemb, size_t size,
         const void *p = ((const char*)base) + (idx * size);
         int comparison = (*compar)(key, p);
         if (comparison == 0) {
-            u = idx;
+            l = idx;
             break;
         } else if (comparison < 0) {
             u = idx;
@@ -77,7 +77,7 @@ qtcBSearch(const void *key, const void *base, size_t nmemb, size_t size,
             l = idx + 1;
         }
     }
-    return (void*)(((const char*) base) + (l * size));
+    return (void*)(((const char*)base) + (l * size));
 }
 
 static int

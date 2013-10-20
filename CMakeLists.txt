@@ -39,6 +39,7 @@ endfunction()
 option(ENABLE_QT4 "Building Qt4 theme." On)
 option(ENABLE_QT5 "Building Qt5 theme." On)
 option(ENABLE_GTK2 "Building Gtk2 theme." On)
+option(ENABLE_TEST "Enable testing." Off)
 option(QTC_ENABLE_X11 "Enable X11" On)
 option(QTC_INSTALL_PO "Install translation files." On)
 
@@ -167,6 +168,9 @@ add_subdirectory(po)
 add_subdirectory(qt4)
 add_subdirectory(qt5)
 add_subdirectory(gtk2)
+if(ENABLE_TEST)
+  add_subdirectory(test)
+endif()
 
 if((ENABLE_QT4 AND QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT) OR
     (ENABLE_QT5 AND QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT) OR
