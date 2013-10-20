@@ -148,10 +148,6 @@ typedef struct
     int             //startDragDist,
                     startDragTime;
     QtcDebug        debug;
-#ifdef FIX_FIREFOX_LOCATION_BAR
-    gboolean        isBrowser;
-    float           fontSize;
-#endif
 } QtData;
 
 typedef struct

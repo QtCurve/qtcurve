@@ -487,11 +487,6 @@ static void setFont(QtFontDetails *font, int f)
             italicStr(font->italic),
             font->size);
 
-#ifdef FIX_FIREFOX_LOCATION_BAR
-    if(FONT_GENERAL==f)
-        qtSettings.fontSize=font->size;
-#endif
-
     /* Qt uses a bold font for progressbars, try to mimic this... */
     if(FONT_GENERAL==f && font->weight>=WEIGHT_NORMAL && font->weight<WEIGHT_DEMIBOLD)
     {
@@ -1467,8 +1462,7 @@ static void processMozillaApp(gboolean add_btn_css, gboolean add_menu_colors, co
 {
     const char *home=qtcGetHome();
 
-    if(home && (strlen(home)+strlen(app)+10+MAX_DEFAULT_NAME)<MAX_CSS_HOME)     /* 10 for .mozilla/<app>/ */
-    {
+    if (home && (strlen(home)+strlen(app)+10+MAX_DEFAULT_NAME)<MAX_CSS_HOME) {
         char cssHome[MAX_CSS_HOME+1];
         DIR  *dir=NULL;
 
@@ -1755,9 +1749,6 @@ gboolean qtSettingsInit()
                          mozThunderbird=!thunderbird && !firefox && isMozApp(qtSettings.appName, "mozilla-thunderbird"),
                          seamonkey=!thunderbird && !firefox && !mozThunderbird && isMozApp(qtSettings.appName, "seamonkey");
 
-#ifdef FIX_FIREFOX_LOCATION_BAR
-                qtSettings.isBrowser=firefox;
-#endif
                 if(firefox || thunderbird || mozThunderbird || seamonkey)
                 {
                     GdkColor *menu_col=SHADE_CUSTOM==opts.shadeMenubars
