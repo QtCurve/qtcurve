@@ -51,7 +51,7 @@ _qtcCatStrsFill(int n, const char **strs, size_t *lens,
 #define _qtcCatStrs(var, strs...)                                       \
     do {                                                                \
         const char *__strs[] = {strs};                                  \
-        int __strs_n = sizeof(__strs) / sizeof(const char*);            \
+        const int __strs_n = sizeof(__strs) / sizeof(const char*);      \
         size_t __strs_lens[sizeof(__strs) / sizeof(const char*)];       \
         size_t __strs_total_len =                                       \
             _qtcCatStrsCalLens(__strs_n, __strs, __strs_lens);          \
@@ -63,7 +63,7 @@ _qtcCatStrsFill(int n, const char **strs, size_t *lens,
 #define _qtcFillStrs(var, buff, strs...)                                \
     do {                                                                \
         const char *__strs[] = {strs};                                  \
-        int __strs_n = sizeof(__strs) / sizeof(const char*);            \
+        const int __strs_n = sizeof(__strs) / sizeof(const char*);      \
         size_t __strs_lens[sizeof(__strs) / sizeof(const char*)];       \
         size_t __strs_total_len =                                       \
             _qtcCatStrsCalLens(__strs_n, __strs, __strs_lens);          \
@@ -179,10 +179,27 @@ QTC_END_DECLS
         (name).p = _qtcSPrintf((name).p, &(name).l, true, fmt, ##args); \
     } while (0)
 
+#define _QTC_LOCAL_BUFF_CAT_STR(name, strs...) do {                     \
+        const char *__strs[] = {strs};                                  \
+        const int __strs_n = sizeof(__strs) / sizeof(const char*);      \
+        size_t __strs_lens[sizeof(__strs) / sizeof(const char*)];       \
+        size_t __strs_total_len =                                       \
+            _qtcCatStrsCalLens(__strs_n, __strs, __strs_lens);          \
+        QTC_RESIZE_LOCAL_BUFF(name, __strs_total_len + 1);              \
+        _qtcCatStrsFill(__strs_n, __strs, __strs_lens,                  \
+                        __strs_total_len, (name).p);                    \
+    } while (0)
+
 #define QTC_LOCAL_BUFF_PRINTF(name, fmt, args...)       \
     ({                                                  \
         _QTC_LOCAL_BUFF_PRINTF(name, fmt, ##args);      \
         (name).p;                                       \
+    })
+
+#define QTC_LOCAL_BUFF_CAT_STR(name, strs...)   \
+    ({                                          \
+        _QTC_LOCAL_BUFF_CAT_STR(name, ##strs);  \
+        (name).p;                               \
     })
 
 #endif
