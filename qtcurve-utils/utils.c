@@ -121,7 +121,7 @@ qtcStrMapItemCompKey(const void *_key, const void *_item)
     if (key->case_sensitive) {
         return strcmp(key->key, item->key);
     } else {
-        return strcasecmp(key->key, key->key);
+        return strcasecmp(key->key, item->key);
     }
 }
 

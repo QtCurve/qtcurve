@@ -313,9 +313,8 @@ qtcStrMapInitKeys(QtcStrMap *map, const char **keys)
         false,                                                    \
         case_sense,                                               \
     };                                                            \
-    if (!map.inited) {                                            \
-        qtcStrMapInitKeys(&map, __##map##_keys);                  \
-    }
+    qtcStrMapInitKeys(&map, __##map##_keys);
+
 int qtcStrMapSearch(const QtcStrMap *map, const char *key, int def);
 #define _qtcStrMapSearch(map, key, def, ...)    \
     (qtcStrMapSearch)(map, key, def)
