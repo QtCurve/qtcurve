@@ -18,3 +18,7 @@ add_test(NAME test-search COMMAND test-search)
 add_executable(test-strmap test-strmap.c)
 target_link_libraries(test-strmap qtcurve-utils)
 add_test(NAME test-strmap COMMAND test-strmap)
+
+add_executable(test-printf test-printf.c)
+target_link_libraries(test-printf qtcurve-utils)
+add_test(NAME test-printf COMMAND test-printf)

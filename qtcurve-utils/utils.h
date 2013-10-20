@@ -186,8 +186,8 @@ const_(const T &t)
             void *_p;                           \
         };                                      \
         size_t l;                               \
-        type *static_p;                         \
-        size_t static_l;                        \
+        type *const static_p;                   \
+        const size_t static_l;                  \
     }
 
 #define QTC_DEF_LOCAL_BUFF(type, name, stack_size, size)                \

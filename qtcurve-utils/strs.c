@@ -36,16 +36,13 @@ _qtcSPrintfV(char *buff, size_t *_size, bool allocated,
 {
     if (!buff || !_size || !*_size) {
         char *res = NULL;
-        size_t new_size = vasprintf(&res, fmt, ap);
-        if (_size) {
-            *_size = new_size;
-        }
+        vasprintf(&res, fmt, ap);
         return res;
     }
     va_list _ap;
     va_copy(_ap, ap);
     size_t size = *_size;
-    size_t new_size = vsnprintf(buff, size, fmt, ap);
+    size_t new_size = vsnprintf(buff, size, fmt, ap) + 1;
     if (new_size > size) {
         new_size = qtcAlignTo(new_size, 1024);
         if (allocated) {

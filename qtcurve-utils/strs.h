@@ -167,7 +167,7 @@ qtcASNPrintf(char *buff, size_t size, const char *fmt, ...)
 QTC_END_DECLS
 
 #define _QTC_LOCAL_BUFF_PRINTF(name, fmt, args...) do {                 \
-        if (!(name).p == (name).static_p) {                             \
+        if ((name).p == (name).static_p) {                              \
             size_t _size = (name).l;                                    \
             char *__res = _qtcSPrintf((name).p, &_size, false, fmt, ##args); \
             if (__res != (name).p) {                                    \
