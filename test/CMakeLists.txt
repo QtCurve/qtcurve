@@ -26,3 +26,7 @@ add_test(NAME test-printf COMMAND test-printf)
 add_executable(test-strlist test-strlist.c)
 target_link_libraries(test-strlist qtcurve-utils)
 add_test(NAME test-strlist COMMAND test-strlist)
+
+add_executable(test-default-arg test-default-arg.c)
+target_link_libraries(test-default-arg qtcurve-utils)
+add_test(NAME test-default-arg COMMAND test-default-arg)
