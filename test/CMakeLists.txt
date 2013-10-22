@@ -22,3 +22,7 @@ add_test(NAME test-strmap COMMAND test-strmap)
 add_executable(test-printf test-printf.c)
 target_link_libraries(test-printf qtcurve-utils)
 add_test(NAME test-printf COMMAND test-printf)
+
+add_executable(test-strlist test-strlist.c)
+target_link_libraries(test-strlist qtcurve-utils)
+add_test(NAME test-strlist COMMAND test-strlist)

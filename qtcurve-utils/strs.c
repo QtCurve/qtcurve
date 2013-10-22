@@ -55,3 +55,43 @@ _qtcSPrintfV(char *buff, size_t *_size, bool allocated,
     }
     return buff;
 }
+
+QTC_EXPORT void
+qtcStrListForEach(const char *str, char delim, char escape,
+                  QtcListForEachFunc func, void *data)
+{
+    QTC_DEF_STR_BUFF(str_buff, 1024, 1024);
+    if (qtcUnlikely(escape == delim)) {
+        escape = '\0';
+    }
+    const char key[] = {delim, escape, '\0'};
+    const char *p = str;
+    while (true) {
+        size_t len = 0;
+        while (true) {
+            size_t sub_len = strcspn(p, key);
+            QTC_RESIZE_LOCAL_BUFF(str_buff, len + sub_len + 2);
+            memcpy(str_buff.p + len, p, sub_len);
+            len += sub_len;
+            p += sub_len;
+            if (escape && *p == escape) {
+                str_buff.p[len] = p[1];
+                if (qtcUnlikely(!p[1])) {
+                    p++;
+                    break;
+                }
+                len++;
+                p += 2;
+            } else {
+                str_buff.p[len] = '\0';
+                break;
+            }
+        }
+        func(str_buff.p, len, data);
+        if (!*p) {
+            break;
+        }
+        p++;
+    }
+    QTC_FREE_LOCAL_BUFF(str_buff);
+}

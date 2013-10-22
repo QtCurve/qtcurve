@@ -164,6 +164,15 @@ qtcASNPrintf(char *buff, size_t size, const char *fmt, ...)
 #define qtcASPrintf(fmt, args...)               \
     qtcASNPrintf(NULL, 0, fmt, ##args)
 
+typedef void (*QtcListForEachFunc)(const char *str, size_t len, void *data);
+void qtcStrListForEach(const char *str, char delim, char escape,
+                       QtcListForEachFunc func, void *data);
+
+// typedef void (*QtcListEleLoader)(void *ele, const char *str, size_t len);
+
+// void *qtcStrLoadList(const char *str, char delim, char escape,
+//                      size_t size, size_t *nele, void *buff);
+
 QTC_END_DECLS
 
 typedef QTC_BUFF_TYPE(char) QtcStrBuff;
