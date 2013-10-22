@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "log.h"
+#include "strs.h"
 #include <unistd.h>
 #include <stdarg.h>
 

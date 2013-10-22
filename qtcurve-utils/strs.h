@@ -223,4 +223,20 @@ typedef QTC_BUFF_TYPE(char) QtcStrBuff;
         (name).p;                               \
     })
 
+QTC_ALWAYS_INLINE static inline bool
+qtcStrToBool(const char *str, bool def)
+{
+    if (str && *str) {
+        if (def) {
+            return !(strcasecmp(str, "0") == 0 || strcasecmp(str, "f") == 0 ||
+                     strcasecmp(str, "false") == 0 ||
+                     strcasecmp(str, "off") == 0);
+        } else {
+            return (strcasecmp(str, "1") == 0 || strcasecmp(str, "t") == 0 ||
+                    strcasecmp(str, "true") == 0 || strcasecmp(str, "on") == 0);
+        }
+    }
+    return def;
+}
+
 #endif
