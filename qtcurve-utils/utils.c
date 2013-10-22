@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "utils.h"
+#include "atomic.h"
 
 #ifdef __QTC_ATOMIC_USE_SYNC_FETCH
 /**
