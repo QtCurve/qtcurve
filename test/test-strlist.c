@@ -48,13 +48,13 @@ main()
         .strs = str_list1,
         .index = 0,
     };
-    qtcStrListForEach(str1, ';', '\\', qtcStrListFunc, &test1);
+    qtcStrListForEach(str1, ';', , qtcStrListFunc, &test1);
     assert(test1.index == (sizeof(str_list1) / sizeof(char*)));
     QtcStrListTest test2 = {
         .strs = str_list2,
         .index = 0,
     };
-    qtcStrListForEach(str2, ',', '\\', qtcStrListFunc, &test2);
+    qtcStrListForEach(str2, , , qtcStrListFunc, &test2);
     assert(test2.index == (sizeof(str_list2) / sizeof(char*)));
     return 0;
 }

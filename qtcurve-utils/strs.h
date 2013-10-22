@@ -167,6 +167,9 @@ qtcASNPrintf(char *buff, size_t size, const char *fmt, ...)
 typedef void (*QtcListForEachFunc)(const char *str, size_t len, void *data);
 void qtcStrListForEach(const char *str, char delim, char escape,
                        QtcListForEachFunc func, void *data);
+#define qtcStrListForEach(str, delim, escape, func, data)               \
+    qtcStrListForEach(str, QTC_DEFAULT(delim, ','),                     \
+                      QTC_DEFAULT(escape, '\\'), func, QTC_DEFAULT(data, NULL))
 
 // typedef void (*QtcListEleLoader)(void *ele, const char *str, size_t len);
 
