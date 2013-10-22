@@ -34,19 +34,11 @@ _qtcCheckLogLevelReal()
         log_level = QTC_LOG_DEBUG;
         return;
     }
-    const char *env_level = getenv("QTCURVE_LEVEL");
-    if (env_level && *env_level) {
-        if (strcasecmp(env_level, "debug") == 0) {
-            log_level = QTC_LOG_DEBUG;
-        } else if (strcasecmp(env_level, "info") == 0) {
-            log_level = QTC_LOG_INFO;
-        } else if (strcasecmp(env_level, "warning") == 0 ||
-                   strcasecmp(env_level, "warn") == 0) {
-            log_level = QTC_LOG_WARN;
-        } else if (strcasecmp(env_level, "error") == 0) {
-            log_level = QTC_LOG_ERROR;
-        }
-    }
+    QTC_DECL_STR_MAP(level_map, false, {"debug", QTC_LOG_DEBUG},
+                     {"info", QTC_LOG_INFO}, {"warning", QTC_LOG_WARN},
+                     {"warn", QTC_LOG_WARN}, {"error", QTC_LOG_ERROR});
+    log_level = qtcStrMapSearch(&level_map, getenv("QTCURVE_LEVEL"),
+                                QTC_LOG_ERROR);
     if (qtcStrToBool(env_debug, true) && log_level <= QTC_LOG_DEBUG) {
         log_level = QTC_LOG_INFO;
     }
