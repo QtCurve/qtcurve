@@ -166,6 +166,18 @@ qtcASNPrintf(char *buff, size_t size, const char *fmt, ...)
 
 QTC_END_DECLS
 
+typedef QTC_BUFF_TYPE(char) QtcStrBuff;
+
+#define QTC_DEF_STR_BUFF(name, stack_size, size)                \
+    char __##qtc_local_buff##name[stack_size];                  \
+    QtcStrBuff name = {                                         \
+        {__##qtc_local_buff##name},                             \
+        sizeof(__##qtc_local_buff##name) / sizeof(char),        \
+        __##qtc_local_buff##name,                               \
+        sizeof(__##qtc_local_buff##name) / sizeof(char)         \
+    };                                                          \
+    QTC_RESIZE_LOCAL_BUFF(name, size)
+
 #define _QTC_LOCAL_BUFF_PRINTF(name, fmt, args...) do {                 \
         if ((name).p == (name).static_p) {                              \
             size_t _size = (name).l;                                    \
