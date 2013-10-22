@@ -63,16 +63,6 @@ typedef struct {
 #define QTC_ALWAYS_INLINE __attribute__((always_inline))
 #define QTC_UNUSED(x) ((void)(x))
 
-QTC_ALWAYS_INLINE static inline int
-_qtcMakeVersionReal(int a, int b, int c)
-{
-    return a << 16 | b << 8 | c;
-}
-#define _qtcMakeVersionV(a, b, c, ...)          \
-    _qtcMakeVersionReal(a, b, c)
-#define qtcMakeVersion(a, b, arg...)            \
-    _qtcMakeVersionV(a, b,##arg, 0)
-
 QTC_ALWAYS_INLINE static inline void*
 qtcAlloc0(size_t size)
 {
@@ -93,24 +83,6 @@ qtcFree(void *p)
 #define qtcNew(type) qtcNewSize(type, sizeof(type))
 #define qtcNewN(type, n) qtcNewSize(type, sizeof(type) * n)
 
-QTC_ALWAYS_INLINE static inline double
-qtcLimit(double d, double l)
-{
-    if (d <= 0) {
-        return 0;
-    }
-    if (d >= l) {
-        return l;
-    }
-    return d;
-}
-
-QTC_ALWAYS_INLINE static inline bool
-qtcEqual(double d1, double d2)
-{
-    return (fabs(d1 - d2) < 0.0001);
-}
-
 #ifdef __cplusplus
 
 #define __QTC_USE_DECLVAL
@@ -129,46 +101,7 @@ qtcEqual(double d1, double d2)
 #define _QTC_COMP_TYPE(T1, T2)                  \
     decltype(0 ? T1() : T2())
 #endif
-
-template <typename T>
-QTC_ALWAYS_INLINE static inline const T&
-qtcMax(const T &a, const T &b)
-{
-    return (a > b) ? a : b;
-}
-template <typename T>
-QTC_ALWAYS_INLINE static inline const T&
-qtcMin(const T &a, const T &b)
-{
-    return (a < b) ? a : b;
-}
-template <typename T1, typename T2>
-QTC_ALWAYS_INLINE static inline _QTC_COMP_TYPE(T1, T2)
-qtcMax(const T1 &a, const T2 &b)
-{
-    return (a > b) ? a : b;
-}
-template <typename T1, typename T2>
-QTC_ALWAYS_INLINE static inline _QTC_COMP_TYPE(T1, T2)
-qtcMin(const T1 &a, const T2 &b)
-{
-    return (a < b) ? a : b;
-}
-#else
-#define qtcMax(a, b)                            \
-    ({                                          \
-        typeof(a) _a = (a);                     \
-        typeof(b) _b = (b);                     \
-        (_a > _b) ? _a : _b;                    \
-    })
-#define qtcMin(a, b)                            \
-    ({                                          \
-        typeof(a) _a = (a);                     \
-        typeof(b) _b = (b);                     \
-        (_a < _b) ? _a : _b;                    \
-    })
 #endif
-#define qtcBound(a, b, c) qtcMax(a, qtcMin(b, c))
 
 #ifdef __cplusplus
 template <class T>
@@ -298,21 +231,6 @@ qtcStrToBool(const char *str, bool def)
         }
     }
     return def;
-}
-
-QTC_ALWAYS_INLINE static inline uintptr_t
-qtcGetPadding(uintptr_t len, uintptr_t align)
-{
-    uintptr_t left;
-    if ((left = len % align))
-        return align - left;
-    return 0;
-}
-
-QTC_ALWAYS_INLINE static inline uintptr_t
-qtcAlignTo(uintptr_t len, uintptr_t align)
-{
-    return len + qtcGetPadding(len, align);
 }
 
 #endif

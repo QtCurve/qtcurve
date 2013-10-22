@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "strs.h"
+#include "number.h"
 
 QTC_EXPORT char*
 _qtcSPrintf(char *buff, size_t *size, bool allocated, const char *fmt, ...)

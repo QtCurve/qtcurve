@@ -18,7 +18,7 @@
  *   51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.              *
  ***************************************************************************/
 
-#include <qtcurve-utils/utils.h>
+#include <qtcurve-utils/number.h>
 #include <assert.h>
 
 int

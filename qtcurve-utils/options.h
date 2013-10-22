@@ -23,7 +23,7 @@
 #ifndef QTC_UTILS_OPTIONS_H
 #define QTC_UTILS_OPTIONS_H
 
-#include "utils.h"
+#include "number.h"
 
 typedef enum {
     SHADING_SIMPLE,
