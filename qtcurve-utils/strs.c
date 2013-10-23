@@ -100,6 +100,7 @@ typedef struct {
     size_t size;
     size_t nele;
     void *buff;
+    size_t max_len;
     QtcListEleLoader loader;
     void *data;
     size_t offset;
@@ -116,12 +117,15 @@ qtcStrListLoader(const char *str, size_t len, void *_data)
     data->loader((char*)data->buff + data->offset * data->size,
                  str, len, data->data);
     data->offset++;
+    if (data->max_len && data->offset >= data->max_len)
+        return false;
     return true;
 }
 
 QTC_EXPORT void*
 qtcStrLoadList(const char *str, char delim, char escape, size_t size,
-               size_t *_nele, void *buff, QtcListEleLoader loader, void *data)
+               size_t *_nele, void *buff, size_t max_len,
+               QtcListEleLoader loader, void *data)
 {
     if (qtcUnlikely(!_nele || !size || !loader)) {
         return NULL;
@@ -130,6 +134,7 @@ qtcStrLoadList(const char *str, char delim, char escape, size_t size,
         .size = size,
         .nele = *_nele,
         .buff = buff,
+        .max_len = max_len,
         .loader = loader,
         .data = data,
         .offset = 0,
@@ -156,10 +161,10 @@ qtcStrListStrLoader(void *ele, const char *str, size_t len, void *data)
 
 QTC_EXPORT char**
 qtcStrLoadStrList(const char *str, char delim, char escape, size_t *nele,
-                  char **buff, const char *def)
+                  char **buff, size_t max_len, const char *def)
 {
     return qtcStrLoadList(str, delim, escape, sizeof(char*), nele, buff,
-                          qtcStrListStrLoader, (void*)def);
+                          max_len, qtcStrListStrLoader, (void*)def);
 }
 
 static void
@@ -178,10 +183,10 @@ qtcStrListIntLoader(void *ele, const char *str, size_t len, void *data)
 
 QTC_EXPORT long*
 qtcStrLoadIntList(const char *str, char delim, char escape, size_t *nele,
-                  long *buff, long def)
+                  long *buff, size_t max_len, long def)
 {
     return qtcStrLoadList(str, delim, escape, sizeof(long), nele, buff,
-                          qtcStrListIntLoader, (void*)(intptr_t)def);
+                          max_len, qtcStrListIntLoader, (void*)(intptr_t)def);
 }
 
 static void
@@ -200,8 +205,8 @@ qtcStrListFloatLoader(void *ele, const char *str, size_t len, void *data)
 
 QTC_EXPORT double*
 qtcStrLoadFloatList(const char *str, char delim, char escape, size_t *nele,
-                    double *buff, double def)
+                    double *buff, size_t max_len, double def)
 {
     return qtcStrLoadList(str, delim, escape, sizeof(double), nele, buff,
-                          qtcStrListFloatLoader, &def);
+                          max_len, qtcStrListFloatLoader, &def);
 }
