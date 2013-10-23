@@ -171,7 +171,7 @@ void qtcStrListForEach(const char *str, char delim, char escape,
     qtcStrListForEach(str, QTC_DEFAULT(delim, ','),                     \
                       QTC_DEFAULT(escape, '\\'), func, QTC_DEFAULT(data, NULL))
 
-typedef void (*QtcListEleLoader)(void *ele, const char *str,
+typedef bool (*QtcListEleLoader)(void *ele, const char *str,
                                  size_t len, void *data);
 
 void *qtcStrLoadList(const char *str, char delim, char escape,

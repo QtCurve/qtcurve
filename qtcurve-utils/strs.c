@@ -114,11 +114,13 @@ qtcStrListLoader(const char *str, size_t len, void *_data)
         data->nele += 8;
         data->buff = realloc(data->buff, data->nele * data->size);
     }
-    data->loader((char*)data->buff + data->offset * data->size,
-                 str, len, data->data);
-    data->offset++;
-    if (data->max_len && data->offset >= data->max_len)
-        return false;
+    if (data->loader((char*)data->buff + data->offset * data->size,
+                     str, len, data->data)) {
+        data->offset++;
+        if (data->max_len && data->offset >= data->max_len) {
+            return false;
+        }
+    }
     return true;
 }
 
@@ -148,7 +150,7 @@ qtcStrLoadList(const char *str, char delim, char escape, size_t size,
     return loader_data.buff;
 }
 
-static void
+static bool
 qtcStrListStrLoader(void *ele, const char *str, size_t len, void *data)
 {
     const char *def = data;
@@ -157,6 +159,7 @@ qtcStrListStrLoader(void *ele, const char *str, size_t len, void *data)
     } else {
         *(char**)ele = qtcSetStrWithLen(NULL, str, len);
     }
+    return true;
 }
 
 QTC_EXPORT char**
@@ -167,7 +170,7 @@ qtcStrLoadStrList(const char *str, char delim, char escape, size_t *nele,
                           max_len, qtcStrListStrLoader, (void*)def);
 }
 
-static void
+static bool
 qtcStrListIntLoader(void *ele, const char *str, size_t len, void *data)
 {
     QTC_UNUSED(len);
@@ -179,6 +182,7 @@ qtcStrListIntLoader(void *ele, const char *str, size_t len, void *data)
         res = def;
     }
     *(long*)ele = res;
+    return true;
 }
 
 QTC_EXPORT long*
@@ -189,7 +193,7 @@ qtcStrLoadIntList(const char *str, char delim, char escape, size_t *nele,
                           max_len, qtcStrListIntLoader, (void*)(intptr_t)def);
 }
 
-static void
+static bool
 qtcStrListFloatLoader(void *ele, const char *str, size_t len, void *data)
 {
     QTC_UNUSED(len);
@@ -201,6 +205,7 @@ qtcStrListFloatLoader(void *ele, const char *str, size_t len, void *data)
         res = def;
     }
     *(double*)ele = res;
+    return true;
 }
 
 QTC_EXPORT double*
