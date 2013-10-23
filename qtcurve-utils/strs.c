@@ -88,8 +88,7 @@ qtcStrListForEach(const char *str, char delim, char escape,
                 break;
             }
         }
-        func(str_buff.p, len, data);
-        if (!*p) {
+        if (!func(str_buff.p, len, data) || !*p) {
             break;
         }
         p++;
@@ -106,7 +105,7 @@ typedef struct {
     size_t offset;
 } QtcStrLoadListData;
 
-static void
+static bool
 qtcStrListLoader(const char *str, size_t len, void *_data)
 {
     QtcStrLoadListData *data = (QtcStrLoadListData*)_data;
@@ -117,6 +116,7 @@ qtcStrListLoader(const char *str, size_t len, void *_data)
     data->loader((char*)data->buff + data->offset * data->size,
                  str, len, data->data);
     data->offset++;
+    return true;
 }
 
 QTC_EXPORT void*

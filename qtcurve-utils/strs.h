@@ -164,7 +164,7 @@ qtcASNPrintf(char *buff, size_t size, const char *fmt, ...)
 #define qtcASPrintf(fmt, args...)               \
     qtcASNPrintf(NULL, 0, fmt, ##args)
 
-typedef void (*QtcListForEachFunc)(const char *str, size_t len, void *data);
+typedef bool (*QtcListForEachFunc)(const char *str, size_t len, void *data);
 void qtcStrListForEach(const char *str, char delim, char escape,
                        QtcListForEachFunc func, void *data);
 #define qtcStrListForEach(str, delim, escape, func, data)               \
@@ -181,6 +181,7 @@ void *qtcStrLoadList(const char *str, char delim, char escape,
     qtcStrLoadList(str, QTC_DEFAULT(delim, ','), QTC_DEFAULT(escape, '\\'), \
                    size, nele, QTC_DEFAULT(buff, NULL), loader,         \
                    QTC_DEFAULT(data, NULL))
+
 char **qtcStrLoadStrList(const char *str, char delim, char escape,
                          size_t *nele, char **buff, const char *def);
 #define qtcStrLoadStrList(str, delim, escape, nele, buff, def)          \

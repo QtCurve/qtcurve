@@ -46,13 +46,14 @@ typedef struct {
     int index;
 } QtcStrListTest;
 
-static void
+static bool
 qtcStrListFunc(const char *str, size_t len, void *_data)
 {
     QtcStrListTest *data = (QtcStrListTest*)_data;
     assert(strlen(str) == len);
     assert(strcmp(str, data->strs[data->index]) == 0);
     data->index++;
+    return true;
 }
 
 int
