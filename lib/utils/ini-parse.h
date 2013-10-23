@@ -1,5 +1,5 @@
 /*****************************************************************************
- *   Copyright 2012 - 2013 Yichao Yu <yyc1992@gmail.com>                     *
+ *   Copyright 2012 - 2014 Yichao Yu <yyc1992@gmail.com>                     *
  *                                                                           *
  *   This program is free software; you can redistribute it and/or modify    *
  *   it under the terms of the GNU Lesser General Public License as          *
@@ -290,6 +290,30 @@ static inline bool
 qtcIniGroupGetBool(QtcIniGroup *grp, const char *name, bool def)
 {
     return qtcStrToBool(qtcIniGroupGetValue(grp, name), def);
+}
+
+static inline long
+qtcIniGroupGetIntWithLen(QtcIniGroup *grp, const char *name,
+                         size_t len, long def)
+{
+    return qtcStrToInt(qtcIniGroupGetValueWithLen(grp, name, len), def);
+}
+static inline long
+qtcIniGroupGetInt(QtcIniGroup *grp, const char *name, long def)
+{
+    return qtcIniGroupGetIntWithLen(grp, name, strlen(name), def);
+}
+
+static inline double
+qtcIniGroupGetFloatWithLen(QtcIniGroup *grp, const char *name,
+                           size_t len, double def)
+{
+    return qtcStrToFloat(qtcIniGroupGetValueWithLen(grp, name, len), def);
+}
+static inline double
+qtcIniGroupGetFloat(QtcIniGroup *grp, const char *name, double def)
+{
+    return qtcIniGroupGetFloatWithLen(grp, name, strlen(name), def);
 }
 
 QTC_END_DECLS
