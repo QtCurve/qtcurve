@@ -62,6 +62,7 @@ typedef struct {
 
 #define QTC_ALWAYS_INLINE __attribute__((always_inline))
 #define QTC_UNUSED(x) ((void)(x))
+
 #define _QTC_USE_1(x, y) x
 #define _QTC_USE_2(x, y) y
 #define __QTC_USE_12(dummy, v, res, ...) res

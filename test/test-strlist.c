@@ -27,6 +27,20 @@ static const char *str_list1[] = {"abcdef", "", ";", "aa\\a", "abb", ""};
 static const char *str2 = "abcdef,ls,\\";
 static const char *str_list2[] = {"abcdef", "ls", ""};
 
+#define _TO_STR(args...)                        \
+    __TO_STR(args)
+#define __TO_STR(args...)                       \
+    #args
+
+#define INT_LIST 1, 2, 3, 4, 5, 1, -2, -3, -5, 9, -10
+#define FLOAT_LIST .1, 0.32, 8.3, 4.8, 4.59, 1.9, -2.10, -3.38, -8.5, 9., -10.9
+
+static const char *int_str = _TO_STR(INT_LIST);
+static const long int_list[] = {INT_LIST};
+
+static const char *float_str = _TO_STR(FLOAT_LIST);
+static const double float_list[] = {FLOAT_LIST};
+
 typedef struct {
     const char **strs;
     int index;
@@ -56,5 +70,36 @@ main()
     };
     qtcStrListForEach(str2, , , qtcStrListFunc, &test2);
     assert(test2.index == (sizeof(str_list2) / sizeof(char*)));
+
+    size_t list1_len;
+    char **list1 = qtcStrLoadStrList(str1, ';', , &list1_len, ,);
+    assert(list1_len == (sizeof(str_list1) / sizeof(char*)));
+    for (unsigned i = 0;i < list1_len;i++) {
+        assert(strcmp(str_list1[i], list1[i]) == 0);
+        free(list1[i]);
+    }
+    free(list1);
+
+    size_t list2_len;
+    char **list2 = qtcStrLoadStrList(str2, , , &list2_len, ,);
+    assert(list2_len == (sizeof(str_list2) / sizeof(char*)));
+    for (unsigned i = 0;i < list2_len;i++) {
+        assert(strcmp(str_list2[i], list2[i]) == 0);
+        free(list2[i]);
+    }
+    free(list2);
+
+    size_t int_list_len;
+    long *int_list_res = qtcStrLoadIntList(int_str, ',', , &int_list_len, ,);
+    assert(int_list_len == (sizeof(int_list) / sizeof(long)));
+    assert(memcmp(int_list, int_list_res, sizeof(int_list)) == 0);
+    free(int_list_res);
+
+    size_t float_list_len;
+    double *float_list_res = qtcStrLoadFloatList(float_str, ',', ,
+                                                 &float_list_len, ,);
+    assert(float_list_len == (sizeof(float_list) / sizeof(long)));
+    assert(memcmp(float_list, float_list_res, sizeof(float_list)) == 0);
+    free(float_list_res);
     return 0;
 }

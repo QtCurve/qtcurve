@@ -171,10 +171,36 @@ void qtcStrListForEach(const char *str, char delim, char escape,
     qtcStrListForEach(str, QTC_DEFAULT(delim, ','),                     \
                       QTC_DEFAULT(escape, '\\'), func, QTC_DEFAULT(data, NULL))
 
-// typedef void (*QtcListEleLoader)(void *ele, const char *str, size_t len);
+typedef void (*QtcListEleLoader)(void *ele, const char *str,
+                                 size_t len, void *data);
 
-// void *qtcStrLoadList(const char *str, char delim, char escape,
-//                      size_t size, size_t *nele, void *buff);
+void *qtcStrLoadList(const char *str, char delim, char escape,
+                     size_t size, size_t *nele, void *buff,
+                     QtcListEleLoader loader, void *data);
+#define qtcStrLoadList(str, delim, escape, size, nele, buff, loader, data) \
+    qtcStrLoadList(str, QTC_DEFAULT(delim, ','), QTC_DEFAULT(escape, '\\'), \
+                   size, nele, QTC_DEFAULT(buff, NULL), loader,         \
+                   QTC_DEFAULT(data, NULL))
+char **qtcStrLoadStrList(const char *str, char delim, char escape,
+                         size_t *nele, char **buff, const char *def);
+#define qtcStrLoadStrList(str, delim, escape, nele, buff, def)          \
+    qtcStrLoadStrList(str, QTC_DEFAULT(delim, ','),                     \
+                      QTC_DEFAULT(escape, '\\'), nele,                  \
+                      QTC_DEFAULT(buff, NULL), QTC_DEFAULT(def, NULL))
+
+long *qtcStrLoadIntList(const char *str, char delim, char escape,
+                        size_t *nele, long *buff, long def);
+#define qtcStrLoadIntList(str, delim, escape, nele, buff, def)          \
+    qtcStrLoadIntList(str, QTC_DEFAULT(delim, ','),                     \
+                      QTC_DEFAULT(escape, '\\'), nele,                  \
+                      QTC_DEFAULT(buff, NULL), QTC_DEFAULT(def, 0))
+
+double *qtcStrLoadFloatList(const char *str, char delim, char escape,
+                            size_t *nele, double *buff, double def);
+#define qtcStrLoadFloatList(str, delim, escape, nele, buff, def)        \
+    qtcStrLoadFloatList(str, QTC_DEFAULT(delim, ','),                   \
+                        QTC_DEFAULT(escape, '\\'), nele,                \
+                        QTC_DEFAULT(buff, NULL), QTC_DEFAULT(def, 0))
 
 QTC_END_DECLS
 

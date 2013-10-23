@@ -30,7 +30,7 @@ _qtcMakeVersionReal(int a, int b, int c)
 #define _qtcMakeVersionV(a, b, c, ...)          \
     _qtcMakeVersionReal(a, b, c)
 #define qtcMakeVersion(a, b, arg...)            \
-    _qtcMakeVersionV(a, b,##arg, 0)
+    _qtcMakeVersionV(a, b, ##arg, 0)
 
 QTC_ALWAYS_INLINE static inline double
 qtcLimit(double d, double l)

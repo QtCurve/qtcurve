@@ -96,3 +96,112 @@ qtcStrListForEach(const char *str, char delim, char escape,
     }
     QTC_FREE_LOCAL_BUFF(str_buff);
 }
+
+typedef struct {
+    size_t size;
+    size_t nele;
+    void *buff;
+    QtcListEleLoader loader;
+    void *data;
+    size_t offset;
+} QtcStrLoadListData;
+
+static void
+qtcStrListLoader(const char *str, size_t len, void *_data)
+{
+    QtcStrLoadListData *data = (QtcStrLoadListData*)_data;
+    if (data->nele <= data->offset) {
+        data->nele += 8;
+        data->buff = realloc(data->buff, data->nele * data->size);
+    }
+    data->loader((char*)data->buff + data->offset * data->size,
+                 str, len, data->data);
+    data->offset++;
+}
+
+QTC_EXPORT void*
+qtcStrLoadList(const char *str, char delim, char escape, size_t size,
+               size_t *_nele, void *buff, QtcListEleLoader loader, void *data)
+{
+    if (qtcUnlikely(!_nele || !size || !loader)) {
+        return NULL;
+    }
+    QtcStrLoadListData loader_data = {
+        .size = size,
+        .nele = *_nele,
+        .buff = buff,
+        .loader = loader,
+        .data = data,
+        .offset = 0,
+    };
+    if (!(loader_data.nele && loader_data.buff)) {
+        loader_data.nele = 16;
+        loader_data.buff = malloc(16 * size);
+    }
+    qtcStrListForEach(str, delim, escape, qtcStrListLoader, &loader_data);
+    *_nele = loader_data.offset;
+    return loader_data.buff;
+}
+
+static void
+qtcStrListStrLoader(void *ele, const char *str, size_t len, void *data)
+{
+    const char *def = data;
+    if (def && !str[0]) {
+        *(char**)ele = strdup(def);
+    } else {
+        *(char**)ele = qtcSetStrWithLen(NULL, str, len);
+    }
+}
+
+QTC_EXPORT char**
+qtcStrLoadStrList(const char *str, char delim, char escape, size_t *nele,
+                  char **buff, const char *def)
+{
+    return qtcStrLoadList(str, delim, escape, sizeof(char*), nele, buff,
+                          qtcStrListStrLoader, (void*)def);
+}
+
+static void
+qtcStrListIntLoader(void *ele, const char *str, size_t len, void *data)
+{
+    QTC_UNUSED(len);
+    long def = (long)(intptr_t)data;
+    str += strspn(str, " \t\b\n\f\v");
+    char *end = NULL;
+    long res = strtol(str, &end, 0);
+    if (end == str) {
+        res = def;
+    }
+    *(long*)ele = res;
+}
+
+QTC_EXPORT long*
+qtcStrLoadIntList(const char *str, char delim, char escape, size_t *nele,
+                  long *buff, long def)
+{
+    return qtcStrLoadList(str, delim, escape, sizeof(long), nele, buff,
+                          qtcStrListIntLoader, (void*)(intptr_t)def);
+}
+
+static void
+qtcStrListFloatLoader(void *ele, const char *str, size_t len, void *data)
+{
+    QTC_UNUSED(len);
+    double def = *(double*)data;
+    str += strspn(str, " \t\b\n\f\v");
+    char *end = NULL;
+    double res = strtod(str, &end);
+    if (end == str) {
+        res = def;
+    }
+    *(double*)ele = res;
+}
+
+QTC_EXPORT double*
+qtcStrLoadFloatList(const char *str, char delim, char escape, size_t *nele,
+                    double *buff, double def)
+{
+    return qtcStrLoadList(str, delim, escape, sizeof(double), nele, buff,
+                          qtcStrListFloatLoader, &def);
+}
