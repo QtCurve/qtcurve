@@ -75,7 +75,7 @@ qtcConfGroupDescNew(QtcConfFileDesc *conf_desc, const char *name,
     return grp_desc;
 }
 
-static QtcConfGroupDesc*
+QTC_EXPORT QtcConfGroupDesc*
 qtcConfGroupDescFind(QtcConfFileDesc *conf_desc, const char *name,
                      size_t name_len)
 {
@@ -118,7 +118,7 @@ qtcConfOptionDescNew(QtcConfGroupDesc *grp_desc, const char *name,
     return opt_desc;
 }
 
-static QtcConfOptionDesc*
+QTC_EXPORT QtcConfOptionDesc*
 qtcConfOptionDescFind(QtcConfGroupDesc *grp_desc, const char *name,
                       size_t name_len)
 {

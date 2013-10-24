@@ -162,6 +162,25 @@ QTC_BEGIN_DECLS
 QtcConfFileDesc *qtcConfDescLoadFp(FILE *fp);
 QtcConfFileDesc *qtcConfDescLoad(const char *fname);
 void qtcConfDescFree(QtcConfFileDesc *desc);
+QtcConfGroupDesc *qtcConfGroupDescFind(
+    QtcConfFileDesc *conf_desc, const char *name, size_t name_len);
+QTC_ALWAYS_INLINE static inline QtcConfGroupDesc*
+_qtcConfGroupDescFind(QtcConfFileDesc *conf_desc, const char *name)
+{
+    return qtcConfGroupDescFind(conf_desc, name, strlen(name));
+}
+#define qtcConfGroupDescFind(conf_desc, name, name_len...)              \
+    QTC_SWITCH_(name_len, qtcConfGroupDescFind)(conf_desc, name, ##name_len)
+
+QtcConfOptionDesc *qtcConfOptionDescFind(
+    QtcConfGroupDesc *grp_desc, const char *name, size_t name_len);
+QTC_ALWAYS_INLINE static inline QtcConfOptionDesc*
+_qtcConfOptionDescFind(QtcConfGroupDesc *grp_desc, const char *name)
+{
+    return qtcConfOptionDescFind(grp_desc, name, strlen(name));
+}
+#define qtcConfOptionDescFind(grp_desc, name, name_len...)              \
+    QTC_SWITCH_(name_len, qtcConfOptionDescFind)(grp_desc, name, ##name_len)
 
 QTC_END_DECLS
 
