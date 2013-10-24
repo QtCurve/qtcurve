@@ -48,8 +48,8 @@ typedef union {
         bool is_static;
     } str_c;
     struct {
-        int min;
-        int max;
+        long min;
+        long max;
     } int_c;
     struct {
         unsigned num;
@@ -68,8 +68,8 @@ typedef union {
         bool is_array_static;
     } str_list_c;
     struct {
-        int min_val;
-        int max_val;
+        long min_val;
+        long max_val;
 
         unsigned min_count;
         unsigned max_count;
@@ -87,48 +87,33 @@ typedef union {
 
 typedef union {
     char *str_def;
-    int int_def;
+    long int_def;
     char *enum_def;
     double float_def;
     bool bool_def;
     QtcColor color_def;
     struct {
         bool is_ele_def;
+        size_t len;
         union {
-            struct {
-                size_t len;
-                char *val;
-            } ele;
-            struct {
-                size_t len;
-                char **vals;
-            } list;
+            char *val;
+            char **vals;
         };
     } str_list_def;
     struct {
         bool is_ele_def;
+        size_t len;
         union {
-            struct {
-                size_t len;
-                int val;
-            } ele;
-            struct {
-                size_t len;
-                int *vals;
-            } list;
+            long val;
+            long *vals;
         };
     } int_list_def;
     struct {
         bool is_ele_def;
+        size_t len;
         union {
-            struct {
-                size_t len;
-                double val;
-            } ele;
-            struct {
-                size_t len;
-                double *vals;
-            } list;
+            double val;
+            double *vals;
         };
     } float_list_def;
 } QtcConfDefault;
@@ -161,14 +146,14 @@ typedef struct {
     char *long_desc;
     QtcList link;
     QtcList option_descs;
-    int option_num;
+    unsigned option_num;
     QtcConfOptionDesc **option_list;
 } QtcConfGroupDesc;
 
 typedef struct {
     char *domain;
     QtcList group_descs;
-    int group_num;
+    unsigned group_num;
     QtcConfGroupDesc **group_list;
 } QtcConfFileDesc;
 

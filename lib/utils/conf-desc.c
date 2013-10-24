@@ -58,7 +58,7 @@ qtcConfGroupDescNew(QtcConfFileDesc *conf_desc, const char *name,
     qtcListInit(&grp_desc->link);
     qtcListInit(&grp_desc->option_descs);
     qtcListInsert(&conf_desc->group_descs, &grp_desc->link);
-    int old_num = conf_desc->group_num;
+    unsigned old_num = conf_desc->group_num;
     conf_desc->group_num++;
     size_t new_alloc = conf_desc->group_num * sizeof(QtcConfGroupDesc*);
     conf_desc->group_list = realloc(conf_desc->group_list, new_alloc);
@@ -86,8 +86,9 @@ qtcConfGroupDescFind(QtcConfFileDesc *conf_desc, const char *name,
     QtcConfGroupDesc **p =
         bsearch(&key, conf_desc->group_list, conf_desc->group_num,
                 sizeof(QtcConfGroupDesc*), _qtcConfKeyCompare);
-    if (p)
+    if (p) {
         return *p;
+    }
     return NULL;
 }
 
@@ -99,7 +100,7 @@ qtcConfOptionDescNew(QtcConfGroupDesc *grp_desc, const char *name,
     opt_desc->name = qtcSetStr(NULL, name, name_len);
     qtcListInit(&opt_desc->link);
     qtcListInsert(&grp_desc->option_descs, &opt_desc->link);
-    int old_num = grp_desc->option_num;
+    unsigned old_num = grp_desc->option_num;
     grp_desc->option_num++;
     size_t new_alloc = grp_desc->option_num * sizeof(QtcConfOptionDesc*);
     grp_desc->option_list = realloc(grp_desc->option_list, new_alloc);
@@ -128,8 +129,9 @@ qtcConfOptionDescFind(QtcConfGroupDesc *grp_desc, const char *name,
     QtcConfOptionDesc **p =
         bsearch(&key, grp_desc->option_list, grp_desc->option_num,
                 sizeof(QtcConfOptionDesc*), _qtcConfKeyCompare);
-    if (p)
+    if (p) {
         return *p;
+    }
     return NULL;
 }
 
@@ -173,8 +175,8 @@ _qtcConfDescLoadConstrain(QtcConfValueDesc *vdesc, QtcIniGroup *ini_grp)
         }
         return;
     case QTC_CONF_INT:
-        constrain->int_c.max = qtcIniGroupGetInt(ini_grp, "Max", INT_MAX);
-        constrain->int_c.min = qtcIniGroupGetInt(ini_grp, "Min", INT_MIN);
+        constrain->int_c.max = qtcIniGroupGetInt(ini_grp, "Max", LONG_MAX);
+        constrain->int_c.min = qtcIniGroupGetInt(ini_grp, "Min", LONG_MIN);
         return;
     case QTC_CONF_ENUM: {
         unsigned i = 0;
@@ -235,9 +237,9 @@ _qtcConfDescLoadConstrain(QtcConfValueDesc *vdesc, QtcIniGroup *ini_grp)
         return;
     case QTC_CONF_INT_LIST:
         constrain->int_list_c.max_val =
-            qtcIniGroupGetInt(ini_grp, "Max", INT_MAX);
+            qtcIniGroupGetInt(ini_grp, "Max", LONG_MAX);
         constrain->int_list_c.min_val =
-            qtcIniGroupGetInt(ini_grp, "Min", INT_MIN);
+            qtcIniGroupGetInt(ini_grp, "Min", LONG_MIN);
 
         constrain->int_list_c.max_count =
             qtcMax(qtcIniGroupGetInt(ini_grp, "MaxCount", 0), 0);
@@ -296,13 +298,44 @@ _qtcConfDescLoadDefault(QtcConfValueDesc *vdesc, QtcIniGroup *ini_grp)
                         qtcIniGroupGetValue(ini_grp, "Default"));
         return;
     case QTC_CONF_STR_LIST:
-        // TODO
+        def->str_list_def.vals =
+            qtcStrLoadStrList(qtcIniGroupGetValue(ini_grp, "Default"), , ,
+                              &def->str_list_def.len, , ,);
+        if (def->str_list_def.vals) {
+            def->str_list_def.is_ele_def = false;
+        } else {
+            def->str_list_def.is_ele_def = true;
+            def->str_list_def.len =
+                qtcMax(qtcIniGroupGetInt(ini_grp, "Length", 0), 0);
+            def->str_list_def.val = qtcIniGroupDupValue(ini_grp, "EleDefault");
+        }
         return;
     case QTC_CONF_INT_LIST:
-        // TODO
+        def->int_list_def.vals =
+            qtcStrLoadIntList(qtcIniGroupGetValue(ini_grp, "Default"), , ,
+                              &def->int_list_def.len, , ,);
+        if (def->int_list_def.vals) {
+            def->int_list_def.is_ele_def = false;
+        } else {
+            def->int_list_def.is_ele_def = true;
+            def->int_list_def.len =
+                qtcMax(qtcIniGroupGetInt(ini_grp, "Length", 0), 0);
+            def->int_list_def.val = qtcIniGroupGetInt(ini_grp, "EleDefault", 0);
+        }
         return;
     case QTC_CONF_FLOAT_LIST:
-        // TODO
+        def->float_list_def.vals =
+            qtcStrLoadFloatList(qtcIniGroupGetValue(ini_grp, "Default"), , ,
+                                &def->float_list_def.len, , ,);
+        if (def->float_list_def.vals) {
+            def->float_list_def.is_ele_def = false;
+        } else {
+            def->float_list_def.is_ele_def = true;
+            def->float_list_def.len =
+                qtcMax(qtcIniGroupGetFloat(ini_grp, "Length", 0), 0);
+            def->float_list_def.val =
+                qtcIniGroupGetFloat(ini_grp, "EleDefault", 0);
+        }
         return;
     }
 }
@@ -434,22 +467,22 @@ qtcConfValueDescDefaultFree(QtcConfValueDesc *vdesc)
         return;
     case QTC_CONF_STR_LIST:
         if (def->str_list_def.is_ele_def) {
-            qtcFree(def->str_list_def.ele.val);
+            qtcFree(def->str_list_def.val);
         } else {
-            for (unsigned i = 0;i < def->str_list_def.list.len;i++) {
-                free(def->str_list_def.list.vals[i]);
+            for (unsigned i = 0;i < def->str_list_def.len;i++) {
+                free(def->str_list_def.vals[i]);
             }
-            qtcFree(def->str_list_def.list.vals);
+            qtcFree(def->str_list_def.vals);
         }
         return;
     case QTC_CONF_INT_LIST:
         if (!def->int_list_def.is_ele_def) {
-            qtcFree(def->int_list_def.list.vals);
+            qtcFree(def->int_list_def.vals);
         }
         return;
     case QTC_CONF_FLOAT_LIST:
         if (!def->float_list_def.is_ele_def) {
-            qtcFree(def->float_list_def.list.vals);
+            qtcFree(def->float_list_def.vals);
         }
         return;
     }
@@ -470,7 +503,7 @@ qtcConfOptionDescFree(QtcConfOptionDesc *option)
 static void
 qtcConfGroupDescFree(QtcConfGroupDesc *group)
 {
-    for (int i = 0;i < group->option_num;i++) {
+    for (unsigned i = 0;i < group->option_num;i++) {
         qtcConfOptionDescFree(group->option_list[i]);
     }
     qtcFree(group->desc);
@@ -483,7 +516,7 @@ qtcConfGroupDescFree(QtcConfGroupDesc *group)
 QTC_EXPORT void
 qtcConfDescFree(QtcConfFileDesc *desc)
 {
-    for (int i = 0;i < desc->group_num;i++) {
+    for (unsigned i = 0;i < desc->group_num;i++) {
         qtcConfGroupDescFree(desc->group_list[i]);
     }
     qtcFree(desc->group_list);
