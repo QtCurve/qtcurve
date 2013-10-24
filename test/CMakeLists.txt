@@ -30,3 +30,7 @@ add_test(NAME test-strlist COMMAND test-strlist)
 add_executable(test-default-arg test-default-arg.c)
 target_link_libraries(test-default-arg qtcurve-utils)
 add_test(NAME test-default-arg COMMAND test-default-arg)
+
+add_executable(test-color-str test-color-str.c)
+target_link_libraries(test-color-str qtcurve-utils)
+add_test(NAME test-color-str COMMAND test-color-str)

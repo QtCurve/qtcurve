@@ -426,9 +426,9 @@ _c2h(char c)
     if (c >= '0' && c <= '9') {
         return c - '0';
     } else if (c >= 'a' && c <= 'f') {
-        return c - 'a';
+        return c - 'a' + 10;
     } else if (c >= 'A' && c <= 'F') {
-        return c - 'A';
+        return c - 'A' + 10;
     } else {
         return 0;
     }
@@ -446,7 +446,7 @@ qtcColorFromStr(QtcColor *color, const char *str)
     color->red = 0;
     color->green = 0;
     color->blue = 0;
-    if (qtcUnlikely(str)) {
+    if (qtcUnlikely(!str)) {
         return;
     }
     str += strspn(str, " \t\b\n\f\v");
