@@ -44,7 +44,7 @@ typedef struct {
 
 typedef union {
     struct {
-        int max_len;
+        unsigned max_len;
         bool is_static;
     } str_c;
     struct {
@@ -52,7 +52,7 @@ typedef union {
         int max;
     } int_c;
     struct {
-        int num;
+        unsigned num;
         QtcConfEnumDesc *descs;
     } enum_c;
     struct {
@@ -60,27 +60,27 @@ typedef union {
         double max;
     } float_c;
     struct {
-        int max_strlen;
+        unsigned max_strlen;
         bool is_str_static;
 
-        int min_count;
-        int max_count;
+        unsigned min_count;
+        unsigned max_count;
         bool is_array_static;
     } str_list_c;
     struct {
         int min_val;
         int max_val;
 
-        int min_count;
-        int max_count;
+        unsigned min_count;
+        unsigned max_count;
         bool is_array_static;
     } int_list_c;
     struct {
         double min_val;
         double max_val;
 
-        int min_count;
-        int max_count;
+        unsigned min_count;
+        unsigned max_count;
         bool is_array_static;
     } float_list_c;
 } QtcConfConstrain;
@@ -96,11 +96,11 @@ typedef union {
         bool is_ele_def;
         union {
             struct {
-                int len;
+                size_t len;
                 char *val;
             } ele;
             struct {
-                int len;
+                size_t len;
                 char **vals;
             } list;
         };
@@ -109,11 +109,11 @@ typedef union {
         bool is_ele_def;
         union {
             struct {
-                int len;
+                size_t len;
                 int val;
             } ele;
             struct {
-                int len;
+                size_t len;
                 int *vals;
             } list;
         };
@@ -122,11 +122,11 @@ typedef union {
         bool is_ele_def;
         union {
             struct {
-                int len;
+                size_t len;
                 double val;
             } ele;
             struct {
-                int len;
+                size_t len;
                 double *vals;
             } list;
         };
