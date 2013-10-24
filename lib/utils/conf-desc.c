@@ -292,7 +292,8 @@ _qtcConfDescLoadDefault(QtcConfValueDesc *vdesc, QtcIniGroup *ini_grp)
         def->bool_def = qtcIniGroupGetBool(ini_grp, "Default", false);
         return;
     case QTC_CONF_COLOR:
-        // TODO
+        qtcColorFromStr(&def->color_def,
+                        qtcIniGroupGetValue(ini_grp, "Default"));
         return;
     case QTC_CONF_STR_LIST:
         // TODO
