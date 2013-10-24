@@ -164,7 +164,7 @@ qtcStrListStrLoader(void *ele, const char *str, size_t len, void *data)
     if (def && !str[0]) {
         *(char**)ele = strdup(def);
     } else {
-        *(char**)ele = qtcSetStrWithLen(NULL, str, len);
+        *(char**)ele = qtcSetStr(NULL, str, len);
     }
     return true;
 }

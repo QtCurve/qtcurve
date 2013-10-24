@@ -113,19 +113,20 @@ qtcFillStrs(char *buff, ArgTypes... strs...)
 #endif
 
 QTC_ALWAYS_INLINE static inline char*
-qtcSetStrWithLen(char *dest, const char *src, size_t len)
+qtcSetStr(char *dest, const char *src, size_t len)
 {
     dest = realloc(dest, len + 1);
     memcpy(dest, src, len);
     dest[len] = '\0';
     return dest;
 }
-
 QTC_ALWAYS_INLINE static inline char*
-qtcSetStr(char *dest, const char *src)
+_qtcSetStr(char *dest, const char *src)
 {
-    return qtcSetStrWithLen(dest, src, strlen(src));
+    return qtcSetStr(dest, src, strlen(src));
 }
+#define qtcSetStr(dest, src, len...)                                    \
+    _QTC_USE_12(len)(qtcSetStr(dest, src, len), _qtcSetStr(dest, src))
 
 QTC_BEGIN_DECLS
 
