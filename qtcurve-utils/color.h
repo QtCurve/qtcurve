@@ -203,6 +203,9 @@ void _qtcColorMix(const QtcColor *c1, const QtcColor *c2,
 void _qtcShade(const QtcColor *ca, QtcColor *cb, double k, EShading shading);
 double _qtcShineAlpha(const QtcColor *bgnd);
 void _qtcCalcRingAlphas(const QtcColor *bgnd);
+void qtcColorFromStr(QtcColor *color, const char *str);
+void qtcColorToStr(const QtcColor *color, char *str);
+
 typedef enum {
     QTC_PIXEL_ARGB,
     QTC_PIXEL_BGRA,

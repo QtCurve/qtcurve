@@ -419,3 +419,58 @@ qtcAdjustPix(unsigned char *data, int numChannels, int w, int h, int stride,
         offset += stride;
     }
 }
+
+QTC_ALWAYS_INLINE static inline int
+_c2h(char c)
+{
+    if (c >= '0' && c <= '9') {
+        return c - '0';
+    } else if (c >= 'a' && c <= 'f') {
+        return c - 'a';
+    } else if (c >= 'A' && c <= 'F') {
+        return c - 'A';
+    } else {
+        return 0;
+    }
+}
+
+QTC_ALWAYS_INLINE static inline int
+_2c2h(const char *s)
+{
+    return _c2h(s[0]) * 16 + _c2h(s[1]);
+}
+
+QTC_EXPORT void
+qtcColorFromStr(QtcColor *color, const char *str)
+{
+    color->red = 0;
+    color->green = 0;
+    color->blue = 0;
+    if (qtcUnlikely(str)) {
+        return;
+    }
+    str += strspn(str, " \t\b\n\f\v");
+    if (str[0] == '#') {
+        str++;
+        size_t len = strlen(str);
+        if (len >= 6) {
+            color->red = _2c2h(str) / 255.0;
+            color->green = _2c2h(str + 2) / 255.0;
+            color->blue = _2c2h(str + 4) / 255.0;
+            return;
+        } else if (len >= 3) {
+            color->red = _c2h(str[0]) / 15.0;
+            color->green = _c2h(str[1]) / 15.0;
+            color->blue = _c2h(str[2]) / 15.0;
+            return;
+        }
+    }
+}
+
+QTC_EXPORT void
+qtcColorToStr(const QtcColor *color, char *str)
+{
+    sprintf(str, "#%02X%02X%02X", (unsigned)(qtcBound(0, color->red, 1) * 255),
+            (unsigned)(qtcBound(0, color->green, 1) * 255),
+            (unsigned)(qtcBound(0, color->blue, 1) * 255));
+}
