@@ -25,6 +25,7 @@
 #include "map.h"
 
 #include <float.h>
+#include <limits.h>
 
 // New and find
 static inline QtcConfFileDesc*
@@ -172,8 +173,8 @@ _qtcConfDescLoadConstrain(QtcConfValueDesc *vdesc, QtcIniGroup *ini_grp)
         }
         return;
     case QTC_CONF_INT:
-        constrain->int_c.max = qtcIniGroupGetInt(ini_grp, "Max", INT32_MAX);
-        constrain->int_c.min = qtcIniGroupGetInt(ini_grp, "Min", INT32_MIN);
+        constrain->int_c.max = qtcIniGroupGetInt(ini_grp, "Max", INT_MAX);
+        constrain->int_c.min = qtcIniGroupGetInt(ini_grp, "Min", INT_MIN);
         return;
     case QTC_CONF_ENUM: {
         unsigned i = 0;
@@ -234,9 +235,9 @@ _qtcConfDescLoadConstrain(QtcConfValueDesc *vdesc, QtcIniGroup *ini_grp)
         return;
     case QTC_CONF_INT_LIST:
         constrain->int_list_c.max_val =
-            qtcIniGroupGetInt(ini_grp, "Max", INT32_MAX);
+            qtcIniGroupGetInt(ini_grp, "Max", INT_MAX);
         constrain->int_list_c.min_val =
-            qtcIniGroupGetInt(ini_grp, "Min", INT32_MIN);
+            qtcIniGroupGetInt(ini_grp, "Min", INT_MIN);
 
         constrain->int_list_c.max_count =
             qtcMax(qtcIniGroupGetInt(ini_grp, "MaxCount", 0), 0);
