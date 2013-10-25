@@ -125,8 +125,8 @@ _qtcSetStr(char *dest, const char *src)
 {
     return qtcSetStr(dest, src, strlen(src));
 }
-#define qtcSetStr(dest, src, len...)                                    \
-    _QTC_USE_12(len)(qtcSetStr(dest, src, len), _qtcSetStr(dest, src))
+#define qtcSetStr(dest, src, len...)                    \
+    QTC_SWITCH_(len, qtcSetStr)(dest, src, ##len)
 
 QTC_BEGIN_DECLS
 

@@ -67,7 +67,9 @@ typedef struct {
 #define _QTC_USE_2(x, y) y
 #define __QTC_USE_12(dummy, v, res, ...) res
 #define _QTC_USE_12(v...) __QTC_USE_12(0, ##v, _QTC_USE_1, _QTC_USE_2)
-#define QTC_DEFAULT(v, def) _QTC_USE_12(v)(v, def)
+#define QTC_SWITCH(v, t, f) _QTC_USE_12(v)(t, f)
+#define QTC_DEFAULT(v, def) QTC_SWITCH(v, v, def)
+#define QTC_SWITCH_(v, f) QTC_SWITCH(v, f, _##f)
 
 QTC_ALWAYS_INLINE static inline void*
 qtcAlloc0(size_t size)
