@@ -1488,7 +1488,7 @@ void QtCurveConfig::stripedProgressChanged()
 void QtCurveConfig::activeTabAppearanceChanged()
 {
     int  current(activeTabAppearance->currentIndex());
-    bool disableCol(APPEARANCE_FLAT==current && APPEARANCE_RAISED==current);
+    bool disableCol(APPEARANCE_FLAT==current || APPEARANCE_RAISED==current);
 
     if(colorSelTab->value() && disableCol)
         colorSelTab->setValue(MIN_COLOR_SEL_TAB_FACTOR);
