@@ -144,7 +144,7 @@ qtcStrLoadList(const char *str, char delim, char escape, size_t size,
         .data = data,
         .offset = 0,
     };
-    if (!(loader_data.nele && loader_data.buff)) {
+    if (!(loader_data.buff && loader_data.nele)) {
         loader_data.nele = 16;
         loader_data.buff = malloc(16 * size);
     }

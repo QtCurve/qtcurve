@@ -103,7 +103,7 @@ main()
     assert(memcmp(float_list, float_list_res, sizeof(float_list)) == 0);
     free(float_list_res);
 
-    size_t float_list_len2;
+    size_t float_list_len2 = 3;
     double static_float_list[3];
     double *float_list_res2 =
         qtcStrLoadFloatList(float_str, ',', , &float_list_len2,
