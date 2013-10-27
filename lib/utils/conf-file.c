@@ -34,7 +34,7 @@ _qtcConfValueSize(const QtcConfValueDesc *desc)
         return constrain->str_c.max_len + 1;
     case QTC_CONF_INT:
     case QTC_CONF_ENUM:
-        return sizeof(int);
+        return sizeof(long);
     case QTC_CONF_FLOAT:
         return sizeof(double);
     case QTC_CONF_BOOL:
@@ -53,8 +53,8 @@ _qtcConfValueSize(const QtcConfValueDesc *desc)
     case QTC_CONF_INT_LIST:
         if (!constrain->int_list_c.is_array_static ||
             qtcUnlikely(constrain->int_list_c.max_count <= 0))
-            return sizeof(int*);
-        return (sizeof(int) * constrain->int_list_c.max_count);
+            return sizeof(long*);
+        return (sizeof(long) * constrain->int_list_c.max_count);
     case QTC_CONF_FLOAT_LIST:
         if (!constrain->float_list_c.is_array_static ||
             qtcUnlikely(constrain->float_list_c.max_count <= 0))
