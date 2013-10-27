@@ -24,14 +24,13 @@
 static size_t
 _qtcConfValueSize(const QtcConfValueDesc *desc)
 {
-    const QtcConfConstrain *constrain = &desc->constrain;
     switch (desc->type) {
     default:
     case QTC_CONF_STR:
-        if (!constrain->str_c.is_static ||
-            qtcUnlikely(constrain->str_c.max_len <= 0))
+        if (!desc->str_c.is_static ||
+            qtcUnlikely(desc->str_c.max_len <= 0))
             return sizeof(char*);
-        return constrain->str_c.max_len + 1;
+        return desc->str_c.max_len + 1;
     case QTC_CONF_INT:
     case QTC_CONF_ENUM:
         return sizeof(long);
@@ -42,24 +41,24 @@ _qtcConfValueSize(const QtcConfValueDesc *desc)
     case QTC_CONF_COLOR:
         return sizeof(QtcColor);
     case QTC_CONF_STR_LIST:
-        if (!constrain->str_list_c.is_array_static ||
-            qtcUnlikely(constrain->str_list_c.max_count <= 0))
+        if (!desc->str_list_c.is_array_static ||
+            qtcUnlikely(desc->str_list_c.max_count <= 0))
             return sizeof(char**); // or sizeof(char*)
-        if (!constrain->str_list_c.is_str_static ||
-            qtcUnlikely(constrain->str_list_c.max_strlen <= 0))
-            return sizeof(char*) * constrain->str_list_c.max_count;
-        return ((constrain->str_list_c.max_strlen + 1) *
-                constrain->str_list_c.max_count);
+        if (!desc->str_list_c.is_str_static ||
+            qtcUnlikely(desc->str_list_c.max_strlen <= 0))
+            return sizeof(char*) * desc->str_list_c.max_count;
+        return ((desc->str_list_c.max_strlen + 1) *
+                desc->str_list_c.max_count);
     case QTC_CONF_INT_LIST:
-        if (!constrain->int_list_c.is_array_static ||
-            qtcUnlikely(constrain->int_list_c.max_count <= 0))
+        if (!desc->int_list_c.is_array_static ||
+            qtcUnlikely(desc->int_list_c.max_count <= 0))
             return sizeof(long*);
-        return (sizeof(long) * constrain->int_list_c.max_count);
+        return (sizeof(long) * desc->int_list_c.max_count);
     case QTC_CONF_FLOAT_LIST:
-        if (!constrain->float_list_c.is_array_static ||
-            qtcUnlikely(constrain->float_list_c.max_count <= 0))
+        if (!desc->float_list_c.is_array_static ||
+            qtcUnlikely(desc->float_list_c.max_count <= 0))
             return sizeof(double*);
-        return (sizeof(double) * constrain->float_list_c.max_count);
+        return (sizeof(double) * desc->float_list_c.max_count);
     }
 }
 

@@ -43,88 +43,84 @@ typedef struct {
     char *enum_name;
 } QtcConfEnumDesc;
 
-typedef union {
-    struct {
-        unsigned max_len;
-        bool is_static;
-    } str_c;
-    struct {
-        long min;
-        long max;
-    } int_c;
-    struct {
-        unsigned num;
-        QtcConfEnumDesc *descs;
-
-        char *enum_type;
-    } enum_c;
-    struct {
-        double min;
-        double max;
-    } float_c;
-    struct {
-        unsigned max_strlen;
-        bool is_str_static;
-
-        unsigned min_count;
-        unsigned max_count;
-        bool is_array_static;
-    } str_list_c;
-    struct {
-        long min_val;
-        long max_val;
-
-        unsigned min_count;
-        unsigned max_count;
-        bool is_array_static;
-    } int_list_c;
-    struct {
-        double min_val;
-        double max_val;
-
-        unsigned min_count;
-        unsigned max_count;
-        bool is_array_static;
-    } float_list_c;
-} QtcConfConstrain;
-
-typedef union {
-    char *str_def;
-    long int_def;
-    char *enum_def;
-    double float_def;
-    bool bool_def;
-    QtcColor color_def;
-    struct {
-        bool is_ele_def;
-        size_t len;
-        union {
-            char *val;
-            char **vals;
-        };
-    } str_list_def;
-    struct {
-        bool is_ele_def;
-        size_t len;
-        union {
-            long val;
-            long *vals;
-        };
-    } int_list_def;
-    struct {
-        bool is_ele_def;
-        size_t len;
-        union {
-            double val;
-            double *vals;
-        };
-    } float_list_def;
-} QtcConfDefault;
-
 typedef struct {
     QtcConfType type;
-    QtcConfConstrain constrain;
-    QtcConfDefault def;
+    union {
+        struct {
+            unsigned max_len;
+            bool is_static;
+        } str_c;
+        struct {
+            long min;
+            long max;
+        } int_c;
+        struct {
+            unsigned num;
+            QtcConfEnumDesc *descs;
+
+            char *enum_type;
+        } enum_c;
+        struct {
+            double min;
+            double max;
+        } float_c;
+        struct {
+            unsigned max_strlen;
+            bool is_str_static;
+
+            unsigned min_count;
+            unsigned max_count;
+            bool is_array_static;
+        } str_list_c;
+        struct {
+            long min_val;
+            long max_val;
+
+            unsigned min_count;
+            unsigned max_count;
+            bool is_array_static;
+        } int_list_c;
+        struct {
+            double min_val;
+            double max_val;
+
+            unsigned min_count;
+            unsigned max_count;
+            bool is_array_static;
+        } float_list_c;
+    };
+    union {
+        char *str_def;
+        long int_def;
+        char *enum_def;
+        double float_def;
+        bool bool_def;
+        QtcColor color_def;
+        struct {
+            bool is_ele_def;
+            size_t len;
+            union {
+                char *val;
+                char **vals;
+            };
+        } str_list_def;
+        struct {
+            bool is_ele_def;
+            size_t len;
+            union {
+                long val;
+                long *vals;
+            };
+        } int_list_def;
+        struct {
+            bool is_ele_def;
+            size_t len;
+            union {
+                double val;
+                double *vals;
+            };
+        } float_list_def;
+    };
 } QtcConfValueDesc;
 
 typedef enum {

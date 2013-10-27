@@ -161,22 +161,21 @@ _qtcConfLoadType(const char *str)
 static void
 _qtcConfDescLoadConstrain(QtcConfValueDesc *vdesc, QtcIniGroup *ini_grp)
 {
-    QtcConfConstrain *constrain = &vdesc->constrain;
     switch (vdesc->type) {
     default:
     case QTC_CONF_STR:
-        constrain->str_c.max_len =
+        vdesc->str_c.max_len =
             qtcMax(qtcIniGroupGetInt(ini_grp, "MaxLength", 0), 0);
-        if (!constrain->str_c.max_len) {
-            constrain->str_c.is_static = false;
+        if (!vdesc->str_c.max_len) {
+            vdesc->str_c.is_static = false;
         } else {
-            constrain->str_c.is_static =
+            vdesc->str_c.is_static =
                 qtcIniGroupGetBool(ini_grp, "Static", false);
         }
         return;
     case QTC_CONF_INT:
-        constrain->int_c.max = qtcIniGroupGetInt(ini_grp, "Max", LONG_MAX);
-        constrain->int_c.min = qtcIniGroupGetInt(ini_grp, "Min", LONG_MIN);
+        vdesc->int_c.max = qtcIniGroupGetInt(ini_grp, "Max", LONG_MAX);
+        vdesc->int_c.min = qtcIniGroupGetInt(ini_grp, "Min", LONG_MIN);
         return;
     case QTC_CONF_ENUM: {
         unsigned i = 0;
@@ -206,70 +205,70 @@ _qtcConfDescLoadConstrain(QtcConfValueDesc *vdesc, QtcIniGroup *ini_grp)
         if (i) {
             enum_descs = realloc(enum_descs, i * sizeof(QtcConfEnumDesc));
         }
-        constrain->enum_c.num = i;
-        constrain->enum_c.descs = enum_descs;
-        constrain->enum_c.enum_type = qtcIniGroupDupValue(ini_grp, "EnumType");
+        vdesc->enum_c.num = i;
+        vdesc->enum_c.descs = enum_descs;
+        vdesc->enum_c.enum_type = qtcIniGroupDupValue(ini_grp, "EnumType");
         break;
     }
     case QTC_CONF_FLOAT:
-        constrain->float_c.max = qtcIniGroupGetFloat(ini_grp, "Max", DBL_MAX);
-        constrain->float_c.min = qtcIniGroupGetFloat(ini_grp, "Min", -DBL_MAX);
+        vdesc->float_c.max = qtcIniGroupGetFloat(ini_grp, "Max", DBL_MAX);
+        vdesc->float_c.min = qtcIniGroupGetFloat(ini_grp, "Min", -DBL_MAX);
         return;
     case QTC_CONF_BOOL:
     case QTC_CONF_COLOR:
         break;
     case QTC_CONF_STR_LIST:
-        constrain->str_list_c.max_strlen =
+        vdesc->str_list_c.max_strlen =
             qtcMax(qtcIniGroupGetInt(ini_grp, "MaxStrlen", 0), 0);
-        if (!constrain->str_list_c.max_strlen) {
-            constrain->str_list_c.is_str_static = false;
+        if (!vdesc->str_list_c.max_strlen) {
+            vdesc->str_list_c.is_str_static = false;
         } else {
-            constrain->str_list_c.is_str_static =
+            vdesc->str_list_c.is_str_static =
                 qtcIniGroupGetBool(ini_grp, "StaticStr", false);
         }
 
-        constrain->str_list_c.max_count =
+        vdesc->str_list_c.max_count =
             qtcMax(qtcIniGroupGetInt(ini_grp, "MaxCount", 0), 0);
-        constrain->str_list_c.min_count =
+        vdesc->str_list_c.min_count =
             qtcMax(qtcIniGroupGetInt(ini_grp, "MinCount", 0), 0);
-        if (!constrain->str_list_c.max_count) {
-            constrain->str_list_c.is_array_static = false;
+        if (!vdesc->str_list_c.max_count) {
+            vdesc->str_list_c.is_array_static = false;
         } else {
-            constrain->str_list_c.is_array_static =
+            vdesc->str_list_c.is_array_static =
                 qtcIniGroupGetBool(ini_grp, "StaticArray", false);
         }
         return;
     case QTC_CONF_INT_LIST:
-        constrain->int_list_c.max_val =
+        vdesc->int_list_c.max_val =
             qtcIniGroupGetInt(ini_grp, "Max", LONG_MAX);
-        constrain->int_list_c.min_val =
+        vdesc->int_list_c.min_val =
             qtcIniGroupGetInt(ini_grp, "Min", LONG_MIN);
 
-        constrain->int_list_c.max_count =
+        vdesc->int_list_c.max_count =
             qtcMax(qtcIniGroupGetInt(ini_grp, "MaxCount", 0), 0);
-        constrain->int_list_c.min_count =
+        vdesc->int_list_c.min_count =
             qtcMax(qtcIniGroupGetInt(ini_grp, "MinCount", 0), 0);
-        if (!constrain->int_list_c.max_count) {
-            constrain->int_list_c.is_array_static = false;
+        if (!vdesc->int_list_c.max_count) {
+            vdesc->int_list_c.is_array_static = false;
         } else {
-            constrain->int_list_c.is_array_static =
+            vdesc->int_list_c.is_array_static =
                 qtcIniGroupGetBool(ini_grp, "StaticArray", false);
         }
         return;
     case QTC_CONF_FLOAT_LIST:
-        constrain->float_list_c.max_val =
+        vdesc->float_list_c.max_val =
             qtcIniGroupGetFloat(ini_grp, "Max", DBL_MAX);
-        constrain->float_list_c.min_val =
+        vdesc->float_list_c.min_val =
             qtcIniGroupGetFloat(ini_grp, "Min", -DBL_MAX);
 
-        constrain->float_list_c.max_count =
+        vdesc->float_list_c.max_count =
             qtcMax(qtcIniGroupGetFloat(ini_grp, "MaxCount", 0), 0);
-        constrain->float_list_c.min_count =
+        vdesc->float_list_c.min_count =
             qtcMax(qtcIniGroupGetFloat(ini_grp, "MinCount", 0), 0);
-        if (!constrain->float_list_c.max_count) {
-            constrain->float_list_c.is_array_static = false;
+        if (!vdesc->float_list_c.max_count) {
+            vdesc->float_list_c.is_array_static = false;
         } else {
-            constrain->float_list_c.is_array_static =
+            vdesc->float_list_c.is_array_static =
                 qtcIniGroupGetBool(ini_grp, "StaticArray", false);
         }
         return;
@@ -279,65 +278,66 @@ _qtcConfDescLoadConstrain(QtcConfValueDesc *vdesc, QtcIniGroup *ini_grp)
 static void
 _qtcConfDescLoadDefault(QtcConfValueDesc *vdesc, QtcIniGroup *ini_grp)
 {
-    QtcConfDefault *def = &vdesc->def;
     switch (vdesc->type) {
     default:
     case QTC_CONF_STR:
-        def->str_def = qtcIniGroupDupValue(ini_grp, "Default");
+        vdesc->str_def = qtcIniGroupDupValue(ini_grp, "Default");
         return;
     case QTC_CONF_INT:
-        def->int_def = qtcIniGroupGetInt(ini_grp, "Default", 0);
+        vdesc->int_def = qtcIniGroupGetInt(ini_grp, "Default", 0);
         return;
     case QTC_CONF_ENUM:
-        def->enum_def = qtcIniGroupDupValue(ini_grp, "Default");
+        vdesc->enum_def = qtcIniGroupDupValue(ini_grp, "Default");
         return;
     case QTC_CONF_FLOAT:
-        def->float_def = qtcIniGroupGetFloat(ini_grp, "Default", 0);
+        vdesc->float_def = qtcIniGroupGetFloat(ini_grp, "Default", 0);
         return;
     case QTC_CONF_BOOL:
-        def->bool_def = qtcIniGroupGetBool(ini_grp, "Default", false);
+        vdesc->bool_def = qtcIniGroupGetBool(ini_grp, "Default", false);
         return;
     case QTC_CONF_COLOR:
-        qtcColorFromStr(&def->color_def,
+        qtcColorFromStr(&vdesc->color_def,
                         qtcIniGroupGetValue(ini_grp, "Default"));
         return;
     case QTC_CONF_STR_LIST:
-        def->str_list_def.vals =
+        vdesc->str_list_def.vals =
             qtcStrLoadStrList(qtcIniGroupGetValue(ini_grp, "Default"), , ,
-                              &def->str_list_def.len, , ,);
-        if (def->str_list_def.vals) {
-            def->str_list_def.is_ele_def = false;
+                              &vdesc->str_list_def.len, , ,);
+        if (vdesc->str_list_def.vals) {
+            vdesc->str_list_def.is_ele_def = false;
         } else {
-            def->str_list_def.is_ele_def = true;
-            def->str_list_def.len =
+            vdesc->str_list_def.is_ele_def = true;
+            vdesc->str_list_def.len =
                 qtcMax(qtcIniGroupGetInt(ini_grp, "Length", 0), 0);
-            def->str_list_def.val = qtcIniGroupDupValue(ini_grp, "EleDefault");
+            vdesc->str_list_def.val =
+                qtcIniGroupDupValue(ini_grp, "EleDefault");
         }
         return;
     case QTC_CONF_INT_LIST:
-        def->int_list_def.vals =
+        vdesc->int_list_def.vals =
             qtcStrLoadIntList(qtcIniGroupGetValue(ini_grp, "Default"), , ,
-                              &def->int_list_def.len, , ,);
-        if (def->int_list_def.vals) {
-            def->int_list_def.is_ele_def = false;
+                              &vdesc->int_list_def.len, , ,);
+        if (vdesc->int_list_def.vals) {
+            vdesc->int_list_def.is_ele_def = false;
         } else {
-            def->int_list_def.is_ele_def = true;
-            def->int_list_def.len =
+            vdesc->int_list_def.is_ele_def = true;
+            vdesc->int_list_def.len =
                 qtcMax(qtcIniGroupGetInt(ini_grp, "Length", 0), 0);
-            def->int_list_def.val = qtcIniGroupGetInt(ini_grp, "EleDefault", 0);
+            vdesc->int_list_def.val =
+                qtcIniGroupGetInt(ini_grp, "EleDefault", 0);
         }
         return;
     case QTC_CONF_FLOAT_LIST:
-        def->float_list_def.vals =
+        vdesc->float_list_def.vals =
             qtcStrLoadFloatList(qtcIniGroupGetValue(ini_grp, "Default"), , ,
-                                &def->float_list_def.len, , ,);
-        if (def->float_list_def.vals) {
-            def->float_list_def.is_ele_def = false;
+                                &vdesc->float_list_def.len, , ,);
+        if (vdesc->float_list_def.vals) {
+            vdesc->float_list_def.is_ele_def = false;
         } else {
-            def->float_list_def.is_ele_def = true;
-            def->float_list_def.len =
+            vdesc->float_list_def.is_ele_def = true;
+            vdesc->float_list_def.len =
                 qtcMax(qtcIniGroupGetFloat(ini_grp, "Length", 0), 0);
-            def->float_list_def.val =
+            vdesc->float_list_def.val =
                 qtcIniGroupGetFloat(ini_grp, "EleDefault", 0);
         }
         return;
@@ -434,7 +434,6 @@ qtcConfDescLoad(const char *fname)
 static void
 qtcConfValueDescConstrainFree(QtcConfValueDesc *vdesc)
 {
-    QtcConfConstrain *constrain = &vdesc->constrain;
     switch (vdesc->type) {
     default:
     case QTC_CONF_STR:
@@ -447,20 +446,19 @@ qtcConfValueDescConstrainFree(QtcConfValueDesc *vdesc)
     case QTC_CONF_FLOAT_LIST:
         break;
     case QTC_CONF_ENUM:
-        for (unsigned i = 0;i < constrain->enum_c.num;i++) {
-            free(constrain->enum_c.descs[i].id);
-            qtcFree(constrain->enum_c.descs[i].name);
-            qtcFree(constrain->enum_c.descs[i].enum_name);
+        for (unsigned i = 0;i < vdesc->enum_c.num;i++) {
+            free(vdesc->enum_c.descs[i].id);
+            qtcFree(vdesc->enum_c.descs[i].name);
+            qtcFree(vdesc->enum_c.descs[i].enum_name);
         }
-        qtcFree(constrain->enum_c.enum_type);
-        free(constrain->enum_c.descs);
+        qtcFree(vdesc->enum_c.enum_type);
+        free(vdesc->enum_c.descs);
     }
 }
 
 static void
 qtcConfValueDescDefaultFree(QtcConfValueDesc *vdesc)
 {
-    QtcConfDefault *def = &vdesc->def;
     switch (vdesc->type) {
     case QTC_CONF_INT:
     case QTC_CONF_FLOAT:
@@ -469,29 +467,29 @@ qtcConfValueDescDefaultFree(QtcConfValueDesc *vdesc)
         break;
     default:
     case QTC_CONF_STR:
-        qtcFree(def->str_def);
+        qtcFree(vdesc->str_def);
         return;
     case QTC_CONF_ENUM:
-        qtcFree(def->enum_def);
+        qtcFree(vdesc->enum_def);
         return;
     case QTC_CONF_STR_LIST:
-        if (def->str_list_def.is_ele_def) {
-            qtcFree(def->str_list_def.val);
+        if (vdesc->str_list_def.is_ele_def) {
+            qtcFree(vdesc->str_list_def.val);
         } else {
-            for (unsigned i = 0;i < def->str_list_def.len;i++) {
-                free(def->str_list_def.vals[i]);
+            for (unsigned i = 0;i < vdesc->str_list_def.len;i++) {
+                free(vdesc->str_list_def.vals[i]);
             }
-            qtcFree(def->str_list_def.vals);
+            qtcFree(vdesc->str_list_def.vals);
         }
         return;
     case QTC_CONF_INT_LIST:
-        if (!def->int_list_def.is_ele_def) {
-            qtcFree(def->int_list_def.vals);
+        if (!vdesc->int_list_def.is_ele_def) {
+            qtcFree(vdesc->int_list_def.vals);
         }
         return;
     case QTC_CONF_FLOAT_LIST:
-        if (!def->float_list_def.is_ele_def) {
-            qtcFree(def->float_list_def.vals);
+        if (!vdesc->float_list_def.is_ele_def) {
+            qtcFree(vdesc->float_list_def.vals);
         }
         return;
     }
