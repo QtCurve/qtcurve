@@ -105,6 +105,8 @@ qtcX11ShadowInstall(xcb_window_t win)
 {
     if (qtcUnlikely(!win))
         return;
+    // In principle, I should check for _KDE_NET_WM_SHADOW in _NET_SUPPORTED.
+    // However, it's complicated and we will gain nothing.
     Display *disp = qtcX11GetDisp();
     xcb_atom_t atom = qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_SHADOW];
     // Use XCB to set window property recieves BadWindow errors for menus in

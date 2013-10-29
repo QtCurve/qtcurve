@@ -135,7 +135,6 @@ bool ShadowHelper::acceptWidget(QWidget* widget) const
 bool
 ShadowHelper::installX11Shadows(QWidget *widget)
 {
-    // TODO?: also check for NET_WM_SUPPORTED atom, before installing shadow
     if (WId wid = qtcGetQWidgetWid(widget)) {
         qtcX11ShadowInstall(wid);
         return true;
