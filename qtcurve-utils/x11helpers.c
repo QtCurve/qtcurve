@@ -24,7 +24,6 @@
 #include "x11icccm.h"
 #include "log.h"
 #include "number.h"
-#include <xcb/xcb_image.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <shadow0-png.h>

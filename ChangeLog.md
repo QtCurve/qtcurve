@@ -1,6 +1,7 @@
 ## WIP
 1. Remove `QTC_GTK2_OLD_MOZILLA`.
 2. Remove mozilla version detection.
+3. Remove `xcb-image` dependency. It is never used.
 
 ## 1.8.17
 1. **Add Qt5 support!!**.

@@ -27,6 +27,7 @@ elseif(ENABLE_QT4)
   set(gen_image_header_DEFS)
 else()
   find_package(PkgConfig REQUIRED)
+  unset(__pkg_config_checked_GEN_IMG_GTK CACHE)
   pkg_check_modules(GEN_IMG_GTK REQUIRED cairo-png)
   set(gen_image_header_SRCS
     gen_image_header_cairo.c)

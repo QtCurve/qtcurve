@@ -24,7 +24,6 @@
 #include "x11shadow_p.h"
 #include "log.h"
 
-#include <xcb/xcb_image.h>
 #include <X11/Xlib-xcb.h>
 
 static Display *qtc_disp = NULL;
