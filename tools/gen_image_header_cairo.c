@@ -68,7 +68,11 @@ main(int argc, char **argv)
             unsigned int red = (pixel & 0xff0000) >> 16;
             unsigned int blue = (pixel & 0xff00) >> 8;
             unsigned int green = (pixel & 0xff);
-            fprintf(outputfile, "%u,%u,%u,%u,", blue, green, red, alpha);
+            uint32_t pixel_data =
+                blue | (green << 8) | (red << 16) | (alpha << 24);
+            uint8_t *p = (uint8_t*)&pixel_data;
+            fprintf(outputfile, "%u,%u,%u,%u,",
+                    (int)p[0], (int)p[1], (int)p[2], (int)p[3]);
         }
     }
     fprintf(outputfile, "};\n");
