@@ -1210,7 +1210,8 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             char *filename = qtcCatStrs(qtcConfDir(), CONFIG_FILE);
             bool rv = false;
             if (!qtcIsRegFile(filename)) {
-                filename = qtcFillStrs(filename, qtcConfDir(), OLD_CONFIG_FILE);
+                filename = qtcFillStrs(filename, qtcConfDir(),
+                                       "/../" OLD_CONFIG_FILE);
             }
             rv = qtcReadConfig(filename, opts, defOpts);
             free(filename);
