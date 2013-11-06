@@ -70,22 +70,21 @@ xdgConfigFolder()
     return xdgDir;
 }
 
-namespace KWinQtCurve
-{
+namespace KWinQtCurve {
 
-    // make the handler accessible to other classes...
+// make the handler accessible to other classes...
 static QtCurveHandler *handler = 0;
-
-QtCurveHandler * Handler()
+QtCurveHandler*
+Handler()
 {
     return handler;
 }
 
-QtCurveHandler::QtCurveHandler()
-              : itsLastMenuXid(0)
-              , itsLastStatusXid(0)
-              , itsStyle(NULL)
-              , itsDBus(NULL)
+QtCurveHandler::QtCurveHandler() :
+    itsLastMenuXid(0),
+    itsLastStatusXid(0),
+    itsStyle(NULL),
+    itsDBus(NULL)
 {
     qtcX11InitXlib(QX11Info::display());
     handler = this;
@@ -98,55 +97,43 @@ QtCurveHandler::QtCurveHandler()
 
 QtCurveHandler::~QtCurveHandler()
 {
-    handler=0;
+    handler = 0;
     delete itsStyle;
 }
 
 void QtCurveHandler::setStyle()
 {
-#if 0
-    if(!qstrcmp(QApplication::style()->metaObject()->className(), "QtCurveStyle")) // The user has select QtCurve...
-    {
-        if(itsStyle) // ...but it wasn't QtCurve before, so delete our QtC instance...
-        {
-            delete itsStyle;
-            itsStyle=NULL;
-        }
-    }
-    else if(!itsStyle) // ...user has not selected QtC, so need to create a QtC instance...
-        itsStyle=QStyleFactory::create("QtCurve");
-#endif
-
-    // Need to use our own style instance, as want to update this when settings change...
-    if(!itsStyle)
-    {
-        KConfig      kglobals("kdeglobals", KConfig::CascadeConfig);
+    // Need to use our own style instance, as want to update this when
+    // settings change...
+    if (!itsStyle) {
+        KConfig kglobals("kdeglobals", KConfig::CascadeConfig);
         KConfigGroup general(&kglobals, "General");
-        QString      styleName=general.readEntry("widgetStyle", QString()).toLower();
+        QString styleName = general.readEntry("widgetStyle", QString()).toLower();
 
-        itsStyle=QStyleFactory::create(styleName.isEmpty() || (styleName!="qtcurve"
+        itsStyle = QStyleFactory::create(styleName.isEmpty() ||
+                                         (styleName != "qtcurve"
 #ifdef QTC_QT4_STYLE_SUPPORT
-                                                                && !styleName.startsWith(THEME_PREFIX)
+                                          && !styleName.startsWith(THEME_PREFIX)
 #endif
-                                                               )
-                                        ? QString("QtCurve") : styleName);
+                                             ) ? QString("QtCurve") : styleName);
+        // Looks wrong with style support
         itsTimeStamp = getTimeStamp(xdgConfigFolder() + "/qtcurve/stylerc");
     }
 }
 
 bool QtCurveHandler::reset(unsigned long changed)
 {
-    bool styleChanged=false;
-    if(abs(itsTimeStamp-getTimeStamp(xdgConfigFolder()+"/qtcurve/stylerc"))>2)
-    {
+    bool styleChanged = false;
+    if (abs(itsTimeStamp -
+            getTimeStamp(xdgConfigFolder() + "/qtcurve/stylerc")) > 2) {
         delete itsStyle;
-        itsStyle=0L;
+        itsStyle = 0L;
         setStyle();
-        styleChanged=true;
+        styleChanged = true;
     }
 
-    // we assume the active font to be the same as the inactive font since the control
-    // center doesn't offer different settings anyways.
+    // we assume the active font to be the same as the inactive font since the
+    // control center doesn't offer different settings anyways.
     itsTitleFont = KDecoration::options()->font(true, false); // not small
     itsTitleFontTool = KDecoration::options()->font(true, true); // small
 
@@ -156,15 +143,17 @@ bool QtCurveHandler::reset(unsigned long changed)
     // read in the configuration
     bool configChanged=readConfig(
 #if KDE_IS_VERSION(4, 3, 85)
-                                  changed&SettingCompositing
+                                  changed & SettingCompositing
 #endif
                                   );
 
     setBorderSize();
 
-    for (int t=0; t < 2; ++t)
-        for (int i=0; i < NumButtonIcons; i++)
-            itsBitmaps[t][i]=QPixmap();
+    for (int t = 0;t < 2;++t) {
+        for (int i = 0;i < NumButtonIcons;i++) {
+            itsBitmaps[t][i] = QPixmap();
+        }
+    }
 
     // Do we need to "hit the wooden hammer" ?
     bool needHardReset = true;
@@ -173,10 +162,9 @@ bool QtCurveHandler::reset(unsigned long changed)
     if (!styleChanged && (changed & ~(SettingColors | SettingFont | SettingButtons)) == 0)
        needHardReset = false;
 
-    if (needHardReset || configChanged)
+    if (needHardReset || configChanged) {
         return true;
-    else
-    {
+    } else {
         resetDecorations(changed);
         return false;
     }
@@ -184,42 +172,44 @@ bool QtCurveHandler::reset(unsigned long changed)
 
 void QtCurveHandler::setBorderSize()
 {
-    switch(itsConfig.borderSize())
-    {
-        case QtCurveConfig::BORDER_NONE:
-        case QtCurveConfig::BORDER_NO_SIDES:
-            itsBorderSize = 1;
-            break;
-        case QtCurveConfig::BORDER_TINY:
-            itsBorderSize = 2;
-            break;
-        case QtCurveConfig::BORDER_LARGE:
-            itsBorderSize = 8;
-            break;
-        case QtCurveConfig::BORDER_VERY_LARGE:
-            itsBorderSize = 12;
-            break;
-        case QtCurveConfig::BORDER_HUGE:
-            itsBorderSize = 18;
-            break;
-        case QtCurveConfig::BORDER_VERY_HUGE:
-            itsBorderSize = 27;
-            break;
-        case QtCurveConfig::BORDER_OVERSIZED:
-            itsBorderSize = 40;
-            break;
-        case QtCurveConfig::BORDER_NORMAL:
-        default:
-            itsBorderSize = 4;
+    switch (itsConfig.borderSize()) {
+    case QtCurveConfig::BORDER_NONE:
+    case QtCurveConfig::BORDER_NO_SIDES:
+        itsBorderSize = 1;
+        break;
+    case QtCurveConfig::BORDER_TINY:
+        itsBorderSize = 2;
+        break;
+    case QtCurveConfig::BORDER_LARGE:
+        itsBorderSize = 8;
+        break;
+    case QtCurveConfig::BORDER_VERY_LARGE:
+        itsBorderSize = 12;
+        break;
+    case QtCurveConfig::BORDER_HUGE:
+        itsBorderSize = 18;
+        break;
+    case QtCurveConfig::BORDER_VERY_HUGE:
+        itsBorderSize = 27;
+        break;
+    case QtCurveConfig::BORDER_OVERSIZED:
+        itsBorderSize = 40;
+        break;
+    case QtCurveConfig::BORDER_NORMAL:
+    default:
+        itsBorderSize = 4;
     }
 
-    if(!outerBorder() && (itsBorderSize==1 || itsBorderSize>4))
+    if (!outerBorder() && (itsBorderSize == 1 || itsBorderSize > 4)) {
         itsBorderSize--;
-    else if(outerBorder() && innerBorder() && itsConfig.borderSize()<=QtCurveConfig::BORDER_NORMAL)
-        itsBorderSize+=2;
+    } else if (outerBorder() && innerBorder() &&
+               itsConfig.borderSize() <= QtCurveConfig::BORDER_NORMAL) {
+        itsBorderSize += 2;
+    }
 }
 
-KDecoration * QtCurveHandler::createDecoration(KDecorationBridge *bridge)
+KDecoration*
+QtCurveHandler::createDecoration(KDecorationBridge *bridge)
 {
     return (new QtCurveClient(bridge, this))->decoration();
 }
@@ -426,13 +416,13 @@ void QtCurveHandler::menuBarSize(unsigned int xid, int size)
     QList<QtCurveClient *>::ConstIterator it(itsClients.begin()),
                                           end(itsClients.end());
 
-    for(; it!=end; ++it)
-        if((*it)->windowId()==xid)
-        {
+    for (;it != end;++it) {
+        if ((*it)->windowId() == xid) {
             (*it)->menuBarSize(size);
             break;
         }
-    itsLastMenuXid=xid;
+    }
+    itsLastMenuXid = xid;
 }
 
 void QtCurveHandler::statusBarState(unsigned int xid, bool state)
@@ -440,13 +430,13 @@ void QtCurveHandler::statusBarState(unsigned int xid, bool state)
     QList<QtCurveClient *>::ConstIterator it(itsClients.begin()),
                                           end(itsClients.end());
 
-    for(; it!=end; ++it)
-        if((*it)->windowId()==xid)
-        {
+    for (;it != end;++it) {
+        if ((*it)->windowId() == xid) {
             (*it)->statusBarState(state);
             break;
         }
-    itsLastStatusXid=xid;
+    }
+    itsLastStatusXid = xid;
 }
 
 void QtCurveHandler::emitToggleMenuBar(int xid)
@@ -486,12 +476,12 @@ void QtCurveHandler::removeClient(QtCurveClient *c)
 #if KDE_IS_VERSION(4, 9, 0)
 KWIN_DECORATION(KWinQtCurve::QtCurveHandler)
 #else
-extern "C"
+extern "C" {
+KDE_EXPORT KDecorationFactory*
+create_factory()
 {
-    KDE_EXPORT KDecorationFactory *create_factory()
-    {
-        return new KWinQtCurve::QtCurveHandler();
-    }
+    return new KWinQtCurve::QtCurveHandler();
+}
 }
 #endif
 
