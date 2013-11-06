@@ -54,6 +54,7 @@
 
 #include <QX11Info>
 #include <qtcurve-utils/x11utils.h>
+#include <qtcurve-utils/dirs.h>
 
 static time_t getTimeStamp(const QString &item)
 {
@@ -62,26 +63,10 @@ static time_t getTimeStamp(const QString &item)
     return !item.isEmpty() && 0==KDE_lstat(QFile::encodeName(item), &info) ? info.st_mtime : 0;
 }
 
-static const QString & xdgConfigFolder()
+static const QString&
+xdgConfigFolder()
 {
-    static QString xdgDir;
-
-    if(xdgDir.isEmpty())
-    {
-        /*
-           Hmm... for 'root' dont bother to check env var, just set to ~/.config
-           - as problems would arise if "sudo kcmshell style", and then
-           "sudo su" / "kcmshell style". The 1st would write to ~/.config, but
-           if root has a XDG_ set then that would be used on the second :-(
-        */
-        char *env=0==getuid() ? NULL : getenv("XDG_CONFIG_HOME");
-
-        if(!env)
-            xdgDir=QDir::homePath()+"/.config";
-        else
-            xdgDir=env;
-    }
-
+    static QString xdgDir = QString::fromLocal8Bit(qtcGetXDGConfigHome());
     return xdgDir;
 }
 
@@ -145,7 +130,7 @@ void QtCurveHandler::setStyle()
 #endif
                                                                )
                                         ? QString("QtCurve") : styleName);
-        itsTimeStamp=getTimeStamp(xdgConfigFolder() + "/qtcurve/stylerc");
+        itsTimeStamp = getTimeStamp(xdgConfigFolder() + "/qtcurve/stylerc");
     }
 }
 

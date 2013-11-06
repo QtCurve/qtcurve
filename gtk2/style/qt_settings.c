@@ -46,6 +46,9 @@ Options opts;
 #define KDEGLOBALS_FILE "kdeglobals"
 #define KDEGLOBALS_SYS_FILE "system.kdeglobals"
 
+#define qtc_gtkrc_printf(args...)                       \
+    gtk_rc_parse_string(QTC_LOCAL_BUFF_PRINTF(args))
+
 static char*
 getKdeHome()
 {
@@ -249,34 +252,23 @@ enum {
 
 #ifdef QTC_GTK2_STYLE_SUPPORT
 static char*
-themeFileSub(const char *prefix, const char *name, char **tmpStr,
-             const char *sub)
+themeFileSub(const char *prefix, const char *name,
+             QtcStrBuff *str_buff, const char *sub)
 {
-    *tmpStr = realloc(*tmpStr, strlen(prefix) + 1 + strlen(sub) + 1 +
-                      strlen(name) + strlen(THEME_SUFFIX) + 1);
-
-    if (*tmpStr) {
-        struct stat st;
-
-        sprintf(*tmpStr, "%s/%s/%s%s", prefix, sub, name, THEME_SUFFIX);
-
-        if (0 == stat(*tmpStr, &st)) {
-            return *tmpStr;
-        }
+    if (qtcIsRegFile(QTC_LOCAL_BUFF_CAT_STR(*str_buff, prefix, "/", sub, "/",
+                                            name, THEME_SUFFIX))) {
+        return str_buff->p;
     }
-
     return NULL;
 }
 
 static char*
-themeFile(const char *prefix, const char *name, char **tmpStr)
+themeFile(const char *prefix, const char *name, QtcStrBuff *str_buff)
 {
-    char *f = themeFileSub(prefix, name, tmpStr, THEME_DIR);
-
+    char *f = themeFileSub(prefix, name, str_buff, THEME_DIR);
     if (!f) {
-        f = themeFileSub(prefix, name, tmpStr, THEME_DIR4);
+        f = themeFileSub(prefix, name, str_buff, THEME_DIR4);
     }
-
     return f;
 }
 #endif
@@ -1170,10 +1162,9 @@ static char *getIconPath()
 
     strcat(path, "\"");
 
-    {
-    int plen=strlen(path);
+    int plen = strlen(path);
 
-    if(path[plen - 1] == ':')
+    if (path[plen - 1] == ':') {
         path[plen - 1] = '\0';
     }
 
@@ -1599,40 +1590,34 @@ static gboolean excludedApp(Strings config)
     return FALSE;
 }
 
-static QtcDebug debugLevel()
+static QtcDebug
+debugLevel()
 {
-    const char *dbg=getenv("QTCURVE_DEBUG");
+    const char *dbg = getenv("QTCURVE_DEBUG");
 
-    if(dbg)
-    {
-        switch(atoi(dbg))
-        {
-            case 1:
-                return DEBUG_SETTINGS;
-            case 2:
-                return DEBUG_ALL;
-            default:
-                return DEBUG_NONE;
+    if (dbg) {
+        switch (atoi(dbg)) {
+        case 1:
+            return DEBUG_SETTINGS;
+        case 2:
+            return DEBUG_ALL;
+        default:
+            return DEBUG_NONE;
         }
     }
-
     return DEBUG_NONE;
 }
 
 gboolean qtSettingsInit()
 {
-    if(0==qt_refs++)
-    {
-        static int lastRead=0;
-
-        int now=time(NULL);
-
-        qtSettings.app=GTK_APP_UNKNOWN;
-
-        if(abs(now-lastRead)>1)
-        {
+    if (0 == qt_refs++) {
+        static int lastRead = 0;
+        int now = time(NULL);
+        qtSettings.app = GTK_APP_UNKNOWN;
+        if (abs(now - lastRead) > 1) {
             char *locale = setlocale(LC_NUMERIC, NULL);
             char *path = NULL;
+            QTC_DEF_STR_BUFF(str_buff, 4096, 1);
             char *tmpStr = NULL;
             GtkSettings *settings=NULL;
             int i;
@@ -1687,9 +1672,10 @@ gboolean qtSettingsInit()
             }
 
 #ifdef QTC_GTK2_STYLE_SUPPORT
-            /* Only for testing - allows me to simulate Qt's -style parameter. e.g start Gtk2 app as follows:
+            /* Only for testing - allows me to simulate Qt's -style parameter.
+               e.g start Gtk2 app as follows:
 
-                QTC_STYLE=qtc_klearlooks gtk-demo
+               QTC_STYLE=qtc_klearlooks gtk-demo
             */
             {
                 const char *env=getenv("QTC_STYLE");
@@ -1701,16 +1687,17 @@ gboolean qtSettingsInit()
                 }
             }
 
+            char *rcFile = NULL;
             /* Is the user using a non-default QtCurve style? */
-            if(qtSettings.styleName && qtSettings.styleName==strstr(qtSettings.styleName, THEME_PREFIX))
-            {
-                if(qtSettings.debug)
-                    printf(DEBUG_PREFIX"Look for themerc file for %s\n", qtSettings.styleName);
-                rcFile=themeFile(getKdeHome(), qtSettings.styleName, &tmpStr);
+            if (qtSettings.styleName &&
+                qtSettings.styleName == strstr(qtSettings.styleName,
+                                               THEME_PREFIX)) {
+                rcFile = themeFile(getKdeHome(),
+                                   qtSettings.styleName, &str_buff);
 
                 if (!rcFile) {
                     rcFile = themeFile(QTC_KDE4_PREFIX, qtSettings.styleName,
-                                       &tmpStr);
+                                       &str_buff);
                 }
             }
 
@@ -1768,8 +1755,7 @@ gboolean qtSettingsInit()
                     else if(mozThunderbird)
                         processMozillaApp(add_btn_css, add_menu_colors, "mozilla-thunderbird", FALSE);
 
-                    qtSettings.app = (firefox ||
-                                      NULL!=getenv("QTC_NEW_MOZILLA") ?
+                    qtSettings.app = (firefox ?
                                       GTK_APP_NEW_MOZILLA : GTK_APP_MOZILLA);
                     if (GTK_APP_MOZILLA == qtSettings.app)
                         qtSettings.app=GTK_APP_NEW_MOZILLA;
@@ -1812,39 +1798,16 @@ gboolean qtSettingsInit()
             if(GTK_APP_JAVA==qtSettings.app)
                 opts.sliderStyle=SLIDER_PLAIN;
 
-            if(GTK_APP_JAVA==qtSettings.app || GTK_APP_JAVA_SWT==qtSettings.app || isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app)
-            {
-#if 0 // Does not work - Gdk tiles the image :-(
-                if(APPEARANCE_FLAT!=opts.bgndAppearance)
-                {
-                    static const char *constFileName="background.png";
-                    char *fileName=(char *)malloc(strlen(qtcConfDir())+strlen(constFileName)+1);
-                    if(fileName)
-                    {
-                        sprintf(fileName, "%s%s", qtcConfDir(), constFileName);
-                        if(drawBackgroundPng(fileName))
-                        {
-                            static const char *format="pixmap_path \"%s\"\nstyle \""RC_SETTING"gradient\" = \"default\" "
-                                                      "{ bg_pixmap[NORMAL] = \"%s\" } "
-                                                      " class \"GtkWindow\" style \""RC_SETTING"gradient\"";
-                            tmpStr=(char *)realloc(tmpStr, strlen(format)+strlen(qtcConfDir())+strlen(constFileName)+1);
-
-                            if(tmpStr)
-                            {
-                                sprintf(tmpStr, format, qtcConfDir(), constFileName);
-                                gtk_rc_parse_string(tmpStr);
-                            }
-                        }
-                        free(fileName);
-                    }
-                }
-#endif
-                opts.square|=SQUARE_POPUP_MENUS;
-                opts.bgndAppearance=APPEARANCE_FLAT, opts.bgndImage.type=IMG_NONE;
-                if(FRAME_SHADED==opts.groupBox)
-                    opts.groupBox=FRAME_PLAIN;
-                opts.gbFactor=0;
-                opts.highlightScrollViews=FALSE;
+            if (GTK_APP_JAVA == qtSettings.app ||
+                GTK_APP_JAVA_SWT == qtSettings.app || isMozilla() ||
+                GTK_APP_OPEN_OFFICE == qtSettings.app) {
+                opts.square |= SQUARE_POPUP_MENUS;
+                opts.bgndAppearance = APPEARANCE_FLAT;
+                opts.bgndImage.type = IMG_NONE;
+                if (FRAME_SHADED == opts.groupBox)
+                    opts.groupBox = FRAME_PLAIN;
+                opts.gbFactor = 0;
+                opts.highlightScrollViews = FALSE;
             }
 
             if(!IS_FLAT(opts.bgndAppearance) && excludedApp(opts.noBgndGradientApps))
@@ -1879,143 +1842,105 @@ gboolean qtSettingsInit()
             if(opts.menuStripe && excludedApp(opts.noMenuStripeApps))
                 opts.menuStripe=SHADE_NONE;
 
-            /*if(isMozilla() || GTK_APP_JAVA==qtSettings.app)*/
-            if(GTK_APP_JAVA!=qtSettings.app)
-            {
-                /* KDE's "apply colors to non-KDE apps" messes up firefox, (and progress bar text) so need to fix this! */
+            if (GTK_APP_JAVA != qtSettings.app) {
+                /* KDE's "apply colors to non-KDE apps" messes up firefox,
+                   (and progress bar text) so need to fix this! */
                 /* ...and inactive highlight!!! */
-                static const char *format="style \""RC_SETTING"MTxt\""
-                                          " {fg[ACTIVE]=\"#%02X%02X%02X\""
-                                          " fg[PRELIGHT]=\"#%02X%02X%02X\"}"
-                                          " style \""RC_SETTING"PTxt\""
-                                          " {fg[ACTIVE]=\"#%02X%02X%02X\""
-                                          " fg[PRELIGHT]=\"#%02X%02X%02X\"}"
-                                          " class \"*MenuItem\" style \""RC_SETTING"MTxt\" "
-                                          " widget_class \"*.*MenuItem*\" style \""RC_SETTING"MTxt\" "
-                                          " widget_class \"*.*ProgressBar\" style \""RC_SETTING"PTxt\"";
-                tmpStr=(char *)realloc(tmpStr, strlen(format));
+                GdkColor *highlightedMenuCol =
+                    (opts.useHighlightForMenu ?
+                     &qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED] :
+                     &qtSettings.colors[PAL_ACTIVE][COLOR_TEXT]);
+                qtc_gtkrc_printf(str_buff, "style \""RC_SETTING"MTxt\""
+                                 " {fg[ACTIVE]=\"#%02X%02X%02X\""
+                                 " fg[PRELIGHT]=\"#%02X%02X%02X\"}"
+                                 " style \"" RC_SETTING "PTxt\""
+                                 " {fg[ACTIVE]=\"#%02X%02X%02X\""
+                                 " fg[PRELIGHT]=\"#%02X%02X%02X\"}"
+                                 " class \"*MenuItem\" style \"" RC_SETTING
+                                 "MTxt\" widget_class \"*.*MenuItem*\" "
+                                 "style \"" RC_SETTING "MTxt\" "
+                                 " widget_class \"*.*ProgressBar\" "
+                                 "style \"" RC_SETTING "PTxt\"",
+                                 toQtColor(highlightedMenuCol->red),
+                                 toQtColor(highlightedMenuCol->green),
+                                 toQtColor(highlightedMenuCol->blue),
+                                 toQtColor(highlightedMenuCol->red),
+                                 toQtColor(highlightedMenuCol->green),
+                                 toQtColor(highlightedMenuCol->blue),
+                                 toQtColor(qtSettings.colors[PAL_ACTIVE]
+                                           [COLOR_TEXT_SELECTED].red),
+                                 toQtColor(qtSettings.colors[PAL_ACTIVE]
+                                           [COLOR_TEXT_SELECTED].green),
+                                 toQtColor(qtSettings.colors[PAL_ACTIVE]
+                                           [COLOR_TEXT_SELECTED].blue),
+                                 toQtColor(qtSettings.colors[PAL_ACTIVE]
+                                           [COLOR_TEXT_SELECTED].red),
+                                 toQtColor(qtSettings.colors[PAL_ACTIVE]
+                                           [COLOR_TEXT_SELECTED].green),
+                                 toQtColor(qtSettings.colors[PAL_ACTIVE]
+                                           [COLOR_TEXT_SELECTED].blue));
+                if (GTK_APP_OPEN_OFFICE == qtSettings.app) {
+                    GdkColor *active = NULL;
+                    GdkColor *inactive = NULL;
 
-                if(tmpStr)
-                {
-                    GdkColor *highlightedMenuCol=opts.useHighlightForMenu
-                                            ? &qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED]
-                                            : &qtSettings.colors[PAL_ACTIVE][COLOR_TEXT];
-
-                    sprintf(tmpStr, format, toQtColor(highlightedMenuCol->red),
-                                            toQtColor(highlightedMenuCol->green),
-                                            toQtColor(highlightedMenuCol->blue),
-                                            toQtColor(highlightedMenuCol->red),
-                                            toQtColor(highlightedMenuCol->green),
-                                            toQtColor(highlightedMenuCol->blue),
-                                            toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].red),
-                                            toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].green),
-                                            toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].blue),
-                                            toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].red),
-                                            toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].green),
-                                            toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].blue));
-                    gtk_rc_parse_string(tmpStr);
-                }
-
-                if(GTK_APP_OPEN_OFFICE==qtSettings.app)
-                {
-                    GdkColor *active=NULL,
-                             *inactive=NULL;
-
-                    if(SHADE_WINDOW_BORDER==opts.shadeMenubars)
-                    {
-                        active=&qtSettings.colors[PAL_ACTIVE][opts.useHighlightForMenu ? COLOR_TEXT_SELECTED : COLOR_WINDOW_BORDER_TEXT];
-                        inactive=&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER_TEXT];
+                    if (SHADE_WINDOW_BORDER == opts.shadeMenubars) {
+                        active = (&qtSettings.colors[PAL_ACTIVE][
+                                      opts.useHighlightForMenu ?
+                                      COLOR_TEXT_SELECTED :
+                                      COLOR_WINDOW_BORDER_TEXT]);
+                        inactive = &qtSettings.colors[PAL_ACTIVE][
+                            COLOR_WINDOW_BORDER_TEXT];
+                    } else if (opts.customMenuTextColor) {
+                        active = &opts.customMenuSelTextColor;
+                        inactive = &opts.customMenuNormTextColor;
+                    } else if (SHADE_BLEND_SELECTED == opts.shadeMenubars ||
+                               SHADE_SELECTED == opts.shadeMenubars ||
+                               (SHADE_CUSTOM == opts.shadeMenubars &&
+                                TOO_DARK(qtcPalette.menubar[ORIGINAL_SHADE]))) {
+                        active = &qtSettings.colors[PAL_ACTIVE][
+                            COLOR_TEXT_SELECTED];
+                        inactive = &qtSettings.colors[PAL_ACTIVE][
+                            COLOR_TEXT_SELECTED];
                     }
-                    else if(opts.customMenuTextColor)
-                    {
-                        active=&opts.customMenuSelTextColor;
-                        inactive=&opts.customMenuNormTextColor;
-                    }
-                    else if (SHADE_BLEND_SELECTED==opts.shadeMenubars || SHADE_SELECTED==opts.shadeMenubars ||
-                         (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(qtcPalette.menubar[ORIGINAL_SHADE])))
-                    {
-                        active=&qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED];
-                        inactive=&qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED];
-                    }
 
-                    if(active && inactive)
-                    {
-                        static const char *format="style \""RC_SETTING"MnuTxt\""
-                                                  " {fg[NORMAL]=\"#%02X%02X%02X\""
-                                                  " fg[PRELIGHT]=\"#%02X%02X%02X\""
-                                                  " fg[ACTIVE]=\"#%02X%02X%02X\""
-                                                  " fg[SELECTED]=\"#%02X%02X%02X\""
-                                                  " text[NORMAL]=\"#%02X%02X%02X\"}"
-                                                  " widget_class \"*<GtkMenuBar>*\" style \""RC_SETTING"MnuTxt\" %s";
-                        static const char *menutitem=" widget_class \"*<GtkMenuItem>*\" style \""RC_SETTING"MnuTxt\" ";
-                        tmpStr=(char *)realloc(tmpStr, strlen(format)+(opts.shadePopupMenu ? strlen(menutitem) : 1));
-
-                        if(tmpStr)
-                        {
-                            sprintf(tmpStr, format, toQtColor(inactive->red),
-                                                    toQtColor(inactive->green),
-                                                    toQtColor(inactive->blue),
-                                                    toQtColor(active->red),
-                                                    toQtColor(active->green),
-                                                    toQtColor(active->blue),
-                                                    toQtColor(active->red),
-                                                    toQtColor(active->green),
-                                                    toQtColor(active->blue),
-                                                    toQtColor(active->red),
-                                                    toQtColor(active->green),
-                                                    toQtColor(active->blue),
-                                                    toQtColor(inactive->red),
-                                                    toQtColor(inactive->green),
-                                                    toQtColor(inactive->blue),
-                                                    opts.shadePopupMenu ? menutitem : " ");
-                            gtk_rc_parse_string(tmpStr);
-                        }
+                    if (active && inactive) {
+                        qtc_gtkrc_printf(
+                            str_buff, "style \""RC_SETTING"MnuTxt\""
+                            " {fg[NORMAL]=\"#%02X%02X%02X\" "
+                            "fg[PRELIGHT]=\"#%02X%02X%02X\" "
+                            "fg[ACTIVE]=\"#%02X%02X%02X\" "
+                            "fg[SELECTED]=\"#%02X%02X%02X\" "
+                            "text[NORMAL]=\"#%02X%02X%02X\"} "
+                            "widget_class \"*<GtkMenuBar>*\" style \""
+                            RC_SETTING "MnuTxt\" %s", toQtColor(inactive->red),
+                            toQtColor(inactive->green),
+                            toQtColor(inactive->blue), toQtColor(active->red),
+                            toQtColor(active->green), toQtColor(active->blue),
+                            toQtColor(active->red), toQtColor(active->green),
+                            toQtColor(active->blue), toQtColor(active->red),
+                            toQtColor(active->green), toQtColor(active->blue),
+                            toQtColor(inactive->red),
+                            toQtColor(inactive->green),
+                            toQtColor(inactive->blue),
+                            opts.shadePopupMenu ?
+                            " widget_class \"*<GtkMenuItem>*\" style \""
+                            RC_SETTING "MnuTxt\" " : " ");
                     }
                 }
             }
 
-//             if(qtSettings.inactiveChangeSelectionColor)
-//             {
-//                 static const char *format="style \""RC_SETTING"HlFix\" "
-//                                           "{base[ACTIVE]=\"#%02X%02X%02X\"}"
-//                                           //" text[ACTIVE]=\"#%02X%02X%02X\"}"
-//                                           "class \"*\" style \""RC_SETTING"HlFix\"";
-//
-//                 tmpStr=(char *)realloc(tmpStr, strlen(format));
-//
-//                 if(tmpStr)
-//                 {
-//                     sprintf(tmpStr, format, toQtColor(qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED].red),
-//                                             toQtColor(qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED].green),
-//                                             toQtColor(qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED].blue));
-//
-//                     // KDE4 does not set the text colour...
-//                     /*
-//                                             toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].red),
-//                                             toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].green),
-//                                             toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].blue));
-//                     */
-//                     gtk_rc_parse_string(tmpStr);
-//                 }
-//             }
-
-            if(GTK_APP_VMPLAYER==qtSettings.app)
-            {
-                opts.shadeMenubars=SHADE_NONE;
-                opts.menubarHiding=HIDE_NONE;
-                opts.statusbarHiding=HIDE_NONE;
+            if (GTK_APP_VMPLAYER == qtSettings.app) {
+                opts.shadeMenubars = SHADE_NONE;
+                opts.menubarHiding = HIDE_NONE;
+                opts.statusbarHiding = HIDE_NONE;
             }
 
-            if(opts.mapKdeIcons && qtSettings.icons)
-            {
-                static const char *constFormat="gtk-icon-theme-name=\"%s\"";
-                tmpStr=(char *)realloc(tmpStr, strlen(constFormat)+strlen(qtSettings.icons)+1);
-
-                sprintf(tmpStr, constFormat, qtSettings.icons);
-                gtk_rc_parse_string(tmpStr);
+            if (opts.mapKdeIcons && qtSettings.icons) {
+                qtc_gtkrc_printf(str_buff, "gtk-icon-theme-name=\"%s\"",
+                                 qtSettings.icons);
             }
 
-            if(opts.mapKdeIcons && (path=getIconPath()))
+            if(opts.mapKdeIcons && (path = getIconPath()))
             {
                 const char *iconTheme=qtSettings.icons ? qtSettings.icons : "XX";
                 int  versionLen=1+strlen(QTC_VERSION)+1+strlen(iconTheme)+1+2+(6*2)+1;  /* '#' VERSION ' '<kde version> <..nums above..>\0 */
@@ -2519,8 +2444,8 @@ gboolean qtSettingsInit()
                 gtk_rc_parse_string("style \""RC_SETTING"TbJ\" { GtkToolbar::button-relief = 1 } "
                                     "widget_class \"*<GtkToolbar>\"  style \""RC_SETTING"TbJ\"");
 
-            if(tmpStr)
-                free(tmpStr);
+            QTC_FREE_LOCAL_BUFF(str_buff);
+            qtcFree(tmpStr);
 
             if(opts.shadeMenubarOnlyWhenActive && SHADE_WINDOW_BORDER==opts.shadeMenubars &&
                EQUAL_COLOR(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER], qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW_BORDER]))

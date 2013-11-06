@@ -1200,30 +1200,25 @@ void qtcCheckConfig(Options *opts)
 bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
 {
     bool checkImages=true;
-    if(!file)
-    {
-        const char *env=getenv("QTCURVE_CONFIG_FILE");
-
-        if(NULL!=env)
+    if (!file) {
+        const char *env = getenv("QTCURVE_CONFIG_FILE");
+        if (env && *env)
             return qtcReadConfig(env, opts, defOpts);
-        else {
-            char *filename = qtcCatStrs(qtcConfDir(), CONFIG_FILE);
-            bool rv = false;
-            if (!qtcIsRegFile(filename)) {
-                filename = qtcFillStrs(filename, qtcConfDir(),
-                                       "/../" OLD_CONFIG_FILE);
-            }
-            rv = qtcReadConfig(filename, opts, defOpts);
-            free(filename);
-            return rv;
+
+        char *filename = qtcCatStrs(qtcConfDir(), CONFIG_FILE);
+        bool rv = false;
+        if (!qtcIsRegFile(filename)) {
+            filename = qtcFillStrs(filename, qtcConfDir(),
+                                   "/../" OLD_CONFIG_FILE);
         }
-    }
-    else {
+        rv = qtcReadConfig(filename, opts, defOpts);
+        free(filename);
+        return rv;
+    } else {
         GHashTable *cfg=loadConfig(file);
 
-        if(cfg)
-        {
-            int     i;
+        if (cfg) {
+            int i;
 
             opts->version=readVersionEntry(cfg, VERSION_KEY);
 
@@ -1842,13 +1837,12 @@ void qtcDefaultSettings(Options *opts)
     opts->titlebarAppearance=APPEARANCE_CUSTOM1;
     opts->inactiveTitlebarAppearance=APPEARANCE_CUSTOM1;
     /* Read system config file... */
-    {
-    static const char * systemFilename=NULL;
+    static const char *systemFilename = NULL;
 
-    if(!systemFilename)
-        systemFilename=getSystemConfigFile();
-
-    if(systemFilename)
+    if (!systemFilename) {
+        systemFilename = getSystemConfigFile();
+    }
+    if (systemFilename) {
         qtcReadConfig(systemFilename, opts, opts);
     }
 }

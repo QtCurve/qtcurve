@@ -1090,28 +1090,21 @@ void qtcCheckConfig(Options *opts)
 
 bool qtcReadConfig(const QString &file, Options *opts, Options *defOpts, bool checkImages)
 {
-    if(file.isEmpty())
-    {
-        const char *env=getenv("QTCURVE_CONFIG_FILE");
+    if (file.isEmpty()) {
+        const char *env = getenv("QTCURVE_CONFIG_FILE");
 
-        if(NULL!=env)
+        if (env)
             return qtcReadConfig(env, opts, defOpts);
-        else
-        {
-            const char *cfgDir=qtcConfDir();
 
-            if(cfgDir)
-            {
-                QString filename(QFile::decodeName(cfgDir)+CONFIG_FILE);
+        const char *cfgDir = qtcConfDir();
+        if (cfgDir) {
+            QString filename(QFile::decodeName(cfgDir)+CONFIG_FILE);
 
-                if(!QFile::exists(filename))
-                    filename=QFile::decodeName(cfgDir) + "../" OLD_CONFIG_FILE;
-                return qtcReadConfig(filename, opts, defOpts);
-            }
+            if (!QFile::exists(filename))
+                filename = QFile::decodeName(cfgDir) + "../" OLD_CONFIG_FILE;
+            return qtcReadConfig(filename, opts, defOpts);
         }
-    }
-    else
-    {
+    } else {
         QtCConfig cfg(file);
 
         if(cfg.ok())
