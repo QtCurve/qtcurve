@@ -243,7 +243,9 @@ bool QtCurveHandler::supports(Ability ability) const
     case AbilityButtonShade:
     // TODO
     // case AbilityButtonResize:
+#if KDE_IS_VERSION(4, 9, 85)
     case AbilityButtonApplicationMenu:
+#endif
     // colors
     case AbilityColorTitleBack:
     case AbilityColorTitleFore:
