@@ -1013,15 +1013,13 @@ Style::Style()
         // will interfere with that of the kcm's widgets!
         itsIsPreview=PREVIEW_MDI;
         itsUsePixmapCache=false;
-    }
-    else if(env && 0==strcmp(env, QTCURVE_PREVIEW_CONFIG_FULL))
-    {
+    } else if(env && 0==strcmp(env, QTCURVE_PREVIEW_CONFIG_FULL)) {
         // As above, but preview is in window - so can use opacity settings!
         itsIsPreview=PREVIEW_WINDOW;
         itsUsePixmapCache=false;
-    }
-    else
+    } else {
         init(true);
+    }
 }
 
 void Style::init(bool initial)
@@ -1038,11 +1036,11 @@ void Style::init(bool initial)
         {
             QString name(QApplication::applicationName());
 
-            if(name.isEmpty())
-                name=qAppName();
+            if (name.isEmpty())
+                name = qAppName();
 
-            if(name.isEmpty())
-                name="QtApp";
+            if (name.isEmpty())
+                name = "QtApp";
 
             itsComponentData=KComponentData(name.toLatin1(), name.toLatin1(), KComponentData::SkipMainComponentRegistration);
         }
@@ -8882,29 +8880,34 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                 QPainterPath path;
 #else
 #if KDE_IS_VERSION(4, 3, 0)
-                QPainterPath path(round<ROUND_SLIGHT
-                                    ? QPainterPath()
-                                    : buildPath(QRectF(state&QtC_StateKWinNoBorder ? tr : tr.adjusted(1, 1, -1, 0)),
-                                                WIDGET_MDI_WINDOW_TITLE, state&QtC_StateKWin && state&QtC_StateKWinTabDrag
-                                                    ? ROUNDED_ALL : ROUNDED_TOP,
-                                                (round>ROUND_SLIGHT /*&& kwin*/ ? 6.0 : 2.0)));
+                QPainterPath path(round < ROUND_SLIGHT ? QPainterPath() :
+                                  buildPath(QRectF(state&QtC_StateKWinNoBorder ?
+                                                   tr : tr.adjusted(1, 1, -1, 0)),
+                                            WIDGET_MDI_WINDOW_TITLE,
+                                            state & QtC_StateKWin &&
+                                            state & QtC_StateKWinTabDrag ?
+                                            ROUNDED_ALL : ROUNDED_TOP,
+                                            (round > ROUND_SLIGHT /*&& kwin*/ ?
+                                             6.0 : 2.0)));
 #else
                 QPainterPath path;
 #endif
 #endif
-                if(!kwin && !CUSTOM_BGND)
+                if (!kwin && !CUSTOM_BGND)
                     painter->fillRect(tr, borderCol);
 
                 painter->setRenderHint(QPainter::Antialiasing, true);
 
-                if(kwin && (state&QtC_StateKWinFillBgnd))
-                    drawBevelGradient(titleCols[ORIGINAL_SHADE], painter, tr, path, true, false, APPEARANCE_FLAT, WIDGET_MDI_WINDOW, false);
-                if((!kwin && !itsIsPreview) ||
-                   (APPEARANCE_NONE!=app && (!IS_FLAT(app) || (titleCols[ORIGINAL_SHADE]!=QApplication::palette().background().color()))))
+                if (kwin && (state & QtC_StateKWinFillBgnd))
+                    drawBevelGradient(titleCols[ORIGINAL_SHADE], painter, tr,
+                                      path, true, false, APPEARANCE_FLAT,
+                                      WIDGET_MDI_WINDOW, false);
+                if ((!kwin && !itsIsPreview) ||
+                    (APPEARANCE_NONE != app &&
+                     (!IS_FLAT(app) || (titleCols[ORIGINAL_SHADE] != QApplication::palette().background().color()))))
                     drawBevelGradient(titleCols[ORIGINAL_SHADE], painter, tr, path, true, false, app, WIDGET_MDI_WINDOW, false);
 
-                if(!(state&QtC_StateKWinNoBorder))
-                {
+                if (!(state & QtC_StateKWinNoBorder)) {
                     QColor light(titleCols[0]),
                            dark(borderCol);
                     bool   addLight=opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER && (!kwin || qtcGetWindowBorderSize(false).sides>1);
