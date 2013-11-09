@@ -22,25 +22,24 @@ if(ENABLE_QT4)
   else()
     set(QTCURVE_STYLE_DIR "${QT_PLUGINS_DIR}/styles/")
   endif()
-endif()
+  add_definitions(${QT_DEFINITIONS} -DQTC_UTILS_QT4)
+  include_directories(
+    "${CMAKE_CURRENT_BINARY_DIR}"
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${QT_INCLUDE_DIR}")
 
-add_definitions(${QT_DEFINITIONS} -DQTC_UTILS_QT4)
-include_directories(
-  "${CMAKE_CURRENT_BINARY_DIR}"
-  "${CMAKE_CURRENT_SOURCE_DIR}"
-  "${QT_INCLUDE_DIR}")
+  if(QTC_QT4_ENABLE_KDE)
+    add_definitions(${KDE4_DEFINITIONS})
+    include_directories(${KDE4_INCLUDES})
+  endif()
 
-if(QTC_QT4_ENABLE_KDE)
-  add_definitions(${KDE4_DEFINITIONS})
-  include_directories(${KDE4_INCLUDES})
-endif()
-
-if(QTC_ENABLE_X11)
-  include_directories(${QTC_X11_INCLUDE_DIRS})
-  add_definitions(${QTC_X11_CFLAGS})
-  set(QTC_QT4_XCB_LINK_LIBS ${QTC_X11_LIBRARIES})
-else()
-  set(QTC_QT4_XCB_LINK_LIBS)
+  if(QTC_ENABLE_X11)
+    include_directories(${QTC_X11_INCLUDE_DIRS})
+    add_definitions(${QTC_X11_CFLAGS})
+    set(QTC_QT4_XCB_LINK_LIBS ${QTC_X11_LIBRARIES})
+  else()
+    set(QTC_QT4_XCB_LINK_LIBS)
+  endif()
 endif()
 
 add_subdirectory(colors)

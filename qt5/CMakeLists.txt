@@ -18,21 +18,20 @@ if(ENABLE_QT5)
     OUTPUT_VARIABLE _Qt5_PLUGIN_INSTALL_DIR
     ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
   set(QTCURVE_STYLE_DIR "${_Qt5_PLUGIN_INSTALL_DIR}/styles/")
-endif()
+  include_directories(
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${CMAKE_CURRENT_BINARY_DIR}")
+  add_definitions(-DQTC_UTILS_QT5 -DQT_DISABLE_DEPRECATED_BEFORE=0x050100
+    ${QTC_QT5_DEFS})
+  include_directories(${QTC_QT5_INCLUDES})
 
-include_directories(
-  "${CMAKE_CURRENT_SOURCE_DIR}"
-  "${CMAKE_CURRENT_BINARY_DIR}")
-add_definitions(-DQTC_UTILS_QT5 -DQT_DISABLE_DEPRECATED_BEFORE=0x050100
-  ${QTC_QT5_DEFS})
-include_directories(${QTC_QT5_INCLUDES})
-
-if(QTC_ENABLE_X11)
-  include_directories(${QTC_X11_INCLUDE_DIRS})
-  add_definitions(${QTC_X11_CFLAGS})
-  set(QTC_QT5_XCB_LINK_LIBS ${QTC_X11_LIBRARIES})
-else()
-  set(QTC_QT5_XCB_LINK_LIBS)
+  if(QTC_ENABLE_X11)
+    include_directories(${QTC_X11_INCLUDE_DIRS})
+    add_definitions(${QTC_X11_CFLAGS})
+    set(QTC_QT5_XCB_LINK_LIBS ${QTC_X11_LIBRARIES})
+  else()
+    set(QTC_QT5_XCB_LINK_LIBS)
+  endif()
 endif()
 
 add_subdirectory(common)
