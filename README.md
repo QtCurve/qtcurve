@@ -229,3 +229,15 @@ current settings.
 Usage:
 
     QTCURVE_CONFIG_FILE=~/testfile kcalc
+
+## License
+QtCurve `1.8.17` and earlier was licensed under GPLv2+. It was relicensed under
+LGPLv2.1+ on Nov. 14th 2013 in order to avoid confusion for moving into
+KDE-infrastructure. This relicensing have got permissions from all contributors
+of QtCurve (`git log --format='%aN <%aE>' | sort -u`):
+
+    Andrey Bondrov <andrey.bondrov@rosalab.ru>
+    Boris Pek <tehnick-8@yandex.ru>
+    Craig Drummond <craig.p.drummond@gmail.com>
+    Sven-Hendrik Haase <sh@lutzhaase.com>
+    Yichao Yu <yyc1992@gmail.com>
