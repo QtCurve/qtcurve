@@ -19,10 +19,15 @@
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
 
+#include <config.h>
 #include "log.h"
 #include "strs.h"
 #include <unistd.h>
 #include <stdarg.h>
+
+#ifdef QTC_ENABLE_BACKTRACE
+#include <execinfo.h>
+#endif
 
 static QtcLogLevel log_level = QTC_LOG_ERROR;
 static bool output_color = false;
@@ -131,4 +136,14 @@ _qtcLog(QtcLogLevel level, const char *fname, int line, const char *func,
     va_start(ap, fmt);
     _qtcLogV(level, fname, line, func, fmt, ap);
     va_end(ap);
+}
+
+QTC_EXPORT void
+qtcBacktrace()
+{
+#ifdef QTC_ENABLE_BACKTRACE
+    void *buff[1024];
+    size_t size = backtrace(buff, 1024);
+    backtrace_symbols_fd(buff, size, STDERR_FILENO);
+#endif
 }

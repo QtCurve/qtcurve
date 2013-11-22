@@ -5,7 +5,7 @@ set(qtcurve_utils_SRCS
   utils.c
   strs.c)
 set(qtcurve_utils_LINKS
-  m)
+  m ${LIBEXECINFO_LIBRARIES})
 
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 

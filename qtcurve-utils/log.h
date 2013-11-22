@@ -94,6 +94,8 @@ void _qtcLogV(QtcLogLevel level, const char *fname, int line, const char *func,
 #define qtcForceLog(fmt, args...)               \
     qtcLog(QTC_LOG_FORCE, fmt,##args)
 
+void qtcBacktrace();
+
 QTC_END_DECLS
 
 #endif

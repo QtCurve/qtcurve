@@ -22,7 +22,6 @@
 #include "dirs.h"
 #include "log.h"
 #include "strs.h"
-#include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
 

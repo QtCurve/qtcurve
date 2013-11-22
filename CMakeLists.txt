@@ -96,6 +96,13 @@ if(NOT DEFINED QTC_KDE4_ICONS_PREFIX)
 endif()
 
 ## Handle options
+find_package(Libexecinfo)
+if(LIBEXECINFO_LIB_FOUND)
+  set(QTC_ENABLE_BACKTRACE On)
+else()
+  set(QTC_ENABLE_BACKTRACE Off)
+endif()
+
 macro(qtc_check_x11)
   find_package(PkgConfig)
   if(NOT PKG_CONFIG_FOUND)
