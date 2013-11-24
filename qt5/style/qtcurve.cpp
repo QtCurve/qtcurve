@@ -460,6 +460,9 @@ Style::prePolish(QWidget *widget) const
     // as well.
     if (widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
         !qtcGetQWidgetWid(widget) && !qtcGetPrePolished(widget)) {
+        // the result of qobject_cast may change if we are called in
+        // constructor (which is usually the case we want here) so we only
+        // set the prePolished property if we have done something.
         if ((opts.bgndOpacity != 100 && qobject_cast<QMainWindow*>(widget)) ||
             (opts.dlgOpacity != 100 && qobject_cast<QDialog*>(widget))) {
             widget->setAttribute(Qt::WA_StyledBackground);
