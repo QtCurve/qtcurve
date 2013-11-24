@@ -149,26 +149,6 @@ in a few major releases.
 
     The opposite of `QTC_QT4_ENABLE_KDE`.
 
-2. `QTC_OLD_NVIDIA_ARROW_FIX`:
-
-    Alias of `QTC_QT4_OLD_NVIDIA_ARROW_FIX`.
-
-3. `QTC_STYLE_SUPPORT`:
-
-    Alias of `QTC_QT4_STYLE_SUPPORT`.
-
-4. `QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT`:
-
-    Alias of `QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT`.
-
-5. `QTC_MODIFY_MOZILLA`:
-
-    Alias of `QTC_GTK2_MODIFY_MOZILLA`.
-
-6. `QTC_USE_CAIRO_FOR_ARROWS`:
-
-    Alias of `QTC_GTK2_USE_CAIRO_FOR_ARROWS`.
-
 ## Tips for compiling with `clang`/`clang++`
 As of clang version 3.3, `clang++` does not seem to be compatible with the c++
 standard library headers shipped with gcc in c++0x mode. If you have problems

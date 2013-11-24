@@ -47,23 +47,18 @@ def_compat_option(QTC_QT4_ENABLE_KDE QTC_QT_ONLY True)
 option(QTC_QT4_ENABLE_KDE "Building Qt4 style with KDE4 support." On)
 # option(QTC_QT5_ENABLE_KDE "Building Qt5 style with KDE5 support." Off)
 
-def_compat_option(QTC_QT4_OLD_NVIDIA_ARROW_FIX QTC_OLD_NVIDIA_ARROW_FIX)
 option(QTC_QT4_OLD_NVIDIA_ARROW_FIX "Qt4 old nvidia arrow fix." Off)
 option(QTC_QT5_OLD_NVIDIA_ARROW_FIX "Qt5 old nvidia arrow fix." Off)
 
-def_compat_option(QTC_QT4_STYLE_SUPPORT QTC_STYLE_SUPPORT)
 option(QTC_QT4_STYLE_SUPPORT
   "Qt4 support for creating a style for each QtCurve theme." Off)
-def_compat_option(QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-  QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT)
+
 option(QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
   "Qt4 support for the 'fix parentless dialogs'." Off)
 option(QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
   "Qt5 support for the 'fix parentless dialogs'." Off)
 
-def_compat_option(QTC_GTK2_MODIFY_MOZILLA QTC_MODIFY_MOZILLA)
 option(QTC_GTK2_MODIFY_MOZILLA "Modify Mozilla Gtk2 with js and css." Off)
-def_compat_option(QTC_GTK2_USE_CAIRO_FOR_ARROWS QTC_USE_CAIRO_FOR_ARROWS)
 option(QTC_GTK2_USE_CAIRO_FOR_ARROWS "Using ciaro to draw arrows." Off)
 option(QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
   "Gtk2 support for the 'fix parentless dialogs'." Off)
