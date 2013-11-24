@@ -35,35 +35,41 @@ typedef enum {
     QTC_LOG_FORCE
 } QtcLogLevel;
 
-QtcLogLevel _qtcCheckLogLevel();
-bool _qtcCheckLogColor();
+QtcLogLevel _qtcGetLogLevel();
+bool _qtcGetLogColor();
 
 static inline QtcLogLevel
-qtcCheckLogLevel()
+qtcGetLogLevel()
 {
     static bool inited = false;
     static QtcLogLevel level = QTC_LOG_ERROR;
     if (!inited) {
-        level = _qtcCheckLogLevel();
+        level = _qtcGetLogLevel();
         inited = true;
     }
     return level;
 }
 
 static inline bool
-qtcCheckLogColor()
+qtcGetLogColor()
 {
     static bool inited = false;
     static bool color = false;
     if (!inited) {
-        color = _qtcCheckLogColor();
+        color = _qtcGetLogColor();
         inited = true;
     }
     return color;
 }
 
-#define qtcLogLevel (qtcCheckLogLevel())
-#define qtcLogColor (qtcCheckLogColor())
+#define qtcLogLevel (qtcGetLogLevel())
+#define qtcLogColor (qtcGetLogColor())
+
+static inline bool
+qtcCheckLogLevel(unsigned level)
+{
+    return level <= QTC_LOG_FORCE && level >= qtcLogLevel;
+}
 
 __attribute__((format(printf, 5, 6)))
 void _qtcLog(QtcLogLevel level, const char *fname, int line, const char *func,
@@ -76,7 +82,7 @@ void _qtcLogV(QtcLogLevel level, const char *fname, int line, const char *func,
 #define qtcLog(__level, fmt, args...)                                   \
     do {                                                                \
         unsigned level = (__level);                                     \
-        if (level > QTC_LOG_FORCE || level < qtcLogLevel) {             \
+        if (!qtcCheckLogLevel(level)) {                                 \
             break;                                                      \
         }                                                               \
         _qtcLog((QtcLogLevel)level, __FILE__, __LINE__, __FUNCTION__,   \
@@ -84,15 +90,15 @@ void _qtcLogV(QtcLogLevel level, const char *fname, int line, const char *func,
     } while (0)
 
 #define qtcDebug(fmt, args...)                  \
-    qtcLog(QTC_LOG_DEBUG, fmt,##args)
+    qtcLog(QTC_LOG_DEBUG, fmt, ##args)
 #define qtcInfo(fmt, args...)                   \
-    qtcLog(QTC_LOG_INFO, fmt,##args)
+    qtcLog(QTC_LOG_INFO, fmt, ##args)
 #define qtcWarn(fmt, args...)                   \
-    qtcLog(QTC_LOG_WARN, fmt,##args)
+    qtcLog(QTC_LOG_WARN, fmt, ##args)
 #define qtcError(fmt, args...)                  \
-    qtcLog(QTC_LOG_ERROR, fmt,##args)
+    qtcLog(QTC_LOG_ERROR, fmt, ##args)
 #define qtcForceLog(fmt, args...)               \
-    qtcLog(QTC_LOG_FORCE, fmt,##args)
+    qtcLog(QTC_LOG_FORCE, fmt, ##args)
 
 void qtcBacktrace();
 

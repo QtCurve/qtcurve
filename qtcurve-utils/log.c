@@ -77,14 +77,14 @@ _qtcLogInit()
 }
 
 QTC_EXPORT QtcLogLevel
-_qtcCheckLogLevel()
+_qtcGetLogLevel()
 {
     _qtcLogInit();
     return log_level;
 }
 
 QTC_EXPORT bool
-_qtcCheckLogColor()
+_qtcGetLogColor()
 {
     _qtcLogInit();
     return output_color;
