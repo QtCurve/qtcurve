@@ -142,7 +142,7 @@ bool ShadowHelper::acceptWidget(QWidget* widget) const
 
     // tooltips
     if ((widget->inherits("QTipLabel") ||
-         (widget->windowFlags() & Qt::WindowType_Mask) == Qt::ToolTip) &&
+         widget->windowType() == Qt::ToolTip) &&
         !widget->inherits("Plasma::ToolTip"))
         return true;
 

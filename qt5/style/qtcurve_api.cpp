@@ -343,8 +343,7 @@ void Style::polish(QWidget *widget)
 
     bool enableMouseOver(opts.highlightFactor || opts.coloredMouseOver);
     if (qtcCheckLogLevel(QTC_LOG_INFO) && qtcGetQWidgetWid(widget) &&
-        (widget->windowFlags() & Qt::WindowType_Mask) != Qt::Desktop &&
-        !qtcGetPrePolished(widget)) {
+        widget->windowType() != Qt::Desktop && !qtcGetPrePolished(widget)) {
         qDebug() << "Window Created before polishing:" << widget;
     }
     qtcSetPrePolished(widget);
@@ -376,7 +375,7 @@ void Style::polish(QWidget *widget)
     // and setting WA_StyledBackground seems to fix this,..
     if (CUSTOM_BGND || FRAME_SHADED == opts.groupBox ||
         FRAME_FADED == opts.groupBox) {
-        switch (widget->windowFlags() & Qt::WindowType_Mask) {
+        switch (widget->windowType()) {
         case Qt::Window:
         case Qt::Sheet:
         case Qt::Dialog: {
@@ -649,13 +648,11 @@ void Style::polish(QWidget *widget)
         ((QDockWidget*)widget)->setTitleBarWidget(new QtCurveDockWidgetTitleBar(widget));
 #ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     else if(opts.fixParentlessDialogs && qobject_cast<QDialog*>(widget) &&
-            widget->windowFlags()&Qt::WindowType_Mask &&
-            (!widget->parentWidget()) /*|| widget->parentWidget()->isHidden())*/)
-    {
-        QWidget *activeWindow=getActiveWindow(widget);
+            widget->windowType() && !widget->parentWidget()
+            /*|| widget->parentWidget()->isHidden())*/) {
+        QWidget *activeWindow = getActiveWindow(widget);
 
-        if(activeWindow)
-        {
+        if (activeWindow) {
             itsReparentedDialogs[widget]=widget->parentWidget();
             widget->setParent(activeWindow, widget->windowFlags());
         }
@@ -881,7 +878,7 @@ void Style::unpolish(QWidget *widget)
     // fix this,..
     if(CUSTOM_BGND || FRAME_SHADED==opts.groupBox || FRAME_FADED==opts.groupBox)
     {
-        switch (widget->windowFlags() & Qt::WindowType_Mask) {
+        switch (widget->windowType()) {
         case Qt::Window:
         case Qt::Sheet:
         case Qt::Dialog:
@@ -1517,7 +1514,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
             QWidget *widget=(QWidget*)object;
 
             // OK, reset back to its original parent..
-            if (widget->windowFlags() & Qt::WindowType_Mask) {
+            if (widget->windowType()) {
                 widget->removeEventFilter(this);
                 widget->setParent(itsReparentedDialogs[widget]);
                 Utils::addEventFilter(widget, this);
@@ -1567,16 +1564,15 @@ bool Style::eventFilter(QObject *object, QEvent *event)
 
             // The parent->isHidden is needed for KWord. It's insert picture file dialog is a child of the insert picture dialog - but the file
             // dialog is shown *before* the picture dialog!
-            if(dlg && dlg->windowFlags()&Qt::WindowType_Mask && (!dlg->parentWidget() || dlg->parentWidget()->isHidden()))
-            {
-                QWidget *activeWindow=getActiveWindow((QWidget *)object);
+            if (dlg && dlg->windowType() &&
+                (!dlg->parentWidget() || dlg->parentWidget()->isHidden())) {
+                QWidget *activeWindow = getActiveWindow((QWidget*)object);
 
-                if(activeWindow)
-                {
+                if (activeWindow) {
                     dlg->removeEventFilter(this);
                     dlg->setParent(activeWindow, dlg->windowFlags());
                     dlg->installEventFilter(this);
-                    itsReparentedDialogs[(QWidget *)dlg]=dlg->parentWidget();
+                    itsReparentedDialogs[(QWidget*)dlg]=dlg->parentWidget();
                     return false;
                 }
             }
