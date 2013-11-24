@@ -5,6 +5,8 @@
 4. Fix old configure file loading in gtk2 version.
    Thanks to Lars Wendler for noticing this.
 5. Relicense under LGPL. With permission from all contributors in the git log.
+6. Treat `Qt::Sheet` as `Qt::Dialog`. This fixes translucent background for
+   close confirmation dialog in QtDesigner.
 
 ## 1.8.17
 1. **Add Qt5 support!!**.
