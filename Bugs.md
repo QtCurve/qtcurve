@@ -16,3 +16,4 @@
 7. Remove most application hacks if not all.
 8. PyQt5, Musescore and (occasionally) QtCreator seg fault on exit in a QtDBus
    destructor even when QtCurve is not linked to QtDBus.
+9. KScreenLocker has rendering problems.

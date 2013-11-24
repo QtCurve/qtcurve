@@ -408,6 +408,11 @@ void Style::polish(QWidget *widget)
                 widget->testAttribute(Qt::WA_TranslucentBackground) ||
                 widget->testAttribute(Qt::WA_NoSystemBackground) ||
                 widget->testAttribute(Qt::WA_PaintOnScreen) ||
+                // For kscreensaver. A bypass window manager hint window
+                // that is not a Tooltip or menu is probably not what we want
+                // to have translucenct background on anyway.
+                (widget->window()->windowFlags() &
+                 Qt::X11BypassWindowManagerHint) ||
                 widget->inherits("KScreenSaver") ||
                 widget->inherits("QTipLabel") ||
                 widget->inherits("QSplashScreen") ||
