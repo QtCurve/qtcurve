@@ -168,11 +168,19 @@ public:
                                              const QPoint &pos,
                                              const QWidget *widget) const override;
 
-    Options &options() {
+    Options&
+    options()
+    {
         return opts;
     }
 
 private:
+    void prePolish(QWidget *w) const;
+    void
+    prePolish(const QWidget *w) const
+    {
+        prePolish(const_cast<QWidget*>(w));
+    }
     void init(bool initial);
     void freeColor(QSet<QColor*> &freedColors, QColor **cols);
     void freeColors();

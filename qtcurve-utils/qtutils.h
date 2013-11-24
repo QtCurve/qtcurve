@@ -26,6 +26,7 @@
 #include <QtGlobal>
 #include <QObject>
 #include <QWidget>
+#include <QVariant>
 #include <config.h>
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && defined QTC_QT5_ENABLE_KDE) || \
@@ -86,6 +87,18 @@ qtcIsWindow(const QWidget *w)
         return true;
     }
     return false;
+}
+
+QTC_ALWAYS_INLINE static inline bool
+qtcGetPrePolished(const QWidget *w)
+{
+    return w->property("__QTC_PRE_POLISHED__").isValid();
+}
+
+QTC_ALWAYS_INLINE static inline void
+qtcSetPrePolished(QWidget *w)
+{
+    w->setProperty("__QTC_PRE_POLISHED__", 1);
 }
 
 #endif

@@ -67,6 +67,8 @@
 #include <QPixmapCache>
 #include <QTextStream>
 
+#include <QDebug>
+
 namespace QtCurve {
 
 void
@@ -340,6 +342,12 @@ void Style::polish(QWidget *widget)
         return;
 
     bool enableMouseOver(opts.highlightFactor || opts.coloredMouseOver);
+    if (qtcCheckLogLevel(QTC_LOG_INFO) && qtcGetQWidgetWid(widget) &&
+        (widget->windowFlags() & Qt::WindowType_Mask) != Qt::Desktop &&
+        !qtcGetPrePolished(widget)) {
+        qDebug() << "Window Created before polishing:" << widget;
+    }
+    qtcSetPrePolished(widget);
 
     if (EFFECT_NONE != opts.buttonEffect &&
         !USE_CUSTOM_ALPHAS(opts) && isNoEtchWidget(widget)) {
@@ -1600,6 +1608,7 @@ void Style::timerEvent(QTimerEvent *event)
 
 int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const
 {
+    prePolish(widget);
     switch((unsigned)metric) {
     case PM_ToolTipLabelFrameWidth:
         return !ROUNDED || opts.square&SQUARE_TOOLTIPS ? BASE_STYLE::pixelMetric(metric, option, widget) : 3;
@@ -1867,6 +1876,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
 
 int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *widget, QStyleHintReturn *returnData) const
 {
+    prePolish(widget);
     switch (hint) {
     case SH_ToolTip_Mask:
     case SH_Menu_Mask:
@@ -2049,6 +2059,7 @@ QPalette Style::standardPalette() const
 void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
                           QPainter *painter, const QWidget *widget) const
 {
+    prePolish(widget);
     QRect r(option->rect);
     State state(option->state);
     const QPalette &palette(option->palette);
@@ -3677,6 +3688,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
 
 void Style::drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
+    prePolish(widget);
     QRect r(option->rect);
     const State &state(option->state);
     const QPalette &palette(option->palette);
@@ -5926,6 +5938,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
 void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
 {
+    prePolish(widget);
     QRect               r(option->rect);
     const State &state(option->state);
     const QPalette      &palette(option->palette);
@@ -7541,6 +7554,7 @@ void Style::drawItemText(QPainter *painter, const QRect &rect, int flags, const 
 
 QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &size, const QWidget *widget) const
 {
+    prePolish(widget);
     QSize newSize(BASE_STYLE::sizeFromContents(type, option, size, widget));
 
     switch (type)
@@ -7809,6 +7823,7 @@ QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, con
 
 QRect Style::subElementRect(SubElement element, const QStyleOption *option, const QWidget *widget) const
 {
+    prePolish(widget);
     QRect rect;
     switch (element) {
     case SE_SliderFocusRect:
@@ -7972,6 +7987,7 @@ QRect Style::subElementRect(SubElement element, const QStyleOption *option, cons
 
 QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget) const
 {
+    prePolish(widget);
     QRect r(option->rect);
     bool  reverse(Qt::RightToLeft==option->direction);
 
@@ -8496,6 +8512,7 @@ Style::hitTestComplexControl(ComplexControl control,
                              const QStyleOptionComplex *option,
                              const QPoint &pos, const QWidget *widget) const
 {
+    prePolish(widget);
     itsSbWidget = 0L;
     switch (control) {
     case CC_ScrollBar:

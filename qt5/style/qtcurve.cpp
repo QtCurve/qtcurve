@@ -442,6 +442,33 @@ Style::Style() :
     }
 }
 
+void
+Style::prePolish(QWidget *widget) const
+{
+    // HACK:
+    // For widgets that are immediately shown after creation (i.e. haven't
+    // entered the main loop yet) Qt5 create the underlaying X-Window before
+    // polishing the widget. Since (the xcb backend of) Qt5 doesn't support
+    // recreating the window either, it is impossible for us to make those
+    // windows translucent anymore.
+    // Luckily, for a log of these widgets, certain QStyle virtual functions
+    // are called before they are shown, giving us a chance to set the
+    // necessary attributes.
+    // This "pre-polish" is used only for QMainWindow and QDialog for now
+    // since these are the most common types that are shown without entering
+    // the main loop. It might be possible to make it works on more widgets
+    // as well.
+    if (widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
+        !qtcGetQWidgetWid(widget) && !qtcGetPrePolished(widget)) {
+        if ((opts.bgndOpacity != 100 && qobject_cast<QMainWindow*>(widget)) ||
+            (opts.dlgOpacity != 100 && qobject_cast<QDialog*>(widget))) {
+            widget->setAttribute(Qt::WA_StyledBackground);
+            setTranslucentBackground(widget);
+            qtcSetPrePolished(widget);
+        }
+    }
+}
+
 void Style::init(bool initial)
 {
     if(!initial)
