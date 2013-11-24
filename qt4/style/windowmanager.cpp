@@ -340,33 +340,35 @@ namespace QtCurve {
     {
 
         // check widget
-        if( !widget ) return false;
-
+        if (!widget) {
+            return false;
+        }
         // accepted default types
-        if(
-            ( qobject_cast<QDialog*>( widget ) && widget->isWindow() ) ||
-            ( qobject_cast<QMainWindow*>( widget ) && widget->isWindow() ) ||
-            qobject_cast<QGroupBox*>( widget ) )
-        { return true; }
-
+        if ((qobject_cast<QDialog*>(widget) && widget->isWindow()) ||
+            (qobject_cast<QMainWindow*>(widget) && widget->isWindow()) ||
+            qobject_cast<QGroupBox*>(widget)) {
+            return true;
+        }
         // more accepted types, provided they are not dock widget titles
-        if( ( qobject_cast<QMenuBar*>( widget ) ||
-            qobject_cast<QTabBar*>( widget ) ||
-            qobject_cast<QStatusBar*>( widget ) ||
-            qobject_cast<QToolBar*>( widget ) ) &&
-            !isDockWidgetTitle( widget ) )
-        { return true; }
-
-        if( widget->inherits( "KScreenSaver" ) && widget->inherits( "KCModule" ) )
-        { return true; }
-
-        if( isWhiteListed( widget ) )
-        { return true; }
-
+        if ((qobject_cast<QMenuBar*>(widget) ||
+             qobject_cast<QTabBar*>(widget) ||
+             qobject_cast<QStatusBar*>(widget) ||
+             qobject_cast<QToolBar*>(widget)) &&
+            !isDockWidgetTitle(widget)) {
+            return true;
+        }
+        if (widget->inherits("KScreenSaver") && widget->inherits("KCModule")) {
+            return true;
+        }
+        if (isWhiteListed(widget)) {
+            return true;
+        }
         // flat toolbuttons
-        if( QToolButton* toolButton = qobject_cast<QToolButton*>( widget ) )
-        { if( toolButton->autoRaise() ) return true; }
-
+        if (QToolButton *toolButton = qobject_cast<QToolButton*>(widget)) {
+            if (toolButton->autoRaise()) {
+                return true;
+            }
+        }
         // viewports
         /*
         one needs to check that
@@ -374,11 +376,19 @@ namespace QtCurve {
         2/ it matches its parent viewport
         3/ the parent is not blacklisted
         */
-        if( QListView* listView = qobject_cast<QListView*>( widget->parentWidget() ) )
-        { if( listView->viewport() == widget && !isBlackListed( listView ) ) return true; }
+        if (QListView *listView =
+            qobject_cast<QListView*>(widget->parentWidget())) {
+            if (listView->viewport() == widget && !isBlackListed(listView)) {
+                return true;
+            }
+        }
 
-        if( QTreeView* treeView = qobject_cast<QTreeView*>( widget->parentWidget() ) )
-        { if( treeView->viewport() == widget && !isBlackListed( treeView ) ) return true; }
+        if (QTreeView *treeView =
+            qobject_cast<QTreeView*>(widget->parentWidget())) {
+            if (treeView->viewport() == widget && !isBlackListed(treeView)) {
+                return true;
+            }
+        }
 
         //if( QGraphicsView* graphicsView = qobject_cast<QGraphicsView*>( widget->parentWidget() ) )
         //{ if( graphicsView->viewport() == widget && !isBlackListed( graphicsView ) ) return true; }
@@ -388,20 +398,18 @@ namespace QtCurve {
         this is because of kstatusbar
         who captures buttonPress/release events
         */
-        if( QLabel* label = qobject_cast<QLabel*>( widget ) )
-        {
-            if( label->textInteractionFlags().testFlag( Qt::TextSelectableByMouse ) ) return false;
-
-            QWidget* parent = label->parentWidget();
-            while( parent )
-            {
-                if( qobject_cast<QStatusBar*>( parent ) ) return true;
+        if (QLabel *label = qobject_cast<QLabel*>(widget)) {
+            if (label->textInteractionFlags()
+                .testFlag(Qt::TextSelectableByMouse))
+                return false;
+            QWidget *parent = label->parentWidget();
+            while (parent) {
+                if (qobject_cast<QStatusBar*>(parent))
+                    return true;
                 parent = parent->parentWidget();
             }
         }
-
         return false;
-
     }
 
     //_____________________________________________________________

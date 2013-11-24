@@ -3448,8 +3448,7 @@ int Style::getOpacity(const QWidget *widget, QPainter *p) const
         if (!w) {
             return opts.bgndOpacity;
         } else {
-            return (w->window() && Qt::Dialog==(w->window()->windowFlags() &
-                                                Qt::WindowType_Mask) ?
+            return (w->window() && qtcIsDialog(w->window()) ?
                     opts.dlgOpacity : opts.bgndOpacity);
         }
     }

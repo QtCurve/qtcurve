@@ -65,4 +65,27 @@ qtcGetQWidgetWid(const QWidget *w)
     return w->internalWinId();
 }
 
+QTC_ALWAYS_INLINE static inline bool
+qtcIsDialog(const QWidget *w)
+{
+    if (!w) {
+        return false;
+    }
+    switch (w->windowFlags() & Qt::WindowType_Mask) {
+    case Qt::Dialog:
+    case Qt::Sheet:
+        return true;
+    }
+    return false;
+}
+
+QTC_ALWAYS_INLINE static inline bool
+qtcIsWindow(const QWidget *w)
+{
+    if (w && (w->windowFlags() & Qt::WindowType_Mask) == Qt::Window) {
+        return true;
+    }
+    return false;
+}
+
 #endif

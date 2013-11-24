@@ -357,13 +357,10 @@ void Style::polish(QWidget *widget)
     // blur_behind region set have proper regions removed for opaque widgets.
     // Note: that the helper does nothing as long as compositing and ARGB are
     // not enabled
+    const bool isDialog = qtcIsDialog(widget->window());
     if ((100 != opts.menuBgndOpacity && qobject_cast<QMenu*>(widget)) ||
-        (100 != opts.bgndOpacity &&
-         (!widget->window() || Qt::Dialog != (widget->window()->windowFlags() &
-                                              Qt::WindowType_Mask))) ||
-        (100 != opts.dlgOpacity &&
-         (!widget->window() || Qt::Dialog == (widget->window()->windowFlags() &
-                                              Qt::WindowType_Mask)))) {
+        (100 != opts.bgndOpacity && (!widget->window() || !isDialog)) ||
+        (100 != opts.dlgOpacity && (!widget->window() || isDialog))) {
         itsBlurHelper->registerWidget(widget);
     }
 
@@ -373,6 +370,7 @@ void Style::polish(QWidget *widget)
         FRAME_FADED == opts.groupBox) {
         switch (widget->windowFlags() & Qt::WindowType_Mask) {
         case Qt::Window:
+        case Qt::Sheet:
         case Qt::Dialog: {
             // For non-transparent widgets, only need to set
             // WA_StyledBackground - and PE_Widget will be called to
@@ -393,9 +391,8 @@ void Style::polish(QWidget *widget)
             Utils::addEventFilter(widget, this);
 #endif
 #if 0
-            int opacity = (Qt::Dialog == (widget->windowFlags() &
-                                         Qt::WindowType_Mask) ?
-                           opts.dlgOpacity : opts.bgndOpacity);
+            int opacity = (qtcIsDialog(widget) ? opts.dlgOpacity :
+                           opts.bgndOpacity);
             // Qt5 xcb backend doesn't support recreating X window now
             // disabling this part for now.
             if (100 == opacity || !widget->isWindow() ||
@@ -768,8 +765,7 @@ void Style::polish(QWidget *widget)
         qtcCheckKDEType(widget, KFileDialog)) {
         QToolBar *tb=getToolBarChild(widget);
 
-        if(tb)
-        {
+        if (tb) {
             int size = pixelMetric(PM_ToolBarIconSize);
             tb->setIconSize(QSize(size, size));
             tb->setMinimumSize(QSize(size+14, size+14));
@@ -822,10 +818,8 @@ void Style::polish(QWidget *widget)
 #ifdef QTC_ENABLE_X11
     QWidget *window=widget->window();
 
-    if ((100!=opts.bgndOpacity &&
-         Qt::Window==(window->windowFlags() & Qt::WindowType_Mask)) ||
-        (100!=opts.dlgOpacity &&
-         Qt::Dialog==(window->windowFlags() & Qt::WindowType_Mask))) {
+    if ((100 != opts.bgndOpacity && qtcIsWindow(window)) ||
+        (100 != opts.dlgOpacity && qtcIsDialog(window))) {
         widget->removeEventFilter(this);
         Utils::addEventFilter(widget, this);
 
@@ -878,9 +872,9 @@ void Style::unpolish(QWidget *widget)
     // fix this,..
     if(CUSTOM_BGND || FRAME_SHADED==opts.groupBox || FRAME_FADED==opts.groupBox)
     {
-        switch (widget->windowFlags() & Qt::WindowType_Mask)
-        {
+        switch (widget->windowFlags() & Qt::WindowType_Mask) {
         case Qt::Window:
+        case Qt::Sheet:
         case Qt::Dialog:
             widget->removeEventFilter(this);
             widget->setAttribute(Qt::WA_StyledBackground, false);
@@ -1070,10 +1064,8 @@ void Style::unpolish(QWidget *widget)
 #ifdef QTC_ENABLE_X11
     QWidget *window = widget->window();
 
-    if ((100 != opts.bgndOpacity &&
-         Qt::Window == (window->windowFlags() & Qt::WindowType_Mask)) ||
-        (100 != opts.dlgOpacity && Qt::Dialog == (window->windowFlags() &
-                                                  Qt::WindowType_Mask))) {
+    if ((100 != opts.bgndOpacity && qtcIsWindow(window)) ||
+        (100 != opts.dlgOpacity && qtcIsDialog(window))) {
         widget->removeEventFilter(this);
     }
 #endif
@@ -1254,15 +1246,14 @@ bool Style::eventFilter(QObject *object, QEvent *event)
             static_cast<QStatusBar *>(object)->setHidden(true);
         break;
 #ifdef QTC_ENABLE_X11
-    case QEvent::PaletteChange:
-    {
+    case QEvent::PaletteChange: {
         QWidget *widget = qobject_cast<QWidget*>(object);
 
         if (widget && widget->isWindow() &&
-            ((widget->windowFlags() & Qt::WindowType_Mask) &
-             (Qt::Window | Qt::Dialog)))
+            (qtcIsDialog(widget) || qtcIsWindow(widget))) {
             setBgndProp(widget, opts.bgndAppearance,
                         IMG_NONE != opts.bgndImage.type);
+        }
         break;
     }
 #endif
@@ -1272,9 +1263,9 @@ bool Style::eventFilter(QObject *object, QEvent *event)
             QWidget *widget = qobject_cast<QWidget*>(object);
 
             if(widget && widget->testAttribute(Qt::WA_StyledBackground) &&
-               (widget->isWindow() && ((widget->windowFlags()&Qt::WindowType_Mask) & (Qt::Window|Qt::Dialog)) &&
-                widget->testAttribute(Qt::WA_TranslucentBackground)))
-            {
+               (widget->isWindow() && (qtcIsWindow(widget) ||
+                                       qtcIsDialog(widget)) &&
+                widget->testAttribute(Qt::WA_TranslucentBackground))) {
                 bool isDialog=qobject_cast<QDialog *>(widget);
 
                 if((100!=opts.bgndOpacity && !isDialog) || (100!=opts.dlgOpacity && isDialog) ||
@@ -1468,13 +1459,12 @@ bool Style::eventFilter(QObject *object, QEvent *event)
         } else if (QEvent::Show==event->type()) {
             QWidget *widget = qobject_cast<QWidget*>(object);
 
-            if(widget && widget->isWindow() && ((widget->windowFlags()&Qt::WindowType_Mask) & (Qt::Window|Qt::Dialog)))
-            {
-                setBgndProp(widget, opts.bgndAppearance, IMG_NONE!=opts.bgndImage.type);
-
-                int opacity = Qt::Dialog == (widget->windowFlags() &
-                                             Qt::WindowType_Mask) ?
-                    opts.dlgOpacity : opts.bgndOpacity;
+            if(widget && widget->isWindow() &&
+               (qtcIsWindow(widget) || qtcIsDialog(widget))) {
+                setBgndProp(widget, opts.bgndAppearance,
+                            IMG_NONE != opts.bgndImage.type);
+                int opacity = (qtcIsDialog(widget) ? opts.dlgOpacity :
+                               opts.bgndOpacity);
                 setOpacityProp(widget, (unsigned short)opacity);
             }
         }
@@ -1515,8 +1505,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
             QWidget *widget=(QWidget*)object;
 
             // OK, reset back to its original parent..
-            if(widget->windowFlags()&Qt::WindowType_Mask)
-            {
+            if (widget->windowFlags() & Qt::WindowType_Mask) {
                 widget->removeEventFilter(this);
                 widget->setParent(itsReparentedDialogs[widget]);
                 Utils::addEventFilter(widget, this);
@@ -2082,8 +2071,8 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
     case PE_Widget:
         if (widget && widget->testAttribute(Qt::WA_StyledBackground) &&
             ((!widget->testAttribute(Qt::WA_NoSystemBackground) &&
-              ((widget->windowFlags() & Qt::WindowType_Mask) &
-               (Qt::Window | Qt::Dialog)) && widget->isWindow()) ||
+              (qtcIsDialog(widget) || qtcIsWindow(widget)) &&
+              widget->isWindow()) ||
              (// itsIsPreview &&
               qobject_cast<const QMdiSubWindow*>(widget)))) {
             bool isDialog = qobject_cast<const QDialog*>(widget);
@@ -5138,17 +5127,18 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
             if(!selected && (100!=opts.bgndOpacity || 100!=opts.dlgOpacity))
             {
                 QWidget *top=widget ? widget->window() : 0L;
-                bool    isDialog=top && Qt::Dialog==(top->windowFlags() & Qt::WindowType_Mask);
+                bool isDialog = top && qtcIsDialog(top);
 
-                // Note: opacity is divided by 150 to make dark inactive tabs more translucent
-                if(isDialog && 100!=opts.dlgOpacity)
-                    fill.setAlphaF(opts.dlgOpacity/150.0);
-                else if(!isDialog && 100!=opts.bgndOpacity)
-                    fill.setAlphaF(opts.bgndOpacity/150.0);
+                // Note: opacity is divided by 150 to make dark
+                // inactive tabs more translucent
+                if (isDialog && 100 != opts.dlgOpacity) {
+                    fill.setAlphaF(opts.dlgOpacity / 150.0);
+                } else if (!isDialog && 100 != opts.bgndOpacity) {
+                    fill.setAlphaF(opts.bgndOpacity / 150.0);
+                }
             }
 
-            switch(tab->shape)
-            {
+            switch(tab->shape) {
             case QTabBar::RoundedNorth:
             case QTabBar::TriangularNorth:
             {
