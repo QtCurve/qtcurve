@@ -427,6 +427,7 @@ void Style::polish(QWidget *widget)
         }
         case Qt::Popup:
             // we currently don't want that kind of gradient on menus etc
+        case Qt::Drawer:
         case Qt::Tool:
             // this we exclude as it is used for dragging of icons etc
         default:
@@ -879,8 +880,11 @@ void Style::unpolish(QWidget *widget)
             widget->removeEventFilter(this);
             widget->setAttribute(Qt::WA_StyledBackground, false);
             break;
-        case Qt::Popup: // we currently don't want that kind of gradient on menus etc
-        case Qt::Tool: // this we exclude as it is used for dragging of icons etc
+        case Qt::Popup:
+            // we currently don't want that kind of gradient on menus etc
+        case Qt::Drawer:
+        case Qt::Tool:
+            // this we exclude as it is used for dragging of icons etc
         default:
             break;
         }
