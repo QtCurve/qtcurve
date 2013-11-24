@@ -2941,19 +2941,18 @@ static void qtcurve_rc_style_init(QtCurveRcStyle *qtcurve_rc)
 {
     QTC_UNUSED(qtcurve_rc);
 #ifdef INCREASE_SB_SLIDER
-    lastSlider.widget=NULL;
+    lastSlider.widget = NULL;
 #endif
-    if(qtSettingsInit())
-    {
+    if (qtSettingsInit()) {
         generateColors();
 #if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
-        if(opts.dlgOpacity<100 || opts.bgndOpacity<100 || opts.menuBgndOpacity<100 || qtSettings.useAlpha)
-        {
+        if (opts.dlgOpacity < 100 || opts.bgndOpacity < 100 ||
+            opts.menuBgndOpacity < 100 || qtSettings.useAlpha) {
             GdkScreen   *screen = gdk_screen_get_default();
-            GdkColormap *colormap = screen ? gdk_screen_get_rgba_colormap(screen) : NULL;
+            GdkColormap *colormap =
+                screen ? gdk_screen_get_rgba_colormap(screen) : NULL;
 
-            if (colormap)
-            {
+            if (colormap) {
                 gtk_widget_push_colormap(colormap);
                 gtk_widget_set_default_colormap(colormap);
             }

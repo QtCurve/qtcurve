@@ -2002,8 +2002,8 @@ gboolean qtSettingsInit()
 
                 gtk_settings_set_long_property(settings, "gtk-toolbar-style", qtSettings.toolbarStyle, "KDE-Settings");
                 if(qtSettings.debug) printf(DEBUG_PREFIX"gtk-toolbar-style %d\n", qtSettings.toolbarStyle);
-                if(NULL==gtk_check_version(2, 4, 0)) /* The following settings only apply for GTK>=2.4.0 */
-                {
+                if (gtk_check_version(2, 4, 0) == NULL) {
+                    /* The following settings only apply for GTK>=2.4.0 */
                     if(qtSettings.debug) printf(DEBUG_PREFIX"gtk-button-images %d\n", qtSettings.buttonIcons);
                     gtk_settings_set_long_property(settings, "gtk-button-images", qtSettings.buttonIcons, "KDE-Settings");
 #if 0
