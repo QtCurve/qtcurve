@@ -11,7 +11,7 @@
    *Oxygen-gtk's solution works* (set rgba on a pre-widget bases).
 5. Cannot make QMainWindow in Qt5 transparent because of upstream bug.
    [Qt-Bug](https://bugreports.qt-project.org/browse/QTBUG-34064)
-   **WORKED AROUND**. *Need to improve (QtCreator still doesn't work).*
+   **WORKED AROUND**. *Need more test*
 6. Menubar in qt does not have translucent background!
 7. Remove most application hacks if not all.
 8. PyQt5, Musescore and (occasionally) QtCreator seg fault on exit in a QtDBus

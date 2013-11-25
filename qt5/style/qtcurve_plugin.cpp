@@ -19,20 +19,56 @@
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
 
-#ifndef __QTCURVE_PLUTIN_H__
-#define __QTCURVE_PLUTIN_H__
+#include "qtcurve_plugin.h"
+#include "qtcurve.h"
 
-#include <QStylePlugin>
+#include <qtcurve-utils/qtutils.h>
+
+#ifdef QTC_ENABLE_X11
+#  include <QApplication>
+#  include <QX11Info>
+#  include <qtcurve-utils/x11utils.h>
+#endif
 
 namespace QtCurve {
-class StylePlugin: public QStylePlugin {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID QStyleFactoryInterface_iid FILE "qtcurvestyle.json")
-public:
-    virtual QStyle *create(const QString &key) override;
-private:
-    void init();
-};
+
+static bool inited = false;
+
+static bool
+qtcEventCallback(void **cbdata)
+{
+    QObject *receiver = (QObject*)cbdata[0];
+    if (qtcUnlikely(!receiver))
+        return false;
+    QWidget *widget = qobject_cast<QWidget*>(receiver);
+    if (qtcUnlikely(widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
+                    !qtcGetQWidgetWid(widget))) {
+        if (Style *style = dynamic_cast<Style*>(widget->style())) {
+            style->prePolish(widget);
+        }
+    }
+    return false;
 }
 
+QStyle*
+StylePlugin::create(const QString &key)
+{
+    init();
+    return "qtcurve" == key.toLower() ? new Style : 0;
+}
+
+void
+StylePlugin::init()
+{
+    if (inited)
+        return;
+    inited = true;
+    QInternal::registerCallback(QInternal::EventNotifyCallback,
+                                qtcEventCallback);
+#ifdef QTC_ENABLE_X11
+    if (qApp->platformName() == "xcb") {
+        qtcX11InitXcb(QX11Info::connection(), QX11Info::appScreen());
+    }
 #endif
+}
+}

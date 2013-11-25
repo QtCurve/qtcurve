@@ -68,7 +68,7 @@ qtcGetLogColor()
 static inline bool
 qtcCheckLogLevel(unsigned level)
 {
-    return level <= QTC_LOG_FORCE && level >= qtcLogLevel;
+    return qtcUnlikely(level <= QTC_LOG_FORCE && level >= qtcLogLevel);
 }
 
 __attribute__((format(printf, 5, 6)))

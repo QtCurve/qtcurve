@@ -769,18 +769,23 @@ void Style::polish(QWidget *widget)
         }
     }
 
-    if(APP_QTCREATOR==theThemedApp && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuWidget())
-        static_cast<QMainWindow *>(widget)->menuWidget()->setStyle(this);
+    if (APP_QTCREATOR == theThemedApp &&
+        qobject_cast<QMainWindow*>(widget) &&
+        static_cast<QMainWindow*>(widget)->menuWidget()) {
+        // As of 2.8.1, QtCreator still uses it's own style by default.
+        // Have no idea what the **** they are thinking.
+        static_cast<QMainWindow*>(widget)->menuWidget()->setStyle(this);
+    }
 
     if (APP_QTCREATOR == theThemedApp && qobject_cast<QDialog*>(widget) &&
         qtcCheckKDEType(widget, KFileDialog)) {
-        QToolBar *tb=getToolBarChild(widget);
 
+        QToolBar *tb = getToolBarChild(widget);
         if (tb) {
             int size = pixelMetric(PM_ToolBarIconSize);
             tb->setIconSize(QSize(size, size));
-            tb->setMinimumSize(QSize(size+14, size+14));
-            setStyleRecursive(tb, this, size+4);
+            tb->setMinimumSize(QSize(size + 14, size + 14));
+            setStyleRecursive(tb, this, size + 4);
         }
     }
 

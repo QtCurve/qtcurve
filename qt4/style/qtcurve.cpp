@@ -77,6 +77,8 @@
 #  include <qtcurve-utils/x11qtc.h>
 #endif
 
+#include <QDebug>
+
 #include <common/config_file.h>
 #include "check_on-png.h"
 #include "check_x_on-png.h"
@@ -1823,6 +1825,10 @@ Style::polish(QWidget *widget)
             bool moved = widget->testAttribute(Qt::WA_Moved);
             if (was_visible) {
                 widget->hide();
+            }
+            if (qtcCheckLogLevel(QTC_LOG_INFO)) {
+                qtcWarn("Window Recreated: ");
+                qDebug() << widget;
             }
             setTranslucentBackground(widget);
             if (!moved) {

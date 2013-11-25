@@ -173,14 +173,14 @@ public:
     {
         return opts;
     }
-
-private:
     void prePolish(QWidget *w) const;
     void
     prePolish(const QWidget *w) const
     {
         prePolish(const_cast<QWidget*>(w));
     }
+
+private:
     void init(bool initial);
     void freeColor(QSet<QColor*> &freedColors, QColor **cols);
     void freeColors();
