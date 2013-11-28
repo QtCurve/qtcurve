@@ -1738,6 +1738,7 @@ Style::polish(QWidget *widget)
             Utils::addEventFilter(widget, this);
 #endif
             break;
+#if 0
             int opacity = (qtcIsDialog(widget) ? opts.dlgOpacity :
                            opts.bgndOpacity);
 
@@ -1810,6 +1811,7 @@ Style::polish(QWidget *widget)
             itsTransparentWidgets.insert(widget);
             connect(widget, SIGNAL(destroyed(QObject*)),
                     SLOT(widgetDestroyed(QObject*)));
+#endif
             break;
         }
         case Qt::Popup:
