@@ -19,24 +19,19 @@
  *   License along with this library. If not,                                *
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
+#ifndef __QTCURVE_PLUGIN_H__
+#define __QTCURVE_PLUGIN_H__
 
-#ifndef _UTILS_H_
-#define _UTILS_H_
-
-#include <QWidget>
+#include <QStylePlugin>
 
 namespace QtCurve {
-namespace Utils {
-static inline void
-addEventFilter(QObject *object, QObject *filter)
-{
-    object->removeEventFilter(filter);
-    object->installEventFilter(filter);
-}
-bool compositingActive();
-bool hasAlphaChannel(const QWidget *widget);
-QString kdeHome();
-}
+class StylePlugin : public QStylePlugin {
+public:
+    virtual QStringList keys() const override;
+    virtual QStyle *create(const QString &key) override;
+private:
+    void init();
+};
 }
 
 #endif

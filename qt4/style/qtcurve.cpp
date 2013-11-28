@@ -36,7 +36,6 @@
 #include <QSplitter>
 #include <QSettings>
 #include <QTreeView>
-#include <QStylePlugin>
 #include <QPixmapCache>
 #include <QMdiSubWindow>
 #include <QStatusBar>
@@ -146,6 +145,14 @@ extern _qt_filedialog_save_filename_hook qt_filedialog_save_filename_hook;
 
 namespace QtCurve
 {
+
+static inline void
+setTranslucentBackground(QWidget *widget)
+{
+    if (qtcCheckLogLevel(QTC_LOG_INFO) && qtcGetQWidgetWid(widget))
+        qWarning() << "Recreating" << widget;
+    widget->setAttribute(Qt::WA_TranslucentBackground);
+}
 
 #if defined FIX_DISABLED_ICONS && defined QTC_QT4_ENABLE_KDE
 QPixmap getIconPixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode, QIcon::State)
@@ -652,57 +659,7 @@ static void setRgb(QColor *col, const QStringList &rgb)
 }
 #endif
 
-#if defined QTC_QT4_STYLE_SUPPORT || !defined QTC_QT4_ENABLE_KDE
-static QString kdeHome()
-{
-    static QString kdeHomePath;
-    if (kdeHomePath.isEmpty())
-    {
-        kdeHomePath = QString::fromLocal8Bit(qgetenv("KDEHOME"));
-        if (kdeHomePath.isEmpty())
-        {
-            QDir    homeDir(QDir::homePath());
-            QString kdeConfDir(QLatin1String("/.kde"));
-            if (homeDir.exists(QLatin1String(".kde4")))
-                kdeConfDir = QLatin1String("/.kde4");
-            kdeHomePath = QDir::homePath() + kdeConfDir;
-        }
-    }
-    return kdeHomePath;
-}
-#endif
-
 #ifdef QTC_QT4_STYLE_SUPPORT
-static void getStyles(const QString &dir, const char *sub, QSet<QString> &styles)
-{
-    QDir d(dir+sub);
-
-    if(d.exists())
-    {
-        QStringList filters;
-
-        filters << QString(THEME_PREFIX "*" THEME_SUFFIX);
-        d.setNameFilters(filters);
-
-        QStringList                entries(d.entryList());
-        QStringList::ConstIterator it(entries.begin()),
-                                   end(entries.end());
-
-        for(; it!=end; ++it)
-        {
-            QString style((*it).left((*it).lastIndexOf(THEME_SUFFIX)));
-
-            if(!styles.contains(style))
-                styles.insert(style);
-        }
-    }
-}
-
-static void getStyles(const QString &dir, QSet<QString> &styles)
-{
-    getStyles(dir, THEME_DIR, styles);
-    getStyles(dir, THEME_DIR4, styles);
-}
 
 static QString themeFile(const QString &dir, const QString &n, const char *sub)
 {
@@ -721,50 +678,12 @@ static QString themeFile(const QString &dir, const QString &n, bool kde3=false)
 }
 #endif
 
-class QtCurveDockWidgetTitleBar : public QWidget
-{
-    public:
-
+class QtCurveDockWidgetTitleBar : public QWidget {
+public:
     QtCurveDockWidgetTitleBar(QWidget* parent) : QWidget(parent) { }
     virtual ~QtCurveDockWidgetTitleBar() { }
     QSize sizeHint() const { return QSize(0, 0); }
 };
-
-class StylePlugin : public QStylePlugin
-{
-    public:
-
-    StylePlugin(QObject *parent=0) : QStylePlugin(parent) {}
-    ~StylePlugin() {}
-
-    QStringList keys() const
-    {
-        QSet<QString> styles;
-        styles.insert("QtCurve");
-
-#ifdef QTC_QT4_STYLE_SUPPORT
-        getStyles(kdeHome(), styles);
-        getStyles(KDE_PREFIX(4), styles);
-#endif
-        return styles.toList();
-    }
-
-    QStyle * create(const QString &key)
-    {
-#ifdef QTC_ENABLE_X11
-        qtcX11InitXlib(QX11Info::display());
-#endif
-        return "qtcurve"==key.toLower()
-                    ? new Style
-#ifdef QTC_QT4_STYLE_SUPPORT
-                    : 0==key.indexOf(THEME_PREFIX)
-                        ? new Style(key)
-#endif
-                        : 0;
-    }
-};
-
-Q_EXPORT_PLUGIN2(Style, StylePlugin)
 
 static inline void drawRect(QPainter *p, const QRect &r)
 {
@@ -1062,7 +981,7 @@ void Style::init(bool initial)
         QString rcFile;
         if(!itsName.isEmpty())
         {
-            rcFile=themeFile(kdeHome(), itsName);
+            rcFile=themeFile(Utils::kdeHome(), itsName);
             if(rcFile.isEmpty()) {
                 rcFile=themeFile(KDE_PREFIX(4), itsName, false);
             }
@@ -1701,12 +1620,6 @@ void Style::polish(QPalette &palette)
 #endif
 }
 
-static inline void
-setTranslucentBackground(QWidget *widget)
-{
-    widget->setAttribute(Qt::WA_TranslucentBackground);
-}
-
 static inline QWidget*
 getParent(QWidget *w, int level)
 {
@@ -1745,7 +1658,6 @@ Style::polish(QWidget *widget)
         (100 != opts.dlgOpacity && (!widget->window() || isDialog))) {
         itsBlurHelper->registerWidget(widget);
     }
-
     // Sometimes get background errors with QToolBox (e.g. in Bespin config),
     // and setting WA_StyledBackground seems to fix this,..
     if (CUSTOM_BGND || FRAME_SHADED == opts.groupBox ||
@@ -2893,8 +2805,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
             break;
         }
 #endif
-        case QEvent::Paint:
-        {
+        case QEvent::Paint: {
             if (CUSTOM_BGND) {
                 QWidget *widget = qobject_cast<QWidget*>(object);
 
@@ -3957,7 +3868,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
     }
 #endif
     case PE_Widget:
-        if(widget && widget->testAttribute(Qt::WA_StyledBackground) &&
+        if (widget && widget->testAttribute(Qt::WA_StyledBackground) &&
            ((!widget->testAttribute(Qt::WA_NoSystemBackground) &&
              (qtcIsDialog(widget) || qtcIsWindow(widget)) &&
              widget->isWindow()) ||
@@ -6411,8 +6322,9 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
                 painter->save();
 
-                if(!opts.xbar || (!widget || 0!=strcmp("QWidget", widget->metaObject()->className())))
+                if(!opts.xbar || (!widget || 0!=strcmp("QWidget", widget->metaObject()->className()))) {
                     drawMenuOrToolBarBackground(widget, painter, mbi->menuRect, option);
+                }
 
                 if(active)
                     drawMenuItem(painter, !opts.roundMbTopOnly && !(opts.square&SQUARE_POPUP_MENUS) ? r.adjusted(1, 1, -1, -1) : r,
@@ -13317,7 +13229,7 @@ const QColor * Style::getMdiColors(const QStyleOption *option, bool active) cons
         itsActiveMdiTextColor=option ? option->palette.text().color() : QApplication::palette().text().color();
         itsMdiTextColor=option ? option->palette.text().color() : QApplication::palette().text().color();
 
-        QFile f(kdeHome()+"/share/config/kdeglobals");
+        QFile f(Utils::kdeHome()+"/share/config/kdeglobals");
 
         if(f.open(QIODevice::ReadOnly))
         {

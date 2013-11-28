@@ -20,74 +20,93 @@
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
 
+#include "qtcurve_plugin.h"
+#include "qtcurve.h"
 #include "config.h"
+
+#include <qtcurve-utils/qtutils.h>
+
 #ifdef QTC_ENABLE_X11
 #  include <QX11Info>
-#  include <qtcurve-utils/x11utils.h>
-#endif
-#include <qtcurve-utils/log.h>
-
-#include "utils.h"
-#include <QDir>
-
-#ifndef QTC_QT4_ENABLE_KDE
-#  undef KDE_IS_VERSION
-#  define KDE_IS_VERSION(A, B, C) 0
-#else
-#  include <kdeversion.h>
-#  include <KDE/KWindowSystem>
+#  include <qtcurve-utils/x11qtc.h>
 #endif
 
 namespace QtCurve {
-namespace Utils {
 
-bool
-compositingActive()
+#ifdef QTC_QT4_STYLE_SUPPORT
+static void
+getStyles(const QString &dir, const char *sub, QSet<QString> &styles)
 {
-#if !defined QTC_QT4_ENABLE_KDE || !KDE_IS_VERSION(4, 4, 0)
-#ifdef QTC_ENABLE_X11
-    return qtcX11CompositingActive();
-#else
-    return false;
-#endif
-#else // QTC_QT4_ENABLE_KDE
-    return KWindowSystem::compositingActive();
-#endif // QTC_QT4_ENABLE_KDE
-}
+    QDir d(dir + sub);
 
-bool
-hasAlphaChannel(const QWidget *widget)
-{
-    if (compositingActive()) {
-#ifdef QTC_ENABLE_X11
-        return (32 == (widget ? widget->x11Info().depth() :
-                       QX11Info().appDepth()));
-#else
-        QTC_UNUSED(widget);
-        return true;
-#endif
-    } else {
-        return false;
-    }
-}
+    if (d.exists()) {
+        QStringList filters;
 
-QString kdeHome()
-{
-    static QString kdeHomePath;
-    if (kdeHomePath.isEmpty()) {
-        kdeHomePath = QString::fromLocal8Bit(qgetenv("KDEHOME"));
-        if (kdeHomePath.isEmpty()) {
-            const QString homePath = QDir::homePath();
-            const QDir homeDir = QDir(homePath);
-            if (homeDir.exists(QLatin1String(".kde4"))) {
-                kdeHomePath = homePath + "/.kde4";
-            } else {
-                kdeHomePath = homePath + "/.kde";
+        filters << QString(THEME_PREFIX "*" THEME_SUFFIX);
+        d.setNameFilters(filters);
+
+        QStringList entries(d.entryList());
+        QStringList::ConstIterator it(entries.begin())
+        QStringList::ConstIterator end(entries.end());
+
+        for (;it != end;++it) {
+            QString style((*it).left((*it).lastIndexOf(THEME_SUFFIX)));
+            if (!styles.contains(style)) {
+                styles.insert(style);
             }
         }
     }
-    return kdeHomePath;
 }
 
+static void
+getStyles(const QString &dir, QSet<QString> &styles)
+{
+    getStyles(dir, THEME_DIR, styles);
+    getStyles(dir, THEME_DIR4, styles);
 }
+#endif
+
+QStringList
+StylePlugin::keys() const
+{
+    QSet<QString> styles;
+    styles.insert("QtCurve");
+
+#ifdef QTC_QT4_STYLE_SUPPORT
+    getStyles(Utils::kdeHome(), styles);
+    getStyles(KDE_PREFIX(4), styles);
+#endif
+    return styles.toList();
+}
+
+QStyle*
+StylePlugin::create(const QString &key)
+{
+    init();
+    if (key.toLower() == "qtcurve") {
+        return new Style;
+    }
+#ifdef QTC_QT4_STYLE_SUPPORT
+    if (key.indexOf(THEME_PREFIX) == 0) {
+        return new Style(key);
+    }
+#endif
+    return 0;
+}
+
+static bool inited = false;
+
+void
+StylePlugin::init()
+{
+    if (inited)
+        return;
+    inited = true;
+#ifdef QTC_ENABLE_X11
+    qtcX11InitXlib(QX11Info::display());
+#endif
+}
+
+Q_EXPORT_PLUGIN2(Style, StylePlugin)
+
 }
