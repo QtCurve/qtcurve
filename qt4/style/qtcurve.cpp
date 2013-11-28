@@ -972,43 +972,40 @@ Style::prePolish(QWidget *widget) const
 
 void Style::init(bool initial)
 {
-    if(!initial)
+    if (!initial)
         freeColors();
 
 #ifdef QTC_QT4_ENABLE_KDE
-    if(initial)
-    {
-        if(KGlobal::hasMainComponent())
-            itsComponentData=KGlobal::mainComponent();
-        else
-        {
+    if (initial) {
+        if (KGlobal::hasMainComponent()) {
+            itsComponentData = KGlobal::mainComponent();
+        } else {
             QString name(QApplication::applicationName());
 
-            if (name.isEmpty())
+            if (name.isEmpty()) {
                 name = qAppName();
-
-            if (name.isEmpty())
+            }
+            if (name.isEmpty()) {
                 name = "QtApp";
-
-            itsComponentData=KComponentData(name.toLatin1(), name.toLatin1(), KComponentData::SkipMainComponentRegistration);
+            }
+            itsComponentData = KComponentData(
+                name.toLatin1(), name.toLatin1(),
+                KComponentData::SkipMainComponentRegistration);
         }
     }
 #endif
 
-    if(itsIsPreview)
-    {
-        if(PREVIEW_WINDOW!=itsIsPreview)
-            opts.bgndOpacity=opts.dlgOpacity=opts.menuBgndOpacity=100;
-    }
-    else
-    {
+    if (itsIsPreview) {
+        if (PREVIEW_WINDOW != itsIsPreview) {
+            opts.bgndOpacity = opts.dlgOpacity = opts.menuBgndOpacity = 100;
+        }
+    } else {
 #ifdef QTC_QT4_STYLE_SUPPORT
         QString rcFile;
-        if(!itsName.isEmpty())
-        {
-            rcFile=themeFile(Utils::kdeHome(), itsName);
-            if(rcFile.isEmpty()) {
-                rcFile=themeFile(KDE_PREFIX(4), itsName, false);
+        if (!itsName.isEmpty()) {
+            rcFile = themeFile(Utils::kdeHome(), itsName);
+            if (rcFile.isEmpty()) {
+                rcFile = themeFile(KDE_PREFIX(4), itsName, false);
             }
         }
         qtcReadConfig(rcFile, &opts);
@@ -1017,24 +1014,31 @@ void Style::init(bool initial)
 #endif
 
 #ifdef QTC_ENABLE_X11
-        if(initial)
-        {
-            QDBusConnection::sessionBus().connect(QString(), "/KGlobalSettings", "org.kde.KGlobalSettings",
-                                                "notifyChange", this, SLOT(kdeGlobalSettingsChange(int, int)));
-            QDBusConnection::sessionBus().connect("org.kde.kwin", "/KWin", "org.kde.KWin",
-                                                "compositingToggled", this, SLOT(compositingToggled()));
+        if (initial) {
+            QDBusConnection::sessionBus().connect(
+                QString(), "/KGlobalSettings", "org.kde.KGlobalSettings",
+                "notifyChange", this, SLOT(kdeGlobalSettingsChange(int, int)));
+            QDBusConnection::sessionBus().connect(
+                "org.kde.kwin", "/KWin", "org.kde.KWin",
+                "compositingToggled", this, SLOT(compositingToggled()));
 
-            if(!qApp || QString(qApp->argv()[0])!="kwin")
-            {
-                QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
-                                                "borderSizesChanged", this, SLOT(borderSizesChanged()));
-                if(opts.menubarHiding&HIDE_KWIN)
-                    QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
-                                                        "toggleMenuBar", this, SLOT(toggleMenuBar(unsigned int)));
+            if (!qApp || QString(qApp->argv()[0]) != "kwin") {
+                QDBusConnection::sessionBus().connect(
+                    "org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
+                    "borderSizesChanged", this, SLOT(borderSizesChanged()));
+                if (opts.menubarHiding & HIDE_KWIN) {
+                    QDBusConnection::sessionBus().connect(
+                        "org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
+                        "toggleMenuBar", this,
+                        SLOT(toggleMenuBar(unsigned int)));
+                }
 
-                if(opts.statusbarHiding&HIDE_KWIN)
-                    QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
-                                                        "toggleStatusBar", this, SLOT(toggleStatusBar(unsigned int)));
+                if (opts.statusbarHiding & HIDE_KWIN) {
+                    QDBusConnection::sessionBus().connect(
+                        "org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
+                        "toggleStatusBar", this,
+                        SLOT(toggleStatusBar(unsigned int)));
+                }
             }
         }
 #endif
@@ -1297,12 +1301,14 @@ void Style::init(bool initial)
     // NOTE: This call will never actually happen, its only here so that the qtcurve.so
     // contains a kio link so that this is not removed by some 'optimisation' of the
     // link process.
-    if(itsPos.x()>65534)
+    if (itsPos.x() > 65534) {
         (void)KFileDialog::getSaveFileName();
+    }
 
     // We need to set the decoration colours for the preview now...
-    if(itsIsPreview)
+    if (itsIsPreview) {
         setDecorationColors();
+    }
 #endif
 }
 
@@ -1310,8 +1316,9 @@ Style::~Style()
 {
     freeColors();
 #ifdef QTC_ENABLE_X11
-    if(itsDBus)
+    if (itsDBus) {
         delete itsDBus;
+    }
 #endif
 }
 
