@@ -20,3 +20,5 @@
 8. PyQt5, Musescore and (occasionally) QtCreator seg fault on exit in a QtDBus
    destructor even when QtCurve is not linked to QtDBus.
 9. KScreenLocker has rendering problems.
+10. QtCurve preference background blur has some problem
+11. combobox list background no blur.
