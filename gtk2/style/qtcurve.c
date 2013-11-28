@@ -244,10 +244,10 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
         }
     }
 
-    if(widget && CUSTOM_BGND && (DETAIL("base") || DETAIL("eventbox")))
+    if(widget && qtcIsCustomBgnd(&opts) && (DETAIL("base") || DETAIL("eventbox")))
         qtcScrollbarSetup(widget);
 
-    if(CUSTOM_BGND && DETAIL("viewportbin"))
+    if(qtcIsCustomBgnd(&opts) && DETAIL("viewportbin"))
     {
         GtkRcStyle *st=widget ? gtk_widget_get_modifier_style(widget) : NULL;
         // if the app hasn't modified bg, draw background gradient
@@ -258,7 +258,7 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
         }
         else
             parent_class->draw_flat_box(style, window, state, shadow, area, widget, detail, x, y, width, height);
-    } else if (CUSTOM_BGND && widget && GTK_IS_WINDOW(widget) &&
+    } else if (qtcIsCustomBgnd(&opts) && widget && GTK_IS_WINDOW(widget) &&
              !isMenuOrToolTipWindow &&
              drawWindowBgnd(cr, style, area, window, widget,
                             x, y, width, height)) {
@@ -403,7 +403,7 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
         drawToolTip(cr, widget, area, x, y, width, height);
     else if(DETAIL("icon_view_item"))
         drawSelection(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, FALSE, 1.0, 0);
-    else if(GTK_STATE_SELECTED!=state && CUSTOM_BGND && DETAIL("eventbox"))
+    else if(GTK_STATE_SELECTED!=state && qtcIsCustomBgnd(&opts) && DETAIL("eventbox"))
         drawWindowBgnd(cr, style, NULL, window, widget, x, y, width, height);
     else if(!(GTK_APP_JAVA==qtSettings.app && widget && GTK_IS_LABEL(widget)))
     {
@@ -1378,7 +1378,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
     }
     else if(detail && (0==strcmp(detail,"dockitem") || 0==strcmp(detail,"dockitem_bin")))
     {
-        if(CUSTOM_BGND && widget)
+        if(qtcIsCustomBgnd(&opts) && widget)
             drawWindowBgnd(cr, style, area, window, widget, x, y, width, height);
     }
     else if(widget && ( (detail && ( menubar || 0==strcmp(detail, "toolbar") || 0==strcmp(detail, "handlebox") ||
@@ -1408,7 +1408,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                     qtcWindowMenuBarDBus(widget, height);
             }
 
-            if(widget && (opacity!=100 || CUSTOM_BGND))
+            if(widget && (opacity!=100 || qtcIsCustomBgnd(&opts)))
                 drawWindowBgnd(cr, style, area, window, widget, x, y, width, height);
 
             if(drawGradient)

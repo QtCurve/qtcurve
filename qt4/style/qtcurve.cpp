@@ -1707,7 +1707,7 @@ Style::polish(QWidget *widget)
     }
     // Sometimes get background errors with QToolBox (e.g. in Bespin config),
     // and setting WA_StyledBackground seems to fix this,..
-    if (CUSTOM_BGND || FRAME_SHADED == opts.groupBox ||
+    if (qtcIsCustomBgnd(&opts) || FRAME_SHADED == opts.groupBox ||
         FRAME_FADED == opts.groupBox) {
         switch (widget->windowType()) {
         case Qt::Window:
@@ -1953,7 +1953,7 @@ Style::polish(QWidget *widget)
     }
     else if (qobject_cast<QAbstractScrollArea*>(widget) && widget->inherits("KFilePlacesView"))
     {
-        if(CUSTOM_BGND)
+        if(qtcIsCustomBgnd(&opts))
             polishScrollArea(static_cast<QAbstractScrollArea*>(widget), true);
         Utils::addEventFilter(widget, this);
     }
@@ -1990,7 +1990,7 @@ Style::polish(QWidget *widget)
         if(BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR)
             emitMenuSize(widget, PREVIEW_MDI==itsIsPreview || !widget->isVisible() ? 0 : widget->rect().height());
 #endif
-        if(CUSTOM_BGND)
+        if(qtcIsCustomBgnd(&opts))
             widget->setBackgroundRole(QPalette::NoRole);
 
         widget->setAttribute(Qt::WA_Hover, true);
@@ -2012,7 +2012,7 @@ Style::polish(QWidget *widget)
             ((QLabel*)widget)->setTextInteractionFlags(((QLabel*)widget)->textInteractionFlags()&~Qt::TextSelectableByMouse);
 
     } else if(/*!opts.gtkScrollViews && */qobject_cast<QAbstractScrollArea*>(widget)) {
-        if(CUSTOM_BGND)
+        if(qtcIsCustomBgnd(&opts))
             polishScrollArea(static_cast<QAbstractScrollArea*>(widget));
         if(!opts.gtkScrollViews && (((QFrame*)widget)->frameWidth()>0))
             Utils::addEventFilter(widget, this);
@@ -2093,7 +2093,7 @@ Style::polish(QWidget *widget)
             // else if (QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
             Utils::addEventFilter(widget, this);
             if (qtcCheckKDEType0(widget->parent(), KTitleWidget)) {
-                if(CUSTOM_BGND)
+                if(qtcIsCustomBgnd(&opts))
                     frame->setAutoFillBackground(false);
                 else
                     frame->setBackgroundRole(QPalette::Window);
@@ -2422,7 +2422,7 @@ void Style::unpolish(QWidget *widget)
 
     // Sometimes get background errors with QToolBox (e.g. in Bespin config), and setting WA_StyledBackground seems to
     // fix this,..
-    if (CUSTOM_BGND || FRAME_SHADED == opts.groupBox ||
+    if (qtcIsCustomBgnd(&opts) || FRAME_SHADED == opts.groupBox ||
         FRAME_FADED == opts.groupBox) {
         switch (widget->windowType()) {
         case Qt::Window:
@@ -2523,7 +2523,7 @@ void Style::unpolish(QWidget *widget)
 
         widget->setAttribute(Qt::WA_Hover, false);
 
-        if(CUSTOM_BGND)
+        if(qtcIsCustomBgnd(&opts))
             widget->setBackgroundRole(QPalette::Background);
 
 //         if(opts.shadeMenubarOnlyWhenActive && SHADE_NONE!=opts.shadeMenubars)
@@ -2591,7 +2591,7 @@ void Style::unpolish(QWidget *widget)
             widget->removeEventFilter(this);
 
             if (qtcCheckKDEType0(widget->parent(), KTitleWidget)) {
-                if(CUSTOM_BGND)
+                if(qtcIsCustomBgnd(&opts))
                     frame->setAutoFillBackground(true);
                 else
                     frame->setBackgroundRole(QPalette::Base);
@@ -2695,7 +2695,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
         QPalette palette = view->palette();
         QColor   color   = ((QWidget*)object)->palette().background().color();
 
-        if(CUSTOM_BGND)
+        if(qtcIsCustomBgnd(&opts))
             color.setAlphaF(0.0);
 
         palette.setColor(view->backgroundRole(), color);
@@ -2854,7 +2854,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
         }
 #endif
         case QEvent::Paint: {
-            if (CUSTOM_BGND) {
+            if (qtcIsCustomBgnd(&opts)) {
                 QWidget *widget = qobject_cast<QWidget*>(object);
 
                 if (widget && widget->testAttribute(Qt::WA_StyledBackground) &&
@@ -3434,7 +3434,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
         case QtC_WindowBorder:
             return opts.windowBorder;
         case QtC_CustomBgnd:
-            return CUSTOM_BGND;
+            return qtcIsCustomBgnd(&opts);
         case QtC_TitleBarButtonAppearance:
             return (int)opts.titlebarButtonAppearance;
         case QtC_TitleAlignment:
@@ -3927,7 +3927,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
              qobject_cast<const QMdiSubWindow*>(widget)))) {
             bool isDialog = qobject_cast<const QDialog*>(widget);
 
-            if (CUSTOM_BGND || itsIsPreview ||
+            if (qtcIsCustomBgnd(&opts) || itsIsPreview ||
                 (isDialog && opts.dlgOpacity != 100) ||
                 (!isDialog && opts.bgndOpacity != 100))
                 drawBackground(painter, widget,
@@ -3938,7 +3938,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
         // disable painting of PE_PanelScrollAreaCorner
         // the default implementation fills the rect with the window background color which does not work for windows that have gradients.
         // ...but need to for WebView!!!
-        if (!opts.gtkScrollViews || !CUSTOM_BGND ||
+        if (!opts.gtkScrollViews || !qtcIsCustomBgnd(&opts) ||
             (widget && widget->inherits("WebView")))
             painter->fillRect(r, palette.brush(QPalette::Window));
         break;
@@ -5305,7 +5305,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             painter->save();
 
             if(const QStyleOptionTabWidgetFrame *twf = qstyleoption_cast<const QStyleOptionTabWidgetFrame*>(option))
-                if((opts.round || (/*CUSTOM_BGND && */0==opts.tabBgnd)) &&
+                if((opts.round || (/*qtcIsCustomBgnd(&opts) && */0==opts.tabBgnd)) &&
                     widget && ::qobject_cast<const QTabWidget*>(widget))
                 {
                     struct QtcTabWidget : public QTabWidget
@@ -5318,7 +5318,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
 
                     if(tw->count()>0 && ((const QtcTabWidget*)widget)->tabsVisible())
                     {
-                        if(!reverse && /*CUSTOM_BGND && */0==opts.tabBgnd) // Does not work for reverse :-(
+                        if(!reverse && /*qtcIsCustomBgnd(&opts) && */0==opts.tabBgnd) // Does not work for reverse :-(
                         {
                             QRect tabRect(((const QtcTabWidget*)widget)->currentTabRect());
                             int   adjust(TAB_MO_GLOW==opts.tabMouseOver && !(opts.thin&THIN_FRAMES) ? 2 : 1);
@@ -8879,7 +8879,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                 QPainterPath path;
 #endif
 #endif
-                if (!kwin && !CUSTOM_BGND)
+                if (!kwin && !qtcIsCustomBgnd(&opts))
                     painter->fillRect(tr, borderCol);
 
                 painter->setRenderHint(QPainter::Antialiasing, true);
@@ -10973,7 +10973,7 @@ void Style::drawBevelGradient(const QColor &base, QPainter *p, const QRect &orig
 
     if(qtcIsFlat(bevApp))
     {
-        if((WIDGET_TAB_TOP!=w && WIDGET_TAB_BOT!=w) || !CUSTOM_BGND || opts.tabBgnd || !sel)
+        if((WIDGET_TAB_TOP!=w && WIDGET_TAB_BOT!=w) || !qtcIsCustomBgnd(&opts) || opts.tabBgnd || !sel)
         {
             if(path.isEmpty())
                 p->fillRect(origRect, base);
@@ -11042,7 +11042,7 @@ void Style::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &
 {
     bool                             topTab(WIDGET_TAB_TOP==w),
                                      botTab(WIDGET_TAB_BOT==w),
-                                     dwt(CUSTOM_BGND && WIDGET_DOCK_WIDGET_TITLE==w),
+                                     dwt(qtcIsCustomBgnd(&opts) && WIDGET_DOCK_WIDGET_TITLE==w),
                                      titleBar(opts.windowBorder&WINDOW_BORDER_BLEND_TITLEBAR &&
                                                     (WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w ||
                                                      (opts.dwtSettings&DWT_COLOR_AS_PER_TITLEBAR &&
@@ -11069,7 +11069,7 @@ void Style::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &
             else
             {
                 col=base;
-                if((sel /*&& CUSTOM_BGND*/ && 0==opts.tabBgnd && !reverse) || dwt)
+                if((sel /*&& qtcIsCustomBgnd(&opts)*/ && 0==opts.tabBgnd && !reverse) || dwt)
                     col.setAlphaF(0.0);
             }
         }
@@ -12962,7 +12962,7 @@ Style::drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p,
         return;
 
     EAppearance app = menu ? opts.menubarAppearance : opts.toolbarAppearance;
-    if (!CUSTOM_BGND || !qtcIsFlat(app) ||
+    if (!qtcIsCustomBgnd(&opts) || !qtcIsFlat(app) ||
         (menu && SHADE_NONE != opts.shadeMenubars)) {
         QRect rx(r);
         QColor col(menu && (option->state & State_Enabled ||

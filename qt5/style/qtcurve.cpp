@@ -1522,7 +1522,7 @@ void Style::drawBevelGradient(const QColor &base, QPainter *p, const QRect &orig
 
     if(qtcIsFlat(bevApp))
     {
-        if((WIDGET_TAB_TOP!=w && WIDGET_TAB_BOT!=w) || !CUSTOM_BGND || opts.tabBgnd || !sel)
+        if((WIDGET_TAB_TOP!=w && WIDGET_TAB_BOT!=w) || !qtcIsCustomBgnd(&opts) || opts.tabBgnd || !sel)
         {
             if(path.isEmpty())
                 p->fillRect(origRect, base);
@@ -1591,7 +1591,7 @@ void Style::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &
 {
     bool                             topTab(WIDGET_TAB_TOP==w),
         botTab(WIDGET_TAB_BOT==w),
-        dwt(CUSTOM_BGND && WIDGET_DOCK_WIDGET_TITLE==w),
+        dwt(qtcIsCustomBgnd(&opts) && WIDGET_DOCK_WIDGET_TITLE==w),
         titleBar(opts.windowBorder&WINDOW_BORDER_BLEND_TITLEBAR &&
                  (WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w ||
                   (opts.dwtSettings&DWT_COLOR_AS_PER_TITLEBAR &&
@@ -1618,7 +1618,7 @@ void Style::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &
             else
             {
                 col=base;
-                if((sel /*&& CUSTOM_BGND*/ && 0==opts.tabBgnd && !reverse) || dwt)
+                if((sel /*&& qtcIsCustomBgnd(&opts)*/ && 0==opts.tabBgnd && !reverse) || dwt)
                     col.setAlphaF(0.0);
             }
         }
@@ -3483,27 +3483,32 @@ int Style::getOpacity(const QWidget *widget, QPainter *p) const
     return 100;
 }
 
-void Style::drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p, const QRect &r, const QStyleOption *option,
-                                        bool menu, bool horiz) const
+void
+Style::drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p,
+                                   const QRect &r, const QStyleOption *option,
+                                   bool menu, bool horiz) const
 {
-    // LibreOffice - when drawMenuOrToolBarBackground is called with menuRect, this is empty!
-    if(r.width()<1 || r.height()<1)
+    // LibreOffice - when drawMenuOrToolBarBackground is called with menuRect,
+    // this is empty!
+    if (r.width() < 1 || r.height() < 1)
         return;
 
-    EAppearance app=menu ? opts.menubarAppearance : opts.toolbarAppearance;
-    if(!CUSTOM_BGND || !qtcIsFlat(app) || (menu && SHADE_NONE!=opts.shadeMenubars))
-    {
-        QRect  rx(r);
-        QColor col(menu && (option->state&State_Enabled || SHADE_NONE!=opts.shadeMenubars)
-                   ? menuColors(option, itsActive)[ORIGINAL_SHADE]
-                   : option->palette.background().color());
-        int    opacity(getOpacity(widget, p));
+    EAppearance app = menu ? opts.menubarAppearance : opts.toolbarAppearance;
+    if (!qtcIsCustomBgnd(&opts) || !qtcIsFlat(app) ||
+        (menu && opts.shadeMenubars != SHADE_NONE)) {
+        QRect rx(r);
+        QColor col(menu && (option->state & State_Enabled ||
+                            opts.shadeMenubars != SHADE_NONE) ?
+                   menuColors(option, itsActive)[ORIGINAL_SHADE] :
+                   option->palette.background().color());
+        int opacity(getOpacity(widget, p));
 
-        if(menu && BLEND_TITLEBAR)
+        if (menu && BLEND_TITLEBAR) {
             rx.adjust(0, -qtcGetWindowBorderSize(false).titleHeight, 0, 0);
-
-        if(opacity<100)
+        }
+        if (opacity < 100) {
             col.setAlphaF(opacity/100.0);
+        }
         drawBevelGradient(col, p, rx, horiz, false, MODIFY_AGUA(app));
     }
 }

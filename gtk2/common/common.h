@@ -281,8 +281,6 @@ enum {
 
 #define MENU_AND_TOOLTIP_RADIUS   (opts.round>=ROUND_FULL ? 5.0 : 3.5)
 
-#define CUSTOM_BGND (!(qtcIsFlatBgnd(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type || 100!=opts.bgndOpacity || 100!=opts.dlgOpacity)
-
 #define GLOW_PROG_ALPHA 0.55
 
 typedef enum {
@@ -801,6 +799,14 @@ typedef struct {
 #endif
     Strings          noMenuStripeApps;
 } Options;
+
+QTC_ALWAYS_INLINE static inline bool
+qtcIsCustomBgnd(const Options *opts)
+{
+    return (!qtcIsFlatBgnd(opts->bgndAppearance) ||
+            opts->bgndImage.type != IMG_NONE ||
+            opts->bgndOpacity != 100 || opts->dlgOpacity != 100);
+}
 
 #include <qtcurve-utils/color.h>
 #define tint(COLA, COLB, FACTOR) qtcColorTint((COLA), (COLB), (FACTOR))

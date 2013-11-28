@@ -170,7 +170,7 @@ drawBevelGradientAlpha(cairo_t *cr, GdkRectangle *area, int x, int y,
 
     if (qtcIsFlat(bevApp)) {
         if ((WIDGET_TAB_TOP != w && WIDGET_TAB_BOT != w) ||
-            !CUSTOM_BGND || opts.tabBgnd || !sel) {
+            !qtcIsCustomBgnd(&opts) || opts.tabBgnd || !sel) {
             drawAreaColorAlpha(cr, area, base, x, y, width, height, alpha);
         }
     } else {
@@ -198,7 +198,7 @@ drawBevelGradientAlpha(cairo_t *cr, GdkRectangle *area, int x, int y,
             double pos = botTab ? 1.0 - grad->stops[i].pos : grad->stops[i].pos;
 
             if (/*sel && */(topTab || botTab) && i == grad->numStops - 1) {
-                if (sel /*&& CUSTOM_BGND*/ && 0 == opts.tabBgnd &&
+                if (sel /*&& qtcIsCustomBgnd(&opts)*/ && 0 == opts.tabBgnd &&
                     !isMozilla()) {
                     alpha = 0.0;
                 }
@@ -2406,7 +2406,7 @@ drawScrollbarGroove(cairo_t *cr, GtkStyle *style, GtkStateType state,
 #if !GTK_CHECK_VERSION(2, 90, 0)
         /* This was the old (pre 1.7.1) else if... but it messes up Gtk3 scrollbars wheb have custom background. And dont think its needed */
         /* But re-added in 1.7.2 for Mozilla! */
-        /*  else if(!CUSTOM_BGND || !(opts.gtkScrollViews && qtcIsFlat(opts.sbarBgndAppearance) &&
+        /*  else if(!qtcIsCustomBgnd(&opts) || !(opts.gtkScrollViews && qtcIsFlat(opts.sbarBgndAppearance) &&
             widget && drawWindowBgnd(cr, style, area, widget, xo, yo, wo, ho)))
         */ else if(isMozilla()) /* 1.7.3 added 'else' so as to not duplicate above! */
             drawBevelGradient(cr, area, xo, yo, wo, ho, &qtcPalette.background[ORIGINAL_SHADE],
@@ -2858,7 +2858,7 @@ void fillTab(cairo_t *cr, GtkStyle *style, GtkWidget *widget, GdkRectangle *area
              GdkColor *col, int x, int y, int width, int height, gboolean horiz, EWidget tab, gboolean grad)
 {
     gboolean selected=GTK_STATE_NORMAL==state,
-        flatBgnd=!CUSTOM_BGND || 0!=opts.tabBgnd;
+        flatBgnd=!qtcIsCustomBgnd(&opts) || 0!=opts.tabBgnd;
 
 //     if(selected && !flatBgnd)
 //         drawWindowBgnd(cr, style, area, widget, x, y, width, height);

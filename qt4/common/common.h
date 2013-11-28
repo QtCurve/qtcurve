@@ -328,8 +328,6 @@ enum {
 #define MENU_AND_TOOLTIP_RADIUS   (opts.round>=ROUND_FULL ? 5.0 : 2.5)
 #endif // !defined __cplusplus
 
-#define CUSTOM_BGND (!(qtcIsFlatBgnd(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type || 100!=opts.bgndOpacity || 100!=opts.dlgOpacity)
-
 #define GLOW_PROG_ALPHA 0.55
 
 #ifdef __cplusplus
@@ -1084,6 +1082,14 @@ typedef struct {
                      windowDragBlackList;
 
 } Options;
+
+QTC_ALWAYS_INLINE static inline bool
+qtcIsCustomBgnd(const Options *opts)
+{
+    return (!qtcIsFlatBgnd(opts->bgndAppearance) ||
+            opts->bgndImage.type != IMG_NONE ||
+            opts->bgndOpacity != 100 || opts->dlgOpacity != 100);
+}
 
 #ifdef QTC_QT4_ENABLE_KDE
 #include <KDE/KColorUtils>
