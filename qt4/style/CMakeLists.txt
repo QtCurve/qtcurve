@@ -42,17 +42,8 @@ foreach(pngname check_on check_x_on dialog_error dialog_information
 endforeach()
 
 set(qtcurve_SRCS
-  qtcurve.cpp
-  windowmanager.cpp
-  blurhelper.cpp
-  utils.cpp
-  shortcuthandler.cpp
+  ${qtcurve_SRCS}
   ${qtcurve_style_common_SRCS})
-set(qtcurve_MOC_HDRS
-  qtcurve.h
-  windowmanager.h
-  blurhelper.h
-  shortcuthandler.h)
 
 if(QTC_ENABLE_X11)
   set(qtcurve_SRCS
