@@ -21,11 +21,11 @@
  *****************************************************************************/
 
 #include "qtcurve_p.h"
+#include <qtcurve-utils/qtutils.h>
 
 #ifdef QTC_ENABLE_X11
 #  include <QDBusConnection>
 #  include <QDBusInterface>
-#  include <qtcurve-utils/qtutils.h>
 #endif
 #include "windowmanager.h"
 #include "blurhelper.h"
@@ -2390,13 +2390,10 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
     bool previewMdi(isWindow && itsIsPreview &&
                     qobject_cast<const QMdiSubWindow*>(widget));
     const QWidget *window = itsIsPreview ? widget : widget->window();
-    int           opacity = BGND_MENU==type
-        ? opts.menuBgndOpacity
-        : BGND_DIALOG==type
-        ? opts.dlgOpacity
-        : opts.bgndOpacity;
-    QRect         bgndRect(widget->rect()),
-        imgRect(bgndRect);
+    int opacity = (BGND_MENU == type ? opts.menuBgndOpacity :
+                   BGND_DIALOG == type ? opts.dlgOpacity : opts.bgndOpacity);
+    QRect bgndRect(widget->rect());
+    QRect imgRect(bgndRect);
 
     if (100 != opacity && !(qobject_cast<const QMdiSubWindow*>(widget) ||
                             Utils::hasAlphaChannel(window))) {
@@ -2405,8 +2402,7 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
 
     p->setClipRegion(widget->rect(), Qt::IntersectClip);
 
-    if(isWindow)
-    {
+    if (isWindow) {
         if(!previewMdi)
         {
             WindowBorders borders=qtcGetWindowBorderSize(false);

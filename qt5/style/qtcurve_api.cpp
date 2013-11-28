@@ -2110,9 +2110,8 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
            (widget && widget->inherits("WebView")))
             painter->fillRect(r, palette.brush(QPalette::Window));
         break;
-    case PE_IndicatorBranch:
-    {
-        int middleH((r.x() + r.width() / 2)-1),
+    case PE_IndicatorBranch: {
+        int middleH((r.x() + r.width() / 2) - 1),
             middleV(r.y() + r.height() / 2),
 #if 0
             beforeH(middleH),
@@ -2123,8 +2122,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
 
         painter->save();
 
-        if (state&State_Children)
-        {
+        if (state & State_Children) {
             QRect ar(r.x()+((r.width()-(LV_SIZE+4))>>1), r.y()+((r.height()-(LV_SIZE+4))>>1), LV_SIZE+4,
                      LV_SIZE+4);
             if(/*LV_OLD==*/opts.lvLines)
