@@ -91,68 +91,152 @@ public:
     virtual KDecoration *createDecoration(KDecorationBridge*) override;
     virtual bool supports(Ability ability) const override;
 
-    const QBitmap &buttonBitmap(ButtonIcon type, const QSize &size, bool toolWindow);
-    int titleHeight() const {return itsTitleHeight;}
-    int titleHeightTool() const {return itsTitleHeightTool;}
-    const QFont &titleFont() {return itsTitleFont;}
-    const QFont &titleFontTool() {return itsTitleFontTool;}
+    const QBitmap &buttonBitmap(ButtonIcon type, const QSize &size,
+                                bool toolWindow);
+    int
+    titleHeight() const
+    {
+        return itsTitleHeight;
+    }
+    int
+    titleHeightTool() const
+    {
+        return itsTitleHeightTool;
+    }
+    const QFont&
+    titleFont()
+    {
+        return itsTitleFont;
+    }
+    const QFont&
+    titleFontTool()
+    {
+        return itsTitleFontTool;
+    }
     int borderSize(bool bot=false) const;
-    bool showResizeGrip() const
-        {return QtCurveConfig::BORDER_NONE == itsConfig.borderSize();}
-    bool haveBottomBorder() const { return QtCurveConfig::BORDER_NONE!=itsConfig.borderSize(); }
-    bool                  roundBottom() const        { return itsConfig.roundBottom() && itsConfig.borderSize()>QtCurveConfig::BORDER_NONE; }
-    QtCurveConfig::Shade  outerBorder() const        { return itsConfig.outerBorder(); }
-    QtCurveConfig::Shade  innerBorder() const        { return itsConfig.innerBorder(); }
-    QStyle *              wStyle() const             { return itsStyle ? itsStyle : QApplication::style(); }
-    int                   borderEdgeSize() const;
-    int                   titleBarPad() const        { return itsConfig.titleBarPad(); }
-    int                   edgePad() const            { return itsConfig.edgePad(); }
-    bool                  borderlessMax() const      { return itsConfig.borderlessMax(); }
-    int                   opacity(bool active) const { return itsConfig.opacity(active); }
-    bool                  opaqueBorder() const       { return itsConfig.opaqueBorder(); }
+    bool
+    showResizeGrip() const
+    {
+        return QtCurveConfig::BORDER_NONE == itsConfig.borderSize();
+    }
+    bool
+    haveBottomBorder() const
+    {
+        return QtCurveConfig::BORDER_NONE!=itsConfig.borderSize();
+    }
+    bool
+    roundBottom() const
+    {
+        return (itsConfig.roundBottom() &&
+                itsConfig.borderSize() > QtCurveConfig::BORDER_NONE);
+    }
+    QtCurveConfig::Shade
+    outerBorder() const
+    {
+        return itsConfig.outerBorder();
+    }
+    QtCurveConfig::Shade
+    innerBorder() const
+    {
+        return itsConfig.innerBorder();
+    }
+    QStyle*
+    wStyle() const
+    {
+        return itsStyle ? itsStyle : QApplication::style();
+    }
+    int borderEdgeSize() const;
+    int
+    titleBarPad() const
+    {
+        return itsConfig.titleBarPad();
+    }
+    int
+    edgePad() const
+    {
+        return itsConfig.edgePad();
+    }
+    bool
+    borderlessMax() const
+    {
+        return itsConfig.borderlessMax();
+    }
+    int
+    opacity(bool active) const
+    {
+        return itsConfig.opacity(active);
+    }
+    bool
+    opaqueBorder() const
+    {
+        return itsConfig.opaqueBorder();
+    }
 #if KDE_IS_VERSION(4, 3, 0)
-    bool                  customShadows() const      { return itsConfig.customShadows(); }
-    QtCurveShadowCache &  shadowCache()              { return itsShadowCache; }
+    bool
+    customShadows() const
+    {
+        return itsConfig.customShadows();
+    }
+    QtCurveShadowCache&
+    shadowCache()
+    {
+        return itsShadowCache;
+    }
 #endif
 #if KDE_IS_VERSION(4, 3, 85)
-    bool                  grouping() const           { return itsConfig.grouping(); }
+    bool
+    grouping() const
+    {
+        return itsConfig.grouping();
+    }
 #endif
-    void                  menuBarSize(unsigned int xid, int size);
-    void                  statusBarState(unsigned int xid, bool state);
-    void                  emitToggleMenuBar(int xid);
-    void                  emitToggleStatusBar(int xid);
-    void                  borderSizeChanged();
-    void                  addClient(QtCurveClient *c)    { itsClients.append(c); }
-    void                  removeClient(QtCurveClient *c);
-    bool                  wasLastMenu(unsigned int id)   { return id==itsLastMenuXid; }
-    bool                  wasLastStatus(unsigned int id) { return id==itsLastStatusXid; }
-    const QColor &        hoverCol(bool active)          { return itsHoverCols[active ? 1 : 0]; }
-
+    void menuBarSize(unsigned int xid, int size);
+    void statusBarState(unsigned int xid, bool state);
+    void emitToggleMenuBar(int xid);
+    void emitToggleStatusBar(int xid);
+    void borderSizeChanged();
+    void
+    addClient(QtCurveClient *c)
+    {
+        itsClients.append(c);
+    }
+    void removeClient(QtCurveClient *c);
+    bool wasLastMenu(unsigned int id)
+    {
+        return id == itsLastMenuXid;
+    }
+    bool
+    wasLastStatus(unsigned int id)
+    {
+        return id == itsLastStatusXid;
+    }
+    const QColor&
+    hoverCol(bool active)
+    {
+        return itsHoverCols[active ? 1 : 0];
+    }
 private:
     bool readConfig(bool compositingToggled=false);
 
-private:
-    int                    itsBorderSize,
-                           itsTitleHeight,
-                           itsTitleHeightTool,
-                           itsTimeStamp;
-    unsigned int           itsLastMenuXid,
-                           itsLastStatusXid;
-    QFont                  itsTitleFont,
-                           itsTitleFontTool;
-    QStyle                 *itsStyle;
-    QBitmap                itsBitmaps[2][NumButtonIcons];
-    QtCurveConfig          itsConfig;
-    QList<QtCurveClient *> itsClients;
-    QtCurveDBus            *itsDBus;
-    QColor                 itsHoverCols[2];
+    int itsBorderSize;
+    int itsTitleHeight;
+    int itsTitleHeightTool;
+    int itsTimeStamp;
+    unsigned int itsLastMenuXid;
+    unsigned int itsLastStatusXid;
+    QFont itsTitleFont;
+    QFont itsTitleFontTool;
+    QStyle *itsStyle;
+    QBitmap itsBitmaps[2][NumButtonIcons];
+    QtCurveConfig itsConfig;
+    QList<QtCurveClient*> itsClients;
+    QtCurveDBus *itsDBus;
+    QColor itsHoverCols[2];
 #if KDE_IS_VERSION(4, 3, 0)
-    QtCurveShadowCache     itsShadowCache;
+    QtCurveShadowCache itsShadowCache;
 #endif
 };
-
 QtCurveHandler *Handler();
-
 }
 
 #endif

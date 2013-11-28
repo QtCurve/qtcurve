@@ -78,10 +78,10 @@ public:
     void updateCaption();
     bool eventFilter(QObject *o, QEvent *e);
     bool isMaximized() const
-        {
-            return maximizeMode() == MaximizeFull &&
-                !options()->moveResizeMaximizedWindows();
-        }
+    {
+        return (maximizeMode() == MaximizeFull &&
+                !options()->moveResizeMaximizedWindows());
+    }
     void menuBarSize(int size);
     void statusBarState(bool state);
     QtCurveToggleButton *createToggleButton(bool menubar);
