@@ -788,16 +788,10 @@ void Style::init(bool initial)
     itsBlurHelper->setEnabled(100!=opts.bgndOpacity || 100!=opts.dlgOpacity || 100!=opts.menuBgndOpacity);
 
 #ifdef QTC_QT5_ENABLE_KDE
-    // Ensure the link to libkio is not stripped, by placing a call to a kio function.
-    // NOTE: This call will never actually happen, its only here so that the qtcurve.so
-    // contains a kio link so that this is not removed by some 'optimisation' of the
-    // link process.
-    // if(itsPos.x()>65534)
-    //     (void)KFileDialog::getSaveFileName();
-
     // We need to set the decoration colours for the preview now...
-    if(itsIsPreview)
+    if (itsIsPreview) {
         setDecorationColors();
+    }
 #endif
 }
 
