@@ -85,7 +85,6 @@ typedef enum {
     APP_KRUNNER,
     APP_KWIN,
     APP_SYSTEMSETTINGS,
-    APP_SKYPE,
     APP_KONTACT,
     APP_ARORA,
     APP_REKONQ,

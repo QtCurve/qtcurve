@@ -284,7 +284,6 @@ static enum
     APP_KRUNNER,
     APP_KWIN,
     APP_SYSTEMSETTINGS,
-    APP_SKYPE,
     APP_KONTACT,
     APP_ARORA,
     APP_REKONQ,
@@ -6767,27 +6766,13 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                 if(button->fontMetrics.height()==19 && r.height()==(23+((opts.thin&THIN_BUTTONS) ? 0 : 2)))
                     r.translate(0, 1);
 
-                if (button->features&QStyleOptionButton::HasMenu)
-                {
+                if (button->features & QStyleOptionButton::HasMenu) {
                     int mbi(pixelMetric(PM_MenuButtonIndicator, button, widget));
 
-                    if (Qt::LeftToRight==button->direction)
+                    if (Qt::LeftToRight == button->direction) {
                         r = r.adjusted(0, 0, -mbi, 0);
-                    else
+                    } else {
                         r = r.adjusted(mbi, 0, 0, 0);
-
-                    if(APP_SKYPE==theThemedApp)
-                    {
-                        // Skype seems to draw a blurry arrow in the lower right corner,
-                        // ...draw over this with a nicer sharper arrow...
-                        QRect ar(button->rect.x()+(button->rect.width()-(LARGE_ARR_WIDTH+3)),
-                                 button->rect.y()+(button->rect.height()-(LARGE_ARR_HEIGHT+2)),
-                                 LARGE_ARR_WIDTH,
-                                 LARGE_ARR_HEIGHT);
-
-                        if(option->state &(State_On | State_Sunken))
-                            ar.adjust(1, 1, 1, 1);
-                        drawArrow(painter, ar, PE_IndicatorArrowDown, MO_ARROW(QPalette::ButtonText));
                     }
                 }
 
