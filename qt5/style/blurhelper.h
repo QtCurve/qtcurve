@@ -62,6 +62,7 @@
 #include <QTimerEvent>
 #include <QDockWidget>
 #include <QMenu>
+#include <QMenuBar>
 #include <QRegion>
 #include <QToolBar>
 
@@ -137,11 +138,15 @@ protected:
     void clear(WId) const;
 
     //! returns true if a given widget is opaque
-    bool isOpaque(const QWidget *widget) const {
+    bool isOpaque(const QWidget *widget) const
+    {
+        // TODO:
+        // Figure out what is the right thing to do with Qt::WA_OpaquePaintEvent
         return (!widget->isWindow()) &&
             ((widget->autoFillBackground() &&
-              widget->palette().color(widget->backgroundRole()).alpha() == 0xff) ||
-             widget->testAttribute(Qt::WA_OpaquePaintEvent));
+              widget->palette().color(widget->backgroundRole()).alpha() ==
+              0xff) || (widget->testAttribute(Qt::WA_OpaquePaintEvent) &&
+                        !qobject_cast<const QMenuBar*>(widget)));
     }
 
     //! true if widget is a transparent window

@@ -165,28 +165,31 @@ BlurHelper::unregisterWidget(QWidget *widget)
 
     }
 
-    //___________________________________________________________
-    void BlurHelper::trimBlurRegion( QWidget* parent, QWidget* widget, QRegion& region ) const
-    {
-        // loop over children
-        foreach (QObject* childObject, widget->children()) {
-            QWidget* child( qobject_cast<QWidget*>( childObject ) );
-            if( !(child && child->isVisible()) ) continue;
-
-            if( isOpaque( child ) )
-            {
-
-                const QPoint offset( child->mapTo( parent, QPoint( 0, 0 ) ) );
-                if( child->mask().isEmpty() ) region -= child->rect().translated( offset );
-                else region -= child->mask().translated( offset );
-
-            } else { trimBlurRegion( parent, child, region ); }
-
+void BlurHelper::trimBlurRegion(QWidget *parent, QWidget *widget,
+                                QRegion &region) const
+{
+    // TODO:
+    //     Maybe we should clip children with parent? In case we hit this[1] kind
+    //     of bugs again.
+    //     [1] https://bugs.kde.org/show_bug.cgi?id=306631
+    // loop over children
+    foreach (QObject *childObject, widget->children()) {
+        QWidget *child(qobject_cast<QWidget*>(childObject));
+        if (!(child && child->isVisible()))
+            continue;
+        if (isOpaque(child)) {
+            const QPoint offset(child->mapTo(parent, QPoint(0, 0)));
+            if (child->mask().isEmpty()) {
+                region -= child->rect().translated(offset);
+            } else {
+                region -= child->mask().translated(offset);
+            }
+        } else {
+            trimBlurRegion(parent, child, region);
         }
-
-        return;
-
     }
+    return;
+}
 
 void
 BlurHelper::update(QWidget *widget) const

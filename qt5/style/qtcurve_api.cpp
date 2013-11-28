@@ -348,6 +348,20 @@ void Style::polish(QWidget *widget)
     }
     qtcSetPrePolished(widget);
 
+    // We draw our customized menubar background. If translucency is enabled
+    // we don't want to draw the background on the menubar twice.
+    // Set attributes on the widget to get a empty background to start with.
+    // TODO:
+    //      Reorganize this polish function
+    //      provide a way to use the parent background (should be useful when
+    //      e.g. background images are used.) (Also need to update blurhelper
+    //      after that)
+    if (qobject_cast<QMenuBar*>(widget)) {
+        widget->setAutoFillBackground(false);
+        widget->setAttribute(Qt::WA_TranslucentBackground);
+        widget->setAttribute(Qt::WA_OpaquePaintEvent);
+    }
+
     if (EFFECT_NONE != opts.buttonEffect &&
         !USE_CUSTOM_ALPHAS(opts) && isNoEtchWidget(widget)) {
         theNoEtchWidgets.insert(static_cast<const QWidget*>(widget));

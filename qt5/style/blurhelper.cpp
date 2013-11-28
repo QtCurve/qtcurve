@@ -149,6 +149,10 @@ void
 BlurHelper::trimBlurRegion(QWidget *parent, QWidget *widget,
                            QRegion &region) const
 {
+    // TODO:
+    //     Maybe we should clip children with parent? In case we hit this[1] kind
+    //     of bugs again.
+    //     [1] https://bugs.kde.org/show_bug.cgi?id=306631
     // loop over children
     for (QObject *childObject: widget->children()) {
         QWidget *child(qobject_cast<QWidget*>(childObject));

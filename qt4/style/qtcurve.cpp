@@ -851,17 +851,17 @@ static void parseWindowLine(const QString &line, QList<int> &data)
 }
 #endif
 
-static const QWidget * getWidget(const QPainter *p)
+static const QWidget*
+getWidget(const QPainter *p)
 {
-    if(p)
-    {
-        if (QInternal::Widget==p->device()->devType())
+    if (p) {
+        if (p->device()->devType() == QInternal::Widget) {
             return static_cast<const QWidget*>(p->device());
-        else
-        {
+        } else {
             QPaintDevice *dev = QPainter::redirected(p->device());
-            if (dev && QInternal::Widget==dev->devType())
-                return static_cast<const QWidget*>(dev) ;
+            if (dev && dev->devType() == QInternal::Widget) {
+                return static_cast<const QWidget*>(dev);
+            }
         }
     }
     return 0L;
@@ -1635,6 +1635,20 @@ Style::polish(QWidget *widget)
         return;
 
     bool enableMouseOver(opts.highlightFactor || opts.coloredMouseOver);
+
+    // We draw our customized menubar background. If translucency is enabled
+    // we don't want to draw the background on the menubar twice.
+    // Set attributes on the widget to get a empty background to start with.
+    // TODO:
+    //      Reorganize this polish function
+    //      provide a way to use the parent background (should be useful when
+    //      e.g. background images are used.) (Also need to update blurhelper
+    //      after that)
+    if (qobject_cast<QMenuBar*>(widget)) {
+        widget->setAutoFillBackground(false);
+        widget->setAttribute(Qt::WA_TranslucentBackground);
+        widget->setAttribute(Qt::WA_OpaquePaintEvent);
+    }
 
     if (EFFECT_NONE != opts.buttonEffect && !USE_CUSTOM_ALPHAS(opts) &&
         isNoEtchWidget(widget)) {
@@ -6323,7 +6337,8 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                 painter->save();
 
                 if(!opts.xbar || (!widget || 0!=strcmp("QWidget", widget->metaObject()->className()))) {
-                    drawMenuOrToolBarBackground(widget, painter, mbi->menuRect, option);
+                    drawMenuOrToolBarBackground(widget, painter,
+                                                mbi->menuRect, option);
                 }
 
                 if(active)
@@ -6796,36 +6811,45 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                 painter->restore();
             }
             break;
-        case CE_MenuBarEmptyArea:
-            {
-                painter->save();
-
-                if(!opts.xbar || (!widget || 0!=strcmp("QWidget", widget->metaObject()->className())))
-                    drawMenuOrToolBarBackground(widget, painter, r, option);
-                if (TB_NONE!=opts.toolbarBorders && widget && widget->parentWidget() &&
-                    (qobject_cast<const QMainWindow*>(widget->parentWidget()) || widget->parentWidget()->inherits("Q3MainWindow")))
-                {
-                    const QColor *use=menuColors(option, itsActive);
-                    bool         dark(TB_DARK==opts.toolbarBorders || TB_DARK_ALL==opts.toolbarBorders);
-
-                    if(TB_DARK_ALL==opts.toolbarBorders || TB_LIGHT_ALL==opts.toolbarBorders)
-                    {
-                        painter->setPen(use[0]);
-                        painter->drawLine(r.x(), r.y(), r.x()+r.width()-1, r.y());
-                        painter->drawLine(r.x(), r.y(), r.x(), r.y()+r.width()-1);
-                        painter->setPen(use[dark ? 3 : 4]);
-                        painter->drawLine(r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
-                        painter->drawLine(r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
-                    }
-                    else
-                    {
-                        painter->setPen(use[dark ? 3 : 4]);
-                        painter->drawLine(r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
-                    }
-                }
-                painter->restore();
+        case CE_MenuBarEmptyArea: {
+            painter->save();
+            if (!opts.xbar ||
+                (!widget || strcmp(widget->metaObject()->className(),
+                                   "QWidget"))) {
+                drawMenuOrToolBarBackground(widget, painter, r, option);
             }
+            if (TB_NONE != opts.toolbarBorders && widget &&
+                widget->parentWidget() &&
+                (qobject_cast<const QMainWindow*>(widget->parentWidget()) ||
+                 widget->parentWidget()->inherits("Q3MainWindow"))) {
+                const QColor *use = menuColors(option, itsActive);
+                bool dark = (TB_DARK == opts.toolbarBorders ||
+                             TB_DARK_ALL == opts.toolbarBorders);
+
+                if (TB_DARK_ALL == opts.toolbarBorders ||
+                    TB_LIGHT_ALL == opts.toolbarBorders) {
+                    painter->setPen(use[0]);
+                    painter->drawLine(r.x(), r.y(),
+                                      r.x() + r.width() - 1, r.y());
+                    painter->drawLine(r.x(), r.y(), r.x(),
+                                      r.y() + r.width() - 1);
+                    painter->setPen(use[dark ? 3 : 4]);
+                    painter->drawLine(r.x(), r.y() + r.height() - 1,
+                                      r.x() + r.width() - 1,
+                                      r.y() + r.height() - 1);
+                    painter->drawLine(r.x() + r.width() - 1, r.y(),
+                                      r.x() + r.width() - 1,
+                                      r.y() + r.height() - 1);
+                } else {
+                    painter->setPen(use[dark ? 3 : 4]);
+                    painter->drawLine(r.x(), r.y() + r.height() - 1,
+                                      r.x() + r.width() - 1,
+                                      r.y() + r.height() - 1);
+                }
+            }
+            painter->restore();
             break;
+        }
         case CE_TabBarTabLabel:
             if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab*>(option))
             {
@@ -12875,7 +12899,7 @@ Style::getOpacity(const QWidget *widget, QPainter *p) const
          const QWidget *w = widget ? widget : getWidget(p);
 
          if (!w) {
-            return opts.bgndOpacity;
+             return opts.bgndOpacity;
          } else {
              return (qtcIsDialog(w->window()) ? opts.dlgOpacity :
                      opts.bgndOpacity);
@@ -12889,24 +12913,27 @@ Style::drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p,
                                    const QRect &r, const QStyleOption *option,
                                    bool menu, bool horiz) const
 {
-    // LibreOffice - when drawMenuOrToolBarBackground is called with menuRect, this is empty!
-    if(r.width()<1 || r.height()<1)
+    // LibreOffice - when drawMenuOrToolBarBackground is
+    // called with menuRect, this is empty!
+    if (r.width() < 1 || r.height() < 1)
         return;
 
-    EAppearance app=menu ? opts.menubarAppearance : opts.toolbarAppearance;
-    if(!CUSTOM_BGND || !IS_FLAT(app) || (menu && SHADE_NONE!=opts.shadeMenubars))
-    {
-        QRect  rx(r);
-        QColor col(menu && (option->state&State_Enabled || SHADE_NONE!=opts.shadeMenubars)
-                            ? menuColors(option, itsActive)[ORIGINAL_SHADE]
-                            : option->palette.background().color());
-        int    opacity(getOpacity(widget, p));
+    EAppearance app = menu ? opts.menubarAppearance : opts.toolbarAppearance;
+    if (!CUSTOM_BGND || !IS_FLAT(app) ||
+        (menu && SHADE_NONE != opts.shadeMenubars)) {
+        QRect rx(r);
+        QColor col(menu && (option->state & State_Enabled ||
+                            SHADE_NONE != opts.shadeMenubars) ?
+                   menuColors(option, itsActive)[ORIGINAL_SHADE] :
+                   option->palette.background().color());
+        int opacity = getOpacity(widget, p);
 
-        if(menu && BLEND_TITLEBAR)
+        if (menu && BLEND_TITLEBAR)
             rx.adjust(0, -qtcGetWindowBorderSize(false).titleHeight, 0, 0);
 
-        if(opacity<100)
-            col.setAlphaF(opacity/100.0);
+        if (opacity < 100) {
+            col.setAlphaF(opacity / 100.0);
+        }
         drawBevelGradient(col, p, rx, horiz, false, MODIFY_AGUA(app));
     }
 }
