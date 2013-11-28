@@ -397,44 +397,6 @@ void Style::polish(QWidget *widget)
 #ifdef QTC_ENABLE_X11
             Utils::addEventFilter(widget, this);
 #endif
-#if 0
-            int opacity = (qtcIsDialog(widget) ? opts.dlgOpacity :
-                           opts.bgndOpacity);
-            // Qt5 xcb backend doesn't support recreating X window now
-            // disabling this part for now.
-            if (100 == opacity || !widget->isWindow() ||
-                Qt::Desktop == widget->windowType() ||
-                widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
-                widget->testAttribute(Qt::WA_TranslucentBackground) ||
-                widget->testAttribute(Qt::WA_NoSystemBackground) ||
-                widget->testAttribute(Qt::WA_PaintOnScreen) ||
-                // For kscreensaver. A bypass window manager hint window
-                // that is not a Tooltip or menu is probably not what we want
-                // to have translucenct background on anyway.
-                (widget->window()->windowFlags() &
-                 Qt::X11BypassWindowManagerHint) ||
-                widget->inherits("KScreenSaver") ||
-                widget->inherits("QTipLabel") ||
-                widget->inherits("QSplashScreen") ||
-                widget->windowFlags().testFlag(Qt::FramelessWindowHint) ||
-                !qtcGetQWidgetWid(widget)) {
-                break;
-            }
-            // whenever you set the translucency flag, Qt will create a new
-            // widget under the hood, replacing the old
-            // ...unfortunately some properties are lost,
-            // among them the window icon.
-            QIcon icon(widget->windowIcon());
-            setTranslucentBackground(widget);
-            widget->setWindowIcon(icon);
-
-            // PE_Widget is not called for transparent widgets,
-            // so need event filter here...
-            Utils::addEventFilter(widget, this);
-            itsTransparentWidgets.insert(widget);
-            connect(widget, &QWidget::destroyed,
-                    this, &Style::widgetDestroyed);
-#endif
             break;
         }
         case Qt::Popup:
