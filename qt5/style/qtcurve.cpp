@@ -461,6 +461,7 @@ Style::prePolish(QWidget *widget) const
     // TODO:
     //     use all informations to check if a widget should be transparent.
     if (widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
+        !(widget->windowFlags() & Qt::MSWindowsOwnDC) &&
         !qtcGetQWidgetWid(widget) && !qtcGetPrePolished(widget)) {
         // the result of qobject_cast may change if we are called in
         // constructor (which is usually the case we want here) so we only

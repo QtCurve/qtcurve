@@ -953,9 +953,8 @@ Style::prePolish(QWidget *widget) const
     // TODO:
     //     use all informations to check if a widget should be transparent.
     if (widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
-        !qtcGetQWidgetWid(widget) &&
         !(widget->windowFlags() & Qt::MSWindowsOwnDC) &&
-        !qtcGetPrePolished(widget)) {
+        !qtcGetQWidgetWid(widget) && !qtcGetPrePolished(widget)) {
         // According to Qt source code, this is set for QGLWidget on all
         // platfroms.
         // Quote from Qt4
