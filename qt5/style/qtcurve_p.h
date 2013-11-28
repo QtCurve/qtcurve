@@ -88,7 +88,6 @@ typedef enum {
     APP_KONTACT,
     APP_ARORA,
     APP_REKONQ,
-    APP_OPERA,
     APP_QTCREATOR,
     APP_KDEVELOP,
     APP_K3B,

@@ -101,8 +101,6 @@ Style::polish(QApplication *app)
         theThemedApp = APP_OPENOFFICE;
     } else if("kdmgreet" == appName) {
         opts.forceAlternateLvCols=false;
-    } else if("Kde4ToolkitLibrary" == appName) {
-        theThemedApp = APP_OPERA;
     }
     if(APP_REKONQ == theThemedApp)
         opts.statusbarHiding=0;
@@ -648,8 +646,7 @@ void Style::polish(QWidget *widget)
             widget->inherits("QComboBoxPrivateContainer") && !widget->testAttribute(Qt::WA_TranslucentBackground))
         setTranslucentBackground(widget);
 
-    if (widget->inherits("QTipLabel") && !qtcIsFlat(opts.tooltipAppearance) &&
-        APP_OPERA != theThemedApp) {
+    if (widget->inherits("QTipLabel") && !qtcIsFlat(opts.tooltipAppearance)) {
         widget->setBackgroundRole(QPalette::NoRole);
         setTranslucentBackground(widget);
     }
@@ -1003,8 +1000,7 @@ void Style::unpolish(QWidget *widget)
     else if(opts.boldProgress && "CE_CapacityBar"==widget->objectName())
         unSetBold(widget);
 
-    if(widget->inherits("QTipLabel") && !qtcIsFlat(opts.tooltipAppearance) && APP_OPERA!=theThemedApp)
-    {
+    if (widget->inherits("QTipLabel") && !qtcIsFlat(opts.tooltipAppearance)) {
         widget->setAttribute(Qt::WA_PaintOnScreen, false);
         widget->setAttribute(Qt::WA_NoSystemBackground, false);
         widget->clearMask();
@@ -3637,10 +3633,8 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
         // TODO: This is the only part left from QWindowsStyle - but I dont think its actually used!
         // case PE_IndicatorProgressChunk:
     case PE_PanelTipLabel: {
-        bool haveAlpha = (Utils::hasAlphaChannel(widget) &&
-                          APP_OPERA != theThemedApp);
-        bool rounded = (!(opts.square & SQUARE_TOOLTIPS) &&
-                        APP_OPERA != theThemedApp);
+        bool haveAlpha = Utils::hasAlphaChannel(widget);
+        bool rounded = !(opts.square & SQUARE_TOOLTIPS);
         QPainterPath path=rounded ? buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, MENU_AND_TOOLTIP_RADIUS) : QPainterPath();
         QColor       col=palette.toolTipBase().color();
 
