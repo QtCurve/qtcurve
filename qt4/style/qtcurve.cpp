@@ -1396,8 +1396,8 @@ void Style::polish(QApplication *app)
         theThemedApp=APP_KONTACT;
     else if("k3b"==appName)
         theThemedApp=APP_K3B;
-    else if("skype"==appName)
-        theThemedApp=APP_SKYPE;
+    // else if("skype"==appName)
+    //     theThemedApp=APP_SKYPE;
     else if("arora"==appName)
         theThemedApp=APP_ARORA;
     else if("rekonq"==appName)
