@@ -1490,7 +1490,7 @@ gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, GdkWin
             double alpha=1.0;
             gboolean useAlpha = (opacity < 100 && isRgbaWidget(topLevel) &&
                                  compositingActive(topLevel));
-            gboolean flatBgnd = IS_FLAT_BGND(opts.bgndAppearance);
+            gboolean flatBgnd = qtcIsFlatBgnd(opts.bgndAppearance);
             GdkColor      *col=NULL;
             GtkStyle      *topStyle=gtk_widget_get_style(topLevel);
 
@@ -1597,7 +1597,7 @@ drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
     if ((doEtch || ROUND_NONE != opts.round) &&
         (!widget || !g_object_get_data(G_OBJECT(widget),
                                        "transparent-bg-hint"))) {
-        if (IS_FLAT_BGND(opts.bgndAppearance) || !widget ||
+        if (qtcIsFlatBgnd(opts.bgndAppearance) || !widget ||
             !drawWindowBgnd(cr, style, area, window, widget, x, y,
                             width, height)) {
             GdkColor parentBgCol;
@@ -1948,7 +1948,7 @@ void drawProgressGroove(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkWin
         col=&qtcPalette.background[2];
     }
 
-    if(!isList && (IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, window, widget, x, y, width, height)))
+    if(!isList && (qtcIsFlatBgnd(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, window, widget, x, y, width, height)))
        && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
         drawAreaColor(cr, area, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
 
@@ -3195,7 +3195,7 @@ drawMenu(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
         cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
     }
 
-    if(/*!comboMenu && */!IS_FLAT_BGND(opts.menuBgndAppearance))
+    if(/*!comboMenu && */!qtcIsFlatBgnd(opts.menuBgndAppearance))
     {
         if(APPEARANCE_STRIPED==opts.menuBgndAppearance)
             drawStripedBgnd(cr, style, area, x, y, width, height, &qtcPalette.menu[ORIGINAL_SHADE], FALSE, alpha);

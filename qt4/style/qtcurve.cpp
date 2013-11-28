@@ -621,13 +621,12 @@ setOpacityProp(QWidget *w, unsigned short opacity)
 }
 
 void
-setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
+setBgndProp(QWidget *w, EAppearance app, bool haveBgndImage)
 {
     if (WId wid = qtcGetQWidgetWid(w->window())) {
-        unsigned long prop =
-            (((IS_FLAT_BGND(app) ?
-              (unsigned short)(haveBgndImage ? APPEARANCE_RAISED :
-                               APPEARANCE_FLAT) : app) & 0xFF) |
+        uint32_t prop =
+            (((qtcIsFlatBgnd(app) ? (haveBgndImage ? APPEARANCE_RAISED :
+                                     APPEARANCE_FLAT) : app) & 0xFF) |
              (w->palette().background().color().rgb() & 0x00FFFFFF) << 8);
 
         qtcX11SetBgnd(wid, prop);
@@ -1426,7 +1425,7 @@ void Style::polish(QApplication *app)
     if(opts.statusbarHiding)
         itsSaveStatusBarStatus=opts.statusbarApps.contains("kde") || opts.statusbarApps.contains(appName);
 
-    if(!IS_FLAT_BGND(opts.bgndAppearance) && opts.noBgndGradientApps.contains(appName))
+    if(!qtcIsFlatBgnd(opts.bgndAppearance) && opts.noBgndGradientApps.contains(appName))
         opts.bgndAppearance=APPEARANCE_FLAT;
     if(IMG_NONE!=opts.bgndImage.type && opts.noBgndImageApps.contains(appName))
         opts.bgndImage.type=IMG_NONE;
@@ -1462,7 +1461,7 @@ void Style::polish(QApplication *app)
         }
         opts.menubarHiding=opts.statusbarHiding=HIDE_NONE;
         opts.square|=SQUARE_POPUP_MENUS|SQUARE_TOOLTIPS;
-        if(!IS_FLAT_BGND(opts.menuBgndAppearance) && 0==opts.lighterPopupMenuBgnd)
+        if(!qtcIsFlatBgnd(opts.menuBgndAppearance) && 0==opts.lighterPopupMenuBgnd)
             opts.lighterPopupMenuBgnd=1; // shade so that we dont have 3d-ish borders...
         opts.menuBgndAppearance=APPEARANCE_FLAT;
     }
@@ -2070,7 +2069,7 @@ Style::polish(QWidget *widget)
         Utils::addEventFilter(widget, this);
     }
 #endif
-    else if ((!IS_FLAT_BGND(opts.menuBgndAppearance) ||
+    else if ((!qtcIsFlatBgnd(opts.menuBgndAppearance) ||
               100 != opts.menuBgndOpacity ||
               !(opts.square & SQUARE_POPUP_MENUS)) &&
              widget->inherits("QComboBoxPrivateContainer") &&
@@ -2113,7 +2112,7 @@ Style::polish(QWidget *widget)
                 QPalette pal(widget->palette());
                 QColor   col(popupMenuCols()[ORIGINAL_SHADE]);
 
-                if(!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS))
+                if(!qtcIsFlatBgnd(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS))
                     col.setAlphaF(0);
 
                 pal.setBrush(QPalette::Active, QPalette::Base, col);
@@ -2131,7 +2130,7 @@ Style::polish(QWidget *widget)
         //   QLatin1String("QtCurvePreview") ==
         //   widget->parentWidget()->objectName())
         ) {
-        if (!IS_FLAT_BGND(opts.menuBgndAppearance) ||
+        if (!qtcIsFlatBgnd(opts.menuBgndAppearance) ||
             100 != opts.menuBgndOpacity ||
             !(opts.square & SQUARE_POPUP_MENUS)) {
             Utils::addEventFilter(widget, this);
@@ -2153,7 +2152,7 @@ Style::polish(QWidget *widget)
         }
     }
 
-    if ((!IS_FLAT_BGND(opts.menuBgndAppearance) ||
+    if ((!qtcIsFlatBgnd(opts.menuBgndAppearance) ||
          100 != opts.menuBgndOpacity || !(opts.square & SQUARE_POPUP_MENUS)) &&
         widget->inherits("QComboBoxPrivateContainer")) {
         Utils::addEventFilter(widget, this);
@@ -2622,7 +2621,7 @@ void Style::unpolish(QWidget *widget)
         }
     }
 
-    if ((!IS_FLAT_BGND(opts.menuBgndAppearance) ||
+    if ((!qtcIsFlatBgnd(opts.menuBgndAppearance) ||
          100 != opts.menuBgndOpacity || !(opts.square & SQUARE_POPUP_MENUS)) &&
         widget->inherits("QComboBoxPrivateContainer")) {
         widget->removeEventFilter(this);
@@ -2865,7 +2864,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                     bool isDialog = qobject_cast<QDialog*>(widget);
 
                     if((100!=opts.bgndOpacity && !isDialog) || (100!=opts.dlgOpacity && isDialog) ||
-                       !(IS_FLAT_BGND(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type)
+                       !(qtcIsFlatBgnd(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type)
                     {
                         QPainter p(widget);
                         p.setClipRegion(static_cast<QPaintEvent*>(event)->region());
@@ -2875,7 +2874,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
             }
 
             //bool isCombo=false;
-            if((!IS_FLAT_BGND(opts.menuBgndAppearance) || IMG_NONE!=opts.menuBgndImage.type || 100!=opts.menuBgndOpacity ||
+            if((!qtcIsFlatBgnd(opts.menuBgndAppearance) || IMG_NONE!=opts.menuBgndImage.type || 100!=opts.menuBgndOpacity ||
                 !(opts.square&SQUARE_POPUP_MENUS)) &&
                 (qobject_cast<QMenu*>(object) || (/*isCombo=*/object->inherits("QComboBoxPrivateContainer"))))
             {
@@ -4368,7 +4367,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                         if(!opts.highlightScrollViews)
                             opt.state&=~State_HasFocus;
 
-                        if(opts.round && IS_FLAT_BGND(opts.bgndAppearance) && 100==opts.bgndOpacity &&
+                        if(opts.round && qtcIsFlatBgnd(opts.bgndAppearance) && 100==opts.bgndOpacity &&
                            widget && widget->parentWidget() && !inQAbstractItemView/* &&
                            widget->palette().background().color()!=widget->parentWidget()->palette().background().color()*/)
                         {
@@ -4488,7 +4487,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                 break;
         case PE_FrameMenu:
             if((opts.square&SQUARE_POPUP_MENUS) &&
-                (IS_FLAT_BGND(opts.menuBgndAppearance) ||
+                (qtcIsFlatBgnd(opts.menuBgndAppearance) ||
                 (opts.gtkComboMenus && widget && widget->parent() && qobject_cast<const QComboBox*>(widget->parent()))))
             {
                 const QColor    *use(popupMenuCols(option));
@@ -5232,7 +5231,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
         case PE_FrameWindow:
         {
             bool         colTbarOnly=opts.windowBorder&WINDOW_BORDER_COLOR_TITLEBAR_ONLY,
-                         fillBgnd=!(state&QtC_StateKWin) && !itsIsPreview && !IS_FLAT_BGND(opts.bgndAppearance);
+                         fillBgnd=!(state&QtC_StateKWin) && !itsIsPreview && !qtcIsFlatBgnd(opts.bgndAppearance);
             const QColor *bgndCols(colTbarOnly || fillBgnd ? backgroundColors(palette.color(QPalette::Active, QPalette::Window)) : 0L),
                          *borderCols(colTbarOnly
                                         ? bgndCols
@@ -5722,7 +5721,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
             bool         horiz(state&State_Horizontal || (r.height()>6 && r.height()>r.width()));
 
             painter->save();
-            if(/*IS_FLAT_BGND(opts.bgndAppearance) || */state&State_MouseOver && state&State_Enabled)
+            if(/*qtcIsFlatBgnd(opts.bgndAppearance) || */state&State_MouseOver && state&State_Enabled)
             {
                 QColor color(palette.color(QPalette::Active, QPalette::Window));
 
@@ -11625,7 +11624,7 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
 {
     bool isWindow(BGND_MENU!=type);
 
-    if(!IS_FLAT_BGND(app))
+    if(!qtcIsFlatBgnd(app))
     {
         static const int constPixmapWidth  = 16;
         static const int constPixmapHeight = 512;
@@ -13572,7 +13571,7 @@ QColor Style::getLowerEtchCol(const QWidget *widget) const
         return col;
     }
 
-    if(IS_FLAT_BGND(opts.bgndAppearance))
+    if(qtcIsFlatBgnd(opts.bgndAppearance))
     {
         bool doEtch=widget && widget->parentWidget() && !theNoEtchWidgets.contains(widget);
 // CPD: Don't really want to check here for every widget, when (so far) on problem seems to be in
@@ -13593,8 +13592,8 @@ QColor Style::getLowerEtchCol(const QWidget *widget) const
     }
 
     QColor col(Qt::white);
-    col.setAlphaF(0.1); // IS_FLAT_BGND(opts.bgndAppearance) ? 0.25 : 0.4);
-
+    col.setAlphaF(0.1);
+    // qtcIsFlatBgnd(opts.bgndAppearance) ? 0.25 : 0.4);
     return col;
 }
 

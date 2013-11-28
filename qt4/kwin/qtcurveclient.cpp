@@ -217,8 +217,7 @@ static void paintTabSeparator(QPainter *painter, const QRect &r)
 
 static void fillBackground(EAppearance app, QPainter &painter, const QColor &col, const QRect &fillRect, const QRect &widgetRect, const QPainterPath path)
 {
-    if(!IS_FLAT_BGND(app) || !widgetRect.isEmpty())
-    {
+    if (!qtcIsFlatBgnd(app) || !widgetRect.isEmpty()) {
         QtCurve::Style::BgndOption opt;
         opt.state|=QtC_StateKWin;
         opt.rect=fillRect;

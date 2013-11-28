@@ -86,7 +86,7 @@ qtcWindowCleanup(GtkWidget *widget)
 {
     if (widget) {
         GObject *obj = G_OBJECT(widget);
-        if (!(IS_FLAT_BGND(opts.bgndAppearance)) ||
+        if (!(qtcIsFlatBgnd(opts.bgndAppearance)) ||
             IMG_NONE!=opts.bgndImage.type) {
             qtcWindowRemoveFromHash(widget);
             qtcDisconnectFromData(obj, "QTC_WINDOW_CONFIGURE_ID");
@@ -172,7 +172,7 @@ qtcWindowIsActive(GtkWidget *widget)
 static gboolean
 qtcWindowSizeRequest(GtkWidget *widget)
 {
-    if (widget && (!(IS_FLAT_BGND(opts.bgndAppearance)) ||
+    if (widget && (!(qtcIsFlatBgnd(opts.bgndAppearance)) ||
                    IMG_NONE != opts.bgndImage.type)) {
         GtkAllocation alloc = qtcWidgetGetAllocation(widget);
         GdkRectangle rect;
@@ -434,7 +434,7 @@ static void
 qtcWindowSetProperties(GtkWidget *w, unsigned short opacity)
 {
     GtkWindow *topLevel = GTK_WINDOW(gtk_widget_get_toplevel(w));
-    unsigned long prop = (IS_FLAT_BGND(opts.bgndAppearance) ?
+    unsigned long prop = (qtcIsFlatBgnd(opts.bgndAppearance) ?
                           (IMG_NONE != opts.bgndImage.type ?
                            APPEARANCE_RAISED : APPEARANCE_FLAT) :
                           opts.bgndAppearance) & 0xFF;
@@ -518,7 +518,7 @@ qtcWindowSetup(GtkWidget *widget, int opacity)
     if (widget && (obj = G_OBJECT(widget)) &&
         !g_object_get_data(obj, "QTC_WINDOW_HACK_SET")) {
         g_object_set_data(obj, "QTC_WINDOW_HACK_SET", (gpointer)1);
-        if (!(IS_FLAT_BGND(opts.bgndAppearance)) ||
+        if (!(qtcIsFlatBgnd(opts.bgndAppearance)) ||
             IMG_NONE != opts.bgndImage.type) {
             QtCWindow *window = qtcWindowLookupHash(widget, TRUE);
             if (window) {

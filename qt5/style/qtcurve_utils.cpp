@@ -107,12 +107,13 @@ void setOpacityProp(QWidget *w, unsigned short opacity)
     }
 }
 
-void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
+void
+setBgndProp(QWidget *w, EAppearance app, bool haveBgndImage)
 {
     if (WId wid = qtcGetQWidgetWid(w->window())) {
-        uint32_t prop = (((IS_FLAT_BGND(app) ?
-                           (unsigned short)(haveBgndImage ? APPEARANCE_RAISED :
-                                            APPEARANCE_FLAT) : app) & 0xFF) |
+        uint32_t prop = (((qtcIsFlatBgnd(app) ?
+                           (haveBgndImage ? APPEARANCE_RAISED :
+                            APPEARANCE_FLAT) : app) & 0xFF) |
                          (w->palette().background().color().rgb() &
                           0x00FFFFFF) << 8);
         qtcX11SetBgnd(wid, prop);

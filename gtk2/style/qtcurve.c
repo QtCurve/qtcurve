@@ -440,7 +440,7 @@ static void gtkDrawHandle(GtkStyle *style, GdkWindow *window, GtkStateType state
                                     debugDisplayWidget(widget, 10);
 
     sanitizeSize(window, &width, &height);
-    if(IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, window, widget, x, y, width, height)))
+    if(qtcIsFlatBgnd(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, window, widget, x, y, width, height)))
     {
 //         gtk_style_apply_default_background(style, window, widget && !qtcWidgetNoWindow(widget), state,
 //                                            area, x, y, width, height);
@@ -821,7 +821,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
     }
     else if(DETAIL("spinbutton"))
     {
-        if(IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, window, widget, x, y, width, height)))
+        if(qtcIsFlatBgnd(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, window, widget, x, y, width, height)))
         {
             qtcStyleApplyDefBgnd(widget && gtk_widget_get_has_window(widget),
                                  GTK_STATE_INSENSITIVE==state ? GTK_STATE_INSENSITIVE : GTK_STATE_NORMAL);
@@ -1158,7 +1158,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                     if(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) && 0!=opts.tabBgnd && widget && gtk_widget_get_parent(widget) && gtk_widget_get_parent(widget)->parent &&
                        GTK_IS_SCROLLED_WINDOW(gtk_widget_get_parent(widget)) && GTK_IS_NOTEBOOK(gtk_widget_get_parent(widget)->parent))
                         drawAreaModColor(cr, area, &qtcPalette.background[ORIGINAL_SHADE], TO_FACTOR(opts.tabBgnd), xo, yo, wo, ho);
-                    else if(IS_FLAT_BGND(opts.bgndAppearance) || !(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) &&
+                    else if(qtcIsFlatBgnd(opts.bgndAppearance) || !(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) &&
                                                               widget && drawWindowBgnd(cr, style, area, window, widget, xo, yo, wo, ho)))
                     {
                         if(!IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType)
@@ -1449,7 +1449,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
     {
         drawBevelGradient(cr, area, x, y, width, height, &qtcPalette.background[ORIGINAL_SHADE], 'h'==detail[0], FALSE, opts.lvAppearance, WIDGET_LISTVIEW_HEADER);
 
-//        if(IS_FLAT_BGND(opts.bgndAppearance) || !widget || !drawWindowBgnd(cr, style, area, widget, x, y, width, height))
+//        if(qtcIsFlatBgnd(opts.bgndAppearance) || !widget || !drawWindowBgnd(cr, style, area, widget, x, y, width, height))
 //        {
 //             drawAreaColor(cr, area, &style->bg[state], x, y, width, height);
 //             if(widget && IMG_NONE!=opts.bgndImage.type)
@@ -1477,7 +1477,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
     {
         EWidget wt=!detail && GTK_IS_TREE_VIEW(widget) ? WIDGET_PBAR_TROUGH : WIDGET_FRAME;
         clipPath(cr, x+1, y+1, width-2, height-2, WIDGET_OTHER, RADIUS_INTERNAL, round);
-        if(IS_FLAT_BGND(opts.bgndAppearance) || !widget || !drawWindowBgnd(cr, style, area, window, widget, x+1, y+1, width-2, height-2))
+        if(qtcIsFlatBgnd(opts.bgndAppearance) || !widget || !drawWindowBgnd(cr, style, area, window, widget, x+1, y+1, width-2, height-2))
         {
             drawAreaColor(cr, area, &style->bg[state], x+1, y+1, width-2, height-2);
             if(widget && IMG_NONE!=opts.bgndImage.type)
@@ -2671,7 +2671,7 @@ static void gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType s
     int size=SIZE_GRIP_SIZE-2;
 
     /* Clear background */
-    if(IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, window, widget, x, y, width, height)))
+    if(qtcIsFlatBgnd(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, window, widget, x, y, width, height)))
     {
 //         gtk_style_apply_default_background(style, window, FALSE, state, area, x, y, width, height);
         if(widget && IMG_NONE!=opts.bgndImage.type)

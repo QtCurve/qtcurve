@@ -966,7 +966,7 @@ void setLowerEtchCol(cairo_t *cr, GtkWidget *widget)
 {
     if(USE_CUSTOM_ALPHAS(opts))
         cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, opts.customAlphas[ALPHA_ETCH_LIGHT]);
-    else if(IS_FLAT_BGND(opts.bgndAppearance) && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
+    else if(qtcIsFlatBgnd(opts.bgndAppearance) && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
     {
         GdkColor *parentBg=getParentBgCol(widget);
 

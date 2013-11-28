@@ -121,7 +121,7 @@ bool isNoEtchWidget(const QWidget *widget);
 
 #ifdef QTC_ENABLE_X11
 void setOpacityProp(QWidget *w, unsigned short opacity);
-void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage);
+void setBgndProp(QWidget *w, EAppearance app, bool haveBgndImage);
 void setSbProp(QWidget *w);
 #endif
 

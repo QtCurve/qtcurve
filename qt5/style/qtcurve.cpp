@@ -2173,7 +2173,7 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
 {
     bool isWindow(BGND_MENU!=type);
 
-    if(!IS_FLAT_BGND(app))
+    if(!qtcIsFlatBgnd(app))
     {
         static const int constPixmapWidth  = 16;
         static const int constPixmapHeight = 512;
@@ -4105,7 +4105,7 @@ QColor Style::getLowerEtchCol(const QWidget *widget) const
         return col;
     }
 
-    if(IS_FLAT_BGND(opts.bgndAppearance))
+    if(qtcIsFlatBgnd(opts.bgndAppearance))
     {
         bool doEtch=widget && widget->parentWidget() && !theNoEtchWidgets.contains(widget);
 // CPD: Don't really want to check here for every widget, when (so far) on problem seems to be in
@@ -4126,7 +4126,7 @@ QColor Style::getLowerEtchCol(const QWidget *widget) const
     }
 
     QColor col(Qt::white);
-    col.setAlphaF(0.1); // IS_FLAT_BGND(opts.bgndAppearance) ? 0.25 : 0.4);
+    col.setAlphaF(0.1); // qtcIsFlatBgnd(opts.bgndAppearance) ? 0.25 : 0.4);
 
     return col;
 }
