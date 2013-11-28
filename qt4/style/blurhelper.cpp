@@ -60,9 +60,9 @@
 #include <QPushButton>
 #include <QToolBar>
 
+#include <qtcurve-utils/qtutils.h>
 #ifdef QTC_ENABLE_X11
 #  include <qtcurve-utils/x11blur.h>
-#  include <qtcurve-utils/qtutils.h>
 #endif
 
 namespace QtCurve
@@ -222,7 +222,7 @@ BlurHelper::clear(WId wid) const
 #ifdef QTC_ENABLE_X11
     qtcX11BlurTrigger(wid, false, 0, 0);
 #else
-    QTC_UNUSED(widget);
+    QTC_UNUSED(wid);
 #endif
 }
 }
