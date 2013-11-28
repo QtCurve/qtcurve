@@ -3507,7 +3507,7 @@ Style::drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p,
             rx.adjust(0, -qtcGetWindowBorderSize(false).titleHeight, 0, 0);
         }
         if (opacity < 100) {
-            col.setAlphaF(opacity/100.0);
+            col.setAlphaF(opacity / 100.0);
         }
         drawBevelGradient(col, p, rx, horiz, false, MODIFY_AGUA(app));
     }
