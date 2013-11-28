@@ -284,11 +284,9 @@ static enum
     APP_KRUNNER,
     APP_KWIN,
     APP_SYSTEMSETTINGS,
-    APP_SKYPE,
     APP_KONTACT,
     APP_ARORA,
     APP_REKONQ,
-    APP_OPERA,
     APP_QTDESIGNER,
     APP_QTCREATOR,
     APP_KDEVELOP,
@@ -1395,8 +1393,6 @@ void Style::polish(QApplication *app)
         theThemedApp=APP_KONTACT;
     else if("k3b"==appName)
         theThemedApp=APP_K3B;
-    else if("skype"==appName)
-        theThemedApp=APP_SKYPE;
     else if("arora"==appName)
         theThemedApp=APP_ARORA;
     else if("rekonq"==appName)
@@ -1411,8 +1407,6 @@ void Style::polish(QApplication *app)
         theThemedApp=APP_OPENOFFICE;
     else if("kdmgreet"==appName)
         opts.forceAlternateLvCols=false;
-    else if("Kde4ToolkitLibrary"==appName)
-        theThemedApp=APP_OPERA;
 
     qtcInfo("QtCurve: Application name: \"%s\"\n",
             appName.toLatin1().constData());
@@ -2084,8 +2078,7 @@ Style::polish(QWidget *widget)
         setTranslucentBackground(widget);
     }
 
-    if (widget->inherits("QTipLabel") && !qtcIsFlat(opts.tooltipAppearance) &&
-        APP_OPERA != theThemedApp) {
+    if (widget->inherits("QTipLabel") && !qtcIsFlat(opts.tooltipAppearance)) {
         widget->setBackgroundRole(QPalette::NoRole);
         setTranslucentBackground(widget);
     }
@@ -2584,8 +2577,7 @@ void Style::unpolish(QWidget *widget)
     else if(opts.boldProgress && "CE_CapacityBar"==widget->objectName())
         unSetBold(widget);
 
-    if(widget->inherits("QTipLabel") && !qtcIsFlat(opts.tooltipAppearance) && APP_OPERA!=theThemedApp)
-    {
+    if (widget->inherits("QTipLabel") && !qtcIsFlat(opts.tooltipAppearance)) {
         widget->setAttribute(Qt::WA_PaintOnScreen, false);
         widget->setAttribute(Qt::WA_NoSystemBackground, false);
         widget->clearMask();
@@ -5552,12 +5544,9 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             break;
         // TODO: This is the only part left from QWindowsStyle - but I dont think its actually used!
         // case PE_IndicatorProgressChunk:
-        case PE_PanelTipLabel:
-        {
-            bool haveAlpha = (Utils::hasAlphaChannel(widget) &&
-                              APP_OPERA != theThemedApp);
-            bool rounded = (!(opts.square & SQUARE_TOOLTIPS) &&
-                            APP_OPERA != theThemedApp);
+        case PE_PanelTipLabel: {
+            bool haveAlpha = Utils::hasAlphaChannel(widget);
+            bool rounded = !(opts.square & SQUARE_TOOLTIPS);
             QPainterPath path=rounded ? buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, MENU_AND_TOOLTIP_RADIUS) : QPainterPath();
             QColor       col=palette.toolTipBase().color();
 
@@ -6768,27 +6757,13 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                 if(button->fontMetrics.height()==19 && r.height()==(23+((opts.thin&THIN_BUTTONS) ? 0 : 2)))
                     r.translate(0, 1);
 
-                if (button->features&QStyleOptionButton::HasMenu)
-                {
+                if (button->features & QStyleOptionButton::HasMenu) {
                     int mbi(pixelMetric(PM_MenuButtonIndicator, button, widget));
 
-                    if (Qt::LeftToRight==button->direction)
+                    if (Qt::LeftToRight == button->direction) {
                         r = r.adjusted(0, 0, -mbi, 0);
-                    else
+                    } else {
                         r = r.adjusted(mbi, 0, 0, 0);
-
-                    if(APP_SKYPE==theThemedApp)
-                    {
-                        // Skype seems to draw a blurry arrow in the lower right corner,
-                        // ...draw over this with a nicer sharper arrow...
-                        QRect ar(button->rect.x()+(button->rect.width()-(LARGE_ARR_WIDTH+3)),
-                                 button->rect.y()+(button->rect.height()-(LARGE_ARR_HEIGHT+2)),
-                                 LARGE_ARR_WIDTH,
-                                 LARGE_ARR_HEIGHT);
-
-                        if(option->state &(State_On | State_Sunken))
-                            ar.adjust(1, 1, 1, 1);
-                        drawArrow(painter, ar, PE_IndicatorArrowDown, MO_ARROW(QPalette::ButtonText));
                     }
                 }
 
