@@ -945,6 +945,35 @@ Style::Style()
     }
 }
 
+void
+Style::prePolish(QWidget *widget) const
+{
+    // HACK:
+    // Ported from Qt5. Hopefully this can be used to remove the hack that
+    // recreates the window
+    // TODO:
+    //     use all informations to check if a widget should be transparent.
+    if (widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
+        !qtcGetQWidgetWid(widget) &&
+        !(widget->windowFlags() & Qt::MSWindowsOwnDC) &&
+        !qtcGetPrePolished(widget)) {
+        // According to Qt source code, this is set for QGLWidget on all
+        // platfroms.
+        // Quote from Qt4
+        //     Widgets with Qt::MSWindowsOwnDC (typically QGLWidget) ...
+
+        // the result of qobject_cast may change if we are called in
+        // constructor (which is usually the case we want here) so we only
+        // set the prePolished property if we have done something.
+        if ((opts.bgndOpacity != 100 && qobject_cast<QMainWindow*>(widget)) ||
+            (opts.dlgOpacity != 100 && qobject_cast<QDialog*>(widget))) {
+            widget->setAttribute(Qt::WA_StyledBackground);
+            setTranslucentBackground(widget);
+            qtcSetPrePolished(widget);
+        }
+    }
+}
+
 void Style::init(bool initial)
 {
     if(!initial)
@@ -1635,6 +1664,11 @@ Style::polish(QWidget *widget)
         return;
 
     bool enableMouseOver(opts.highlightFactor || opts.coloredMouseOver);
+    if (qtcCheckLogLevel(QTC_LOG_INFO) && qtcGetQWidgetWid(widget) &&
+        widget->windowType() != Qt::Desktop && !qtcGetPrePolished(widget)) {
+        qDebug() << "Window Created before polishing:" << widget;
+    }
+    qtcSetPrePolished(widget);
 
     // We draw our customized menubar background. If translucency is enabled
     // we don't want to draw the background on the menubar twice.
@@ -1699,6 +1733,7 @@ Style::polish(QWidget *widget)
 #ifdef QTC_ENABLE_X11
             Utils::addEventFilter(widget, this);
 #endif
+            break;
             int opacity = (qtcIsDialog(widget) ? opts.dlgOpacity :
                            opts.bgndOpacity);
 
@@ -1790,9 +1825,9 @@ Style::polish(QWidget *widget)
             //     Find out the real problem (or at least reproduce the crash
             //     with a simpler program)
             //     Check Qt5
-            if (widget->inherits("QGLWidget")) {
-                setTranslucentBackground(widget);
-            }
+            // if (widget->inherits("QGLWidget")) {
+            //     setTranslucentBackground(widget);
+            // }
             break;
         }
         if (qobject_cast<QSlider*>(widget))
@@ -3178,6 +3213,7 @@ void Style::timerEvent(QTimerEvent *event)
 
 int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const
 {
+    prePolish(widget);
     switch((unsigned)metric)
     {
         case PM_ToolTipLabelFrameWidth:
@@ -3456,6 +3492,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
 
 int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *widget, QStyleHintReturn *returnData) const
 {
+    prePolish(widget);
     switch (hint)
     {
         case SH_ToolTip_Mask:
@@ -3858,6 +3895,7 @@ int Style::layoutSpacingImplementation(QSizePolicy::ControlType control1, QSizeP
 
 void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
+    prePolish(widget);
     QRect r(option->rect);
     QFlags<State> state(option->state);
     const QPalette &palette(option->palette);
@@ -5544,6 +5582,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
 
 void Style::drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
+    prePolish(widget);
     QRect               r(option->rect);
     const QFlags<State> &state(option->state);
     const QPalette      &palette(option->palette);
@@ -7859,6 +7898,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
 void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
 {
+    prePolish(widget);
     QRect               r(option->rect);
     const QFlags<State> &state(option->state);
     const QPalette      &palette(option->palette);
@@ -9640,6 +9680,7 @@ void Style::drawItemText(QPainter *painter, const QRect &rect, int flags, const 
 
 QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &size, const QWidget *widget) const
 {
+    prePolish(widget);
     QSize newSize(BASE_STYLE::sizeFromContents(type, option, size, widget));
 
     switch (type)
@@ -9908,6 +9949,7 @@ QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, con
 
 QRect Style::subElementRect(SubElement element, const QStyleOption *option, const QWidget *widget) const
 {
+    prePolish(widget);
     QRect rect;
     switch (element)
     {
@@ -10066,6 +10108,7 @@ QRect Style::subElementRect(SubElement element, const QStyleOption *option, cons
 
 QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget) const
 {
+    prePolish(widget);
     QRect r(option->rect);
     bool  reverse(Qt::RightToLeft==option->direction);
 
@@ -10588,6 +10631,7 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
 QStyle::SubControl Style::hitTestComplexControl(ComplexControl control, const QStyleOptionComplex *option,
                                                 const QPoint &pos, const QWidget *widget) const
 {
+    prePolish(widget);
     itsSbWidget=0L;
     switch (control)
     {

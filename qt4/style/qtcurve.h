@@ -182,6 +182,12 @@ public:
                                      const QStyleOptionComplex *option,
                                      const QPoint &pos,
                                      const QWidget *widget) const;
+    void prePolish(QWidget *w) const;
+    void
+    prePolish(const QWidget *w) const
+    {
+        prePolish(const_cast<QWidget*>(w));
+    }
 
 private:
 

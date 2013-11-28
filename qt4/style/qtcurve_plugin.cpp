@@ -96,12 +96,31 @@ StylePlugin::create(const QString &key)
 
 static bool inited = false;
 
+static bool
+qtcEventCallback(void **cbdata)
+{
+    QObject *receiver = (QObject*)cbdata[0];
+    if (qtcUnlikely(!receiver))
+        return false;
+    QWidget *widget = qobject_cast<QWidget*>(receiver);
+    // QEvent *event = (QEvent*)cbdata[1];
+    if (qtcUnlikely(widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
+                    !qtcGetQWidgetWid(widget))) {
+        if (Style *style = dynamic_cast<Style*>(widget->style())) {
+            style->prePolish(widget);
+        }
+    }
+    return false;
+}
+
 void
 StylePlugin::init()
 {
     if (inited)
         return;
     inited = true;
+    QInternal::registerCallback(QInternal::EventNotifyCallback,
+                                qtcEventCallback);
 #ifdef QTC_ENABLE_X11
     qtcX11InitXlib(QX11Info::display());
 #endif

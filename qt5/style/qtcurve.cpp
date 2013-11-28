@@ -458,6 +458,8 @@ Style::prePolish(QWidget *widget) const
     // since these are the most common types that are shown without entering
     // the main loop. It might be possible to make it works on more widgets
     // as well.
+    // TODO:
+    //     use all informations to check if a widget should be transparent.
     if (widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
         !qtcGetQWidgetWid(widget) && !qtcGetPrePolished(widget)) {
         // the result of qobject_cast may change if we are called in
