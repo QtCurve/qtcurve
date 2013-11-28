@@ -2077,7 +2077,7 @@ Style::polish(QWidget *widget)
         setTranslucentBackground(widget);
     }
 
-    if (widget->inherits("QTipLabel") && !IS_FLAT(opts.tooltipAppearance) &&
+    if (widget->inherits("QTipLabel") && !qtcIsFlat(opts.tooltipAppearance) &&
         APP_OPERA != theThemedApp) {
         widget->setBackgroundRole(QPalette::NoRole);
         setTranslucentBackground(widget);
@@ -2206,7 +2206,7 @@ Style::polish(QWidget *widget)
     if (qobject_cast<QMenuBar*>(widget) || widget->inherits("Q3ToolBar") || qobject_cast<QToolBar*>(widget) || parentIsToolbar)
         widget->setBackgroundRole(QPalette::Window);
 
-    if(!IS_FLAT(opts.toolbarAppearance) && parentIsToolbar)
+    if(!qtcIsFlat(opts.toolbarAppearance) && parentIsToolbar)
         widget->setAutoFillBackground(false);
 
     if (APP_SYSTEMSETTINGS == theThemedApp &&
@@ -2577,7 +2577,7 @@ void Style::unpolish(QWidget *widget)
     else if(opts.boldProgress && "CE_CapacityBar"==widget->objectName())
         unSetBold(widget);
 
-    if(widget->inherits("QTipLabel") && !IS_FLAT(opts.tooltipAppearance) && APP_OPERA!=theThemedApp)
+    if(widget->inherits("QTipLabel") && !qtcIsFlat(opts.tooltipAppearance) && APP_OPERA!=theThemedApp)
     {
         widget->setAttribute(Qt::WA_PaintOnScreen, false);
         widget->setAttribute(Qt::WA_NoSystemBackground, false);
@@ -4619,7 +4619,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                             painter->save();
 
                             // Only need to adjust coords if toolbar has a gradient...
-                            if(!IS_FLAT(opts.toolbarAppearance))
+                            if(!qtcIsFlat(opts.toolbarAppearance))
                             {
                                 r2.setY(-widget->mapTo((QWidget*)tb, QPoint(r.x(), r.y())).y());
                                 r2.setHeight(tb->rect().height());
@@ -4746,7 +4746,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
 
                     rect=QRect(doEtch ? rect.adjusted(1, 1, -1, -1) : rect);
 
-                    if(IS_FLAT(opts.appearance))
+                    if(qtcIsFlat(opts.appearance))
                         painter->fillRect(rect.adjusted(1, 1, -1, -1), bgnd);
                     else
                         drawBevelGradient(bgnd, painter, rect.adjusted(1, 1, -1, -1), true, false, APPEARANCE_INVERTED, WIDGET_TROUGH);
@@ -5564,7 +5564,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             if(haveAlpha)
                 col.setAlphaF(0.875);
             drawBevelGradient(col, painter, r, path, true, false, opts.tooltipAppearance, WIDGET_TOOLTIP, !haveAlpha);
-            if(IS_FLAT(opts.tooltipAppearance))
+            if(qtcIsFlat(opts.tooltipAppearance))
             {
                 painter->setPen(QPen(palette.toolTipText(), 0));
                 drawRect(painter, r);
@@ -5876,7 +5876,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                 if(isKOffice)
                     fillRect.adjust(-r.x(), -r.y(), 0, 0);
 
-                if(!IS_FLAT(opts.dwtAppearance))
+                if(!qtcIsFlat(opts.dwtAppearance))
                 {
                     painter->save();
 
@@ -6099,7 +6099,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     }
                     painter->setRenderHint(QPainter::Antialiasing, false);
                 }
-                else if(!IS_FLAT(opts.lvAppearance) && !reverse && ((State_Enabled|State_Active)==state || State_Enabled==state))
+                else if(!qtcIsFlat(opts.lvAppearance) && !reverse && ((State_Enabled|State_Active)==state || State_Enabled==state))
                 {
                     QPolygon     top;
                     const QColor &col(getFill(option, use));
@@ -6187,7 +6187,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
             if(opts.borderProgress)
                 drawBorder(painter, r, option, ROUNDED_ALL, backgroundColors(option), WIDGET_PBAR_TROUGH,
-                           IS_FLAT(opts.progressGrooveAppearance) && ECOLOR_DARK!=opts.progressGrooveColor ? BORDER_SUNKEN : BORDER_FLAT);
+                           qtcIsFlat(opts.progressGrooveAppearance) && ECOLOR_DARK!=opts.progressGrooveColor ? BORDER_SUNKEN : BORDER_FLAT);
             painter->restore();
             break;
         }
@@ -7533,7 +7533,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
             }
 
             painter->save();
-            if(opts.flatSbarButtons && !IS_FLAT(opts.sbarBgndAppearance) /*&& SCROLLBAR_NONE!=opts.scrollbarType*/)
+            if(opts.flatSbarButtons && !qtcIsFlat(opts.sbarBgndAppearance) /*&& SCROLLBAR_NONE!=opts.scrollbarType*/)
                 drawBevelGradientReal(palette.brush(QPalette::Background).color(), painter, r, state&State_Horizontal, false,
                                       opts.sbarBgndAppearance, WIDGET_SB_BGND);
 
@@ -7599,7 +7599,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
             if(state&State_Horizontal)
             {
-                if(IS_FLAT(opts.appearance))
+                if(qtcIsFlat(opts.appearance))
                     painter->fillRect(r.x(), r.y()+1, r.width(), r.height()-2, use[2]);
                 else
                     drawBevelGradient(use[2], painter, QRect(r.x(), r.y()+1, r.width(), r.height()-2),
@@ -7622,7 +7622,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
             }
             else
             {
-                if(IS_FLAT(opts.appearance))
+                if(qtcIsFlat(opts.appearance))
                     painter->fillRect(r.x()+1, r.y(), r.width()-2, r.height(), use[2]);
                 else
                     drawBevelGradient(use[2], painter, QRect(r.x()+1, r.y(), r.width()-2, r.height()),
@@ -8890,7 +8890,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                                       WIDGET_MDI_WINDOW, false);
                 if ((!kwin && !itsIsPreview) ||
                     (APPEARANCE_NONE != app &&
-                     (!IS_FLAT(app) || (titleCols[ORIGINAL_SHADE] != QApplication::palette().background().color()))))
+                     (!qtcIsFlat(app) || (titleCols[ORIGINAL_SHADE] != QApplication::palette().background().color()))))
                     drawBevelGradient(titleCols[ORIGINAL_SHADE], painter, tr, path, true, false, app, WIDGET_MDI_WINDOW, false);
 
                 if (!(state & QtC_StateKWinNoBorder)) {
@@ -9293,7 +9293,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                     painter->fillRect(r, itsBackgroundCols[ORIGINAL_SHADE]);
 
                 if(!opts.gtkScrollViews ||
-                   (opts.flatSbarButtons && !IS_FLAT(opts.sbarBgndAppearance)/* && SCROLLBAR_NONE!=opts.scrollbarType*/))
+                   (opts.flatSbarButtons && !qtcIsFlat(opts.sbarBgndAppearance)/* && SCROLLBAR_NONE!=opts.scrollbarType*/))
                     drawBevelGradientReal(palette.brush(QPalette::Background).color(), painter, r, horiz, false,
                                           opts.sbarBgndAppearance, WIDGET_SB_BGND);
 
@@ -10876,7 +10876,7 @@ void Style::drawProgressBevelGradient(QPainter *p, const QRect &origRect, const 
 
         QPainter pixPainter(pix);
 
-        if(IS_FLAT(bevApp))
+        if(qtcIsFlat(bevApp))
             pixPainter.fillRect(r, cols[ORIGINAL_SHADE]);
         else
             drawBevelGradientReal(cols[ORIGINAL_SHADE], &pixPainter, r, horiz, false, bevApp, WIDGET_PROGRESSBAR);
@@ -10892,7 +10892,7 @@ void Style::drawProgressBevelGradient(QPainter *p, const QRect &origRect, const 
                             ? QRect(r.x(), r.y(), PROGRESS_CHUNK_WIDTH, r.height())
                             : QRect(r.x(), r.y(), r.width(), PROGRESS_CHUNK_WIDTH));
 
-                if(IS_FLAT(bevApp))
+                if(qtcIsFlat(bevApp))
                     pixPainter.fillRect(r2, cols[1]);
                 else
                     drawBevelGradientReal(cols[1], &pixPainter, r2, horiz, false, bevApp, WIDGET_PROGRESSBAR);
@@ -10922,7 +10922,7 @@ void Style::drawProgressBevelGradient(QPainter *p, const QRect &origRect, const 
                 }
 
                 pixPainter.setClipRegion(reg);
-                if(IS_FLAT(bevApp))
+                if(qtcIsFlat(bevApp))
                     pixPainter.fillRect(r, cols[1]);
                 else
                     drawBevelGradientReal(cols[1], &pixPainter, r, horiz, false, bevApp, WIDGET_PROGRESSBAR);
@@ -10971,7 +10971,7 @@ void Style::drawBevelGradient(const QColor &base, QPainter *p, const QRect &orig
     if(origRect.width()<1 || origRect.height()<1)
         return;
 
-    if(IS_FLAT(bevApp))
+    if(qtcIsFlat(bevApp))
     {
         if((WIDGET_TAB_TOP!=w && WIDGET_TAB_BOT!=w) || !CUSTOM_BGND || opts.tabBgnd || !sel)
         {
@@ -12339,7 +12339,7 @@ void Style::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option
         border=opts.borderMenuitems ? 0 : fill;
 
     if(itsHighlightCols!=cols && MENU_BAR==type && !(option->state&(State_On|State_Sunken)) &&
-       !opts.colorMenubarMouseOver && (opts.borderMenuitems || !IS_FLAT(opts.menuitemAppearance)))
+       !opts.colorMenubarMouseOver && (opts.borderMenuitems || !qtcIsFlat(opts.menuitemAppearance)))
         fill=ORIGINAL_SHADE;
 
     if(MENU_BAR!=type && APPEARANCE_FADE==opts.menuitemAppearance)
@@ -12675,7 +12675,7 @@ void Style::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOptionSlid
 
         p->save();
         p->setClipRegion(QRegion(clipRegion)); // , QPainter::CoordPainter);
-        if(IS_FLAT(opts.sliderAppearance))
+        if(qtcIsFlat(opts.sliderAppearance))
         {
             p->fillRect(r, fill);
 
@@ -12962,7 +12962,7 @@ Style::drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p,
         return;
 
     EAppearance app = menu ? opts.menubarAppearance : opts.toolbarAppearance;
-    if (!CUSTOM_BGND || !IS_FLAT(app) ||
+    if (!CUSTOM_BGND || !qtcIsFlat(app) ||
         (menu && SHADE_NONE != opts.shadeMenubars)) {
         QRect rx(r);
         QColor col(menu && (option->state & State_Enabled ||

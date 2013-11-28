@@ -95,6 +95,12 @@ qtcIsFlatBgnd(EAppearance appear)
     return appear == APPEARANCE_FLAT || appear == APPEARANCE_RAISED;
 }
 
+QTC_ALWAYS_INLINE static inline bool
+qtcIsFlat(EAppearance appear)
+{
+    return qtcIsFlatBgnd(appear) || appear == APPEARANCE_FADE;
+}
+
 /**
  * Number of scrollbar buttons.
  **/

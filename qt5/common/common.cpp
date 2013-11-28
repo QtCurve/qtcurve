@@ -166,7 +166,7 @@ qtcWidgetApp(EWidget w, const Options *opts)
     case WIDGET_MDI_WINDOW_BUTTON:
         return opts->titlebarButtonAppearance;
     case WIDGET_DIAL:
-        return IS_FLAT(opts->appearance) ? APPEARANCE_RAISED :
+        return qtcIsFlat(opts->appearance) ? APPEARANCE_RAISED :
         APPEARANCE_SOFT_GRADIENT;
 #endif
     case WIDGET_TROUGH:

@@ -178,7 +178,7 @@ qtcWindowSizeRequest(GtkWidget *widget)
         GdkRectangle rect;
         rect.x = 0;
         rect.y = 0;
-        if (IS_FLAT(opts.bgndAppearance) &&
+        if (qtcIsFlat(opts.bgndAppearance) &&
             IMG_NONE != opts.bgndImage.type) {
             EPixPos pos = (IMG_FILE == opts.bgndImage.type ?
                            opts.bgndImage.pos : PP_TR);

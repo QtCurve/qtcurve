@@ -168,7 +168,7 @@ drawBevelGradientAlpha(cairo_t *cr, GdkRectangle *area, int x, int y,
     /*                     WIDGET_LISTVIEW_HEADER == w) ? bevApp : */
     /*                    APPEARANCE_GRADIENT); */
 
-    if (IS_FLAT(bevApp)) {
+    if (qtcIsFlat(bevApp)) {
         if ((WIDGET_TAB_TOP != w && WIDGET_TAB_BOT != w) ||
             !CUSTOM_BGND || opts.tabBgnd || !sel) {
             drawAreaColorAlpha(cr, area, base, x, y, width, height, alpha);
@@ -1968,7 +1968,7 @@ void drawProgressGroove(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkWin
         GtkWidget *parent=widget ? gtk_widget_get_parent(widget) : NULL;
         GtkStyle  *style=widget ? gtk_widget_get_style(parent ? parent : widget) : NULL;
         drawBorder(cr, style, state, area, x, y, width, height, NULL, ROUNDED_ALL,
-                   IS_FLAT(opts.progressGrooveAppearance) && ECOLOR_DARK!=opts.progressGrooveColor ? BORDER_SUNKEN : BORDER_FLAT,
+                   qtcIsFlat(opts.progressGrooveAppearance) && ECOLOR_DARK!=opts.progressGrooveColor ? BORDER_SUNKEN : BORDER_FLAT,
                    WIDGET_PBAR_TROUGH, DF_BLEND);
     }
     else /* if(!opts.borderProgress) */
@@ -2144,7 +2144,7 @@ drawTriangularSlider(cairo_t *cr, GtkStyle *style, GtkStateType state,
     }
     }
     cairo_clip(cr);
-    if (IS_FLAT(opts.sliderAppearance)) {
+    if (qtcIsFlat(opts.sliderAppearance)) {
         drawAreaColor(cr, NULL, &colors[bgnd], x+1, y+1, width-2, height-2);
         if (MO_PLASTIK == opts.coloredMouseOver && coloredMouseOver) {
             int col = SLIDER_MO_SHADE;
@@ -2274,7 +2274,7 @@ drawScrollbarGroove(cairo_t *cr, GtkStyle *style, GtkStateType state,
     QTC_UNUSED(detail);
     int sbarRound = ROUNDED_ALL;
     int xo=x, yo=y, wo=width, ho=height;
-    gboolean drawBg=opts.flatSbarButtons/* && !IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType*/,
+    gboolean drawBg=opts.flatSbarButtons/* && !qtcIsFlat(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType*/,
         thinner=opts.thinSbarGroove && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons);
 
     if (opts.flatSbarButtons) {
@@ -2396,17 +2396,17 @@ drawScrollbarGroove(cairo_t *cr, GtkStyle *style, GtkStateType state,
 
     if(drawBg) {
         GtkWidget *parent=NULL;
-        if(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) && 0!=opts.tabBgnd && widget &&
+        if(opts.gtkScrollViews && qtcIsFlat(opts.sbarBgndAppearance) && 0!=opts.tabBgnd && widget &&
            (parent=gtk_widget_get_parent(widget)) && GTK_IS_SCROLLED_WINDOW(parent) &&
            (parent=gtk_widget_get_parent(parent)) && GTK_IS_NOTEBOOK(parent))
             drawAreaModColor(cr, area, &qtcPalette.background[ORIGINAL_SHADE], TO_FACTOR(opts.tabBgnd), xo, yo, wo, ho);
-        else if(!IS_FLAT(opts.sbarBgndAppearance) || !opts.gtkScrollViews)
+        else if(!qtcIsFlat(opts.sbarBgndAppearance) || !opts.gtkScrollViews)
             drawBevelGradient(cr, area, xo, yo, wo, ho, &qtcPalette.background[ORIGINAL_SHADE],
                               horiz, FALSE, opts.sbarBgndAppearance, WIDGET_SB_BGND);
 #if !GTK_CHECK_VERSION(2, 90, 0)
         /* This was the old (pre 1.7.1) else if... but it messes up Gtk3 scrollbars wheb have custom background. And dont think its needed */
         /* But re-added in 1.7.2 for Mozilla! */
-        /*  else if(!CUSTOM_BGND || !(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) &&
+        /*  else if(!CUSTOM_BGND || !(opts.gtkScrollViews && qtcIsFlat(opts.sbarBgndAppearance) &&
             widget && drawWindowBgnd(cr, style, area, widget, xo, yo, wo, ho)))
         */ else if(isMozilla()) /* 1.7.3 added 'else' so as to not duplicate above! */
             drawBevelGradient(cr, area, xo, yo, wo, ho, &qtcPalette.background[ORIGINAL_SHADE],
@@ -2947,10 +2947,10 @@ void drawToolTip(cairo_t *cr, GtkWidget *widget, GdkRectangle *area, int x, int 
 #if GTK_CHECK_VERSION(2,9,0)
     if(!rounded)
 #endif
-        if(IS_FLAT(opts.tooltipAppearance))
+        if(qtcIsFlat(opts.tooltipAppearance))
         {
             cairo_new_path(cr);
-            /*if(IS_FLAT(opts.tooltipAppearance))*/
+            /*if(qtcIsFlat(opts.tooltipAppearance))*/
             cairo_set_source_rgb(cr, CAIRO_COL(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT]));
             /*else
               cairo_set_source_rgba(cr, 0, 0, 0, 0.25);*/
@@ -3089,7 +3089,7 @@ void drawMenuItem(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *w
             borderVal=opts.borderMenuitems ? 0 : fillVal;
 
         if(grayItem && mb && !active_mb && !opts.colorMenubarMouseOver &&
-           (opts.borderMenuitems || !IS_FLAT(opts.menuitemAppearance)))
+           (opts.borderMenuitems || !qtcIsFlat(opts.menuitemAppearance)))
             fillVal=ORIGINAL_SHADE;
 
         if(mb && !opts.roundMbTopOnly && !(opts.square&SQUARE_POPUP_MENUS))
@@ -3928,7 +3928,7 @@ drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
                      &(qtcPalette.background[2]));
     GdkColor *selCol1 = &qtcPalette.highlight[0];
     /* GdkColor *selCol2 = */
-    /*     &qtcPalette.highlight[IS_FLAT(opts.appearance) ? 0 : 3]; */
+    /*     &qtcPalette.highlight[qtcIsFlat(opts.appearance) ? 0 : 3]; */
     GdkRectangle clipArea;
     EBorder     borderProfile=active || opts.borderInactiveTab
         ? opts.borderTab

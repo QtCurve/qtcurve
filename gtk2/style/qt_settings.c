@@ -1812,7 +1812,7 @@ gboolean qtSettingsInit()
                 opts.highlightScrollViews = FALSE;
             }
 
-            if(!IS_FLAT(opts.bgndAppearance) && excludedApp(opts.noBgndGradientApps))
+            if(!qtcIsFlat(opts.bgndAppearance) && excludedApp(opts.noBgndGradientApps))
                 opts.bgndAppearance=APPEARANCE_FLAT;
 
             if(IMG_NONE!=opts.bgndImage.type && excludedApp(opts.noBgndImageApps))

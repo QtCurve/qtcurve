@@ -1155,13 +1155,13 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 {
                     /* This section messes up Gtk3 scrollbars with custom background - and doesnt seem to be required for Gtk2 either. remove at 1.7.1 */
                     /* Re-added in 1.7.2 as needed by Mozilla! */
-                    if(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) && 0!=opts.tabBgnd && widget && gtk_widget_get_parent(widget) && gtk_widget_get_parent(widget)->parent &&
+                    if(opts.gtkScrollViews && qtcIsFlat(opts.sbarBgndAppearance) && 0!=opts.tabBgnd && widget && gtk_widget_get_parent(widget) && gtk_widget_get_parent(widget)->parent &&
                        GTK_IS_SCROLLED_WINDOW(gtk_widget_get_parent(widget)) && GTK_IS_NOTEBOOK(gtk_widget_get_parent(widget)->parent))
                         drawAreaModColor(cr, area, &qtcPalette.background[ORIGINAL_SHADE], TO_FACTOR(opts.tabBgnd), xo, yo, wo, ho);
-                    else if(qtcIsFlatBgnd(opts.bgndAppearance) || !(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) &&
+                    else if(qtcIsFlatBgnd(opts.bgndAppearance) || !(opts.gtkScrollViews && qtcIsFlat(opts.sbarBgndAppearance) &&
                                                               widget && drawWindowBgnd(cr, style, area, window, widget, xo, yo, wo, ho)))
                     {
-                        if(!IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType)
+                        if(!qtcIsFlat(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType)
                             drawBevelGradient(cr, area, xo, yo, wo, ho, &qtcPalette.background[ORIGINAL_SHADE],
                                               horiz, FALSE, opts.sbarBgndAppearance, WIDGET_SB_BGND);
                          else
@@ -1394,7 +1394,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
             int         menuBarAdjust=0,
                         opacity=getOpacity(widget);
             double      alpha=opacity!=100 ? (opacity/100.00) : 1.0;
-            gboolean    drawGradient=GTK_SHADOW_NONE!=shadow && !IS_FLAT(app),
+            gboolean    drawGradient=GTK_SHADOW_NONE!=shadow && !qtcIsFlat(app),
                         fillBackground=menubar && SHADE_NONE!=opts.shadeMenubars;
 
             if ((menubar && opts.windowDrag) ||

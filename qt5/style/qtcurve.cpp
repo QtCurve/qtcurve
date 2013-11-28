@@ -1425,7 +1425,7 @@ void Style::drawProgressBevelGradient(QPainter *p, const QRect &origRect, const 
 
         QPainter pixPainter(pix);
 
-        if(IS_FLAT(bevApp))
+        if(qtcIsFlat(bevApp))
             pixPainter.fillRect(r, cols[ORIGINAL_SHADE]);
         else
             drawBevelGradientReal(cols[ORIGINAL_SHADE], &pixPainter, r, horiz, false, bevApp, WIDGET_PROGRESSBAR);
@@ -1441,7 +1441,7 @@ void Style::drawProgressBevelGradient(QPainter *p, const QRect &origRect, const 
                      ? QRect(r.x(), r.y(), PROGRESS_CHUNK_WIDTH, r.height())
                      : QRect(r.x(), r.y(), r.width(), PROGRESS_CHUNK_WIDTH));
 
-            if(IS_FLAT(bevApp))
+            if(qtcIsFlat(bevApp))
                 pixPainter.fillRect(r2, cols[1]);
             else
                 drawBevelGradientReal(cols[1], &pixPainter, r2, horiz, false, bevApp, WIDGET_PROGRESSBAR);
@@ -1471,7 +1471,7 @@ void Style::drawProgressBevelGradient(QPainter *p, const QRect &origRect, const 
             }
 
             pixPainter.setClipRegion(reg);
-            if(IS_FLAT(bevApp))
+            if(qtcIsFlat(bevApp))
                 pixPainter.fillRect(r, cols[1]);
             else
                 drawBevelGradientReal(cols[1], &pixPainter, r, horiz, false, bevApp, WIDGET_PROGRESSBAR);
@@ -1520,7 +1520,7 @@ void Style::drawBevelGradient(const QColor &base, QPainter *p, const QRect &orig
     if(origRect.width()<1 || origRect.height()<1)
         return;
 
-    if(IS_FLAT(bevApp))
+    if(qtcIsFlat(bevApp))
     {
         if((WIDGET_TAB_TOP!=w && WIDGET_TAB_BOT!=w) || !CUSTOM_BGND || opts.tabBgnd || !sel)
         {
@@ -2885,7 +2885,7 @@ void Style::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option
         border=opts.borderMenuitems ? 0 : fill;
 
     if(itsHighlightCols!=cols && MENU_BAR==type && !(option->state&(State_On|State_Sunken)) &&
-       !opts.colorMenubarMouseOver && (opts.borderMenuitems || !IS_FLAT(opts.menuitemAppearance)))
+       !opts.colorMenubarMouseOver && (opts.borderMenuitems || !qtcIsFlat(opts.menuitemAppearance)))
         fill=ORIGINAL_SHADE;
 
     if(MENU_BAR!=type && APPEARANCE_FADE==opts.menuitemAppearance)
@@ -3208,7 +3208,7 @@ void Style::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOptionSlid
 
         p->save();
         p->setClipRegion(QRegion(clipRegion)); // , QPainter::CoordPainter);
-        if(IS_FLAT(opts.sliderAppearance))
+        if(qtcIsFlat(opts.sliderAppearance))
         {
             p->fillRect(r, fill);
 
@@ -3491,7 +3491,7 @@ void Style::drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p, cons
         return;
 
     EAppearance app=menu ? opts.menubarAppearance : opts.toolbarAppearance;
-    if(!CUSTOM_BGND || !IS_FLAT(app) || (menu && SHADE_NONE!=opts.shadeMenubars))
+    if(!CUSTOM_BGND || !qtcIsFlat(app) || (menu && SHADE_NONE!=opts.shadeMenubars))
     {
         QRect  rx(r);
         QColor col(menu && (option->state&State_Enabled || SHADE_NONE!=opts.shadeMenubars)
