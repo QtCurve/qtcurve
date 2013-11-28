@@ -10,6 +10,10 @@
 7. Introduce `prePolish()` to Workaround a bug in Qt5 which make it impossible
    for QMainWindow and QDialog to be transparent.
    [Qt-Bug](https://bugreports.qt-project.org/browse/QTBUG-34064)
+8. Remove backward compatible options for deprecated options.
+9. Fix compilation without X11 enabled.
+10. Use `prePolish()` in qt4, this fixes most of application crashes.
+11. Fix menubar background when translucency is enabled.
 
 ## 1.8.17
 1. **Add Qt5 support!!**.
