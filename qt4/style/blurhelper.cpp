@@ -65,19 +65,18 @@
 #  include <qtcurve-utils/x11blur.h>
 #endif
 
-namespace QtCurve
+namespace QtCurve {
+BlurHelper::BlurHelper(QObject *parent):
+    QObject(parent),
+    _enabled(false)
 {
+}
 
-    //___________________________________________________________
-    BlurHelper::BlurHelper(QObject *parent):
-        QObject(parent),
-        _enabled(false)
-    {
-    }
-
-    //___________________________________________________________
-    void BlurHelper::registerWidget( QWidget* widget )
-    { Utils::addEventFilter(widget, this); }
+void
+BlurHelper::registerWidget(QWidget* widget)
+{
+    Utils::addEventFilter(widget, this);
+}
 
 void
 BlurHelper::unregisterWidget(QWidget *widget)
@@ -88,85 +87,65 @@ BlurHelper::unregisterWidget(QWidget *widget)
     }
 }
 
-    //___________________________________________________________
-    bool BlurHelper::eventFilter( QObject* object, QEvent* event )
-    {
-
-        // do nothing if not enabled
-        if( !enabled() ) return false;
-
-        switch( event->type() )
-        {
-
-            case QEvent::Hide:
-            {
-                QWidget* widget( qobject_cast<QWidget*>( object ) );
-                if( widget && isOpaque( widget ) )
-                {
-                    QWidget* window( widget->window() );
-                    if (window && isTransparent(window) && !_pendingWidgets.contains(window) )
-                    {
-                        _pendingWidgets.insert( window, window );
-                        delayedUpdate();
-                    }
-                }
-                break;
-
-            }
-
-            case QEvent::Show:
-            case QEvent::Resize:
-            {
-
-                // cast to widget and check
-                QWidget* widget( qobject_cast<QWidget*>( object ) );
-                if( !widget ) break;
-                if( isTransparent( widget ) )
-                {
-
-                    _pendingWidgets.insert( widget, widget );
-                    delayedUpdate();
-
-                } else if( isOpaque( widget ) ) {
-
-                    QWidget* window( widget->window() );
-                    if( isTransparent( window ) )
-                    {
-                        _pendingWidgets.insert( window, window );
-                        delayedUpdate();
-                    }
-
-                }
-
-                break;
-            }
-
-            default: break;
-
-        }
-
-        // never eat events
+bool
+BlurHelper::eventFilter(QObject *object, QEvent *event)
+{
+    // do nothing if not enabled
+    if (!enabled())
         return false;
-
+    switch (event->type()) {
+    case QEvent::Hide: {
+        QWidget *widget = qtcToWidget(object);
+        if (widget && isOpaque(widget)) {
+            QWidget *window(widget->window());
+            if (window && isTransparent(window) &&
+                !_pendingWidgets.contains(window)) {
+                _pendingWidgets.insert(window, window);
+                delayedUpdate();
+            }
+        }
+        break;
     }
-
-    //___________________________________________________________
-    QRegion BlurHelper::blurRegion( QWidget* widget ) const
-    {
-        if( !widget->isVisible() ) return QRegion();
-
-        // get main region
-        QRegion region = widget->mask().isEmpty() ? widget->rect():widget->mask();
-
-
-        // trim blur region to remove unnecessary areas
-        trimBlurRegion( widget, widget, region );
-        return region;
-
+    case QEvent::Show:
+    case QEvent::Resize: {
+        // cast to widget and check
+        QWidget *widget = qtcToWidget(object);
+        if (!widget)
+            break;
+        if (isTransparent(widget)) {
+            _pendingWidgets.insert(widget, widget);
+            delayedUpdate();
+        } else if (isOpaque(widget)) {
+            QWidget* window(widget->window());
+            if (isTransparent(window)) {
+                _pendingWidgets.insert(window, window);
+                delayedUpdate();
+            }
+        }
+        break;
     }
+    default:
+        break;
+    }
+    // never eat events
+    return false;
+}
 
-void BlurHelper::trimBlurRegion(QWidget *parent, QWidget *widget,
-                                QRegion &region) const
+QRegion
+BlurHelper::blurRegion(QWidget *widget) const
+{
+    if (!widget->isVisible())
+        return QRegion();
+    // get main region
+    QRegion region = widget->mask().isEmpty() ? widget->rect() : widget->mask();
+    // trim blur region to remove unnecessary areas
+    trimBlurRegion(widget, widget, region);
+    return region;
+}
+
+void
+BlurHelper::trimBlurRegion(QWidget *parent, QWidget *widget,
+                           QRegion &region) const
 {
     // TODO:
     //     Maybe we should clip children with parent? In case we hit this[1] kind
@@ -174,7 +153,7 @@ void BlurHelper::trimBlurRegion(QWidget *parent, QWidget *widget,
     //     [1] https://bugs.kde.org/show_bug.cgi?id=306631
     // loop over children
     foreach (QObject *childObject, widget->children()) {
-        QWidget *child(qobject_cast<QWidget*>(childObject));
+        QWidget *child = qtcToWidget(childObject);
         if (!(child && child->isVisible()))
             continue;
         if (isOpaque(child)) {

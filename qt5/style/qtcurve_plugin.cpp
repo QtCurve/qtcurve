@@ -40,7 +40,7 @@ qtcEventCallback(void **cbdata)
     QObject *receiver = (QObject*)cbdata[0];
     if (qtcUnlikely(!receiver))
         return false;
-    QWidget *widget = qobject_cast<QWidget*>(receiver);
+    QWidget *widget = qtcToWidget(receiver);
     if (qtcUnlikely(widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
                     !qtcGetQWidgetWid(widget))) {
         if (Style *style = dynamic_cast<Style*>(widget->style())) {

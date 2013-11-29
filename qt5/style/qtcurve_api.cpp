@@ -1242,7 +1242,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
         break;
 #ifdef QTC_ENABLE_X11
     case QEvent::PaletteChange: {
-        QWidget *widget = qobject_cast<QWidget*>(object);
+        QWidget *widget = qtcToWidget(object);
 
         if (widget && widget->isWindow() &&
             (qtcIsDialog(widget) || qtcIsWindow(widget))) {
@@ -1255,13 +1255,13 @@ bool Style::eventFilter(QObject *object, QEvent *event)
     case QEvent::Paint:
     {
         if (qtcIsCustomBgnd(&opts)) {
-            QWidget *widget = qobject_cast<QWidget*>(object);
+            QWidget *widget = qtcToWidget(object);
 
             if(widget && widget->testAttribute(Qt::WA_StyledBackground) &&
                (widget->isWindow() && (qtcIsWindow(widget) ||
                                        qtcIsDialog(widget)) &&
                 widget->testAttribute(Qt::WA_TranslucentBackground))) {
-                bool isDialog=qobject_cast<QDialog *>(widget);
+                bool isDialog = qobject_cast<QDialog*>(widget);
 
                 if((100!=opts.bgndOpacity && !isDialog) || (100!=opts.dlgOpacity && isDialog) ||
                    !(qtcIsFlatBgnd(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type)
@@ -1278,7 +1278,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
             !(opts.square&SQUARE_POPUP_MENUS)) &&
            (qobject_cast<QMenu*>(object) || (/*isCombo=*/object->inherits("QComboBoxPrivateContainer"))))
         {
-            QWidget      *widget=qobject_cast<QWidget *>(object);
+            QWidget *widget = qtcToWidget(object);
             QPainter     p(widget);
             QRect        r(widget->rect());
             double       radius=MENU_AND_TOOLTIP_RADIUS;
@@ -1352,9 +1352,10 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                     }
                 }
             }
-        }
-        else if(itsClickedLabel==object && qobject_cast<QLabel*>(object) && ((QLabel *)object)->buddy() && ((QLabel *)object)->buddy()->isEnabled())
-        {
+        } else if (itsClickedLabel == object &&
+                   qobject_cast<QLabel*>(object) &&
+                   ((QLabel*)object)->buddy() &&
+                   ((QLabel*)object)->buddy()->isEnabled()) {
             // paint focus rect
             QLabel                *lbl = (QLabel *)object;
             QPainter              painter(lbl);
@@ -1452,7 +1453,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                          !((QMenuBar *)mb)->isVisible() ? 0 :
                          mb->size().height(), true);
         } else if (QEvent::Show==event->type()) {
-            QWidget *widget = qobject_cast<QWidget*>(object);
+            QWidget *widget = qtcToWidget(object);
 
             if(widget && widget->isWindow() &&
                (qtcIsWindow(widget) || qtcIsDialog(widget))) {
@@ -1474,7 +1475,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
              opts.windowBorder &
              WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR ||
              opts.menubarHiding & HIDE_KWIN) &&
-           qobject_cast<QMenuBar *>(object)) {
+           qobject_cast<QMenuBar*>(object)) {
             QMenuBar *mb = (QMenuBar*)object;
             emitMenuSize((QMenuBar*)mb, 0);
         }

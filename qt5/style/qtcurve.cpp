@@ -451,7 +451,7 @@ Style::prePolish(QWidget *widget) const
     // polishing the widget. Since (the xcb backend of) Qt5 doesn't support
     // recreating the window either, it is impossible for us to make those
     // windows translucent anymore.
-    // Luckily, for a log of these widgets, certain QStyle virtual functions
+    // Luckily, for a lot of these widgets, certain QStyle virtual functions
     // are called before they are shown, giving us a chance to set the
     // necessary attributes.
     // This "pre-polish" is used only for QMainWindow and QDialog for now

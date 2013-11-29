@@ -96,7 +96,7 @@ BlurHelper::eventFilter(QObject *object, QEvent *event)
 
     switch (event->type()) {
     case QEvent::Hide: {
-        QWidget *widget(qobject_cast<QWidget*>(object));
+        QWidget *widget = qtcToWidget(object);
         if (widget && isOpaque(widget)) {
             QWidget *window(widget->window());
             if (window && isTransparent(window) &&
@@ -110,7 +110,7 @@ BlurHelper::eventFilter(QObject *object, QEvent *event)
     case QEvent::Show:
     case QEvent::Resize: {
         // cast to widget and check
-        QWidget *widget(qobject_cast<QWidget*>(object));
+        QWidget *widget = qtcToWidget(object);
         if (!widget)
             break;
         if (isTransparent(widget)) {
@@ -155,7 +155,7 @@ BlurHelper::trimBlurRegion(QWidget *parent, QWidget *widget,
     //     [1] https://bugs.kde.org/show_bug.cgi?id=306631
     // loop over children
     for (QObject *childObject: widget->children()) {
-        QWidget *child(qobject_cast<QWidget*>(childObject));
+        QWidget *child = qtcToWidget(childObject);
         if (!(child && child->isVisible()))
             continue;
         if (isOpaque(child)) {

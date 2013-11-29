@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #include <qtcurve-utils/utils.h>
+#include <qtcurve-utils/qtutils.h>
 
 #include <QActionEvent>
 #include <QApplication>
@@ -45,7 +46,7 @@ static MacMenu *instance = 0;
 bool
 FullscreenWatcher::eventFilter(QObject *o, QEvent *ev)
 {
-    QWidget *window = qobject_cast<QWidget*>(o);
+    QWidget *window = qtcToWidget(o);
     if (!(window && ev->type() == QEvent::WindowStateChange))
         return false;
     if (window->windowState() & Qt::WindowFullScreen)

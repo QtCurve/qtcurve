@@ -79,6 +79,22 @@ qtcIsWindow(const QWidget *w)
     return w && w->windowType() == Qt::Window;
 }
 
+QTC_ALWAYS_INLINE static inline QWidget*
+qtcToWidget(QObject *obj)
+{
+    if (obj->isWidgetType())
+        return static_cast<QWidget*>(obj);
+    return NULL;
+}
+
+QTC_ALWAYS_INLINE static inline const QWidget*
+qtcToWidget(const QObject *obj)
+{
+    if (obj->isWidgetType())
+        return static_cast<const QWidget*>(obj);
+    return NULL;
+}
+
 QTC_ALWAYS_INLINE static inline bool
 qtcGetPrePolished(const QWidget *w)
 {

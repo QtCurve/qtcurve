@@ -87,7 +87,7 @@ bool ShortcutHandler::eventFilter(QObject *o, QEvent *e)
     if (!o->isWidgetType())
         return QObject::eventFilter(o, e);
 
-    QWidget *widget = qobject_cast<QWidget*>(o);
+    QWidget *widget = static_cast<QWidget*>(o);
     switch(e->type())
     {
     case QEvent::KeyPress:
