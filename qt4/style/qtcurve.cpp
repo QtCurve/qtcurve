@@ -13769,7 +13769,7 @@ void
 Style::toggleMenuBar(unsigned int xid)
 {
 #ifdef QTC_ENABLE_X11
-    static unsigned int   lastXid  = 0;
+    static unsigned int lastXid = 0;
     static struct timeval lastTime = {0, 0};
 
     if (diffTime(&lastTime) || lastXid != xid) {

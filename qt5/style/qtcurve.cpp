@@ -4303,7 +4303,8 @@ getWindow(unsigned int xid)
     return NULL;
 }
 
-static bool diffTime(struct timeval *lastTime)
+static bool
+diffTime(struct timeval *lastTime)
 {
     struct timeval now, diff;
 
@@ -4318,12 +4319,12 @@ void
 Style::toggleMenuBar(unsigned int xid)
 {
 #ifdef QTC_ENABLE_X11
-    static unsigned int   lastXid  = 0;
+    static unsigned int lastXid = 0;
     static struct timeval lastTime = {0, 0};
 
     if (diffTime(&lastTime) || lastXid != xid) {
-        QMainWindow *win=getWindow(xid);
-        if(win) {
+        QMainWindow *win = getWindow(xid);
+        if (win) {
             toggleMenuBar(win);
         }
     }
@@ -4333,10 +4334,11 @@ Style::toggleMenuBar(unsigned int xid)
 #endif
 }
 
-void Style::toggleStatusBar(unsigned int xid)
+void
+Style::toggleStatusBar(unsigned int xid)
 {
 #ifdef QTC_ENABLE_X11
-    static unsigned int lastXid  = 0;
+    static unsigned int lastXid = 0;
     static struct timeval lastTime = {0, 0};
 
     if (diffTime(&lastTime) || lastXid != xid) {
