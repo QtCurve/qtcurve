@@ -950,6 +950,7 @@ Style::prePolish(QWidget *widget) const
     // recreates the window
     // TODO:
     //     use all informations to check if a widget should be transparent.
+    //     Maybe we can also do sth to their parents' and/or children as well
     if (widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
         !(widget->windowFlags() & Qt::MSWindowsOwnDC) &&
         !qtcGetQWidgetWid(widget) && !qtcGetPrePolished(widget)) {
@@ -13752,87 +13753,91 @@ getWindow(unsigned int xid)
     return NULL;
 }
 
-static bool diffTime(struct timeval *lastTime)
+static bool
+diffTime(struct timeval *lastTime)
 {
     struct timeval now, diff;
 
     gettimeofday(&now, NULL);
     timersub(&now, lastTime, &diff);
-    *lastTime=now;
-    return diff.tv_sec>0 || diff.tv_usec>500000;
+    *lastTime = now;
+    return diff.tv_sec > 0 || diff.tv_usec > 500000;
 }
 #endif
 
-void Style::toggleMenuBar(unsigned int xid)
+void
+Style::toggleMenuBar(unsigned int xid)
 {
 #ifdef QTC_ENABLE_X11
     static unsigned int   lastXid  = 0;
     static struct timeval lastTime = {0, 0};
 
-    if(diffTime(&lastTime) || lastXid!=xid)
-    {
-        QMainWindow *win=getWindow(xid);
-        if(win)
+    if (diffTime(&lastTime) || lastXid != xid) {
+        QMainWindow *win = getWindow(xid);
+        if (win) {
             toggleMenuBar(win);
+        }
     }
-    lastXid=xid;
+    lastXid = xid;
 #else
     Q_UNUSED(xid);
 #endif
 }
 
-void Style::toggleStatusBar(unsigned int xid)
+void
+Style::toggleStatusBar(unsigned int xid)
 {
 #ifdef QTC_ENABLE_X11
-    static unsigned int   lastXid  = 0;
+    static unsigned int lastXid  = 0;
     static struct timeval lastTime = {0, 0};
 
-    if(diffTime(&lastTime) || lastXid!=xid)
-    {
-        QMainWindow *win=getWindow(xid);
-        if(win)
+    if (diffTime(&lastTime) || lastXid != xid) {
+        QMainWindow *win = getWindow(xid);
+        if (win) {
             toggleStatusBar(win);
+        }
     }
-    lastXid=xid;
+    lastXid = xid;
 #else
     Q_UNUSED(xid);
 #endif
 }
 
-void Style::compositingToggled()
+void
+Style::compositingToggled()
 {
 #ifdef QTC_ENABLE_X11
-    QWidgetList                tlw=QApplication::topLevelWidgets();
-    QWidgetList::ConstIterator it(tlw.begin()),
-                               end(tlw.end());
+    QWidgetList tlw = QApplication::topLevelWidgets();
+    QWidgetList::ConstIterator it(tlw.begin());
+    QWidgetList::ConstIterator end(tlw.end());
 
-    for(; it!=end; ++it)
+    for (;it != end;++it) {
         (*it)->update();
+    }
 #endif
 }
 
-void Style::toggleMenuBar(QMainWindow *window)
+void
+Style::toggleMenuBar(QMainWindow *window)
 {
     bool triggeredAction(false);
 
 #ifdef QTC_QT4_ENABLE_KDE
-    if(qobject_cast<KXmlGuiWindow*>(window))
-    {
-        KActionCollection *collection=static_cast<KXmlGuiWindow*>(window)->actionCollection();
-        QAction           *act=collection ? collection->action(KStandardAction::name(KStandardAction::ShowMenubar)) : 0L;
-        if(act)
-        {
+    if (qobject_cast<KXmlGuiWindow*>(window)) {
+        KActionCollection *collection =
+            static_cast<KXmlGuiWindow*>(window)->actionCollection();
+        QAction *act = collection ? collection->action(KStandardAction::name(KStandardAction::ShowMenubar)) : 0L;
+        if (act) {
             act->trigger();
-            triggeredAction=true;
+            triggeredAction = true;
         }
     }
 #endif
-    if(!triggeredAction)
-    {
-        QWidget *menubar=window->menuWidget();
-        if(itsSaveMenuBarStatus)
+    if (!triggeredAction) {
+        QWidget *menubar = window->menuWidget();
+        if (itsSaveMenuBarStatus) {
             qtcSetMenuBarHidden(appName, menubar->isVisible());
-
+        }
         window->menuWidget()->setHidden(menubar->isVisible());
     }
 }
@@ -13842,34 +13847,30 @@ void Style::toggleStatusBar(QMainWindow *window)
     bool triggeredAction(false);
 
 #ifdef QTC_QT4_ENABLE_KDE
-    if(qobject_cast<KXmlGuiWindow*>(window))
-    {
-        KActionCollection *collection=static_cast<KXmlGuiWindow*>(window)->actionCollection();
-        QAction           *act=collection ? collection->action(KStandardAction::name(KStandardAction::ShowStatusbar)) : 0L;
-        if(act)
-        {
+    if (qobject_cast<KXmlGuiWindow*>(window)) {
+        KActionCollection *collection = static_cast<KXmlGuiWindow*>(window)->actionCollection();
+        QAction *act = collection ? collection->action(KStandardAction::name(KStandardAction::ShowStatusbar)) : 0L;
+        if (act) {
             act->trigger();
-            triggeredAction=true;
+            triggeredAction = true;
 #ifdef QTC_ENABLE_X11
-            //emitStatusBarState(true); // TODO: ???
+            // emitStatusBarState(true); // TODO: ???
 #endif
         }
     }
 #endif
-    if(!triggeredAction)
-    {
-        QList<QStatusBar*> sb=getStatusBars(window);
+    if (!triggeredAction) {
+        QList<QStatusBar*> sb = getStatusBars(window);
 
-        if(sb.count())
-        {
-            if(itsSaveStatusBarStatus)
+        if (sb.count()) {
+            if (itsSaveStatusBarStatus)
                 qtcSetStatusBarHidden(appName, sb.first()->isVisible());
 
-            QList<QStatusBar*>::ConstIterator it(sb.begin()),
-                                            end(sb.end());
-            for(; it!=end; ++it)
+            QList<QStatusBar*>::ConstIterator it(sb.begin());
+            QList<QStatusBar*>::ConstIterator end(sb.end());
+            for (;it != end;++it) {
                 (*it)->setHidden((*it)->isVisible());
-
+            }
 #ifdef QTC_ENABLE_X11
             emitStatusBarState(sb.first());
 #endif
