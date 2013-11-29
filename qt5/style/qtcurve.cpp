@@ -442,7 +442,7 @@ Style::Style() :
     }
 }
 
-void
+__attribute__((hot)) void
 Style::prePolish(QWidget *widget) const
 {
     // HACK:

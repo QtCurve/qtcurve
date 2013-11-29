@@ -34,7 +34,7 @@ namespace QtCurve {
 
 static bool inited = false;
 
-static bool
+__attribute__((hot)) static bool
 qtcEventCallback(void **cbdata)
 {
     QObject *receiver = (QObject*)cbdata[0];
