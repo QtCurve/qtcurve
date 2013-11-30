@@ -37,6 +37,7 @@
 #include <locale.h>
 #include <gmodule.h>
 #include <ctype.h>
+#include <dlfcn.h>
 
 QtCPalette qtcPalette;
 Options opts;
@@ -1610,6 +1611,70 @@ debugLevel()
     return DEBUG_NONE;
 }
 
+static inline bool
+isFlashPluginDlopen()
+{
+    static void *hdl = NULL;
+    if (!hdl) {
+        hdl = dlopen(NULL, RTLD_NOW);
+    }
+    if (qtcUnlikely(!hdl)) {
+        return false;
+    }
+    if (dlsym(hdl, "Flash_EnforceLocalSecurity") ||
+        dlsym(hdl, "Flash_DisableLocalSecurity")) {
+        return true;
+    }
+    const char *(*np_getmimedescription)() = dlsym(hdl, "NP_GetMIMEDescription");
+    if (np_getmimedescription) {
+        const char *mime = np_getmimedescription();
+        if (mime && (strstr(mime, "flash") || strstr(mime, "Flash") ||
+                     strstr(mime, "shockwave") || strstr(mime, "Shockwave"))) {
+            return true;
+        }
+    }
+    const char *(*np_getpluginversion)() = dlsym(hdl, "NP_GetPluginVersion");
+    if (np_getpluginversion) {
+        const char *flash_ver = np_getpluginversion();
+        // 64 is just some random maximum length...
+        if (!flash_ver || strlen(flash_ver) >= 64) {
+            return false;
+        }
+        char func_name[128] = "FlashPlayer_";
+        char *p = func_name + strlen("FlashPlayer_");
+        int i = 0;
+        for (;flash_ver[i];i++) {
+            switch (flash_ver[i]) {
+            case '0' ... '9':
+                // GNU extension
+                p[i] = flash_ver[i];
+                break;
+            default:
+                p[i] = '_';
+                break;
+            }
+        }
+        // copy '\0' as well.
+        memcpy(p + i, "_FlashPlayer", sizeof("_FlashPlayer"));
+        if (dlsym(hdl, func_name)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static inline bool
+isFlashPlugin()
+{
+    // can probably remove everything except dlopen and
+    // chrome flash plugin here.
+    return (isFlashPluginDlopen() ||
+            strcmp(qtSettings.appName, CHROME_FLASH_PLUGIN) == 0 ||
+            strcmp(qtSettings.appName, "nspluginviewer") == 0 ||
+            strcmp(qtSettings.appName, "plugin-container") == 0 ||
+            strcmp(qtSettings.appName, "npviewer.bin") == 0);
+}
+
 gboolean qtSettingsInit()
 {
     if (0 == qt_refs++) {
@@ -1779,15 +1844,13 @@ gboolean qtSettingsInit()
                     qtSettings.app=GTK_APP_EVOLUTION;
                 else if(0==strcmp(qtSettings.appName, "eclipse"))
                     qtSettings.app=GTK_APP_JAVA_SWT;
-                else if(0==strcmp(qtSettings.appName, CHROME_FLASH_PLUGIN) ||
-                        0==strcmp(qtSettings.appName, "nspluginviewer") ||
-                        0==strcmp(qtSettings.appName, "plugin-container") ||
-                        0==strcmp(qtSettings.appName, "npviewer.bin") )
-                    qtSettings.app=GTK_APP_FLASH_PLUGIN;
-                else if(0==strcmp(qtSettings.appName, "ghb"))
+                else if (isFlashPlugin()) {
+                    qtSettings.app = GTK_APP_FLASH_PLUGIN;
+                } else if (strcmp(qtSettings.appName, "ghb") == 0) {
                     qtSettings.app=GTK_APP_GHB;
-                /*else if(app==strstr(qtSettings.appName, "gaim"))
-                    qtSettings.app=GTK_APP_GAIM;*/
+                }/*  else if (app == strstr(qtSettings.appName, "gaim")) { */
+                /*    qtSettings.app = GTK_APP_GAIM; */
+                /* } */
             }
 
             if(qtSettings.debug)
