@@ -42,8 +42,8 @@ endif()
 target_link_libraries(qtcurve-utils ${qtcurve_utils_LINKS})
 
 set_target_properties(qtcurve-utils PROPERTIES
-  VERSION 0.1
-  SOVERSION 0
+  VERSION 1.0
+  SOVERSION 1
   COMPILE_FLAGS "-fvisibility=hidden"
   LINK_FLAGS "-Wl,--no-undefined"
   LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")

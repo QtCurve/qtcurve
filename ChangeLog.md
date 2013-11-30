@@ -1,22 +1,23 @@
 ## WIP
-1. Remove `QTC_GTK2_OLD_MOZILLA`.
-2. Remove mozilla version detection.
+1. Remove mozilla version detection.
+2. Remove `QTC_GTK2_OLD_MOZILLA`.
 3. Remove `xcb-image` dependency. It is never used.
 4. Fix old configure file loading in gtk2 version.
    Thanks to Lars Wendler for noticing this.
-5. Relicense under LGPL. With permission from all contributors in the git log.
-6. Treat `Qt::Sheet` as `Qt::Dialog`. This fixes translucent background for
+5. Fix compile without Qt
+6. Relicense under LGPL. With permission from all contributors in the git log.
+7. Treat `Qt::Sheet` as `Qt::Dialog`. This fixes translucent background for
    close confirmation dialog in QtDesigner.
-7. Introduce `prePolish()` to Workaround a bug in Qt5 which make it impossible
+8. Remove backward compatible options for deprecated options.
+9. Introduce `prePolish()` to Workaround a bug in Qt5 which make it impossible
    for QMainWindow and QDialog to be transparent.
    [Qt-Bug](https://bugreports.qt-project.org/browse/QTBUG-34064)
-8. Remove backward compatible options for deprecated options.
-9. Fix compilation without X11 enabled.
-10. Use `prePolish()` in qt4, this fixes most of application crashes.
-11. Fix Qt menubar background when translucency is enabled.
-12. Fix flash plugin in non-chromium/firefox browsers in linux when translucent
+10. Fix compilation without X11 enabled.
+11. Use `prePolish()` in qt4, this fixes most of application crashes.
+12. Fix Qt menubar background when translucency is enabled.
+13. Fix flash plugin in non-chromium/firefox browsers in linux when translucent
     background is enabled for gtk.
-13. Fix (workaround) kaffeine with translucent background.
+14. Fix (workaround) kaffeine with translucent background.
 
 ## 1.8.17
 1. **Add Qt5 support!!**.
