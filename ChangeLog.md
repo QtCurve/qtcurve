@@ -13,7 +13,9 @@
 8. Remove backward compatible options for deprecated options.
 9. Fix compilation without X11 enabled.
 10. Use `prePolish()` in qt4, this fixes most of application crashes.
-11. Fix menubar background when translucency is enabled.
+11. Fix Qt menubar background when translucency is enabled.
+12. Fix flash plugin in non-chromium/firefox browsers in linux when translucent
+    background is enabled for gtk.
 
 ## 1.8.17
 1. **Add Qt5 support!!**.
