@@ -446,31 +446,47 @@ __attribute__((hot)) void
 Style::prePolish(QWidget *widget) const
 {
     // HACK:
-    // For widgets that are immediately shown after creation (i.e. haven't
-    // entered the main loop yet) Qt5 create the underlaying X-Window before
-    // polishing the widget. Since (the xcb backend of) Qt5 doesn't support
-    // recreating the window either, it is impossible for us to make those
-    // windows translucent anymore.
-    // Luckily, for a lot of these widgets, certain QStyle virtual functions
-    // are called before they are shown, giving us a chance to set the
-    // necessary attributes.
-    // This "pre-polish" is used only for QMainWindow and QDialog for now
-    // since these are the most common types that are shown without entering
-    // the main loop. It might be possible to make it works on more widgets
-    // as well.
+    // Set TranslucentBackground properties on toplevel widgets before they
+    // create native windows. These windows are typically shown after being
+    // created before entering the main loop and therefore do not have a
+    // chance to be polished before creating window id.
     // TODO:
-    //     use all informations to check if a widget should be transparent.
+    //     Use all informations to check if a widget should be transparent.
+    //     Need to figure out how Qt5's xcb backend deal with RGB native window
+    //     as a child of a RGBA window. However, since Qt5 will not recreate
+    //     native window, this is probably easier to deal with than Qt4.
+    //     (After we create a RGB window, Qt5 will not override it).
     if (widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
         !(widget->windowFlags() & Qt::MSWindowsOwnDC) &&
-        !qtcGetQWidgetWid(widget) && !qtcGetPrePolished(widget)) {
+        (!qtcGetQWidgetWid(widget) || qtcGetPrePolishStarted(widget)) &&
+        !qtcGetPrePolished(widget)) {
+        // Skip MSWindowsOwnDC since it is set for QGLWidget and not likely to
+        // be used in other cases.
+
         // the result of qobject_cast may change if we are called in
         // constructor (which is usually the case we want here) so we only
         // set the prePolished property if we have done something.
         if ((opts.bgndOpacity != 100 && qobject_cast<QMainWindow*>(widget)) ||
-            (opts.dlgOpacity != 100 && qobject_cast<QDialog*>(widget))) {
+            (opts.dlgOpacity != 100 && (qobject_cast<QDialog*>(widget) ||
+                                        qtcIsDialog(widget)))) {
             widget->setAttribute(Qt::WA_StyledBackground);
             setTranslucentBackground(widget);
             qtcSetPrePolished(widget);
+        } else if (opts.bgndOpacity != 100) {
+            if (qtcIsWindow(widget)) {
+                if (!widget->testAttribute(Qt::WA_TranslucentBackground)) {
+                    widget->setAttribute(Qt::WA_StyledBackground);
+                    setTranslucentBackground(widget);
+                    qtcSetPrePolishStarted(widget);
+                }
+            } else if (widget->testAttribute(Qt::WA_TranslucentBackground) &&
+                       qtcGetPrePolishStarted(widget)) {
+                widget->setAttribute(Qt::WA_StyledBackground, false);
+                widget->setAttribute(Qt::WA_TranslucentBackground, false);
+                // WA_TranslucentBackground also sets Qt::WA_NoSystemBackground
+                // Set it back here.
+                widget->setAttribute(Qt::WA_NoSystemBackground, false);
+            }
         }
     }
 }
