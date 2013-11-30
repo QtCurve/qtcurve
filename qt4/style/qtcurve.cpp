@@ -953,7 +953,8 @@ Style::prePolish(QWidget *widget) const
     // This way should work for all applicaitons except when the applicaiton
     // relies on a native RGB window since the children of a RGBA window in
     // Qt are usually also RGBA (Note that gl widget works because it is
-    // treated differently in Qt).
+    // treated differently in Qt). The only example of such application I have
+    // found so far is kaffeine. See workaround bellow.
 
     // TODO:
     //     use all informations to check if a widget should be transparent.
@@ -965,6 +966,27 @@ Style::prePolish(QWidget *widget) const
         // Skip MSWindowsOwnDC since it is set for QGLWidget and not likely to
         // be used in other cases.
 
+        // Fix for kaffeine. Kaffeine needs a RGB window for the XV extension.
+        // Setting parent to NULL forces a native RGB window to be created
+        // for MediaWidget so that its children will also have RGB visual.
+        // Kaffeine later sets the parent again (when adding the to layout)
+        // after the native RGB children has already been created and in this
+        // case, Qt does not create recreate the children window. This seems to
+        // be the only way in Qt4 to have a RGB non-OpenGL window in a RGBA
+        // window.
+        if (opts.bgndOpacity != 100 && widget->inherits("MediaWidget")) {
+            widget->setAttribute(Qt::WA_DontCreateNativeAncestors);
+            widget->setAttribute(Qt::WA_TranslucentBackground, false);
+            widget->setAttribute(Qt::WA_NativeWindow);
+            if (widget->depth() == 24 && !qtcGetQWidgetWid(widget)) {
+                qtcSetPrePolished(widget);
+                // Kaffeine set parent back after children window has been
+                // created.
+                widget->setParent(NULL);
+                widget->createWinId();
+            }
+            return;
+        }
         // the result of qobject_cast may change if we are called in
         // constructor (which is usually the case we want here) so we only
         // set the prePolished property if we have done something.
