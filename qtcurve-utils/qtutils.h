@@ -107,4 +107,16 @@ qtcSetPrePolished(QWidget *w)
     w->setProperty("__QTC_PRE_POLISHED__", 1);
 }
 
+QTC_ALWAYS_INLINE static inline bool
+qtcGetPrePolishStarted(const QWidget *w)
+{
+    return w->property("__QTC_PRE_POLISH_STARTED__").isValid();
+}
+
+QTC_ALWAYS_INLINE static inline void
+qtcSetPrePolishStarted(QWidget *w)
+{
+    w->setProperty("__QTC_PRE_POLISH_STARTED__", 1);
+}
+
 #endif
