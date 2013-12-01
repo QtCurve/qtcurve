@@ -445,6 +445,10 @@ Style::Style() :
 __attribute__((hot)) void
 Style::prePolish(QWidget *widget) const
 {
+    // TODO: skip event hook if it is kwin
+    if (theThemedApp == APP_KWIN) {
+        return;
+    }
     // HACK:
     // Set TranslucentBackground properties on toplevel widgets before they
     // create native windows. These windows are typically shown after being

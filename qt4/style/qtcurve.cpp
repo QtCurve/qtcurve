@@ -276,10 +276,9 @@ static void drawTbArrow(const QStyle *style, const QStyleOptionToolButton *toolb
 #define M_PI 3.14159265358979323846
 #endif
 
-static const int constMenuPixmapWidth=22;
+static const int constMenuPixmapWidth = 22;
 
-static enum
-{
+static enum {
     APP_PLASMA,
     APP_KRUNNER,
     APP_KWIN,
@@ -293,7 +292,7 @@ static enum
     APP_K3B,
     APP_OPENOFFICE,
     APP_OTHER
-} theThemedApp=APP_OTHER;
+} theThemedApp = APP_OTHER;
 
 static QString appName;
 
@@ -945,6 +944,10 @@ Style::Style()
 __attribute__((hot)) void
 Style::prePolish(QWidget *widget) const
 {
+    // TODO: skip event hook if it is kwin
+    if (theThemedApp == APP_KWIN) {
+        return;
+    }
     // HACK:
     // Set TranslucentBackground properties on toplevel widgets before they
     // create native windows. These windows are typically shown after being
