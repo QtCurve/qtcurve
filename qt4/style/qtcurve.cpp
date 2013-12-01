@@ -149,7 +149,7 @@ namespace QtCurve
 static inline void
 setTranslucentBackground(QWidget *widget)
 {
-    if (qtcCheckLogLevel(QTC_LOG_INFO) && qtcGetQWidgetWid(widget))
+    if (qtcCheckLogLevel(QTC_LOG_INFO) && qtcGetWid(widget))
         qWarning() << "Recreating" << widget;
     widget->setAttribute(Qt::WA_TranslucentBackground);
 }
@@ -612,7 +612,7 @@ static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
 void
 setOpacityProp(QWidget *w, unsigned short opacity)
 {
-    if (WId wid = qtcGetQWidgetWid(w->window())) {
+    if (WId wid = qtcGetWid(w->window())) {
         qtcX11SetOpacity(wid, opacity);
         qtcX11Flush();
     }
@@ -621,7 +621,7 @@ setOpacityProp(QWidget *w, unsigned short opacity)
 void
 setBgndProp(QWidget *w, EAppearance app, bool haveBgndImage)
 {
-    if (WId wid = qtcGetQWidgetWid(w->window())) {
+    if (WId wid = qtcGetWid(w->window())) {
         uint32_t prop =
             (((qtcIsFlatBgnd(app) ? (haveBgndImage ? APPEARANCE_RAISED :
                                      APPEARANCE_FLAT) : app) & 0xFF) |
@@ -635,7 +635,7 @@ setBgndProp(QWidget *w, EAppearance app, bool haveBgndImage)
 void
 setSbProp(QWidget *w)
 {
-    if (WId wid = qtcGetQWidgetWid(w->window())) {
+    if (WId wid = qtcGetWid(w->window())) {
         static const char *constStatusBarProperty = "qtcStatusBar";
         QVariant prop(w->property(constStatusBarProperty));
 
@@ -961,7 +961,7 @@ Style::prePolish(QWidget *widget) const
     //     Maybe we can also do sth to their parents' and/or children as well
     if (widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
         !(widget->windowFlags() & Qt::MSWindowsOwnDC) &&
-        (!qtcGetQWidgetWid(widget) || qtcGetPrePolishStarted(widget)) &&
+        (!qtcGetWid(widget) || qtcGetPrePolishStarted(widget)) &&
         !qtcGetPrePolished(widget)) {
         // Skip MSWindowsOwnDC since it is set for QGLWidget and not likely to
         // be used in other cases.
@@ -978,7 +978,7 @@ Style::prePolish(QWidget *widget) const
             widget->setAttribute(Qt::WA_DontCreateNativeAncestors);
             widget->setAttribute(Qt::WA_TranslucentBackground, false);
             widget->setAttribute(Qt::WA_NativeWindow);
-            if (widget->depth() == 24 && !qtcGetQWidgetWid(widget)) {
+            if (widget->depth() == 24 && !qtcGetWid(widget)) {
                 qtcSetPrePolished(widget);
                 // Kaffeine set parent back after children window has been
                 // created.
@@ -1700,7 +1700,7 @@ Style::polish(QWidget *widget)
         return;
 
     bool enableMouseOver(opts.highlightFactor || opts.coloredMouseOver);
-    if (qtcCheckLogLevel(QTC_LOG_INFO) && qtcGetQWidgetWid(widget) &&
+    if (qtcCheckLogLevel(QTC_LOG_INFO) && qtcGetWid(widget) &&
         widget->windowType() != Qt::Desktop && !qtcGetPrePolished(widget)) {
         qDebug() << "Window Created before polishing:" << widget;
     }
@@ -1795,7 +1795,7 @@ Style::polish(QWidget *widget)
                 widget->inherits("QTipLabel") ||
                 widget->inherits("QSplashScreen") ||
                 widget->windowFlags().testFlag(Qt::FramelessWindowHint) ||
-                !qtcGetQWidgetWid(widget)) {
+                !qtcGetWid(widget)) {
                 break;
             }
             // The window has already been created.
@@ -13790,7 +13790,7 @@ getWindow(unsigned int xid)
     QWidgetList::ConstIterator end(tlw.end());
 
     for(;it != end;++it) {
-        if (qobject_cast<QMainWindow*>(*it) && qtcGetQWidgetWid(*it) == xid) {
+        if (qobject_cast<QMainWindow*>(*it) && qtcGetWid(*it) == xid) {
             return static_cast<QMainWindow*>(*it);
         }
     }
@@ -13925,7 +13925,7 @@ void Style::toggleStatusBar(QMainWindow *window)
 #ifdef QTC_ENABLE_X11
 void Style::emitMenuSize(QWidget *w, unsigned short size, bool force)
 {
-    if (WId wid = qtcGetQWidgetWid(w->window())) {
+    if (WId wid = qtcGetWid(w->window())) {
         static const char *constMenuSizeProperty="qtcMenuSize";
         unsigned short oldSize = 2000;
         if (!force) {
@@ -13960,7 +13960,7 @@ void Style::emitStatusBarState(QStatusBar *sb)
             itsDBus = new QDBusInterface("org.kde.kwin", "/QtCurve",
                                          "org.kde.QtCurve");
         itsDBus->call(QDBus::NoBlock, "statusBarState",
-                      (unsigned int)qtcGetQWidgetWid(sb->window()),
+                      (unsigned int)qtcGetWid(sb->window()),
                       sb->isVisible());
     }
 }

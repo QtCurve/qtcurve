@@ -59,7 +59,7 @@ qtcCheckType0(T2 *obj, const char *name)
 #endif
 
 QTC_ALWAYS_INLINE static inline WId
-qtcGetQWidgetWid(const QWidget *w)
+qtcGetWid(const QWidget *w)
 {
     if (!(w && w->testAttribute(Qt::WA_WState_Created)))
         return (WId)0;
@@ -69,8 +69,8 @@ qtcGetQWidgetWid(const QWidget *w)
 QTC_ALWAYS_INLINE static inline bool
 qtcIsDialog(const QWidget *w)
 {
-    return w && (w->windowType() == Qt::Dialog ||
-                 w->windowType() == Qt::Sheet);
+    Qt::WindowType type = w ? w->windowType() : (Qt::WindowType)0;
+    return type == Qt::Dialog || type == Qt::Sheet;
 }
 
 QTC_ALWAYS_INLINE static inline bool

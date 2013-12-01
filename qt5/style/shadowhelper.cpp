@@ -157,7 +157,7 @@ bool ShadowHelper::acceptWidget(QWidget* widget) const
 bool
 ShadowHelper::installX11Shadows(QWidget *widget)
 {
-    if (WId wid = qtcGetQWidgetWid(widget)) {
+    if (WId wid = qtcGetWid(widget)) {
         qtcX11ShadowInstall(wid);
         return true;
     }
@@ -167,7 +167,7 @@ ShadowHelper::installX11Shadows(QWidget *widget)
 //_______________________________________________________
 void ShadowHelper::uninstallX11Shadows(QWidget *widget) const
 {
-    if (WId wid = qtcGetQWidgetWid(widget)) {
+    if (WId wid = qtcGetWid(widget)) {
         qtcX11ShadowUninstall(wid);
     }
 }

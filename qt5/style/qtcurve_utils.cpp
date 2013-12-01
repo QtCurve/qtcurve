@@ -101,7 +101,7 @@ bool isNoEtchWidget(const QWidget *widget)
 
 void setOpacityProp(QWidget *w, unsigned short opacity)
 {
-    if (WId wid = qtcGetQWidgetWid(w->window())) {
+    if (WId wid = qtcGetWid(w->window())) {
         qtcX11SetOpacity(wid, opacity);
         qtcX11Flush();
     }
@@ -110,7 +110,7 @@ void setOpacityProp(QWidget *w, unsigned short opacity)
 void
 setBgndProp(QWidget *w, EAppearance app, bool haveBgndImage)
 {
-    if (WId wid = qtcGetQWidgetWid(w->window())) {
+    if (WId wid = qtcGetWid(w->window())) {
         uint32_t prop = (((qtcIsFlatBgnd(app) ?
                            (haveBgndImage ? APPEARANCE_RAISED :
                             APPEARANCE_FLAT) : app) & 0xFF) |
@@ -123,7 +123,7 @@ setBgndProp(QWidget *w, EAppearance app, bool haveBgndImage)
 
 void setSbProp(QWidget *w)
 {
-    if (WId wid = qtcGetQWidgetWid(w->window())) {
+    if (WId wid = qtcGetWid(w->window())) {
         static const char *constStatusBarProperty = "qtcStatusBar";
         QVariant prop(w->property(constStatusBarProperty));
 

@@ -338,7 +338,7 @@ void Style::polish(QWidget *widget)
         return;
 
     bool enableMouseOver(opts.highlightFactor || opts.coloredMouseOver);
-    if (qtcCheckLogLevel(QTC_LOG_INFO) && qtcGetQWidgetWid(widget) &&
+    if (qtcCheckLogLevel(QTC_LOG_INFO) && qtcGetWid(widget) &&
         widget->windowType() != Qt::Desktop && !qtcGetPrePolished(widget)) {
         qDebug() << "Window Created before polishing:" << widget;
     }

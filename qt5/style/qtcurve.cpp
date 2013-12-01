@@ -458,7 +458,7 @@ Style::prePolish(QWidget *widget) const
     //     (After we create a RGB window, Qt5 will not override it).
     if (widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
         !(widget->windowFlags() & Qt::MSWindowsOwnDC) &&
-        (!qtcGetQWidgetWid(widget) || qtcGetPrePolishStarted(widget)) &&
+        (!qtcGetWid(widget) || qtcGetPrePolishStarted(widget)) &&
         !qtcGetPrePolished(widget)) {
         // Skip MSWindowsOwnDC since it is set for QGLWidget and not likely to
         // be used in other cases.
@@ -4312,7 +4312,7 @@ getWindow(unsigned int xid)
     QWidgetList::ConstIterator end(tlw.end());
 
     for (;it != end;++it) {
-        if (qobject_cast<QMainWindow*>(*it) && qtcGetQWidgetWid(*it) == xid) {
+        if (qobject_cast<QMainWindow*>(*it) && qtcGetWid(*it) == xid) {
             return static_cast<QMainWindow*>(*it);
         }
     }
@@ -4448,7 +4448,7 @@ void Style::toggleStatusBar(QMainWindow *window)
 #ifdef QTC_ENABLE_X11
 void Style::emitMenuSize(QWidget *w, unsigned short size, bool force)
 {
-    if (WId wid = qtcGetQWidgetWid(w->window())) {
+    if (WId wid = qtcGetWid(w->window())) {
         static const char *constMenuSizeProperty = "qtcMenuSize";
         unsigned short oldSize = 2000;
 
@@ -4483,7 +4483,7 @@ void Style::emitStatusBarState(QStatusBar *sb)
             itsDBus = new QDBusInterface("org.kde.kwin", "/QtCurve",
                                          "org.kde.QtCurve");
         itsDBus->call(QDBus::NoBlock, "statusBarState",
-                      (unsigned int)qtcGetQWidgetWid(sb->window()),
+                      (unsigned int)qtcGetWid(sb->window()),
                       sb->isVisible());
     }
 }

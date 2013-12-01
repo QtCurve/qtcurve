@@ -83,7 +83,7 @@ BlurHelper::unregisterWidget(QWidget *widget)
 {
     widget->removeEventFilter(this);
     if (isTransparent(widget)) {
-        clear(qtcGetQWidgetWid(widget));
+        clear(qtcGetWid(widget));
     }
 }
 
@@ -175,7 +175,7 @@ BlurHelper::update(QWidget *widget) const
 {
 #ifdef QTC_ENABLE_X11
     // Do not create native window if there isn't one yet.
-    WId wid = qtcGetQWidgetWid(widget);
+    WId wid = qtcGetWid(widget);
     if (!wid) {
         return;
     }
