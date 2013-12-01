@@ -982,7 +982,7 @@ void Style::unpolish(QWidget *widget)
         }
     } else if(qobject_cast<QDockWidget *>(widget) &&
             ((QDockWidget *)widget)->titleBarWidget() &&
-            dynamic_cast<QtCurveDockWidgetTitleBar *>(((QDockWidget *)widget)->titleBarWidget()) &&
+              dynamic_cast<QtCurveDockWidgetTitleBar *>(((QDockWidget *)widget)->titleBarWidget()) &&
             widget->parentWidget() &&
             widget->parentWidget()->parentWidget() &&
             widget->parentWidget()->parentWidget()->parentWidget() &&
@@ -1071,7 +1071,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
     bool isSViewCont = (APP_KONTACT == theThemedApp &&
                         itsSViewContainers.contains((QWidget*)object));
 
-    if (::qobject_cast<QMenuBar*>(object) &&
+    if (qobject_cast<QMenuBar*>(object) &&
         dynamic_cast<QMouseEvent*>(event)) {
         if (updateMenuBarEvent((QMouseEvent*)event, (QMenuBar*)object)) {
             return true;

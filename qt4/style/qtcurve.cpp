@@ -2726,7 +2726,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
 {
     bool isSViewCont=APP_KONTACT==theThemedApp && itsSViewContainers.contains((QWidget*)object);
 
-    if(::qobject_cast<QMenuBar*>(object) && dynamic_cast<QMouseEvent*>(event))
+    if (qobject_cast<QMenuBar*>(object) && dynamic_cast<QMouseEvent*>(event))
     {
         if(updateMenuBarEvent((QMouseEvent*)event, (QMenuBar*)object))
             return true;

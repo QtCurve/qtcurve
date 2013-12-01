@@ -106,7 +106,9 @@ qtcEventCallback(void **cbdata)
     // QEvent *event = (QEvent*)cbdata[1];
     if (qtcUnlikely(widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
                     (!qtcGetWid(widget) || qtcGetPrePolishStarted(widget)))) {
-        if (Style *style = dynamic_cast<Style*>(widget->style())) {
+        QStyle *qstyle = widget->style();
+        Style *style = qstyle ? qobject_cast<Style*>(qstyle) : NULL;
+        if (style) {
             style->prePolish(widget);
         }
     }
