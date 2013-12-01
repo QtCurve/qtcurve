@@ -108,7 +108,7 @@ qtcX11ShadowInstall(xcb_window_t win)
     // In principle, I should check for _KDE_NET_WM_SHADOW in _NET_SUPPORTED.
     // However, it's complicated and we will gain nothing.
     Display *disp = qtcX11GetDisp();
-    xcb_atom_t atom = qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_SHADOW];
+    xcb_atom_t atom = qtc_x11_kde_net_wm_shadow;
     // Use XCB to set window property recieves BadWindow errors for menus in
     // Qt4 kpartsplugin here, probably because of the order of some pending
     // event/requests in Xlib. Calling XFlush() before xcb_change_property()
@@ -131,8 +131,7 @@ qtcX11ShadowUninstall(xcb_window_t win)
 {
     if (qtcUnlikely(!win))
         return;
-    qtcX11CallVoid(delete_property, win,
-                   qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_SHADOW]);
+    qtcX11CallVoid(delete_property, win, qtc_x11_kde_net_wm_shadow);
     qtcX11Flush();
 }
 
@@ -156,7 +155,7 @@ qtcX11MoveTrigger(xcb_window_t wid, uint32_t x, uint32_t y)
     xev->response_type = XCB_CLIENT_MESSAGE;
     xev->format = 32;
     xev->window = wid;
-    xev->type = qtc_x11_atoms[QTC_X11_ATOM_NET_WM_MOVERESIZE];
+    xev->type = qtc_x11_net_wm_moveresize;
     xev->data.data32[0] = x;
     xev->data.data32[1] = y;
     xev->data.data32[2] = 8; // NET::Move
@@ -176,7 +175,7 @@ qtcX11BlurTrigger(xcb_window_t wid, bool enable, unsigned prop_num,
         return;
     }
     Display *disp = qtcX11GetDisp();
-    xcb_atom_t atom = qtc_x11_atoms[QTC_X11_ATOM_KDE_NET_WM_BLUR_BEHIND_REGION];
+    xcb_atom_t atom = qtc_x11_kde_net_wm_blur_behind_region;
     if (enable) {
         if (disp) {
             QTC_DEF_LOCAL_BUFF(unsigned long, xlib_props, 256, prop_num);

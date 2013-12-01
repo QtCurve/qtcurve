@@ -94,34 +94,32 @@ static inline int tabCloseIconSize(int titleHeight)
 
 int getMenubarSizeProperty(WId wId)
 {
-    return qtcX11GetShortProp(wId,
-                              qtc_x11_atoms[QTC_X11_ATOM_QTC_MENUBAR_SIZE]);
+    return qtcX11GetShortProp(wId, qtc_x11_qtc_menubar_size);
 }
 
 int getStatusbarSizeProperty(WId wId)
 {
-    return qtcX11GetShortProp(wId, qtc_x11_atoms[QTC_X11_ATOM_QTC_STATUSBAR]);
+    return qtcX11GetShortProp(wId, qtc_x11_qtc_statusbar);
 }
 
 int getOpacityProperty(WId wId)
 {
-    int o = qtcX11GetShortProp(wId, qtc_x11_atoms[QTC_X11_ATOM_QTC_OPACITY]);
+    int o = qtcX11GetShortProp(wId, qtc_x11_qtc_opacity);
     return o <= 0 || o >= 100 ? 100 : o;
 }
 
 void getBgndSettings(WId wId, EAppearance &app, QColor &col)
 {
-    auto reply = qtcX11Call(get_property, 0, wId,
-                            qtc_x11_atoms[QTC_X11_ATOM_QTC_BGND],
+    auto reply = qtcX11Call(get_property, 0, wId, qtc_x11_qtc_bgnd,
                             XCB_ATOM_CARDINAL, 0, 1);
-    if (!reply)
+    if (!reply) {
         return;
+    }
     if (xcb_get_property_value_length(reply) > 0) {
         uint32_t val = *(int32_t*)xcb_get_property_value(reply);
         app = (EAppearance)(val&0xFF);
         col.setRgb((val & 0xFF000000) >> 24, (val & 0x00FF0000) >> 16,
                    (val & 0x0000FF00) >> 8);
-
     }
     free(reply);
 }
@@ -1547,7 +1545,7 @@ void QtCurveClient::informAppOfBorderSizeChanges()
     xev->response_type = XCB_CLIENT_MESSAGE;
     xev->format = 32;
     xev->window = windowId();
-    xev->type = qtc_x11_atoms[QTC_X11_ATOM_QTC_TITLEBAR_SIZE];
+    xev->type = qtc_x11_qtc_titlebar_size;
     xev->data.data32[0] = 0;
     qtcX11CallVoid(send_event, false, windowId(), XCB_EVENT_MASK_NO_EVENT,
                    (const char*)xev);
@@ -1566,7 +1564,7 @@ void QtCurveClient::informAppOfActiveChange()
         xev->response_type = XCB_CLIENT_MESSAGE;
         xev->format = 32;
         xev->window = windowId();
-        xev->type = qtc_x11_atoms[QTC_X11_ATOM_QTC_ACTIVE_WINDOW];
+        xev->type = qtc_x11_qtc_active_window;
         xev->data.data32[0] = isActive() ? 1 : 0;
         qtcX11CallVoid(send_event, false, windowId(), XCB_EVENT_MASK_NO_EVENT,
                        (const char*)xev);
@@ -1587,8 +1585,8 @@ void QtCurveClient::sendToggleToApp(bool menubar)
         xev->response_type = XCB_CLIENT_MESSAGE;
         xev->format = 32;
         xev->window = windowId();
-        xev->type = qtc_x11_atoms[menubar ? QTC_X11_ATOM_QTC_TOGGLE_MENUBAR :
-                                  QTC_X11_ATOM_QTC_TOGGLE_STATUSBAR];
+        xev->type = (menubar ? qtc_x11_qtc_toggle_menubar :
+                     qtc_x11_qtc_toggle_statusbar);
         xev->data.data32[0] = 0;
         qtcX11CallVoid(send_event, false, windowId(), XCB_EVENT_MASK_NO_EVENT,
                        (const char*)xev);

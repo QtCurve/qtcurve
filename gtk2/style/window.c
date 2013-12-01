@@ -123,7 +123,7 @@ qtcWindowClientEvent(GtkWidget *widget, GdkEventClient *event, gpointer data)
 {
     QTC_UNUSED(data);
     if (gdk_x11_atom_to_xatom(event->message_type) ==
-        qtc_x11_atoms[QTC_X11_ATOM_QTC_ACTIVE_WINDOW]) {
+        qtc_x11_qtc_active_window) {
         if (event->data.l[0]) {
             qtcCurrentActiveWindow = widget;
         } else if (qtcCurrentActiveWindow == widget) {
@@ -131,7 +131,7 @@ qtcWindowClientEvent(GtkWidget *widget, GdkEventClient *event, gpointer data)
         }
         gtk_widget_queue_draw(widget);
     } else if (gdk_x11_atom_to_xatom(event->message_type) ==
-               qtc_x11_atoms[QTC_X11_ATOM_QTC_TITLEBAR_SIZE]) {
+               qtc_x11_qtc_titlebar_size) {
         qtcGetWindowBorderSize(true);
         GtkWidget *menubar = qtcWindowGetMenuBar(widget, 0);
 
@@ -139,12 +139,12 @@ qtcWindowClientEvent(GtkWidget *widget, GdkEventClient *event, gpointer data)
             gtk_widget_queue_draw(menubar);
         }
     } else if (gdk_x11_atom_to_xatom(event->message_type) ==
-               qtc_x11_atoms[QTC_X11_ATOM_QTC_TOGGLE_MENUBAR]) {
+               qtc_x11_qtc_toggle_menubar) {
         if (opts.menubarHiding & HIDE_KWIN && qtcWindowToggleMenuBar(widget)) {
             gtk_widget_queue_draw(widget);
         }
     } else if (gdk_x11_atom_to_xatom(event->message_type) ==
-               qtc_x11_atoms[QTC_X11_ATOM_QTC_TOGGLE_STATUSBAR]) {
+               qtc_x11_qtc_toggle_statusbar) {
         if (opts.statusbarHiding & HIDE_KWIN &&
             qtcWindowToggleStatusBar(widget)) {
             gtk_widget_queue_draw(widget);
@@ -451,8 +451,8 @@ qtcWindowSetProperties(GtkWidget *w, unsigned short opacity)
              ((toQtColor(bgnd->green) & 0xFF) << 16) |
              ((toQtColor(bgnd->blue) & 0xFF) << 8));
     qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, wid,
-                   qtc_x11_atoms[QTC_X11_ATOM_QTC_BGND], XCB_ATOM_CARDINAL,
-                   32, 1, (unsigned char*)&prop);
+                   qtc_x11_qtc_bgnd, XCB_ATOM_CARDINAL, 32, 1,
+                   (unsigned char*)&prop);
     qtcX11Flush();
 }
 

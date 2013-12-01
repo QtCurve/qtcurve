@@ -37,27 +37,26 @@ qtcX11SetShortProp(xcb_window_t win, xcb_atom_t atom, unsigned short prop)
 static inline void
 qtcX11SetMenubarSize(xcb_window_t win, unsigned short s)
 {
-    qtcX11SetShortProp(win, qtc_x11_atoms[QTC_X11_ATOM_QTC_MENUBAR_SIZE], s);
+    qtcX11SetShortProp(win, qtc_x11_qtc_menubar_size, s);
 }
 
 static inline void
 qtcX11SetStatusBar(xcb_window_t win)
 {
-    qtcX11SetShortProp(win, qtc_x11_atoms[QTC_X11_ATOM_QTC_STATUSBAR], 1);
+    qtcX11SetShortProp(win, qtc_x11_qtc_statusbar, 1);
 }
 
 static inline void
 qtcX11SetOpacity(xcb_window_t win, unsigned short o)
 {
-    qtcX11SetShortProp(win, qtc_x11_atoms[QTC_X11_ATOM_QTC_OPACITY], o);
+    qtcX11SetShortProp(win, qtc_x11_qtc_opacity, o);
 }
 
 static inline void
 qtcX11SetBgnd(xcb_window_t win, uint32_t prop)
 {
     qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, win,
-                   qtc_x11_atoms[QTC_X11_ATOM_QTC_BGND],
-                   XCB_ATOM_CARDINAL, 32, 1, &prop);
+                   qtc_x11_qtc_bgnd, XCB_ATOM_CARDINAL, 32, 1, &prop);
 }
 
 #endif

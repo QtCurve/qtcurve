@@ -27,29 +27,20 @@
 
 QTC_BEGIN_DECLS
 
-typedef enum {
-    QTC_X11_ATOM_NET_WM_MOVERESIZE,
-    QTC_X11_ATOM_NET_WM_CM_S_DEFAULT,
-
-    QTC_X11_ATOM_KDE_NET_WM_SKIP_SHADOW,
-    QTC_X11_ATOM_KDE_NET_WM_FORCE_SHADOW,
-    QTC_X11_ATOM_KDE_NET_WM_SHADOW,
-    QTC_X11_ATOM_KDE_NET_WM_BLUR_BEHIND_REGION,
-
-    QTC_X11_ATOM_QTC_MENUBAR_SIZE,
-    QTC_X11_ATOM_QTC_STATUSBAR,
-    QTC_X11_ATOM_QTC_TITLEBAR_SIZE,
-    QTC_X11_ATOM_QTC_ACTIVE_WINDOW,
-    QTC_X11_ATOM_QTC_TOGGLE_MENUBAR,
-    QTC_X11_ATOM_QTC_TOGGLE_STATUSBAR,
-    QTC_X11_ATOM_QTC_OPACITY,
-    QTC_X11_ATOM_QTC_BGND,
-    QTC_X11_ATOM_XEMBED_INFO,
-
-    _QTC_X11_ATOM_NUMBER,
-} QtcX11AtomId;
-
-extern xcb_atom_t qtc_x11_atoms[_QTC_X11_ATOM_NUMBER];
+extern xcb_atom_t qtc_x11_net_wm_moveresize;
+extern xcb_atom_t qtc_x11_net_wm_cm_s_default;
+extern xcb_atom_t qtc_x11_kde_net_wm_skip_shadow;
+extern xcb_atom_t qtc_x11_kde_net_wm_force_shadow;
+extern xcb_atom_t qtc_x11_kde_net_wm_shadow;
+extern xcb_atom_t qtc_x11_kde_net_wm_blur_behind_region;
+extern xcb_atom_t qtc_x11_qtc_menubar_size;
+extern xcb_atom_t qtc_x11_qtc_statusbar;
+extern xcb_atom_t qtc_x11_qtc_titlebar_size;
+extern xcb_atom_t qtc_x11_qtc_active_window;
+extern xcb_atom_t qtc_x11_qtc_toggle_menubar;
+extern xcb_atom_t qtc_x11_qtc_toggle_statusbar;
+extern xcb_atom_t qtc_x11_qtc_opacity;
+extern xcb_atom_t qtc_x11_qtc_bgnd;
 
 typedef struct _XDisplay Display;
 
@@ -72,16 +63,6 @@ xcb_window_t qtcX11RootWindow(int scrn_no);
 void qtcX11Flush();
 void qtcX11FlushXlib();
 uint32_t qtcX11GenerateId();
-void qtcX11GetAtoms(size_t n, xcb_atom_t *atoms,
-                    const char *const names[], bool create);
-QTC_ALWAYS_INLINE static inline xcb_atom_t
-qtcX11GetAtom(const char *name, bool create)
-{
-    xcb_atom_t atom;
-    qtcX11GetAtoms(1, &atom, &name, create);
-    return atom;
-}
-
 int32_t qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom);
 void qtcX11MapRaised(xcb_window_t win);
 bool qtcX11CompositingActive();
@@ -152,5 +133,16 @@ _qtcX11CallVoid(xcb_void_cookie_t (*func)(xcb_connection_t*, Args...),
     (_qtcX11CallVoid(xcb_##name##_checked, args))
 
 #endif
+
+QTC_ALWAYS_INLINE static inline xcb_atom_t
+qtcX11GetAtom(const char *name, bool create)
+{
+    xcb_intern_atom_reply_t *r = qtcX11Call(intern_atom, !create,
+                                            strlen(name), name);
+    xcb_atom_t atom = r ? r->atom : 0;
+    if (r)
+        free(r);
+    return atom;
+}
 
 #endif

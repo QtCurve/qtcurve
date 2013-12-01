@@ -32,31 +32,45 @@ static xcb_connection_t *qtc_xcb_conn = NULL;
 static int qtc_default_screen_no = -1;
 static xcb_window_t qtc_root_window = {0};
 static xcb_screen_t *qtc_default_screen = NULL;
-QTC_EXPORT xcb_atom_t qtc_x11_atoms[_QTC_X11_ATOM_NUMBER];
-
 static char wm_cm_s_atom_name[100] = "_NET_WM_CM_S";
 
-static const char *const qtc_x11_atom_names[_QTC_X11_ATOM_NUMBER] = {
-    [QTC_X11_ATOM_NET_WM_MOVERESIZE] = "_NET_WM_MOVERESIZE",
-    [QTC_X11_ATOM_NET_WM_CM_S_DEFAULT] = wm_cm_s_atom_name,
+QTC_EXPORT xcb_atom_t qtc_x11_net_wm_moveresize;
+QTC_EXPORT xcb_atom_t qtc_x11_net_wm_cm_s_default;
+QTC_EXPORT xcb_atom_t qtc_x11_kde_net_wm_skip_shadow;
+QTC_EXPORT xcb_atom_t qtc_x11_kde_net_wm_force_shadow;
+QTC_EXPORT xcb_atom_t qtc_x11_kde_net_wm_shadow;
+QTC_EXPORT xcb_atom_t qtc_x11_kde_net_wm_blur_behind_region;
+QTC_EXPORT xcb_atom_t qtc_x11_qtc_menubar_size;
+QTC_EXPORT xcb_atom_t qtc_x11_qtc_statusbar;
+QTC_EXPORT xcb_atom_t qtc_x11_qtc_titlebar_size;
+QTC_EXPORT xcb_atom_t qtc_x11_qtc_active_window;
+QTC_EXPORT xcb_atom_t qtc_x11_qtc_toggle_menubar;
+QTC_EXPORT xcb_atom_t qtc_x11_qtc_toggle_statusbar;
+QTC_EXPORT xcb_atom_t qtc_x11_qtc_opacity;
+QTC_EXPORT xcb_atom_t qtc_x11_qtc_bgnd;
+static xcb_atom_t qtc_x11_xembed_info;
 
-    [QTC_X11_ATOM_KDE_NET_WM_SKIP_SHADOW] = "_KDE_NET_WM_SKIP_SHADOW",
-    [QTC_X11_ATOM_KDE_NET_WM_FORCE_SHADOW] = "_KDE_NET_WM_FORCE_SHADOW",
-    [QTC_X11_ATOM_KDE_NET_WM_SHADOW] = "_KDE_NET_WM_SHADOW",
-    [QTC_X11_ATOM_KDE_NET_WM_BLUR_BEHIND_REGION] =
-    "_KDE_NET_WM_BLUR_BEHIND_REGION",
-
-    [QTC_X11_ATOM_QTC_MENUBAR_SIZE] = "_QTCURVE_MENUBAR_SIZE_",
-    [QTC_X11_ATOM_QTC_STATUSBAR] = "_QTCURVE_STATUSBAR_",
-    [QTC_X11_ATOM_QTC_TITLEBAR_SIZE] = "_QTCURVE_TITLEBAR_SIZE_",
-    [QTC_X11_ATOM_QTC_ACTIVE_WINDOW] = "_QTCURVE_ACTIVE_WINDOW_",
-    [QTC_X11_ATOM_QTC_TOGGLE_MENUBAR] = "_QTCURVE_TOGGLE_MENUBAR_",
-    [QTC_X11_ATOM_QTC_TOGGLE_STATUSBAR] = "_QTCURVE_TOGGLE_STATUSBAR_",
-    [QTC_X11_ATOM_QTC_OPACITY] = "_QTCURVE_OPACITY_",
-    [QTC_X11_ATOM_QTC_BGND] = "_QTCURVE_BGND_",
-
-    [QTC_X11_ATOM_XEMBED_INFO] = "_XEMBED_INFO",
+static const struct {
+    xcb_atom_t *atom;
+    const char *name;
+} qtc_x11_atoms[] = {
+    {&qtc_x11_net_wm_moveresize, "_NET_WM_MOVERESIZE"},
+    {&qtc_x11_net_wm_cm_s_default, wm_cm_s_atom_name},
+    {&qtc_x11_kde_net_wm_skip_shadow, "_KDE_NET_WM_SKIP_SHADOW"},
+    {&qtc_x11_kde_net_wm_force_shadow, "_KDE_NET_WM_FORCE_SHADOW"},
+    {&qtc_x11_kde_net_wm_shadow, "_KDE_NET_WM_SHADOW"},
+    {&qtc_x11_kde_net_wm_blur_behind_region, "_KDE_NET_WM_BLUR_BEHIND_REGION"},
+    {&qtc_x11_qtc_menubar_size, "_QTCURVE_MENUBAR_SIZE_"},
+    {&qtc_x11_qtc_statusbar, "_QTCURVE_STATUSBAR_"},
+    {&qtc_x11_qtc_titlebar_size, "_QTCURVE_TITLEBAR_SIZE_"},
+    {&qtc_x11_qtc_active_window, "_QTCURVE_ACTIVE_WINDOW_"},
+    {&qtc_x11_qtc_toggle_menubar, "_QTCURVE_TOGGLE_MENUBAR_"},
+    {&qtc_x11_qtc_toggle_statusbar, "_QTCURVE_TOGGLE_STATUSBAR_"},
+    {&qtc_x11_qtc_opacity, "_QTCURVE_OPACITY_"},
+    {&qtc_x11_qtc_bgnd, "_QTCURVE_BGND_"},
+    {&qtc_x11_xembed_info, "_XEMBED_INFO"}
 };
+#define QTC_X11_ATOM_N (sizeof(qtc_x11_atoms) / sizeof(qtc_x11_atoms[0]))
 
 QTC_EXPORT xcb_window_t
 (qtcX11RootWindow)(int scrn_no)
@@ -100,6 +114,27 @@ screen_of_display(xcb_connection_t *c, int screen)
     return NULL;
 }
 
+static void
+qtcX11AtomsInit()
+{
+    xcb_connection_t *conn = qtc_xcb_conn;
+    xcb_intern_atom_cookie_t cookies[QTC_X11_ATOM_N];
+    for (size_t i = 0;i < QTC_X11_ATOM_N;i++) {
+        cookies[i] = xcb_intern_atom(conn, 0, strlen(qtc_x11_atoms[i].name),
+                                     qtc_x11_atoms[i].name);
+    }
+    for (size_t i = 0;i < QTC_X11_ATOM_N;i++) {
+        xcb_intern_atom_reply_t *r =
+            xcb_intern_atom_reply(conn, cookies[i], NULL);
+        if (qtcLikely(r)) {
+            *qtc_x11_atoms[i].atom = r->atom;
+            free(r);
+        } else {
+            *qtc_x11_atoms[i].atom = 0;
+        }
+    }
+}
+
 QTC_EXPORT xcb_screen_t*
 (qtcX11GetScreen)(int screen_no)
 {
@@ -129,8 +164,7 @@ qtcX11InitXcb(xcb_connection_t *conn, int screen_no)
     }
     const size_t base_len = strlen("_NET_WM_CM_S");
     sprintf(wm_cm_s_atom_name + base_len, "%d", screen_no);
-    qtcX11GetAtoms(_QTC_X11_ATOM_NUMBER, qtc_x11_atoms,
-                   qtc_x11_atom_names, true);
+    qtcX11AtomsInit();
     qtcX11ShadowInit();
 }
 
@@ -173,30 +207,6 @@ qtcX11GenerateId()
     return 0;
 }
 
-QTC_EXPORT void
-qtcX11GetAtoms(size_t n, xcb_atom_t *atoms, const char *const names[],
-               bool create)
-{
-    xcb_connection_t *conn = qtc_xcb_conn;
-    memset(atoms, 0, sizeof(xcb_atom_t) * n);
-    if (qtcUnlikely(!conn)) {
-        return;
-    }
-    xcb_intern_atom_cookie_t cookies[n];
-    for (size_t i = 0;i < n;i++) {
-        cookies[i] = xcb_intern_atom(conn, !create,
-                                     strlen(names[i]), names[i]);
-    }
-    for (size_t i = 0;i < n;i++) {
-        xcb_intern_atom_reply_t *r =
-            xcb_intern_atom_reply(conn, cookies[i], 0);
-        if (r) {
-            atoms[i] = r->atom;
-            free(r);
-        }
-    }
-}
-
 QTC_EXPORT int32_t
 qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom)
 {
@@ -232,8 +242,7 @@ QTC_EXPORT bool
 qtcX11CompositingActive()
 {
     xcb_get_selection_owner_reply_t *reply =
-        qtcX11Call(get_selection_owner,
-                   qtc_x11_atoms[QTC_X11_ATOM_NET_WM_CM_S_DEFAULT]);
+        qtcX11Call(get_selection_owner, qtc_x11_net_wm_cm_s_default);
     if (!reply) {
         return false;
     }
@@ -267,10 +276,9 @@ qtcX11IsEmbed(xcb_window_t win)
 {
     if (qtcUnlikely(!win))
         return false;
-    xcb_atom_t xembed_atom = qtc_x11_atoms[QTC_X11_ATOM_XEMBED_INFO];
     xcb_get_property_reply_t *reply =
-        qtcX11Call(get_property, 0, win, xembed_atom,
-                   xembed_atom, 0, 1);
+        qtcX11Call(get_property, 0, win, qtc_x11_xembed_info,
+                   qtc_x11_xembed_info, 0, 1);
     if (!reply) {
         return false;
     }
