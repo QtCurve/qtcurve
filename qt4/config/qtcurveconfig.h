@@ -46,12 +46,9 @@ class CImagePropertiesDialog;
 class KAboutData;
 class KComponentData;
 
-class CGradientPreview : public QWidget
-{
+class CGradientPreview: public QWidget {
     Q_OBJECT
-
-    public:
-
+public:
     CGradientPreview(QtCurveConfig *c, QWidget *p);
     ~CGradientPreview();
 
@@ -60,73 +57,60 @@ class CGradientPreview : public QWidget
     void paintEvent(QPaintEvent *);
     void setGrad(const Gradient &g);
 
-    public Q_SLOTS:
-
+public Q_SLOTS:
     void setColor(const QColor &col);
 
-    private:
-
+private:
     QtCurveConfig *cfg;
     QColor        color;
     Gradient      grad;
     QStyle        *style;
 };
 
-struct Preset
-{
-    Preset(const Options &o, const QString &f=QString()) : loaded(true), opts(o), fileName(f) { }
-    Preset(const QString &f=QString()) : loaded(false), fileName(f) { }
+struct Preset {
+    Preset(const Options &o, const QString &f=QString()):
+        loaded(true), opts(o), fileName(f) {}
+    Preset(const QString &f=QString()): loaded(false), fileName(f) {}
 
-    bool    loaded;
+    bool loaded;
     Options opts;
     QString fileName;
 };
 
-class CStylePreview : public KXmlGuiWindow, public Ui::StylePreview
-{
+class CStylePreview: public KXmlGuiWindow, public Ui::StylePreview {
     Q_OBJECT
-
-    public:
-
+public:
     CStylePreview(QWidget *parent = 0);
     ~CStylePreview();
 
     void closeEvent(QCloseEvent *e);
     QSize sizeHint() const;
 
-    Q_SIGNALS:
-
+Q_SIGNALS:
     void closePressed();
 
-    private:
-
+private:
     KAboutData     *aboutData;
     KComponentData *componentData;
 };
 
-class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
-{
+class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase {
     Q_OBJECT
-
-    public:
-
+public:
     QtCurveConfig(QWidget *parent);
     virtual ~QtCurveConfig();
 
     QSize    sizeHint() const;
     EShading currentShading() const { return (EShading)shading->currentIndex(); }
 
-    Q_SIGNALS:
-
+Q_SIGNALS:
     void changed(bool);
 
-    public Q_SLOTS:
-
+public Q_SLOTS:
     void save();
     void defaults();
 
-    private Q_SLOTS:
-
+private Q_SLOTS:
     void setPreset();
     void updateChanged();
     void gtkButtonOrderChanged();
@@ -198,10 +182,10 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void copyGradient(QAction *act);
     void previewControlPressed();
 
-    public:
-
+public:
     bool savePreset(const QString &name);
-    QString getPresetName(const QString &cap, QString label, QString def, QString name=QString());
+    QString getPresetName(const QString &cap, QString label, QString def,
+                          QString name=QString());
     void setupStack();
     void setupPresets(const Options &currentStyle, const Options &defaultStyle);
     void setupPreview();
@@ -224,10 +208,13 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     int  getThinFlags();
     bool diffTitleBarButtonColors(const Options &opts);
     bool settingsChanged(const Options &opts);
-    bool settingsChanged() { return settingsChanged(presets[currentText].opts); }
+    bool
+    settingsChanged()
+    {
+        return settingsChanged(presets[currentText].opts);
+    }
 
 private:
-
     Options                previewStyle;
     CWorkspace             *workSpace;
     CStylePreview          *stylePreview;

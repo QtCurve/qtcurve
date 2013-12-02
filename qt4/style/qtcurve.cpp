@@ -498,8 +498,7 @@ static bool isNoEtchWidget(const QWidget *widget)
     if(APP_KRUNNER==theThemedApp)
         return true;
 
-    if(APP_PLASMA==theThemedApp)
-    {
+    if (APP_PLASMA == theThemedApp) {
         const QWidget *top=widget->window();
 
         return !top || (!qobject_cast<const QDialog*>(top) && !qobject_cast<const QMainWindow*>(top));
@@ -1483,12 +1482,12 @@ void Style::polish(QApplication *app)
     if(100!=opts.menuBgndOpacity && opts.noMenuBgndOpacityApps.contains(appName))
         opts.menuBgndOpacity=100;
 
-    if(APP_PLASMA==theThemedApp)
-        opts.bgndOpacity=100;
-    else if(APP_KWIN==theThemedApp)
-        opts.bgndOpacity=opts.dlgOpacity=100, opts.bgndAppearance=APPEARANCE_FLAT;
-    else if(APP_OPENOFFICE==theThemedApp)
-    {
+    if (APP_PLASMA == theThemedApp) {
+        opts.bgndOpacity = 100;
+    } else if (APP_KWIN == theThemedApp) {
+        opts.bgndOpacity = opts.dlgOpacity = 100;
+        opts.bgndAppearance = APPEARANCE_FLAT;
+    } else if(APP_OPENOFFICE==theThemedApp) {
         opts.scrollbarType=SCROLLBAR_WINDOWS;
         if(APPEARANCE_FADE==opts.menuitemAppearance)
             opts.menuitemAppearance=APPEARANCE_FLAT;
@@ -2451,13 +2450,13 @@ void Style::unpolish(QApplication *app)
 
 void Style::unpolish(QWidget *widget)
 {
-    if(!widget)
+    if (!widget)
         return;
 
-    if(EFFECT_NONE!=opts.buttonEffect && theNoEtchWidgets.contains(widget))
-    {
+    if (EFFECT_NONE != opts.buttonEffect && theNoEtchWidgets.contains(widget)) {
         theNoEtchWidgets.remove(static_cast<const QWidget*>(widget));
-        disconnect(widget, SIGNAL(destroyed(QObject*)), this, SLOT(widgetDestroyed(QObject*)));
+        disconnect(widget, SIGNAL(destroyed(QObject*)),
+                   this, SLOT(widgetDestroyed(QObject*)));
     }
 
     itsWindowManager->unregisterWidget(widget);
@@ -5491,19 +5490,19 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                                   QListView::IconMode!=((const QListView*)widget)->viewMode()))))),
                        modAlpha(!(state&State_Active) && itsInactiveChangeSelectionColor);
 
-                if (hover && !hasCustomBackground)
-                {
-                    if (!(state & State_Selected))
-                        color.setAlphaF(APP_PLASMA==theThemedApp && !widget ? (0.5 * (modAlpha ? 0.75 : 1.0)) : 0.20);
-                    else
-                    {
+                if (hover && !hasCustomBackground) {
+                    if (!(state & State_Selected)) {
+                        color.setAlphaF(APP_PLASMA == theThemedApp && !widget ?
+                                        (0.5 * (modAlpha ? 0.75 : 1.0)) : 0.20);
+                    } else {
                         color = color.lighter(110);
-                        if(modAlpha)
+                        if (modAlpha) {
                             color.setAlphaF(INACTIVE_SEL_ALPHA);
+                        }
                     }
+                } else if (modAlpha) {
+                    color.setAlphaF(color.alphaF() * INACTIVE_SEL_ALPHA);
                 }
-                else if(modAlpha)
-                    color.setAlphaF(color.alphaF()*INACTIVE_SEL_ALPHA);
 
                 if(square)
                     drawBevelGradient(color, painter, r, true, false, opts.selectionAppearance, WIDGET_SELECTION);

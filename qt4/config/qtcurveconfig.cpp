@@ -1295,24 +1295,25 @@ QSize QtCurveConfig::sizeHint() const
 
 void QtCurveConfig::save()
 {
-    if(!kwin->ok())
+    if (!kwin->ok())
         return;
 
-    Options opts=presets[currentText].opts;
+    Options opts = presets[currentText].opts;
 
     setOptions(opts);
 
-    if(IMG_FILE==opts.bgndImage.type)
-    {
-        opts.bgndImage.pixmap.file=installThemeFile(bgndImageDlg->fileName(), BGND_FILE IMAGE_FILE);
-//         printf("SAVE BGND:%s\n", opts.bgndImage.pixmap.file.toLatin1().constData());
-    }
-    else
+    if (IMG_FILE == opts.bgndImage.type) {
+        opts.bgndImage.pixmap.file = installThemeFile(bgndImageDlg->fileName(),
+                                                      BGND_FILE IMAGE_FILE);
+    } else {
         removeInstalledThemeFile(BGND_FILE IMAGE_FILE);
-    if(APPEARANCE_FILE==opts.bgndAppearance)
-        opts.bgndPixmap.file=installThemeFile(bgndPixmapDlg->fileName(), BGND_FILE);
-    else
+    }
+    if (APPEARANCE_FILE == opts.bgndAppearance) {
+        opts.bgndPixmap.file = installThemeFile(bgndPixmapDlg->fileName(),
+                                                BGND_FILE);
+    } else {
         removeInstalledThemeFile(BGND_FILE);
+    }
     if(IMG_FILE==opts.menuBgndImage.type)
     {
         opts.menuBgndImage.pixmap.file=installThemeFile(menuBgndImageDlg->fileName(), BGND_FILE MENU_FILE IMAGE_FILE);
@@ -1338,14 +1339,17 @@ void QtCurveConfig::save()
 
     kwin->save(0L);
     // If using QtCurve window decoration, get this to update...
-    KConfig      kwin("kwinrc", KConfig::CascadeConfig);
+    KConfig kwin("kwinrc", KConfig::CascadeConfig);
     KConfigGroup style(&kwin, "Style");
 
-    if(style.readEntry("PluginLib", QString())=="kwin3_qtcurve")
-        QDBusConnection::sessionBus().send(QDBusMessage::createSignal("/KWin", "org.kde.KWin", "reloadConfig"));
+    if (style.readEntry("PluginLib", QString()) == "kwin3_qtcurve") {
+        QDBusConnection::sessionBus().send(
+            QDBusMessage::createSignal("/KWin", "org.kde.KWin",
+                                       "reloadConfig"));
+    }
 
-    // Remove QTCURVE_PREVIEW_CONFIG setting, so that main kcmstyle preview does not revert to
-    // default settings!
+    // Remove QTCURVE_PREVIEW_CONFIG setting, so that main kcmstyle
+    // preview does not revert to default settings!
     qputenv(QTCURVE_PREVIEW_CONFIG, "");
 }
 

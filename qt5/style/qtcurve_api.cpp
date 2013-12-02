@@ -128,12 +128,12 @@ Style::polish(QApplication *app)
         opts.noMenuBgndOpacityApps.contains(appName))
         opts.menuBgndOpacity = 100;
 
-    if(APP_PLASMA == theThemedApp)
-        opts.bgndOpacity=100;
-    else if(APP_KWIN == theThemedApp)
-        opts.bgndOpacity=opts.dlgOpacity=100, opts.bgndAppearance = APPEARANCE_FLAT;
-    else if(APP_OPENOFFICE == theThemedApp)
-    {
+    if (APP_PLASMA == theThemedApp) {
+        opts.bgndOpacity = 100;
+    } else if (APP_KWIN == theThemedApp) {
+        opts.bgndOpacity = opts.dlgOpacity = 100;
+        opts.bgndAppearance = APPEARANCE_FLAT;
+    } else if(APP_OPENOFFICE == theThemedApp) {
         opts.scrollbarType=SCROLLBAR_WINDOWS;
         if(APPEARANCE_FADE == opts.menuitemAppearance)
             opts.menuitemAppearance = APPEARANCE_FLAT;
@@ -3533,15 +3533,15 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
                                  QListView::IconMode!=((const QListView *)widget)->viewMode()))))),
                 modAlpha(!(state&State_Active) && itsInactiveChangeSelectionColor);
 
-            if (hover && !hasCustomBackground)
-            {
-                if (!(state & State_Selected))
-                    color.setAlphaF(APP_PLASMA==theThemedApp && !widget ? (0.5 * (modAlpha ? 0.75 : 1.0)) : 0.20);
-                else
-                {
+            if (hover && !hasCustomBackground) {
+                if (!(state & State_Selected)) {
+                    color.setAlphaF(APP_PLASMA == theThemedApp && !widget ?
+                                    (0.5 * (modAlpha ? 0.75 : 1.0)) : 0.20);
+                }else {
                     color = color.lighter(110);
-                    if(modAlpha)
+                    if (modAlpha) {
                         color.setAlphaF(INACTIVE_SEL_ALPHA);
+                    }
                 }
             }
             else if(modAlpha)
