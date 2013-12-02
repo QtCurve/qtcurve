@@ -79,6 +79,20 @@ qtcIsWindow(const QWidget *w)
     return w && w->windowType() == Qt::Window;
 }
 
+QTC_ALWAYS_INLINE static inline bool
+qtcIsToolTip(const QWidget *w)
+{
+    Qt::WindowType type = w ? w->windowType() : (Qt::WindowType)0;
+    return (type == Qt::Tool || type == Qt::SplashScreen ||
+            type == Qt::ToolTip || type == Qt::Drawer);
+}
+
+QTC_ALWAYS_INLINE static inline bool
+qtcIsPopup(const QWidget *w)
+{
+    return w && w->windowType() == Qt::Popup;
+}
+
 QTC_ALWAYS_INLINE static inline QWidget*
 qtcToWidget(QObject *obj)
 {

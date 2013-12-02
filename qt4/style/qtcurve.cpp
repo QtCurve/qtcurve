@@ -943,10 +943,10 @@ Style::Style()
 __attribute__((hot)) void
 Style::prePolish(QWidget *widget) const
 {
-    // TODO: skip event hook if it is kwin
     if (theThemedApp == APP_KWIN) {
         return;
     }
+
     // HACK:
     // Set TranslucentBackground properties on toplevel widgets before they
     // create native windows. These windows are typically shown after being
@@ -999,8 +999,11 @@ Style::prePolish(QWidget *widget) const
             setTranslucentBackground(widget);
             qtcSetPrePolished(widget);
         } else if (opts.bgndOpacity != 100) {
-            if (qtcIsWindow(widget)) {
+            // TODO: Translucent tooltips, check popup/spash screen etc.
+            if (qtcIsWindow(widget) || qtcIsToolTip(widget)) {
                 if (!widget->testAttribute(Qt::WA_TranslucentBackground)) {
+                    // TODO: should probably set this one in polish
+                    //       where we have full information about the widget.
                     widget->setAttribute(Qt::WA_StyledBackground);
                     setTranslucentBackground(widget);
                     qtcSetPrePolishStarted(widget);
@@ -1482,9 +1485,7 @@ void Style::polish(QApplication *app)
     if(100!=opts.menuBgndOpacity && opts.noMenuBgndOpacityApps.contains(appName))
         opts.menuBgndOpacity=100;
 
-    if (APP_PLASMA == theThemedApp) {
-        opts.bgndOpacity = 100;
-    } else if (APP_KWIN == theThemedApp) {
+    if (APP_KWIN == theThemedApp) {
         opts.bgndOpacity = opts.dlgOpacity = 100;
         opts.bgndAppearance = APPEARANCE_FLAT;
     } else if(APP_OPENOFFICE==theThemedApp) {

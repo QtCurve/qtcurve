@@ -445,7 +445,6 @@ Style::Style() :
 __attribute__((hot)) void
 Style::prePolish(QWidget *widget) const
 {
-    // TODO: skip event hook if it is kwin
     if (theThemedApp == APP_KWIN) {
         return;
     }
@@ -477,8 +476,11 @@ Style::prePolish(QWidget *widget) const
             setTranslucentBackground(widget);
             qtcSetPrePolished(widget);
         } else if (opts.bgndOpacity != 100) {
-            if (qtcIsWindow(widget)) {
+            // TODO: Translucent tooltips, check popup/spash screen etc.
+            if (qtcIsWindow(widget) || qtcIsToolTip(widget)) {
                 if (!widget->testAttribute(Qt::WA_TranslucentBackground)) {
+                    // TODO: should probably set this one in polish
+                    //       where we have full information about the widget.
                     widget->setAttribute(Qt::WA_StyledBackground);
                     setTranslucentBackground(widget);
                     qtcSetPrePolishStarted(widget);
