@@ -28,7 +28,10 @@
 #  include <QApplication>
 #  include <QX11Info>
 #  include <qtcurve-utils/x11utils.h>
+#  include <qtcurve-utils/x11blur.h>
 #endif
+
+#include <QQuickWindow>
 
 namespace QtCurve {
 
@@ -45,6 +48,21 @@ qtcEventCallback(void **cbdata)
                     (!qtcGetWid(widget) || qtcGetPrePolishStarted(widget)))) {
         if (Style *style = qtcGetStyle(widget)) {
             style->prePolish(widget);
+        }
+    } else if (QQuickWindow *window = qobject_cast<QQuickWindow*>(receiver)) {
+        if (Style *style = qtcGetStyle(qApp)) {
+            QColor color = window->color();
+            int opacity = style->options().bgndOpacity;
+            if (color.alpha() == 255 && opacity != 100) {
+                qreal opacityF = opacity / 100.0;
+                window->setColor(QColor::fromRgbF(color.redF() * opacityF,
+                                                  color.greenF() * opacityF,
+                                                  color.blueF() * opacityF,
+                                                  opacityF));
+#ifdef QTC_ENABLE_X11
+                qtcX11BlurTrigger(window->winId(), true, 0, NULL);
+#endif
+            }
         }
     }
     return false;
@@ -65,6 +83,7 @@ StylePlugin::init()
     inited = true;
     QInternal::registerCallback(QInternal::EventNotifyCallback,
                                 qtcEventCallback);
+    QQuickWindow::setDefaultAlphaBuffer(true);
 #ifdef QTC_ENABLE_X11
     if (qApp->platformName() == "xcb") {
         qtcX11InitXcb(QX11Info::connection(), QX11Info::appScreen());
