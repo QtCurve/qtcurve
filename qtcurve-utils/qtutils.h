@@ -133,4 +133,13 @@ qtcSetPrePolishStarted(QWidget *w)
     w->setProperty("__QTC_PRE_POLISH_STARTED__", 1);
 }
 
+template<class StyleType, class C>
+static inline StyleType*
+_qtcGetStyle(const C *obj)
+{
+    QStyle *style = obj->style();
+    return style ? qobject_cast<StyleType*>(style) : 0;
+}
+#define qtcGetStyle(obj) _qtcGetStyle<Style>(obj)
+
 #endif
