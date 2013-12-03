@@ -178,15 +178,6 @@ QtcThemedApp theThemedApp = APP_OTHER;
 static QString getFile(const QString &f);
 QString appName = getFile(qApp->arguments()[0]);
 
-#ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-static QWidget*
-getActiveWindow(QWidget *widget)
-{
-    QWidget *activeWindow = QApplication::activeWindow();
-    return activeWindow && activeWindow!=widget ? activeWindow : 0L;
-}
-#endif
-
 //
 // OK, Etching looks cr*p on plasma widgets, and khtml...
 // CPD:TODO WebKit?

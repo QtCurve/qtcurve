@@ -116,12 +116,6 @@ Style::polish(QApplication *app)
     if(SHADE_NONE!=opts.menuStripe && opts.noMenuStripeApps.contains(appName))
         opts.menuStripe=SHADE_NONE;
 
-#ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-    // Plasma and Kate do not like the 'Fix parentless dialogs' option...
-    if(opts.fixParentlessDialogs && (APP_PLASMA == theThemedApp || opts.noDlgFixApps.contains(appName) || opts.noDlgFixApps.contains("kde")))
-        opts.fixParentlessDialogs=false;
-#endif
-
     if((100!=opts.bgndOpacity || 100!=opts.dlgOpacity) && (opts.noBgndOpacityApps.contains(appName) || appName.endsWith(".kss")))
         opts.bgndOpacity=opts.dlgOpacity=100;
     if (100 != opts.menuBgndOpacity &&
@@ -627,19 +621,6 @@ void Style::polish(QWidget *widget)
             widget->parentWidget()->parentWidget()->inherits("KFileWidget") /*&&
                                                                               widget->parentWidget()->parentWidget()->parentWidget()->inherits("KFileDialog")*/)
         ((QDockWidget*)widget)->setTitleBarWidget(new QtCurveDockWidgetTitleBar(widget));
-#ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-    else if(opts.fixParentlessDialogs && qobject_cast<QDialog*>(widget) &&
-            widget->windowType() && !widget->parentWidget()
-            /*|| widget->parentWidget()->isHidden())*/) {
-        QWidget *activeWindow = getActiveWindow(widget);
-
-        if (activeWindow) {
-            itsReparentedDialogs[widget]=widget->parentWidget();
-            widget->setParent(activeWindow, widget->windowFlags());
-        }
-        Utils::addEventFilter(widget, this);
-    }
-#endif
     else if((!qtcIsFlatBgnd(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) &&
             widget->inherits("QComboBoxPrivateContainer") && !widget->testAttribute(Qt::WA_TranslucentBackground))
         setTranslucentBackground(widget);
@@ -991,10 +972,6 @@ void Style::unpolish(QWidget *widget)
         delete ((QDockWidget *)widget)->titleBarWidget();
         ((QDockWidget *)widget)->setTitleBarWidget(0L);
     }
-#ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-    else if(opts.fixParentlessDialogs && qobject_cast<QDialog *>(widget))
-        widget->removeEventFilter(this);
-#endif
     else if(opts.boldProgress && "CE_CapacityBar"==widget->objectName())
         unSetBold(widget);
 
@@ -1493,20 +1470,6 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 itsProgressBarAnimateTimer = 0;
             }
         }
-#ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-        if(opts.fixParentlessDialogs && qobject_cast<QDialog *>(object) && itsReparentedDialogs.contains((QWidget*)object))
-        {
-            QWidget *widget=(QWidget*)object;
-
-            // OK, reset back to its original parent..
-            if (widget->windowType()) {
-                widget->removeEventFilter(this);
-                widget->setParent(itsReparentedDialogs[widget]);
-                Utils::addEventFilter(widget, this);
-            }
-            itsReparentedDialogs.remove(widget);
-        }
-#endif
         break;
     }
     case QEvent::Enter:
@@ -1541,28 +1504,6 @@ bool Style::eventFilter(QObject *object, QEvent *event)
             return false;
         }
         break;
-#ifdef QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-    case 70: // QEvent::ChildInserted - QT3_SUPPORT
-        if(opts.fixParentlessDialogs && qobject_cast<QDialog *>(object))
-        {
-            QDialog *dlg=(QDialog *)object;
-
-            // The parent->isHidden is needed for KWord. It's insert picture file dialog is a child of the insert picture dialog - but the file
-            // dialog is shown *before* the picture dialog!
-            if (dlg && dlg->windowType() &&
-                (!dlg->parentWidget() || dlg->parentWidget()->isHidden())) {
-                QWidget *activeWindow = getActiveWindow((QWidget*)object);
-
-                if (activeWindow) {
-                    dlg->removeEventFilter(this);
-                    dlg->setParent(activeWindow, dlg->windowFlags());
-                    dlg->installEventFilter(this);
-                    itsReparentedDialogs[(QWidget*)dlg]=dlg->parentWidget();
-                    return false;
-                }
-            }
-        }
-#endif
     default:
         break;
     }
@@ -2612,27 +2553,29 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
         if(!opts.drawStatusBarFrames)
             break;
     case PE_FrameMenu:
-        if((opts.square&SQUARE_POPUP_MENUS) &&
-           (qtcIsFlatBgnd(opts.menuBgndAppearance) ||
-            (opts.gtkComboMenus && widget && widget->parent() && qobject_cast<const QComboBox *>(widget->parent()))))
-        {
-            const QColor    *use(popupMenuCols(option));
-            EGradientBorder border=qtcGetGradient(opts.menuBgndAppearance, &opts)->border;
+        if ((opts.square & SQUARE_POPUP_MENUS) &&
+            (qtcIsFlatBgnd(opts.menuBgndAppearance) ||
+             (opts.gtkComboMenus && widget && widget->parent() &&
+              qobject_cast<const QComboBox*>(widget->parent())))) {
+            qDebug() << painter;
+            const QColor *use(popupMenuCols(option));
+            EGradientBorder border =
+                qtcGetGradient(opts.menuBgndAppearance, &opts)->border;
             painter->save();
             painter->setPen(use[QTC_STD_BORDER]);
             drawRect(painter, r);
 
-            if(USE_BORDER(border) && APPEARANCE_FLAT!=opts.menuBgndAppearance)
-            {
+            if (USE_BORDER(border) &&
+                APPEARANCE_FLAT != opts.menuBgndAppearance) {
                 painter->setPen(use[0]);
-                if(GB_LIGHT==border)
+                if (GB_LIGHT == border) {
                     drawRect(painter, r.adjusted(1, 1, -1, -1));
-                else
-                {
-                    if(GB_3D!=border)
-                    {
-                        painter->drawLine(r.x()+1, r.y()+1, r.x()+r.width()-2,  r.y()+1);
-                        painter->drawLine(r.x()+1, r.y()+1, r.x()+1,  r.y()+r.height()-2);
+                } else {
+                    if (GB_3D != border) {
+                        painter->drawLine(r.x() + 1, r.y() + 1,
+                                          r.x() + r.width() - 2,  r.y() + 1);
+                        painter->drawLine(r.x() + 1, r.y() + 1, r.x() + 1,
+                                          r.y() + r.height() - 2);
                     }
                     painter->setPen(use[FRAME_DARK_SHADOW]);
                     painter->drawLine(r.x()+1, r.y()+r.height()-2, r.x()+r.width()-2,  r.y()+r.height()-2);
