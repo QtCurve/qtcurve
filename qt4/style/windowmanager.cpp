@@ -110,11 +110,9 @@ namespace QtCurve {
         _locked( false ),
         _cursorOverride( false )
     {
-
         // install application wise event filter
-        _appEventFilter = new AppEventFilter( this );
-        qApp->installEventFilter( _appEventFilter );
-
+        _appEventFilter = new AppEventFilter(this);
+        qApp->installEventFilter(_appEventFilter);
     }
 
     //_____________________________________________________________
@@ -135,31 +133,25 @@ namespace QtCurve {
 
     }
 
-    //_____________________________________________________________
     void WindowManager::registerWidget( QWidget* widget )
     {
-
-        if( isBlackListed( widget ) )
-        {
-
+        if (isBlackListed(widget)) {
             /*
             also install filter for blacklisted widgets
             to be able to catch the relevant events and prevent
             the drag to happen
             */
-            Utils::addEventFilter(widget, this);
-
-        } else if( isDragable( widget ) ) {
-            Utils::addEventFilter(widget, this);
+            widget->installEventFilter(this);
+        } else if (isDragable(widget)) {
+            widget->installEventFilter(this);
         }
-
     }
 
-    //_____________________________________________________________
     void WindowManager::unregisterWidget( QWidget* widget )
     {
-        if( widget )
-        { widget->removeEventFilter( this ); }
+        if (widget) {
+            widget->removeEventFilter(this);
+        }
     }
 
     //_____________________________________________________________

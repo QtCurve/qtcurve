@@ -28,11 +28,6 @@
 
 namespace QtCurve {
 namespace Utils {
-static inline void addEventFilter(QObject *object, QObject *filter)
-{
-    object->removeEventFilter(filter);
-    object->installEventFilter(filter);
-}
 bool compositingActive();
 bool hasAlphaChannel(const QWidget *widget);
 }

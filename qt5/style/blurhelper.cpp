@@ -65,7 +65,6 @@
 #endif
 
 namespace QtCurve {
-//___________________________________________________________
 BlurHelper::BlurHelper(QObject *parent):
     QObject(parent),
     _enabled(false)
@@ -75,7 +74,7 @@ BlurHelper::BlurHelper(QObject *parent):
 void
 BlurHelper::registerWidget(QWidget *widget)
 {
-    Utils::addEventFilter(widget, this);
+    widget->installEventFilter(this);
 }
 
 void
