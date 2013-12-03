@@ -55,8 +55,6 @@ option(QTC_QT4_STYLE_SUPPORT
 
 option(QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
   "Qt4 support for the 'fix parentless dialogs'." Off)
-option(QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-  "Qt5 support for the 'fix parentless dialogs'." Off)
 
 option(QTC_GTK2_MODIFY_MOZILLA "Modify Mozilla Gtk2 with js and css." Off)
 option(QTC_GTK2_USE_CAIRO_FOR_ARROWS "Using ciaro to draw arrows." Off)
