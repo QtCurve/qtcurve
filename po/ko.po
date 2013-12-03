@@ -4151,46 +4151,6 @@ msgstr ""
 msgid "Use KDE equivalent"
 msgstr "KDE와 동일하게 사용하기(&K)"
 
-#. i18n: file: config/qtcurveconfigbase.ui:3697
-#. i18n: ectx: property (text), widget (QLabel, fixParentlessDialogs_label)
-#: po/rc.cpp:1373 rc.cpp:1373
-msgid "'Parent-less' dialogs:"
-msgstr "'부모 없는' 대화 상자:"
-
-#. i18n: file: config/qtcurveconfigbase.ui:3709
-#. i18n: ectx: property (toolTip), widget (QCheckBox, fixParentlessDialogs)
-#: po/rc.cpp:1376 rc.cpp:1376
-msgid ""
-"<p><b>Warning: Experimental!</b></p>\n"
-"<p>Some applications - such as Kate, Kaffeine, and GIMP - produce dialogs "
-"that have no 'parent'. This causes the dialog to recieve an entry in the "
-"taskbar, and allows the dialog to be minimised independantly of the main "
-"application window.</p>\n"
-"\n"
-"<p>If you enable this option, QtCurve will try to 'fix' this by assigning "
-"the dialogs a parent. </p>\n"
-"\n"
-"<p><i><b>Note:</b> This may break some applications, as it wiill alter the "
-"behaviour of dialogs in a way the application has not intended. Therefore, "
-"please use with care.</i></p>"
-msgstr ""
-"<p><b>경고: 실험적입니다!</b></p>\n"
-"<p>Kate, Kaffeine과 GIMP와 같은 몇몇 프로그램은 '부모'가 없는 대화 상자를 만듭니다. 이것은 대화 상자가 작업 "
-"표시줄에 등록이 되도록 하고, "
-"대화 상자가 메인 프로그램 창에 독립적으로 최소화 되는 것을 허락합니다.</p>\n"
-"\n"
-"<p>만약, 이 옵션을 사용한다면, QtCurve는 대화 상자를 부모에게 할당함으로써 이것을 '수정'하려고 시도합니다. </p>\n"
-"\n"
-"<p><i><b>주의:</b> 이것은 프로그램이 의도하지 않은 방법으로 대화 상자의 행동을 바꿈으로써, 몇몇 프로그램을 고장낼 수 "
-"있습니다. "
-"그러므로, 주의해서 사용하십시오.</i></p>"
-
-#. i18n: file: config/qtcurveconfigbase.ui:3712
-#. i18n: ectx: property (text), widget (QCheckBox, fixParentlessDialogs)
-#: po/rc.cpp:1384 rc.cpp:1384
-msgid "Re-parent to currently active window"
-msgstr "현재 활성 창을 부모로 하기(&R)"
-
 #. i18n: file: config/qtcurveconfigbase.ui:3719
 #. i18n: ectx: property (text), widget (QLabel, label)
 #: po/rc.cpp:1387 rc.cpp:1387

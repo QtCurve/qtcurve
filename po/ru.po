@@ -4386,48 +4386,6 @@ msgstr ""
 msgid "Use KDE equivalent"
 msgstr "Использовать эквиваленты KDE"
 
-#. i18n: file: config/qtcurveconfigbase.ui:3697
-#. i18n: ectx: property (text), widget (QLabel, fixParentlessDialogs_label)
-#: po/rc.cpp:1373 rc.cpp:1373
-msgid "'Parent-less' dialogs:"
-msgstr "Диалоговые окна без родительского окна (parent-less):"
-
-#. i18n: file: config/qtcurveconfigbase.ui:3709
-#. i18n: ectx: property (toolTip), widget (QCheckBox, fixParentlessDialogs)
-#: po/rc.cpp:1376 rc.cpp:1376
-msgid ""
-"<p><b>Warning: Experimental!</b></p>\n"
-"<p>Some applications - such as Kate, Kaffeine, and GIMP - produce dialogs "
-"that have no 'parent'. This causes the dialog to receive an entry in the "
-"taskbar, and allows the dialog to be minimised independantly of the main "
-"application window.</p>\n"
-"\n"
-"<p>If you enable this option, QtCurve will try to 'fix' this by assigning "
-"the dialogs a parent. </p>\n"
-"\n"
-"<p><i><b>Note:</b> This may break some applications, as it wiill alter the "
-"behaviour of dialogs in a way the application has not intended. Therefore, "
-"please use with care.</i></p>"
-msgstr ""
-"<p><b>ВНИМАНИЕ: Экспериментальная функция!</b></p>\n"
-"<p>Некоторые приложения — такие, как Kate, Kaffeine и GIMP — создают"
-"диалоги без родительского окна. Поэтому такие диалоги получают свой "
-"пункт на панели задач, и их можно свернуть независимо от окна главного "
-"приложения.</p>\n"
-"\n"
-"<p>Если эта опция будет включена, QtCurve постарается исправить это, "
-"назначив диалогу «родителя». </p>\n"
-"\n"
-"<p><i><b>Примечание:</b> Это может поломать работу некоторых приложений, "
-"поскольку изменит поведение диалогов на такое, какое не планировалось в "
-"данном приложении. Поэтому используйте эту опцию с осторожностью.</i></p>"
-
-#. i18n: file: config/qtcurveconfigbase.ui:3712
-#. i18n: ectx: property (text), widget (QCheckBox, fixParentlessDialogs)
-#: po/rc.cpp:1384 rc.cpp:1384
-msgid "Re-parent to currently active window"
-msgstr "Сделать текущее активное окно родительским для этого диалога"
-
 #. i18n: file: config/qtcurveconfigbase.ui:3719
 #. i18n: ectx: property (text), widget (QLabel, label)
 #: po/rc.cpp:1387 rc.cpp:1387
