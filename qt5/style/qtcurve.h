@@ -351,7 +351,6 @@ private:
     void shade(const color &ca, color *cb, double k) const;
     QColor getLowerEtchCol(const QWidget *widget) const;
     int getFrameRound(const QWidget *widget) const;
-    void  unregisterArgbWidget(QWidget *w);
 
 private Q_SLOTS:
     virtual QIcon standardIcon(StandardPixmap pix, const QStyleOption *option=0,
@@ -418,7 +417,6 @@ private:
     mutable const QWidget *itsSbWidget;
     mutable QLabel *itsClickedLabel;
     QSet<QProgressBar*> itsProgressBars;
-    QSet<QWidget*> itsTransparentWidgets;
     int itsProgressBarAnimateTimer,
         itsAnimateStep;
     QTime itsTimer;

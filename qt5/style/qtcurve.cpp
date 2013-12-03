@@ -4166,15 +4166,6 @@ int Style::getFrameRound(const QWidget *widget) const
     return ROUNDED_ALL;
 }
 
-void Style::unregisterArgbWidget(QWidget *w)
-{
-    if(itsTransparentWidgets.contains(w))
-    {
-        w->setAttribute(Qt::WA_NoSystemBackground, false);
-        w->setAttribute(Qt::WA_TranslucentBackground, false);
-    }
-}
-
 void Style::widgetDestroyed(QObject *o)
 {
     QWidget *w = static_cast<QWidget*>(o);
@@ -4198,7 +4189,6 @@ void Style::widgetDestroyed(QObject *o)
             itsSViewContainers.remove(*r);
         }
     }
-    unregisterArgbWidget(w);
 }
 
 #ifdef QTC_QT5_ENABLE_KDE

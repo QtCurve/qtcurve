@@ -78,12 +78,11 @@ blendOOMenuHighlight(const QPalette &pal, const QColor &highlight)
 
 bool isNoEtchWidget(const QWidget *widget)
 {
-    if(APP_KRUNNER==theThemedApp)
+    if (APP_KRUNNER==theThemedApp)
         return true;
 
-    if(APP_PLASMA==theThemedApp)
-    {
-        const QWidget *top=widget->window();
+    if (APP_PLASMA==theThemedApp) {
+        const QWidget *top = widget->window();
 
         return !top || (!qobject_cast<const QDialog *>(top) && !qobject_cast<const QMainWindow *>(top));
     }

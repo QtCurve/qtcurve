@@ -486,7 +486,7 @@ static bool isKateView(const QWidget *widget)
 
 static bool isNoEtchWidget(const QWidget *widget)
 {
-    if(APP_KRUNNER==theThemedApp)
+    if (APP_KRUNNER == theThemedApp)
         return true;
 
     if (APP_PLASMA == theThemedApp) {
@@ -1424,9 +1424,9 @@ void Style::polish(QApplication *app)
     if("kwin"==appName)
         theThemedApp=APP_KWIN;
     else if("systemsettings"==appName)
-        theThemedApp=APP_SYSTEMSETTINGS;
+        theThemedApp = APP_SYSTEMSETTINGS;
     else if("plasma"==appName || appName.startsWith("plasma-"))
-        theThemedApp=APP_PLASMA;
+        theThemedApp = APP_PLASMA;
     else if("krunner"==appName || "krunner_lock"==appName || "kscreenlocker"==appName)
         theThemedApp=APP_KRUNNER;
     else if("kontact"==appName)
@@ -1832,10 +1832,6 @@ Style::polish(QWidget *widget)
             }
             widget->setWindowIcon(icon);
 
-            // PE_Widget is not called for transparent widgets,
-            // so need event filter here...
-            widget->installEventFilter(this);
-            itsTransparentWidgets.insert(widget);
             connect(widget, SIGNAL(destroyed(QObject*)),
                     SLOT(widgetDestroyed(QObject*)));
 #endif
@@ -1847,20 +1843,6 @@ Style::polish(QWidget *widget)
         case Qt::Tool:
             // this we exclude as it is used for dragging of icons etc
         default:
-            // Not setting translucent background on QGLWidget seems to cause
-            // crashing in amarok. (Oxygen-Transparent has the same issue).
-            // Not Sure whether this is the right fix, what causes the crash
-            // and how it interfere with XEmbed etc.
-            // Need explore on the issue more but setting this property
-            // doesn't seems to cause any rendering problem (AFAIK).
-            // Keep it for now.
-            // TODO:
-            //     Find out the real problem (or at least reproduce the crash
-            //     with a simpler program)
-            //     Check Qt5
-            // if (widget->inherits("QGLWidget")) {
-            //     setTranslucentBackground(widget);
-            // }
             break;
         }
         if (qobject_cast<QSlider*>(widget))
@@ -2437,7 +2419,6 @@ void Style::unpolish(QWidget *widget)
     itsShadowHelper->unregisterWidget(widget);
 #endif
     itsBlurHelper->unregisterWidget(widget);
-    unregisterArgbWidget(widget);
 
     // Sometimes get background errors with QToolBox (e.g. in Bespin config), and setting WA_StyledBackground seems to
     // fix this,..
@@ -13579,14 +13560,6 @@ int Style::getFrameRound(const QWidget *widget) const
     return ROUNDED_ALL;
 }
 
-void Style::unregisterArgbWidget(QWidget *w)
-{
-    if (itsTransparentWidgets.contains(w)) {
-        w->setAttribute(Qt::WA_NoSystemBackground, false);
-        w->setAttribute(Qt::WA_TranslucentBackground, false);
-    }
-}
-
 void Style::widgetDestroyed(QObject *o)
 {
     QWidget *w=static_cast<QWidget*>(o);
@@ -13611,7 +13584,6 @@ void Style::widgetDestroyed(QObject *o)
         for(; r!=remEnd; ++r)
             itsSViewContainers.remove(*r);
     }
-    unregisterArgbWidget(w);
 }
 
 #ifdef QTC_QT4_ENABLE_KDE

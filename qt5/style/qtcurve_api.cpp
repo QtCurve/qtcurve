@@ -835,7 +835,6 @@ void Style::unpolish(QWidget *widget)
     itsShadowHelper->unregisterWidget(widget);
 #endif
     itsBlurHelper->unregisterWidget(widget);
-    unregisterArgbWidget(widget);
 
     // Sometimes get background errors with QToolBox (e.g. in Bespin config), and setting WA_StyledBackground seems to
     // fix this,..
@@ -3475,7 +3474,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
                 if (!(state & State_Selected)) {
                     color.setAlphaF(APP_PLASMA == theThemedApp && !widget ?
                                     (0.5 * (modAlpha ? 0.75 : 1.0)) : 0.20);
-                }else {
+                } else {
                     color = color.lighter(110);
                     if (modAlpha) {
                         color.setAlphaF(INACTIVE_SEL_ALPHA);
