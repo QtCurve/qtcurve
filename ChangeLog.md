@@ -18,6 +18,7 @@
 13. Fix flash plugin in non-chromium/firefox browsers in linux when translucent
     background is enabled for gtk.
 14. Fix (workaround) kaffeine with translucent background.
+15. Remove parentless dialog fix
 
 ## 1.8.17
 1. **Add Qt5 support!!**.

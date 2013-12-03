@@ -20,7 +20,6 @@ embolden=false
 fadeLines=true
 fillProgress=true
 fillSlider=true
-fixParentlessDialogs=false
 focus=filled
 framelessGroupBoxes=true
 groupBoxLine=false

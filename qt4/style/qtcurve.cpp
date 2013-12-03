@@ -367,15 +367,6 @@ static void unSetBold(QWidget *widget)
     }
 }
 
-#ifdef QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-static QWidget * getActiveWindow(QWidget *widget)
-{
-    QWidget *activeWindow=QApplication::activeWindow();
-
-    return activeWindow && activeWindow!=widget ? activeWindow : 0L;
-}
-#endif
-
 static void adjustToolbarButtons(const QWidget *widget, const QToolBar *toolbar, int &leftAdjust, int &topAdjust,
                                  int &rightAdjust, int &bottomAdjust, int &round)
 {
@@ -1474,12 +1465,6 @@ void Style::polish(QApplication *app)
     if(SHADE_NONE!=opts.menuStripe && opts.noMenuStripeApps.contains(appName))
         opts.menuStripe=SHADE_NONE;
 
-#ifdef QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-    // Plasma and Kate do not like the 'Fix parentless dialogs' option...
-    if(opts.fixParentlessDialogs && (APP_PLASMA==theThemedApp || opts.noDlgFixApps.contains(appName) || opts.noDlgFixApps.contains("kde")))
-        opts.fixParentlessDialogs=false;
-#endif
-
     if((100!=opts.bgndOpacity || 100!=opts.dlgOpacity) && (opts.noBgndOpacityApps.contains(appName) || appName.endsWith(".kss")))
         opts.bgndOpacity=opts.dlgOpacity=100;
     if(100!=opts.menuBgndOpacity && opts.noMenuBgndOpacityApps.contains(appName))
@@ -2104,20 +2089,6 @@ Style::polish(QWidget *widget)
         ((QDockWidget*)widget)
             ->setTitleBarWidget(new QtCurveDockWidgetTitleBar(widget));
     }
-#ifdef QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-    else if (opts.fixParentlessDialogs && qobject_cast<QDialog*>(widget) &&
-             widget->windowType() && !widget->parentWidget()
-             /*|| widget->parentWidget()->isHidden())*/) {
-        QWidget *activeWindow=getActiveWindow(widget);
-
-        if(activeWindow)
-        {
-            itsReparentedDialogs[widget]=widget->parentWidget();
-            widget->setParent(activeWindow, widget->windowFlags());
-        }
-        widget->installEventFilter(this);
-    }
-#endif
     else if ((!qtcIsFlatBgnd(opts.menuBgndAppearance) ||
               100 != opts.menuBgndOpacity ||
               !(opts.square & SQUARE_POPUP_MENUS)) &&
@@ -2618,10 +2589,6 @@ void Style::unpolish(QWidget *widget)
         delete ((QDockWidget*)widget)->titleBarWidget();
         ((QDockWidget*)widget)->setTitleBarWidget(0L);
     }
-#ifdef QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-    else if(opts.fixParentlessDialogs && qobject_cast<QDialog*>(widget))
-        widget->removeEventFilter(this);
-#endif
     else if(opts.boldProgress && "CE_CapacityBar"==widget->objectName())
         unSetBold(widget);
 
@@ -3139,20 +3106,6 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                     itsProgressBarAnimateTimer = 0;
                 }
             }
-#ifdef QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-            if(opts.fixParentlessDialogs && qobject_cast<QDialog*>(object) && itsReparentedDialogs.contains((QWidget*)object))
-            {
-                QWidget *widget=(QWidget*)object;
-
-                // OK, reset back to its original parent..
-                if (widget->windowType()) {
-                    widget->removeEventFilter(this);
-                    widget->setParent(itsReparentedDialogs[widget]);
-                    widget->installEventFilter(this);
-                }
-                itsReparentedDialogs.remove(widget);
-            }
-#endif
             break;
         }
         case QEvent::Enter:
@@ -3209,29 +3162,6 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 return false;
             }
             break;
-#ifdef QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-        case 70: // QEvent::ChildInserted - QT3_SUPPORT
-            if(opts.fixParentlessDialogs && qobject_cast<QDialog*>(object))
-            {
-                QDialog *dlg=(QDialog*)object;
-
-                // The parent->isHidden is needed for KWord. It's insert picture file dialog is a child of the insert picture dialog - but the file
-                // dialog is shown *before* the picture dialog!
-                if (dlg && dlg->windowType() &&
-                    (!dlg->parentWidget() || dlg->parentWidget()->isHidden())) {
-                    QWidget *activeWindow=getActiveWindow((QWidget*)object);
-
-                    if(activeWindow)
-                    {
-                        dlg->removeEventFilter(this);
-                        dlg->setParent(activeWindow, dlg->windowFlags());
-                        dlg->installEventFilter(this);
-                        itsReparentedDialogs[(QWidget*)dlg]=dlg->parentWidget();
-                        return false;
-                    }
-                }
-            }
-#endif
         default:
             break;
     }

@@ -183,10 +183,6 @@ gboolean mapToTopLevel(GdkWindow *window, GtkWidget *widget, gint *x, gint *y, g
 int getRound(const char *detail, GtkWidget *widget, int x, int y,
              int width, int height, gboolean rev);
 
-#ifdef QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-GtkWidget * getParentWindow(GtkWidget *widget);
-void dialogMapEvent(GtkWidget *widget, gpointer user_data);
-#endif
 gboolean treeViewCellHasChildren(GtkTreeView *treeView, GtkTreePath *path);
 gboolean treeViewCellIsLast(GtkTreeView *treeView, GtkTreePath *path);
 GtkTreePath * treeViewPathParent(GtkTreeView *treeView, GtkTreePath *path);

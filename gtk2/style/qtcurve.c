@@ -148,46 +148,6 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
         }
     }
 #endif
-#ifdef QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-    if(widget && opts.fixParentlessDialogs && !isMenuOrToolTipWindow && GTK_IS_WINDOW(widget) && detail && 0==strcmp(detail, "base"))
-    {
-        GtkWidget *topLevel=gtk_widget_get_toplevel(widget);
-
-        if(topLevel && gtk_widget_is_toplevel(topLevel))
-        {
-            const gchar *typename=g_type_name(G_OBJECT_TYPE(topLevel));
-
-            if(GTK_APP_GIMP_PLUGIN==qtSettings.app)
-            {
-                /* CPD should really try to find active GIMP window... */
-                gtk_window_set_skip_taskbar_hint(GTK_WINDOW(topLevel), TRUE);
-                gtk_window_set_skip_pager_hint(GTK_WINDOW(topLevel), TRUE);
-                gtk_window_set_keep_above(GTK_WINDOW(topLevel), TRUE);
-            }
-            else if((GTK_WINDOW(topLevel)->modal || GTK_IS_DIALOG(topLevel) || /*GTK_APP_GAIM==qtSettings.app ||*/
-                    (GTK_APP_GIMP==qtSettings.app && strcmp(typename, GIMP_WINDOW) && strcmp(typename, GIMP_MAIN) ) ) &&
-                   !g_object_get_data(G_OBJECT(topLevel), MODAL_HACK) && NULL==gtk_window_get_transient_for(GTK_WINDOW(topLevel)))
-            {
-                g_object_set_data(G_OBJECT(topLevel), MODAL_HACK, (gpointer)1);
-
-                /*
-                  For non-modal dialogs we set the transient hint when the "map" event is received, this has the
-                  effect that the dialog is placed where it would've been without this hack, but it does not get
-                  a taskbar entry... This "fixes" gimp and its multitude of dialogs...
-                */
-                if(!GTK_WINDOW(topLevel)->modal)
-                    g_signal_connect(G_OBJECT(topLevel), "map", G_CALLBACK(dialogMapEvent), topLevel);
-                else
-                {
-                    GtkWidget *top=getParentWindow(topLevel);
-
-                    if(top)
-                        GTK_WINDOW(topLevel)->transient_parent=GTK_WINDOW(top);
-                }
-            }
-        }
-    }
-#endif
 
     if(opts.windowDrag>WM_DRAG_MENU_AND_TOOLBAR && (DETAIL("base") || DETAIL("eventbox") || DETAIL("viewportbin")))
         qtcWMMoveSetup(widget);

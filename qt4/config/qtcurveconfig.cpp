@@ -1008,15 +1008,6 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(toolbarSeparators, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(splitters, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(fillSlider, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-#ifdef QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-    connect(noDlgFixApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
-    connect(fixParentlessDialogs, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-#else
-    fixParentlessDialogs_label->hide();
-    fixParentlessDialogs->hide();
-    noDlgFixApps_label->hide();
-    noDlgFixApps->hide();
-#endif
     connect(stripedSbar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(sliderStyle, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(roundMbTopOnly, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -2984,10 +2975,6 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.menubarMouseOver=menubarMouseOver->isChecked();
     opts.shadeMenubarOnlyWhenActive=shadeMenubarOnlyWhenActive->isChecked();
     opts.thin=getThinFlags();
-#ifdef QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-    opts.fixParentlessDialogs=fixParentlessDialogs->isChecked();
-    opts.noDlgFixApps=toSet(noDlgFixApps->text());
-#endif
     opts.animatedProgress=animatedProgress->isChecked();
     opts.stripedProgress=(EStripe)stripedProgress->currentIndex();
     opts.lighterPopupMenuBgnd=lighterPopupMenuBgnd->value();
@@ -3260,10 +3247,6 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     thin_menuitems->setChecked(opts.thin&THIN_MENU_ITEMS);
     thin_buttons->setChecked(opts.thin&THIN_BUTTONS);
     thin_frames->setChecked(opts.thin&THIN_FRAMES);
-#ifdef QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-    fixParentlessDialogs->setChecked(opts.fixParentlessDialogs);
-    noDlgFixApps->setText(toString(opts.noDlgFixApps));
-#endif
     animatedProgress->setChecked(opts.animatedProgress);
     stripedProgress->setCurrentIndex(opts.stripedProgress);
     embolden->setChecked(opts.embolden);
@@ -3685,10 +3668,6 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          menubarMouseOver->isChecked()!=opts.menubarMouseOver ||
          shadeMenubarOnlyWhenActive->isChecked()!=opts.shadeMenubarOnlyWhenActive ||
          getThinFlags()!=opts.thin ||
-#ifdef QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-         fixParentlessDialogs->isChecked()!=opts.fixParentlessDialogs ||
-         toSet(noDlgFixApps->text())!=opts.noDlgFixApps ||
-#endif
          animatedProgress->isChecked()!=opts.animatedProgress ||
          stripedProgress->currentIndex()!=opts.stripedProgress ||
          lighterPopupMenuBgnd->value()!=opts.lighterPopupMenuBgnd ||

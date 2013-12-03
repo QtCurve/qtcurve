@@ -430,9 +430,6 @@ private:
         itsAnimateStep;
     QTime itsTimer;
     mutable QMap<int, QColor*> itsTitleBarButtonsCols;
-#ifdef QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-    mutable QMap<QWidget*, QWidget*> itsReparentedDialogs;
-#endif
     mutable QList<int> itsMdiButtons[2]; // 0=left, 1=right
     mutable int itsTitlebarHeight;
 

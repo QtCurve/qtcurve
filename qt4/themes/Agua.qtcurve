@@ -9,7 +9,6 @@ comboBtn=selected
 crColor=true
 customShades=0
 defBtnIndicator=tint
-fixParentlessDialogs=false
 glowProgress=true
 gtkComboMenus=true
 highlightFactor=7

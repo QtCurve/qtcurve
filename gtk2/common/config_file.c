@@ -950,10 +950,6 @@ static void copyOpts(Options *src, Options *dest)
         dest->noBgndOpacityApps=src->noBgndOpacityApps;
         dest->noMenuBgndOpacityApps=src->noMenuBgndOpacityApps;
         dest->noBgndImageApps=src->noBgndImageApps;
-#ifdef QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-        dest->noDlgFixApps=src->noDlgFixApps;
-        src->noDlgFixApps=NULL;
-#endif
         dest->noMenuStripeApps=src->noMenuStripeApps;
         src->noBgndGradientApps=src->noBgndOpacityApps=src->noMenuBgndOpacityApps=src->noBgndImageApps=src->noMenuStripeApps=NULL;
         memcpy(dest->customShades, src->customShades,
@@ -978,11 +974,6 @@ static void freeOpts(Options *opts)
             g_strfreev(opts->noMenuBgndOpacityApps);
         if(opts->noBgndImageApps)
             g_strfreev(opts->noBgndImageApps);
-#ifdef QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-        if(opts->noDlgFixApps)
-            g_strfreev(opts->noDlgFixApps);
-        opts->noDlgFixApps=NULL
-#endif
         if(opts->noMenuStripeApps)
             g_strfreev(opts->noMenuStripeApps);
         opts->noBgndGradientApps=opts->noBgndOpacityApps=opts->noMenuBgndOpacityApps=opts->noBgndImageApps=opts->noMenuStripeApps=NULL;
@@ -1226,9 +1217,6 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
 
             Options newOpts;
             Options *def=&newOpts;
-#ifdef QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-            opts->noDlgFixApps=NULL;
-#endif
             opts->noBgndGradientApps=opts->noBgndOpacityApps=opts->noMenuBgndOpacityApps=opts->noBgndImageApps=opts->noMenuStripeApps=NULL;
             for(i=0; i<NUM_CUSTOM_GRAD; ++i)
                 opts->customGradient[i]=NULL;
@@ -1338,10 +1326,6 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             if(APPEARANCE_FLAT==opts->menuBgndAppearance && 0==opts->lighterPopupMenuBgnd && opts->version<qtcMakeVersion(1, 7))
                 opts->menuBgndAppearance=APPEARANCE_RAISED;
 
-#ifdef QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-            CFG_READ_BOOL(fixParentlessDialogs);
-            CFG_READ_STRING_LIST(noDlgFixApps);
-#endif
             CFG_READ_STRIPE(stripedProgress);
             CFG_READ_SLIDER(sliderStyle);
             CFG_READ_BOOL(animatedProgress);
@@ -1742,10 +1726,6 @@ void qtcDefaultSettings(Options *opts)
     opts->toolbarBorders=TB_NONE;
     opts->toolbarSeparators=LINE_SUNKEN;
     opts->splitters=LINE_1DOT;
-#ifdef QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-    opts->fixParentlessDialogs=false;
-    opts->noDlgFixApps=NULL;
-#endif
     opts->customMenuTextColor=false;
     opts->coloredMouseOver=MO_GLOW;
     opts->menubarMouseOver=true;

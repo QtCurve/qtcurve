@@ -1294,59 +1294,6 @@ gboolean mapToTopLevel(GdkWindow *window, GtkWidget *widget, gint *x, gint *y, g
     return FALSE;
 }
 
-#ifdef QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-#define GIMP_MAIN   "GimpToolbox"      /* Main GIMP toolbox */
-#define GIMP_WINDOW "GimpDisplayShell" /* Image window */
-
-GtkWidget * getParentWindow(GtkWidget *widget)
-{
-    GtkWidget *top=NULL;
-    GList     *topWindows,
-              *node;
-
-    if(GTK_IS_DIALOG(widget) || GTK_APP_GIMP!=qtSettings.app)
-        for(topWindows=node=gtk_window_list_toplevels(); node; node = node->next)
-        {
-            GtkWidget *w=node->data;
-
-            if(w && GTK_IS_WIDGET(w) && gtk_widget_get_window(w) && w!=widget && qtcWindowIsActive(w))
-            {
-                top=w;
-                break;
-            }
-        }
-
-    if(!top && GTK_APP_GIMP == qtSettings.app)
-    {
-        for(topWindows=node=gtk_window_list_toplevels(); node; node = node->next)
-        {
-            GtkWidget *w=node->data;
-
-            if(w && GTK_IS_WIDGET(w) && 0 == strcmp(g_type_name(G_OBJECT_TYPE(w)), GIMP_MAIN))
-            {
-                top=w;
-                break;
-            }
-        }
-    }
-
-    return top;
-}
-
-void dialogMapEvent(GtkWidget *widget, gpointer user_data)
-{
-    GtkWidget *top=getParentWindow(widget);
-
-    if(top)
-    {
-        GTK_WINDOW(widget)->transient_parent=GTK_WINDOW(top);
-        gdk_window_set_transient_for(gtk_widget_get_window(widget), gtk_widget_get_window(top));
-        /*gtk_window_set_skip_taskbar_hint(GTK_WINDOW(widget), TRUE);
-        gtk_window_set_skip_pager_hint(GTK_WINDOW(widget), TRUE); */
-    }
-}
-#endif
-
 gboolean treeViewCellHasChildren(GtkTreeView *treeView, GtkTreePath *path)
 {
     // check treeview and path

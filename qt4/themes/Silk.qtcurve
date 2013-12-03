@@ -33,7 +33,6 @@ defBtnIndicator=glow
 drawStatusBarFrames=false
 embolden=false
 fadeLines=true
-fixParentlessDialogs=false
 flatSbarButtons=true
 focus=filled
 framelessGroupBoxes=true

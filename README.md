@@ -93,14 +93,7 @@ recommanded to turn on in distribution packages.
 
     (Default: `Off`)
 
-3. `QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT`:
-
-    Enable support for the 'fixParentlessDialogs' config option. NOTE: This is
-    known to break some applications - hence is disabled by default!
-
-    (Default: `Off`)
-
-4. `QTC_GTK2_MODIFY_MOZILLA`:
+3. `QTC_GTK2_MODIFY_MOZILLA`:
 
     1. Modify `userChrome.css`
 
@@ -123,20 +116,12 @@ recommanded to turn on in distribution packages.
 
     (Default: `Off`)
 
-5. `QTC_GTK2_USE_CAIRO_FOR_ARROWS`:
+4. `QTC_GTK2_USE_CAIRO_FOR_ARROWS`:
 
     Use Cairo, and not Gdk, to draw the non-antialised arrows. It has been
     reported that for intel Xorg drivers >2.8, that drawing these non-antialised
     arrows with cairo results in nothing being drawn! As of 0.69.0, the default
     is to use Gdk.
-
-    (Default: `Off`)
-
-6. `QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT`:
-
-    Enable support for the 'fixParentlessDialogs' config option.
-
-    **NOTE**: This is known to break some applications.
 
     (Default: `Off`)
 

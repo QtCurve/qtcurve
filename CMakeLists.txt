@@ -53,13 +53,8 @@ option(QTC_QT5_OLD_NVIDIA_ARROW_FIX "Qt5 old nvidia arrow fix." Off)
 option(QTC_QT4_STYLE_SUPPORT
   "Qt4 support for creating a style for each QtCurve theme." Off)
 
-option(QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-  "Qt4 support for the 'fix parentless dialogs'." Off)
-
 option(QTC_GTK2_MODIFY_MOZILLA "Modify Mozilla Gtk2 with js and css." Off)
 option(QTC_GTK2_USE_CAIRO_FOR_ARROWS "Using ciaro to draw arrows." Off)
-option(QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-  "Gtk2 support for the 'fix parentless dialogs'." Off)
 
 ## Common settings.
 # Only try to figure out what kde prefix is if not specified at command line.
@@ -172,16 +167,6 @@ add_subdirectory(qt5)
 add_subdirectory(gtk2)
 if(ENABLE_TEST)
   add_subdirectory(test)
-endif()
-
-if((ENABLE_QT4 AND QTC_QT4_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT) OR
-    (ENABLE_QT5 AND QTC_QT5_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT) OR
-    (ENABLE_GTK2 AND QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT))
-  message(WARNING
-    "You have enabled support for the 'fix parentless dialogs' option. "
-    "This is known to BREAK some applications. Please "
-    "DO NOT report errors to application authors when you have "
-    "this enabled. Please reconsider DISABLING this option.")
 endif()
 
 if(ENABLE_GTK2 AND QTC_GTK2_MODIFY_MOZILLA)

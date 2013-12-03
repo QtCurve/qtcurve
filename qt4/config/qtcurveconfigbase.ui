@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>756</width>
-    <height>510</height>
+    <width>866</width>
+    <height>587</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -67,15 +67,6 @@
      </attribute>
      <attribute name="headerDefaultSectionSize">
       <number>10</number>
-     </attribute>
-     <attribute name="headerMinimumSectionSize">
-      <number>10</number>
-     </attribute>
-     <attribute name="headerDefaultSectionSize">
-      <number>10</number>
-     </attribute>
-     <attribute name="headerVisible">
-      <bool>false</bool>
      </attribute>
      <attribute name="headerMinimumSectionSize">
       <number>10</number>
@@ -3636,6 +3627,9 @@
      </widget>
      <widget class="QWidget" name="page_12">
       <layout class="QFormLayout" name="formLayout_19">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::ExpandingFieldsGrow</enum>
+       </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label_80">
          <property name="text">
@@ -3692,35 +3686,13 @@
         </widget>
        </item>
        <item row="4" column="0">
-        <widget class="QLabel" name="fixParentlessDialogs_label">
-         <property name="text">
-          <string>'Parent-less' dialogs:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="QCheckBox" name="fixParentlessDialogs">
-         <property name="toolTip">
-          <string>&lt;p&gt;&lt;b&gt;Warning: Experimental!&lt;/b&gt;&lt;/p&gt;
-&lt;p&gt;Some applications - such as Kate, Kaffeine, and GIMP - produce dialogs that have no 'parent'. This causes the dialog to receive an entry in the taskbar, and allows the dialog to be minimised independantly of the main application window.&lt;/p&gt;
-
-&lt;p&gt;If you enable this option, QtCurve will try to 'fix' this by assigning the dialogs a parent. &lt;/p&gt;
-
-&lt;p&gt;&lt;i&gt;&lt;b&gt;Note:&lt;/b&gt; This may break some applications, as it wiill alter the behaviour of dialogs in a way the application has not intended. Therefore, please use with care.&lt;/i&gt;&lt;/p&gt;</string>
-         </property>
-         <property name="text">
-          <string>Re-parent to currently active window</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
           <string>Password character:</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
+       <item row="4" column="1">
         <widget class="QPushButton" name="passwordChar">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -3733,14 +3705,14 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
+       <item row="5" column="0">
         <widget class="QLabel" name="label_77">
          <property name="text">
           <string>Gtk expander highlight:</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="5" column="1">
         <widget class="KIntNumInput" name="expanderHighlight">
          <property name="toolTip">
           <string>&lt;p&gt;Defines the amount by which the popup menu background will be lightened (or darkened).</string>
@@ -3756,6 +3728,9 @@
       <layout class="QVBoxLayout" name="verticalLayout_17">
        <item>
         <layout class="QFormLayout" name="formLayout_20">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::ExpandingFieldsGrow</enum>
+         </property>
          <item row="0" column="0">
           <widget class="QLabel" name="label_81">
            <property name="text">
@@ -3865,20 +3840,6 @@
           <widget class="KLineEdit" name="statusbarApps">
            <property name="toolTip">
             <string>&lt;p&gt;Comma separated list of names of KDE4 applications where QtCurve needs to manually save whether the statusbar is hidden or not.&lt;/p&gt;&lt;p&gt;Use &lt;i&gt;kde&lt;/i&gt; to set for all KDE applications. The statusbar state of Gtk2 applications is always manually saved.&lt;/p&gt;</string>
-           </property>
-          </widget>
-         </item>
-         <item row="8" column="0">
-          <widget class="QLabel" name="noDlgFixApps_label">
-           <property name="text">
-            <string>Don't apply parent-less dialog fix:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="8" column="1">
-          <widget class="KLineEdit" name="noDlgFixApps">
-           <property name="toolTip">
-            <string>&lt;p&gt;Comma separated list of names of applications where QtCurve should not attempt to fix parent-less dialogs.&lt;/p&gt;&lt;p&gt;Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications, and &lt;i&gt;kde&lt;/i&gt; to disable for all KDE applications&lt;/p&gt;</string>
            </property>
           </widget>
          </item>
@@ -4441,19 +4402,14 @@
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
  <customwidgets>
   <customwidget>
-   <class>KIntSpinBox</class>
-   <extends>QSpinBox</extends>
-   <header>knuminput.h</header>
-  </customwidget>
-  <customwidget>
    <class>KDoubleNumInput</class>
    <extends>QWidget</extends>
    <header>knuminput.h</header>
   </customwidget>
   <customwidget>
-   <class>KPushButton</class>
+   <class>KColorButton</class>
    <extends>QPushButton</extends>
-   <header>kpushbutton.h</header>
+   <header>kcolorbutton.h</header>
   </customwidget>
   <customwidget>
    <class>KLineEdit</class>
@@ -4461,9 +4417,14 @@
    <header>klineedit.h</header>
   </customwidget>
   <customwidget>
-   <class>KColorButton</class>
+   <class>KPushButton</class>
    <extends>QPushButton</extends>
-   <header>kcolorbutton.h</header>
+   <header>kpushbutton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KIntSpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>knuminput.h</header>
   </customwidget>
   <customwidget>
    <class>KIntNumInput</class>
@@ -4700,7 +4661,6 @@
   <tabstop>reorderGtkButtons</tabstop>
   <tabstop>stdBtnSizes</tabstop>
   <tabstop>mapKdeIcons</tabstop>
-  <tabstop>fixParentlessDialogs</tabstop>
   <tabstop>passwordChar</tabstop>
   <tabstop>expanderHighlight</tabstop>
   <tabstop>noBgndGradientApps</tabstop>
@@ -4711,7 +4671,6 @@
   <tabstop>useQtFileDialogApps</tabstop>
   <tabstop>menubarApps</tabstop>
   <tabstop>statusbarApps</tabstop>
-  <tabstop>noDlgFixApps</tabstop>
   <tabstop>exportKde3Button</tabstop>
   <tabstop>exportQt3Button</tabstop>
   <tabstop>gradCombo</tabstop>

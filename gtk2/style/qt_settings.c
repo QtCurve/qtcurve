@@ -1859,11 +1859,6 @@ gboolean qtSettingsInit()
             if(qtSettings.useAlpha && opts.version<qtcMakeVersion(1, 7, 2) && 100==opts.menuBgndOpacity && 100==opts.dlgOpacity && 100==opts.bgndOpacity)
                 qtSettings.useAlpha=false;
 
-#ifdef QTC_GTK2_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
-            if(opts.fixParentlessDialogs && excludedApp(opts.noDlgFixApps))
-                opts.fixParentlessDialogs=FALSE;
-#endif
-
             if(opts.menuStripe && excludedApp(opts.noMenuStripeApps))
                 opts.menuStripe=SHADE_NONE;
 
