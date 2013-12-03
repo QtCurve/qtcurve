@@ -79,7 +79,7 @@ bool ShadowHelper::registerWidget(QWidget* widget, bool force)
     }
 
     // store in map and add destroy signal connection
-    widget->installEventFilter(widget);
+    widget->installEventFilter(this);
     _widgets.insert(widget, 0);
 
     /*
