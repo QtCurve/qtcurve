@@ -392,17 +392,6 @@ void Style::polish(QWidget *widget)
             // WA_StyledBackground - and PE_Widget will be called to
             // render background...
             widget->setAttribute(Qt::WA_StyledBackground);
-
-            // Hack: stop here if application is of type Plasma
-            /*
-              Right now we need to reject window candidates if the application
-              is of type plasma because it conflicts with some widgets embedded
-              into the SysTray. Ideally one would rather find a "generic" reason,
-              not to handle them
-            */
-            if (APP_PLASMA == theThemedApp && !widget->inherits("QDialog"))
-                break;
-
 #ifdef QTC_ENABLE_X11
             widget->installEventFilter(this);
 #endif
