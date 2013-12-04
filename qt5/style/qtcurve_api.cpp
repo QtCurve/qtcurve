@@ -1257,7 +1257,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                     p.drawPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL, radius));
                 }
 
-                if(USE_BORDER(border) && APPEARANCE_FLAT!=opts.menuBgndAppearance)
+                if(qtcUseBorder(border) && APPEARANCE_FLAT!=opts.menuBgndAppearance)
                 {
                     QRect ri(r.adjusted(1, 1, -1, -1));
 
@@ -2532,7 +2532,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
             painter->setPen(use[QTC_STD_BORDER]);
             drawRect(painter, r);
 
-            if (USE_BORDER(border) &&
+            if (qtcUseBorder(border) &&
                 APPEARANCE_FLAT != opts.menuBgndAppearance) {
                 painter->setPen(use[0]);
                 if (GB_LIGHT == border) {

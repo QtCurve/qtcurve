@@ -167,9 +167,8 @@ enum {
 
 #define SIZE_GRIP_SIZE 12
 
-#define USE_BORDER(B)          (GB_SHINE!=(B) && GB_NONE!=(B))
 #define DRAW_MENU_BORDER       (APPEARANCE_FLAT!=opts.menuBgndAppearance && opts.version>=qtcMakeVersion(1, 7) && \
-                                USE_BORDER(qtcGetGradient(opts.menuBgndAppearance, &opts)->border))
+                                qtcUseBorder(qtcGetGradient(opts.menuBgndAppearance, &opts)->border))
 
 #define USE_GLOW_FOCUS(mouseOver) (FOCUS_GLOW==opts.focus && (MO_GLOW!=opts.coloredMouseOver || !(mouseOver)))
 
@@ -600,14 +599,6 @@ typedef struct {
            val,
            alpha;
 } GradientStop;
-
-typedef enum {
-    GB_NONE,
-    GB_LIGHT,
-    GB_3D,
-    GB_3D_FULL,
-    GB_SHINE
-} EGradientBorder;
 
 typedef struct {
     int titleHeight,

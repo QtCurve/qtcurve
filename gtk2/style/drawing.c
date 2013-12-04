@@ -3278,7 +3278,7 @@ drawMenu(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
         else
             cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
         cairo_stroke(cr);
-        if(USE_BORDER(border) && APPEARANCE_FLAT!=opts.menuBgndAppearance)
+        if(qtcUseBorder(border) && APPEARANCE_FLAT!=opts.menuBgndAppearance)
         {
             if(roundedMenu)
             {

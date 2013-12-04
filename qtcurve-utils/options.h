@@ -97,6 +97,20 @@ typedef enum {
     FRAME_FADED
 } EFrame;
 
+typedef enum {
+    GB_NONE,
+    GB_LIGHT,
+    GB_3D,
+    GB_3D_FULL,
+    GB_SHINE
+} EGradientBorder;
+
+QTC_ALWAYS_INLINE static inline bool
+qtcUseBorder(EGradientBorder border)
+{
+    return border != GB_SHINE && border != GB_NONE;
+}
+
 QTC_ALWAYS_INLINE static inline bool
 qtcNoFrame(EFrame frame)
 {
