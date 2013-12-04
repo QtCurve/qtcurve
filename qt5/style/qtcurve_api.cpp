@@ -641,19 +641,24 @@ void Style::polish(QWidget *widget)
         }
 
     if (qobject_cast<QMenu*>(widget)) {
-        if(!qtcIsFlatBgnd(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS))
-        {
+        if (!qtcIsFlatBgnd(opts.menuBgndAppearance) ||
+            opts.menuBgndOpacity != 100 ||
+            !(opts.square & SQUARE_POPUP_MENUS)) {
             widget->installEventFilter(this);
-            if((100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) && !widget->testAttribute(Qt::WA_TranslucentBackground))
+            if ((100 != opts.menuBgndOpacity ||
+                 !(opts.square & SQUARE_POPUP_MENUS)) &&
+                !widget->testAttribute(Qt::WA_TranslucentBackground)) {
                 setTranslucentBackground(widget);
+            }
         }
         if (opts.lighterPopupMenuBgnd || opts.shadePopupMenu) {
             QPalette pal(widget->palette());
-
-            pal.setBrush(QPalette::Active, QPalette::Window, popupMenuCols()[ORIGINAL_SHADE]);
+            pal.setBrush(QPalette::Active, QPalette::Window,
+                         popupMenuCols()[ORIGINAL_SHADE]);
             widget->setPalette(pal);
-            if(opts.shadePopupMenu)
+            if (opts.shadePopupMenu) {
                 setMenuTextColors(widget, false);
+            }
             if (IMG_NONE != opts.menuBgndImage.type) {
                 widget->installEventFilter(this);
             }
@@ -710,7 +715,7 @@ void Style::polish(QWidget *widget)
                            qobject_cast<QLineEdit *>(widget)))
         widget->setFont(QApplication::font());
 
-    if (qobject_cast<QMenuBar *>(widget) || qobject_cast<QToolBar*>(widget) ||
+    if (qobject_cast<QMenuBar*>(widget) || qobject_cast<QToolBar*>(widget) ||
         parentIsToolbar)
         widget->setBackgroundRole(QPalette::Window);
 
@@ -987,15 +992,16 @@ void Style::unpolish(QWidget *widget)
         widget->clearMask();
     }
 
-    if (qobject_cast<QMenuBar *>(widget) ||
-        qobject_cast<QToolBar *>(widget) ||
-        (widget && qobject_cast<QToolBar *>(widget->parent())))
+    if (widget && (qobject_cast<QMenuBar*>(widget) ||
+                   qobject_cast<QToolBar*>(widget) ||
+                   qobject_cast<QToolBar*>(widget->parent()))) {
         widget->setBackgroundRole(QPalette::Button);
+    }
 #ifdef QTC_ENABLE_X11
     QWidget *window = widget->window();
 
-    if ((100 != opts.bgndOpacity && qtcIsWindow(window)) ||
-        (100 != opts.dlgOpacity && qtcIsDialog(window))) {
+    if ((opts.bgndOpacity != 100 && qtcIsWindow(window)) ||
+        (opts.dlgOpacity != 100 && qtcIsDialog(window))) {
         widget->removeEventFilter(this);
     }
 #endif
