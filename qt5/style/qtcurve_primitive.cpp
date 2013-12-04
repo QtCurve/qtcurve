@@ -30,6 +30,7 @@
 #include <QMainWindow>
 #include <QListView>
 #include <QPixmapCache>
+#include <QDockWidget>
 
 #include "shadowhelper.h"
 #include "utils.h"
@@ -1096,6 +1097,171 @@ Style::drawPrimitiveFrameWindow(PrimitiveElement element,
                               r.x() + r.width() - 5, r.y() + r.height() - 2);
         }
     }
+    painter->restore();
+    return true;
+}
+
+bool
+Style::drawPrimitiveButton(PrimitiveElement element, const QStyleOption *option,
+                    QPainter *painter, const QWidget *widget) const
+{
+    QRect r = option->rect;
+    State state = option->state;
+    if (state & STATE_DWT_BUTTON &&
+        (opts.dwtSettings & DWT_BUTTONS_AS_PER_TITLEBAR)) {
+        return true;
+    }
+    bool doEtch = opts.buttonEffect != EFFECT_NONE;
+
+    // This fixes the "Sign in" button at mail.lycos.co.uk
+    // ...basically if KHTML gices us a fully transparent background colour,
+    // then dont paint the button.
+    if (option->palette.button().color().alpha() == 0) {
+        if (state & State_MouseOver && state & State_Enabled &&
+            opts.coloredMouseOver == MO_GLOW && doEtch &&
+            !(opts.thin&THIN_FRAMES)) {
+            drawGlow(painter, r, WIDGET_STD_BUTTON);
+        }
+        return true;
+    }
+    if (!widget)
+        widget = getWidget(painter);
+    const QColor *use = buttonColors(option);
+    bool isDefault = false;
+    bool isFlat = false;
+    bool isKWin = state & QtC_StateKWin;
+    bool isDown = state & State_Sunken || state & State_On;
+    bool isOnListView = (!isKWin && widget &&
+                         qobject_cast<const QAbstractItemView*>(widget));
+    QStyleOption opt(*option);
+    if (element == PE_PanelButtonBevel)
+        opt.state |= State_Enabled;
+    if (const QStyleOptionButton *button =
+        qstyleoption_cast<const QStyleOptionButton*>(option)) {
+        isDefault = ((button->features & QStyleOptionButton::DefaultButton) &&
+                     (button->state & State_Enabled));
+        isFlat = button->features & QStyleOptionButton::Flat;
+    }
+    if (!(opt.state & State_Enabled))
+        opt.state &= ~State_MouseOver;
+    // For some reason with OO.o not all buttons are set as raised!
+    if (!(opt.state & State_AutoRaise))
+        opt.state |= State_Raised;
+
+    isDefault = (isDefault ||
+                 (doEtch && FULL_FOCUS && MO_GLOW == opts.coloredMouseOver &&
+                  opt.state & State_HasFocus && opt.state & State_Enabled));
+    if (isFlat && !isDown && !(opt.state & State_MouseOver))
+        return true;
+    painter->save();
+
+    if (isOnListView)
+        opt.state |= State_Horizontal | State_Raised;
+    if (isDefault && state&State_Enabled &&
+        (IND_TINT == opts.defBtnIndicator ||
+         IND_SELECTED == opts.defBtnIndicator)) {
+        use = itsDefBtnCols;
+    } else if (state & STATE_DWT_BUTTON && widget &&
+               opts.titlebarButtons & TITLEBAR_BUTTON_COLOR &&
+               coloredMdiButtons(state & State_Active,
+                                 state & State_MouseOver) &&
+               !(opts.titlebarButtons & TITLEBAR_BUTTON_COLOR_SYMBOL)) {
+        if (constDwtClose == widget->objectName()) {
+            use = itsTitleBarButtonsCols[TITLEBAR_CLOSE];
+        } else if (constDwtFloat == widget->objectName()) {
+            use = itsTitleBarButtonsCols[TITLEBAR_MAX];
+        }else if (widget->parentWidget() &&
+                  widget->parentWidget()->parentWidget() &&
+                  widget->parentWidget()->inherits("KoDockWidgetTitleBar") &&
+                  qobject_cast<QDockWidget*>(widget->parentWidget()
+                                             ->parentWidget())) {
+            QDockWidget *dw =
+                (QDockWidget*)widget->parentWidget()->parentWidget();
+            QWidget *koDw = widget->parentWidget();
+            int fw = (dw->isFloating() ?
+                      pixelMetric(QStyle::PM_DockWidgetFrameWidth, 0, dw) : 0);
+            QRect geom = widget->geometry();
+            QStyleOptionDockWidget dwOpt;
+            dwOpt.initFrom(dw);
+            dwOpt.rect = QRect(QPoint(fw, fw),
+                               QSize(koDw->geometry().width() - (fw * 2),
+                                     koDw->geometry().height() - (fw * 2)));
+            dwOpt.title = dw->windowTitle();
+            dwOpt.closable = ((dw->features() &
+                               QDockWidget::DockWidgetClosable) ==
+                              QDockWidget::DockWidgetClosable);
+            dwOpt.floatable = ((dw->features() &
+                                QDockWidget::DockWidgetFloatable) ==
+                               QDockWidget::DockWidgetFloatable);
+            if (dwOpt.closable &&
+                subElementRect(
+                    QStyle::SE_DockWidgetCloseButton, &dwOpt,
+                    widget->parentWidget()->parentWidget()) == geom) {
+                use = itsTitleBarButtonsCols[TITLEBAR_CLOSE];
+            } else if (dwOpt.floatable &&
+                       subElementRect(
+                           QStyle::SE_DockWidgetFloatButton, &dwOpt,
+                           widget->parentWidget()->parentWidget()) == geom) {
+                use = itsTitleBarButtonsCols[TITLEBAR_MAX];
+            } else {
+                use = itsTitleBarButtonsCols[TITLEBAR_SHADE];
+            }
+        }
+    }
+    if (isKWin) {
+        opt.state |= STATE_KWIN_BUTTON;
+    }
+    bool coloredDef = (isDefault && state&State_Enabled &&
+                       IND_COLORED == opts.defBtnIndicator);
+    if (widget && qobject_cast<const QAbstractButton*>(widget) &&
+        static_cast<const QAbstractButton*>(widget)->isCheckable())
+        opt.state |= STATE_TOGGLE_BUTTON;
+
+    drawLightBevel(painter, r, &opt, widget, ROUNDED_ALL,
+                   coloredDef ? itsDefBtnCols[MO_DEF_BTN] :
+                   getFill(&opt, use, false,
+                           isDefault && state & State_Enabled &&
+                           IND_DARKEN == opts.defBtnIndicator),
+                   coloredDef ? itsDefBtnCols : use, true,
+                   isKWin || state&STATE_DWT_BUTTON ?
+                   WIDGET_MDI_WINDOW_BUTTON :
+                   isOnListView ? WIDGET_NO_ETCH_BTN :
+                   isDefault && state & State_Enabled ?
+                   WIDGET_DEF_BUTTON :
+                   state & STATE_TBAR_BUTTON ? WIDGET_TOOLBAR_BUTTON :
+                   WIDGET_STD_BUTTON);
+
+    if (isDefault && state&State_Enabled)
+        switch (opts.defBtnIndicator) {
+        case IND_CORNER: {
+            QPainterPath path;
+            int offset = isDown ? 5 : 4;
+            int etchOffset = doEtch ? 1 : 0;
+            double xd = r.x() + 0.5;
+            double yd = r.y() + 0.5;
+            const QColor *cols = itsFocusCols ? itsFocusCols : itsHighlightCols;
+
+            path.moveTo(xd + offset + etchOffset, yd + offset + etchOffset);
+            path.lineTo(xd + offset + 6 + etchOffset, yd + offset + etchOffset);
+            path.lineTo(xd + offset + etchOffset, yd + offset + 6 + etchOffset);
+            path.lineTo(xd + offset + etchOffset, yd + offset + etchOffset);
+            painter->setBrush(cols[isDown ? 0 : 4]);
+            painter->setPen(cols[isDown ? 0 : 4]);
+            painter->setRenderHint(QPainter::Antialiasing, true);
+            painter->drawPath(path);
+            painter->setRenderHint(QPainter::Antialiasing, false);
+            break;
+        }
+        case IND_COLORED: {
+            int offset = COLORED_BORDER_SIZE + (doEtch ? 1 : 0);
+            QRect r2 = r.adjusted(offset, offset, -offset, -offset);
+            drawBevelGradient(getFill(&opt, use), painter, r2, true,
+                              state & (State_On | State_Sunken),
+                              opts.appearance, WIDGET_STD_BUTTON);
+        }
+        default:
+            break;
+        }
     painter->restore();
     return true;
 }

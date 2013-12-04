@@ -483,6 +483,9 @@ private:
                                   const QStyleOption *option,
                                   QPainter *painter,
                                   const QWidget *widget) const;
+    bool drawPrimitiveButton(PrimitiveElement element,
+                             const QStyleOption *option, QPainter *painter,
+                             const QWidget *widget) const;
 
 private:
     mutable Options opts;
