@@ -34,8 +34,10 @@
 #include "qtcurve.h"
 #include <common/config_file.h>
 
-#define MO_ARROW(MENU, COL) (!MENU && MO_NONE!=opts.coloredMouseOver && GTK_STATE_PRELIGHT==state \
-                                    ? &qtcPalette.mouseover[ARROW_MO_SHADE] : (COL))
+#define MO_ARROW(MENU, COL)                             \
+    (!MENU && MO_NONE != opts.coloredMouseOver &&       \
+     GTK_STATE_PRELIGHT == state ?                      \
+     &qtcPalette.mouseover[ARROW_MO_SHADE] : (COL))
 
 #include "qt_settings.h"
 #include "animation.h"

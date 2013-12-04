@@ -54,14 +54,6 @@ static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
 
 #define SB_SUB2 ((QStyle::SubControl)(QStyle::SC_ScrollBarGroove << 1))
 
-#define MO_ARROW_X(MO, COL) (state & State_Enabled ?                    \
-                             (MO_NONE != opts.coloredMouseOver && (MO) ? \
-                              itsMouseOverCols[ARROW_MO_SHADE] :        \
-                              palette.color(COL)) :                     \
-                             palette.color(QPalette::Disabled, COL))
-
-#define MO_ARROW(COL) MO_ARROW_X(state & State_MouseOver, COL)
-
 #define WINDOWTITLE_SPACER 0x10000000
 #define STATE_REVERSE QStyle::StateFlag(0x10000000)
 #define STATE_MENU QStyle::StateFlag(0x20000000)

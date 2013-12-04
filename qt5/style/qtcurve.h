@@ -381,6 +381,65 @@ private:
     void emitMenuSize(QWidget *w, unsigned short size, bool force=false);
     void emitStatusBarState(QStatusBar *sb);
 #endif
+    const QColor&
+    MOArrow(QFlags<State> state, const QPalette &palette, bool mo,
+            QPalette::ColorRole rol) const
+    {
+        if (!(state & State_Enabled)) {
+            return palette.color(QPalette::Disabled, rol);
+        } else if (opts.coloredMouseOver != MO_NONE && mo) {
+            return itsMouseOverCols[ARROW_MO_SHADE];
+        } else {
+            return palette.color(rol);
+        }
+    }
+    const QColor&
+    MOArrow(QFlags<State> state, const QPalette &palette,
+            QPalette::ColorRole rol) const
+    {
+        return MOArrow(state, palette, state & State_MouseOver, rol);
+    }
+
+    bool drawPrimitivePanelMenu(PrimitiveElement element,
+                                const QStyleOption *option,
+                                QPainter *painter,
+                                const QWidget *widget) const;
+    bool drawPrimitiveIndicatorTabClose(PrimitiveElement element,
+                                        const QStyleOption *option,
+                                        QPainter *painter,
+                                        const QWidget *widget) const;
+    bool drawPrimitiveWidget(PrimitiveElement element,
+                             const QStyleOption *option,
+                             QPainter *painter,
+                             const QWidget *widget) const;
+    bool drawPrimitivePanelScrollAreaCorner(PrimitiveElement element,
+                                            const QStyleOption *option,
+                                            QPainter *painter,
+                                            const QWidget *widget) const;
+    bool drawPrimitiveIndicatorBranch(PrimitiveElement element,
+                                      const QStyleOption *option,
+                                      QPainter *painter,
+                                      const QWidget *widget) const;
+    bool drawPrimitiveIndicatorViewItemCheck(PrimitiveElement element,
+                                             const QStyleOption *option,
+                                             QPainter *painter,
+                                             const QWidget *widget) const;
+    bool drawPrimitiveIndicatorHeaderArrow(PrimitiveElement element,
+                                           const QStyleOption *option,
+                                           QPainter *painter,
+                                           const QWidget *widget) const;
+    bool drawPrimitiveIndicatorArrow(PrimitiveElement element,
+                                     const QStyleOption *option,
+                                     QPainter *painter,
+                                     const QWidget *widget) const;
+    bool drawPrimitiveIndicatorSpin(PrimitiveElement element,
+                                    const QStyleOption *option,
+                                    QPainter *painter,
+                                    const QWidget *widget) const;
+    bool drawPrimitiveIndicatorToolBarSeparator(PrimitiveElement element,
+                                                const QStyleOption *option,
+                                                QPainter *painter,
+                                                const QWidget *widget) const;
 
 private:
     mutable Options opts;

@@ -123,13 +123,6 @@
 // TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
 #define FIX_DISABLED_ICONS
 
-#define MO_ARROW_X(MO, COL) (state&State_Enabled \
-                                    ? (MO_NONE!=opts.coloredMouseOver && (MO) \
-                                        ? itsMouseOverCols[ARROW_MO_SHADE] \
-                                        : palette.color(COL)) \
-                                    : palette.color(QPalette::Disabled, COL))
-#define MO_ARROW(COL)       MO_ARROW_X(state&State_MouseOver, COL)
-
 extern QString (*qt_filedialog_existing_directory_hook)(
     QWidget *parent, const QString &caption, const QString &dir,
     QFileDialog::Options options);
@@ -3949,7 +3942,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             drawArrow(painter, ar, state&State_Open ?
                       PE_IndicatorArrowDown : reverse ?
                       PE_IndicatorArrowLeft : PE_IndicatorArrowRight,
-                      MO_ARROW(QPalette::ButtonText));
+                      MOArrow(state, palette, QPalette::ButtonText));
         }
 
         const int constStep = /*LV_OLD == */opts.lvLines ? 0
@@ -4003,7 +3996,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             drawArrow(painter, r,
                       header->sortIndicator & QStyleOptionHeader::SortUp ?
                       PE_IndicatorArrowUp : PE_IndicatorArrowDown,
-                      MO_ARROW(QPalette::ButtonText));
+                      MOArrow(state, palette, QPalette::ButtonText));
         }
         break;
     case PE_IndicatorArrowUp:
@@ -4015,7 +4008,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
         if((QStyle::State_Enabled|QtC_StateKWin)==state) {
             drawArrow(painter, r, element, Qt::color1, false, true);
         } else {
-            QColor col(MO_ARROW(QPalette::Text));
+            QColor col = MOArrow(state, palette, QPalette::Text);
             if (state & (State_Sunken | State_On) &&
                !(widget &&
                  ((opts.unifySpin && qobject_cast<const QSpinBox*>(widget)) ||
@@ -4038,7 +4031,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
     case PE_IndicatorSpinDown: {
             QRect sr(r);
             const QColor *use(buttonColors(option));
-            const QColor col(MO_ARROW(QPalette::ButtonText));
+            const QColor &col = MOArrow(state, palette, QPalette::ButtonText);
             bool down(PE_IndicatorSpinDown==element || PE_IndicatorSpinMinus==element);
 
             if((!opts.unifySpinBtns || state&State_Sunken) && !opts.unifySpin)
@@ -6643,7 +6636,8 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     if(option->state &(State_On | State_Sunken))
                         ar.adjust(1, 1, 1, 1);
 
-                    drawArrow(painter, ar, PE_IndicatorArrowDown, MO_ARROW(QPalette::ButtonText));
+                    drawArrow(painter, ar, PE_IndicatorArrowDown,
+                              MOArrow(state, palette, QPalette::ButtonText));
                 }
             }
             break;
@@ -8210,8 +8204,10 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                     if(mflags&State_Sunken)
                         tool.rect.adjust(1, 1, 1, 1);
                     drawArrow(painter, tool.rect, PE_IndicatorArrowDown,
-                              MO_ARROW_X(toolbutton->activeSubControls&SC_ToolButtonMenu,
-                                             QPalette::ButtonText));
+                              MOArrow(state, palette,
+                                      toolbutton->activeSubControls &
+                                      SC_ToolButtonMenu,
+                                      QPalette::ButtonText));
                 }
 
                 if ((FOCUS_GLOW!=opts.focus || !drawnBevel) && toolbutton->state&State_HasFocus)
@@ -8259,7 +8255,8 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                     if(bflags&State_Sunken)
                         arrow.adjust(1, 1, 1, 1);
 
-                    drawArrow(painter, arrow, PE_IndicatorArrowDown, MO_ARROW(QPalette::ButtonText));
+                    drawArrow(painter, arrow, PE_IndicatorArrowDown,
+                              MOArrow(state, palette, QPalette::ButtonText));
                 }
             }
             break;
@@ -9523,7 +9520,8 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                     if(sunken && (!comboBox->editable || !opts.unifyCombo))
                         arrow.adjust(1, 1, 1, 1);
 
-                    QColor arrowColor(MO_ARROW_X(mouseOver, QPalette::ButtonText));
+                    const QColor &arrowColor = MOArrow(state, palette, mouseOver,
+                                                       QPalette::ButtonText);
                     if(comboBox->editable || !(opts.gtkComboMenus && opts.doubleGtkComboArrow)) {
                         drawArrow(painter, arrow, PE_IndicatorArrowDown, arrowColor, false);
                     } else {

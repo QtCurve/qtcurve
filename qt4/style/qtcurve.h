@@ -387,6 +387,24 @@ private:
     void emitMenuSize(QWidget *w, unsigned short size, bool force=false);
     void emitStatusBarState(QStatusBar *sb);
 #endif
+    const QColor&
+    MOArrow(QFlags<State> state, const QPalette &palette, bool mo,
+            QPalette::ColorRole rol) const
+    {
+        if (!(state & State_Enabled)) {
+            return palette.color(QPalette::Disabled, rol);
+        } else if (opts.coloredMouseOver != MO_NONE && mo) {
+            return itsMouseOverCols[ARROW_MO_SHADE];
+        } else {
+            return palette.color(rol);
+        }
+    }
+    const QColor&
+    MOArrow(QFlags<State> state, const QPalette &palette,
+            QPalette::ColorRole rol) const
+    {
+        return MOArrow(state, palette, state & State_MouseOver, rol);
+    }
 
 private:
 
