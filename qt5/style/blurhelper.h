@@ -145,8 +145,7 @@ protected:
         return (!widget->isWindow()) &&
             ((widget->autoFillBackground() &&
               widget->palette().color(widget->backgroundRole()).alpha() ==
-              0xff) || (widget->testAttribute(Qt::WA_OpaquePaintEvent) &&
-                        !qobject_cast<const QMenuBar*>(widget)));
+              0xff) || widget->testAttribute(Qt::WA_OpaquePaintEvent));
     }
 
     //! true if widget is a transparent window

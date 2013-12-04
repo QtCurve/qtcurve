@@ -29,3 +29,5 @@
 9. Redo configure system and interface.
 
 10. Test prepolish. See if we can remove the recreating window trick all together.
+
+11. QPainter composition mode.

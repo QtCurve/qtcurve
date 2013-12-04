@@ -1,7 +1,7 @@
 1. Firefox doesn't support transparent menu.
 2. Partially set translucent background crashes amarok (in opengl).
    (Also affects Oxygen Transparent.)
-   **Doesn't crash anymore after doing prepolish, need more test.**
+   **Doesn't crash anymore after doing prepolish, need more tests.**
 3. Transparent dialog break Qt MDI window.
    **Partially fixed by drawing background ourselves.**
    *Need to figure out what Oxygen Transparent is doing, what's wrong with*
@@ -13,8 +13,8 @@
    **WORKED AROUND**. *Need more test*
 6. Menubar in qt does not have translucent background! (NOT True, the problem is
    double background drawing)
-   **Fixed by not inherit background from parent and only draw the menu
-   background**. *TODO: need to add a way to just use parent background. Useful*
+   **Fixed by setting proper composition mode**.
+   *TODO: need to add a better way to just use parent background. Useful*
    *especially when background images are used.*
 7. Remove most application hacks if not all.
 8. PyQt5, Musescore and (occasionally) QtCreator seg fault on exit in a QtDBus
@@ -24,3 +24,4 @@
 11. combobox list background no blur.
 12. QtQuickControl is a mess...
 13. Plasma Kickoff (in panel) scrollbar has transparent background...
+14. kscreensaver and kmix has wrong background drawn.

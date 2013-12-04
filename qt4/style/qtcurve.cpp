@@ -1685,6 +1685,8 @@ getParent(QWidget *w, int level)
 void
 Style::polish(QWidget *widget)
 {
+    // TODO:
+    //      Reorganize this polish function
     if (!widget)
         return;
 
@@ -1694,26 +1696,6 @@ Style::polish(QWidget *widget)
         qDebug() << "Window Created before polishing:" << widget;
     }
     qtcSetPrePolished(widget);
-
-    // We draw our customized menubar background. If translucency is enabled
-    // we don't want to draw the background on the menubar twice.
-    // Set attributes on the widget to get a empty background to start with.
-    // The extra condition is taken from Style::drawMenuOrToolBarBackground
-    // which does the drawing, need to understand this.
-    // TODO:
-    //      Reorganize this polish function
-    //      provide a way to use the parent background (should be useful when
-    //      e.g. background images are used.) (Also need to update blurhelper
-    //      after that)
-    //      Check toolbar
-    //      Understand the extra conditions
-    if (qobject_cast<QMenuBar*>(widget) &&
-        (!qtcIsCustomBgnd(&opts) || !qtcIsFlat(opts.menubarAppearance) ||
-         opts.shadeMenubars != SHADE_NONE)) {
-        widget->setAutoFillBackground(false);
-        widget->setAttribute(Qt::WA_TranslucentBackground);
-        widget->setAttribute(Qt::WA_OpaquePaintEvent);
-    }
 
     if (EFFECT_NONE != opts.buttonEffect && !USE_CUSTOM_ALPHAS(opts) &&
         isNoEtchWidget(widget)) {
@@ -1938,7 +1920,7 @@ Style::polish(QWidget *widget)
         qobject_cast<QTextEdit*>(widget) ||
         qobject_cast<QLineEdit*>(widget) ||
         qobject_cast<QDial*>(widget) ||
-//        qobject_cast<QDockWidget*>(widget) ||
+        // qobject_cast<QDockWidget*>(widget) ||
         widget->inherits("QWorkspaceTitleBar") ||
         widget->inherits("QDockSeparator") ||
         widget->inherits("QDockWidgetSeparator") ||
@@ -12893,6 +12875,8 @@ Style::drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p,
     EAppearance app = menu ? opts.menubarAppearance : opts.toolbarAppearance;
     if (!qtcIsCustomBgnd(&opts) || !qtcIsFlat(app) ||
         (menu && SHADE_NONE != opts.shadeMenubars)) {
+        p->save();
+        p->setCompositionMode(QPainter::CompositionMode_Source);
         QRect rx(r);
         QColor col(menu && (option->state & State_Enabled ||
                             SHADE_NONE != opts.shadeMenubars) ?
@@ -12907,6 +12891,7 @@ Style::drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p,
             col.setAlphaF(opacity / 100.0);
         }
         drawBevelGradient(col, p, rx, horiz, false, MODIFY_AGUA(app));
+        p->restore();
     }
 }
 

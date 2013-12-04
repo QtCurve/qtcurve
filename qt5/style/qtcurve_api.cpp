@@ -327,6 +327,8 @@ void Style::polish(QPalette &palette)
 
 void Style::polish(QWidget *widget)
 {
+    // TODO:
+    //      Reorganize this polish function
     if (!widget)
         return;
 
@@ -336,26 +338,6 @@ void Style::polish(QWidget *widget)
         qDebug() << "Window Created before polishing:" << widget;
     }
     qtcSetPrePolished(widget);
-
-    // We draw our customized menubar background. If translucency is enabled
-    // we don't want to draw the background on the menubar twice.
-    // Set attributes on the widget to get a empty background to start with.
-    // The extra condition is taken from Style::drawMenuOrToolBarBackground
-    // which does the drawing, need to understand this.
-    // TODO:
-    //      Reorganize this polish function
-    //      provide a way to use the parent background (should be useful when
-    //      e.g. background images are used.) (Also need to update blurhelper
-    //      after that)
-    //      Check toolbar
-    //      Understand the extra conditions
-    if (qobject_cast<QMenuBar*>(widget) &&
-        (!qtcIsCustomBgnd(&opts) || !qtcIsFlat(opts.menubarAppearance) ||
-         opts.shadeMenubars != SHADE_NONE)) {
-        widget->setAutoFillBackground(false);
-        widget->setAttribute(Qt::WA_TranslucentBackground);
-        widget->setAttribute(Qt::WA_OpaquePaintEvent);
-    }
 
     if (EFFECT_NONE != opts.buttonEffect &&
         !USE_CUSTOM_ALPHAS(opts) && isNoEtchWidget(widget)) {
@@ -514,7 +496,7 @@ void Style::polish(QWidget *widget)
 
     if (qobject_cast<QSplitterHandle*>(widget)) {
         widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
-    } else if (qobject_cast<QScrollBar *>(widget)) {
+    } else if (qobject_cast<QScrollBar*>(widget)) {
         if(enableMouseOver)
             widget->setAttribute(Qt::WA_Hover, true);
         widget->setAttribute(Qt::WA_OpaquePaintEvent, false);

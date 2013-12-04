@@ -3504,6 +3504,8 @@ Style::drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p,
     EAppearance app = menu ? opts.menubarAppearance : opts.toolbarAppearance;
     if (!qtcIsCustomBgnd(&opts) || !qtcIsFlat(app) ||
         (menu && opts.shadeMenubars != SHADE_NONE)) {
+        p->save();
+        p->setCompositionMode(QPainter::CompositionMode_Source);
         QRect rx(r);
         QColor col(menu && (option->state & State_Enabled ||
                             opts.shadeMenubars != SHADE_NONE) ?
@@ -3518,6 +3520,7 @@ Style::drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p,
             col.setAlphaF(opacity / 100.0);
         }
         drawBevelGradient(col, p, rx, horiz, false, MODIFY_AGUA(app));
+        p->restore();
     }
 }
 
