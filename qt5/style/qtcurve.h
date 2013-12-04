@@ -400,6 +400,18 @@ private:
         return MOArrow(state, palette, state & State_MouseOver, rol);
     }
 
+    bool
+    drawPrimitiveNone(PrimitiveElement element,
+                      const QStyleOption *option,
+                      QPainter *painter,
+                      const QWidget *widget) const
+    {
+        QTC_UNUSED(element);
+        QTC_UNUSED(option);
+        QTC_UNUSED(painter);
+        QTC_UNUSED(widget);
+        return true;
+    }
     bool drawPrimitivePanelMenu(PrimitiveElement element,
                                 const QStyleOption *option,
                                 QPainter *painter,
@@ -440,6 +452,37 @@ private:
                                                 const QStyleOption *option,
                                                 QPainter *painter,
                                                 const QWidget *widget) const;
+    bool drawPrimitiveFrameGroupBox(PrimitiveElement element,
+                                    const QStyleOption *option,
+                                    QPainter *painter,
+                                    const QWidget *widget) const;
+    bool drawPrimitiveFrame(PrimitiveElement element,
+                            const QStyleOption *option, QPainter *painter,
+                            const QWidget *widget) const;
+    bool drawPrimitivePanelMenuBar(PrimitiveElement element,
+                                   const QStyleOption *option,
+                                   QPainter *painter,
+                                   const QWidget *widget) const;
+    bool drawPrimitivePanelTipLabel(PrimitiveElement element,
+                                    const QStyleOption *option,
+                                    QPainter *painter,
+                                    const QWidget *widget) const;
+    bool drawPrimitiveQtcBackground(PrimitiveElement element,
+                                    const QStyleOption *option,
+                                    QPainter *painter,
+                                    const QWidget *widget) const;
+    bool drawPrimitivePanelItemViewItem(PrimitiveElement element,
+                                        const QStyleOption *option,
+                                        QPainter *painter,
+                                        const QWidget *widget) const;
+    bool drawPrimitiveFrameTabWidget(PrimitiveElement element,
+                                     const QStyleOption *option,
+                                     QPainter *painter,
+                                     const QWidget *widget) const;
+    bool drawPrimitiveFrameWindow(PrimitiveElement element,
+                                  const QStyleOption *option,
+                                  QPainter *painter,
+                                  const QWidget *widget) const;
 
 private:
     mutable Options opts;

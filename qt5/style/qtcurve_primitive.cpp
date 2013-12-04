@@ -27,6 +27,13 @@
 #include <QTreeView>
 #include <QSpinBox>
 #include <QComboBox>
+#include <QMainWindow>
+#include <QListView>
+#include <QPixmapCache>
+
+#include "shadowhelper.h"
+#include "utils.h"
+#include <common/config_file.h>
 
 namespace QtCurve {
 
@@ -395,6 +402,699 @@ Style::drawPrimitiveIndicatorToolBarSeparator(PrimitiveElement element,
     case LINE_DOTS:
         drawDots(painter, r, !(state & State_Horizontal), 1, 5,
                  itsBackgroundCols, 0, 5);
+    }
+    painter->restore();
+    return true;
+}
+
+bool
+Style::drawPrimitiveFrameGroupBox(PrimitiveElement element,
+                                  const QStyleOption *option,
+                                  QPainter *painter,
+                                  const QWidget *widget) const
+{
+    QTC_UNUSED(element);
+    if (opts.groupBox == FRAME_NONE)
+        return true;
+    bool reverse = Qt::RightToLeft == option->direction;
+    QRect r = option->rect;
+    if (const QStyleOptionFrame *_frame =
+        qstyleoption_cast<const QStyleOptionFrame*>(option)) {
+        QStyleOptionFrame frame(*_frame);
+        if (frame.features & QStyleOptionFrame::Flat ||
+            opts.groupBox == FRAME_LINE) {
+            drawFadedLine(painter, QRect(r.x(), r.y(), r.width(), 1),
+                          backgroundColors(option)[QTC_STD_BORDER],
+                          opts.gbLabel & GB_LBL_CENTRED || reverse,
+                          opts.gbLabel & GB_LBL_CENTRED || !reverse, true);
+        } else {
+            if (opts.gbLabel & GB_LBL_OUTSIDE) {
+                r.adjust(0, 2, 0, 0);
+            }
+            if (opts.groupBox == FRAME_SHADED ||
+                opts.groupBox == FRAME_FADED) {
+                int round = (opts.square & SQUARE_FRAME ?
+                             ROUNDED_NONE : ROUNDED_ALL);
+                QPainterPath path =
+                    buildPath(r, WIDGET_FRAME, round,
+                              ROUNDED_ALL == round ?
+                              qtcGetRadius(&opts, r.width(), r.height(),
+                                           WIDGET_FRAME,
+                                           RADIUS_EXTERNAL) : 0.0);
+                painter->save();
+                painter->setClipping(false);
+                if (opts.gbFactor != 0) {
+                    QColor col = opts.gbFactor < 0 ? Qt::black : Qt::white;
+
+                    col.setAlphaF(TO_ALPHA(opts.gbFactor));
+                    if (FRAME_SHADED == opts.groupBox) {
+                        painter->fillPath(path, col);
+                    } else {
+                        QLinearGradient grad(r.topLeft(), r.bottomLeft());
+                        grad.setColorAt(0, col);
+                        col.setAlphaF(0.0);
+                        grad.setColorAt(1, col);
+                        painter->fillPath(path, grad);
+                    }
+                }
+
+                if (!(opts.gbLabel & (GB_LBL_INSIDE | GB_LBL_OUTSIDE)))
+                    painter->restore();
+                if (FRAME_SHADED == opts.groupBox) {
+                    drawBorder(painter, r, option, round,
+                               backgroundColors(option), WIDGET_FRAME,
+                               /* state & State_Raised && opts.gbFactor < 0 ?
+                                  BORDER_RAISED : */BORDER_SUNKEN);
+                } else {
+                    QColor col = backgroundColors(option)[QTC_STD_BORDER];
+                    QLinearGradient grad(r.topLeft(), r.bottomLeft());
+                    col.setAlphaF(1.0);
+                    grad.setColorAt(0, col);
+                    col.setAlphaF(0.0);
+                    grad.setColorAt(1, col);
+                    painter->setRenderHint(QPainter::Antialiasing, true);
+                    painter->setPen(QPen(QBrush(grad), 1));
+                    painter->drawPath(path);
+                }
+                if (opts.gbLabel & (GB_LBL_INSIDE|GB_LBL_OUTSIDE)) {
+                    painter->restore();
+                }
+            } else {
+                frame.state &= ~(State_Sunken | State_HasFocus);
+                frame.rect = r;
+                drawPrimitive(PE_Frame, &frame, painter, widget);
+            }
+        }
+    }
+    return true;
+}
+
+bool
+Style::drawPrimitiveFrame(PrimitiveElement element,
+                          const QStyleOption *option, QPainter *painter,
+                          const QWidget *widget) const
+{
+    QTC_UNUSED(element);
+    QRect r = option->rect;
+    const QPalette &palette(option->palette);
+    State state = option->state;
+
+    // Dont draw OO.o status bar frames...
+    if (isOOWidget(widget) && r.height() < 22)
+        return true;
+    if (widget && qtcCheckKDEType0(widget->parent(), KTitleWidget)) {
+        return true;
+    } else if (widget && qtcCheckType0<QComboBox>(widget->parent())) {
+        if (opts.gtkComboMenus &&
+            !((QComboBox*)(widget->parent()))->isEditable()) {
+            drawPrimitive(PE_FrameMenu, option, painter, widget);
+        } else if (opts.square & SQUARE_POPUP_MENUS) {
+            const QColor *use = (APP_KRUNNER == theThemedApp ?
+                                 itsBackgroundCols : backgroundColors(option));
+            painter->save();
+            painter->setPen(use[QTC_STD_BORDER]);
+            drawRect(painter, r);
+            painter->setPen(palette.base().color());
+            drawRect(painter, r.adjusted(1, 1, -1, -1));
+            painter->restore();
+        }
+    } else {
+        const QStyleOptionFrame *fo =
+            qstyleoption_cast<const QStyleOptionFrame*>(option);
+        if (theThemedApp == APP_K3B &&
+            !(state & (State_Sunken | State_Raised)) &&
+            fo && fo->lineWidth == 1) {
+            painter->save();
+            painter->setPen(backgroundColors(option)[QTC_STD_BORDER]);
+            drawRect(painter, r);
+            painter->restore();
+        } else if ((state == QtC_StateKWin ||
+                    state == (QtC_StateKWin | State_Active)) && fo &&
+                   fo->lineWidth == 1 && fo->midLineWidth == 1) {
+            QColor border;
+            if (fo->version == TBAR_BORDER_VERSION_HACK + 2) {
+                border = palette.color(QPalette::Active, QPalette::Shadow);
+            } else {
+                const QColor *borderCols =
+                    (opts.windowBorder & WINDOW_BORDER_COLOR_TITLEBAR_ONLY ?
+                     backgroundColors(palette.color(QPalette::Active,
+                                                    QPalette::Window)) :
+                     theThemedApp == APP_KWIN ? buttonColors(option) :
+                     getMdiColors(option, state & State_Active));
+                border = borderCols[fo->version == TBAR_BORDER_VERSION_HACK ?
+                                    0 : QTC_STD_BORDER];
+            }
+            border.setAlphaF(1.0);
+            painter->save();
+            painter->setRenderHint(QPainter::Antialiasing, false);
+            painter->setPen(border);
+            drawRect(painter, r);
+            painter->restore();
+        } else {
+            bool kateView = isKateView(widget);
+            bool kontactPreview = !kateView && isKontactPreviewPane(widget);
+            bool sv = (isOOWidget(widget) ||
+                       qobject_cast<const QAbstractScrollArea*>(widget) ||
+                       ((opts.square & SQUARE_SCROLLVIEW) &&
+                        (kateView || kontactPreview)));
+            bool squareSv = (sv && ((opts.square & SQUARE_SCROLLVIEW) ||
+                                    (widget && widget->isWindow())));
+            bool inQAbstractItemView =
+                (widget && widget->parentWidget() &&
+                 isInQAbstractItemView(widget->parentWidget()));
+
+            if (sv && (opts.etchEntry || squareSv || isOOWidget(widget))) {
+                // For some reason, in KPackageKit, the KTextBrower when
+                // polished is not in the scrollview, but is when painted.
+                // So check here if it should not be etched.
+                // Also, see not in getLowerEtchCol()
+                if (DO_EFFECT && !USE_CUSTOM_ALPHAS(opts) && widget &&
+                    widget->parentWidget() &&
+                    !theNoEtchWidgets.contains(widget) &&
+                    inQAbstractItemView) {
+                    theNoEtchWidgets.insert(widget);
+                }
+                // If we are set to have sunken scrollviews, then the frame
+                // width is set to 3. ...but it we are a scrollview within
+                // a scrollview, then we dont draw sunken, therefore
+                // need to draw inner border...
+                bool doEtch = DO_EFFECT && opts.etchEntry;
+                bool noEtchW = (doEtch && !USE_CUSTOM_ALPHAS(opts) &&
+                                theNoEtchWidgets.contains(widget));
+                if (doEtch && noEtchW) {
+                    painter->setPen(palette.brush(QPalette::Base).color());
+                    drawRect(painter, r.adjusted(2, 2, -2, -2));
+                }
+                if (!opts.highlightScrollViews && fo) {
+                    QStyleOptionFrame opt(*fo);
+                    opt.state &= ~State_HasFocus;
+                    drawEntryField(painter, r, widget, &opt,
+                                   squareSv ? ROUNDED_NONE : ROUNDED_ALL,
+                                   false, doEtch && !noEtchW,
+                                   WIDGET_SCROLLVIEW);
+                } else {
+                    drawEntryField(painter, r, widget, option,
+                                   squareSv ? ROUNDED_NONE : ROUNDED_ALL, false,
+                                   doEtch && !noEtchW, WIDGET_SCROLLVIEW);
+                }
+            }
+            // K3b's Disk usage status bar, etc...
+            // else if (APP_K3B == theThemedApp && widget &&
+            //          widget->inherits("K3b::FillStatusDisplay"))
+            else if (fo && fo->lineWidth > 0) {
+                bool kwinTab = (theThemedApp == APP_KWIN && widget &&
+                                !widget->parentWidget() &&
+                                !strcmp(widget->metaObject()->className(),
+                                        "KWin::TabBox"));
+                QStyleOption opt = *option;
+                painter->save();
+                if (kwinTab) {
+                    r.adjust(-1, -1, 1, 1);
+                }
+                if (!opts.highlightScrollViews) {
+                    opt.state &= ~State_HasFocus;
+                }
+                if (opts.round && qtcIsFlatBgnd(opts.bgndAppearance) &&
+                    opts.bgndOpacity == 100 && widget &&
+                    widget->parentWidget() && !inQAbstractItemView//  &&
+                    // widget->palette().background().color() !=
+                    // widget->parentWidget()->palette().background().color()
+                    ) {
+                    painter->setPen(widget->parentWidget()->palette()
+                                    .background().color());
+                    painter->drawRect(r);
+                    painter->drawRect(r.adjusted(1, 1, -1, -1));
+                }
+                if (sv || kateView || kontactPreview) {
+                    painter->setRenderHint(QPainter::Antialiasing, true);
+                    painter->setPen(
+                        option->palette.brush(
+                            opts.thin & THIN_FRAMES &&
+                            !(opts.square & SQUARE_SCROLLVIEW) ?
+                            QPalette::Window : QPalette::Base).color());
+                    painter->drawPath(
+                        buildPath(r.adjusted(1, 1, -1, -1),
+                                  WIDGET_SCROLLVIEW, ROUNDED_ALL,
+                                  qtcGetRadius(&opts, r.width() - 2,
+                                               r.height() - 2,
+                                               WIDGET_SCROLLVIEW,
+                                               RADIUS_INTERNAL)));
+                    painter->setRenderHint(QPainter::Antialiasing, false);
+                }
+                drawBorder(painter, r, &opt,
+                           opts.round ?  getFrameRound(widget) : ROUND_NONE,
+                           backgroundColors(option),
+                           sv || kateView || kontactPreview ?
+                           WIDGET_SCROLLVIEW : WIDGET_FRAME,
+                           state & State_Sunken || state & State_HasFocus ?
+                           BORDER_SUNKEN : state & State_Raised ? BORDER_RAISED :
+                           BORDER_FLAT);
+                painter->restore();
+            }
+        }
+    }
+    return true;
+}
+
+bool
+Style::drawPrimitivePanelMenuBar(PrimitiveElement element,
+                                 const QStyleOption *option,
+                                 QPainter *painter,
+                                 const QWidget *widget) const
+{
+    QTC_UNUSED(element);
+    const QRect &r = option->rect;
+    if (widget && widget->parentWidget() &&
+        qobject_cast<const QMainWindow*>(widget->parentWidget())) {
+        painter->save();
+        drawMenuOrToolBarBackground(widget, painter, r, option);
+        if (opts.toolbarBorders != TB_NONE) {
+            const QColor *use = (itsActive ? itsMenubarCols :
+                                 backgroundColors(option));
+            bool dark = (opts.toolbarBorders == TB_DARK ||
+                         opts.toolbarBorders == TB_DARK_ALL);
+            if (opts.toolbarBorders == TB_DARK_ALL ||
+                opts.toolbarBorders == TB_LIGHT_ALL) {
+                painter->setPen(use[0]);
+                painter->drawLine(r.x(), r.y(), r.x() + r.width() - 1, r.y());
+                painter->drawLine(r.x(), r.y(), r.x(), r.y() + r.height() - 1);
+                painter->setPen(use[dark ? 3 : 4]);
+                painter->drawLine(r.x(), r.y() + r.height() - 1,
+                                  r.x() + r.width() - 1,
+                                  r.y() + r.height() - 1);
+                painter->drawLine(r.x() + r.width() - 1, r.y(),
+                                  r.x() + r.width() - 1,
+                                  r.y() + r.height() - 1);
+            } else {
+                painter->setPen(use[dark ? 3 : 4]);
+                painter->drawLine(r.x(), r.y() + r.height() - 1,
+                                  r.x() + r.width() - 1,
+                                  r.y() + r.height() - 1);
+            }
+        }
+        painter->restore();
+    }
+    return true;
+}
+
+bool
+Style::drawPrimitivePanelTipLabel(PrimitiveElement element,
+                                  const QStyleOption *option,
+                                  QPainter *painter,
+                                  const QWidget *widget) const
+{
+    QTC_UNUSED(element);
+    const QRect &r = option->rect;
+    const QPalette &palette(option->palette);
+    bool haveAlpha = Utils::hasAlphaChannel(widget);
+    bool rounded = !(opts.square & SQUARE_TOOLTIPS);
+    QPainterPath path =
+        (rounded ? buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL,
+                             MENU_AND_TOOLTIP_RADIUS) : QPainterPath());
+    QColor col = palette.toolTipBase().color();
+
+#ifdef QTC_ENABLE_X11
+    if (widget && widget->window()) {
+        itsShadowHelper->registerWidget(widget->window());
+    }
+#endif
+    painter->save();
+    if (rounded)
+        painter->setRenderHint(QPainter::Antialiasing, true);
+    if (haveAlpha)
+        col.setAlphaF(0.875);
+    drawBevelGradient(col, painter, r, path, true, false,
+                      opts.tooltipAppearance, WIDGET_TOOLTIP, !haveAlpha);
+    if (qtcIsFlat(opts.tooltipAppearance)) {
+        painter->setPen(QPen(palette.toolTipText(), 0));
+        drawRect(painter, r);
+    }
+    painter->restore();
+    return true;
+}
+
+bool
+Style::drawPrimitiveQtcBackground(PrimitiveElement element,
+                                  const QStyleOption *option,
+                                  QPainter *painter,
+                                  const QWidget *widget) const
+{
+    QTC_UNUSED(element);
+    QTC_UNUSED(widget);
+    const QRect &r = option->rect;
+    const QPalette &palette(option->palette);
+    State state = option->state;
+    if (const BgndOption *bgnd =
+        qstyleoption_cast<const BgndOption*>(option)) {
+        if (state & QtC_StateKWin) {
+            QColor col(palette.brush(QPalette::Window).color());
+            int opacity(col.alphaF() * 100);
+            col.setAlphaF(1.0);
+            drawBackground(painter, col, r, opacity, BGND_WINDOW,
+                           bgnd->app, bgnd->path);
+            // APPEARANCE_RAISED is used to signal flat background,
+            // but have background image!
+            if (bgnd->app != APPEARANCE_FLAT) {
+                painter->save();
+                painter->setClipRect(bgnd->rect, Qt::IntersectClip);
+                drawBackgroundImage(painter, true,
+                                    BGND_IMG_ON_BORDER ? bgnd->rect :
+                                    bgnd->widgetRect);
+                painter->restore();
+            }
+        }
+    }
+    return true;
+}
+
+bool
+Style::drawPrimitivePanelItemViewItem(PrimitiveElement element,
+                                      const QStyleOption *option,
+                                      QPainter *painter,
+                                      const QWidget *widget) const
+{
+    QTC_UNUSED(element);
+    const QStyleOptionViewItemV4 *v4Opt =
+        qstyleoption_cast<const QStyleOptionViewItemV4*>(option);
+    const QAbstractItemView *view =
+        qobject_cast<const QAbstractItemView*>(widget);
+    QRect r = option->rect;
+    const QPalette &palette(option->palette);
+    State state = option->state;
+    bool reverse = Qt::RightToLeft == option->direction;
+    bool hover = (state & State_MouseOver && state & State_Enabled &&
+                  (!view ||
+                   QAbstractItemView::NoSelection != view->selectionMode()));
+    bool hasCustomBackground = (v4Opt->backgroundBrush.style() != Qt::NoBrush &&
+                                !(option->state & State_Selected));
+    bool hasSolidBackground =
+        (!hasCustomBackground ||
+         v4Opt->backgroundBrush.style() == Qt::SolidPattern);
+    if (!hover && !(state & State_Selected) && !hasCustomBackground &&
+        !(v4Opt->features & QStyleOptionViewItem::Alternate)) {
+        return true;
+    }
+    QPalette::ColorGroup cg(state & State_Enabled ? state & State_Active ?
+                            QPalette::Normal : QPalette::Inactive :
+                            QPalette::Disabled);
+    if (v4Opt && (v4Opt->features & QStyleOptionViewItem::Alternate)) {
+        painter->fillRect(r, option->palette.brush(cg,
+                                                   QPalette::AlternateBase));
+    }
+    if (!hover && !(state & State_Selected) && !hasCustomBackground) {
+        return true;
+    }
+    if (hasCustomBackground) {
+        const QPointF prevOrigin = painter->brushOrigin();
+        painter->setBrushOrigin(r.topLeft());
+        painter->fillRect(r, v4Opt->backgroundBrush);
+        painter->setBrushOrigin(prevOrigin);
+    }
+    if (state & State_Selected || hover) {
+        if (!widget) {
+            widget = getWidget(painter);
+            if (widget) {
+                widget = widget->parentWidget();
+            }
+        }
+        QColor color = (hasCustomBackground && hasSolidBackground ?
+                        v4Opt->backgroundBrush.color() :
+                        palette.color(cg, QPalette::Highlight));
+        bool square = ((opts.square & SQUARE_LISTVIEW_SELECTION) &&
+                       (/*(!widget && r.height()<=40 && r.width()>=48) || */
+                           (widget && !widget->inherits("KFilePlacesView") &&
+                            (qobject_cast<const QTreeView*>(widget) ||
+                             (qobject_cast<const QListView*>(widget) &&
+                              ((const QListView*)widget)->viewMode() !=
+                              QListView::IconMode)))));
+        bool modAlpha = (!(state & State_Active) &&
+                         itsInactiveChangeSelectionColor);
+        if (hover && !hasCustomBackground) {
+            if (!(state & State_Selected)) {
+                color.setAlphaF(APP_PLASMA == theThemedApp && !widget ?
+                                (0.5 * (modAlpha ? 0.75 : 1.0)) : 0.20);
+            } else {
+                color = color.lighter(110);
+                if (modAlpha) {
+                    color.setAlphaF(INACTIVE_SEL_ALPHA);
+                }
+            }
+        } else if (modAlpha) {
+            color.setAlphaF(color.alphaF() * INACTIVE_SEL_ALPHA);
+        }
+        if (square) {
+            drawBevelGradient(color, painter, r, true, false,
+                              opts.selectionAppearance, WIDGET_SELECTION);
+        } else {
+            QPixmap pix;
+            QString key;
+            key.sprintf("qtc-sel-%x-%x", r.height(), color.rgba());
+            if (!itsUsePixmapCache || !QPixmapCache::find(key, pix)) {
+                pix = QPixmap(QSize(24, r.height()));
+                pix.fill(Qt::transparent);
+                QPainter pixPainter(&pix);
+                QRect border(0, 0, pix.width(), pix.height());
+                double radius(qtcGetRadius(&opts, r.width(), r.height(),
+                                           WIDGET_OTHER, RADIUS_SELECTION));
+                pixPainter.setRenderHint(QPainter::Antialiasing, true);
+                drawBevelGradient(color, &pixPainter, border,
+                                  buildPath(QRectF(border), WIDGET_OTHER,
+                                            ROUNDED_ALL, radius), true,
+                                  false, opts.selectionAppearance,
+                                  WIDGET_SELECTION, false);
+                if (opts.borderSelection) {
+                    pixPainter.setBrush(Qt::NoBrush);
+                    pixPainter.setPen(color);
+                    pixPainter.drawPath(buildPath(border, WIDGET_SELECTION,
+                                                  ROUNDED_ALL, radius));
+                }
+                pixPainter.end();
+                if (itsUsePixmapCache) {
+                    QPixmapCache::insert(key, pix);
+                }
+            }
+            bool roundedLeft = false;
+            bool roundedRight = false;
+            if (v4Opt) {
+                roundedLeft = (QStyleOptionViewItemV4::Beginning ==
+                               v4Opt->viewItemPosition);
+                roundedRight = (QStyleOptionViewItemV4::End ==
+                                v4Opt->viewItemPosition);
+                if (QStyleOptionViewItemV4::OnlyOne == v4Opt->viewItemPosition ||
+                    QStyleOptionViewItemV4::Invalid == v4Opt->viewItemPosition ||
+                    (view && view->selectionBehavior() !=
+                     QAbstractItemView::SelectRows)) {
+                        roundedLeft = roundedRight = true;
+                }
+            }
+            int size = (roundedLeft && roundedRight ?
+                        qMin(8, r.width() / 2) : 8);
+            if (!reverse ? roundedLeft : roundedRight) {
+                painter->drawPixmap(r.topLeft(), pix.copy(0, 0, size,
+                                                          r.height()));
+                r.adjust(size, 0, 0, 0);
+            }
+            if (!reverse ? roundedRight : roundedLeft) {
+                painter->drawPixmap(r.right() - size + 1, r.top(),
+                                    pix.copy(24 - size, 0, size, r.height()));
+                r.adjust(0, 0, -size, 0);
+            }
+            if (r.isValid()) {
+                painter->drawTiledPixmap(r, pix.copy(7, 0, 8, r.height()));
+            }
+        }
+    }
+    return true;
+}
+
+bool
+Style::drawPrimitiveFrameTabWidget(PrimitiveElement element,
+                                   const QStyleOption *option,
+                                   QPainter *painter,
+                                   const QWidget *widget) const
+{
+    QTC_UNUSED(element);
+    const QRect &r = option->rect;
+    bool reverse = option->direction == Qt::RightToLeft;
+    int round = opts.square & SQUARE_TAB_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
+
+    painter->save();
+    if (const QStyleOptionTabWidgetFrame *twf =
+        qstyleoption_cast<const QStyleOptionTabWidgetFrame*>(option)) {
+        if ((opts.round || (/*qtcIsCustomBgnd(&opts) && */opts.tabBgnd == 0)) &&
+            widget && qobject_cast<const QTabWidget*>(widget)) {
+            struct QtcTabWidget : public QTabWidget {
+                bool
+                tabsVisible() const
+                {
+                    return tabBar() && tabBar()->isVisible();
+                }
+                QRect
+                currentTabRect() const
+                {
+                    return tabBar()->tabRect(tabBar()->currentIndex());
+                }
+            };
+            const QTabWidget *tw = (const QTabWidget*)widget;
+            if (tw->count() > 0 &&
+                ((const QtcTabWidget*)widget)->tabsVisible()) {
+                if (!reverse && /*qtcIsCustomBgnd(&opts) && */
+                    opts.tabBgnd == 0) {
+                        // Does not work for reverse :-(
+                    QRect tabRect =
+                        ((const QtcTabWidget*)widget)->currentTabRect();
+                    int adjust = (opts.tabMouseOver == TAB_MO_GLOW &&
+                                  !(opts.thin&THIN_FRAMES) ? 2 : 1);
+                    switch (tw->tabPosition()) {
+                    case QTabWidget::South:
+                        tabRect = QRect(tabRect.x() + adjust,
+                                        r.y() + r.height() - 2,
+                                        tabRect.width() - 2 * adjust, 4);
+                        break;
+                    case QTabWidget::North: {
+                        int leftAdjust =
+                            qtcMax(twf->leftCornerWidgetSize.width(), 0);
+                        tabRect.adjust(leftAdjust + adjust, 0,
+                                       leftAdjust - adjust, 2);
+                        break;
+                    }
+                    case QTabWidget::West:
+                        tabRect.adjust(0, adjust, 2, -adjust);
+                        break;
+                    case QTabWidget::East:
+                        tabRect = QRect(r.x() + r.width() - 2,
+                                        tabRect.y() + adjust, 4,
+                                        tabRect.height() - 2 * adjust);
+                        break;
+                    }
+                    painter->setClipRegion(QRegion(r).subtracted(tabRect),
+                                           Qt::IntersectClip);
+                }
+                if (!(opts.square & SQUARE_TAB_FRAME) &&
+                    tw->currentIndex() == 0) {
+                    bool reverse = twf->direction == Qt::RightToLeft;
+                    switch (tw->tabPosition()) {
+                    case QTabWidget::North:
+                        if (reverse && twf->rightCornerWidgetSize.isEmpty()) {
+                            round -= CORNER_TR;
+                        } else if (!reverse &&
+                                   twf->leftCornerWidgetSize.isEmpty()) {
+                            round-=CORNER_TL;
+                        }
+                        break;
+                    case QTabWidget::South:
+                        if (reverse && twf->rightCornerWidgetSize.isEmpty()) {
+                            round -= CORNER_BR;
+                        } else if (!reverse &&
+                                   twf->leftCornerWidgetSize.isEmpty()) {
+                            round -= CORNER_BL;
+                        }
+                        break;
+                    case QTabWidget::West:
+                        round -= CORNER_TL;
+                        break;
+                    case QTabWidget::East:
+                        round -= CORNER_TR;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    QStyleOption opt(*option);
+    const QColor *use = backgroundColors(option);
+
+    opt.state |= State_Enabled;
+    if (opts.tabBgnd != 0) {
+        QColor bgnd(shade(use[ORIGINAL_SHADE], TO_FACTOR(opts.tabBgnd)));
+        painter->fillRect(r.adjusted(0, 1, 0, -1), bgnd);
+        painter->fillRect(r.adjusted(1, 0, -1, 0), bgnd);
+    }
+    drawBorder(painter, r, &opt, round, use, WIDGET_TAB_FRAME,
+               opts.borderTab ? BORDER_LIGHT : BORDER_RAISED, false);
+    painter->restore();
+    return true;
+}
+
+bool
+Style::drawPrimitiveFrameWindow(PrimitiveElement element,
+                                const QStyleOption *option,
+                                QPainter *painter,
+                                const QWidget *widget) const
+{
+    QTC_UNUSED(element);
+    QTC_UNUSED(widget);
+    const QRect &r = option->rect;
+    State state = option->state;
+    const QPalette &palette(option->palette);
+    bool colTbarOnly = opts.windowBorder & WINDOW_BORDER_COLOR_TITLEBAR_ONLY;
+    bool fillBgnd = (!(state & QtC_StateKWin) && !itsIsPreview &&
+                     !qtcIsFlatBgnd(opts.bgndAppearance));
+    const QColor *bgndCols =
+        (colTbarOnly || fillBgnd ?
+         backgroundColors(palette.color(QPalette::Active,
+                                        QPalette::Window)) : 0L);
+    const QColor *borderCols = (colTbarOnly ? bgndCols :
+                                theThemedApp == APP_KWIN ?
+                                buttonColors(option) :
+                                getMdiColors(option, state & State_Active));
+    QColor light = borderCols[0];
+    QColor dark = (option->version == (TBAR_BORDER_VERSION_HACK + 2) ?
+                   palette.color(QPalette::Active, QPalette::Shadow) :
+                   borderCols[option &&
+                              option->version == TBAR_BORDER_VERSION_HACK ?
+                              0 : QTC_STD_BORDER]);
+    bool isKWin = state & QtC_StateKWin;
+    bool addLight = (opts.windowBorder & WINDOW_BORDER_ADD_LIGHT_BORDER &&
+                     (!isKWin || qtcGetWindowBorderSize(false).sides > 1));
+    light.setAlphaF(1.0);
+    dark.setAlphaF(1.0);
+    painter->save();
+    if (fillBgnd) {
+        painter->fillRect(r, bgndCols[ORIGINAL_SHADE]);
+    }
+    if (opts.round < ROUND_SLIGHT || !isKWin ||
+        (state & QtC_StateKWinNotFull && state & QtC_StateKWin)) {
+        painter->setRenderHint(QPainter::Antialiasing, false);
+        if (addLight) {
+            painter->setPen(light);
+            painter->drawLine(r.x() + 1, r.y(), r.x() + 1,
+                              r.y() + r.height() - 1);
+        }
+        painter->setPen(dark);
+        drawRect(painter, r);
+    } else {
+        if (addLight) {
+            painter->setRenderHint(QPainter::Antialiasing, false);
+            painter->setPen(light);
+            painter->drawLine(r.x() + 1, r.y(), r.x() + 1,
+                              r.y() + r.height() -
+                              (1 + (opts.round > ROUND_SLIGHT &&
+                                    state & QtC_StateKWin ? 3 : 1)));
+        }
+        painter->setRenderHint(QPainter::Antialiasing, true);
+        painter->setPen(dark);
+        painter->drawPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL,
+                                    opts.round > ROUND_SLIGHT &&
+                                    state & QtC_StateKWin ? 6.0 : 2.0));
+        if (FULLLY_ROUNDED && !(state & QtC_StateKWinCompositing)) {
+            QColor col(opts.windowBorder & WINDOW_BORDER_COLOR_TITLEBAR_ONLY ?
+                       backgroundColors(option)[QTC_STD_BORDER] :
+                       buttonColors(option)[QTC_STD_BORDER]);
+            painter->setRenderHint(QPainter::Antialiasing, false);
+            painter->setPen(col);
+            painter->drawPoint(r.x() + 2, r.y() + r.height() - 3);
+            painter->drawPoint(r.x() + r.width() - 3, r.y() + r.height() - 3);
+            painter->drawLine(r.x() + 1, r.y() + r.height() - 5,
+                              r.x() + 1, r.y() + r.height() - 4);
+            painter->drawLine(r.x() + 3, r.y() + r.height() - 2,
+                              r.x() + 4, r.y() + r.height() - 2);
+            painter->drawLine(r.x() + r.width() - 2, r.y() + r.height() - 5,
+                              r.x() + r.width() - 2, r.y() + r.height() - 4);
+            painter->drawLine(r.x() + r.width() - 4, r.y() + r.height() - 2,
+                              r.x() + r.width() - 5, r.y() + r.height() - 2);
+        }
     }
     painter->restore();
     return true;
