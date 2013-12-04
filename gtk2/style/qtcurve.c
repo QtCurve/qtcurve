@@ -2019,7 +2019,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         {
             int diff=qtcWidgetGetAllocation(widget).x-qtcWidgetGetAllocation(parent).x;
 
-            if (NO_FRAME(opts.groupBox)) {
+            if (qtcNoFrame(opts.groupBox)) {
                 x -= qtcBound(0, diff, 8);
             } else if (opts.gbLabel&GB_LBL_OUTSIDE) {
                 x -= qtcBound(0, diff, 4);
@@ -2034,7 +2034,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
             if(area)
             {
                 area2=*area;
-                if (NO_FRAME(opts.groupBox)) {
+                if (qtcNoFrame(opts.groupBox)) {
                     area2.x -= qtcBound(0, diff, 8);
                 } else if (opts.gbLabel & GB_LBL_OUTSIDE) {
                     area2.x -= qtcBound(0, diff, 4);

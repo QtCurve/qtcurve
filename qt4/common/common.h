@@ -691,22 +691,11 @@ typedef enum
 
 typedef enum
 {
-    FRAME_NONE,
-    FRAME_PLAIN,
-    FRAME_LINE,
-    FRAME_SHADED,
-    FRAME_FADED
-} EFrame;
-
-typedef enum
-{
     GB_LBL_BOLD     = 0x01,
     GB_LBL_CENTRED  = 0x02,
     GB_LBL_INSIDE   = 0x04,
     GB_LBL_OUTSIDE  = 0x08
 } EGBLabel;
-
-#define NO_FRAME(A) (FRAME_NONE==(A) || FRAME_LINE==(A))
 
 typedef enum
 {

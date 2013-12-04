@@ -10418,7 +10418,7 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
                     int          h(fontMetrics.height()),
                                  tw(fontMetrics.size(Qt::TextShowMnemonic, groupBox->text + QLatin1Char(' ')).width()),
                                  marg((groupBox->features & QStyleOptionFrameV2::Flat) ||
-                                       NO_FRAME(opts.groupBox) || opts.gbLabel&GB_LBL_OUTSIDE
+                                       qtcNoFrame(opts.groupBox) || opts.gbLabel&GB_LBL_OUTSIDE
                                             ? 0
                                             : opts.gbLabel&GB_LBL_INSIDE
                                                 ? 2
@@ -10427,14 +10427,16 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
                                  indicatorSpace(pixelMetric(PM_CheckBoxLabelSpacing, option, widget) - 1);
                     bool         hasCheckBox(groupBox->subControls & QStyle::SC_GroupBoxCheckBox);
                     int          checkBoxSize(hasCheckBox ? (indicatorWidth + indicatorSpace) : 0),
-                                 checkAdjust(NO_FRAME(opts.groupBox) || opts.gbLabel&GB_LBL_OUTSIDE ? 0 : 2);
+                                 checkAdjust(qtcNoFrame(opts.groupBox) || opts.gbLabel&GB_LBL_OUTSIDE ? 0 : 2);
 
                     if(0==checkAdjust)
                         checkBoxSize-=2;
 
                     r.adjust(marg, 0, -marg, 0);
-                    if(!NO_FRAME(opts.groupBox) && opts.gbLabel&GB_LBL_INSIDE)
+                    if(!qtcNoFrame(opts.groupBox) &&
+                       opts.gbLabel & GB_LBL_INSIDE) {
                         r.adjust(0, 2, 0, 2);
+                    }
                     r.setHeight(h);
 
                     // Adjusted rect for label + indicatorWidth + indicatorSpace

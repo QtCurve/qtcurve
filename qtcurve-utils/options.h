@@ -89,6 +89,20 @@ typedef enum {
     NUM_STD_APP = (APPEARANCE_LV_AGUA - NUM_CUSTOM_GRAD) + 1
 } EAppearance;
 
+typedef enum {
+    FRAME_NONE,
+    FRAME_PLAIN,
+    FRAME_LINE,
+    FRAME_SHADED,
+    FRAME_FADED
+} EFrame;
+
+QTC_ALWAYS_INLINE static inline bool
+qtcNoFrame(EFrame frame)
+{
+    return frame == FRAME_NONE || frame == FRAME_LINE;
+}
+
 QTC_ALWAYS_INLINE static inline bool
 qtcIsFlatBgnd(EAppearance appear)
 {
