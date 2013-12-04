@@ -1857,36 +1857,38 @@ Style::polish(QWidget *widget)
         qobject_cast<QMdiSubWindow*>(widget))
         widget->setAttribute(Qt::WA_StyledBackground);
 
-    if(opts.menubarHiding && qobject_cast<QMainWindow*>(widget) && static_cast<QMainWindow*>(widget)->menuWidget())
-    {
+    if (opts.menubarHiding && qobject_cast<QMainWindow*>(widget) &&
+        static_cast<QMainWindow*>(widget)->menuWidget()) {
         widget->installEventFilter(this);
-        if (itsSaveMenuBarStatus)
+        if (itsSaveMenuBarStatus) {
             static_cast<QMainWindow*>(widget)->menuWidget()
                 ->installEventFilter(this);
-        if(itsSaveMenuBarStatus && qtcMenuBarHidden(appName))
-        {
+        }
+        if (itsSaveMenuBarStatus && qtcMenuBarHidden(appName)) {
             static_cast<QMainWindow*>(widget)->menuWidget()->setHidden(true);
 #ifdef QTC_ENABLE_X11
-            if(BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR)
+            if (BLEND_TITLEBAR || opts.menubarHiding & HIDE_KWIN ||
+                opts.windowBorder &
+                WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR) {
                 emitMenuSize(static_cast<QMainWindow*>(widget)->menuWidget(), 0);
+            }
 #endif
         }
     }
 
-    if(opts.statusbarHiding && qobject_cast<QMainWindow*>(widget))
-    {
-        QList<QStatusBar*> sb=getStatusBars(widget);
-
+    if (opts.statusbarHiding && qobject_cast<QMainWindow*>(widget)) {
+        QList<QStatusBar*> sb = getStatusBars(widget);
         if (sb.count()) {
             widget->installEventFilter(this);
-            QList<QStatusBar*>::ConstIterator it(sb.begin()),
-                                               end(sb.end());
-            for(; it!=end; ++it)
-            {
-                if(itsSaveStatusBarStatus)
+            QList<QStatusBar*>::ConstIterator it(sb.begin());
+            QList<QStatusBar*>::ConstIterator end(sb.end());
+            for (;it != end;++it) {
+                if (itsSaveStatusBarStatus) {
                     (*it)->installEventFilter(this);
-                if(itsSaveStatusBarStatus && qtcStatusBarHidden(appName))
+                }
+                if (itsSaveStatusBarStatus && qtcStatusBarHidden(appName)) {
                     (*it)->setHidden(true);
+                }
             }
 #ifdef QTC_ENABLE_X11
             setSbProp(widget);
@@ -1896,8 +1898,8 @@ Style::polish(QWidget *widget)
     }
 
     // Enable hover effects in all itemviews
-    if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(widget))
-    {
+    if (QAbstractItemView *itemView =
+        qobject_cast<QAbstractItemView*>(widget)) {
         QWidget *viewport=itemView->viewport();
         viewport->setAttribute(Qt::WA_Hover);
 

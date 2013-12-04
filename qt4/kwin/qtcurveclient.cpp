@@ -1657,17 +1657,19 @@ void QtCurveClient::toggleStatusBar()
     sendToggleToApp(false);
 }
 
-QtCurveToggleButton * QtCurveClient::createToggleButton(bool menubar)
+QtCurveToggleButton*
+QtCurveClient::createToggleButton(bool menubar)
 {
     QtCurveToggleButton *button = new QtCurveToggleButton(menubar, this);
-    int                 size    = layoutMetric(LM_TitleHeight)-6;
+    int size = layoutMetric(LM_TitleHeight) - 6;
 
     button->setFixedSize(size, size);
-    //button->setCheckable(true);
-    //button->setChecked(false);
-    connect(button, SIGNAL(clicked()), menubar ? SLOT(toggleMenuBar()) : SLOT(toggleStatusBar()));
-//     widget()->setAttribute(Qt::WA_Hover, true);
-//     widget()->installEventFilter(this);
+    // button->setCheckable(true);
+    // button->setChecked(false);
+    connect(button, SIGNAL(clicked()),
+            menubar ? SLOT(toggleMenuBar()) : SLOT(toggleStatusBar()));
+    // widget()->setAttribute(Qt::WA_Hover, true);
+    // widget()->installEventFilter(this);
     return button;
 }
 

@@ -424,7 +424,7 @@ void Style::polish(QWidget *widget)
         qobject_cast<QMdiSubWindow*>(widget))
         widget->setAttribute(Qt::WA_StyledBackground);
 
-    if (opts.menubarHiding && qobject_cast<QMainWindow *>(widget) &&
+    if (opts.menubarHiding && qobject_cast<QMainWindow*>(widget) &&
         static_cast<QMainWindow*>(widget)->menuWidget()) {
         widget->installEventFilter(this);
         if (itsSaveMenuBarStatus)
@@ -522,27 +522,33 @@ void Style::polish(QWidget *widget)
             widget->installEventFilter(this);
         }
     } else if (qobject_cast<QAbstractScrollArea*>(widget) &&
-             widget->inherits("KFilePlacesView")) {
+               widget->inherits("KFilePlacesView")) {
         if (qtcIsCustomBgnd(&opts))
-            polishScrollArea(static_cast<QAbstractScrollArea *>(widget), true);
+            polishScrollArea(static_cast<QAbstractScrollArea*>(widget), true);
         widget->installEventFilter(this);
     } else if (qobject_cast<QProgressBar*>(widget)) {
-        if(widget->palette().color(QPalette::Inactive, QPalette::HighlightedText)!=widget->palette().color(QPalette::Active, QPalette::HighlightedText))
-        {
+        if (widget->palette().color(QPalette::Inactive,
+                                    QPalette::HighlightedText) !=
+            widget->palette().color(QPalette::Active,
+                                    QPalette::HighlightedText)) {
             QPalette pal(widget->palette());
-            pal.setColor(QPalette::Inactive, QPalette::HighlightedText, pal.color(QPalette::Active, QPalette::HighlightedText));
+            pal.setColor(QPalette::Inactive, QPalette::HighlightedText,
+                         pal.color(QPalette::Active,
+                                   QPalette::HighlightedText));
             widget->setPalette(pal);
         }
 
-        if(opts.boldProgress)
+        if (opts.boldProgress)
             setBold(widget);
         widget->installEventFilter(this);
-    } else if(qobject_cast<QMenuBar*>(widget)) {
+    } else if (qobject_cast<QMenuBar*>(widget)) {
 #ifdef QTC_ENABLE_X11
-        if (BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN ||
-            opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR)
-            emitMenuSize(widget, PREVIEW_MDI==itsIsPreview ||
+        if (BLEND_TITLEBAR || opts.menubarHiding & HIDE_KWIN ||
+            opts.windowBorder &
+            WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR) {
+            emitMenuSize(widget, PREVIEW_MDI == itsIsPreview ||
                          !widget->isVisible() ? 0 : widget->rect().height());
+        }
 #endif
         if (qtcIsCustomBgnd(&opts))
             widget->setBackgroundRole(QPalette::NoRole);
@@ -570,9 +576,8 @@ void Style::polish(QWidget *widget)
         if (!opts.gtkScrollViews && (((QFrame*)widget)->frameWidth() > 0)) {
             widget->installEventFilter(this);
         }
-        if(APP_KONTACT==theThemedApp && widget->parentWidget())
-        {
-            QWidget *frame=scrollViewFrame(widget->parentWidget());
+        if (APP_KONTACT == theThemedApp && widget->parentWidget()) {
+            QWidget *frame = scrollViewFrame(widget->parentWidget());
 
             if (frame) {
                 frame->installEventFilter(this);
@@ -617,11 +622,13 @@ void Style::polish(QWidget *widget)
     }
 
     if (!widget->isWindow())
-        if (QFrame *frame = qobject_cast<QFrame *>(widget))
-        {
+        if (QFrame *frame = qobject_cast<QFrame*>(widget)) {
             // kill ugly frames...
-            if (QFrame::Box==frame->frameShape() || QFrame::Panel==frame->frameShape() || QFrame::WinPanel==frame->frameShape())
+            if (QFrame::Box == frame->frameShape() ||
+                QFrame::Panel == frame->frameShape() ||
+                QFrame::WinPanel == frame->frameShape()) {
                 frame->setFrameShape(QFrame::StyledPanel);
+            }
             //else if (QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
             widget->installEventFilter(this);
 
@@ -683,12 +690,16 @@ void Style::polish(QWidget *widget)
         }
     }
 
-    if((!qtcIsFlatBgnd(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) &&
-       widget->inherits("QComboBoxPrivateContainer"))
-    {
+    if ((!qtcIsFlatBgnd(opts.menuBgndAppearance) ||
+         opts.menuBgndOpacity != 100 ||
+         !(opts.square & SQUARE_POPUP_MENUS)) &&
+        widget->inherits("QComboBoxPrivateContainer")) {
         widget->installEventFilter(this);
-        if((100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) && !widget->testAttribute(Qt::WA_TranslucentBackground))
+        if ((100 != opts.menuBgndOpacity ||
+             !(opts.square & SQUARE_POPUP_MENUS)) &&
+            !widget->testAttribute(Qt::WA_TranslucentBackground)) {
             setTranslucentBackground(widget);
+        }
     }
 
     bool parentIsToolbar(false);
@@ -788,10 +799,12 @@ void Style::polish(QWidget *widget)
 #ifdef QTC_QT5_ENABLE_KDE
     // Make file selection button in QPrintDialog appear more KUrlRequester like...
     if (qobject_cast<QToolButton*>(widget) &&
-        widget->parentWidget() && widget->parentWidget()->parentWidget() && widget->parentWidget()->parentWidget()->parentWidget() &&
-       qobject_cast<QGroupBox*>(widget->parentWidget()) &&
-       qobject_cast<QPrintDialog*>(widget->parentWidget()->parentWidget()->parentWidget()) &&
-       static_cast<QToolButton*>(widget)->text() == QLatin1String("...")) {
+        widget->parentWidget() &&
+        widget->parentWidget()->parentWidget() &&
+        widget->parentWidget()->parentWidget()->parentWidget() &&
+        qobject_cast<QGroupBox*>(widget->parentWidget()) &&
+        qobject_cast<QPrintDialog*>(widget->parentWidget()->parentWidget()->parentWidget()) &&
+        static_cast<QToolButton*>(widget)->text() == QLatin1String("...")) {
         static_cast<QToolButton*>(widget)->setIcon(KIcon("document-open"));
         static_cast<QToolButton*>(widget)->setAutoRaise(false);
     }
