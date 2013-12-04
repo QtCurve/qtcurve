@@ -3653,7 +3653,8 @@ QColor Style::titlebarIconColor(const QStyleOption *option) const
 
 const QColor * Style::popupMenuCols(const QStyleOption *option) const
 {
-    return USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu || !option ? itsPopupMenuCols : backgroundColors(option);
+    return (opts.lighterPopupMenuBgnd || opts.shadePopupMenu || !option ?
+            itsPopupMenuCols : backgroundColors(option));
 }
 
 const QColor * Style::checkRadioColors(const QStyleOption *option) const
@@ -3751,14 +3752,16 @@ void Style::setMenuColors(const QColor &bgnd)
         : itsMenubarCols
         : itsBackgroundCols;
 
-    if(USE_LIGHTER_POPUP_MENU)
-    {
-        if(!itsPopupMenuCols)
-            itsPopupMenuCols=new QColor [TOTAL_SHADES+1];
-        shadeColors(shade(base[ORIGINAL_SHADE], TO_FACTOR(opts.lighterPopupMenuBgnd)), itsPopupMenuCols);
+    if (opts.lighterPopupMenuBgnd) {
+        if (!itsPopupMenuCols) {
+            itsPopupMenuCols = new QColor[TOTAL_SHADES + 1];
+        }
+        shadeColors(shade(base[ORIGINAL_SHADE],
+                          TO_FACTOR(opts.lighterPopupMenuBgnd)),
+                    itsPopupMenuCols);
+    } else {
+        itsPopupMenuCols = base;
     }
-    else
-        itsPopupMenuCols=base;
 }
 
 void Style::setMenuTextColors(QWidget *widget, bool isMenuBar) const

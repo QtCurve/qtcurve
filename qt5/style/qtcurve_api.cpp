@@ -640,22 +640,14 @@ void Style::polish(QWidget *widget)
             }
         }
 
-    if(qobject_cast<QMenu *>(widget)/* && !(widget->parentWidget() &&
-                                       #ifndef QTC_QT5_ENABLE_KDE
-                                       widget->inherits("KMenu") && widget->parentWidget()->inherits("KXmlGuiWindow")
-                                       #else
-                                       qobject_cast<KMenu *>(widget) && qobject_cast<KXmlGuiWindow *>(widget->parentWidget())
-                                       #endif
-                                       && QLatin1String("QtCurvePreview")==widget->parentWidget()->objectName())*/)
-    {
+    if (qobject_cast<QMenu*>(widget)) {
         if(!qtcIsFlatBgnd(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS))
         {
             widget->installEventFilter(this);
             if((100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) && !widget->testAttribute(Qt::WA_TranslucentBackground))
                 setTranslucentBackground(widget);
         }
-        if(USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu)
-        {
+        if (opts.lighterPopupMenuBgnd || opts.shadePopupMenu) {
             QPalette pal(widget->palette());
 
             pal.setBrush(QPalette::Active, QPalette::Window, popupMenuCols()[ORIGINAL_SHADE]);
@@ -981,8 +973,9 @@ void Style::unpolish(QWidget *widget)
         widget->setAttribute(Qt::WA_TranslucentBackground, false);
         widget->clearMask();
 
-        if(USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu)
+        if (opts.lighterPopupMenuBgnd || opts.shadePopupMenu) {
             widget->setPalette(QApplication::palette());
+        }
     }
 
     if((!qtcIsFlatBgnd(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) &&

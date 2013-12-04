@@ -3095,8 +3095,10 @@ void drawMenuItem(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *w
         if(mb && !opts.roundMbTopOnly && !(opts.square&SQUARE_POPUP_MENUS))
             x++, y++, width-=2, height-=2;
 
-        if(grayItem && !mb && (USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu))
-            itemCols=qtcPalette.menu;
+        if (grayItem && !mb &&
+            (opts.lighterPopupMenuBgnd || opts.shadePopupMenu)) {
+            itemCols = qtcPalette.menu;
+        }
         if(!mb && APPEARANCE_FADE==opts.menuitemAppearance)
         {
             gboolean        reverse=FALSE; /* TODO !!! */
@@ -3204,10 +3206,10 @@ drawMenu(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
         else
             drawBevelGradientAlpha(cr, area, x, y, width, height, &qtcPalette.menu[ORIGINAL_SHADE], GT_HORIZ==opts.menuBgndGrad,
                                    FALSE, opts.menuBgndAppearance, WIDGET_OTHER, alpha);
+    } else if (opts.shadePopupMenu || opts.lighterPopupMenuBgnd || useAlpha) {
+        drawAreaColorAlpha(cr, area, &qtcPalette.menu[ORIGINAL_SHADE], x, y,
+                           width, height, alpha);
     }
-    else if(opts.shadePopupMenu || USE_LIGHTER_POPUP_MENU || useAlpha)
-        drawAreaColorAlpha(cr, area, &qtcPalette.menu[ORIGINAL_SHADE], x, y, width, height, alpha);
-
     if(/*!comboMenu && */IMG_NONE!=opts.menuBgndImage.type)
         drawBgndRings(cr, x, y, width, height, FALSE);
 

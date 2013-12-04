@@ -1556,8 +1556,7 @@ void generateColors()
 
     /* Tear off menu items dont seem to draw they're background, and the default background
         is drawn :-(  Fix/hack this by making that background the correct color */
-    if(USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu)
-    {
+    if (opts.lighterPopupMenuBgnd || opts.shadePopupMenu) {
         static const char *format="style \""RC_SETTING"Mnu\" { "
                                     "bg[NORMAL]=\"#%02X%02X%02X\" "
                                     "fg[NORMAL]=\"#%02X%02X%02X\" "
@@ -1598,9 +1597,10 @@ void generateColors()
             opts.customMenuStripeColor=qtcPalette.background[ORIGINAL_SHADE];
             break;
         case SHADE_DARKEN:
-            opts.customMenuStripeColor=USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu
-                ? qtcPalette.menu[ORIGINAL_SHADE]
-                : qtcPalette.background[MENU_STRIPE_SHADE];
+            opts.customMenuStripeColor =
+                (opts.lighterPopupMenuBgnd || opts.shadePopupMenu ?
+                 qtcPalette.menu[ORIGINAL_SHADE] :
+                 qtcPalette.background[MENU_STRIPE_SHADE]);
             break;
         case SHADE_CUSTOM:
             break;

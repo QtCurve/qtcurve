@@ -2106,15 +2106,9 @@ Style::polish(QWidget *widget)
             }
         }
 
-    if (qobject_cast<QMenu*>(widget)//  &&
-        // !(widget->parentWidget() &&
-        //   qtcCheckKDEType(widget, KMenu) &&
-        //   qtcCheckKDEType(widget->parentWidget(), KXmlGuiWindow) &&
-        //   QLatin1String("QtCurvePreview") ==
-        //   widget->parentWidget()->objectName())
-        ) {
+    if (qobject_cast<QMenu*>(widget)) {
         if (!qtcIsFlatBgnd(opts.menuBgndAppearance) ||
-            100 != opts.menuBgndOpacity ||
+            opts.menuBgndOpacity != 100 ||
             !(opts.square & SQUARE_POPUP_MENUS)) {
             widget->installEventFilter(this);
             if ((100 != opts.menuBgndOpacity ||
@@ -2123,12 +2117,13 @@ Style::polish(QWidget *widget)
                 setTranslucentBackground(widget);
             }
         }
-        if (USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu) {
-            QPalette pal(widget->palette());
+        if (opts.lighterPopupMenuBgnd || opts.shadePopupMenu) {
+            QPalette pal = widget->palette();
 
-            pal.setBrush(QPalette::Active, QPalette::Window, popupMenuCols()[ORIGINAL_SHADE]);
+            pal.setBrush(QPalette::Active, QPalette::Window,
+                         popupMenuCols()[ORIGINAL_SHADE]);
             widget->setPalette(pal);
-            if(opts.shadePopupMenu)
+            if (opts.shadePopupMenu)
                 setMenuTextColors(widget, false);
             if (IMG_NONE != opts.menuBgndImage.type) {
                 widget->installEventFilter(this);
@@ -2593,7 +2588,7 @@ void Style::unpolish(QWidget *widget)
         widget->setAttribute(Qt::WA_TranslucentBackground, false);
         widget->clearMask();
 
-        if (USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu) {
+        if (opts.lighterPopupMenuBgnd || opts.shadePopupMenu) {
             widget->setPalette(QApplication::palette());
         }
     }
@@ -13036,9 +13031,11 @@ QColor Style::titlebarIconColor(const QStyleOption *option) const
     return buttonColors(option)[ORIGINAL_SHADE];
 }
 
-const QColor * Style::popupMenuCols(const QStyleOption *option) const
+const QColor*
+Style::popupMenuCols(const QStyleOption *option) const
 {
-    return USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu || !option ? itsPopupMenuCols : backgroundColors(option);
+    return (opts.lighterPopupMenuBgnd || opts.shadePopupMenu || !option ?
+            itsPopupMenuCols : backgroundColors(option));
 }
 
 const QColor * Style::checkRadioColors(const QStyleOption *option) const
@@ -13136,14 +13133,16 @@ void Style::setMenuColors(const QColor &bgnd)
                         : itsMenubarCols
                     : itsBackgroundCols;
 
-    if(USE_LIGHTER_POPUP_MENU)
-    {
-        if(!itsPopupMenuCols)
-            itsPopupMenuCols=new QColor [TOTAL_SHADES+1];
-        shadeColors(shade(base[ORIGINAL_SHADE], TO_FACTOR(opts.lighterPopupMenuBgnd)), itsPopupMenuCols);
+    if (opts.lighterPopupMenuBgnd) {
+        if (!itsPopupMenuCols) {
+            itsPopupMenuCols = new QColor[TOTAL_SHADES + 1];
+        }
+        shadeColors(shade(base[ORIGINAL_SHADE],
+                          TO_FACTOR(opts.lighterPopupMenuBgnd)),
+                    itsPopupMenuCols);
+    } else {
+        itsPopupMenuCols = base;
     }
-    else
-        itsPopupMenuCols=base;
 }
 
 void Style::setMenuTextColors(QWidget *widget, bool isMenuBar) const

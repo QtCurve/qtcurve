@@ -107,8 +107,8 @@ enum {
 
 #define FRAME_DARK_SHADOW 2
 #define FOCUS_SHADE(SEL)         (FOCUS_GLOW==opts.focus ? GLOW_MO : ((SEL) ? 3 : ORIGINAL_SHADE))
-#define MENU_STRIPE_SHADE (USE_LIGHTER_POPUP_MENU ? ORIGINAL_SHADE : 2)
-#define MENU_SEP_SHADE    (USE_LIGHTER_POPUP_MENU ? 4 : 3)
+#define MENU_STRIPE_SHADE (opts.lighterPopupMenuBgnd ? ORIGINAL_SHADE : 2)
+#define MENU_SEP_SHADE    (opts.lighterPopupMenuBgnd ? 4 : 3)
 
 #define BGND_STRIPE_SHADE 0.95
 
@@ -167,7 +167,6 @@ enum {
 
 #define SIZE_GRIP_SIZE 12
 
-#define USE_LIGHTER_POPUP_MENU (opts.lighterPopupMenuBgnd)
 #define USE_BORDER(B)          (GB_SHINE!=(B) && GB_NONE!=(B))
 #define DRAW_MENU_BORDER       (APPEARANCE_FLAT!=opts.menuBgndAppearance && opts.version>=qtcMakeVersion(1, 7) && \
                                 USE_BORDER(qtcGetGradient(opts.menuBgndAppearance, &opts)->border))
