@@ -188,9 +188,6 @@ enum {
 
 #define SIZE_GRIP_SIZE 12
 
-#define DRAW_MENU_BORDER       (APPEARANCE_FLAT!=opts.menuBgndAppearance && opts.version>=qtcMakeVersion(1,7) && \
-                                qtcUseBorder(qtcGetGradient(opts.menuBgndAppearance, &opts)->border))
-
 #define USE_GLOW_FOCUS(mouseOver) (FOCUS_GLOW==opts.focus && (MO_GLOW!=opts.coloredMouseOver || !(mouseOver)))
 
 #define USE_SHADED_MENU_BAR_COLORS (SHADE_CUSTOM==opts.shadeMenubars || SHADE_BLEND_SELECTED==opts.shadeMenubars)
@@ -1055,6 +1052,18 @@ typedef struct {
 
 } Options;
 
+void qtcSetupGradient(Gradient *grad, EGradientBorder border, int numStops, ...);
+const Gradient *qtcGetGradient(EAppearance app, const Options *opts);
+
+QTC_ALWAYS_INLINE static inline bool
+qtcDrawMenuBorder(const Options *opts)
+{
+    return (opts->menuBgndAppearance != APPEARANCE_FLAT &&
+            opts->version >= qtcMakeVersion(1, 7) &&
+            qtcUseBorder(qtcGetGradient(opts->menuBgndAppearance,
+                                        opts)->border));
+}
+
 QTC_ALWAYS_INLINE static inline bool
 qtcIsCustomBgnd(const Options *opts)
 {
@@ -1078,9 +1087,6 @@ qtcIsCustomBgnd(const Options *opts)
 #define midColor(COLA, COLB) qtcColorMix((COLA), (COLB), 0.5)
 #endif // __cplusplus
 #endif // QT_VERSION && (QT_VERSION >= 0x040000) && defined QTC_QT4_ENABLE_KDE
-
-void qtcSetupGradient(Gradient *grad, EGradientBorder border, int numStops, ...);
-const Gradient * qtcGetGradient(EAppearance app, const Options *opts);
 
 #ifdef __cplusplus
 EAppearance qtcWidgetApp(EWidget w, const Options *opts, bool active=true);

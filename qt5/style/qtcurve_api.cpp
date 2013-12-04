@@ -1622,7 +1622,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
              isKontactPreviewPane(widget)))
             return (opts.gtkScrollViews || opts.thinSbarGroove || !opts.borderSbarGroove) && (!opts.highlightScrollViews) ? 1 : 2;
 
-        if (!DRAW_MENU_BORDER && !opts.borderMenuitems && opts.square&SQUARE_POPUP_MENUS && qobject_cast<const QMenu *>(widget))
+        if (!qtcDrawMenuBorder(&opts) && !opts.borderMenuitems && opts.square&SQUARE_POPUP_MENUS && qobject_cast<const QMenu *>(widget))
             return 1;
 
         if(DO_EFFECT && opts.etchEntry &&
