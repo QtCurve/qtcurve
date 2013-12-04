@@ -1924,13 +1924,14 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
     default:
 #ifdef QTC_QT5_ENABLE_KDE
         // Tell the calling app that we can handle certain custom widgets...
-        if(hint>=SH_CustomBase && widget)
-            if("CE_CapacityBar"==widget->objectName())
-            {
-                if (opts.boldProgress)
-                    setBold((QWidget *)widget);
+        if (hint >= SH_CustomBase && widget) {
+            if ("CE_CapacityBar" == widget->objectName()) {
+                if (opts.boldProgress) {
+                    setBold(const_cast<QWidget*>widget);
+                }
                 return CE_QtC_KCapacityBar;
             }
+        }
 #endif
         return BASE_STYLE::styleHint(hint, option, widget, returnData);
     }
@@ -8133,61 +8134,60 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
         }
         break;
     case CC_Slider:
-        if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider *>(option))
-        {
-            if(SLIDER_TRIANGULAR==opts.sliderStyle)
-            {
-                int   tickSize(pixelMetric(PM_SliderTickmarkOffset, option, widget)),
+        if (const QStyleOptionSlider *slider =
+            qstyleoption_cast<const QStyleOptionSlider*>(option)) {
+            if (SLIDER_TRIANGULAR == opts.sliderStyle) {
+                int tickSize(pixelMetric(PM_SliderTickmarkOffset, option, widget)),
                     mod=MO_GLOW==opts.coloredMouseOver && DO_EFFECT ? 2 : 0;
                 QRect rect(BASE_STYLE::subControlRect(control, option, subControl, widget));
 
-                switch (subControl)
-                {
+                switch (subControl) {
                 case SC_SliderHandle:
-                    if (slider->orientation == Qt::Horizontal)
-                    {
-                        rect.setWidth(11+mod);
-                        rect.setHeight(15+mod);
-                        int centerY(r.center().y() - rect.height() / 2);
-                        if (slider->tickPosition & QSlider::TicksAbove)
+                    if (slider->orientation == Qt::Horizontal) {
+                        rect.setWidth(11 + mod);
+                        rect.setHeight(15 + mod);
+                        int centerY = r.center().y() - rect.height() / 2;
+                        if (slider->tickPosition & QSlider::TicksAbove) {
                             centerY += tickSize;
-                        if (slider->tickPosition & QSlider::TicksBelow)
-                            centerY -= (tickSize-1);
+                        }
+                        if (slider->tickPosition & QSlider::TicksBelow) {
+                            centerY -= tickSize - 1;
+                        }
                         rect.moveTop(centerY);
-                    }
-                    else
-                    {
-                        rect.setWidth(15+mod);
-                        rect.setHeight(11+mod);
-                        int centerX(r.center().x() - rect.width() / 2);
-                        if (slider->tickPosition & QSlider::TicksAbove)
+                    } else {
+                        rect.setWidth(15 + mod);
+                        rect.setHeight(11 + mod);
+                        int centerX = r.center().x() - rect.width() / 2;
+                        if (slider->tickPosition & QSlider::TicksAbove) {
                             centerX += tickSize;
-                        if (slider->tickPosition & QSlider::TicksBelow)
-                            centerX -= (tickSize-1);
+                        }
+                        if (slider->tickPosition & QSlider::TicksBelow) {
+                            centerX -= tickSize - 1;
+                        }
                         rect.moveLeft(centerX);
                     }
                     break;
-                case SC_SliderGroove:
-                {
-                    QPoint grooveCenter(r.center());
+                case SC_SliderGroove: {
+                    QPoint grooveCenter = r.center();
 
-                    if (Qt::Horizontal==slider->orientation)
-                    {
+                    if (Qt::Horizontal == slider->orientation) {
                         rect.setHeight(13);
                         --grooveCenter.ry();
-                        if (slider->tickPosition & QSlider::TicksAbove)
-                            grooveCenter.ry() += (tickSize+2);
-                        if (slider->tickPosition & QSlider::TicksBelow)
-                            grooveCenter.ry() -= (tickSize-1);
-                    }
-                    else
-                    {
+                        if (slider->tickPosition & QSlider::TicksAbove) {
+                            grooveCenter.ry() += tickSize + 2;
+                        }
+                        if (slider->tickPosition & QSlider::TicksBelow) {
+                            grooveCenter.ry() -= tickSize - 1;
+                        }
+                    } else {
                         rect.setWidth(13);
                         --grooveCenter.rx();
-                        if (slider->tickPosition & QSlider::TicksAbove)
-                            grooveCenter.rx() += (tickSize+2);
-                        if (slider->tickPosition & QSlider::TicksBelow)
-                            grooveCenter.rx() -= (tickSize-1);
+                        if (slider->tickPosition & QSlider::TicksAbove) {
+                            grooveCenter.rx() += tickSize + 2;
+                        }
+                        if (slider->tickPosition & QSlider::TicksBelow) {
+                            grooveCenter.rx() -= tickSize - 1;
+                        }
                     }
                     rect.moveCenter(grooveCenter);
                     break;
@@ -8196,38 +8196,44 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
                     break;
                 }
                 return rect;
-            }
-            else
-            {
-                bool horizontal(Qt::Horizontal==slider->orientation);
-                int  thickness(pixelMetric(PM_SliderControlThickness, slider, widget)),
-                    tickOffset(slider->tickPosition&QSlider::TicksAbove ||
-                               slider->tickPosition&QSlider::TicksBelow
-                               ? pixelMetric(PM_SliderTickmarkOffset, slider, widget)
-                               : ((horizontal ? r.height() : r.width()) - thickness)/2);
+            } else {
+                bool horizontal = Qt::Horizontal == slider->orientation;
+                int thickness = pixelMetric(PM_SliderControlThickness,
+                                            slider, widget);
+                int tickOffset = (slider->tickPosition & QSlider::TicksAbove ||
+                                  slider->tickPosition & QSlider::TicksBelow ?
+                                  pixelMetric(PM_SliderTickmarkOffset, slider,
+                                              widget) :
+                                  ((horizontal ? r.height() :
+                                    r.width()) - thickness) / 2);
 
-                switch (subControl)
-                {
-                case SC_SliderHandle:
-                {
-                    int len(pixelMetric(PM_SliderLength, slider, widget)),
-                        sliderPos(sliderPositionFromValue(slider->minimum, slider->maximum,
-                                                          slider->sliderPosition,
-                                                          (horizontal ? r.width()
-                                                           : r.height()) - len,
-                                                          slider->upsideDown));
+                switch (subControl) {
+                case SC_SliderHandle: {
+                    int len = pixelMetric(PM_SliderLength, slider, widget);
+                    int sliderPos =
+                        sliderPositionFromValue(slider->minimum, slider->maximum,
+                                                slider->sliderPosition,
+                                                (horizontal ? r.width() :
+                                                 r.height()) - len,
+                                                slider->upsideDown);
 
-                    if (horizontal)
-                        r.setRect(r.x() + sliderPos, r.y() + tickOffset, len, thickness);
-                    else
-                        r.setRect(r.x() + tickOffset, r.y() + sliderPos, thickness, len);
+                    if (horizontal) {
+                        r.setRect(r.x() + sliderPos, r.y() + tickOffset,
+                                  len, thickness);
+                    } else {
+                        r.setRect(r.x() + tickOffset, r.y() + sliderPos,
+                                  thickness, len);
+                    }
                     break;
                 }
                 case SC_SliderGroove:
-                    if (horizontal)
-                        r.setRect(r.x(), r.y() + tickOffset, r.width(), thickness);
-                    else
-                        r.setRect(r.x() + tickOffset, r.y(), thickness, r.height());
+                    if (horizontal) {
+                        r.setRect(r.x(), r.y() + tickOffset,
+                                  r.width(), thickness);
+                    } else {
+                        r.setRect(r.x() + tickOffset, r.y(),
+                                  thickness, r.height());
+                    }
                     break;
                 default:
                     break;
@@ -8237,26 +8243,26 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
         }
         break;
     case CC_GroupBox:
-        if(SC_GroupBoxCheckBox==subControl || SC_GroupBoxLabel==subControl)
-            if (const QStyleOptionGroupBox *groupBox = qstyleoption_cast<const QStyleOptionGroupBox *>(option))
-            {
-                QFont font(widget ? widget->font() : QApplication::font());
-
-                font.setBold(opts.gbLabel&GB_LBL_BOLD);
-
+        if (SC_GroupBoxCheckBox == subControl || SC_GroupBoxLabel == subControl)
+            if (const QStyleOptionGroupBox *groupBox =
+                qstyleoption_cast<const QStyleOptionGroupBox*>(option)) {
+                QFont font = widget ? widget->font() : QApplication::font();
+                font.setBold(opts.gbLabel & GB_LBL_BOLD);
                 QFontMetrics fontMetrics(font);
-                int          h(fontMetrics.height()),
-                    tw(fontMetrics.size(Qt::TextShowMnemonic, groupBox->text + QLatin1Char(' ')).width()),
-                    marg((groupBox->features & QStyleOptionFrame::Flat) ||
-                         NO_FRAME(opts.groupBox) || opts.gbLabel&GB_LBL_OUTSIDE
-                         ? 0
-                         : opts.gbLabel&GB_LBL_INSIDE
-                         ? 2
-                         : 6),
-                    indicatorWidth(pixelMetric(PM_IndicatorWidth, option, widget)),
-                    indicatorSpace(pixelMetric(PM_CheckBoxLabelSpacing, option, widget) - 1);
-                bool         hasCheckBox(groupBox->subControls & QStyle::SC_GroupBoxCheckBox);
-                int          checkBoxSize(hasCheckBox ? (indicatorWidth + indicatorSpace) : 0),
+                int h = fontMetrics.height();
+                int tw = fontMetrics.size(Qt::TextShowMnemonic,
+                                          groupBox->text +
+                                          QLatin1Char(' ')).width();
+                int marg = ((groupBox->features & QStyleOptionFrame::Flat) ||
+                            NO_FRAME(opts.groupBox) ||
+                            opts.gbLabel & GB_LBL_OUTSIDE ? 0 :
+                            opts.gbLabel & GB_LBL_INSIDE ? 2 : 6);
+                int indicatorWidth = pixelMetric(PM_IndicatorWidth,
+                                                 option, widget);
+                int indicatorSpace = pixelMetric(PM_CheckBoxLabelSpacing,
+                                                 option, widget) - 1;
+                bool hasCheckBox(groupBox->subControls & QStyle::SC_GroupBoxCheckBox);
+                int checkBoxSize(hasCheckBox ? (indicatorWidth + indicatorSpace) : 0),
                     checkAdjust(NO_FRAME(opts.groupBox) || opts.gbLabel&GB_LBL_OUTSIDE ? 0 : 2);
 
                 if(0==checkAdjust)
@@ -8268,33 +8274,35 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
                 r.setHeight(h);
 
                 // Adjusted rect for label + indicatorWidth + indicatorSpace
-                Qt::Alignment align(groupBox->textAlignment);
-                if(opts.gbLabel&GB_LBL_CENTRED)
-                {
-                    align&=~(Qt::AlignLeft|Qt::AlignRight);
-                    align|=Qt::AlignHCenter;
+                Qt::Alignment align = groupBox->textAlignment;
+                if (opts.gbLabel & GB_LBL_CENTRED) {
+                    align &= ~(Qt::AlignLeft | Qt::AlignRight);
+                    align |= Qt::AlignHCenter;
                 }
-                r=alignedRect(groupBox->direction, align, QSize(tw + checkBoxSize, h), r);
+                r = alignedRect(groupBox->direction, align,
+                                QSize(tw + checkBoxSize, h), r);
 
                 // Adjust totalRect if checkbox is set
-                if (hasCheckBox)
-                {
-                    if (SC_GroupBoxCheckBox==subControl) // Adjust for check box
-                    {
+                if (hasCheckBox) {
+                    if (SC_GroupBoxCheckBox == subControl) {
+                        // Adjust for check box
                         int indicatorHeight(pixelMetric(PM_IndicatorHeight, option, widget)),
                             top(r.top() + (fontMetrics.height() - indicatorHeight) / 2);
 
                         r.setRect(reverse ? (r.right() - indicatorWidth) : r.left()+checkAdjust, top, indicatorWidth, indicatorHeight);
+                    } else {
+                        // Adjust for label
+                        r.setRect(reverse ? r.left() :
+                                  (r.left() + checkBoxSize), r.top(),
+                                  r.width() - checkBoxSize, r.height());
                     }
-                    else // Adjust for label
-                        r.setRect(reverse ? r.left() : (r.left() + checkBoxSize), r.top(), r.width() - checkBoxSize, r.height());
                 }
                 return r;
             }
         break;
     case CC_TitleBar:
-        if (const QStyleOptionTitleBar *tb = qstyleoption_cast<const QStyleOptionTitleBar *>(option))
-        {
+        if (const QStyleOptionTitleBar *tb =
+            qstyleoption_cast<const QStyleOptionTitleBar*>(option)) {
             bool isMinimized(tb->titleBarState&Qt::WindowMinimized),
                 isMaximized(tb->titleBarState&Qt::WindowMaximized);
 

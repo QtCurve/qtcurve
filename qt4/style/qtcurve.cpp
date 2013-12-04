@@ -143,8 +143,7 @@ typedef QString (*_qt_filedialog_save_filename_hook)(QWidget * parent, const QSt
 extern _qt_filedialog_save_filename_hook qt_filedialog_save_filename_hook;
 #endif
 
-namespace QtCurve
-{
+namespace QtCurve {
 
 static inline void
 setTranslucentBackground(QWidget *widget)
@@ -155,105 +154,115 @@ setTranslucentBackground(QWidget *widget)
 }
 
 #if defined FIX_DISABLED_ICONS && defined QTC_QT4_ENABLE_KDE
-QPixmap getIconPixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode, QIcon::State)
+static inline QPixmap
+getIconPixmap(const QIcon &icon, const QSize &size,
+              QIcon::Mode mode, QIcon::State)
 {
-    QPixmap pix=icon.pixmap(size, QIcon::Normal);
+    QPixmap pix = icon.pixmap(size, QIcon::Normal);
 
-    if(QIcon::Disabled==mode)
-    {
-        QImage img=pix.toImage();
+    if (QIcon::Disabled == mode) {
+        QImage img = pix.toImage();
         KIconEffect::toGray(img, 1.0);
         KIconEffect::semiTransparent(img);
-        pix=QPixmap::fromImage(img);
+        pix = QPixmap::fromImage(img);
     }
 
     return pix;
 }
-
 #else
-inline QPixmap getIconPixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode, QIcon::State state=QIcon::Off)
+QTC_ALWAYS_INLINE static inline QPixmap
+getIconPixmap(const QIcon &icon, const QSize &size,
+              QIcon::Mode mode, QIcon::State state=QIcon::Off)
 {
     return icon.pixmap(size, mode, state);
 }
 #endif
-inline QPixmap getIconPixmap(const QIcon &icon, int size, QIcon::Mode mode, QIcon::State state=QIcon::Off)
+
+QTC_ALWAYS_INLINE static inline QPixmap
+getIconPixmap(const QIcon &icon, int size, QIcon::Mode mode,
+              QIcon::State state=QIcon::Off)
 {
     return getIconPixmap(icon, QSize(size, size), mode, state);
 }
 
-inline QPixmap getIconPixmap(const QIcon &icon, int size, int flags, QIcon::State state=QIcon::Off)
+QTC_ALWAYS_INLINE static inline QPixmap
+getIconPixmap(const QIcon &icon, const QSize &size, int flags,
+              QIcon::State state=QIcon::Off)
 {
-    return getIconPixmap(icon, QSize(size, size), flags&QStyle::State_Enabled ? QIcon::Normal : QIcon::Disabled, state);
+    return getIconPixmap(icon, size, (flags & QStyle::State_Enabled ?
+                                      QIcon::Normal : QIcon::Disabled), state);
 }
 
-inline QPixmap getIconPixmap(const QIcon &icon, const QSize &size, int flags, QIcon::State state=QIcon::Off)
+QTC_ALWAYS_INLINE static inline QPixmap
+getIconPixmap(const QIcon &icon, int size, int flags,
+              QIcon::State state=QIcon::Off)
 {
-    return getIconPixmap(icon, size, flags&QStyle::State_Enabled ? QIcon::Normal : QIcon::Disabled, state);
+    return getIconPixmap(icon, QSize(size, size), flags, state);
 }
 
-static Style::Icon pix2Icon(QStyle::StandardPixmap pix)
+QTC_ALWAYS_INLINE static inline Style::Icon
+pix2Icon(QStyle::StandardPixmap pix)
 {
-    switch(pix)
-    {
-        case QStyle::SP_TitleBarNormalButton:
-            return Style::ICN_RESTORE;
-        case QStyle::SP_TitleBarShadeButton:
-            return Style::ICN_SHADE;
-        case QStyle::SP_ToolBarHorizontalExtensionButton:
-            return Style::ICN_RIGHT;
-        case QStyle::SP_ToolBarVerticalExtensionButton:
-            return Style::ICN_DOWN;
-        case QStyle::SP_TitleBarUnshadeButton:
-            return Style::ICN_UNSHADE;
-        default:
-        case QStyle::SP_DockWidgetCloseButton:
-        case QStyle::SP_TitleBarCloseButton:
-            return Style::ICN_CLOSE;
+    switch (pix) {
+    case QStyle::SP_TitleBarNormalButton:
+        return Style::ICN_RESTORE;
+    case QStyle::SP_TitleBarShadeButton:
+        return Style::ICN_SHADE;
+    case QStyle::SP_ToolBarHorizontalExtensionButton:
+        return Style::ICN_RIGHT;
+    case QStyle::SP_ToolBarVerticalExtensionButton:
+        return Style::ICN_DOWN;
+    case QStyle::SP_TitleBarUnshadeButton:
+        return Style::ICN_UNSHADE;
+    default:
+    case QStyle::SP_DockWidgetCloseButton:
+    case QStyle::SP_TitleBarCloseButton:
+        return Style::ICN_CLOSE;
     }
 }
 
-static Style::Icon subControlToIcon(QStyle::SubControl sc)
+QTC_ALWAYS_INLINE static inline Style::Icon
+subControlToIcon(QStyle::SubControl sc)
 {
-    switch(sc)
-    {
-        case QStyle::SC_TitleBarMinButton:
-            return Style::ICN_MIN;
-        case QStyle::SC_TitleBarMaxButton:
-            return Style::ICN_MAX;
-        case QStyle::SC_TitleBarCloseButton:
-        default:
-            return Style::ICN_CLOSE;
-        case QStyle::SC_TitleBarNormalButton:
-            return Style::ICN_RESTORE;
-        case QStyle::SC_TitleBarShadeButton:
-            return Style::ICN_SHADE;
-        case QStyle::SC_TitleBarUnshadeButton:
-            return Style::ICN_UNSHADE;
-        case QStyle::SC_TitleBarSysMenu:
-            return Style::ICN_MENU;
+    switch (sc) {
+    case QStyle::SC_TitleBarMinButton:
+        return Style::ICN_MIN;
+    case QStyle::SC_TitleBarMaxButton:
+        return Style::ICN_MAX;
+    case QStyle::SC_TitleBarCloseButton:
+    default:
+        return Style::ICN_CLOSE;
+    case QStyle::SC_TitleBarNormalButton:
+        return Style::ICN_RESTORE;
+    case QStyle::SC_TitleBarShadeButton:
+        return Style::ICN_SHADE;
+    case QStyle::SC_TitleBarUnshadeButton:
+        return Style::ICN_UNSHADE;
+    case QStyle::SC_TitleBarSysMenu:
+        return Style::ICN_MENU;
     }
 }
 
-static void drawTbArrow(const QStyle *style, const QStyleOptionToolButton *toolbutton, const QRect &rect, QPainter *painter,
-                        const QWidget *widget = 0)
+QTC_ALWAYS_INLINE static inline void
+drawTbArrow(const QStyle *style, const QStyleOptionToolButton *toolbutton,
+            const QRect &rect, QPainter *painter, const QWidget *widget=0)
 {
     QStyle::PrimitiveElement pe;
-    switch (toolbutton->arrowType)
-    {
-        case Qt::LeftArrow:
-            pe = QStyle::PE_IndicatorArrowLeft;
-            break;
-        case Qt::RightArrow:
-            pe = QStyle::PE_IndicatorArrowRight;
-            break;
-        case Qt::UpArrow:
-            pe = QStyle::PE_IndicatorArrowUp;
-            break;
-        case Qt::DownArrow:
-            pe = QStyle::PE_IndicatorArrowDown;
-            break;
-        default:
-            return;
+    switch (toolbutton->arrowType) {
+    case Qt::LeftArrow:
+        pe = QStyle::PE_IndicatorArrowLeft;
+        break;
+    case Qt::RightArrow:
+        pe = QStyle::PE_IndicatorArrowRight;
+        break;
+    case Qt::UpArrow:
+        pe = QStyle::PE_IndicatorArrowUp;
+        break;
+    case Qt::DownArrow:
+        pe = QStyle::PE_IndicatorArrowDown;
+        break;
+    default:
+        return;
     }
 
     QStyleOption arrowOpt;
@@ -296,48 +305,51 @@ static enum {
 
 static QString appName;
 
-static inline bool isOOWidget(const QWidget *widget)
+static inline bool
+isOOWidget(const QWidget *widget)
 {
-    return APP_OPENOFFICE==theThemedApp && !widget;
+    return APP_OPENOFFICE == theThemedApp && !widget;
 }
 
-static bool blendOOMenuHighlight(const QPalette &pal, const QColor &highlight)
+static inline bool
+blendOOMenuHighlight(const QPalette &pal, const QColor &highlight)
 {
-    QColor text(pal.text().color()),
-           hl(pal.highlightedText().color());
+    QColor text(pal.text().color());
+    QColor hl(pal.highlightedText().color());
 
-    return (text.red()<50) && (text.green()<50) && (text.blue()<50) &&
-           (hl.red()>127) && (hl.green()>127) && (hl.blue()>127) &&
-           TOO_DARK(highlight);
+    return (text.red() < 50 && text.green() < 50 &&
+            text.blue() < 50 && hl.red() > 127 && hl.green() > 127 &&
+            hl.blue() > 127 && TOO_DARK(highlight));
 }
 
-int static toHint(int sc)
+QTC_ALWAYS_INLINE static inline int
+toHint(int sc)
 {
-    switch(sc)
-    {
-        case QStyle::SC_TitleBarSysMenu:
-            return Qt::WindowSystemMenuHint;
-        case QStyle::SC_TitleBarMinButton:
-            return Qt::WindowMinimizeButtonHint;
-        case QStyle::SC_TitleBarMaxButton:
-            return Qt::WindowMaximizeButtonHint;
-        case QStyle::SC_TitleBarCloseButton:
-            return 0;
-        case QStyle::SC_TitleBarNormalButton:
-            return 0;
-        case QStyle::SC_TitleBarShadeButton:
-        case QStyle::SC_TitleBarUnshadeButton:
-            return Qt::WindowShadeButtonHint;
-        case QStyle::SC_TitleBarContextHelpButton:
-            return Qt::WindowContextHelpButtonHint;
-        default:
-            return 0;
+    switch (sc) {
+    case QStyle::SC_TitleBarSysMenu:
+        return Qt::WindowSystemMenuHint;
+    case QStyle::SC_TitleBarMinButton:
+        return Qt::WindowMinimizeButtonHint;
+    case QStyle::SC_TitleBarMaxButton:
+        return Qt::WindowMaximizeButtonHint;
+    case QStyle::SC_TitleBarCloseButton:
+        return 0;
+    case QStyle::SC_TitleBarNormalButton:
+        return 0;
+    case QStyle::SC_TitleBarShadeButton:
+    case QStyle::SC_TitleBarUnshadeButton:
+        return Qt::WindowShadeButtonHint;
+    case QStyle::SC_TitleBarContextHelpButton:
+        return Qt::WindowContextHelpButtonHint;
+    default:
+        return 0;
     }
 }
 
-static const char *constBoldProperty="qtc-set-bold";
+static const char *constBoldProperty = "qtc-set-bold";
 
-static void setBold(QWidget *widget)
+static void
+setBold(QWidget *widget)
 {
     QVariant prop(widget->property(constBoldProperty));
     if(!prop.isValid() || !prop.toBool())
