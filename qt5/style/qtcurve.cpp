@@ -102,32 +102,6 @@
 
 #include <qtcurve-utils/color.h>
 
-#ifdef QTC_QT5_ENABLE_KDE
-typedef QString (*_qt_filedialog_existing_directory_hook)(
-    QWidget *parent, const QString &caption, const QString &dir,
-    QFileDialog::Options options);
-extern _qt_filedialog_existing_directory_hook qt_filedialog_existing_directory_hook;
-
-typedef QString (*_qt_filedialog_open_filename_hook)(
-    QWidget *parent, const QString &caption, const QString &dir,
-    const QString &filter, QString *selectedFilter,
-    QFileDialog::Options options);
-extern _qt_filedialog_open_filename_hook qt_filedialog_open_filename_hook;
-
-typedef QStringList (*_qt_filedialog_open_filenames_hook)(
-    QWidget * parent, const QString &caption, const QString &dir,
-    const QString &filter, QString *selectedFilter,
-    QFileDialog::Options options);
-extern _qt_filedialog_open_filenames_hook qt_filedialog_open_filenames_hook;
-
-typedef QString (*_qt_filedialog_save_filename_hook)(
-    QWidget *parent, const QString &caption, const QString &dir,
-    const QString &filter, QString *selectedFilter,
-    QFileDialog::Options options);
-extern _qt_filedialog_save_filename_hook qt_filedialog_save_filename_hook;
-
-#endif
-
 namespace QtCurve {
 
 static Style::Icon

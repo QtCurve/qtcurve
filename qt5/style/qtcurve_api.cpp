@@ -66,8 +66,28 @@
 #include <QSettings>
 #include <QPixmapCache>
 #include <QTextStream>
+#include <QFileDialog>
 
 #include <QDebug>
+
+extern QString (*qt_filedialog_existing_directory_hook)(
+    QWidget *parent, const QString &caption, const QString &dir,
+    QFileDialog::Options options);
+
+extern QString (*qt_filedialog_open_filename_hook)(
+    QWidget *parent, const QString &caption, const QString &dir,
+    const QString &filter, QString *selectedFilter,
+    QFileDialog::Options options);
+
+extern QStringList (*qt_filedialog_open_filenames_hook)(
+    QWidget * parent, const QString &caption, const QString &dir,
+    const QString &filter, QString *selectedFilter,
+    QFileDialog::Options options);
+
+extern QString (*qt_filedialog_save_filename_hook)(
+    QWidget *parent, const QString &caption, const QString &dir,
+    const QString &filter, QString *selectedFilter,
+    QFileDialog::Options options);
 
 namespace QtCurve {
 
@@ -143,14 +163,12 @@ Style::polish(QApplication *app)
         opts.menuBgndAppearance = APPEARANCE_FLAT;
     }
 
-#ifdef QTC_QT5_ENABLE_KDE
-    if(opts.useQtFileDialogApps.contains(appName)) {
-        qt_filedialog_existing_directory_hook=0L;
-        qt_filedialog_open_filename_hook=0L;
-        qt_filedialog_open_filenames_hook=0L;
-        qt_filedialog_save_filename_hook=0L;
+    if (opts.useQtFileDialogApps.contains(appName)) {
+        qt_filedialog_existing_directory_hook = 0L;
+        qt_filedialog_open_filename_hook = 0L;
+        qt_filedialog_open_filenames_hook = 0L;
+        qt_filedialog_save_filename_hook = 0L;
     }
-#endif
 
     BASE_STYLE::polish(app);
     if (opts.hideShortcutUnderline) {
