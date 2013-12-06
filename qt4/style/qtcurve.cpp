@@ -1823,9 +1823,9 @@ Style::polish(QWidget *widget)
         default:
             break;
         }
-        if (qobject_cast<QSlider*>(widget))
+        if (qobject_cast<QSlider*>(widget)) {
             widget->setBackgroundRole(QPalette::NoRole);
-
+        }
         if (widget->autoFillBackground() && widget->parentWidget() &&
             "qt_scrollarea_viewport" == widget->parentWidget()->objectName() &&
             qtcCheckType0<QAbstractScrollArea>(widget->parentWidget()
@@ -1937,66 +1937,65 @@ Style::polish(QWidget *widget)
         widget->inherits("Q3DockWindowResizeHandle")))
         widget->setAttribute(Qt::WA_Hover, true);
 
-    if (qobject_cast<QSplitterHandle*>(widget))
+    if (qobject_cast<QSplitterHandle*>(widget)) {
         widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
-    else if (qobject_cast<QScrollBar*>(widget))
-    {
-        if(enableMouseOver)
+    } else if (qobject_cast<QScrollBar*>(widget)) {
+        if (enableMouseOver) {
             widget->setAttribute(Qt::WA_Hover, true);
+        }
         widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
         if (!opts.gtkScrollViews) {
             widget->installEventFilter(this);
         }
-    }
-    else if (qobject_cast<QAbstractScrollArea*>(widget) && widget->inherits("KFilePlacesView"))
-    {
-        if(qtcIsCustomBgnd(&opts))
+    } else if (qobject_cast<QAbstractScrollArea*>(widget) &&
+               widget->inherits("KFilePlacesView")) {
+        if (qtcIsCustomBgnd(&opts)) {
             polishScrollArea(static_cast<QAbstractScrollArea*>(widget), true);
+        }
         widget->installEventFilter(this);
-    }
-    else if (qobject_cast<QProgressBar*>(widget))
-    {
-        if(widget->palette().color(QPalette::Inactive, QPalette::HighlightedText)!=widget->palette().color(QPalette::Active, QPalette::HighlightedText))
-        {
+    } else if (qobject_cast<QProgressBar*>(widget)) {
+        if (widget->palette().color(QPalette::Inactive,
+                                    QPalette::HighlightedText) !=
+            widget->palette().color(QPalette::Active,
+                                    QPalette::HighlightedText)) {
             QPalette pal(widget->palette());
-            pal.setColor(QPalette::Inactive, QPalette::HighlightedText, pal.color(QPalette::Active, QPalette::HighlightedText));
+            pal.setColor(QPalette::Inactive, QPalette::HighlightedText,
+                         pal.color(QPalette::Active,
+                                   QPalette::HighlightedText));
             widget->setPalette(pal);
         }
-
-        if(opts.boldProgress)
+        if (opts.boldProgress) {
             setBold(widget);
+        }
         widget->installEventFilter(this);
-    }
-    else if (widget->inherits("Q3Header"))
-    {
+    } else if (widget->inherits("Q3Header")) {
         widget->setMouseTracking(true);
         widget->installEventFilter(this);
-    }
-    else if(opts.highlightScrollViews && widget->inherits("Q3ScrollView"))
-    {
+    } else if(opts.highlightScrollViews && widget->inherits("Q3ScrollView")) {
         widget->installEventFilter(this);
         widget->setAttribute(Qt::WA_Hover, true);
-    }
-    else if(qobject_cast<QMenuBar*>(widget))
-    {
+    } else if(qobject_cast<QMenuBar*>(widget)) {
 #ifdef QTC_ENABLE_X11
         if (opts.xbar &&
             (!((APP_QTDESIGNER==theThemedApp || APP_KDEVELOP==theThemedApp) && widget->inherits("QDesignerMenuBar"))))
             Bespin::MacMenu::manage((QMenuBar*)widget);
 
-        if(BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR)
-            emitMenuSize(widget, PREVIEW_MDI==itsIsPreview || !widget->isVisible() ? 0 : widget->rect().height());
+        if (BLEND_TITLEBAR || opts.menubarHiding & HIDE_KWIN ||
+            opts.windowBorder & WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR) {
+            emitMenuSize(widget, PREVIEW_MDI == itsIsPreview ||
+                         !widget->isVisible() ? 0 : widget->rect().height());
+        }
 #endif
-        if(qtcIsCustomBgnd(&opts))
+        if (qtcIsCustomBgnd(&opts)) {
             widget->setBackgroundRole(QPalette::NoRole);
-
+        }
         widget->setAttribute(Qt::WA_Hover, true);
 
         // if(opts.shadeMenubarOnlyWhenActive && SHADE_NONE!=opts.shadeMenubars)
         widget->installEventFilter(this);
 
         setMenuTextColors(widget, true);
-    } else if(qobject_cast<QLabel*>(widget)) {
+    } else if (qobject_cast<QLabel*>(widget)) {
         widget->installEventFilter(this);
         if (WM_DRAG_ALL == opts.windowDrag &&
             (((QLabel*)widget)->textInteractionFlags()
@@ -2006,7 +2005,7 @@ Style::polish(QWidget *widget)
                              KTitleWidget))
             ((QLabel*)widget)->setTextInteractionFlags(((QLabel*)widget)->textInteractionFlags()&~Qt::TextSelectableByMouse);
 
-    } else if(/*!opts.gtkScrollViews && */qobject_cast<QAbstractScrollArea*>(widget)) {
+    } else if (/*!opts.gtkScrollViews && */qobject_cast<QAbstractScrollArea*>(widget)) {
         if(qtcIsCustomBgnd(&opts))
             polishScrollArea(static_cast<QAbstractScrollArea*>(widget));
         if (!opts.gtkScrollViews && (((QFrame*)widget)->frameWidth() > 0)) {
@@ -2032,7 +2031,7 @@ Style::polish(QWidget *widget)
               !widget->parentWidget()->window()->windowTitle().isEmpty()) {
         widget->window()->setWindowTitle(widget->parentWidget()->window()
                                          ->windowTitle());
-    } else if(widget->inherits("QWhatsThat")) {
+    } else if (widget->inherits("QWhatsThat")) {
         QPalette pal(widget->palette());
         QColor shadow(pal.shadow().color());
 
@@ -2050,8 +2049,7 @@ Style::polish(QWidget *widget)
         ) {
         ((QDockWidget*)widget)
             ->setTitleBarWidget(new QtCurveDockWidgetTitleBar(widget));
-    }
-    else if ((!qtcIsFlatBgnd(opts.menuBgndAppearance) ||
+    } else if ((!qtcIsFlatBgnd(opts.menuBgndAppearance) ||
               100 != opts.menuBgndOpacity ||
               !(opts.square & SQUARE_POPUP_MENUS)) &&
              widget->inherits("QComboBoxPrivateContainer") &&
@@ -2081,8 +2079,9 @@ Style::polish(QWidget *widget)
 
                 QLayout *layout(frame->layout());
 
-                if(layout)
+                if (layout) {
                     layout->setMargin(0);
+                }
             }
 
             QWidget *p=0L;
@@ -2653,19 +2652,19 @@ bool Style::eventFilter(QObject *object, QEvent *event)
 {
     bool isSViewCont=APP_KONTACT==theThemedApp && itsSViewContainers.contains((QWidget*)object);
 
-    if (qobject_cast<QMenuBar*>(object) && dynamic_cast<QMouseEvent*>(event))
-    {
+    if (qobject_cast<QMenuBar*>(object) && dynamic_cast<QMouseEvent*>(event)) {
         if(updateMenuBarEvent((QMouseEvent*)event, (QMenuBar*)object))
             return true;
     }
 
-    if (QEvent::Show==event->type() && qobject_cast<QAbstractScrollArea*>(object) && object->inherits("KFilePlacesView"))
-    {
-        QWidget  *view   = ((QAbstractScrollArea*)object)->viewport();
+    if (event->type() == QEvent::Show &&
+        qobject_cast<QAbstractScrollArea*>(object) &&
+        object->inherits("KFilePlacesView")) {
+        QWidget *view = ((QAbstractScrollArea*)object)->viewport();
         QPalette palette = view->palette();
-        QColor   color   = ((QWidget*)object)->palette().background().color();
+        QColor color = ((QWidget*)object)->palette().background().color();
 
-        if(qtcIsCustomBgnd(&opts))
+        if (qtcIsCustomBgnd(&opts))
             color.setAlphaF(0.0);
 
         palette.setColor(view->backgroundRole(), color);
@@ -2673,29 +2672,26 @@ bool Style::eventFilter(QObject *object, QEvent *event)
         object->removeEventFilter(this);
     }
 
-    if((!opts.gtkScrollViews &&  ::qobject_cast<QAbstractScrollArea*>(object)) || isSViewCont)
-    {
+    if ((!opts.gtkScrollViews &&
+         qobject_cast<QAbstractScrollArea*>(object)) || isSViewCont) {
         QPoint pos;
-        switch(event->type())
-        {
-            case QEvent::MouseMove:
-            case QEvent::MouseButtonPress:
-            case QEvent::MouseButtonRelease:
-                pos=((QMouseEvent*)event)->pos();
-                break;
-            case QEvent::Wheel:
-                pos=((QWheelEvent*)event)->pos();
-            default:
-                break;
+        switch (event->type()) {
+        case QEvent::MouseMove:
+        case QEvent::MouseButtonPress:
+        case QEvent::MouseButtonRelease:
+            pos = ((QMouseEvent*)event)->pos();
+            break;
+        case QEvent::Wheel:
+            pos = ((QWheelEvent*)event)->pos();
+        default:
+            break;
         }
 
-        if(!pos.isNull())
-        {
+        if (!pos.isNull()) {
             QAbstractScrollArea *area=0L;
-            QPoint              mapped(pos);
+            QPoint mapped(pos);
 
-            if(isSViewCont)
-            {
+            if (isSViewCont) {
                 QSet<QWidget*>::ConstIterator it(itsSViewContainers[(QWidget*)object].begin()),
                                                end(itsSViewContainers[(QWidget*)object].end());
 
@@ -2706,12 +2702,11 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                         if((*it)->rect().adjusted(0, 0, 4, 4).contains(mapped))
                             area=(QAbstractScrollArea*)(*it);
                     }
+            } else {
+                area = (QAbstractScrollArea*)object;
             }
-            else
-                area=(QAbstractScrollArea*)object;
 
-            if(area)
-            {
+            if (area) {
                 QScrollBar *sbars[2]={area->verticalScrollBar(), area->horizontalScrollBar() };
 
                 for(int i=0; i<2; ++i)
@@ -11545,8 +11540,10 @@ QPixmap Style::drawStripes(const QColor &color, int opacity) const
     return pix;
 }
 
-void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int opacity, BackgroundType type, EAppearance app,
-                          const QPainterPath &path) const
+void
+Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r,
+                      int opacity, BackgroundType type, EAppearance app,
+                      const QPainterPath &path) const
 {
     bool isWindow(BGND_MENU!=type);
 
@@ -11769,13 +11766,10 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
     bool previewMdi(isWindow && itsIsPreview &&
                     qobject_cast<const QMdiSubWindow*>(widget));
     const QWidget *window = itsIsPreview ? widget : widget->window();
-    int           opacity = BGND_MENU==type
-                                ? opts.menuBgndOpacity
-                                : BGND_DIALOG==type
-                                    ? opts.dlgOpacity
-                                    : opts.bgndOpacity;
-    QRect         bgndRect(widget->rect()),
-                  imgRect(bgndRect);
+    int opacity = (BGND_MENU == type ? opts.menuBgndOpacity :
+                   BGND_DIALOG == type ? opts.dlgOpacity : opts.bgndOpacity);
+    QRect bgndRect = widget->rect();
+    QRect imgRect = bgndRect;
 
     if (100 != opacity && !(qobject_cast<const QMdiSubWindow*>(widget) ||
                             Utils::hasAlphaChannel(window))) {
@@ -11785,21 +11779,23 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
     p->setClipRegion(widget->rect(), Qt::IntersectClip);
 
     if (isWindow) {
-        if(!previewMdi)
-        {
-            WindowBorders borders=qtcGetWindowBorderSize(false);
-            bgndRect.adjust(-borders.sides, -borders.titleHeight, borders.sides, borders.bottom);
+        if (!previewMdi) {
+            WindowBorders borders = qtcGetWindowBorderSize(false);
+            bgndRect.adjust(-borders.sides, -borders.titleHeight,
+                            borders.sides, borders.bottom);
+        } else {
+            bgndRect.adjust(0, -pixelMetric(PM_TitleBarHeight,
+                                            0L, widget), 0, 0);
         }
-        else
-        {
-            bgndRect.adjust(0, -pixelMetric(PM_TitleBarHeight, 0L, widget), 0, 0);
+        if (BGND_IMG_ON_BORDER) {
+            imgRect = bgndRect;
         }
-        if(BGND_IMG_ON_BORDER)
-            imgRect=bgndRect;
     }
 
-    drawBackground(p, isWindow ? window->palette().window().color() : popupMenuCols()[ORIGINAL_SHADE], bgndRect, opacity, type,
-                   BGND_MENU!=type ? opts.bgndAppearance : opts.menuBgndAppearance);
+    drawBackground(p, isWindow ? window->palette().window().color() :
+                   popupMenuCols()[ORIGINAL_SHADE], bgndRect, opacity, type,
+                   BGND_MENU != type ? opts.bgndAppearance :
+                   opts.menuBgndAppearance);
     drawBackgroundImage(p, isWindow, imgRect);
 }
 
@@ -12910,20 +12906,23 @@ Style::drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p,
     }
 }
 
-void Style::drawHandleMarkers(QPainter *p, const QRect &rx, const QStyleOption *option, bool tb, ELine handles) const
+void
+Style::drawHandleMarkers(QPainter *p, const QRect &rx,
+                         const QStyleOption *option,
+                         bool tb, ELine handles) const
 {
-    if(rx.width()<2 || rx.height()<2)
+    if (rx.width() < 2 || rx.height() < 2)
         return;
 
     QRect r(rx);
 
-    if(APP_OPENOFFICE==theThemedApp)
-    {
-        r.setX(r.x()+2);
+    if (theThemedApp == APP_OPENOFFICE) {
+        r.setX(r.x() + 2);
         r.setWidth(10);
     }
 
-    // CPD: Mouse over of toolbar handles not working - the whole toolbar seems to be active :-(
+    // CPD: Mouse over of toolbar handles not working -
+    // the whole toolbar seems to be active :-(
     QStyleOption opt(*option);
 
     opt.state&=~State_MouseOver;

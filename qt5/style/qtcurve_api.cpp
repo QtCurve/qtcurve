@@ -3458,19 +3458,19 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
         }
         break;
     case CE_MenuItem:
-        if (const QStyleOptionMenuItem *menuItem = qstyleoption_cast<const QStyleOptionMenuItem *>(option))
-        {
-            bool           comboMenu(qobject_cast<const QComboBox*>(widget)),
+        if (const QStyleOptionMenuItem *menuItem =
+            qstyleoption_cast<const QStyleOptionMenuItem*>(option)) {
+            // TODO check qtquick
+            bool comboMenu(qobject_cast<const QComboBox*>(widget)),
                 reverse(Qt::RightToLeft==menuItem->direction),
                 isOO(isOOWidget(widget));
-            int            checkcol(qMax(menuItem->maxIconWidth, 20)),
+            int checkcol(qMax(menuItem->maxIconWidth, 20)),
                 stripeWidth(qMax(checkcol, constMenuPixmapWidth)-2);
             const QColor * use(popupMenuCols(option));
 
             QRect rx(r);
 
-            if(isOO)
-            {
+            if (isOO) {
                 if(opts.borderMenuitems)
                     r.adjust(2, 0, -2, 0);
                 else if(APPEARANCE_FADE==opts.menuitemAppearance)
@@ -3479,8 +3479,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
             painter->save();
 
-            if (QStyleOptionMenuItem::Separator==menuItem->menuItemType)
-            {
+            if (QStyleOptionMenuItem::Separator==menuItem->menuItemType) {
                 bool isMenu(!widget || qobject_cast<const QMenu*>(widget)),
                     doStripe(isMenu && opts.menuStripe && !comboMenu);
 
@@ -4902,9 +4901,6 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
 {
     prePolish(widget);
-    if (!widget) {
-        qDebug() << __func__ << control << option << painter;
-    }
     QRect               r(option->rect);
     const State &state(option->state);
     const QPalette      &palette(option->palette);
