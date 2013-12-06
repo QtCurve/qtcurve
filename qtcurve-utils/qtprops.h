@@ -27,6 +27,8 @@
 #include <QVariant>
 
 struct QtcWidgetProps {
+    QtcWidgetProps(): opacity(100) {}
+    int opacity;
     bool prePolished: 1;
     bool prePolishStarted: 1;
 };

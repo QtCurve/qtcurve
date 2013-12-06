@@ -1745,77 +1745,6 @@ Style::polish(QWidget *widget)
             widget->installEventFilter(this);
 #endif
             break;
-#if 0
-            int opacity = (qtcIsDialog(widget) ? opts.dlgOpacity :
-                           opts.bgndOpacity);
-
-            if (100 == opacity || !widget->isWindow() ||
-                Qt::Desktop == widget->windowType() ||
-                widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
-                widget->testAttribute(Qt::WA_TranslucentBackground) ||
-                widget->testAttribute(Qt::WA_NoSystemBackground) ||
-                widget->testAttribute(Qt::WA_PaintOnScreen) ||
-                // For kscreensaver. A bypass window manager hint window
-                // that is not a Tooltip or menu is probably not what we want
-                // to have translucenct background on anyway.
-                (widget->window()->windowFlags() &
-                 Qt::X11BypassWindowManagerHint) ||
-                widget->inherits("KScreenSaver") ||
-                widget->inherits("QTipLabel") ||
-                widget->inherits("QSplashScreen") ||
-                widget->windowFlags().testFlag(Qt::FramelessWindowHint) ||
-                !qtcGetWid(widget)) {
-                break;
-            }
-            // The window has already been created.
-#ifdef QTC_ENABLE_X11
-            // When setting WA_TranslucentBackground Qt4 may recreate
-            // the underlaying X window. This can break the XEmbed protocol
-            // and cause the embeded window to be "floating" (e.g. in
-            // kpartsplugin). Luckily, we can detect this by looking for
-            // _XEMBED_INFO property on the window.
-            if (qtcX11IsEmbed(widget->internalWinId())) {
-                break;
-            }
-#endif
-
-            // whenever you set the translucency flag, Qt will
-            // create a new widget under the hood, replacing the old
-            // ...unfortunately some properties are lost, among them the
-            // window icon.
-            QIcon icon(widget->windowIcon());
-            // Qt tries to move the window to its original position
-            // when recreating the window, however, this causes
-            // Qt::WA_Moved attribute to be set and therefore
-            // USPosition and PPosition to be set in WM_NORMAL_HINTS
-            // which breaks window manager auto positioning.
-            // As a better workaround than moving the window to random
-            // position, we disable auto mapping when recreating the window
-            // and clear the Moved flag before showing the window ourselves.
-            // Upstream bug report:
-            //     https://bugreports.qt-project.org/browse/QTBUG-34108
-            bool was_visible = widget->isVisible();
-            bool moved = widget->testAttribute(Qt::WA_Moved);
-            if (was_visible) {
-                widget->hide();
-            }
-            if (qtcCheckLogLevel(QTC_LOG_INFO)) {
-                qtcWarn("Window Recreated: ");
-                qDebug() << widget;
-            }
-            setTranslucentBackground(widget);
-            if (!moved) {
-                widget->setAttribute(Qt::WA_Moved, false);
-            }
-            if (was_visible) {
-                widget->show();
-            }
-            widget->setWindowIcon(icon);
-
-            connect(widget, SIGNAL(destroyed(QObject*)),
-                    SLOT(widgetDestroyed(QObject*)));
-#endif
-            break;
         }
         case Qt::Popup:
             // we currently don't want that kind of gradient on menus etc
@@ -2840,51 +2769,55 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 }
             }
 
-            //bool isCombo=false;
-            if((!qtcIsFlatBgnd(opts.menuBgndAppearance) || IMG_NONE!=opts.menuBgndImage.type || 100!=opts.menuBgndOpacity ||
-                !(opts.square&SQUARE_POPUP_MENUS)) &&
-                (qobject_cast<QMenu*>(object) || (/*isCombo=*/object->inherits("QComboBoxPrivateContainer"))))
-            {
+            if ((!qtcIsFlatBgnd(opts.menuBgndAppearance) ||
+                 opts.menuBgndImage.type != IMG_NONE ||
+                 opts.menuBgndOpacity != 100 ||
+                 !(opts.square & SQUARE_POPUP_MENUS)) &&
+                (qobject_cast<QMenu*>(object) ||
+                 (object->inherits("QComboBoxPrivateContainer")))) {
                 QWidget *widget = qtcToWidget(object);
-                QPainter     p(widget);
-                QRect        r(widget->rect());
-                double       radius=MENU_AND_TOOLTIP_RADIUS;
+                QPainter p(widget);
+                QRect r(widget->rect());
+                double radius = MENU_AND_TOOLTIP_RADIUS;
                 QStyleOption opt;
                 opt.init(widget);
                 const QColor *use(popupMenuCols(&opt));
 
                 p.setClipRegion(static_cast<QPaintEvent*>(event)->region());
-                if(!opts.popupBorder)
-                {
+                if (!opts.popupBorder) {
                     p.setRenderHint(QPainter::Antialiasing, true);
                     p.setPen(use[ORIGINAL_SHADE]);
                     p.drawPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL, radius));
                     p.setRenderHint(QPainter::Antialiasing, false);
                 }
-                if(!(opts.square&SQUARE_POPUP_MENUS)) // && !isCombo)
-                    p.setClipRegion(windowMask(r, opts.round>ROUND_SLIGHT), Qt::IntersectClip);
+                if (!(opts.square & SQUARE_POPUP_MENUS)) // && !isCombo)
+                    p.setClipRegion(windowMask(r, opts.round>ROUND_SLIGHT),
+                                    Qt::IntersectClip);
 
-                // In case the gradient uses alpha, we need to fill with the background colour - this makes it consistent with Gtk.
-                if(100==opts.menuBgndOpacity)
+                // In case the gradient uses alpha, we need to fill with
+                // the background colour - this makes it consistent with Gtk.
+                if (100 == opts.menuBgndOpacity) {
                     p.fillRect(r, opt.palette.brush(QPalette::Background));
+                }
                 drawBackground(&p, widget, BGND_MENU);
-                if(opts.popupBorder)
-                {
-                    EGradientBorder border=qtcGetGradient(opts.menuBgndAppearance, &opts)->border;
+                if (opts.popupBorder) {
+                    EGradientBorder border =
+                        qtcGetGradient(opts.menuBgndAppearance, &opts)->border;
 
                     p.setClipping(false);
                     p.setPen(use[QTC_STD_BORDER]);
-                    // For now dont round combos - getting weird effects with shadow/clipping in Gtk2 style :-(
-                    if(opts.square&SQUARE_POPUP_MENUS) // || isCombo)
+                    // For now dont round combos - getting weird effects with
+                    // shadow/clipping in Gtk2 style :-(
+                    if (opts.square & SQUARE_POPUP_MENUS) {
                         drawRect(&p, r);
-                    else
-                    {
+                    } else {
                         p.setRenderHint(QPainter::Antialiasing, true);
-                        p.drawPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL, radius));
+                        p.drawPath(buildPath(r, WIDGET_OTHER,
+                                             ROUNDED_ALL, radius));
                     }
 
-                    if(qtcUseBorder(border) && APPEARANCE_FLAT!=opts.menuBgndAppearance)
-                    {
+                    if (qtcUseBorder(border) &&
+                        APPEARANCE_FLAT != opts.menuBgndAppearance) {
                         QRect ri(r.adjusted(1, 1, -1, -1));
 
                         p.setPen(use[0]);
@@ -3124,8 +3057,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
 
 void Style::timerEvent(QTimerEvent *event)
 {
-    if (event->timerId() == itsProgressBarAnimateTimer)
-    {
+    if (event->timerId() == itsProgressBarAnimateTimer) {
         itsAnimateStep = itsTimer.elapsed() / (1000 / constProgressBarFps);
         foreach (QProgressBar *bar, const_(itsProgressBars)) {
             if ((opts.animatedProgress && 0 == itsAnimateStep % 2 &&
