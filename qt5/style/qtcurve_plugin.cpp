@@ -22,7 +22,7 @@
 #include "qtcurve_plugin.h"
 #include "qtcurve.h"
 
-#include <qtcurve-utils/qtutils.h>
+#include <qtcurve-utils/qtprops.h>
 
 #ifdef QTC_ENABLE_X11
 #  include <QApplication>
@@ -44,8 +44,9 @@ qtcEventCallback(void **cbdata)
     if (qtcUnlikely(!receiver))
         return false;
     QWidget *widget = qtcToWidget(receiver);
+    QtcWidgetPropsP props(widget);
     if (qtcUnlikely(widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
-                    (!qtcGetWid(widget) || qtcGetPrePolishStarted(widget)))) {
+                    (!qtcGetWid(widget) || props->prePolishStarted))) {
         if (Style *style = qtcGetStyle(widget)) {
             style->prePolish(widget);
         }

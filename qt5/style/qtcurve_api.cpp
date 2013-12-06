@@ -20,7 +20,7 @@
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
 
-#include <qtcurve-utils/qtutils.h>
+#include <qtcurve-utils/qtprops.h>
 
 #include "qtcurve_p.h"
 #include "utils.h"
@@ -350,12 +350,13 @@ void Style::polish(QWidget *widget)
     if (!widget)
         return;
 
+    QtcWidgetPropsP qtcProps(widget);
     bool enableMouseOver(opts.highlightFactor || opts.coloredMouseOver);
     if (qtcCheckLogLevel(QTC_LOG_INFO) && qtcGetWid(widget) &&
-        widget->windowType() != Qt::Desktop && !qtcGetPrePolished(widget)) {
+        widget->windowType() != Qt::Desktop && !qtcProps->prePolished) {
         qDebug() << "Window Created before polishing:" << widget;
     }
-    qtcSetPrePolished(widget);
+    qtcProps->prePolished = true;
 
     if (EFFECT_NONE != opts.buttonEffect &&
         !USE_CUSTOM_ALPHAS(opts) && isNoEtchWidget(widget)) {

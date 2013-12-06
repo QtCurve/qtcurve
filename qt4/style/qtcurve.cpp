@@ -22,7 +22,7 @@
 
 #include "config.h"
 #include <qtcurve-utils/log.h>
-#include <qtcurve-utils/qtutils.h>
+#include <qtcurve-utils/qtprops.h>
 
 #include "qtcurve.h"
 #include "windowmanager.h"
@@ -949,6 +949,7 @@ Style::prePolish(QWidget *widget) const
         return;
     }
 
+    QtcWidgetPropsP props(widget);
     // HACK:
     // Set TranslucentBackground properties on toplevel widgets before they
     // create native windows. These windows are typically shown after being
@@ -965,8 +966,8 @@ Style::prePolish(QWidget *widget) const
     //     Maybe we can also do sth to their parents' and/or children as well
     if (widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
         !(widget->windowFlags() & Qt::MSWindowsOwnDC) &&
-        (!qtcGetWid(widget) || qtcGetPrePolishStarted(widget)) &&
-        !qtcGetPrePolished(widget)) {
+        (!qtcGetWid(widget) || props->prePolishStarted) &&
+        !props->prePolished) {
         // Skip MSWindowsOwnDC since it is set for QGLWidget and not likely to
         // be used in other cases.
 
@@ -983,7 +984,7 @@ Style::prePolish(QWidget *widget) const
             widget->setAttribute(Qt::WA_TranslucentBackground, false);
             widget->setAttribute(Qt::WA_NativeWindow);
             if (widget->depth() == 24 && !qtcGetWid(widget)) {
-                qtcSetPrePolished(widget);
+                props->prePolished = true;
                 // Kaffeine set parent back after children window has been
                 // created.
                 widget->setParent(NULL);
@@ -999,7 +1000,7 @@ Style::prePolish(QWidget *widget) const
                                         qtcIsDialog(widget)))) {
             widget->setAttribute(Qt::WA_StyledBackground);
             setTranslucentBackground(widget);
-            qtcSetPrePolished(widget);
+            props->prePolished = true;
         } else if (opts.bgndOpacity != 100) {
             // TODO: Translucent tooltips, check popup/spash screen etc.
             if (qtcIsWindow(widget) || qtcIsToolTip(widget)) {
@@ -1008,10 +1009,10 @@ Style::prePolish(QWidget *widget) const
                     //       where we have full information about the widget.
                     widget->setAttribute(Qt::WA_StyledBackground);
                     setTranslucentBackground(widget);
-                    qtcSetPrePolishStarted(widget);
+                    props->prePolishStarted = true;
                 }
             } else if (widget->testAttribute(Qt::WA_TranslucentBackground) &&
-                       qtcGetPrePolishStarted(widget)) {
+                       props->prePolishStarted) {
                 widget->setAttribute(Qt::WA_StyledBackground, false);
                 widget->setAttribute(Qt::WA_TranslucentBackground, false);
                 // WA_TranslucentBackground also sets Qt::WA_NoSystemBackground
@@ -1698,12 +1699,13 @@ Style::polish(QWidget *widget)
     if (!widget)
         return;
 
+    QtcWidgetPropsP qtcProps(widget);
     bool enableMouseOver(opts.highlightFactor || opts.coloredMouseOver);
     if (qtcCheckLogLevel(QTC_LOG_INFO) && qtcGetWid(widget) &&
-        widget->windowType() != Qt::Desktop && !qtcGetPrePolished(widget)) {
+        widget->windowType() != Qt::Desktop && !qtcProps->prePolished) {
         qDebug() << "Window Created before polishing:" << widget;
     }
-    qtcSetPrePolished(widget);
+    qtcProps->prePolished = true;
 
     if (EFFECT_NONE != opts.buttonEffect && !USE_CUSTOM_ALPHAS(opts) &&
         isNoEtchWidget(widget)) {

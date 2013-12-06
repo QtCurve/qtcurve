@@ -21,7 +21,7 @@
  *****************************************************************************/
 
 #include "qtcurve_p.h"
-#include <qtcurve-utils/qtutils.h>
+#include <qtcurve-utils/qtprops.h>
 
 #ifdef QTC_ENABLE_X11
 #  include <QDBusConnection>
@@ -413,6 +413,7 @@ Style::prePolish(QWidget *widget) const
     if (theThemedApp == APP_KWIN) {
         return;
     }
+    QtcWidgetPropsP props(widget);
     // HACK:
     // Set TranslucentBackground properties on toplevel widgets before they
     // create native windows. These windows are typically shown after being
@@ -426,8 +427,8 @@ Style::prePolish(QWidget *widget) const
     //     (After we create a RGB window, Qt5 will not override it).
     if (widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
         !(widget->windowFlags() & Qt::MSWindowsOwnDC) &&
-        (!qtcGetWid(widget) || qtcGetPrePolishStarted(widget)) &&
-        !qtcGetPrePolished(widget)) {
+        (!qtcGetWid(widget) || props->prePolishStarted) &&
+        !props->prePolished) {
         // Skip MSWindowsOwnDC since it is set for QGLWidget and not likely to
         // be used in other cases.
 
@@ -439,7 +440,7 @@ Style::prePolish(QWidget *widget) const
                                         qtcIsDialog(widget)))) {
             widget->setAttribute(Qt::WA_StyledBackground);
             setTranslucentBackground(widget);
-            qtcSetPrePolished(widget);
+            props->prePolished = true;
         } else if (opts.bgndOpacity != 100) {
             // TODO: Translucent tooltips, check popup/spash screen etc.
             if (qtcIsWindow(widget) || qtcIsToolTip(widget)) {
@@ -448,10 +449,10 @@ Style::prePolish(QWidget *widget) const
                     //       where we have full information about the widget.
                     widget->setAttribute(Qt::WA_StyledBackground);
                     setTranslucentBackground(widget);
-                    qtcSetPrePolishStarted(widget);
+                    props->prePolishStarted = true;
                 }
             } else if (widget->testAttribute(Qt::WA_TranslucentBackground) &&
-                       qtcGetPrePolishStarted(widget)) {
+                       props->prePolishStarted) {
                 widget->setAttribute(Qt::WA_StyledBackground, false);
                 widget->setAttribute(Qt::WA_TranslucentBackground, false);
                 // WA_TranslucentBackground also sets Qt::WA_NoSystemBackground
