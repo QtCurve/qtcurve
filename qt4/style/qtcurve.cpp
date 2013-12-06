@@ -998,26 +998,33 @@ Style::prePolish(QWidget *widget) const
         if ((opts.bgndOpacity != 100 && qobject_cast<QMainWindow*>(widget)) ||
             (opts.dlgOpacity != 100 && (qobject_cast<QDialog*>(widget) ||
                                         qtcIsDialog(widget)))) {
+            props->prePolished = true;
             widget->setAttribute(Qt::WA_StyledBackground);
             setTranslucentBackground(widget);
-            props->prePolished = true;
+            // WA_TranslucentBackground also sets Qt::WA_NoSystemBackground
+            // Set it back here.
+            widget->setAttribute(Qt::WA_NoSystemBackground, false);
+            // Set this for better efficiency for now
+            widget->setAutoFillBackground(false);
         } else if (opts.bgndOpacity != 100) {
             // TODO: Translucent tooltips, check popup/spash screen etc.
             if (qtcIsWindow(widget) || qtcIsToolTip(widget)) {
                 if (!widget->testAttribute(Qt::WA_TranslucentBackground)) {
                     // TODO: should probably set this one in polish
                     //       where we have full information about the widget.
+                    props->prePolishStarted = true;
                     widget->setAttribute(Qt::WA_StyledBackground);
                     setTranslucentBackground(widget);
-                    props->prePolishStarted = true;
+                    // WA_TranslucentBackground also sets
+                    // Qt::WA_NoSystemBackground Set it back here.
+                    widget->setAttribute(Qt::WA_NoSystemBackground, false);
+                    // Set this for better efficiency for now
+                    widget->setAutoFillBackground(false);
                 }
             } else if (widget->testAttribute(Qt::WA_TranslucentBackground) &&
                        props->prePolishStarted) {
                 widget->setAttribute(Qt::WA_StyledBackground, false);
                 widget->setAttribute(Qt::WA_TranslucentBackground, false);
-                // WA_TranslucentBackground also sets Qt::WA_NoSystemBackground
-                // Set it back here.
-                widget->setAttribute(Qt::WA_NoSystemBackground, false);
             }
         }
     }
@@ -1741,9 +1748,6 @@ Style::polish(QWidget *widget)
             // WA_StyledBackground - and PE_Widget will be called to
             // render background...
             widget->setAttribute(Qt::WA_StyledBackground);
-#ifdef QTC_ENABLE_X11
-            widget->installEventFilter(this);
-#endif
             break;
         }
         case Qt::Popup:
@@ -2750,25 +2754,6 @@ bool Style::eventFilter(QObject *object, QEvent *event)
         }
 #endif
         case QEvent::Paint: {
-            if (qtcIsCustomBgnd(&opts)) {
-                QWidget *widget = qtcToWidget(object);
-
-                if (widget && widget->testAttribute(Qt::WA_StyledBackground) &&
-                    (widget->isWindow() && (qtcIsWindow(widget) ||
-                                            qtcIsDialog(widget)) &&
-                    widget->testAttribute(Qt::WA_TranslucentBackground))) {
-                    bool isDialog = qobject_cast<QDialog*>(widget);
-
-                    if((100!=opts.bgndOpacity && !isDialog) || (100!=opts.dlgOpacity && isDialog) ||
-                       !(qtcIsFlatBgnd(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type)
-                    {
-                        QPainter p(widget);
-                        p.setClipRegion(static_cast<QPaintEvent*>(event)->region());
-                        drawBackground(&p, widget, isDialog ? BGND_DIALOG : BGND_WINDOW);
-                    }
-                }
-            }
-
             if ((!qtcIsFlatBgnd(opts.menuBgndAppearance) ||
                  opts.menuBgndImage.type != IMG_NONE ||
                  opts.menuBgndOpacity != 100 ||
@@ -3788,15 +3773,21 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
            ((!widget->testAttribute(Qt::WA_NoSystemBackground) &&
              (qtcIsDialog(widget) || qtcIsWindow(widget)) &&
              widget->isWindow()) ||
-            (// itsIsPreview &&
-             qobject_cast<const QMdiSubWindow*>(widget)))) {
+            (qobject_cast<const QMdiSubWindow*>(widget)))) {
             bool isDialog = qobject_cast<const QDialog*>(widget);
 
             if (qtcIsCustomBgnd(&opts) || itsIsPreview ||
                 (isDialog && opts.dlgOpacity != 100) ||
-                (!isDialog && opts.bgndOpacity != 100))
+                (!isDialog && opts.bgndOpacity != 100)) {
+                painter->save();
+                // Blur and shadow here?
+                if (!qobject_cast<const QMdiSubWindow*>(widget))
+                    painter->setCompositionMode(
+                        QPainter::CompositionMode_Source);
                 drawBackground(painter, widget,
                                isDialog ? BGND_DIALOG : BGND_WINDOW);
+                painter->restore();
+            }
         }
         break;
     case PE_PanelScrollAreaCorner:
