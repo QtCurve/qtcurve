@@ -2636,9 +2636,11 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
     // TODO
     if (!drawFunc)
         return;
+    painter->save();
     if (qtcUnlikely(!(this->*drawFunc)(element, option, painter, widget))) {
         BASE_STYLE::drawPrimitive(element, option, painter, widget);
     }
+    painter->restore();
 }
 
 void Style::drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const

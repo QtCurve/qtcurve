@@ -96,13 +96,11 @@ Style::drawPrimitiveWidget(PrimitiveElement element,
         if (qtcIsCustomBgnd(&opts) || itsIsPreview ||
             (isDialog && opts.dlgOpacity != 100) ||
             (!isDialog && opts.bgndOpacity != 100)) {
-            painter->save();
             if (!(widget && qobject_cast<const QMdiSubWindow*>(widget))) {
                 painter->setCompositionMode(QPainter::CompositionMode_Source);
             }
             drawBackground(painter, widget,
                            isDialog ? BGND_DIALOG : BGND_WINDOW);
-            painter->restore();
         }
     }
     return true;
@@ -146,7 +144,6 @@ Style::drawPrimitiveIndicatorBranch(PrimitiveElement element,
     int beforeH = middleH;
 #endif
     int afterV = middleV;
-    painter->save();
     if (state & State_Children) {
         QRect ar(r.x() + (r.width() - LV_SIZE - 4) / 2,
                  r.y() + (r.height() - LV_SIZE - 4) / 2,
@@ -238,7 +235,6 @@ Style::drawPrimitiveIndicatorBranch(PrimitiveElement element,
                               middleH - constStep, beforeV);
         }
     }
-    painter->restore();
     return true;
 }
 
@@ -371,7 +367,6 @@ Style::drawPrimitiveIndicatorToolBarSeparator(PrimitiveElement element,
     QTC_UNUSED(widget);
     const QRect &r = option->rect;
     State state = option->state;
-    painter->save();
     switch (opts.toolbarSeparators) {
     case LINE_NONE:
         break;
@@ -410,7 +405,6 @@ Style::drawPrimitiveIndicatorToolBarSeparator(PrimitiveElement element,
         drawDots(painter, r, !(state & State_Horizontal), 1, 5,
                  itsBackgroundCols, 0, 5);
     }
-    painter->restore();
     return true;
 }
 
@@ -673,7 +667,6 @@ Style::drawPrimitivePanelMenuBar(PrimitiveElement element,
     const QRect &r = option->rect;
     if (widget && widget->parentWidget() &&
         qobject_cast<const QMainWindow*>(widget->parentWidget())) {
-        painter->save();
         drawMenuOrToolBarBackground(widget, painter, r, option);
         if (opts.toolbarBorders != TB_NONE) {
             const QColor *use = (itsActive ? itsMenubarCols :
@@ -699,7 +692,6 @@ Style::drawPrimitivePanelMenuBar(PrimitiveElement element,
                                   r.y() + r.height() - 1);
             }
         }
-        painter->restore();
     }
     return true;
 }
@@ -725,7 +717,6 @@ Style::drawPrimitivePanelTipLabel(PrimitiveElement element,
         itsShadowHelper->registerWidget(widget->window());
     }
 #endif
-    painter->save();
     if (rounded)
         painter->setRenderHint(QPainter::Antialiasing, true);
     if (haveAlpha)
@@ -736,7 +727,6 @@ Style::drawPrimitivePanelTipLabel(PrimitiveElement element,
         painter->setPen(QPen(palette.toolTipText(), 0));
         drawRect(painter, r);
     }
-    painter->restore();
     return true;
 }
 
@@ -762,12 +752,10 @@ Style::drawPrimitiveQtcBackground(PrimitiveElement element,
             // APPEARANCE_RAISED is used to signal flat background,
             // but have background image!
             if (bgnd->app != APPEARANCE_FLAT) {
-                painter->save();
                 painter->setClipRect(bgnd->rect, Qt::IntersectClip);
                 drawBackgroundImage(painter, true,
                                     BGND_IMG_ON_BORDER ? bgnd->rect :
                                     bgnd->widgetRect);
-                painter->restore();
             }
         }
     }
@@ -925,7 +913,6 @@ Style::drawPrimitiveFrameTabWidget(PrimitiveElement element,
     bool reverse = option->direction == Qt::RightToLeft;
     int round = opts.square & SQUARE_TAB_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
 
-    painter->save();
     if (const QStyleOptionTabWidgetFrame *twf =
         qstyleoption_cast<const QStyleOptionTabWidgetFrame*>(option)) {
         if ((opts.round || (/*qtcIsCustomBgnd(&opts) && */opts.tabBgnd == 0)) &&
@@ -1020,7 +1007,6 @@ Style::drawPrimitiveFrameTabWidget(PrimitiveElement element,
     }
     drawBorder(painter, r, &opt, round, use, WIDGET_TAB_FRAME,
                opts.borderTab ? BORDER_LIGHT : BORDER_RAISED, false);
-    painter->restore();
     return true;
 }
 
@@ -1057,7 +1043,6 @@ Style::drawPrimitiveFrameWindow(PrimitiveElement element,
                      (!isKWin || qtcGetWindowBorderSize(false).sides > 1));
     light.setAlphaF(1.0);
     dark.setAlphaF(1.0);
-    painter->save();
     if (fillBgnd) {
         painter->fillRect(r, bgndCols[ORIGINAL_SHADE]);
     }
@@ -1103,7 +1088,6 @@ Style::drawPrimitiveFrameWindow(PrimitiveElement element,
                               r.x() + r.width() - 5, r.y() + r.height() - 2);
         }
     }
-    painter->restore();
     return true;
 }
 
@@ -1159,7 +1143,6 @@ Style::drawPrimitiveButton(PrimitiveElement element, const QStyleOption *option,
                   opt.state & State_HasFocus && opt.state & State_Enabled));
     if (isFlat && !isDown && !(opt.state & State_MouseOver))
         return true;
-    painter->save();
 
     if (isOnListView)
         opt.state |= State_Horizontal | State_Raised;
@@ -1268,7 +1251,6 @@ Style::drawPrimitiveButton(PrimitiveElement element, const QStyleOption *option,
         default:
             break;
         }
-    painter->restore();
     return true;
 }
 
