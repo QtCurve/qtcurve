@@ -40,17 +40,18 @@ struct _QtcWidgetProps {
 };
 Q_DECLARE_METATYPE(QSharedPointer<_QtcWidgetProps>)
 
+#define QTC_PROP_NAME "_q__QTCURVE_WIDGET_PROPERTIES__"
+
 QTC_ALWAYS_INLINE static inline QSharedPointer<_QtcWidgetProps>
 qtcGetWidgetProps(const QWidget *w)
 {
     // use _q_ to mimic qt internal properties and suppress QtDesigner
     // warning about unsupported properties.
-    QVariant val(w->property("_q__QTCURVE_WIDGET_PROPERTIES__"));
+    QVariant val(w->property(QTC_PROP_NAME));
     if (!val.isValid()) {
         val = QVariant::fromValue(QSharedPointer<_QtcWidgetProps>(
                                       new _QtcWidgetProps));
-        const_cast<QWidget*>(w)->setProperty(
-            "_q__QTCURVE_WIDGET_PROPERTIES__", val);
+        const_cast<QWidget*>(w)->setProperty(QTC_PROP_NAME, val);
     }
     return val.value<QSharedPointer<_QtcWidgetProps> >();
 }

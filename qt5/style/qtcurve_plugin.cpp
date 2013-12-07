@@ -43,8 +43,17 @@ qtcEventCallback(void **cbdata)
     QObject *receiver = (QObject*)cbdata[0];
     if (qtcUnlikely(!receiver))
         return false;
-    QWidget *widget = qtcToWidget(receiver);
     QEvent *event = (QEvent*)cbdata[1];
+    if (qtcUnlikely(event &&
+                    event->type() == QEvent::DynamicPropertyChange)) {
+        QDynamicPropertyChangeEvent *prop_event =
+            static_cast<QDynamicPropertyChangeEvent*>(event);
+        // ignore the property change events from ourselves
+        if (prop_event->propertyName() == QTC_PROP_NAME) {
+            return false;
+        }
+    }
+    QWidget *widget = qtcToWidget(receiver);
     QtcWidgetProps props(widget);
     if (qtcUnlikely(widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
                     (!qtcGetWid(widget) || props->prePolishStarted))) {
