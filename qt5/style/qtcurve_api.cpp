@@ -746,32 +746,37 @@ void Style::polish(QWidget *widget)
         parentIsToolbar)
         widget->setBackgroundRole(QPalette::Window);
 
-    if(!qtcIsFlat(opts.toolbarAppearance) && parentIsToolbar)
+    if (!qtcIsFlat(opts.toolbarAppearance) && parentIsToolbar) {
         widget->setAutoFillBackground(false);
+    }
 
-    if(APP_SYSTEMSETTINGS==theThemedApp &&
-       widget && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
-       qobject_cast<QFrame *>(widget) && QFrame::NoFrame!=((QFrame *)widget)->frameShape() &&
-       qobject_cast<QFrame *>(widget->parentWidget()) &&
-       qobject_cast<QTabWidget *>(widget->parentWidget()->parentWidget()))
-        ((QFrame *)widget)->setFrameShape(QFrame::NoFrame);
+    if (APP_SYSTEMSETTINGS == theThemedApp &&
+        widget && widget->parentWidget() &&
+        widget->parentWidget()->parentWidget() &&
+        qobject_cast<QFrame*>(widget) &&
+        ((QFrame *)widget)->frameShape() != QFrame::NoFrame &&
+        qobject_cast<QFrame*>(widget->parentWidget()) &&
+        qobject_cast<QTabWidget*>(widget->parentWidget()->parentWidget())) {
+        ((QFrame*)widget)->setFrameShape(QFrame::NoFrame);
+    }
 
     if (QLayout *layout = widget->layout()) {
         // explicitely check public layout classes,
         // QMainWindowLayout doesn't work here
-        if (qobject_cast<QBoxLayout*>(layout)
-            || qobject_cast<QFormLayout*>(layout)
-            || qobject_cast<QGridLayout*>(layout)
-            || qobject_cast<QStackedLayout*>(layout)) {
+        if (qobject_cast<QBoxLayout*>(layout) ||
+            qobject_cast<QFormLayout*>(layout) ||
+            qobject_cast<QGridLayout*>(layout) ||
+            qobject_cast<QStackedLayout*>(layout)) {
             polishLayout(layout);
         }
     }
 
-    if( (APP_K3B==theThemedApp && widget->inherits("K3b::ThemedHeader") && qobject_cast<QFrame *>(widget)) ||
-        widget->inherits("KColorPatch"))
-    {
-        ((QFrame *)widget)->setLineWidth(0);
-        ((QFrame *)widget)->setFrameShape(QFrame::NoFrame);
+    if ((theThemedApp == APP_K3B &&
+         widget->inherits("K3b::ThemedHeader") &&
+         qobject_cast<QFrame *>(widget)) ||
+        widget->inherits("KColorPatch")) {
+        ((QFrame*)widget)->setLineWidth(0);
+        ((QFrame*)widget)->setFrameShape(QFrame::NoFrame);
     }
 
     if(APP_KDEVELOP==theThemedApp && !opts.stdSidebarButtons && widget->inherits("Sublime::IdealButtonBarWidget") && widget->layout())
@@ -835,13 +840,12 @@ void Style::unpolish(QWidget *widget)
 
     // Sometimes get background errors with QToolBox (e.g. in Bespin config), and setting WA_StyledBackground seems to
     // fix this,..
-    if(qtcIsCustomBgnd(&opts) || FRAME_SHADED==opts.groupBox || FRAME_FADED==opts.groupBox)
-    {
+    if (qtcIsCustomBgnd(&opts) || opts.groupBox == FRAME_SHADED ||
+        opts.groupBox == FRAME_FADED) {
         switch (widget->windowType()) {
         case Qt::Window:
         case Qt::Sheet:
         case Qt::Dialog:
-            widget->removeEventFilter(this);
             widget->setAttribute(Qt::WA_StyledBackground, false);
             break;
         case Qt::Popup:
@@ -853,34 +857,34 @@ void Style::unpolish(QWidget *widget)
             break;
         }
 
-        if(qobject_cast<QSlider *>(widget))
+        if (qobject_cast<QSlider*>(widget)) {
             widget->setBackgroundRole(QPalette::Window);
+        }
     }
 
-    if (// itsIsPreview &&
-        qobject_cast<QMdiSubWindow*>(widget))
+    if (qobject_cast<QMdiSubWindow*>(widget))
         widget->setAttribute(Qt::WA_StyledBackground, false);
 
-    if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuWidget())
-    {
+    if (opts.menubarHiding && qobject_cast<QMainWindow*>(widget) &&
+        static_cast<QMainWindow*>(widget)->menuWidget()) {
         widget->removeEventFilter(this);
-        if(itsSaveMenuBarStatus)
-            static_cast<QMainWindow *>(widget)->menuWidget()->removeEventFilter(this);
+        if (itsSaveMenuBarStatus) {
+            static_cast<QMainWindow*>(widget)->menuWidget()
+                ->removeEventFilter(this);
+        }
     }
 
-    if(opts.statusbarHiding && qobject_cast<QMainWindow *>(widget))
-    {
-        QList<QStatusBar *> sb=getStatusBars(widget);
+    if (opts.statusbarHiding && qobject_cast<QMainWindow*>(widget)) {
+        QList<QStatusBar*> sb=getStatusBars(widget);
 
-        if(sb.count())
-        {
+        if (sb.count()) {
             widget->removeEventFilter(this);
-            if(itsSaveStatusBarStatus)
-            {
-                QList<QStatusBar *>::ConstIterator it(sb.begin()),
-                    end(sb.end());
-                for(; it!=end; ++it)
+            if (itsSaveStatusBarStatus) {
+                QList<QStatusBar*>::ConstIterator it(sb.begin());
+                QList<QStatusBar*>::ConstIterator end(sb.end());
+                for(;it != end;++it) {
                     (*it)->removeEventFilter(this);
+                }
             }
         }
     }
@@ -925,7 +929,6 @@ void Style::unpolish(QWidget *widget)
         if(qtcIsCustomBgnd(&opts))
             widget->setBackgroundRole(QPalette::Background);
 
-//         if(opts.shadeMenubarOnlyWhenActive && SHADE_NONE!=opts.shadeMenubars)
         widget->removeEventFilter(this);
 
         if(SHADE_WINDOW_BORDER==opts.shadeMenubars || opts.customMenuTextColor || SHADE_BLEND_SELECTED==opts.shadeMenubars ||
