@@ -11697,10 +11697,14 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
                    BGND_DIALOG == type ? opts.dlgOpacity : opts.bgndOpacity);
     QRect bgndRect = widget->rect();
     QRect imgRect = bgndRect;
+    QtcWidgetPropsP props(widget);
 
     if (100 != opacity && !(qobject_cast<const QMdiSubWindow*>(widget) ||
                             Utils::hasAlphaChannel(window))) {
         opacity = 100;
+    }
+    if (widget) {
+        props->opacity = opacity;
     }
 
     p->setClipRegion(widget->rect(), Qt::IntersectClip);
@@ -12780,26 +12784,6 @@ void Style::drawSliderGroove(QPainter *p, const QRect &groove, const QRect &hand
     }
 }
 
-
-int
-Style::getOpacity(const QWidget *widget, QPainter *p) const
-{
-    if (opts.bgndOpacity == opts.dlgOpacity)
-        return opts.bgndOpacity;
-
-    if (opts.bgndOpacity != 100 || opts.dlgOpacity != 100) {
-         const QWidget *w = widget ? widget : getWidget(p);
-
-         if (!w) {
-             return opts.bgndOpacity;
-         } else {
-             return (qtcIsDialog(w->window()) ? opts.dlgOpacity :
-                     opts.bgndOpacity);
-         }
-    }
-    return 100;
-}
-
 void
 Style::drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p,
                                    const QRect &r, const QStyleOption *option,
@@ -12820,7 +12804,7 @@ Style::drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p,
                             SHADE_NONE != opts.shadeMenubars) ?
                    menuColors(option, itsActive)[ORIGINAL_SHADE] :
                    option->palette.background().color());
-        int opacity = getOpacity(widget, p);
+        int opacity = qtcGetOpacity(widget ? widget : getWidget(p));
 
         if (menu && BLEND_TITLEBAR) {
             rx.adjust(0, -qtcGetWindowBorderSize(false).titleHeight, 0, 0);

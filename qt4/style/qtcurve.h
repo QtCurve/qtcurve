@@ -300,7 +300,6 @@ private:
     void drawSliderGroove(QPainter *p, const QRect &groove, const QRect &handle,
                           const QStyleOptionSlider *slider,
                           const QWidget *widget) const;
-    int  getOpacity(const QWidget *widget, QPainter *p) const;
     void drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p,
                                      const QRect &r, const QStyleOption *option,
                                      bool menu=true,

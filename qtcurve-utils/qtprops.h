@@ -76,4 +76,19 @@ private:
     mutable QSharedPointer<QtcWidgetProps> p;
 };
 
+static inline int
+qtcGetOpacity(const QWidget *widget)
+{
+    for (const QWidget *w = widget;w;w = w->parentWidget()) {
+        QtcWidgetPropsP props(w);
+        if (props->opacity < 100) {
+            return props->opacity;
+        }
+        if (w->isWindow()) {
+            break;
+        }
+    }
+    return 100;
+}
+
 #endif
