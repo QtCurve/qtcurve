@@ -44,13 +44,19 @@ qtcEventCallback(void **cbdata)
     if (qtcUnlikely(!receiver))
         return false;
     QWidget *widget = qtcToWidget(receiver);
+    QEvent *event = (QEvent*)cbdata[1];
     QtcWidgetPropsP props(widget);
     if (qtcUnlikely(widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
                     (!qtcGetWid(widget) || props->prePolishStarted))) {
         if (Style *style = qtcGetStyle(widget)) {
             style->prePolish(widget);
         }
+    } else if (widget && event->type() == QEvent::UpdateRequest) {
+        props->opacity = 100;
     } else if (QQuickWindow *window = qobject_cast<QQuickWindow*>(receiver)) {
+        // QtQuickControl support
+        // This is still VERY experimental.
+        // Need a lot more testing and refactoring.
         if (Style *style = qtcGetStyle(qApp)) {
             QColor color = window->color();
             int opacity = style->options().bgndOpacity;
