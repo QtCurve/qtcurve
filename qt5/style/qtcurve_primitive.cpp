@@ -39,19 +39,6 @@
 namespace QtCurve {
 
 bool
-Style::drawPrimitivePanelMenu(PrimitiveElement element,
-                              const QStyleOption *option,
-                              QPainter *painter,
-                              const QWidget *widget) const
-{
-    QTC_UNUSED(element);
-    QTC_UNUSED(option);
-    QTC_UNUSED(painter);
-    QTC_UNUSED(widget);
-    return true;
-}
-
-bool
 Style::drawPrimitiveIndicatorTabClose(PrimitiveElement element,
                                       const QStyleOption *option,
                                       QPainter *painter,
@@ -1251,6 +1238,88 @@ Style::drawPrimitiveButton(PrimitiveElement element, const QStyleOption *option,
         default:
             break;
         }
+    return true;
+}
+
+bool
+Style::drawPrimitivePanelMenu(PrimitiveElement element,
+                              const QStyleOption *option,
+                              QPainter *painter,
+                              const QWidget *widget) const
+{
+    QTC_UNUSED(element);
+    QTC_UNUSED(widget);
+    const QRect &r = option->rect;
+    double radius = MENU_AND_TOOLTIP_RADIUS;
+    const QColor *use = popupMenuCols(option);
+    painter->setClipRegion(r);
+    painter->setCompositionMode(QPainter::CompositionMode_Source);
+    if (!opts.popupBorder) {
+        painter->setRenderHint(QPainter::Antialiasing, true);
+        painter->setPen(use[ORIGINAL_SHADE]);
+        painter->drawPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL, radius));
+        painter->setRenderHint(QPainter::Antialiasing, false);
+    }
+    if (!(opts.square & SQUARE_POPUP_MENUS)) {
+        painter->setClipRegion(windowMask(r, opts.round > ROUND_SLIGHT),
+                               Qt::IntersectClip);
+    }
+
+    // In case the gradient uses alpha, we need to fill with the background
+    // colour - this makes it consistent with Gtk.
+    if (opts.menuBgndOpacity == 100)
+        painter->fillRect(r, option->palette.brush(QPalette::Background));
+    drawBackground(painter, popupMenuCols()[ORIGINAL_SHADE], r,
+                   opts.menuBgndOpacity, BGND_MENU, opts.menuBgndAppearance);
+    drawBackgroundImage(painter, false, r);
+    // TODO: draw border in other functions.
+    if (opts.popupBorder) {
+        EGradientBorder border =
+            qtcGetGradient(opts.menuBgndAppearance, &opts)->border;
+        painter->setClipping(false);
+        painter->setPen(use[QTC_STD_BORDER]);
+        if (opts.square & SQUARE_POPUP_MENUS) {
+            drawRect(painter, r);
+        } else {
+            painter->setRenderHint(QPainter::Antialiasing, true);
+            painter->drawPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL, radius));
+        }
+        if (qtcUseBorder(border) &&
+            APPEARANCE_FLAT != opts.menuBgndAppearance) {
+            QRect ri(r.adjusted(1, 1, -1, -1));
+            painter->setPen(use[0]);
+            if (GB_LIGHT == border) {
+                if (opts.square & SQUARE_POPUP_MENUS) {
+                    drawRect(painter, ri);
+                } else {
+                    painter->drawPath(buildPath(ri, WIDGET_OTHER, ROUNDED_ALL,
+                                                radius - 1.0));
+                }
+            } else if (opts.square & SQUARE_POPUP_MENUS) {
+                if (GB_3D != border) {
+                    painter->drawLine(ri.x(), ri.y(), ri.x() + ri.width() - 1,
+                                      ri.y());
+                    painter->drawLine(ri.x(), ri.y(), ri.x(),
+                                      ri.y() + ri.height() - 1);
+                }
+                painter->setPen(use[FRAME_DARK_SHADOW]);
+                painter->drawLine(ri.x(), ri.y() + ri.height() - 1,
+                                  ri.x() + ri.width() - 1,
+                                  ri.y() + ri.height() - 1);
+                painter->drawLine(ri.x() + ri.width() - 1, ri.y(),
+                                  ri.x() + ri.width() - 1,
+                                  ri.y() + ri.height() - 1);
+            } else {
+                QPainterPath tl;
+                QPainterPath br;
+                buildSplitPath(ri, ROUNDED_ALL, radius - 1.0, tl, br);
+                if (GB_3D != border)
+                    painter->drawPath(tl);
+                painter->setPen(use[FRAME_DARK_SHADOW]);
+                painter->drawPath(br);
+            }
+        }
+    }
     return true;
 }
 

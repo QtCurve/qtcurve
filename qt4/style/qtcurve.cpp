@@ -2337,7 +2337,6 @@ void Style::unpolish(QWidget *widget)
         case Qt::Window:
         case Qt::Sheet:
         case Qt::Dialog:
-            widget->removeEventFilter(this);
             widget->setAttribute(Qt::WA_StyledBackground, false);
             break;
         case Qt::Popup:
@@ -2415,27 +2414,22 @@ void Style::unpolish(QWidget *widget)
         if(opts.boldProgress)
             unSetBold(widget);
         itsProgressBars.remove((QProgressBar*)widget);
-    }
-    else if (widget->inherits("Q3Header"))
-    {
+    } else if (widget->inherits("Q3Header")) {
         widget->setMouseTracking(false);
         widget->removeEventFilter(this);
-    }
-    else if(opts.highlightScrollViews && widget->inherits("Q3ScrollView"))
+    } else if (opts.highlightScrollViews && widget->inherits("Q3ScrollView")) {
         widget->removeEventFilter(this);
-    else if(qobject_cast<QMenuBar*>(widget))
-    {
+    } else if (qobject_cast<QMenuBar*>(widget)) {
 #ifdef QTC_ENABLE_X11
-        if(opts.xbar)
+        if (opts.xbar) {
             Bespin::MacMenu::release((QMenuBar*)widget);
+        }
 #endif
-
         widget->setAttribute(Qt::WA_Hover, false);
 
         if(qtcIsCustomBgnd(&opts))
             widget->setBackgroundRole(QPalette::Background);
 
-//         if(opts.shadeMenubarOnlyWhenActive && SHADE_NONE!=opts.shadeMenubars)
             widget->removeEventFilter(this);
 
         if(SHADE_WINDOW_BORDER==opts.shadeMenubars || opts.customMenuTextColor || SHADE_BLEND_SELECTED==opts.shadeMenubars ||

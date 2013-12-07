@@ -664,15 +664,9 @@ void Style::polish(QWidget *widget)
         }
 
     if (qobject_cast<QMenu*>(widget)) {
-        if (!qtcIsFlatBgnd(opts.menuBgndAppearance) ||
-            opts.menuBgndOpacity != 100 ||
+        if (opts.menuBgndOpacity != 100 ||
             !(opts.square & SQUARE_POPUP_MENUS)) {
-            widget->installEventFilter(this);
-            if ((100 != opts.menuBgndOpacity ||
-                 !(opts.square & SQUARE_POPUP_MENUS)) &&
-                !widget->testAttribute(Qt::WA_TranslucentBackground)) {
-                setTranslucentBackground(widget);
-            }
+            setTranslucentBackground(widget);
         }
         if (opts.lighterPopupMenuBgnd || opts.shadePopupMenu) {
             QPalette pal(widget->palette());
@@ -682,9 +676,6 @@ void Style::polish(QWidget *widget)
             if (opts.shadePopupMenu) {
                 setMenuTextColors(widget, false);
             }
-            if (IMG_NONE != opts.menuBgndImage.type) {
-                widget->installEventFilter(this);
-            }
         }
     }
 
@@ -693,17 +684,18 @@ void Style::polish(QWidget *widget)
          !(opts.square & SQUARE_POPUP_MENUS)) &&
         widget->inherits("QComboBoxPrivateContainer")) {
         widget->installEventFilter(this);
-        if ((100 != opts.menuBgndOpacity ||
-             !(opts.square & SQUARE_POPUP_MENUS)) &&
-            !widget->testAttribute(Qt::WA_TranslucentBackground)) {
+        if (opts.menuBgndOpacity != 100 ||
+            !(opts.square & SQUARE_POPUP_MENUS)) {
             setTranslucentBackground(widget);
         }
     }
 
     bool parentIsToolbar(false);
 
-    // Using dark menubars - konqueror's combo box texts get messed up. Seems to be when a plain QWidget has widget->setBackgroundRole(QPalette::Window);
-    // and widget->setAutoFillBackground(false); set (below). These onyl happen if 'parentIsToolbar' - so dont bather detecting this if the widget
+    // Using dark menubars - konqueror's combo box texts get messed up. Seems
+    // to be when a plain QWidget has widget->setBackgroundRole(QPalette::Window);
+    // and widget->setAutoFillBackground(false); set (below). These only happen
+    // if 'parentIsToolbar' - so dont bather detecting this if the widget
     // is a plain QWidget
     //
     // QWidget QComboBoxListView QComboBoxPrivateContainer SearchBarCombo KToolBar KonqMainWindow
@@ -966,7 +958,7 @@ void Style::unpolish(QWidget *widget)
                                                                               widget->parentWidget()->parentWidget()->parentWidget()->inherits("KFileDialog")*/)
     {
         delete ((QDockWidget *)widget)->titleBarWidget();
-        ((QDockWidget *)widget)->setTitleBarWidget(0L);
+        ((QDockWidget*)widget)->setTitleBarWidget(0L);
     }
     else if(opts.boldProgress && "CE_CapacityBar"==widget->objectName())
         unSetBold(widget);
@@ -2631,6 +2623,9 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
         break;
     case PE_PanelTipLabel:
         drawFunc = &Style::drawPrimitivePanelTipLabel;
+        break;
+    case PE_PanelMenu:
+        drawFunc = &Style::drawPrimitivePanelMenu;
         break;
     default:
         BASE_STYLE::drawPrimitive(element, option, painter, widget);
