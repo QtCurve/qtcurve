@@ -87,16 +87,22 @@ Style::drawPrimitiveWidget(PrimitiveElement element,
 {
     QTC_UNUSED(element);
     QTC_UNUSED(option);
+    // TODO handle NULL
     if (widget && widget->testAttribute(Qt::WA_StyledBackground) &&
         ((!widget->testAttribute(Qt::WA_NoSystemBackground) &&
           (qtcIsDialog(widget) || qtcIsWindow(widget))) ||
-         (qobject_cast<const QMdiSubWindow*>(widget)))) {
+         qobject_cast<const QMdiSubWindow*>(widget))) {
         bool isDialog = qtcIsDialog(widget);
         if (qtcIsCustomBgnd(&opts) || itsIsPreview ||
             (isDialog && opts.dlgOpacity != 100) ||
             (!isDialog && opts.bgndOpacity != 100)) {
+            painter->save();
+            if (!(widget && qobject_cast<const QMdiSubWindow*>(widget))) {
+                painter->setCompositionMode(QPainter::CompositionMode_Source);
+            }
             drawBackground(painter, widget,
                            isDialog ? BGND_DIALOG : BGND_WINDOW);
+            painter->restore();
         }
     }
     return true;

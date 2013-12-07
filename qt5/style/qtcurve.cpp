@@ -438,26 +438,33 @@ Style::prePolish(QWidget *widget) const
         if ((opts.bgndOpacity != 100 && qobject_cast<QMainWindow*>(widget)) ||
             (opts.dlgOpacity != 100 && (qobject_cast<QDialog*>(widget) ||
                                         qtcIsDialog(widget)))) {
+            props->prePolished = true;
             widget->setAttribute(Qt::WA_StyledBackground);
             setTranslucentBackground(widget);
-            props->prePolished = true;
+            // WA_TranslucentBackground also sets Qt::WA_NoSystemBackground
+            // Set it back here.
+            widget->setAttribute(Qt::WA_NoSystemBackground, false);
+            // Set this for better efficiency for now
+            widget->setAutoFillBackground(false);
         } else if (opts.bgndOpacity != 100) {
             // TODO: Translucent tooltips, check popup/spash screen etc.
             if (qtcIsWindow(widget) || qtcIsToolTip(widget)) {
                 if (!widget->testAttribute(Qt::WA_TranslucentBackground)) {
                     // TODO: should probably set this one in polish
                     //       where we have full information about the widget.
+                    props->prePolishStarted = true;
                     widget->setAttribute(Qt::WA_StyledBackground);
                     setTranslucentBackground(widget);
-                    props->prePolishStarted = true;
+                    // WA_TranslucentBackground also sets
+                    // Qt::WA_NoSystemBackground Set it back here.
+                    widget->setAttribute(Qt::WA_NoSystemBackground, false);
+                    // Set this for better efficiency for now
+                    widget->setAutoFillBackground(false);
                 }
             } else if (widget->testAttribute(Qt::WA_TranslucentBackground) &&
                        props->prePolishStarted) {
                 widget->setAttribute(Qt::WA_StyledBackground, false);
                 widget->setAttribute(Qt::WA_TranslucentBackground, false);
-                // WA_TranslucentBackground also sets Qt::WA_NoSystemBackground
-                // Set it back here.
-                widget->setAttribute(Qt::WA_NoSystemBackground, false);
             }
         }
     }

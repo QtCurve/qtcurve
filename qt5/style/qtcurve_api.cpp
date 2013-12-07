@@ -393,9 +393,6 @@ void Style::polish(QWidget *widget)
             // WA_StyledBackground - and PE_Widget will be called to
             // render background...
             widget->setAttribute(Qt::WA_StyledBackground);
-#ifdef QTC_ENABLE_X11
-            widget->installEventFilter(this);
-#endif
             break;
         }
         case Qt::Popup:
@@ -1226,25 +1223,6 @@ bool Style::eventFilter(QObject *object, QEvent *event)
     }
 #endif
     case QEvent::Paint: {
-        if (qtcIsCustomBgnd(&opts)) {
-            QWidget *widget = qtcToWidget(object);
-
-            if(widget && widget->testAttribute(Qt::WA_StyledBackground) &&
-               (widget->isWindow() && (qtcIsWindow(widget) ||
-                                       qtcIsDialog(widget)) &&
-                widget->testAttribute(Qt::WA_TranslucentBackground))) {
-                bool isDialog = qobject_cast<QDialog*>(widget);
-
-                if((100!=opts.bgndOpacity && !isDialog) || (100!=opts.dlgOpacity && isDialog) ||
-                   !(qtcIsFlatBgnd(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type)
-                {
-                    QPainter p(widget);
-                    p.setClipRegion(static_cast<QPaintEvent*>(event)->region());
-                    drawBackground(&p, widget, isDialog ? BGND_DIALOG : BGND_WINDOW);
-                }
-            }
-        }
-
         if ((!qtcIsFlatBgnd(opts.menuBgndAppearance) ||
              opts.menuBgndImage.type != IMG_NONE ||
              opts.menuBgndOpacity != 100 ||
