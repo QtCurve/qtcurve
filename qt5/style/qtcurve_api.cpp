@@ -61,7 +61,6 @@
 #include <QPushButton>
 #include <QHeaderView>
 #include <QLineEdit>
-#include <QSpinBox>
 #include <QDir>
 #include <QSettings>
 #include <QPixmapCache>
@@ -489,22 +488,22 @@ void Style::polish(QWidget *widget)
         ((QToolButton *)widget)->setAutoRaise(true);
 
     if(enableMouseOver &&
-       (qobject_cast<QPushButton *>(widget) ||
+       (qobject_cast<QPushButton*>(widget) ||
         qobject_cast<QAbstractButton*>(widget) ||
-        qobject_cast<QComboBox *>(widget) ||
-        qobject_cast<QAbstractSpinBox *>(widget) ||
-        qobject_cast<QCheckBox *>(widget) ||
-        qobject_cast<QGroupBox *>(widget) ||
-        qobject_cast<QRadioButton *>(widget) ||
-        qobject_cast<QSplitterHandle *>(widget) ||
-        qobject_cast<QSlider *>(widget) ||
-        qobject_cast<QHeaderView *>(widget) ||
-        qobject_cast<QTabBar *>(widget) ||
-        qobject_cast<QAbstractScrollArea *>(widget) ||
-        qobject_cast<QTextEdit *>(widget) ||
-        qobject_cast<QLineEdit *>(widget) ||
-        qobject_cast<QDial *>(widget) ||
-//        qobject_cast<QDockWidget *>(widget) ||
+        qobject_cast<QComboBox*>(widget) ||
+        qobject_cast<QAbstractSpinBox*>(widget) ||
+        qobject_cast<QCheckBox*>(widget) ||
+        qobject_cast<QGroupBox*>(widget) ||
+        qobject_cast<QRadioButton*>(widget) ||
+        qobject_cast<QSplitterHandle*>(widget) ||
+        qobject_cast<QSlider*>(widget) ||
+        qobject_cast<QHeaderView*>(widget) ||
+        qobject_cast<QTabBar*>(widget) ||
+        qobject_cast<QAbstractScrollArea*>(widget) ||
+        qobject_cast<QTextEdit*>(widget) ||
+        qobject_cast<QLineEdit*>(widget) ||
+        qobject_cast<QDial*>(widget) ||
+        // qobject_cast<QDockWidget*>(widget) ||
         widget->inherits("QWorkspaceTitleBar") ||
         widget->inherits("QDockSeparator") ||
         widget->inherits("QDockWidgetSeparator")))
@@ -601,8 +600,7 @@ void Style::polish(QWidget *widget)
         pal.setColor(QPalette::Shadow, shadow);
         widget->setPalette(pal);
         widget->setMask(QRegion(widget->rect().adjusted(0, 0, -6, -6))+QRegion(widget->rect().adjusted(6, 6, 0, 0)));
-    }
-    else if(qobject_cast<QDockWidget *>(widget) &&
+    } else if(qobject_cast<QDockWidget*>(widget) &&
             widget->parentWidget() &&
             widget->parentWidget()->parentWidget() &&
             widget->parentWidget()->parentWidget()->parentWidget() &&
@@ -881,41 +879,37 @@ void Style::unpolish(QWidget *widget)
         }
     }
 
-    if(qobject_cast<QPushButton *>(widget) ||
-       qobject_cast<QComboBox *>(widget) ||
-       qobject_cast<QAbstractSpinBox *>(widget) ||
-       qobject_cast<QCheckBox *>(widget) ||
-       qobject_cast<QGroupBox *>(widget) ||
-       qobject_cast<QRadioButton *>(widget) ||
-       qobject_cast<QSplitterHandle *>(widget) ||
-       qobject_cast<QSlider *>(widget) ||
-       qobject_cast<QHeaderView *>(widget) ||
-       qobject_cast<QTabBar *>(widget) ||
-       qobject_cast<QAbstractScrollArea *>(widget) ||
-       qobject_cast<QTextEdit *>(widget) ||
-       qobject_cast<QLineEdit *>(widget) ||
-       qobject_cast<QDial *>(widget) ||
-//       qobject_cast<QDockWidget *>(widget) ||
+    if(qobject_cast<QPushButton*>(widget) ||
+       qobject_cast<QComboBox*>(widget) ||
+       qobject_cast<QAbstractSpinBox*>(widget) ||
+       qobject_cast<QCheckBox*>(widget) ||
+       qobject_cast<QGroupBox*>(widget) ||
+       qobject_cast<QRadioButton*>(widget) ||
+       qobject_cast<QSplitterHandle*>(widget) ||
+       qobject_cast<QSlider*>(widget) ||
+       qobject_cast<QHeaderView*>(widget) ||
+       qobject_cast<QTabBar*>(widget) ||
+       qobject_cast<QAbstractScrollArea*>(widget) ||
+       qobject_cast<QTextEdit*>(widget) ||
+       qobject_cast<QLineEdit*>(widget) ||
+       qobject_cast<QDial*>(widget) ||
+       // qobject_cast<QDockWidget *>(widget) ||
        widget->inherits("QWorkspaceTitleBar") ||
        widget->inherits("QDockSeparator") ||
        widget->inherits("QDockWidgetSeparator"))
         widget->setAttribute(Qt::WA_Hover, false);
-    if (qobject_cast<QScrollBar *>(widget))
-    {
+    if (qobject_cast<QScrollBar*>(widget)) {
         widget->setAttribute(Qt::WA_Hover, false);
         if(ROUNDED && !opts.flatSbarButtons)
             widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
         if(!opts.gtkScrollViews)
             widget->removeEventFilter(this);
-    }
-    else if (qobject_cast<QProgressBar *>(widget))
-    {
+    } else if (qobject_cast<QProgressBar*>(widget)) {
         widget->removeEventFilter(this);
         if(opts.boldProgress)
             unSetBold(widget);
         itsProgressBars.remove((QProgressBar *)widget);
-    }
-    else if (qobject_cast<QMenuBar*>(widget)) {
+    } else if (qobject_cast<QMenuBar*>(widget)) {
         widget->setAttribute(Qt::WA_Hover, false);
 
         if(qtcIsCustomBgnd(&opts))
