@@ -25,6 +25,7 @@
 #include "qtutils.h"
 #include <QSharedPointer>
 #include <QVariant>
+#include <QMdiSubWindow>
 
 struct QtcWidgetProps {
     QtcWidgetProps():
@@ -42,12 +43,12 @@ Q_DECLARE_METATYPE(QSharedPointer<QtcWidgetProps>)
 QTC_ALWAYS_INLINE static inline QSharedPointer<QtcWidgetProps>
 qtcGetWidgetProps(const QWidget *w)
 {
-    QVariant val(w->property("__QTCURVE_WIDGET_PROPERTIES__"));
+    QVariant val(w->property("_q__QTCURVE_WIDGET_PROPERTIES__"));
     if (!val.isValid()) {
         val = QVariant::fromValue(QSharedPointer<QtcWidgetProps>(
                                       new QtcWidgetProps));
         const_cast<QWidget*>(w)->setProperty(
-            "__QTCURVE_WIDGET_PROPERTIES__", val);
+            "_q__QTCURVE_WIDGET_PROPERTIES__", val);
     }
     return val.value<QSharedPointer<QtcWidgetProps> >();
 }
@@ -84,7 +85,7 @@ qtcGetOpacity(const QWidget *widget)
         if (props->opacity < 100) {
             return props->opacity;
         }
-        if (w->isWindow()) {
+        if (w->isWindow() || qobject_cast<const QMdiSubWindow*>(w)) {
             break;
         }
     }
