@@ -485,6 +485,48 @@ private:
     bool drawPrimitiveButton(PrimitiveElement element,
                              const QStyleOption *option, QPainter *painter,
                              const QWidget *widget) const;
+    bool drawPrimitiveFrameFocusRect(PrimitiveElement element,
+                                     const QStyleOption *option,
+                                     QPainter *painter,
+                                     const QWidget *widget) const;
+    bool drawPrimitiveIndicatorToolBarHandle(PrimitiveElement element,
+                                             const QStyleOption *option,
+                                             QPainter *painter,
+                                             const QWidget *widget) const;
+    bool drawPrimitiveIndicatorRadioButton(PrimitiveElement element,
+                                           const QStyleOption *option,
+                                           QPainter *painter,
+                                           const QWidget *widget) const;
+    bool drawPrimitiveIndicatorCheckBox(PrimitiveElement element,
+                                        const QStyleOption *option,
+                                        QPainter *painter,
+                                        const QWidget *widget) const;
+    bool drawPrimitiveFrameLineEdit(PrimitiveElement element,
+                                    const QStyleOption *option,
+                                    QPainter *painter,
+                                    const QWidget *widget) const;
+    bool drawPrimitivePanelLineEdit(PrimitiveElement element,
+                                    const QStyleOption *option,
+                                    QPainter *painter,
+                                    const QWidget *widget) const;
+    bool drawPrimitiveIndicatorDockWidgetResizeHandle(
+        PrimitiveElement element, const QStyleOption *option,
+        QPainter *painter, const QWidget *widget) const;
+    bool drawPrimitiveButtonTool(PrimitiveElement element,
+                                 const QStyleOption *option, QPainter *painter,
+                                 const QWidget *widget) const;
+    bool drawPrimitiveFrameDockWidget(PrimitiveElement element,
+                                      const QStyleOption *option,
+                                      QPainter *painter,
+                                      const QWidget *widget) const;
+    bool drawPrimitiveFrameStatusBarOrMenu(PrimitiveElement element,
+                                           const QStyleOption *option,
+                                           QPainter *painter,
+                                           const QWidget *widget) const;
+    bool drawPrimitiveFrameTabBarBase(PrimitiveElement element,
+                                      const QStyleOption *option,
+                                      QPainter *painter,
+                                      const QWidget *widget) const;
 
 private:
     mutable Options opts;
