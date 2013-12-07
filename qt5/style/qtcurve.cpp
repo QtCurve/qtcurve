@@ -413,7 +413,7 @@ Style::prePolish(QWidget *widget) const
     if (theThemedApp == APP_KWIN) {
         return;
     }
-    QtcWidgetPropsP props(widget);
+    QtcWidgetProps props(widget);
     // HACK:
     // Set TranslucentBackground properties on toplevel widgets before they
     // create native windows. These windows are typically shown after being
@@ -2386,7 +2386,7 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
                    BGND_DIALOG == type ? opts.dlgOpacity : opts.bgndOpacity);
     QRect bgndRect(widget->rect());
     QRect imgRect(bgndRect);
-    QtcWidgetPropsP props(widget);
+    QtcWidgetProps props(widget);
 
     if (100 != opacity && !(qobject_cast<const QMdiSubWindow*>(widget) ||
                             Utils::hasAlphaChannel(window))) {

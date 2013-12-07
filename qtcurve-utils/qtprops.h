@@ -27,8 +27,8 @@
 #include <QVariant>
 #include <QMdiSubWindow>
 
-struct QtcWidgetProps {
-    QtcWidgetProps():
+struct _QtcWidgetProps {
+    _QtcWidgetProps():
         opacity(100),
         prePolished(false),
         prePolishStarted(false)
@@ -38,33 +38,27 @@ struct QtcWidgetProps {
     bool prePolished: 1;
     bool prePolishStarted: 1;
 };
-Q_DECLARE_METATYPE(QSharedPointer<QtcWidgetProps>)
+Q_DECLARE_METATYPE(QSharedPointer<_QtcWidgetProps>)
 
-QTC_ALWAYS_INLINE static inline QSharedPointer<QtcWidgetProps>
+QTC_ALWAYS_INLINE static inline QSharedPointer<_QtcWidgetProps>
 qtcGetWidgetProps(const QWidget *w)
 {
+    // use _q_ to mimic qt internal properties and suppress QtDesigner
+    // warning about unsupported properties.
     QVariant val(w->property("_q__QTCURVE_WIDGET_PROPERTIES__"));
     if (!val.isValid()) {
-        val = QVariant::fromValue(QSharedPointer<QtcWidgetProps>(
-                                      new QtcWidgetProps));
+        val = QVariant::fromValue(QSharedPointer<_QtcWidgetProps>(
+                                      new _QtcWidgetProps));
         const_cast<QWidget*>(w)->setProperty(
             "_q__QTCURVE_WIDGET_PROPERTIES__", val);
     }
-    return val.value<QSharedPointer<QtcWidgetProps> >();
+    return val.value<QSharedPointer<_QtcWidgetProps> >();
 }
 
-class QtcWidgetPropsP {
+class QtcWidgetProps {
 public:
-    QtcWidgetPropsP(const QWidget *widget): w(widget), p(0) {}
-    inline QtcWidgetProps&
-    operator*() const
-    {
-        if (!p) {
-            p = qtcGetWidgetProps(w);
-        }
-        return *p;
-    }
-    inline QtcWidgetProps*
+    QtcWidgetProps(const QWidget *widget): w(widget), p(0) {}
+    inline _QtcWidgetProps*
     operator->() const
     {
         if (!p && w) {
@@ -74,18 +68,23 @@ public:
     }
 private:
     const QWidget *w;
-    mutable QSharedPointer<QtcWidgetProps> p;
+    mutable QSharedPointer<_QtcWidgetProps> p;
 };
 
 static inline int
 qtcGetOpacity(const QWidget *widget)
 {
     for (const QWidget *w = widget;w;w = w->parentWidget()) {
-        QtcWidgetPropsP props(w);
+        QtcWidgetProps props(w);
+        if (qobject_cast<const QMdiSubWindow*>(w)) {
+            // don't use opacity on QMdiSubWindow menu for now, as it will
+            // draw through the background as well.
+            return 100;
+        }
         if (props->opacity < 100) {
             return props->opacity;
         }
-        if (w->isWindow() || qobject_cast<const QMdiSubWindow*>(w)) {
+        if (w->isWindow()) {
             break;
         }
     }

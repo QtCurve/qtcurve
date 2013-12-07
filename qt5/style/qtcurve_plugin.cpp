@@ -45,7 +45,7 @@ qtcEventCallback(void **cbdata)
         return false;
     QWidget *widget = qtcToWidget(receiver);
     QEvent *event = (QEvent*)cbdata[1];
-    QtcWidgetPropsP props(widget);
+    QtcWidgetProps props(widget);
     if (qtcUnlikely(widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
                     (!qtcGetWid(widget) || props->prePolishStarted))) {
         if (Style *style = qtcGetStyle(widget)) {

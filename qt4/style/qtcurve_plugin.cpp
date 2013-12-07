@@ -103,7 +103,7 @@ qtcEventCallback(void **cbdata)
     if (qtcUnlikely(!receiver))
         return false;
     QWidget *widget = qtcToWidget(receiver);
-    QtcWidgetPropsP props(widget);
+    QtcWidgetProps props(widget);
     QEvent *event = (QEvent*)cbdata[1];
     if (qtcUnlikely(widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
                     (!qtcGetWid(widget) || props->prePolishStarted))) {
