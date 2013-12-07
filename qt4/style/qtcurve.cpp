@@ -3769,11 +3769,12 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
     }
 #endif
     case PE_Widget:
+        // TODO: handle widget == NULL
         if (widget && widget->testAttribute(Qt::WA_StyledBackground) &&
            ((!widget->testAttribute(Qt::WA_NoSystemBackground) &&
              (qtcIsDialog(widget) || qtcIsWindow(widget)) &&
              widget->isWindow()) ||
-            (qobject_cast<const QMdiSubWindow*>(widget)))) {
+            qobject_cast<const QMdiSubWindow*>(widget))) {
             bool isDialog = qobject_cast<const QDialog*>(widget);
 
             if (qtcIsCustomBgnd(&opts) || itsIsPreview ||
@@ -3781,7 +3782,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                 (!isDialog && opts.bgndOpacity != 100)) {
                 painter->save();
                 // Blur and shadow here?
-                if (!qobject_cast<const QMdiSubWindow*>(widget))
+                if (!(widget && qobject_cast<const QMdiSubWindow*>(widget)))
                     painter->setCompositionMode(
                         QPainter::CompositionMode_Source);
                 drawBackground(painter, widget,
@@ -8149,12 +8150,13 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                         else
                             fr.rect.adjust(3, 3, -3, -3);
 
-#if QT_VERSION >= 0x040300
-                        if (toolbutton->features & QStyleOptionToolButton::MenuButtonPopup)
-#else
-                        if (toolbutton->features & QStyleOptionToolButton::Menu)
-#endif
-                            fr.rect.adjust(0, 0, -(pixelMetric(QStyle::PM_MenuButtonIndicator, toolbutton, widget)-1), 0);
+                        if (toolbutton->features &
+                            QStyleOptionToolButton::MenuButtonPopup) {
+                            fr.rect.adjust(
+                                0, 0, -(pixelMetric(
+                                            QStyle::PM_MenuButtonIndicator,
+                                            toolbutton, widget) - 1), 0);
+                        }
                     }
                     if(!(state&State_MouseOver && FULL_FOCUS && MO_NONE!=opts.coloredMouseOver))
                         drawPrimitive(PE_FrameFocusRect, &fr, painter, widget);
@@ -9638,9 +9640,8 @@ QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, con
             if (const QStyleOptionToolButton* tbOpt = qstyleoption_cast<const QStyleOptionToolButton*>(option))
             {
                 // Make Kate/KWrite's option toolbuton have the same size as the next/prev buttons...
-                if(widget && !getToolBar(widget) && !tbOpt->text.isEmpty() &&
-                   tbOpt->features&QStyleOptionToolButton::MenuButtonPopup)
-                {
+                if (widget && !getToolBar(widget) && !tbOpt->text.isEmpty() &&
+                   tbOpt->features & QStyleOptionToolButton::MenuButtonPopup) {
                     QStyleOptionButton btn;
 
                     btn.init(widget);
@@ -9656,7 +9657,8 @@ QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, con
                     newSize.setHeight(newSize.height()-4);
 
                 if (tbOpt->features & QStyleOptionToolButton::MenuButtonPopup)
-                    menuAreaWidth = pixelMetric(QStyle::PM_MenuButtonIndicator, option, widget);
+                    menuAreaWidth = pixelMetric(QStyle::PM_MenuButtonIndicator,
+                                                option, widget);
                 else if (tbOpt->features & QStyleOptionToolButton::HasMenu)
                     switch(tbOpt->toolButtonStyle)
                     {
