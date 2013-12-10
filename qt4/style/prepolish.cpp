@@ -28,6 +28,8 @@
 #include <QMainWindow>
 #include <QDialog>
 #include <QX11Info>
+#include <QApplication>
+#include <QDesktopWidget>
 
 // Copied from qt_x11_p.h.
 // This is not part of the public API but should be stable enough to use
@@ -50,53 +52,114 @@ namespace QtCurve {
 
 // Access protected functions.
 struct QtcX11Info: public QX11Info {
-    static inline QtcX11Info*
-    getInfo(const QWidget *w)
-    {
-        return static_cast<QtcX11Info*>(const_cast<QX11Info*>(&w->x11Info()));
-    }
-    // Qt uses XCreateSimpleWindow when defaultVisual and defaultColormap
-    // are true. This confuses QGLWidget when recreating window caused by
-    // reparenting to a widget with different depth, result in a mismatch
-    // in x11info and native window.
-    inline void
-    fixVisual()
-    {
-        if (qtcUnlikely(!x11data))
-            setX11Data(getX11Data(true));
-        x11data->defaultVisual = false;
-        x11data->defaultColormap = false;
-    }
+    static bool creatingDummy;
+    static QtcX11Info *getInfo(const QWidget *w);
+    QWidget *getRgbaDummy();
+    QWidget *getRgbDummy();
+    void fixVisual();
+    void setRgba(bool rgba=true);
 };
+bool QtcX11Info::creatingDummy = false;
+
+inline QtcX11Info*
+QtcX11Info::getInfo(const QWidget *w)
+{
+    return static_cast<QtcX11Info*>(const_cast<QX11Info*>(&w->x11Info()));
+}
+
+// Qt uses XCreateSimpleWindow when defaultVisual and defaultColormap
+// are true. This confuses QGLWidget when recreating window caused by
+// reparenting to a widget with different depth, result in a mismatch
+// in x11info and native window.
+inline void
+QtcX11Info::fixVisual()
+{
+    if (qtcUnlikely(!x11data))
+        setX11Data(getX11Data(true));
+    x11data->defaultVisual = false;
+    x11data->defaultColormap = false;
+}
+
+inline QWidget*
+QtcX11Info::getRgbaDummy()
+{
+    static QWidget **rgbaDummies = NULL;
+    creatingDummy = true;
+    QDesktopWidget *desktop = qApp->desktop();
+    int screenCount = desktop->screenCount();
+    int screen = this->screen();
+    if (qtcUnlikely(!rgbaDummies))
+        rgbaDummies = (QWidget**)calloc(screenCount, sizeof(QWidget*));
+    if (qtcUnlikely(!rgbaDummies[screen])) {
+        rgbaDummies[screen] = new QWidget(desktop->screen(screen));
+        rgbaDummies[screen]->setAttribute(Qt::WA_TranslucentBackground);
+        rgbaDummies[screen]->setAttribute(Qt::WA_WState_Polished);
+        rgbaDummies[screen]->winId();
+    }
+    creatingDummy = false;
+    return rgbaDummies[screen];
+}
+
+inline QWidget*
+QtcX11Info::getRgbDummy()
+{
+    static QWidget **rgbDummies = NULL;
+    creatingDummy = true;
+    QDesktopWidget *desktop = qApp->desktop();
+    int screenCount = desktop->screenCount();
+    int screen = this->screen();
+    if (qtcUnlikely(!rgbDummies))
+        rgbDummies = (QWidget**)calloc(screenCount, sizeof(QWidget*));
+    if (qtcUnlikely(!rgbDummies[screen])) {
+        rgbDummies[screen] = new QWidget(desktop->screen(screen));
+        rgbDummies[screen]->setAttribute(Qt::WA_WState_Polished);
+        rgbDummies[screen]->winId();
+    }
+    creatingDummy = false;
+    return rgbDummies[screen];
+}
+
+inline void
+QtcX11Info::setRgba(bool rgba)
+{
+    setX11Data(getInfo(rgba ? getRgbaDummy() : getRgbDummy())->x11data);
+}
 
 __attribute__((hot)) void
 Style::prePolish(QWidget *widget) const
 {
-    if (theThemedApp == APP_KWIN) {
+    if (QtcX11Info::creatingDummy || !widget || theThemedApp == APP_KWIN) {
         return;
     }
 
-    if (widget)
-        QtcX11Info::getInfo(widget)->fixVisual();
+    QtcX11Info *x11Info = QtcX11Info::getInfo(widget);
     QtcWidgetProps props(widget);
+    // Don't use XCreateSimpleWindow
+    x11Info->fixVisual();
     // HACK:
-    // Set TranslucentBackground properties on toplevel widgets before they
-    // create native windows. These windows are typically shown after being
+    // Modify X11Info of toplevel widgets before they create native windows.
+    // This way we won't interfere with widgets that set this property
+    // themselves, e.g. plasma, kscreenlock.
+    // We do this on windows that are typically shown right after being
     // created before entering the main loop and therefore do not have a
-    // chance to be polished before creating window id.
+    // chance to be polished before creating window id. In this way, we can
+    // avoid recreating native window which breaks a lot of applications.
     // This way should work for all applicaitons except when the applicaiton
     // relies on a native RGB window since the children of a RGBA window in
-    // Qt are usually also RGBA (Note that gl widget works because it is
-    // treated differently in Qt). The only example of such application I have
-    // found so far is kaffeine. See workaround bellow.
+    // Qt are usually also RGBA. The only example of such application I have
+    // found so far is kaffeine. See workaround bellow. (NOTE: gl widget works
+    // because it is treated differently in Qt) (NOTE2: gl widget will not work
+    // straightforwardly when reparenting to a 32bit window due to a bug in
+    // Qt4, which causes a 24bit x11info and 32bit gl window to be created
+    // The x11Info->fixVisual() above should work around it, too lazy to
+    // report upstream..... :-P).
 
     // TODO:
     //     use all informations to check if a widget should be transparent.
     //     Maybe we can also do sth to their parents' and/or children as well
-    if (widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
+    if (!widget->testAttribute(Qt::WA_WState_Polished) &&
         !(widget->windowFlags() & Qt::MSWindowsOwnDC) &&
-        (!qtcGetWid(widget) || props->prePolishStarted) &&
-        !props->prePolished) {
+        !qtcGetWid(widget) && !props->prePolished) {
         // Skip MSWindowsOwnDC since it is set for QGLWidget and not likely to
         // be used in other cases.
 
@@ -110,9 +173,8 @@ Style::prePolish(QWidget *widget) const
         // window.
         if (opts.bgndOpacity != 100 && widget->inherits("MediaWidget")) {
             widget->setAttribute(Qt::WA_DontCreateNativeAncestors);
-            widget->setAttribute(Qt::WA_TranslucentBackground, false);
             widget->setAttribute(Qt::WA_NativeWindow);
-            if (widget->depth() == 24 && !qtcGetWid(widget)) {
+            if (!qtcGetWid(widget)) {
                 props->prePolished = true;
                 // Kaffeine set parent back after children window has been
                 // created.
@@ -124,37 +186,13 @@ Style::prePolish(QWidget *widget) const
         // the result of qobject_cast may change if we are called in
         // constructor (which is usually the case we want here) so we only
         // set the prePolished property if we have done something.
-        if ((opts.bgndOpacity != 100 && qobject_cast<QMainWindow*>(widget)) ||
-            (opts.dlgOpacity != 100 && (qobject_cast<QDialog*>(widget) ||
-                                        qtcIsDialog(widget)))) {
+        if ((opts.bgndOpacity != 100 && (qtcIsWindow(widget) ||
+                                         qtcIsToolTip(widget))) ||
+            (opts.dlgOpacity != 100 && qtcIsDialog(widget))) {
             props->prePolished = true;
-            widget->setAttribute(Qt::WA_StyledBackground);
-            widget->setAttribute(Qt::WA_TranslucentBackground);
-            // WA_TranslucentBackground also sets Qt::WA_NoSystemBackground
-            // Set it back here.
-            widget->setAttribute(Qt::WA_NoSystemBackground, false);
+            x11Info->setRgba();
             // Set this for better efficiency for now
             widget->setAutoFillBackground(false);
-        } else if (opts.bgndOpacity != 100) {
-            // TODO: Translucent tooltips, check popup/spash screen etc.
-            if (qtcIsWindow(widget) || qtcIsToolTip(widget)) {
-                if (!widget->testAttribute(Qt::WA_TranslucentBackground)) {
-                    // TODO: should probably set this one in polish
-                    //       where we have full information about the widget.
-                    props->prePolishStarted = true;
-                    widget->setAttribute(Qt::WA_StyledBackground);
-                    widget->setAttribute(Qt::WA_TranslucentBackground);
-                    // WA_TranslucentBackground also sets
-                    // Qt::WA_NoSystemBackground Set it back here.
-                    widget->setAttribute(Qt::WA_NoSystemBackground, false);
-                    // Set this for better efficiency for now
-                    widget->setAutoFillBackground(false);
-                }
-            } else if (widget->testAttribute(Qt::WA_TranslucentBackground) &&
-                       props->prePolishStarted) {
-                widget->setAttribute(Qt::WA_StyledBackground, false);
-                widget->setAttribute(Qt::WA_TranslucentBackground, false);
-            }
         }
     }
 }
