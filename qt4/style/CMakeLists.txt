@@ -3,6 +3,7 @@ set(qtcurve_SRCS
   qtcurve_plugin.cpp
   windowmanager.cpp
   blurhelper.cpp
+  prepolish.cpp
   utils.cpp
   shortcuthandler.cpp)
 set(qtcurve_MOC_HDRS
