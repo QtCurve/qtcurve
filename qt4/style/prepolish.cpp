@@ -24,10 +24,50 @@
 #include <qtcurve-utils/qtprops.h>
 
 #include "qtcurve_p.h"
+
 #include <QMainWindow>
 #include <QDialog>
+#include <QX11Info>
+
+// Copied from qt_x11_p.h.
+// This is not part of the public API but should be stable enough to use
+// because it had never changed since the first git commit of Qt.
+struct QX11InfoData {
+    uint ref;
+    int screen;
+    int dpiX;
+    int dpiY;
+    int depth;
+    int cells;
+    unsigned long colormap;
+    void *visual;
+    bool defaultColormap;
+    bool defaultVisual;
+    int subpixel;
+};
 
 namespace QtCurve {
+
+// Access protected functions.
+struct QtcX11Info: public QX11Info {
+    static inline QtcX11Info*
+    getInfo(const QWidget *w)
+    {
+        return static_cast<QtcX11Info*>(const_cast<QX11Info*>(&w->x11Info()));
+    }
+    // Qt uses XCreateSimpleWindow when defaultVisual and defaultColormap
+    // are true. This confuses QGLWidget when recreating window caused by
+    // reparenting to a widget with different depth, result in a mismatch
+    // in x11info and native window.
+    inline void
+    fixVisual()
+    {
+        if (qtcUnlikely(!x11data))
+            setX11Data(getX11Data(true));
+        x11data->defaultVisual = false;
+        x11data->defaultColormap = false;
+    }
+};
 
 __attribute__((hot)) void
 Style::prePolish(QWidget *widget) const
@@ -36,6 +76,8 @@ Style::prePolish(QWidget *widget) const
         return;
     }
 
+    if (widget)
+        QtcX11Info::getInfo(widget)->fixVisual();
     QtcWidgetProps props(widget);
     // HACK:
     // Set TranslucentBackground properties on toplevel widgets before they
