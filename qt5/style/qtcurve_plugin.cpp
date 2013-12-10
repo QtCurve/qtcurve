@@ -44,8 +44,7 @@ qtcEventCallback(void **cbdata)
     if (qtcUnlikely(!receiver))
         return false;
     QEvent *event = (QEvent*)cbdata[1];
-    if (qtcUnlikely(event &&
-                    event->type() == QEvent::DynamicPropertyChange)) {
+    if (qtcUnlikely(event->type() == QEvent::DynamicPropertyChange)) {
         QDynamicPropertyChangeEvent *prop_event =
             static_cast<QDynamicPropertyChangeEvent*>(event);
         // ignore the property change events from ourselves
