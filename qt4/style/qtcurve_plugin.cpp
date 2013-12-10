@@ -103,8 +103,7 @@ qtcEventCallback(void **cbdata)
     if (qtcUnlikely(!receiver))
         return false;
     QEvent *event = (QEvent*)cbdata[1];
-    if (qtcUnlikely(event &&
-                    event->type() == QEvent::DynamicPropertyChange)) {
+    if (qtcUnlikely(event->type() == QEvent::DynamicPropertyChange)) {
         QDynamicPropertyChangeEvent *prop_event =
             static_cast<QDynamicPropertyChangeEvent*>(event);
         // ignore the property change events from ourselves
@@ -113,14 +112,15 @@ qtcEventCallback(void **cbdata)
         }
     }
     QWidget *widget = qtcToWidget(receiver);
-    QtcWidgetProps props(widget);
-    if (qtcUnlikely(widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
-                    (!qtcGetWid(widget) || props->prePolishStarted))) {
+    if (!widget)
+        return false;
+    if (qtcUnlikely(!widget->testAttribute(Qt::WA_WState_Polished) &&
+                    !qtcGetWid(widget))) {
         if (Style *style = qtcGetStyle(widget)) {
             style->prePolish(widget);
         }
-    } else if (widget && event->type() == QEvent::UpdateRequest) {
-        props->opacity = 100;
+    } else if (event->type() == QEvent::UpdateRequest) {
+        QtcWidgetProps(widget)->opacity = 100;
     }
     return false;
 }
