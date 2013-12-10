@@ -19,9 +19,7 @@
 7. Remove most application hacks if not all.
 8. PyQt5, Musescore and (occasionally) QtCreator seg fault on exit in a QtDBus
    destructor even when QtCurve is not linked to QtDBus.
-9. KScreenLocker has rendering problems.
-10. QtCurve preference background blur has some problem
-11. combobox list background no blur.
-12. QtQuickControl is a mess...
-13. Plasma Kickoff (in panel) scrollbar has transparent background...
-14. kscreensaver and kmix has wrong background drawn.
+9. QtCurve preference background blur has some problem
+10. combobox list background no blur.
+11. QtQuickControl is a mess...
+12. Plasma Kickoff (in panel) scrollbar has transparent background...

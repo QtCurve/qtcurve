@@ -19,6 +19,7 @@
     background is enabled for gtk.
 14. Fix (workaround) kaffeine with translucent background.
 15. Remove parentless dialog fix
+16. Fix kscreenlocker. Second version of prepolishing
 
 ## 1.8.17
 1. **Add Qt5 support!!**.
