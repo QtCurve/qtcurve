@@ -440,11 +440,6 @@ setStyleRecursive(QWidget *w, QStyle *s, int minSize)
     }
 }
 
-//
-// OK, Etching looks cr*p on plasma widgets, and khtml...
-// CPD:TODO WebKit?
-static QSet<const QWidget*> theNoEtchWidgets;
-
 static bool isA(const QObject *w, const char *type)
 {
     return w && (0==strcmp(w->metaObject()->className(), type) || (w->parent() && 0==strcmp(w->parent()->metaObject()->className(), type)));
@@ -1614,9 +1609,7 @@ Style::polish(QWidget *widget)
 
     if (EFFECT_NONE != opts.buttonEffect && !USE_CUSTOM_ALPHAS(opts) &&
         isNoEtchWidget(widget)) {
-        theNoEtchWidgets.insert(static_cast<const QWidget*>(widget));
-        connect(widget, SIGNAL(destroyed(QObject*)),
-                this, SLOT(widgetDestroyed(QObject*)));
+        qtcProps->noEtch = true;
     }
 
     itsWindowManager->registerWidget(widget);
@@ -2213,13 +2206,6 @@ void Style::unpolish(QWidget *widget)
 {
     if (!widget)
         return;
-
-    if (EFFECT_NONE != opts.buttonEffect && theNoEtchWidgets.contains(widget)) {
-        theNoEtchWidgets.remove(static_cast<const QWidget*>(widget));
-        disconnect(widget, SIGNAL(destroyed(QObject*)),
-                   this, SLOT(widgetDestroyed(QObject*)));
-    }
-
     itsWindowManager->unregisterWidget(widget);
 #ifdef QTC_ENABLE_X11
     itsShadowHelper->unregisterWidget(widget);
@@ -4067,21 +4053,26 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                             ((opts.square&SQUARE_SCROLLVIEW) && (kateView || kontactPreview))),
                         squareSv(sv && ((opts.square&SQUARE_SCROLLVIEW) || (widget && widget->isWindow()))),
                         inQAbstractItemView(widget && widget->parentWidget() && isInQAbstractItemView(widget->parentWidget()));
+                    QtcWidgetProps props(widget);
 
-                    if(sv && (opts.etchEntry || squareSv || isOOWidget(widget)))
-                    {
+                    if (sv && (opts.etchEntry || squareSv ||
+                               isOOWidget(widget))) {
                         // For some reason, in KPackageKit, the KTextBrower when polished is not in the scrollview,
                         // but is when painted. So check here if it should not be etched.
                         // Also, see not in getLowerEtchCol()
-                        if(DO_EFFECT && !USE_CUSTOM_ALPHAS(opts) && widget && widget->parentWidget() &&
-                            !theNoEtchWidgets.contains(widget) && inQAbstractItemView)
-                            theNoEtchWidgets.insert(widget);
+                        if (DO_EFFECT && !USE_CUSTOM_ALPHAS(opts) && widget &&
+                            widget->parentWidget() &&
+                            !props->noEtch && inQAbstractItemView) {
+                            props->noEtch = true;
+                        }
 
                         // If we are set to have sunken scrollviews, then the frame width is set to 3.
                         // ...but it we are a scrollview within a scrollview, then we dont draw sunken, therefore
                         // need to draw inner border...
-                        bool doEtch=DO_EFFECT && opts.etchEntry,
-                             noEtchW=doEtch && !USE_CUSTOM_ALPHAS(opts) && theNoEtchWidgets.contains(widget);
+                        bool doEtch = DO_EFFECT && opts.etchEntry;
+                        bool noEtchW = (doEtch &&
+                                        !USE_CUSTOM_ALPHAS(opts) &&
+                                        props->noEtch);
 
                         if(doEtch && noEtchW)
                         {
@@ -13298,23 +13289,22 @@ void Style::shade(const QColor &ca, QColor *cb, double k) const
 
 QColor Style::getLowerEtchCol(const QWidget *widget) const
 {
-    if(USE_CUSTOM_ALPHAS(opts))
-    {
+    if (USE_CUSTOM_ALPHAS(opts)) {
         QColor col(Qt::white);
         col.setAlphaF(opts.customAlphas[ALPHA_ETCH_LIGHT]);
         return col;
     }
 
-    if(qtcIsFlatBgnd(opts.bgndAppearance))
-    {
-        bool doEtch=widget && widget->parentWidget() && !theNoEtchWidgets.contains(widget);
-// CPD: Don't really want to check here for every widget, when (so far) on problem seems to be in
-// KPackageKit, and thats with its KTextBrowser - so just check when we draw scrollviews...
-//     if(doEtch && isInQAbstractItemView(widget->parentWidget()))
-//     {
-//         doEtch=false;
-//         theNoEtchWidgets.insert(widget);
-//     }
+    QtcWidgetProps props(widget);
+    if (qtcIsFlatBgnd(opts.bgndAppearance)) {
+        bool doEtch = widget && widget->parentWidget() && !props->noEtch;
+        // CPD: Don't really want to check here for every widget, when
+        // (so far) on problem seems to be in KPackageKit, and thats with
+        // its KTextBrowser - so just check when we draw scrollviews...
+        // if (doEtch && isInQAbstractItemView(widget->parentWidget())) {
+        //     doEtch = false;
+        //     props->noEtch = true;
+        // }
 
         if(doEtch)
         {
@@ -13355,10 +13345,8 @@ int Style::getFrameRound(const QWidget *widget) const
 
 void Style::widgetDestroyed(QObject *o)
 {
-    QWidget *w=static_cast<QWidget*>(o);
-    theNoEtchWidgets.remove(w);
-    if(APP_KONTACT==theThemedApp)
-    {
+    QWidget *w = static_cast<QWidget*>(o);
+    if (APP_KONTACT == theThemedApp) {
         itsSViewContainers.remove(w);
         QMap<QWidget*, QSet<QWidget*> >::Iterator it(itsSViewContainers.begin());
         QMap<QWidget*, QSet<QWidget*> >::Iterator end(itsSViewContainers.end());

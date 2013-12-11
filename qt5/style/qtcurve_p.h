@@ -98,7 +98,6 @@ typedef enum {
 } WindowsStyleConsts;
 
 extern QtcThemedApp theThemedApp;
-extern QSet<const QWidget*> theNoEtchWidgets;
 
 static inline bool
 isOOWidget(const QWidget *widget)

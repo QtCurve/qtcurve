@@ -21,7 +21,7 @@
  *****************************************************************************/
 
 #include "qtcurve_p.h"
-#include <qtcurve-utils/qtutils.h>
+#include <qtcurve-utils/qtprops.h>
 
 #include <QMdiSubWindow>
 #include <QTreeView>
@@ -552,15 +552,15 @@ Style::drawPrimitiveFrame(PrimitiveElement element,
                  isInQAbstractItemView(widget->parentWidget()));
 
             if (sv && (opts.etchEntry || squareSv || isOOWidget(widget))) {
+                QtcWidgetProps props(widget);
                 // For some reason, in KPackageKit, the KTextBrower when
                 // polished is not in the scrollview, but is when painted.
                 // So check here if it should not be etched.
                 // Also, see not in getLowerEtchCol()
                 if (DO_EFFECT && !USE_CUSTOM_ALPHAS(opts) && widget &&
-                    widget->parentWidget() &&
-                    !theNoEtchWidgets.contains(widget) &&
+                    widget->parentWidget() && !props->noEtch &&
                     inQAbstractItemView) {
-                    theNoEtchWidgets.insert(widget);
+                    props->noEtch = true;
                 }
                 // If we are set to have sunken scrollviews, then the frame
                 // width is set to 3. ...but it we are a scrollview within
@@ -568,7 +568,7 @@ Style::drawPrimitiveFrame(PrimitiveElement element,
                 // need to draw inner border...
                 bool doEtch = DO_EFFECT && opts.etchEntry;
                 bool noEtchW = (doEtch && !USE_CUSTOM_ALPHAS(opts) &&
-                                theNoEtchWidgets.contains(widget));
+                                props->noEtch);
                 if (doEtch && noEtchW) {
                     painter->setPen(palette.brush(QPalette::Base).color());
                     drawRect(painter, r.adjusted(2, 2, -2, -2));

@@ -32,13 +32,17 @@ struct _QtcWidgetProps {
         opacity(100),
         prePolished(false),
         prePolishStarted(false),
-        shadowRegistered(false)
+        shadowRegistered(false),
+        noEtch(false)
     {
     }
     int opacity;
     bool prePolished: 1;
     bool prePolishStarted: 1;
     bool shadowRegistered: 1;
+    // OK, Etching looks cr*p on plasma widgets, and khtml...
+    // CPD:TODO WebKit?
+    bool noEtch: 1;
 };
 Q_DECLARE_METATYPE(QSharedPointer<_QtcWidgetProps>)
 

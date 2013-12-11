@@ -359,9 +359,7 @@ void Style::polish(QWidget *widget)
 
     if (EFFECT_NONE != opts.buttonEffect &&
         !USE_CUSTOM_ALPHAS(opts) && isNoEtchWidget(widget)) {
-        theNoEtchWidgets.insert(static_cast<const QWidget*>(widget));
-        connect(widget, &QWidget::destroyed,
-                this, &Style::widgetDestroyed);
+        qtcProps->noEtch = true;
     }
 
     itsWindowManager->registerWidget(widget);
@@ -815,13 +813,6 @@ void Style::unpolish(QWidget *widget)
 {
     if (!widget)
         return;
-
-    if (EFFECT_NONE != opts.buttonEffect && theNoEtchWidgets.contains(widget)) {
-        theNoEtchWidgets.remove(static_cast<const QWidget*>(widget));
-        disconnect(widget, &QWidget::destroyed,
-                   this, &Style::widgetDestroyed);
-    }
-
     itsWindowManager->unregisterWidget(widget);
 #ifdef QTC_ENABLE_X11
     itsShadowHelper->unregisterWidget(widget);
