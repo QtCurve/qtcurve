@@ -56,8 +56,7 @@
 #include <QEvent>
 
 #include <qtcurve-utils/x11shadow.h>
-#include <qtcurve-utils/qtutils.h>
-#include <qtcurve-utils/log.h>
+#include <qtcurve-utils/qtprops.h>
 
 namespace QtCurve {
 const char *const ShadowHelper::netWMForceShadowPropertyName =
@@ -65,70 +64,44 @@ const char *const ShadowHelper::netWMForceShadowPropertyName =
 const char *const ShadowHelper::netWMSkipShadowPropertyName =
     "_KDE_NET_WM_SKIP_SHADOW";
 
-//_______________________________________________________
-bool ShadowHelper::registerWidget(QWidget* widget, bool force)
+bool
+ShadowHelper::registerWidget(QWidget *widget, bool force)
 {
+    QtcWidgetProps props(widget);
     // make sure widget is not already registered
-    if (_widgets.contains(widget)) {
+    if (props->shadowRegistered)
         return false;
-    }
-
     // check if widget qualifies
-    if (!(force || acceptWidget(widget))) {
+    if (!(force || acceptWidget(widget)))
         return false;
-    }
+    props->shadowRegistered = true;
 
-    // store in map and add destroy signal connection
+    // WinIdChange Event
     widget->installEventFilter(this);
-    _widgets.insert(widget, 0);
-
-    /*
-      need to install shadow directly when widget "created" state is already set
-      since WinID changed is never called when this is the case
-    */
-    if (installX11Shadows(widget)) {
-        _widgets.insert(widget, widget->internalWinId());
-    }
-
-    connect(widget, SIGNAL(destroyed(QObject*)),
-            SLOT(objectDeleted(QObject*)));
+    installX11Shadows(widget);
     return true;
 }
 
-//_______________________________________________________
-void ShadowHelper::unregisterWidget( QWidget* widget )
+void
+ShadowHelper::unregisterWidget(QWidget *widget)
 {
-    if (_widgets.remove(widget)) {
+    QtcWidgetProps props(widget);
+    if (props->shadowRegistered) {
         uninstallX11Shadows(widget);
+        props->shadowRegistered = false;
     }
 }
 
-//_______________________________________________________
-bool ShadowHelper::eventFilter(QObject* object, QEvent* event)
+bool
+ShadowHelper::eventFilter(QObject *object, QEvent *event)
 {
-    // check event type
-    if (event->type() != QEvent::WinIdChange)
-        return false;
-
-    // cast widget
-    QWidget *widget(static_cast<QWidget*>(object));
-
-    // install shadows and update winId
-    if (installX11Shadows(widget)) {
-        _widgets.insert(widget, widget->internalWinId());
-    }
-
+    if (event->type() == QEvent::WinIdChange)
+        installX11Shadows(static_cast<QWidget*>(object));
     return false;
 }
 
-//_______________________________________________________
-void ShadowHelper::objectDeleted(QObject *object)
-{
-    _widgets.remove(static_cast<QWidget*>(object));
-}
-
-//_______________________________________________________
-bool ShadowHelper::acceptWidget(QWidget* widget) const
+bool
+ShadowHelper::acceptWidget(QWidget *widget) const
 {
     if (widget->property(netWMSkipShadowPropertyName).toBool())
         return false;

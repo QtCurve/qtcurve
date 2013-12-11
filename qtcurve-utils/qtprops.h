@@ -31,12 +31,14 @@ struct _QtcWidgetProps {
     _QtcWidgetProps():
         opacity(100),
         prePolished(false),
-        prePolishStarted(false)
+        prePolishStarted(false),
+        shadowRegistered(false)
     {
     }
     int opacity;
     bool prePolished: 1;
     bool prePolishStarted: 1;
+    bool shadowRegistered: 1;
 };
 Q_DECLARE_METATYPE(QSharedPointer<_QtcWidgetProps>)
 

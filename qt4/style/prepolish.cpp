@@ -170,6 +170,7 @@ Style::prePolish(QWidget *widget) const
         // case, Qt does not create recreate the children window. This seems to
         // be the only way in Qt4 to have a RGB non-OpenGL window in a RGBA
         // window.
+        // TODO: maybe we can hack around parent x11info
         if (opts.bgndOpacity != 100 && widget->inherits("MediaWidget")) {
             widget->setAttribute(Qt::WA_DontCreateNativeAncestors);
             widget->setAttribute(Qt::WA_NativeWindow);

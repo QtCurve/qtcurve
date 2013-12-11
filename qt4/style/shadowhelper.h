@@ -55,50 +55,42 @@
 #include <qwindowdefs.h>
 
 namespace QtCurve {
-// ! handle shadow pixmaps passed to window manager via X property
+//! handle shadow pixmaps passed to window manager via X property
 class ShadowHelper: public QObject {
     Q_OBJECT
 public:
-    // !@name property names
-    static const char*const netWMForceShadowPropertyName;
-    static const char*const netWMSkipShadowPropertyName;
-    // ! constructor
+    //!@name property names
+    static const char *const netWMForceShadowPropertyName;
+    static const char *const netWMSkipShadowPropertyName;
+    //! constructor
     ShadowHelper(QObject *parent): QObject(parent)
     {
     }
 
-    // ! destructor
+    //! destructor
     virtual
     ~ShadowHelper()
     {
     }
 
-    // ! register widget
+    //! register widget
     bool registerWidget(QWidget*, bool force=false);
 
-    // ! unregister widget
+    //! unregister widget
     void unregisterWidget(QWidget*);
 
-    // ! event filter
-    virtual bool eventFilter(QObject*, QEvent*);
-
-protected Q_SLOTS:
-    // ! unregister widget
-    void objectDeleted(QObject*);
+    //! event filter
+    virtual bool eventFilter(QObject*, QEvent*) override;
 
 protected:
-    // ! accept widget
+    //! accept widget
     bool acceptWidget(QWidget*) const;
 
-    // ! install shadow X11 property on given widget
+    //! install shadow X11 property on given widget
     bool installX11Shadows(QWidget*);
 
-    // ! uninstall shadow X11 property on given widget
+    //! uninstall shadow X11 property on given widget
     void uninstallX11Shadows(QWidget*) const;
-
-private:
-    // ! set of registered widgets
-    QMap<QWidget*, WId> _widgets;
 };
 }
 

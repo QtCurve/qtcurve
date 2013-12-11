@@ -1660,7 +1660,7 @@ Style::polish(QWidget *widget)
             widget->setBackgroundRole(QPalette::NoRole);
         }
         if (widget->autoFillBackground() && widget->parentWidget() &&
-            "qt_scrollarea_viewport" == widget->parentWidget()->objectName() &&
+            widget->parentWidget()->objectName() == "qt_scrollarea_viewport" &&
             qtcCheckType0<QAbstractScrollArea>(widget->parentWidget()
                                                ->parentWidget()) && //grampa
             qtcCheckType0(widget->parentWidget()->parentWidget()
@@ -1679,8 +1679,7 @@ Style::polish(QWidget *widget)
     // Figuring out what's wrong.
     // Check what oxygen does to QMdiSubWindow
     // Check Qt5 version
-    if (// itsIsPreview &&
-        qobject_cast<QMdiSubWindow*>(widget))
+    if (qobject_cast<QMdiSubWindow*>(widget))
         widget->setAttribute(Qt::WA_StyledBackground);
 
     if (opts.menubarHiding && qobject_cast<QMainWindow*>(widget) &&
@@ -13361,22 +13360,23 @@ void Style::widgetDestroyed(QObject *o)
     if(APP_KONTACT==theThemedApp)
     {
         itsSViewContainers.remove(w);
-        QMap<QWidget *, QSet<QWidget*> >::Iterator it(itsSViewContainers.begin()),
-                                                    end(itsSViewContainers.end());
-        QSet<QWidget*>                             rem;
+        QMap<QWidget*, QSet<QWidget*> >::Iterator it(itsSViewContainers.begin());
+        QMap<QWidget*, QSet<QWidget*> >::Iterator end(itsSViewContainers.end());
+        QSet<QWidget*> rem;
 
-        for(; it!=end; ++it)
-        {
+        for (;it != end;++it) {
             (*it).remove(w);
-            if((*it).isEmpty())
+            if ((*it).isEmpty()) {
                 rem.insert(it.key());
+            }
         }
 
-        QSet<QWidget*>::ConstIterator r(rem.begin()),
-                                       remEnd(rem.end());
+        QSet<QWidget*>::ConstIterator r(rem.begin());
+        QSet<QWidget*>::ConstIterator remEnd(rem.end());
 
-        for(; r!=remEnd; ++r)
+        for (;r != remEnd;++r) {
             itsSViewContainers.remove(*r);
+        }
     }
 }
 

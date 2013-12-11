@@ -62,12 +62,16 @@ public:
     //!@name property names
     static const char *const netWMForceShadowPropertyName;
     static const char *const netWMSkipShadowPropertyName;
-
     //! constructor
-    ShadowHelper(QObject *parent): QObject(parent) {};
+    ShadowHelper(QObject *parent): QObject(parent)
+    {
+    }
 
     //! destructor
-    virtual ~ShadowHelper() {};
+    virtual
+    ~ShadowHelper()
+    {
+    }
 
     //! register widget
     bool registerWidget(QWidget*, bool force=false);
@@ -79,9 +83,6 @@ public:
     virtual bool eventFilter(QObject*, QEvent*) override;
 
 protected:
-    //! unregister widget
-    void objectDeleted(QObject*);
-
     //! accept widget
     bool acceptWidget(QWidget*) const;
 
@@ -90,12 +91,7 @@ protected:
 
     //! uninstall shadow X11 property on given widget
     void uninstallX11Shadows(QWidget*) const;
-
-private:
-    //! set of registered widgets
-    QMap<QWidget*, WId> _widgets;
 };
-
 }
 
 #endif
