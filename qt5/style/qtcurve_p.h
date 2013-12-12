@@ -63,10 +63,6 @@ static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
 #define STATE_DWT_BUTTON QStyle::StateFlag(0x20000000)
 #define STATE_TOGGLE_BUTTON QStyle::StateFlag(0x10000000)
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
-
 #define PIXMAP_DIMENSION 10
 
 // TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!

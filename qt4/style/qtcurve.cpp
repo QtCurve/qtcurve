@@ -280,10 +280,6 @@ drawTbArrow(const QStyle *style, const QStyleOptionToolButton *toolbutton,
 #define STATE_DWT_BUTTON    (QStyle::StateFlag)0x20000000
 #define STATE_TOGGLE_BUTTON (QStyle::StateFlag)0x10000000
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
-
 static const int constMenuPixmapWidth = 22;
 
 QtcThemedApp theThemedApp = APP_OTHER;

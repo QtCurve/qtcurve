@@ -28,8 +28,6 @@
 #include <common/common.h>
 #include "compatability.h"
 
-#define M_PI 3.14159265358979323846
-
 #if (CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 10, 0))
 #define CAIRO_GRAD_END 0.999
 #else
