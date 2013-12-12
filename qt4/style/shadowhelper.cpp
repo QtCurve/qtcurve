@@ -126,6 +126,12 @@ ShadowHelper::acceptWidget(QWidget *widget) const
     if (qobject_cast<QToolBar*>(widget) || qobject_cast<QDockWidget*>(widget))
         return true;
 
+    // Fix Lancelot main menu shadow. Somehow they sets the override the
+    // shadow of the main menu to nothing instead of the plasma one.
+    // Maybe I should submit a patch for lancelot later instead.
+    if (widget->inherits("LancelotWindow"))
+        return true;
+
     // reject
     return false;
 }
