@@ -20,6 +20,7 @@
 14. Fix (workaround) kaffeine with translucent background.
 15. Remove parentless dialog fix
 16. Fix kscreenlocker. Second version of prepolishing
+17. Improve shadow of QBalloonTip
 
 ## 1.8.17
 1. **Add Qt5 support!!**.

@@ -117,4 +117,20 @@ _qtcGetStyle(const C *obj)
 }
 #define qtcGetStyle(obj) _qtcGetStyle<Style>(obj)
 
+// Get the width and direction of the arrow in a QBalloonTip
+QTC_ALWAYS_INLINE static inline int
+qtcGetBalloonMargin(QWidget *widget, bool *atTop)
+{
+    int topMargin = 0;
+    int rightMargin = 0;
+    widget->getContentsMargins(NULL, &topMargin, &rightMargin, NULL);
+    if (topMargin > rightMargin) {
+        *atTop = true;
+        return topMargin - rightMargin;
+    } else {
+        *atTop = false;
+        return rightMargin - topMargin;
+    }
+}
+
 #endif

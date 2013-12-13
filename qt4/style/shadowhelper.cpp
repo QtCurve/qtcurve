@@ -117,9 +117,8 @@ ShadowHelper::acceptWidget(QWidget *widget) const
         return true;
 
     // tooltips
-    if ((widget->inherits("QTipLabel") ||
-         widget->windowType() == Qt::ToolTip) &&
-        !widget->inherits("Plasma::ToolTip"))
+    if ((widget->windowType() == Qt::ToolTip ||
+         widget->inherits("QTipLabel")) && !widget->inherits("Plasma::ToolTip"))
         return true;
 
     // detached widgets
@@ -140,7 +139,18 @@ bool
 ShadowHelper::installX11Shadows(QWidget *widget)
 {
     if (WId wid = qtcGetWid(widget)) {
-        qtcX11ShadowInstall(wid);
+        if (widget->windowType() == Qt::ToolTip &&
+            widget->inherits("QBalloonTip")) {
+            bool atTop = true;
+            int margin = qtcGetBalloonMargin(widget, &atTop);
+            int margins[4] = {0, 0, 0, 0};
+            // KWin's shadows margin order is top, right, bottom, left..
+            margins[atTop ? 0 : 1] = margin;
+            // TODO: no enough rounded corner
+            qtcX11ShadowInstallWithMargin(wid, margins);
+        } else {
+            qtcX11ShadowInstall(wid);
+        }
         return true;
     }
     return false;

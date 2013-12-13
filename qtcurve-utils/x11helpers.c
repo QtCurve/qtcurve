@@ -44,6 +44,13 @@
 static uint32_t shadow_pixmaps[8];
 static int shadow_size = 0;
 static uint32_t shadow_data_xcb[8 + 4];
+// Use XCB to set window property recieves BadWindow errors for menus in
+// Qt4 kpartsplugin here, probably because of the order of some pending
+// event/requests in Xlib. Calling XFlush() before xcb_change_property()
+// doesn't solve the problem for unknown reason but using XChangeProperty
+// works.
+// NOTE: XChangeProperty want `unsigned long` for format 32. So we need
+// two seperate data buffers.
 static unsigned long shadow_data_xlib[8 + 4];
 
 static xcb_pixmap_t
@@ -101,6 +108,37 @@ qtcX11ShadowDestroy()
 }
 
 QTC_EXPORT void
+qtcX11ShadowInstallWithMargin(xcb_window_t win, const int margins[4])
+{
+    if (qtcUnlikely(!win))
+        return;
+    if (qtcUnlikely(!margins)) {
+        qtcX11ShadowInstall(win);
+        return;
+    }
+    // In principle, I should check for _KDE_NET_WM_SHADOW in _NET_SUPPORTED.
+    // However, it's complicated and we will gain nothing.
+    Display *disp = qtcX11GetDisp();
+    xcb_atom_t atom = qtc_x11_kde_net_wm_shadow;
+    if (disp) {
+        unsigned long shadow_data[8 + 4];
+        memcpy(shadow_data, shadow_data_xlib, 12 * sizeof(unsigned long));
+        for (int i = 0;i < 4;i++)
+            shadow_data[i + 8] -= margins[i];
+        XChangeProperty(disp, win, atom, XA_CARDINAL, 32, PropModeReplace,
+                        (unsigned char*)shadow_data, 12);
+    } else {
+        uint32_t shadow_data[8 + 4];
+        memcpy(shadow_data, shadow_data_xcb, 12 * sizeof(uint32_t));
+        for (int i = 0;i < 4;i++)
+            shadow_data[i + 8] -= margins[i];
+        qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, win,
+                       atom, XCB_ATOM_CARDINAL, 32, 12, shadow_data);
+        qtcX11Flush();
+    }
+}
+
+QTC_EXPORT void
 qtcX11ShadowInstall(xcb_window_t win)
 {
     if (qtcUnlikely(!win))
@@ -109,13 +147,6 @@ qtcX11ShadowInstall(xcb_window_t win)
     // However, it's complicated and we will gain nothing.
     Display *disp = qtcX11GetDisp();
     xcb_atom_t atom = qtc_x11_kde_net_wm_shadow;
-    // Use XCB to set window property recieves BadWindow errors for menus in
-    // Qt4 kpartsplugin here, probably because of the order of some pending
-    // event/requests in Xlib. Calling XFlush() before xcb_change_property()
-    // doesn't solve the problem for unknown reason but using XChangeProperty
-    // works.
-    // NOTE: XChangeProperty want `unsigned long` for format 32. So we need
-    // two seperate data buffers.
     if (disp) {
         XChangeProperty(disp, win, atom, XA_CARDINAL, 32, PropModeReplace,
                         (unsigned char*)shadow_data_xlib, 12);

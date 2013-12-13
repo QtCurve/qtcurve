@@ -27,6 +27,7 @@
 QTC_BEGIN_DECLS
 
 void qtcX11ShadowInstall(xcb_window_t win);
+void qtcX11ShadowInstallWithMargin(xcb_window_t win, const int margins[4]);
 void qtcX11ShadowUninstall(xcb_window_t win);
 
 QTC_END_DECLS

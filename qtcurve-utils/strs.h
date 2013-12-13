@@ -116,7 +116,7 @@ qtcFillStrs(char *buff, ArgTypes... strs...)
 QTC_ALWAYS_INLINE static inline char*
 qtcSetStr(char *dest, const char *src, size_t len)
 {
-    dest = realloc(dest, len + 1);
+    dest = (char*)realloc(dest, len + 1);
     memcpy(dest, src, len);
     dest[len] = '\0';
     return dest;
