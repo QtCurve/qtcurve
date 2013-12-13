@@ -122,14 +122,14 @@ QTC_ALWAYS_INLINE static inline int
 qtcGetBalloonMargin(QWidget *widget, bool *atTop)
 {
     int topMargin = 0;
-    int rightMargin = 0;
-    widget->getContentsMargins(NULL, &topMargin, &rightMargin, NULL);
-    if (topMargin > rightMargin) {
+    int bottomMargin = 0;
+    widget->getContentsMargins(NULL, &topMargin, NULL, &bottomMargin);
+    if (topMargin > bottomMargin) {
         *atTop = true;
-        return topMargin - rightMargin;
+        return topMargin - bottomMargin;
     } else {
         *atTop = false;
-        return rightMargin - topMargin;
+        return bottomMargin - topMargin;
     }
 }
 
