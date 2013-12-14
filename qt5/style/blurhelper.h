@@ -170,7 +170,6 @@ bool
 BlurHelper::isTransparent(const QWidget *widget) const
 {
     return (widget->isWindow() &&
-            widget->testAttribute(Qt::WA_TranslucentBackground) &&
             // widgets using qgraphicsview
             !(widget->graphicsProxyWidget() ||
               widget->inherits("Plasma::Dialog")) &&

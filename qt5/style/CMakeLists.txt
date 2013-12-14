@@ -52,7 +52,8 @@ endif()
 add_definitions(-DQT_PLUGIN)
 include_directories(
   "${CMAKE_CURRENT_SOURCE_DIR}"
-  "${CMAKE_CURRENT_BINARY_DIR}")
+  "${CMAKE_CURRENT_BINARY_DIR}"
+  ${Qt5Widgets_PRIVATE_INCLUDE_DIRS})
 qt5_wrap_cpp(qtcurve_MOC_SRCS ${qtcurve_MOC_HDRS})
 add_library(qtcurve-qt5 MODULE ${qtcurve_SRCS} ${qtcurve_MOC_SRCS})
 set_target_properties(qtcurve-qt5 PROPERTIES

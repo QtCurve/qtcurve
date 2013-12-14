@@ -53,13 +53,13 @@ qtcEventCallback(void **cbdata)
         }
     }
     QWidget *widget = qtcToWidget(receiver);
-    QtcWidgetProps props(widget);
     if (qtcUnlikely(widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
-                    (!qtcGetWid(widget) || props->prePolishStarted))) {
+                    !qtcGetWid(widget))) {
         if (Style *style = qtcGetStyle(widget)) {
             style->prePolish(widget);
         }
     } else if (widget && event->type() == QEvent::UpdateRequest) {
+        QtcWidgetProps props(widget);
         props->opacity = 100;
     } else if (QQuickWindow *window = qobject_cast<QQuickWindow*>(receiver)) {
         // QtQuickControl support

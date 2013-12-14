@@ -68,6 +68,9 @@
 #include <QSettings>
 #include <QPixmapCache>
 #include <QTextStream>
+#include <QWindow>
+
+#include "private/qwidget_p.h"
 
 #ifdef QTC_ENABLE_X11
 #  include "shadowhelper.h"
@@ -207,50 +210,6 @@ static QString kdeHome()
     return kdeHomePath;
 }
 #endif
-
-// #ifdef QTC_STYLE_SUPPORT
-// static void getStyles(const QString &dir, const char *sub, QSet<QString> &styles)
-// {
-//     QDir d(dir + sub);
-
-//     if(d.exists()) {
-//         QStringList filters;
-
-//         filters << QString(THEME_PREFIX "*" THEME_SUFFIX);
-//         d.setNameFilters(filters);
-
-//         QStringList entries(d.entryList());
-//         QStringList::ConstIterator it(entries.begin()),
-//             end(entries.end());
-
-//         for(;it != end;++it) {
-//             QString style((*it).left((*it).lastIndexOf(THEME_SUFFIX)));
-
-//             if(!styles.contains(style)) {
-//                 styles.insert(style);
-//             }
-//         }
-//     }
-// }
-
-// static void getStyles(const QString &dir, QSet<QString> &styles)
-// {
-//     getStyles(dir, THEME_DIR, styles);
-//     getStyles(dir, THEME_DIR4, styles);
-// }
-
-// static QString themeFile(const QString &dir, const QString &n, const char *sub)
-// {
-//     QString name(dir+sub+n+THEME_SUFFIX);
-
-//     return QFile(name).exists() ? name : QString();
-// }
-
-// static QString themeFile(const QString &dir, const QString &n)
-// {
-//     return themeFile(dir, n, THEME_DIR4);
-// }
-// #endif
 
 static bool isHoriz(const QStyleOption *option, EWidget w, bool joinedTBar)
 {
@@ -422,45 +381,32 @@ Style::prePolish(QWidget *widget) const
     //     (After we create a RGB window, Qt5 will not override it).
     if (widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
         !(widget->windowFlags() & Qt::MSWindowsOwnDC) &&
-        (!qtcGetWid(widget) || props->prePolishStarted) &&
-        !props->prePolished) {
+        !qtcGetWid(widget) && !props->prePolished) {
         // Skip MSWindowsOwnDC since it is set for QGLWidget and not likely to
         // be used in other cases.
-
-        // the result of qobject_cast may change if we are called in
-        // constructor (which is usually the case we want here) so we only
-        // set the prePolished property if we have done something.
-        if ((opts.bgndOpacity != 100 && qobject_cast<QMainWindow*>(widget)) ||
-            (opts.dlgOpacity != 100 && (qobject_cast<QDialog*>(widget) ||
-                                        qtcIsDialog(widget)))) {
+        if ((opts.bgndOpacity != 100 && (qtcIsWindow(widget) ||
+                                         qtcIsToolTip(widget))) ||
+            (opts.dlgOpacity != 100 && qtcIsDialog(widget))) {
             props->prePolished = true;
-            widget->setAttribute(Qt::WA_StyledBackground);
-            setTranslucentBackground(widget);
-            // WA_TranslucentBackground also sets Qt::WA_NoSystemBackground
-            // Set it back here.
-            widget->setAttribute(Qt::WA_NoSystemBackground, false);
             // Set this for better efficiency for now
             widget->setAutoFillBackground(false);
-        } else if (opts.bgndOpacity != 100) {
-            // TODO: Translucent tooltips, check popup/spash screen etc.
-            if (qtcIsWindow(widget) || qtcIsToolTip(widget)) {
-                if (!widget->testAttribute(Qt::WA_TranslucentBackground)) {
-                    // TODO: should probably set this one in polish
-                    //       where we have full information about the widget.
-                    props->prePolishStarted = true;
-                    widget->setAttribute(Qt::WA_StyledBackground);
-                    setTranslucentBackground(widget);
-                    // WA_TranslucentBackground also sets
-                    // Qt::WA_NoSystemBackground Set it back here.
-                    widget->setAttribute(Qt::WA_NoSystemBackground, false);
-                    // Set this for better efficiency for now
-                    widget->setAutoFillBackground(false);
-                }
-            } else if (widget->testAttribute(Qt::WA_TranslucentBackground) &&
-                       props->prePolishStarted) {
-                widget->setAttribute(Qt::WA_StyledBackground, false);
-                widget->setAttribute(Qt::WA_TranslucentBackground, false);
+            QWidgetPrivate *widgetPrivate =
+                static_cast<QWidgetPrivate*>(QObjectPrivate::get(widget));
+            widgetPrivate->createTLExtra();
+            widgetPrivate->createTLSysExtra();
+            widgetPrivate->updateIsOpaque();
+            if (QWindow *window = widget->windowHandle()) {
+                // Maybe we can register event filters and/or listen for signals
+                // like parent change or screen change on the QWidgetWindow
+                // so that we have a better change to update the alpha info
+                QSurfaceFormat format = window->format();
+                format.setAlphaBufferSize(8);
+                window->setFormat(format);
             }
+            // QWidgetPrivate::updateIsTranslucent sets the format back
+            // is Qt::WA_TranslucentBackground is not set. So we need to do
+            // this repeatedly
+            props->prePolished = false;
         }
     }
 }
