@@ -386,7 +386,9 @@ Style::prePolish(QWidget *widget) const
         // be used in other cases.
         if ((opts.bgndOpacity != 100 && (qtcIsWindow(widget) ||
                                          qtcIsToolTip(widget))) ||
-            (opts.dlgOpacity != 100 && qtcIsDialog(widget))) {
+            (opts.dlgOpacity != 100 && qtcIsDialog(widget)) ||
+            // TODO: window flags, port to Qt4
+            (opts.menuBgndOpacity != 100 && qobject_cast<QMenu*>(widget))) {
             props->prePolished = true;
             // Set this for better efficiency for now
             widget->setAutoFillBackground(false);
