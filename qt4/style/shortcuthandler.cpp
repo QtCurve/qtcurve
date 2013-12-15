@@ -118,10 +118,9 @@ bool ShortcutHandler::eventFilter(QObject *o, QEvent *e)
         if (QEvent::WindowDeactivate == e->type() ||
             Qt::Key_Alt == static_cast<QKeyEvent*>(e)->key()) {
             itsAltDown = false;
-            QSet<QWidget*>::ConstIterator it(itsUpdated.constBegin()),
-                end(itsUpdated.constEnd());
-            for (;it != end;++it)
-                (*it)->update();
+            foreach (QWidget *widget, itsUpdated) {
+                widget->update();
+            }
             if (!itsUpdated.contains(widget))
                 widget->update();
             itsSeenAlt.clear();

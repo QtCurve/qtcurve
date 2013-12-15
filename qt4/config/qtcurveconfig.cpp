@@ -175,16 +175,17 @@ static void removeInstalledThemeFile(const QString &file)
     removeFile(qtcConfDir()+QLatin1String(THEME_IMAGE_PREFIX)+file);
 }
 
-static void removeThemeImages(const QString &themeFile)
+static void
+removeThemeImages(const QString &themeFile)
 {
-    QString                    themeName(getFileName(themeFile).remove(EXTENSION).replace(' ', '_'));
-    QDir                       dir(KGlobal::dirs()->saveLocation("data", "QtCurve/", KStandardDirs::NoDuplicates));
-    QStringList                files(dir.entryList());
-    QStringList::ConstIterator it(files.begin()),
-                               end(files.end());
-    for(; it!=end; ++it)
-        if((*it).startsWith(themeName+BGND_FILE))
-            QFile::remove(dir.path()+"/"+(*it));
+    QString themeName(getFileName(themeFile).remove(EXTENSION).replace(' ', '_'));
+    QDir dir(KGlobal::dirs()->saveLocation("data", "QtCurve/",
+                                           KStandardDirs::NoDuplicates));
+    foreach (const QString &file, dir.entryList()) {
+        if (file.startsWith(themeName + BGND_FILE)) {
+            QFile::remove(dir.path() + "/" + file);
+        }
+    }
 }
 
 static void setStyleRecursive(QWidget *w, QStyle *s)
@@ -2697,19 +2698,17 @@ void QtCurveConfig::importPreset()
                         zipDir->copyTo(tmpDir->name(), false);
 
                         // Find settings file...
-                        QDir                       dir(tmpDir->name());
-                        QStringList                files(dir.entryList());
-                        QStringList::ConstIterator it(files.begin()),
-                                                   end(files.end());
-                        for(; it!=end; ++it)
-                            if((*it).endsWith(EXTENSION))
-                                qtcFile=dir.path()+"/"+(*it);
-
-                        if(qtcFile.isEmpty())
+                        QDir dir(tmpDir->name());
+                        foreach (const QString &file, dir.entryList()) {
+                            if (file.endsWith(EXTENSION)) {
+                                qtcFile = dir.path() + "/" + file;
+                            }
+                        }
+                        if (qtcFile.isEmpty())
                             KMessageBox::error(this, i18n("Invalid compressed settings file.\n(Could not locate settings file.)"));
-                    }
-                    else
+                    } else {
                         KMessageBox::error(this, i18n("Invalid compressed settings file.\n(Could not list ZIP contents.)"));
+                    }
                 }
             }
 

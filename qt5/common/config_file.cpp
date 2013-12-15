@@ -1388,8 +1388,8 @@ bool qtcReadConfig(const QString &file, Options *opts, Options *defOpts, bool ch
                 if (cols.count() &&
                     0 == (cols.count() % NUM_TITLEBAR_BUTTONS) &&
                     cols.count() <= (NUM_TITLEBAR_BUTTONS * 3)) {
-                    QStringList::ConstIterator it(cols.begin()),
-                                               end(cols.end());
+                    QStringList::ConstIterator it(cols.begin());
+                    QStringList::ConstIterator end(cols.end());
 
                     for (int i = 0;it != end;++it, ++i) {
                         QColor col;

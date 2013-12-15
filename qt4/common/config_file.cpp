@@ -681,17 +681,16 @@ static void readDoubleList(QtCConfig &cfg, const char *key, double *list, int co
     QStringList strings(readStringEntry(cfg, key).split(',', QString::SkipEmptyParts));
     bool ok(count==strings.size());
 
-    if(ok)
-    {
+    if (ok) {
         QStringList::ConstIterator it(strings.begin());
-        int                        i;
-
-        for(i=0; i<count && ok; ++i, ++it)
+        for (int i = 0;i < count && ok;++i, ++it) {
             list[i]=(*it).toDouble(&ok);
+        }
     }
 
-    if(!ok && strings.size())
-        list[0]=0;
+    if (!ok && strings.size()) {
+        list[0] = 0;
+    }
 }
 
 #define CFG_READ_COLOR(ENTRY) do {                      \

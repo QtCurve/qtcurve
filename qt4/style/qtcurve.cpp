@@ -1694,14 +1694,12 @@ Style::polish(QWidget *widget)
         QList<QStatusBar*> sb = getStatusBars(widget);
         if (sb.count()) {
             widget->installEventFilter(this);
-            QList<QStatusBar*>::ConstIterator it(sb.begin());
-            QList<QStatusBar*>::ConstIterator end(sb.end());
-            for (;it != end;++it) {
+            foreach (QStatusBar *statusBar, sb) {
                 if (itsSaveStatusBarStatus) {
-                    (*it)->installEventFilter(this);
+                    statusBar->installEventFilter(this);
                 }
                 if (itsSaveStatusBarStatus && qtcStatusBarHidden(appName)) {
-                    (*it)->setHidden(true);
+                    statusBar->setHidden(true);
                 }
             }
 #ifdef QTC_ENABLE_X11
@@ -2230,19 +2228,15 @@ void Style::unpolish(QWidget *widget)
             static_cast<QMainWindow*>(widget)->menuWidget()->removeEventFilter(this);
     }
 
-    if(opts.statusbarHiding && qobject_cast<QMainWindow*>(widget))
-    {
-        QList<QStatusBar*> sb=getStatusBars(widget);
+    if (opts.statusbarHiding && qobject_cast<QMainWindow*>(widget)) {
+        QList<QStatusBar*> sb = getStatusBars(widget);
 
-        if(sb.count())
-        {
+        if (sb.count()) {
             widget->removeEventFilter(this);
-            if(itsSaveStatusBarStatus)
-            {
-                QList<QStatusBar*>::ConstIterator it(sb.begin()),
-                                                   end(sb.end());
-                for(; it!=end; ++it)
-                    (*it)->removeEventFilter(this);
+            if (itsSaveStatusBarStatus) {
+                foreach (QStatusBar *statusBar, sb) {
+                    statusBar->removeEventFilter(this);
+                }
             }
         }
     }
@@ -10179,86 +10173,89 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
             readMdiPositions();
 
             const int controlSize(tb->rect.height() - constWindowMargin *2);
+            int sc = (SC_TitleBarUnshadeButton == subControl ?
+                      SC_TitleBarShadeButton :
+                      SC_TitleBarNormalButton == subControl ? isMaximized ?
+                      SC_TitleBarMaxButton : SC_TitleBarMinButton :
+                      subControl);
+            int pos = 0;
+            int totalLeft = 0;
+            int totalRight = 0;
+            bool rhs = false;
+            bool found = false;
 
-            QList<int>::ConstIterator it(itsMdiButtons[0].begin()),
-                                      end(itsMdiButtons[0].end());
-            int                       sc(SC_TitleBarUnshadeButton==subControl
-                                        ? SC_TitleBarShadeButton
-                                        : SC_TitleBarNormalButton==subControl
-                                            ? isMaximized
-                                                ? SC_TitleBarMaxButton
-                                                : SC_TitleBarMinButton
-                                            : subControl),
-                                      pos(0),
-                                      totalLeft(0),
-                                      totalRight(0);
-            bool                      rhs(false),
-                                      found(false);
-
-            for(; it!=end; ++it)
-                if(SC_TitleBarCloseButton==(*it) || WINDOWTITLE_SPACER==(*it) || tb->titleBarFlags&(toHint(*it)))
-                {
-                    totalLeft+=WINDOWTITLE_SPACER==(*it) ? controlSize/2 : controlSize;
-                    if(*it==sc)
-                        found=true;
-                    else if(!found)
-                        pos+=WINDOWTITLE_SPACER==(*it) ? controlSize/2 : controlSize;
-                }
-
-            if(!found)
-            {
-                pos=0;
-                rhs=true;
-            }
-
-            it=itsMdiButtons[1].begin();
-            end=itsMdiButtons[1].end();
-            for(; it!=end; ++it)
-                if(SC_TitleBarCloseButton==(*it) || WINDOWTITLE_SPACER==(*it) || tb->titleBarFlags&(toHint(*it)))
-                {
-                    if(WINDOWTITLE_SPACER!=(*it) || totalRight)
-                        totalRight+=WINDOWTITLE_SPACER==(*it) ? controlSize/2 : controlSize;
-                    if(rhs)
-                    {
-                        if(*it==sc)
-                        {
-                            pos+=controlSize;
-                            found=true;
-                        }
-                        else if(found)
-                            pos+=WINDOWTITLE_SPACER==(*it) ? controlSize/2 : controlSize;
+            foreach (int hint, itsMdiButtons[0]) {
+                if (hint == SC_TitleBarCloseButton ||
+                    hint == WINDOWTITLE_SPACER ||
+                    tb->titleBarFlags & toHint(hint)) {
+                    totalLeft += (WINDOWTITLE_SPACER == hint ?
+                                  controlSize / 2 : controlSize);
+                    if (hint == sc) {
+                        found = true;
+                    } else if (!found) {
+                        pos += (WINDOWTITLE_SPACER == hint ? controlSize / 2 :
+                                controlSize);
                     }
                 }
+            }
+            if (!found) {
+                pos = 0;
+                rhs = true;
+            }
 
-            totalLeft+=(constWindowMargin*(totalLeft ? 2 : 1));
-            totalRight+=(constWindowMargin*(totalRight ? 2 : 1));
+            foreach (int hint, itsMdiButtons[1]) {
+                if (hint == SC_TitleBarCloseButton ||
+                    hint == WINDOWTITLE_SPACER ||
+                    tb->titleBarFlags & toHint(hint)) {
+                    if (hint != WINDOWTITLE_SPACER || totalRight)
+                        totalRight += (hint == WINDOWTITLE_SPACER ?
+                                       controlSize / 2 : controlSize);
+                    if (rhs) {
+                        if (hint == sc) {
+                            pos += controlSize;
+                            found = true;
+                        } else if (found) {
+                            pos += (hint == WINDOWTITLE_SPACER ?
+                                    controlSize / 2 : controlSize);
+                        }
+                    }
+                }
+            }
 
-            if(SC_TitleBarLabel==subControl)
+            totalLeft += constWindowMargin * (totalLeft ? 2 : 1);
+            totalRight += constWindowMargin * (totalRight ? 2 : 1);
+
+            if (subControl == SC_TitleBarLabel) {
                 r.adjust(totalLeft, 0, -totalRight, 0);
-            else if(!found)
+            } else if (!found) {
                 return QRect();
-            else if(rhs)
-                r.setRect(r.right()-(pos+constWindowMargin), r.top()+constWindowMargin, controlSize, controlSize);
-            else
-                r.setRect(r.left()+constWindowMargin+pos, r.top()+constWindowMargin, controlSize, controlSize);
-            if(0==(r.height()%2))
+            } else if (rhs) {
+                r.setRect(r.right() - (pos + constWindowMargin),
+                          r.top() + constWindowMargin,
+                          controlSize, controlSize);
+            } else {
+                r.setRect(r.left() + constWindowMargin + pos,
+                          r.top() + constWindowMargin,
+                          controlSize, controlSize);
+            }
+            if (r.height() % 2 == 0)
                 r.adjust(0, 0, 1, 1);
             return visualRect(tb->direction, tb->rect, r);
         }
-        default:
-            break;
+    default:
+        break;
     }
-
     return QCommonStyle::subControlRect(control, option, subControl, widget);
 }
 
-QStyle::SubControl Style::hitTestComplexControl(ComplexControl control, const QStyleOptionComplex *option,
-                                                const QPoint &pos, const QWidget *widget) const
+QStyle::SubControl
+Style::hitTestComplexControl(ComplexControl control,
+                             const QStyleOptionComplex *option,
+                             const QPoint &pos, const QWidget *widget) const
 {
     prePolish(widget);
-    itsSbWidget=0L;
-    switch (control)
-    {
+    itsSbWidget = 0L;
+    switch (control) {
         case CC_ScrollBar:
             if (const QStyleOptionSlider *scrollBar = qstyleoption_cast<const QStyleOptionSlider*>(option))
             {
@@ -13310,33 +13307,27 @@ void Style::kdeGlobalSettingsChange(int type, int)
 #ifndef QTC_QT4_ENABLE_KDE
     Q_UNUSED(type)
 #else
-    switch(type)
-    {
-        case KGlobalSettings::StyleChanged:
-        {
-            KGlobal::config()->reparseConfiguration();
-            if(itsUsePixmapCache)
-                QPixmapCache::clear();
-            init(false);
-
-            QWidgetList                tlw=QApplication::topLevelWidgets();
-            QWidgetList::ConstIterator it(tlw.begin()),
-                                       end(tlw.end());
-
-            for(; it!=end; ++it)
-                (*it)->update();
-            break;
+    switch(type) {
+    case KGlobalSettings::StyleChanged: {
+        KGlobal::config()->reparseConfiguration();
+        if (itsUsePixmapCache)
+            QPixmapCache::clear();
+        init(false);
+        foreach (QWidget *widget, QApplication::topLevelWidgets()) {
+            widget->update();
         }
-        case KGlobalSettings::PaletteChanged:
-            KGlobal::config()->reparseConfiguration();
-            applyKdeSettings(true);
-            if(itsUsePixmapCache)
-                QPixmapCache::clear();
-            break;
-        case KGlobalSettings::FontChanged:
-            KGlobal::config()->reparseConfiguration();
-            applyKdeSettings(false);
-            break;
+        break;
+    }
+    case KGlobalSettings::PaletteChanged:
+        KGlobal::config()->reparseConfiguration();
+        applyKdeSettings(true);
+        if (itsUsePixmapCache)
+            QPixmapCache::clear();
+        break;
+    case KGlobalSettings::FontChanged:
+        KGlobal::config()->reparseConfiguration();
+        applyKdeSettings(false);
+        break;
     }
 #endif
 

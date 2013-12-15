@@ -4041,11 +4041,8 @@ void Style::widgetDestroyed(QObject *o)
                 rem.insert(it.key());
             }
         }
-
-        QSet<QWidget*>::ConstIterator r(rem.begin()), remEnd(rem.end());
-
-        for(;r != remEnd;++r) {
-            itsSViewContainers.remove(*r);
+        for (QWidget *widget: const_(rem)) {
+            itsSViewContainers.remove(widget);
         }
     }
 }
@@ -4097,32 +4094,28 @@ void Style::kdeGlobalSettingsChange(int type, int)
     Q_UNUSED(type);
 #else
     switch(type) {
-        case KGlobalSettings::StyleChanged:
-        {
-            KGlobal::config()->reparseConfiguration();
-            if(itsUsePixmapCache)
-                QPixmapCache::clear();
-            init(false);
+    case KGlobalSettings::StyleChanged: {
+        KGlobal::config()->reparseConfiguration();
+        if (itsUsePixmapCache)
+            QPixmapCache::clear();
+        init(false);
 
-            QWidgetList                tlw=QApplication::topLevelWidgets();
-            QWidgetList::ConstIterator it(tlw.begin()),
-                end(tlw.end());
-
-            for(; it!=end; ++it)
-                (*it)->update();
-            break;
+        for (QWidget *widget: QApplication::topLevelWidgets()) {
+            widget->update();
         }
-        case KGlobalSettings::PaletteChanged:
-            KGlobal::config()->reparseConfiguration();
-            applyKdeSettings(true);
-            if(itsUsePixmapCache)
-                QPixmapCache::clear();
-            break;
-        case KGlobalSettings::FontChanged:
-            KGlobal::config()->reparseConfiguration();
-            applyKdeSettings(false);
-            break;
-        }
+        break;
+    }
+    case KGlobalSettings::PaletteChanged:
+        KGlobal::config()->reparseConfiguration();
+        applyKdeSettings(true);
+        if (itsUsePixmapCache)
+            QPixmapCache::clear();
+        break;
+    case KGlobalSettings::FontChanged:
+        KGlobal::config()->reparseConfiguration();
+        applyKdeSettings(false);
+        break;
+    }
 #endif
 
     itsBlurHelper->setEnabled(Utils::compositingActive());
@@ -4132,17 +4125,15 @@ void Style::kdeGlobalSettingsChange(int type, int)
 void Style::borderSizesChanged()
 {
 #ifdef QTC_QT5_ENABLE_KDE
-    int old=qtcGetWindowBorderSize(false).titleHeight;
+    int old = qtcGetWindowBorderSize(false).titleHeight;
 
-    if(old!=qtcGetWindowBorderSize(true).titleHeight)
-    {
-        QWidgetList                tlw=QApplication::topLevelWidgets();
-        QWidgetList::ConstIterator it(tlw.begin()),
-            end(tlw.end());
-
-        for(; it!=end; ++it)
-            if(qobject_cast<QMainWindow *>(*it) && static_cast<QMainWindow*>(*it)->menuBar())
-                static_cast<QMainWindow*>(*it)->menuBar()->update();
+    if (old != qtcGetWindowBorderSize(true).titleHeight) {
+        for (QWidget *widget: QApplication::topLevelWidgets()) {
+            if (qobject_cast<QMainWindow*>(widget) &&
+                static_cast<QMainWindow*>(widget)->menuBar()) {
+                static_cast<QMainWindow*>(widget)->menuBar()->update();
+            }
+        }
     }
 #endif
 }
@@ -4153,13 +4144,9 @@ getWindow(unsigned int xid)
 {
     if (qtcUnlikely(xid))
         return NULL;
-    QWidgetList tlw = QApplication::topLevelWidgets();
-    QWidgetList::ConstIterator it(tlw.begin());
-    QWidgetList::ConstIterator end(tlw.end());
-
-    for (;it != end;++it) {
-        if (qobject_cast<QMainWindow*>(*it) && qtcGetWid(*it) == xid) {
-            return static_cast<QMainWindow*>(*it);
+    for (QWidget *widget: QApplication::topLevelWidgets()) {
+        if (qobject_cast<QMainWindow*>(widget) && qtcGetWid(widget) == xid) {
+            return static_cast<QMainWindow*>(widget);
         }
     }
     return NULL;
@@ -4218,12 +4205,9 @@ Style::toggleStatusBar(unsigned int xid)
 void Style::compositingToggled()
 {
 #ifdef QTC_ENABLE_X11
-    QWidgetList tlw = QApplication::topLevelWidgets();
-    QWidgetList::ConstIterator it(tlw.begin()),
-        end(tlw.end());
-
-    for(; it!=end; ++it)
-        (*it)->update();
+    for (QWidget *widget: QApplication::topLevelWidgets()) {
+        widget->update();
+    }
 #endif
 }
 
@@ -4270,20 +4254,16 @@ void Style::toggleStatusBar(QMainWindow *window)
         }
     }
 #endif
-    if(!triggeredAction)
-    {
-        QList<QStatusBar *> sb=getStatusBars(window);
+    if (!triggeredAction) {
+        QList<QStatusBar*> sb = getStatusBars(window);
 
-        if(sb.count())
-        {
-            if(itsSaveStatusBarStatus)
+        if (sb.count()) {
+            if (itsSaveStatusBarStatus) {
                 qtcSetStatusBarHidden(appName, sb.first()->isVisible());
-
-            QList<QStatusBar *>::ConstIterator it(sb.begin()),
-                end(sb.end());
-            for(; it!=end; ++it)
-                (*it)->setHidden((*it)->isVisible());
-
+            }
+            for (QStatusBar *statusBar: const_(sb)) {
+                statusBar->setHidden(statusBar->isVisible());
+            }
 #ifdef QTC_ENABLE_X11
             emitStatusBarState(sb.first());
 #endif

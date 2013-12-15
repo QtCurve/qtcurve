@@ -408,21 +408,16 @@ int QtCurveHandler::borderSize(bool bot) const
 
 void QtCurveHandler::borderSizeChanged()
 {
-    QList<QtCurveClient *>::ConstIterator it(itsClients.begin()),
-                                          end(itsClients.end());
-
-    for(; it!=end; ++it)
-        (*it)->informAppOfBorderSizeChanges();
+    foreach (QtCurveClient *client, itsClients) {
+        client->informAppOfBorderSizeChanges();
+    }
 }
 
 void QtCurveHandler::menuBarSize(unsigned int xid, int size)
 {
-    QList<QtCurveClient *>::ConstIterator it(itsClients.begin()),
-                                          end(itsClients.end());
-
-    for (;it != end;++it) {
-        if ((*it)->windowId() == xid) {
-            (*it)->menuBarSize(size);
+    foreach (QtCurveClient *client, itsClients) {
+        if (client->windowId() == xid) {
+            client->menuBarSize(size);
             break;
         }
     }
@@ -431,12 +426,9 @@ void QtCurveHandler::menuBarSize(unsigned int xid, int size)
 
 void QtCurveHandler::statusBarState(unsigned int xid, bool state)
 {
-    QList<QtCurveClient *>::ConstIterator it(itsClients.begin()),
-                                          end(itsClients.end());
-
-    for (;it != end;++it) {
-        if ((*it)->windowId() == xid) {
-            (*it)->statusBarState(state);
+    foreach (QtCurveClient *client, itsClients) {
+        if (client->windowId() == xid) {
+            client->statusBarState(state);
             break;
         }
     }

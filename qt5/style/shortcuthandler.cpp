@@ -26,6 +26,7 @@
 #include <QMenuBar>
 #include <QEvent>
 #include <QKeyEvent>
+#include <qtcurve-utils/utils.h>
 
 namespace QtCurve {
 
@@ -121,15 +122,13 @@ bool ShortcutHandler::eventFilter(QObject *o, QEvent *e)
         break;
     case QEvent::WindowDeactivate:
     case QEvent::KeyRelease:
-        if (QEvent::WindowDeactivate==e->type() || Qt::Key_Alt==static_cast<QKeyEvent*>(e)->key())
-        {
+        if (QEvent::WindowDeactivate == e->type() ||
+            static_cast<QKeyEvent*>(e)->key() == Qt::Key_Alt) {
             itsAltDown = false;
-            QSet<QWidget *>::ConstIterator it(itsUpdated.constBegin()),
-                end(itsUpdated.constEnd());
-
-            for (; it!=end; ++it)
-                (*it)->update();
-            if(!itsUpdated.contains(widget))
+            for (QWidget *widget: const_(itsUpdated)) {
+                widget->update();
+            }
+            if (!itsUpdated.contains(widget))
                 widget->update();
             itsSeenAlt.clear();
             itsUpdated.clear();

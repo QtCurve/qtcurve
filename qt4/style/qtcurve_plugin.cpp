@@ -45,12 +45,8 @@ getStyles(const QString &dir, const char *sub, QSet<QString> &styles)
         filters << QString(THEME_PREFIX "*" THEME_SUFFIX);
         d.setNameFilters(filters);
 
-        QStringList entries(d.entryList());
-        QStringList::ConstIterator it(entries.begin())
-        QStringList::ConstIterator end(entries.end());
-
-        for (;it != end;++it) {
-            QString style((*it).left((*it).lastIndexOf(THEME_SUFFIX)));
+        foreach (const QString &str, d.entryList()) {
+            QString style(str.left(str.lastIndexOf(THEME_SUFFIX)));
             if (!styles.contains(style)) {
                 styles.insert(style);
             }
