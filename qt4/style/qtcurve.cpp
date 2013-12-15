@@ -2014,14 +2014,14 @@ Style::polish(QWidget *widget)
         ((QFrame*)widget)->setFrameShape(QFrame::NoFrame);
 
     if (QLayout *layout = widget->layout()) {
-        // explicitely check public layout classes, QMainWindowLayout doesn't work here
-        if (qobject_cast<QBoxLayout*>(layout)
-#if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
-             || qobject_cast<QFormLayout*>(layout)
-#endif
-             || qobject_cast<QGridLayout*>(layout)
-             || qobject_cast<QStackedLayout*>(layout))
-                polishLayout(layout);
+        // explicitely check public layout classes,
+        // QMainWindowLayout doesn't work here
+        if (qobject_cast<QBoxLayout*>(layout) ||
+            qobject_cast<QFormLayout*>(layout) ||
+            qobject_cast<QGridLayout*>(layout) ||
+            qobject_cast<QStackedLayout*>(layout)) {
+            polishLayout(layout);
+        }
     }
 
     if((APP_K3B==theThemedApp && widget->inherits("K3b::ThemedHeader") && qobject_cast<QFrame*>(widget)) ||
@@ -2065,7 +2065,6 @@ Style::polish(QWidget *widget)
 #endif
 }
 
-#if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
 static QFontMetrics styledFontMetrics(const QStyleOption *option, const QWidget *widget)
 {
     return (option ? option->fontMetrics :
@@ -2111,14 +2110,6 @@ void Style::polishFormLayout(QFormLayout *layout)
             continue;
 
         int fieldHeight = fieldItem->sizeHint().height();
-#if QT_VERSION < 0x040600
-        // work around KIntNumInput::sizeHint() bug
-        if (fieldItem->widget() && fieldItem->widget()->inherits("KIntNumInput"))
-        {
-            fieldHeight -= 2;
-            fieldItem->widget()->setMaximumHeight(fieldHeight);
-        }
-#endif
         /* for large fields, we don't center */
         if (fieldHeight <= 2 * fontHeight(0, label) + addedHeight)
         {
@@ -2131,7 +2122,7 @@ void Style::polishFormLayout(QFormLayout *layout)
             label->setMinimumHeight(labelHeight);
         else
         {
-#if QT_VERSION >= 0x040602
+#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 2)
             label->setMinimumHeight((labelHeight * 4 + 6) / 7);
 #else
             // QFormLayout determines label size as height * 5 / 4, so revert that
@@ -2143,16 +2134,13 @@ void Style::polishFormLayout(QFormLayout *layout)
 
 void Style::polishLayout(QLayout *layout)
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
     if (QFormLayout *formLayout = qobject_cast<QFormLayout*>(layout))
         polishFormLayout(formLayout);
-#endif
     // recurse into layouts
     for (int i = 0; i < layout->count(); ++i)
         if (QLayout *l = layout->itemAt(i)->layout())
             polishLayout(l);
 }
-#endif
 
 // Taken from oxygen!
 void Style::polishScrollArea(QAbstractScrollArea *scrollArea, bool isKFilePlacesView) const
@@ -2956,10 +2944,8 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
         case PM_LargeIconSize:
             return 32;
 #else
-#if QT_VERSION >= 0x040500
         case PM_TabCloseIndicatorWidth:
         case PM_TabCloseIndicatorHeight:
-#endif
         case PM_SmallIconSize:
         case PM_ButtonIconSize:
             return KIconLoader::global()->currentSize(KIconLoader::Small);
@@ -2972,13 +2958,9 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
             // TODO return KIconLoader::global()->currentSize(KIconLoader::MessageBox);
             return KIconLoader::SizeHuge;
 #endif
-#if QT_VERSION >= 0x040500
         case PM_SubMenuOverlap:
             return -2;
         case PM_ScrollView_ScrollBarSpacing:
-#else
-        case PM_TextCursorWidth+3:
-#endif
             return opts.etchEntry ? 2 : 3;
         case PM_MenuPanelWidth:
             return opts.popupBorder ? pixelMetric(PM_DefaultFrameWidth, option, widget) : 0;
@@ -3037,13 +3019,6 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
                     ? (opts.thin&THIN_BUTTONS) ? 4 : 6
                     : (opts.thin&THIN_BUTTONS) ? 2 : 4)+MAX_ROUND_BTN_PAD;
         case PM_TabBarTabShiftVertical:
-#if QT_VERSION < 0x040500
-            if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab*>(option))
-            {
-                 if((QTabBar::RoundedSouth==tab->shape || QTabBar::TriangularSouth==tab->shape))
-                    return -2;
-            }
-#endif
             return 2;
         case PM_TabBarTabShiftHorizontal:
             return 0;
@@ -3365,16 +3340,16 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
                     return !cmb->editable;
             }
             return 0;
-#if QT_VERSION >= 0x040400
         case SH_FormLayoutFormAlignment:
-            return Qt::AlignLeft | Qt::AlignTop; // KDE4 HIG, align the contents in a form layout to the left
+            // KDE4 HIG, align the contents in a form layout to the left
+            return Qt::AlignLeft | Qt::AlignTop;
         case SH_FormLayoutLabelAlignment:
-            return Qt::AlignRight; // KDE4  HIG, align the labels in a form layout to the right
+            // KDE4  HIG, align the labels in a form layout to the right
+            return Qt::AlignRight;
         case SH_FormLayoutFieldGrowthPolicy:
             return QFormLayout::ExpandingFieldsGrow;
         case SH_FormLayoutWrapPolicy:
             return QFormLayout::DontWrapRows;
-#endif
 #ifdef QTC_QT4_ENABLE_KDE
         case SH_DialogButtonBox_ButtonsHaveIcons:
             return KGlobalSettings::showIconsOnPushButtons();
@@ -3624,7 +3599,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
     bool reverse(Qt::RightToLeft==option->direction);
 
     switch ((unsigned)element) {
-#if (QT_VERSION >= 0x040500) && defined QTC_QT4_ENABLE_KDE
+#if defined QTC_QT4_ENABLE_KDE
     case PE_IndicatorTabClose: {
         int size(pixelMetric(QStyle::PM_SmallIconSize));
         QIcon::Mode mode(state&State_Enabled ? state& State_Raised ?
@@ -5124,9 +5099,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             painter->restore();
             break;
         }
-#if QT_VERSION >= 0x040400
-        case PE_PanelItemViewItem:
-        {
+        case PE_PanelItemViewItem: {
             const QStyleOptionViewItemV4 *v4Opt = qstyleoption_cast<const QStyleOptionViewItemV4*>(option);
             const QAbstractItemView      *view = qobject_cast<const QAbstractItemView*>(widget);
             bool                         hover = state&State_MouseOver && state&State_Enabled && (!view ||
@@ -5258,7 +5231,6 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             }
             break;
         }
-#endif
         case QtC_PE_DrawBackground:
             if (const QtCurve::Style::BgndOption *bgnd = qstyleoption_cast<const QtCurve::Style::BgndOption*>(option))
                 if(state&QtC_StateKWin)
@@ -5593,16 +5565,13 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
             }
             break;
         case CE_DockWidgetTitle:
-            if (const QStyleOptionDockWidget *dwOpt = qstyleoption_cast<const QStyleOptionDockWidget*>(option))
-            {
-#if QT_VERSION >= 0x040300
-                const QStyleOptionDockWidgetV2 *v2 = qstyleoption_cast<const QStyleOptionDockWidgetV2*>(dwOpt);
-                bool                           verticalTitleBar(v2 == 0 ? false : v2->verticalTitleBar);
-#else
-                bool                           verticalTitleBar(false);
-#endif
-                bool                           isKOffice(widget && widget->inherits("KoDockWidgetTitleBar"));
-                QRect                          fillRect(r);
+            if (const QStyleOptionDockWidget *dwOpt =
+                qstyleoption_cast<const QStyleOptionDockWidget*>(option)) {
+                const QStyleOptionDockWidgetV2 *v2 =
+                    qstyleoption_cast<const QStyleOptionDockWidgetV2*>(dwOpt);
+                bool verticalTitleBar(v2 == 0 ? false : v2->verticalTitleBar);
+                bool isKOffice(widget && widget->inherits("KoDockWidgetTitleBar"));
+                QRect fillRect(r);
 
                 // This fixes the look of KOffice's dock widget titlebars...
                 if(isKOffice)
@@ -5623,10 +5592,8 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                         double radius(qtcGetRadius(&opts, fillRect.width(), fillRect.height(), WIDGET_OTHER, RADIUS_EXTERNAL));
                         int    round=ROUNDED_ALL;
 
-#if QT_VERSION >= 0x040300
                         if(opts.dwtSettings&DWT_ROUND_TOP_ONLY)
                             round=verticalTitleBar ? ROUNDED_LEFT : ROUNDED_TOP;
-#endif
                         painter->setRenderHint(QPainter::Antialiasing, true);
                         drawBevelGradient(col, painter, fillRect, buildPath(QRectF(fillRect), WIDGET_OTHER, round, radius), !verticalTitleBar,
                                           false, opts.dwtAppearance, WIDGET_DOCK_WIDGET_TITLE, false);
@@ -5637,7 +5604,6 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
                 if (!dwOpt->title.isEmpty())
                 {
-#if QT_VERSION >= 0x040300
                     QRect titleRect(subElementRect(SE_DockWidgetTitleBarText, option, widget));
 
                     if (verticalTitleBar)
@@ -5656,10 +5622,6 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                         painter->rotate(-90);
                         painter->translate(-rVert.left(), -rVert.top());
                     }
-#else
-                    const int margin(4);
-                    QRect titleRect(visualRect(dwOpt->direction, r, r.adjusted(margin, 0, -margin * 2 - 26, 0)));
-#endif
 #ifdef QTC_QT4_ENABLE_KDE
                     if(opts.dwtSettings&DWT_FONT_AS_PER_TITLEBAR)
                         painter->setFont(KGlobalSettings::windowTitleFont());
@@ -5729,7 +5691,6 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                 }
             }
             break;
-#if QT_VERSION >= 0x040300
         case CE_HeaderEmptyArea:
         {
             const QStyleOptionHeader *ho = qstyleoption_cast<const QStyleOptionHeader*>(option);
@@ -5763,7 +5724,6 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
             painter->restore();
             break;
         }
-#endif
         case CE_HeaderSection:
             if (const QStyleOptionHeader *ho = qstyleoption_cast<const QStyleOptionHeader*>(option))
             {
@@ -6013,15 +5973,9 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     bottomToTop = bar2->bottomToTop;
                 }
 
-#if QT_VERSION < 0x040300
-                if(vertical)
-                    return;
-#endif
-
                 painter->save();
                 painter->setRenderHint(QPainter::Antialiasing, true);
 
-#if QT_VERSION >= 0x040300
                 if (vertical)
                 {
                     r = QRect(r.left(), r.top(), r.height(), r.width()); // flip width and height
@@ -6039,7 +5993,6 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     }
                     painter->setTransform(m);
                 }
-#endif
 
                 int                  progressIndicatorPos = (bar->progress - qreal(bar->minimum)) /
                                                              qMax(qreal(1.0), qreal(bar->maximum) - bar->minimum) * r.width();
@@ -6148,10 +6101,6 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                                stripeWidth(qMax(checkcol, constMenuPixmapWidth)-2);
                 const QColor * use(popupMenuCols(option));
 
-#if QT_VERSION < 0x040600
-                if(!(comboMenu && opts.gtkComboMenus))
-                  r.adjust(0, 0, -1, 0);
-#endif
                 QRect rx(r);
 
                 if(isOO)
@@ -6411,13 +6360,10 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     drawPrimitive(PE_FrameDefaultButton, option, painter, widget);
                 if (btn->features & QStyleOptionButton::AutoDefaultButton)
                     r.setCoords(r.left() + dbi, r.top() + dbi, r.right() - dbi, r.bottom() - dbi);
-                if (!(btn->features & (QStyleOptionButton::Flat
-#if QT_VERSION >= 0x040300
-                       |QStyleOptionButton::CommandLinkButton
-#endif
-                       )) ||
-                    state&(State_Sunken | State_On | State_MouseOver))
-                {
+                if (!(btn->features &
+                      (QStyleOptionButton::Flat |
+                       QStyleOptionButton::CommandLinkButton)) ||
+                    state & (State_Sunken | State_On | State_MouseOver)) {
                     QStyleOptionButton tmpBtn(*btn);
 
                     tmpBtn.rect = r;
@@ -6610,11 +6556,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
         case CE_TabBarTabLabel:
             if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab*>(option))
             {
-#if QT_VERSION >= 0x040500
                 QStyleOptionTabV3 tabV2(*tab);
-#else
-                QStyleOptionTabV2 tabV2(*tab);
-#endif
                 bool verticalTabs(QTabBar::RoundedEast==tabV2.shape || QTabBar::RoundedWest==tabV2.shape ||
                                   QTabBar::TriangularEast==tabV2.shape || QTabBar::TriangularWest==tabV2.shape),
                      toolbarTab=!opts.toolbarTabs && widget && widget->parentWidget() &&
@@ -6649,20 +6591,9 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                 if (!styleHint(SH_UnderlineShortcut, option, widget))
                     alignment |= Qt::TextHideMnemonic;
 
-#if QT_VERSION >= 0x040500
                 if(toolbarTab)
                     tabV2.state&=~State_Selected;
                 r = subElementRect(SE_TabBarTabText, &tabV2, widget);
-#else
-                r.adjust(0, 0, pixelMetric(QStyle::PM_TabBarTabShiftHorizontal, tab, widget),
-                               pixelMetric(QStyle::PM_TabBarTabShiftVertical, tab, widget));
-
-                if (!toolbarTab && state&State_Selected)
-                {
-                    r.setBottom(r.bottom() - pixelMetric(QStyle::PM_TabBarTabShiftVertical, tab, widget));
-                    r.setRight(r.right() - pixelMetric(QStyle::PM_TabBarTabShiftHorizontal, tab, widget));
-                }
-#endif
                 if (!tabV2.icon.isNull())
                 {
                     QSize iconSize(tabV2.iconSize);
@@ -6679,27 +6610,19 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
                     int offset = 4,
                         left = option->rect.left();
-#if QT_VERSION >= 0x040500
                     if (tabV2.leftButtonSize.isNull() || tabV2.leftButtonSize.width()<=0)
                         offset += 2;
                     else
                         left += tabV2.leftButtonSize.width() + 2;
-#endif
                     QRect iconRect = QRect(left + offset, r.center().y() - tabIcon.height() / 2,
                                            tabIconSize.width(), tabIconSize.height());
                     if (!verticalTabs)
                         iconRect = visualRect(option->direction, option->rect, iconRect);
                     painter->drawPixmap(iconRect.x(), iconRect.y(), tabIcon);
-#if QT_VERSION < 0x040500
-                    r.adjust(reverse ? 0 : tabIconSize.width(), 0, reverse ? -tabIconSize.width() : 0, 0);
-#endif
                 }
 
                 if(!tab->text.isEmpty())
                 {
-#if QT_VERSION < 0x040500
-                    r.adjust(constTabPad, 0, -constTabPad, 0);
-#endif
                     drawItemTextWithRole(painter, r, alignment, tab->palette, tab->state&State_Enabled, tab->text,
                                          !opts.stdSidebarButtons && toolbarTab && state&State_Selected
                                             ? QPalette::HighlightedText : QPalette::WindowText);
@@ -6778,9 +6701,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                      selected(state&State_Selected),
                      horiz(QTabBar::RoundedNorth==tab->shape || QTabBar::RoundedSouth==tab->shape);
 
-#if QT_VERSION >= 0x040500
                 QStyleOptionTabV3 tabV3(*tab);
-#endif
                 QRect        r2(r);
                 bool         rtlHorTabs(Qt::RightToLeft==tab->direction && horiz),
                              oneTab(QStyleOptionTab::OnlyOneTab==tab->position),
@@ -6800,13 +6721,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                                  (rtlHorTabs && Qt::AlignRight==tabBarAlignment)),
                              rightAligned((!rtlHorTabs && Qt::AlignRight==tabBarAlignment) ||
                                           (rtlHorTabs && Qt::AlignLeft==tabBarAlignment)),
-                             docMode(
-#if QT_VERSION >= 0x040500
-                                      tabV3.documentMode
-#else
-                                    false
-#endif
-                                   ),
+                             docMode(tabV3.documentMode),
                              docFixLeft(!leftCornerWidget && leftAligned && firstTab && (docMode || onlyTab)),
                              fixLeft(!onlyTab && !leftCornerWidget && leftAligned && firstTab && !docMode),
                              fixRight(!onlyTab && !rightCornerWidget && rightAligned && lastTab && !docMode),
@@ -7900,15 +7815,11 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 
                 State mflags(bflags);
 
-                if(!isOOWidget(widget))
-                {
-#if QT_VERSION >= 0x040500
-                    if (state&State_Sunken && !(toolbutton->activeSubControls&SC_ToolButton))
-                        bflags&=~State_Sunken;
-#else
-                    if (toolbutton->activeSubControls&SC_ToolButtonMenu && state&State_Enabled)
-                        mflags |= State_Sunken;
-#endif
+                if (!isOOWidget(widget)) {
+                    if (state & State_Sunken &&
+                        !(toolbutton->activeSubControls & SC_ToolButton)) {
+                        bflags &= ~State_Sunken;
+                    }
                 }
 
                 bool         drawMenu=TBTN_JOINED==opts.tbarBtns
@@ -8588,7 +8499,6 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 #ifndef QTC_QT4_ENABLE_KDE
                 QPainterPath path;
 #else
-#if KDE_IS_VERSION(4, 3, 0)
                 QPainterPath path(round < ROUND_SLIGHT ? QPainterPath() :
                                   buildPath(QRectF(state&QtC_StateKWinNoBorder ?
                                                    tr : tr.adjusted(1, 1, -1, 0)),
@@ -8598,9 +8508,6 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                                             ROUNDED_ALL : ROUNDED_TOP,
                                             (round > ROUND_SLIGHT /*&& kwin*/ ?
                                              6.0 : 2.0)));
-#else
-                QPainterPath path;
-#endif
 #endif
                 if (!kwin && !qtcIsCustomBgnd(&opts))
                     painter->fillRect(tr, borderCol);
@@ -9038,10 +8945,10 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                                                     ? opt.rect.adjusted(0, mod, 0, -mod)
                                                     : opt.rect.adjusted(mod, 0, -mod, 0)
                                                 : opt.rect, &opt, widget,
-    #ifndef SIMPLE_SCROLLBARS
+#ifndef SIMPLE_SCROLLBARS
                                    !(opts.square&SQUARE_SB_SLIDER) && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons)
                                         ? ROUNDED_ALL :
-    #endif
+#endif
                                    ROUNDED_NONE,
                                    itsBackgroundCols[2], itsBackgroundCols, true,
                                    opts.thinSbarGroove ? WIDGET_SLIDER_TROUGH : WIDGET_TROUGH);
@@ -9655,13 +9562,9 @@ QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, con
             }
             break;
         case CT_MenuBarItem:
-#if QT_VERSION >= 0x040500
             if (!size.isEmpty())
-                newSize=size+QSize((windowsItemHMargin * 4)+2, windowsItemVMargin+1);
-#else
-            if (!size.isEmpty())
-                newSize=size+QSize((windowsItemHMargin * 4)+2, windowsItemVMargin);
-#endif
+                newSize = size + QSize(windowsItemHMargin * 4 + 2,
+                                       windowsItemVMargin + 1);
             break;
         default:
             break;
@@ -9695,7 +9598,6 @@ QRect Style::subElementRect(SubElement element, const QStyleOption *option, cons
                 rect.adjust(0, 0, -m, 0);
             return rect;
         }
-#if QT_VERSION >= 0x040500
         case SE_TabBarTabLeftButton:
             return QCommonStyle::subElementRect(element, option, widget).translated(-2, -1);
         case SE_TabBarTabRightButton:
@@ -9782,7 +9684,6 @@ QRect Style::subElementRect(SubElement element, const QStyleOption *option, cons
                 return rect;
             }
             break;
-#endif
         case SE_RadioButtonIndicator:
             rect = visualRect(option->direction, option->rect,
                               QCommonStyle::subElementRect(element, option, widget)).adjusted(0, 0, 1, 1);
@@ -9798,14 +9699,12 @@ QRect Style::subElementRect(SubElement element, const QStyleOption *option, cons
         case SE_ProgressBarGroove:
         case SE_ProgressBarLabel:
             return option->rect;
-#if QT_VERSION >= 0x040300
         case SE_GroupBoxLayoutItem:
             rect = option->rect;
 //             if (const QStyleOptionGroupBox *groupBoxOpt = qstyleoption_cast<const QStyleOptionGroupBox*>(option))
 //                 if (groupBoxOpt->subControls & (SC_GroupBoxCheckBox | SC_GroupBoxLabel))
 //                     rect.setTop(rect.top() + 2);    // eat the top margin a little bit
             break;
-#endif
         case SE_PushButtonFocusRect:
             if(FULL_FOCUS)
             {

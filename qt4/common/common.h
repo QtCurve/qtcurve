@@ -1076,7 +1076,7 @@ qtcIsCustomBgnd(const Options *opts)
 #include <KDE/KColorUtils>
 #define tint(COLA, COLB, FACTOR) KColorUtils::tint((COLA), (COLB), (FACTOR))
 #define midColor(COLA, COLB) KColorUtils::mix((COLA), (COLB), 0.5)
-#else // QT_VERSION && (QT_VERSION >= 0x040000) && defined QTC_QT4_ENABLE_KDE
+#else
 #include <qtcurve-utils/color.h>
 #ifdef __cplusplus
 #define tint(COLA, COLB, FACTOR) qtcColorTint(&(COLA), &(COLB), (FACTOR))
@@ -1086,7 +1086,7 @@ qtcIsCustomBgnd(const Options *opts)
 #define tint(COLA, COLB, FACTOR) qtcColorTint((COLA), (COLB), (FACTOR))
 #define midColor(COLA, COLB) qtcColorMix((COLA), (COLB), 0.5)
 #endif // __cplusplus
-#endif // QT_VERSION && (QT_VERSION >= 0x040000) && defined QTC_QT4_ENABLE_KDE
+#endif
 
 #ifdef __cplusplus
 EAppearance qtcWidgetApp(EWidget w, const Options *opts, bool active=true);
@@ -1128,15 +1128,9 @@ typedef enum
 #define FULL_OUTER_RADIUS    2.5
 #define FULL_ETCH_RADIUS     3.5
 
-#if defined QT_VERSION && (QT_VERSION < 0x040600)
-#define SLIGHT_INNER_RADIUS  0.5
-#define SLIGHT_OUTER_RADIUS  1.5
-#define SLIGHT_ETCH_RADIUS   2.5
-#else // QT_VERSION && (QT_VERSION < 0x040600)
 #define SLIGHT_INNER_RADIUS  0.75
 #define SLIGHT_OUTER_RADIUS  1.75
 #define SLIGHT_ETCH_RADIUS   2.75
-#endif //QT_VERSION && (QT_VERSION < 0x040600)
 
 #else // __cplusplus
 

@@ -807,16 +807,10 @@ void Style::polishFormLayout(QFormLayout *layout)
         }
 //         else if (verticalTextShift(label->fontMetrics()) & 1)
 //                 labelHeight += 1;
-        if (qobject_cast<QCheckBox *>(label))
+        if (qobject_cast<QCheckBox *>(label)) {
             label->setMinimumHeight(labelHeight);
-        else
-        {
-#if 1 // QT_VERSION >= 0x040602
+        } else {
             label->setMinimumHeight((labelHeight * 4 + 6) / 7);
-#else
-            // QFormLayout determines label size as height * 5 / 4, so revert that
-            label->setMinimumHeight((labelHeight * 4 + 4) / 5);
-#endif
         }
     }
 }

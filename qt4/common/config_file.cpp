@@ -604,7 +604,7 @@ void qtcLoadBgndImage(QtCImage *img)
     }
 }
 
-#endif // (!defined QT_VERSION || QT_VERSION >= 0x040000) && !defined CONFIG_DIALOG
+#endif
 
 static void checkColor(EShade *s, color *c)
 {

@@ -31,8 +31,8 @@
 #include <QCache>
 #include <QColor>
 #include <QStyleOption>
-#include <QCommonStyle>
 #include <QtGlobal>
+#include <QCommonStyle>
 typedef qulonglong QtcKey;
 #include <common/common.h>
 
@@ -62,7 +62,6 @@ class ShadowHelper;
 class Style: public QCommonStyle {
     Q_OBJECT
     Q_CLASSINFO("X-KDE-CustomElements", "true")
-
 public:
     enum BackgroundType {
         BGND_WINDOW,
@@ -120,24 +119,12 @@ public:
 #endif
     ~Style();
 
-    void init(bool initial);
-    void freeColor(QSet<QColor*> &freedColors, QColor **cols);
-    void freeColors();
-
-    Options&
-    options()
-    {
-        return opts;
-    }
-
     void polish(QApplication *app);
     void polish(QPalette &palette);
     void polish(QWidget *widget);
 
-#if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
     void polishFormLayout(QFormLayout *layout);
     void polishLayout(QLayout *layout);
-#endif
     void polishScrollArea(QAbstractScrollArea *scrollArea,
                           bool isKFilePlacesView=false) const;
 
@@ -175,6 +162,11 @@ public:
                                      const QStyleOptionComplex *option,
                                      const QPoint &pos,
                                      const QWidget *widget) const;
+    Options&
+    options()
+    {
+        return opts;
+    }
     void prePolish(QWidget *w) const;
     void
     prePolish(const QWidget *w) const
@@ -183,7 +175,9 @@ public:
     }
 
 private:
-
+    void init(bool initial);
+    void freeColor(QSet<QColor*> &freedColors, QColor **cols);
+    void freeColors();
     void drawSideBarButton(QPainter *painter, const QRect &r,
                            const QStyleOption *option,
                            const QWidget *widget) const;

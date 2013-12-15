@@ -59,7 +59,7 @@ class ShortcutHandler;
 class ShadowHelper;
 #endif
 
-class Style : public QCommonStyle {
+class Style: public QCommonStyle {
     Q_OBJECT
     Q_CLASSINFO("X-KDE-CustomElements", "true")
 public:
@@ -87,14 +87,14 @@ public:
         PREVIEW_WINDOW
     };
 
-    class PreviewOption : public QStyleOption {
+    class PreviewOption: public QStyleOption {
     public:
         Options opts;
     };
 
-    class BgndOption : public QStyleOption {
+    class BgndOption: public QStyleOption {
     public:
-        EAppearance  app;
+        EAppearance app;
         QPainterPath path;
         QRect widgetRect;
     };

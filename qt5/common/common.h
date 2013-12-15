@@ -369,7 +369,7 @@ typedef enum
 #define WINDOW_TEXT_SHADOW_ALPHA(A) (EFFECT_SHADOW==(A) ? 0.10 : 0.60)
 #define WINDOW_SHADOW_COLOR(A)      (EFFECT_SHADOW==(A) ? Qt::black : Qt::white)
 
-#endif //defined __cplusplus && defined QT_VERSION && (QT_VERSION >= 0x040000)
+#endif
 
 #define QTCURVE_PREVIEW_CONFIG      "QTCURVE_PREVIEW_CONFIG"
 #define QTCURVE_PREVIEW_CONFIG_FULL "QTCURVE_PREVIEW_CONFIG_FULL"
