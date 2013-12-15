@@ -440,14 +440,12 @@ void Style::polish(QWidget *widget)
 
         if (sb.count()) {
             widget->installEventFilter(this);
-            QList<QStatusBar*>::ConstIterator it(sb.begin());
-            QList<QStatusBar*>::ConstIterator end(sb.end());
-            for (;it != end;++it) {
+            for (QStatusBar *statusBar: const_(sb)) {
                 if (itsSaveStatusBarStatus) {
-                    (*it)->installEventFilter(this);
+                    statusBar->installEventFilter(this);
                 }
                 if (itsSaveStatusBarStatus && qtcStatusBarHidden(appName)) {
-                    (*it)->setHidden(true);
+                    statusBar->setHidden(true);
                 }
             }
 #ifdef QTC_ENABLE_X11
@@ -861,10 +859,8 @@ void Style::unpolish(QWidget *widget)
         if (sb.count()) {
             widget->removeEventFilter(this);
             if (itsSaveStatusBarStatus) {
-                QList<QStatusBar*>::ConstIterator it(sb.begin());
-                QList<QStatusBar*>::ConstIterator end(sb.end());
-                for(;it != end;++it) {
-                    (*it)->removeEventFilter(this);
+                for (QStatusBar *statusBar: const_(sb)) {
+                    statusBar->removeEventFilter(this);
                 }
             }
         }
@@ -6782,76 +6778,79 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
             readMdiPositions();
 
             const int controlSize(tb->rect.height() - constWindowMargin *2);
+            int sc = (subControl == SC_TitleBarUnshadeButton ?
+                      SC_TitleBarShadeButton :
+                      subControl == SC_TitleBarNormalButton ?
+                      isMaximized ? SC_TitleBarMaxButton :
+                      SC_TitleBarMinButton : subControl);
+            int pos = 0;
+            int totalLeft = 0;
+            int totalRight = 0;
+            bool rhs = false;
+            bool found = false;
 
-            QList<int>::ConstIterator it(itsMdiButtons[0].begin()),
-                end(itsMdiButtons[0].end());
-            int                       sc(SC_TitleBarUnshadeButton==subControl
-                                         ? SC_TitleBarShadeButton
-                                         : SC_TitleBarNormalButton==subControl
-                                         ? isMaximized
-                                         ? SC_TitleBarMaxButton
-                                         : SC_TitleBarMinButton
-                                         : subControl),
-                pos(0),
-                totalLeft(0),
-                totalRight(0);
-            bool                      rhs(false),
-                found(false);
-
-            for(; it!=end; ++it)
-                if(SC_TitleBarCloseButton==(*it) || WINDOWTITLE_SPACER==(*it) || tb->titleBarFlags&(toHint(*it)))
-                {
-                    totalLeft+=WINDOWTITLE_SPACER==(*it) ? controlSize/2 : controlSize;
-                    if(*it==sc)
-                        found=true;
-                    else if(!found)
-                        pos+=WINDOWTITLE_SPACER==(*it) ? controlSize/2 : controlSize;
-                }
-
-            if(!found)
-            {
-                pos=0;
-                rhs=true;
-            }
-
-            it=itsMdiButtons[1].begin();
-            end=itsMdiButtons[1].end();
-            for(; it!=end; ++it)
-                if(SC_TitleBarCloseButton==(*it) || WINDOWTITLE_SPACER==(*it) || tb->titleBarFlags&(toHint(*it)))
-                {
-                    if(WINDOWTITLE_SPACER!=(*it) || totalRight)
-                        totalRight+=WINDOWTITLE_SPACER==(*it) ? controlSize/2 : controlSize;
-                    if(rhs)
-                    {
-                        if(*it==sc)
-                        {
-                            pos+=controlSize;
-                            found=true;
-                        }
-                        else if(found)
-                            pos+=WINDOWTITLE_SPACER==(*it) ? controlSize/2 : controlSize;
+            for (int hint: const_(itsMdiButtons[0])) {
+                if (hint == SC_TitleBarCloseButton ||
+                    hint == WINDOWTITLE_SPACER ||
+                    tb->titleBarFlags & toHint(hint)) {
+                    totalLeft += (hint == WINDOWTITLE_SPACER ?
+                                  controlSize / 2 : controlSize);
+                    if (hint == sc) {
+                        found = true;
+                    } else if (!found) {
+                        pos += (hint == WINDOWTITLE_SPACER ?
+                                controlSize / 2 : controlSize);
                     }
                 }
+            }
+            if (!found) {
+                pos = 0;
+                rhs = true;
+            }
 
-            totalLeft+=(constWindowMargin*(totalLeft ? 2 : 1));
-            totalRight+=(constWindowMargin*(totalRight ? 2 : 1));
+            for (int hint: const_(itsMdiButtons[1])) {
+                if (hint == SC_TitleBarCloseButton ||
+                    hint == WINDOWTITLE_SPACER ||
+                    tb->titleBarFlags & toHint(hint)) {
+                    if (hint != WINDOWTITLE_SPACER || totalRight) {
+                        totalRight += (hint == WINDOWTITLE_SPACER ?
+                                       controlSize / 2 : controlSize);
+                    }
+                    if (rhs) {
+                        if (hint == sc) {
+                            pos += controlSize;
+                            found = true;
+                        } else if (found) {
+                            pos += (hint == WINDOWTITLE_SPACER ?
+                                    controlSize / 2 : controlSize);
+                        }
+                    }
+                }
+            }
 
-            if(SC_TitleBarLabel==subControl)
+            totalLeft += constWindowMargin * (totalLeft ? 2 : 1);
+            totalRight += constWindowMargin * (totalRight ? 2 : 1);
+
+            if (subControl == SC_TitleBarLabel) {
                 r.adjust(totalLeft, 0, -totalRight, 0);
-            else if(!found)
+            } else if (!found) {
                 return QRect();
-            else if(rhs)
-                r.setRect(r.right()-(pos+constWindowMargin), r.top()+constWindowMargin, controlSize, controlSize);
-            else
-                r.setRect(r.left()+constWindowMargin+pos, r.top()+constWindowMargin, controlSize, controlSize);
-            if(0==(r.height()%2))
+            } else if (rhs) {
+                r.setRect(r.right() - (pos + constWindowMargin),
+                          r.top() + constWindowMargin,
+                          controlSize, controlSize);
+            } else {
+                r.setRect(r.left() + constWindowMargin + pos,
+                          r.top() + constWindowMargin,
+                          controlSize, controlSize);
+            }
+            if (r.height()%2 == 0)
                 r.adjust(0, 0, 1, 1);
             return visualRect(tb->direction, tb->rect, r);
         }
     default:
         break;
     }
-
     return QCommonStyle::subControlRect(control, option, subControl, widget);
 }
 
