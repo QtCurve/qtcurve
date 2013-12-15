@@ -37,10 +37,11 @@ Style::prePolish(QWidget *widget) const
         return;
     QtcWidgetProps props(widget);
     // HACK:
-    // Set TranslucentBackground properties on toplevel widgets before they
+    // Request for RGBA format on toplevel widgets before they
     // create native windows. These windows are typically shown after being
     // created before entering the main loop and therefore do not have a
-    // chance to be polished before creating window id.
+    // chance to be polished before creating window id. (NOTE: somehow the popup
+    // menu on mdi sub window in QtDesigner has the same problem).
     // TODO:
     //     Use all informations to check if a widget should be transparent.
     //     Need to figure out how Qt5's xcb backend deal with RGB native window
@@ -55,17 +56,20 @@ Style::prePolish(QWidget *widget) const
         if ((opts.bgndOpacity != 100 && (qtcIsWindow(widget) ||
                                          qtcIsToolTip(widget))) ||
             (opts.dlgOpacity != 100 && qtcIsDialog(widget)) ||
-            // TODO: window flags, port to Qt4
             (opts.menuBgndOpacity != 100 && qobject_cast<QMenu*>(widget))) {
             props->prePolished = true;
             // Set this for better efficiency for now
             widget->setAutoFillBackground(false);
+            QWindow *window = widget->windowHandle();
             QWidgetPrivate *widgetPrivate =
                 static_cast<QWidgetPrivate*>(QObjectPrivate::get(widget));
-            widgetPrivate->createTLExtra();
-            widgetPrivate->createTLSysExtra();
             widgetPrivate->updateIsOpaque();
-            if (QWindow *window = widget->windowHandle()) {
+            if (!window) {
+                widgetPrivate->createTLExtra();
+                widgetPrivate->createTLSysExtra();
+                window = widget->windowHandle();
+            }
+            if (window) {
                 // Maybe we can register event filters and/or listen for signals
                 // like parent change or screen change on the QWidgetWindow
                 // so that we have a better change to update the alpha info

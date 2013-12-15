@@ -27,6 +27,7 @@
 #include <QX11Info>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QMenu>
 
 // Copied from qt_x11_p.h.
 // This is not part of the public API but should be stable enough to use
@@ -165,7 +166,8 @@ Style::prePolish(QWidget *widget) const
         // set the prePolished property if we have done something.
         if ((opts.bgndOpacity != 100 && (qtcIsWindow(widget) ||
                                          qtcIsToolTip(widget))) ||
-            (opts.dlgOpacity != 100 && qtcIsDialog(widget))) {
+            (opts.dlgOpacity != 100 && qtcIsDialog(widget)) ||
+            (opts.menuBgndOpacity != 100 && qobject_cast<QMenu*>(widget))) {
             props->prePolished = true;
             x11Info->setRgba();
             // Set this for better efficiency for now
