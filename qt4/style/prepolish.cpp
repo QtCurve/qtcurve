@@ -53,10 +53,9 @@ namespace QtCurve {
 struct QtcX11Info: public QX11Info {
     static bool creatingDummy;
     static QtcX11Info *getInfo(const QWidget *w);
-    QWidget *getRgbaDummy();
-    QWidget *getRgbDummy();
+    QWidget *rgbaDummy();
     void fixVisual();
-    void setRgba(bool rgba=true);
+    void setRgba();
 };
 bool QtcX11Info::creatingDummy = false;
 
@@ -80,56 +79,36 @@ QtcX11Info::fixVisual()
 }
 
 inline QWidget*
-QtcX11Info::getRgbaDummy()
+QtcX11Info::rgbaDummy()
 {
-    static QWidget **rgbaDummies = NULL;
+    static QWidget **dummies = NULL;
     creatingDummy = true;
     QDesktopWidget *desktop = qApp->desktop();
     int screenCount = desktop->screenCount();
-    int screen = this->screen();
-    if (qtcUnlikely(!rgbaDummies))
-        rgbaDummies = (QWidget**)calloc(screenCount, sizeof(QWidget*));
-    if (qtcUnlikely(!rgbaDummies[screen])) {
-        rgbaDummies[screen] = new QWidget(desktop->screen(screen));
-        rgbaDummies[screen]->setAttribute(Qt::WA_TranslucentBackground);
-        rgbaDummies[screen]->setAttribute(Qt::WA_WState_Polished);
-        rgbaDummies[screen]->winId();
+    int scrno = screen();
+    if (qtcUnlikely(!dummies))
+        dummies = (QWidget**)calloc(screenCount, sizeof(QWidget*));
+    if (qtcUnlikely(!dummies[scrno])) {
+        dummies[scrno] = new QWidget(desktop->screen(scrno));
+        dummies[scrno]->setAttribute(Qt::WA_TranslucentBackground);
+        dummies[scrno]->setAttribute(Qt::WA_WState_Polished);
+        dummies[scrno]->winId();
     }
     creatingDummy = false;
-    return rgbaDummies[screen];
-}
-
-inline QWidget*
-QtcX11Info::getRgbDummy()
-{
-    static QWidget **rgbDummies = NULL;
-    creatingDummy = true;
-    QDesktopWidget *desktop = qApp->desktop();
-    int screenCount = desktop->screenCount();
-    int screen = this->screen();
-    if (qtcUnlikely(!rgbDummies))
-        rgbDummies = (QWidget**)calloc(screenCount, sizeof(QWidget*));
-    if (qtcUnlikely(!rgbDummies[screen])) {
-        rgbDummies[screen] = new QWidget(desktop->screen(screen));
-        rgbDummies[screen]->setAttribute(Qt::WA_WState_Polished);
-        rgbDummies[screen]->winId();
-    }
-    creatingDummy = false;
-    return rgbDummies[screen];
+    return dummies[scrno];
 }
 
 inline void
-QtcX11Info::setRgba(bool rgba)
+QtcX11Info::setRgba()
 {
-    setX11Data(getInfo(rgba ? getRgbaDummy() : getRgbDummy())->x11data);
+    setX11Data(getInfo(rgbaDummy())->x11data);
 }
 
 __attribute__((hot)) void
 Style::prePolish(QWidget *widget) const
 {
-    if (QtcX11Info::creatingDummy || !widget || theThemedApp == APP_KWIN) {
+    if (!widget || QtcX11Info::creatingDummy || theThemedApp == APP_KWIN)
         return;
-    }
 
     QtcX11Info *x11Info = QtcX11Info::getInfo(widget);
     QtcWidgetProps props(widget);

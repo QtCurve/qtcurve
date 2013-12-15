@@ -364,9 +364,8 @@ Style::Style() :
 __attribute__((hot)) void
 Style::prePolish(QWidget *widget) const
 {
-    if (theThemedApp == APP_KWIN) {
+    if (!widget || theThemedApp == APP_KWIN)
         return;
-    }
     QtcWidgetProps props(widget);
     // HACK:
     // Set TranslucentBackground properties on toplevel widgets before they
@@ -379,7 +378,7 @@ Style::prePolish(QWidget *widget) const
     //     as a child of a RGBA window. However, since Qt5 will not recreate
     //     native window, this is probably easier to deal with than Qt4.
     //     (After we create a RGB window, Qt5 will not override it).
-    if (widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
+    if (!widget->testAttribute(Qt::WA_WState_Polished) &&
         !(widget->windowFlags() & Qt::MSWindowsOwnDC) &&
         !qtcGetWid(widget) && !props->prePolished) {
         // Skip MSWindowsOwnDC since it is set for QGLWidget and not likely to
