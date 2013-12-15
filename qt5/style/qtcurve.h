@@ -115,20 +115,33 @@ public:
     Style();
     ~Style();
 
-    virtual void polish(QPalette &palette) override;
     virtual void polish(QApplication *app) override;
+    virtual void polish(QPalette &palette) override;
     virtual void polish(QWidget *widget) override;
     virtual void unpolish(QApplication *app) override;
     virtual void unpolish(QWidget *widget) override;
 
     virtual bool eventFilter(QObject *object, QEvent *event) override;
     virtual void timerEvent(QTimerEvent *event) override;
+
     virtual int pixelMetric(PixelMetric metric, const QStyleOption *option=0,
                             const QWidget *widget=0) const override;
     virtual int styleHint(StyleHint hint, const QStyleOption *option,
                           const QWidget *widget,
                           QStyleHintReturn *returnData=0) const override;
+    virtual QSize sizeFromContents(ContentsType type,
+                                   const QStyleOption *option,
+                                   const QSize &size,
+                                   const QWidget *widget) const override;
     virtual QPalette standardPalette() const override;
+    virtual QIcon standardIcon(StandardPixmap pix, const QStyleOption *option=0,
+                               const QWidget *widget=0) const override;
+    virtual int layoutSpacing(QSizePolicy::ControlType control1,
+                              QSizePolicy::ControlType control2,
+                              Qt::Orientation orientation,
+                              const QStyleOption *option = 0,
+                              const QWidget *widget = 0) const override;
+
     virtual void drawPrimitive(PrimitiveElement element,
                                const QStyleOption *option,
                                QPainter *painter,
@@ -142,13 +155,9 @@ public:
                                     const QWidget *widget) const override;
     virtual void drawItemText(QPainter *painter, const QRect &rect, int flags,
                               const QPalette &pal, bool enabled,
-                              const QString &text,
-                              QPalette::ColorRole textRole =
+                              const QString &text, QPalette::ColorRole textRole=
                               QPalette::NoRole) const override;
-    virtual QSize sizeFromContents(ContentsType type,
-                                   const QStyleOption *option,
-                                   const QSize &size,
-                                   const QWidget *widget) const override;
+
     virtual QRect subElementRect(SubElement element, const QStyleOption *option,
                                  const QWidget *widget) const override;
     virtual QRect subControlRect(ComplexControl control,
@@ -204,28 +213,30 @@ private:
                            const QPainterPath &path, bool horiz, bool sel,
                            EAppearance bevApp, EWidget w=WIDGET_OTHER,
                            bool useCache=true) const;
-    void drawBevelGradientReal(const QColor &base, QPainter *p,
-                               const QRect &r, const QPainterPath &path,
-                               bool horiz, bool sel, EAppearance bevApp,
-                               EWidget w) const;
+    void drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &r,
+                               const QPainterPath &path, bool horiz, bool sel,
+                               EAppearance bevApp, EWidget w) const;
 
-    void drawBevelGradient(const QColor &base, QPainter *p, QRect const &r,
-                           bool horiz, bool sel, EAppearance bevApp,
-                           EWidget w=WIDGET_OTHER, bool useCache=true) const {
+    void
+    drawBevelGradient(const QColor &base, QPainter *p, QRect const &r,
+                      bool horiz, bool sel, EAppearance bevApp,
+                      EWidget w=WIDGET_OTHER, bool useCache=true) const
+    {
         drawBevelGradient(base, p, r, QPainterPath(), horiz, sel, bevApp, w,
                           useCache);
     }
-    void drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &r,
-                               bool horiz, bool sel, EAppearance bevApp,
-                               EWidget w) const {
+    void
+    drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &r,
+                          bool horiz, bool sel,
+                          EAppearance bevApp, EWidget w) const
+    {
         drawBevelGradientReal(base, p, r, QPainterPath(), horiz,
                               sel, bevApp, w);
     }
 
     void drawSunkenBevel(QPainter *p, const QRect &r, const QColor &col) const;
-    void drawLightBevel(QPainter *p, const QRect &r,
-                        const QStyleOption *option, const QWidget *widget,
-                        int round, const QColor &fill,
+    void drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *option,
+                        const QWidget *widget, int round, const QColor &fill,
                         const QColor *custom=0, bool doBorder=true,
                         EWidget w=WIDGET_OTHER) const;
     void drawLightBevelReal(QPainter *p, const QRect &r,
@@ -254,9 +265,9 @@ private:
     void buildSplitPath(const QRect &r, int round, double radius,
                         QPainterPath &tl, QPainterPath &br) const;
     void drawBorder(QPainter *p, const QRect &r, const QStyleOption *option,
-                    int round, const QColor *custom=0,
-                    EWidget w=WIDGET_OTHER, EBorder borderProfile=BORDER_FLAT,
-                    bool doBlend=true, int borderVal=QTC_STD_BORDER) const;
+                    int round, const QColor *custom=0, EWidget w=WIDGET_OTHER,
+                    EBorder borderProfile=BORDER_FLAT, bool doBlend=true,
+                    int borderVal=QTC_STD_BORDER) const;
     void drawMdiControl(QPainter *p, const QStyleOptionTitleBar *titleBar,
                         SubControl sc, const QWidget *widget,
                         ETitleBarButtons btn, const QColor &iconColor,
@@ -302,25 +313,27 @@ private:
     void colorTab(QPainter *p, const QRect &r, bool horiz,
                   EWidget tab, int round) const;
     void shadeColors(const QColor &base, QColor *vals) const;
-    const QColor * buttonColors(const QStyleOption *option) const;
-    QColor         titlebarIconColor(const QStyleOption *option) const;
-    const QColor * popupMenuCols(const QStyleOption *option=0L) const;
-    const QColor * checkRadioColors(const QStyleOption *option) const;
-    const QColor * sliderColors(const QStyleOption *option) const;
-    const QColor * backgroundColors(const QColor &col) const;
-    const QColor * backgroundColors(const QStyleOption *option) const {
+    const QColor *buttonColors(const QStyleOption *option) const;
+    QColor titlebarIconColor(const QStyleOption *option) const;
+    const QColor *popupMenuCols(const QStyleOption *option=0L) const;
+    const QColor *checkRadioColors(const QStyleOption *option) const;
+    const QColor *sliderColors(const QStyleOption *option) const;
+    const QColor *backgroundColors(const QColor &col) const;
+    const QColor*
+    backgroundColors(const QStyleOption *option) const
+    {
         return (option ?
                 backgroundColors(option->palette.background().color()) :
                 itsBackgroundCols);
     }
-    const QColor * highlightColors(const QColor &col) const;
-    const QColor * highlightColors(const QStyleOption *option,
-                                   bool useActive) const {
-        return highlightColors(option->palette.brush(
-                                   useActive ?
-                                   QPalette::Active :
-                                   QPalette::Current,
-                                   QPalette::Highlight).color());
+    const QColor *highlightColors(const QColor &col) const;
+    const QColor*
+    highlightColors(const QStyleOption *option, bool useActive) const
+    {
+        return highlightColors(
+            option->palette.brush(useActive ? QPalette::Active :
+                                  QPalette::Current,
+                                  QPalette::Highlight).color());
     }
     const QColor *borderColors(const QStyleOption *option,
                                const QColor *use) const;
@@ -344,13 +357,6 @@ private:
     int getFrameRound(const QWidget *widget) const;
 
 private Q_SLOTS:
-    virtual QIcon standardIcon(StandardPixmap pix, const QStyleOption *option=0,
-                               const QWidget *widget=0) const override;
-    virtual int layoutSpacing(QSizePolicy::ControlType control1,
-                              QSizePolicy::ControlType control2,
-                              Qt::Orientation orientation,
-                              const QStyleOption *option = 0,
-                              const QWidget *widget = 0) const override;
     void kdeGlobalSettingsChange(int type, int);
     void borderSizesChanged();
     void toggleMenuBar(unsigned int xid);
@@ -522,11 +528,11 @@ private:
 
 private:
     mutable Options opts;
-    QColor itsHighlightCols[TOTAL_SHADES+1],
-        itsBackgroundCols[TOTAL_SHADES+1],
-        itsMenubarCols[TOTAL_SHADES+1],
-        itsFocusCols[TOTAL_SHADES+1],
-        itsMouseOverCols[TOTAL_SHADES+1],
+    QColor itsHighlightCols[TOTAL_SHADES + 1],
+        itsBackgroundCols[TOTAL_SHADES + 1],
+        itsMenubarCols[TOTAL_SHADES + 1],
+        itsFocusCols[TOTAL_SHADES + 1],
+        itsMouseOverCols[TOTAL_SHADES + 1],
         *itsPopupMenuCols,
         *itsSliderCols,
         *itsDefBtnCols,
@@ -535,7 +541,7 @@ private:
         *itsSortedLvColors,
         *itsOOMenuCols,
         *itsProgressCols,
-        itsButtonCols[TOTAL_SHADES+1],
+        itsButtonCols[TOTAL_SHADES + 1],
         itsCheckRadioCol;
     bool itsSaveMenuBarStatus,
         itsSaveStatusBarStatus,
@@ -547,9 +553,9 @@ private:
     mutable QColor *itsMdiColors;
     mutable QColor itsActiveMdiTextColor;
     mutable QColor itsMdiTextColor;
-    mutable QColor itsColoredButtonCols[TOTAL_SHADES+1];
-    mutable QColor itsColoredBackgroundCols[TOTAL_SHADES+1];
-    mutable QColor itsColoredHighlightCols[TOTAL_SHADES+1];
+    mutable QColor itsColoredButtonCols[TOTAL_SHADES + 1];
+    mutable QColor itsColoredBackgroundCols[TOTAL_SHADES + 1];
+    mutable QColor itsColoredHighlightCols[TOTAL_SHADES + 1];
     mutable QCache<QtcKey, QPixmap> itsPixmapCache;
     mutable bool itsActive;
     mutable const QWidget *itsSbWidget;

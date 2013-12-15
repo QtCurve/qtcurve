@@ -119,49 +119,53 @@ public:
 #endif
     ~Style();
 
-    void polish(QApplication *app);
-    void polish(QPalette &palette);
-    void polish(QWidget *widget);
+    virtual void polish(QApplication *app) override;
+    virtual void polish(QPalette &palette) override;
+    virtual void polish(QWidget *widget) override;
+    virtual void unpolish(QApplication *app) override;
+    virtual void unpolish(QWidget *widget) override;
 
-    void polishFormLayout(QFormLayout *layout);
-    void polishLayout(QLayout *layout);
-    void polishScrollArea(QAbstractScrollArea *scrollArea,
-                          bool isKFilePlacesView=false) const;
+    virtual bool eventFilter(QObject *object, QEvent *event) override;
+    virtual void timerEvent(QTimerEvent *event) override;
 
-    void unpolish(QApplication *app);
-    void unpolish(QWidget *widget);
-    bool eventFilter(QObject *object, QEvent *event);
-    void timerEvent(QTimerEvent *event);
-    int pixelMetric(PixelMetric metric, const QStyleOption *option=0,
-                    const QWidget *widget=0) const;
-    int styleHint(StyleHint hint, const QStyleOption *option,
-                  const QWidget *widget, QStyleHintReturn *returnData=0) const;
-    QPalette standardPalette() const;
-    void drawPrimitive(PrimitiveElement element, const QStyleOption *option,
-                       QPainter *painter, const QWidget *widget) const;
-    void drawControl(ControlElement control, const QStyleOption *option,
-                     QPainter *painter, const QWidget *widget) const;
-    void drawComplexControl(ComplexControl control,
-                            const QStyleOptionComplex *option,
-                            QPainter *painter, const QWidget *widget) const;
-    void drawItemTextWithRole(QPainter *painter, const QRect &rect, int flags,
+    virtual int pixelMetric(PixelMetric metric, const QStyleOption *option=0,
+                            const QWidget *widget=0) const override;
+    virtual int styleHint(StyleHint hint, const QStyleOption *option,
+                          const QWidget *widget,
+                          QStyleHintReturn *returnData=0) const override;
+    virtual QSize sizeFromContents(ContentsType type,
+                                   const QStyleOption *option,
+                                   const QSize &size,
+                                   const QWidget *widget) const override;
+    virtual QPalette standardPalette() const override;
+
+    virtual void drawPrimitive(PrimitiveElement element,
+                               const QStyleOption *option,
+                               QPainter *painter,
+                               const QWidget *widget) const override;
+    virtual void drawControl(ControlElement control, const QStyleOption *option,
+                             QPainter *painter,
+                             const QWidget *widget) const override;
+    virtual void drawComplexControl(ComplexControl control,
+                                    const QStyleOptionComplex *option,
+                                    QPainter *painter,
+                                    const QWidget *widget) const override;
+    virtual void drawItemText(QPainter *painter, const QRect &rect, int flags,
                               const QPalette &pal, bool enabled,
-                              const QString &text,
-                              QPalette::ColorRole textRole) const;
-    void drawItemText(QPainter *painter, const QRect &rect, int flags,
-                      const QPalette &pal, bool enabled, const QString &text,
-                      QPalette::ColorRole textRole=QPalette::NoRole) const;
-    QSize sizeFromContents(ContentsType type, const QStyleOption *option,
-                           const QSize &size, const QWidget *widget) const;
-    QRect subElementRect(SubElement element, const QStyleOption *option,
-                         const QWidget *widget) const;
-    QRect subControlRect(ComplexControl control,
-                         const QStyleOptionComplex *option,
-                         SubControl subControl, const QWidget *widget) const;
-    SubControl hitTestComplexControl(ComplexControl control,
-                                     const QStyleOptionComplex *option,
-                                     const QPoint &pos,
-                                     const QWidget *widget) const;
+                              const QString &text, QPalette::ColorRole textRole=
+                              QPalette::NoRole) const override;
+
+    virtual QRect subElementRect(SubElement element, const QStyleOption *option,
+                                 const QWidget *widget) const override;
+    virtual QRect subControlRect(ComplexControl control,
+                                 const QStyleOptionComplex *option,
+                                 SubControl subControl,
+                                 const QWidget *widget) const override;
+    virtual SubControl hitTestComplexControl(ComplexControl control,
+                                             const QStyleOptionComplex *option,
+                                             const QPoint &pos,
+                                             const QWidget *widget) const override;
+
     Options&
     options()
     {
@@ -178,6 +182,15 @@ private:
     void init(bool initial);
     void freeColor(QSet<QColor*> &freedColors, QColor **cols);
     void freeColors();
+    void polishFormLayout(QFormLayout *layout);
+    void polishLayout(QLayout *layout);
+    void polishScrollArea(QAbstractScrollArea *scrollArea,
+                          bool isKFilePlacesView=false) const;
+
+    void drawItemTextWithRole(QPainter *painter, const QRect &rect, int flags,
+                              const QPalette &pal, bool enabled,
+                              const QString &text,
+                              QPalette::ColorRole textRole) const;
     void drawSideBarButton(QPainter *painter, const QRect &r,
                            const QStyleOption *option,
                            const QWidget *widget) const;
@@ -194,29 +207,28 @@ private:
                                    EAppearance bevApp,
                                    const QColor *cols) const;
     void drawBevelGradient(const QColor &base, QPainter *p, QRect const &r,
-                           const QPainterPath &path,
-                           bool horiz, bool sel, EAppearance bevApp,
-                           EWidget w=WIDGET_OTHER, bool useCache=true) const;
+                           const QPainterPath &path, bool horiz, bool sel,
+                           EAppearance bevApp, EWidget w=WIDGET_OTHER,
+                           bool useCache=true) const;
     void drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &r,
-                               const QPainterPath &path,
-                               bool horiz, bool sel, EAppearance bevApp,
-                               EWidget w) const;
+                               const QPainterPath &path, bool horiz, bool sel,
+                               EAppearance bevApp, EWidget w) const;
 
     void
     drawBevelGradient(const QColor &base, QPainter *p, QRect const &r,
                       bool horiz, bool sel, EAppearance bevApp,
                       EWidget w=WIDGET_OTHER, bool useCache=true) const
     {
-        drawBevelGradient(base, p, r,
-                          QPainterPath(), horiz, sel, bevApp, w, useCache);
+        drawBevelGradient(base, p, r, QPainterPath(), horiz, sel, bevApp, w,
+                          useCache);
     }
     void
     drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &r,
                           bool horiz, bool sel,
                           EAppearance bevApp, EWidget w) const
     {
-        drawBevelGradientReal(base, p, r, QPainterPath(), horiz, sel, bevApp,
-                              w);
+        drawBevelGradientReal(base, p, r, QPainterPath(), horiz,
+                              sel, bevApp, w);
     }
 
     void drawSunkenBevel(QPainter *p, const QRect &r, const QColor &col) const;
@@ -232,10 +244,10 @@ private:
                             bool onToolbar) const;
     void drawGlow(QPainter *p, const QRect &r, EWidget w,
                   const QColor *cols=0L) const;
-    void drawEtch(QPainter *p, const QRect &r, const QWidget *widget, EWidget w,
-                  bool raised=false, int round=ROUNDED_ALL) const;
-    void drawBgndRing(QPainter &painter, int x, int y, int size, int size2,
-                      bool isWindow) const;
+    void drawEtch(QPainter *p, const QRect &r, const QWidget *widget,
+                  EWidget w, bool raised=false, int round=ROUNDED_ALL) const;
+    void drawBgndRing(QPainter &painter, int x, int y, int size,
+                      int size2, bool isWindow) const;
     QPixmap drawStripes(const QColor &color, int opacity) const;
     void drawBackground(QPainter *p, const QColor &bgnd, const QRect &r,
                         int opacity, BackgroundType type, EAppearance app,
@@ -243,10 +255,10 @@ private:
     void drawBackgroundImage(QPainter *p, bool isWindow, const QRect &r) const;
     void drawBackground(QPainter *p, const QWidget *widget,
                         BackgroundType type) const;
-    QPainterPath buildPath(const QRectF &r, EWidget w, int round,
-                           double radius) const;
-    QPainterPath buildPath(const QRect &r, EWidget w, int round,
-                           double radius) const;
+    QPainterPath buildPath(const QRectF &r, EWidget w,
+                           int round, double radius) const;
+    QPainterPath buildPath(const QRect &r, EWidget w,
+                           int round, double radius) const;
     void buildSplitPath(const QRect &r, int round, double radius,
                         QPainterPath &tl, QPainterPath &br) const;
     void drawBorder(QPainter *p, const QRect &r, const QStyleOption *option,
@@ -265,9 +277,8 @@ private:
     bool drawMdiButton(QPainter *painter, const QRect &r, bool hover,
                        bool sunken, const QColor *cols) const;
     void drawMdiIcon(QPainter *painter, const QColor &color, const QColor &bgnd,
-                     const QRect &r,
-                     bool hover, bool sunken, Icon iclearcon, bool stdSize,
-                     bool drewFrame) const;
+                     const QRect &r, bool hover, bool sunken, Icon iclearcon,
+                     bool stdSize, bool drewFrame) const;
     void drawIcon(QPainter *painter, const QColor &color, const QRect &r,
                   bool sunken, Icon icon, bool stdSize=true) const;
     void drawEntryField(QPainter *p, const QRect &rx, const QWidget *widget,
@@ -289,16 +300,15 @@ private:
                           const QWidget *widget) const;
     void drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p,
                                      const QRect &r, const QStyleOption *option,
-                                     bool menu=true,
-                                     bool horiz=true) const;
+                                     bool menu=true, bool horiz=true) const;
     void drawHandleMarkers(QPainter *p, const QRect &r,
                            const QStyleOption *option, bool tb,
                            ELine handles) const;
     void fillTab(QPainter *p, const QRect &r, const QStyleOption *option,
                  const QColor &fill, bool horiz, EWidget tab,
                  bool tabOnly) const;
-    void colorTab(QPainter *p, const QRect &r, bool horiz, EWidget tab,
-                  int round) const;
+    void colorTab(QPainter *p, const QRect &r, bool horiz,
+                  EWidget tab, int round) const;
     void shadeColors(const QColor &base, QColor *vals) const;
     const QColor *buttonColors(const QStyleOption *option) const;
     QColor titlebarIconColor(const QStyleOption *option) const;
@@ -309,8 +319,9 @@ private:
     const QColor*
     backgroundColors(const QStyleOption *option) const
     {
-        return option ? backgroundColors(option->palette.background().color()) :
-            itsBackgroundCols;
+        return (option ?
+                backgroundColors(option->palette.background().color()) :
+                itsBackgroundCols);
     }
     const QColor *highlightColors(const QColor &col) const;
     const QColor*
@@ -343,16 +354,14 @@ private:
     int getFrameRound(const QWidget *widget) const;
 
 private Q_SLOTS:
-
     void widgetDestroyed(QObject *o);
-    QIcon standardIconImplementation(StandardPixmap pix,
-                                     const QStyleOption *option=0,
-                                     const QWidget *widget=0) const;
-    int layoutSpacingImplementation(QSizePolicy::ControlType control1,
-                                    QSizePolicy::ControlType control2,
-                                    Qt::Orientation orientation,
-                                    const QStyleOption *option,
-                                    const QWidget *widget) const;
+    int layoutSpacingImplementation(
+        QSizePolicy::ControlType control1, QSizePolicy::ControlType control2,
+        Qt::Orientation orientation, const QStyleOption *option=0,
+        const QWidget *widget=0) const;
+    QIcon standardIconImplementation(
+        StandardPixmap pix, const QStyleOption *option=0,
+        const QWidget *widget=0) const;
     void kdeGlobalSettingsChange(int type, int);
     void borderSizesChanged();
     void toggleMenuBar(unsigned int xid);
