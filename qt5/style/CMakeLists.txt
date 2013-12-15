@@ -1,4 +1,5 @@
 set(qtcurve_SRCS
+  prepolish.cpp
   qtcurve.cpp
   qtcurve_api.cpp
   qtcurve_plugin.cpp

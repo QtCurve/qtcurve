@@ -24,8 +24,6 @@
 
 #include "qtcurve_p.h"
 
-#include <QMainWindow>
-#include <QDialog>
 #include <QX11Info>
 #include <QApplication>
 #include <QDesktopWidget>

@@ -68,9 +68,6 @@
 #include <QSettings>
 #include <QPixmapCache>
 #include <QTextStream>
-#include <QWindow>
-
-#include "private/qwidget_p.h"
 
 #ifdef QTC_ENABLE_X11
 #  include "shadowhelper.h"
@@ -358,57 +355,6 @@ Style::Style() :
         itsUsePixmapCache=false;
     } else {
         init(true);
-    }
-}
-
-__attribute__((hot)) void
-Style::prePolish(QWidget *widget) const
-{
-    if (!widget || theThemedApp == APP_KWIN)
-        return;
-    QtcWidgetProps props(widget);
-    // HACK:
-    // Set TranslucentBackground properties on toplevel widgets before they
-    // create native windows. These windows are typically shown after being
-    // created before entering the main loop and therefore do not have a
-    // chance to be polished before creating window id.
-    // TODO:
-    //     Use all informations to check if a widget should be transparent.
-    //     Need to figure out how Qt5's xcb backend deal with RGB native window
-    //     as a child of a RGBA window. However, since Qt5 will not recreate
-    //     native window, this is probably easier to deal with than Qt4.
-    //     (After we create a RGB window, Qt5 will not override it).
-    if (!widget->testAttribute(Qt::WA_WState_Polished) &&
-        !(widget->windowFlags() & Qt::MSWindowsOwnDC) &&
-        !qtcGetWid(widget) && !props->prePolished) {
-        // Skip MSWindowsOwnDC since it is set for QGLWidget and not likely to
-        // be used in other cases.
-        if ((opts.bgndOpacity != 100 && (qtcIsWindow(widget) ||
-                                         qtcIsToolTip(widget))) ||
-            (opts.dlgOpacity != 100 && qtcIsDialog(widget)) ||
-            // TODO: window flags, port to Qt4
-            (opts.menuBgndOpacity != 100 && qobject_cast<QMenu*>(widget))) {
-            props->prePolished = true;
-            // Set this for better efficiency for now
-            widget->setAutoFillBackground(false);
-            QWidgetPrivate *widgetPrivate =
-                static_cast<QWidgetPrivate*>(QObjectPrivate::get(widget));
-            widgetPrivate->createTLExtra();
-            widgetPrivate->createTLSysExtra();
-            widgetPrivate->updateIsOpaque();
-            if (QWindow *window = widget->windowHandle()) {
-                // Maybe we can register event filters and/or listen for signals
-                // like parent change or screen change on the QWidgetWindow
-                // so that we have a better change to update the alpha info
-                QSurfaceFormat format = window->format();
-                format.setAlphaBufferSize(8);
-                window->setFormat(format);
-            }
-            // QWidgetPrivate::updateIsTranslucent sets the format back
-            // is Qt::WA_TranslucentBackground is not set. So we need to do
-            // this repeatedly
-            props->prePolished = false;
-        }
     }
 }
 
