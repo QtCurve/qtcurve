@@ -31,21 +31,14 @@
 #include <QCache>
 #include <QColor>
 #include <QStyleOption>
-#include <Q_UINT64>
+#include <QCommonStyle>
+#include <QtGlobal>
 typedef qulonglong QtcKey;
 #include <common/common.h>
 
 #ifdef QTC_QT4_ENABLE_KDE
 #include <KDE/KComponentData>
 #endif
-
-// #ifdef QTC_KSTYLE
-// #include <kstyle.h>
-// #define BASE_STYLE KStyle
-// #else
-#include <QCommonStyle>
-#define BASE_STYLE QCommonStyle
-// #endif
 
 class QStyleOptionSlider;
 class QLabel;

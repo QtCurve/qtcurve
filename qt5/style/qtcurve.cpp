@@ -1069,7 +1069,7 @@ QIcon Style::standardIcon(StandardPixmap pix, const QStyleOption *option,
         break;
     }
     // TODO ?
-    return BASE_STYLE::standardIcon(pix, option, widget);
+    return QCommonStyle::standardIcon(pix, option, widget);
 }
 
 int Style::layoutSpacing(QSizePolicy::ControlType control1,
@@ -1084,10 +1084,14 @@ int Style::layoutSpacing(QSizePolicy::ControlType control1,
 }
 
 // Use 'drawItemTextWithRole' when already know which role to use.
-void Style::drawItemTextWithRole(QPainter *painter, const QRect &rect, int flags, const QPalette &pal, bool enabled,
-                                 const QString &text, QPalette::ColorRole textRole) const
+void
+Style::drawItemTextWithRole(QPainter *painter, const QRect &rect, int flags,
+                            const QPalette &pal, bool enabled,
+                            const QString &text,
+                            QPalette::ColorRole textRole) const
 {
-    BASE_STYLE::drawItemText(painter, rect, flags, pal, enabled, text, textRole);
+    QCommonStyle::drawItemText(painter, rect, flags, pal,
+                               enabled, text, textRole);
 }
 
 void Style::drawSideBarButton(QPainter *painter, const QRect &r, const QStyleOption *option, const QWidget *widget) const

@@ -32,20 +32,13 @@
 #include <QColor>
 #include <QStyleOption>
 #include <QtGlobal>
+#include <QCommonStyle>
 typedef qulonglong QtcKey;
 #include <common/common.h>
 
 #ifdef QTC_QT5_ENABLE_KDE
 #include <KDE/KComponentData>
 #endif
-
-// #ifdef QTC_KSTYLE
-// #include <kstyle.h>
-// #define BASE_STYLE KStyle
-// #else
-#include <QCommonStyle>
-#define BASE_STYLE QCommonStyle
-// #endif
 
 class QStyleOptionSlider;
 class QLabel;
@@ -66,10 +59,9 @@ class ShortcutHandler;
 class ShadowHelper;
 #endif
 
-class Style : public BASE_STYLE {
+class Style : public QCommonStyle {
     Q_OBJECT
     Q_CLASSINFO("X-KDE-CustomElements", "true")
-
 public:
     enum BackgroundType {
         BGND_WINDOW,

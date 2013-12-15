@@ -1406,7 +1406,7 @@ void Style::polish(QApplication *app)
         qt_filedialog_save_filename_hook = 0L;
     }
 
-    BASE_STYLE::polish(app);
+    QCommonStyle::polish(app);
     if (opts.hideShortcutUnderline) {
         app->installEventFilter(itsShortcutHandler);
     }
@@ -2195,7 +2195,7 @@ void Style::unpolish(QApplication *app)
 {
     if(opts.hideShortcutUnderline)
         app->removeEventFilter(itsShortcutHandler);
-    BASE_STYLE::unpolish(app);
+    QCommonStyle::unpolish(app);
 }
 
 void Style::unpolish(QWidget *widget)
@@ -2910,7 +2910,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
             break;
     }
 
-    return BASE_STYLE::eventFilter(object, event);
+    return QCommonStyle::eventFilter(object, event);
 }
 
 void Style::timerEvent(QTimerEvent *event)
@@ -2936,7 +2936,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
     switch((unsigned)metric)
     {
         case PM_ToolTipLabelFrameWidth:
-            return !ROUNDED || opts.square&SQUARE_TOOLTIPS ? BASE_STYLE::pixelMetric(metric, option, widget) : 3;
+            return !ROUNDED || opts.square&SQUARE_TOOLTIPS ? QCommonStyle::pixelMetric(metric, option, widget) : 3;
         case PM_MdiSubWindowFrameWidth:
             return 3;
         case PM_DockWidgetTitleMargin:
@@ -3131,7 +3131,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
                     ++size;
                 return size;
             }
-            return BASE_STYLE::pixelMetric(metric, option, widget);
+            return QCommonStyle::pixelMetric(metric, option, widget);
         case PM_SliderLength:
             return (SLIDER_CIRCULAR==opts.sliderStyle
                         ? CIRCULAR_SLIDER_SIZE
@@ -3200,7 +3200,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
             if (qtcCheckKDEType0(widget, KTabBar) &&
                 !qstyleoption_cast<const QStyleOptionTab*>(option))
                 return 10;
-            return BASE_STYLE::pixelMetric(metric, option, widget);
+            return QCommonStyle::pixelMetric(metric, option, widget);
         case PM_TabBarBaseOverlap:
             if (qtcCheckKDEType0(widget, KTabBar) &&
                 !qstyleoption_cast<const QStyleOptionTab*>(option))
@@ -3208,7 +3208,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
 // Fall through!
 //.........
         default:
-            return BASE_STYLE::pixelMetric(metric, option, widget);
+            return QCommonStyle::pixelMetric(metric, option, widget);
     }
 }
 
@@ -3221,7 +3221,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
         case SH_Menu_Mask:
             if ((SH_ToolTip_Mask == hint && (opts.square & SQUARE_TOOLTIPS)) ||
                 (SH_Menu_Mask == hint && (opts.square & SQUARE_POPUP_MENUS))) {
-                return BASE_STYLE::styleHint(hint, option, widget, returnData);
+                return QCommonStyle::styleHint(hint, option, widget, returnData);
             } else {
                 if (!Utils::hasAlphaChannel(widget) &&
                     (!widget || widget->isWindow())) {
@@ -3392,7 +3392,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
                     return CE_QtC_KCapacityBar;
                 }
 #endif
-            return BASE_STYLE::styleHint(hint, option, widget, returnData);
+            return QCommonStyle::styleHint(hint, option, widget, returnData);
    }
 }
 
@@ -3401,7 +3401,7 @@ QPalette Style::standardPalette() const
 #ifdef QTC_QT4_ENABLE_KDE
     return KGlobalSettings::createApplicationPalette(KSharedConfig::openConfig(itsComponentData));
 #else
-    return BASE_STYLE::standardPalette();
+    return QCommonStyle::standardPalette();
 #endif
 }
 
@@ -3604,7 +3604,7 @@ QIcon Style::standardIconImplementation(StandardPixmap pix, const QStyleOption *
         default:
             break;
     }
-    return BASE_STYLE::standardIconImplementation(pix, option, widget);
+    return QCommonStyle::standardIconImplementation(pix, option, widget);
 }
 
 int Style::layoutSpacingImplementation(QSizePolicy::ControlType control1, QSizePolicy::ControlType control2, Qt::Orientation orientation,
@@ -4173,7 +4173,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             {
                 if(tbb->shape != QTabBar::RoundedNorth && tbb->shape != QTabBar::RoundedWest &&
                    tbb->shape != QTabBar::RoundedSouth && tbb->shape != QTabBar::RoundedEast)
-                    BASE_STYLE::drawPrimitive(element, option, painter, widget);
+                    QCommonStyle::drawPrimitive(element, option, painter, widget);
                 else
                 {
                     static const int constSidePad=16*2;
@@ -5306,7 +5306,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
         }
             // Fall through!
         default:
-            BASE_STYLE::drawPrimitive(element, option, painter, widget);
+            QCommonStyle::drawPrimitive(element, option, painter, widget);
             break;
     }
 }
@@ -7605,12 +7605,12 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                             drawBevelGradient(shade(palette.background().color(), TO_FACTOR(opts.crHighlight)), painter,
                                               highlightRect, true, false, opts.selectionAppearance, WIDGET_SELECTION);
                     }
-                    BASE_STYLE::drawControl(element, &copy, painter, widget);
+                    QCommonStyle::drawControl(element, &copy, painter, widget);
                     break;
                 }
             // Fall through!
         default:
-            BASE_STYLE::drawControl(element, option, painter, widget);
+            QCommonStyle::drawControl(element, option, painter, widget);
     }
 }
 
@@ -9368,7 +9368,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
             }
             break;
         default:
-            BASE_STYLE::drawComplexControl(control, option, painter, widget);
+            QCommonStyle::drawComplexControl(control, option, painter, widget);
             break;
     }
 }
@@ -9377,7 +9377,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 void Style::drawItemTextWithRole(QPainter *painter, const QRect &rect, int flags, const QPalette &pal, bool enabled,
                                  const QString &text, QPalette::ColorRole textRole) const
 {
-    BASE_STYLE::drawItemText(painter, rect, flags, pal, enabled, text, textRole);
+    QCommonStyle::drawItemText(painter, rect, flags, pal, enabled, text, textRole);
 }
 
 void Style::drawItemText(QPainter *painter, const QRect &rect, int flags, const QPalette &pal, bool enabled, const QString &text,
@@ -9393,18 +9393,18 @@ void Style::drawItemText(QPainter *painter, const QRect &rect, int flags, const 
 
             if(itsInactiveChangeSelectionColor && QPalette::Inactive==p.currentColorGroup())
                 p.setCurrentColorGroup(QPalette::Active);
-            BASE_STYLE::drawItemText(painter, rect, flags, p, enabled, text, QPalette::HighlightedText);
+            QCommonStyle::drawItemText(painter, rect, flags, p, enabled, text, QPalette::HighlightedText);
             return;
         }
     }
 
-    BASE_STYLE::drawItemText(painter, rect, flags, pal, enabled, text, textRole);
+    QCommonStyle::drawItemText(painter, rect, flags, pal, enabled, text, textRole);
 }
 
 QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &size, const QWidget *widget) const
 {
     prePolish(widget);
-    QSize newSize(BASE_STYLE::sizeFromContents(type, option, size, widget));
+    QSize newSize(QCommonStyle::sizeFromContents(type, option, size, widget));
 
     switch (type)
     {
@@ -9685,7 +9685,7 @@ QRect Style::subElementRect(SubElement element, const QStyleOption *option, cons
             bool                           verticalTitleBar = v2 ? v2->verticalTitleBar : false;
             int                            m = pixelMetric(PM_DockWidgetTitleMargin, option, widget);
 
-            rect = BASE_STYLE::subElementRect(element, option, widget);
+            rect = QCommonStyle::subElementRect(element, option, widget);
 
             if (verticalTitleBar)
                 rect.adjust(0, 0, 0, -m);
@@ -9697,9 +9697,9 @@ QRect Style::subElementRect(SubElement element, const QStyleOption *option, cons
         }
 #if QT_VERSION >= 0x040500
         case SE_TabBarTabLeftButton:
-            return BASE_STYLE::subElementRect(element, option, widget).translated(-2, -1);
+            return QCommonStyle::subElementRect(element, option, widget).translated(-2, -1);
         case SE_TabBarTabRightButton:
-            return BASE_STYLE::subElementRect(element, option, widget).translated(2, -1);
+            return QCommonStyle::subElementRect(element, option, widget).translated(2, -1);
         case SE_TabBarTabText:
             if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab*>(option))
             {
@@ -9785,7 +9785,7 @@ QRect Style::subElementRect(SubElement element, const QStyleOption *option, cons
 #endif
         case SE_RadioButtonIndicator:
             rect = visualRect(option->direction, option->rect,
-                              BASE_STYLE::subElementRect(element, option, widget)).adjusted(0, 0, 1, 1);
+                              QCommonStyle::subElementRect(element, option, widget)).adjusted(0, 0, 1, 1);
             break;
         case SE_ProgressBarContents:
           return opts.fillProgress
@@ -9817,13 +9817,13 @@ QRect Style::subElementRect(SubElement element, const QStyleOption *option, cons
             }
             else
             {
-                rect=BASE_STYLE::subElementRect(element, option, widget);
+                rect=QCommonStyle::subElementRect(element, option, widget);
                 if(DO_EFFECT)
                     rect.adjust(1, 1, -1, -1);
             }
             return rect;
         default:
-            return BASE_STYLE::subElementRect(element, option, widget);
+            return QCommonStyle::subElementRect(element, option, widget);
     }
 
     return visualRect(option->direction, option->rect, rect);
@@ -10097,7 +10097,7 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
                             ret=QRect(0, sliderstart, sbextent, sliderLength);
                         break;
                     default:
-                        ret = BASE_STYLE::subControlRect(control, option, subControl, widget);
+                        ret = QCommonStyle::subControlRect(control, option, subControl, widget);
                         break;
                 }
                 return visualRect(scrollBar->direction/*Qt::LeftToRight*/, scrollBar->rect, ret);
@@ -10110,7 +10110,7 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
                 {
                     int   tickSize(pixelMetric(PM_SliderTickmarkOffset, option, widget)),
                           mod=MO_GLOW==opts.coloredMouseOver && DO_EFFECT ? 2 : 0;
-                    QRect rect(BASE_STYLE::subControlRect(control, option, subControl, widget));
+                    QRect rect(QCommonStyle::subControlRect(control, option, subControl, widget));
 
                     switch (subControl)
                     {
@@ -10350,7 +10350,7 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
             break;
     }
 
-    return BASE_STYLE::subControlRect(control, option, subControl, widget);
+    return QCommonStyle::subControlRect(control, option, subControl, widget);
 }
 
 QStyle::SubControl Style::hitTestComplexControl(ComplexControl control, const QStyleOptionComplex *option,
@@ -10386,7 +10386,7 @@ QStyle::SubControl Style::hitTestComplexControl(ComplexControl control, const QS
             break;
     }
 
-    return BASE_STYLE::hitTestComplexControl(control, option,  pos, widget);
+    return QCommonStyle::hitTestComplexControl(control, option,  pos, widget);
 }
 
 void Style::drawSideBarButton(QPainter *painter, const QRect &r, const QStyleOption *option, const QWidget *widget) const
