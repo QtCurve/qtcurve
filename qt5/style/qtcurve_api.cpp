@@ -740,7 +740,7 @@ void Style::polish(QWidget *widget)
         widget->setAutoFillBackground(false);
     }
 
-    if (APP_SYSTEMSETTINGS == theThemedApp &&
+    if (theThemedApp == APP_SYSTEMSETTINGS &&
         widget && widget->parentWidget() &&
         widget->parentWidget()->parentWidget() &&
         qobject_cast<QFrame*>(widget) &&
@@ -769,8 +769,8 @@ void Style::polish(QWidget *widget)
         ((QFrame*)widget)->setFrameShape(QFrame::NoFrame);
     }
 
-    if(APP_KDEVELOP==theThemedApp && !opts.stdSidebarButtons && widget->inherits("Sublime::IdealButtonBarWidget") && widget->layout())
-    {
+    if (theThemedApp == APP_KDEVELOP && !opts.stdSidebarButtons &&
+        widget->inherits("Sublime::IdealButtonBarWidget") && widget->layout()) {
         widget->layout()->setSpacing(0);
         widget->layout()->setMargin(0);
     }
@@ -781,7 +781,6 @@ void Style::polish(QWidget *widget)
     if ((100 != opts.bgndOpacity && qtcIsWindow(window)) ||
         (100 != opts.dlgOpacity && qtcIsDialog(window))) {
         widget->installEventFilter(this);
-
         if (widget->inherits("KFilePlacesView")) {
             widget->setAutoFillBackground(false);
             widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
@@ -1018,9 +1017,6 @@ void Style::unpolish(QWidget *widget)
 
 bool Style::eventFilter(QObject *object, QEvent *event)
 {
-    bool isSViewCont = (APP_KONTACT == theThemedApp &&
-                        itsSViewContainers.contains((QWidget*)object));
-
     if (qobject_cast<QMenuBar*>(object) &&
         dynamic_cast<QMouseEvent*>(event)) {
         if (updateMenuBarEvent((QMouseEvent*)event, (QMenuBar*)object)) {
@@ -1028,7 +1024,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
         }
     }
 
-    if (QEvent::Show == event->type() &&
+    if (event->type() == QEvent::Show &&
         qobject_cast<QAbstractScrollArea*>(object) &&
         object->inherits("KFilePlacesView")) {
         QWidget *view = ((QAbstractScrollArea*)object)->viewport();
@@ -1043,8 +1039,10 @@ bool Style::eventFilter(QObject *object, QEvent *event)
         object->removeEventFilter(this);
     }
 
+    bool isSViewCont = (APP_KONTACT == theThemedApp &&
+                        itsSViewContainers.contains((QWidget*)object));
     if ((!opts.gtkScrollViews &&
-         ::qobject_cast<QAbstractScrollArea*>(object)) || isSViewCont) {
+         qobject_cast<QAbstractScrollArea*>(object)) || isSViewCont) {
         QPoint pos;
         switch (event->type()) {
         case QEvent::MouseMove:
@@ -1481,12 +1479,16 @@ void Style::timerEvent(QTimerEvent *event)
     event->ignore();
 }
 
-int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const
+int
+Style::pixelMetric(PixelMetric metric, const QStyleOption *option,
+                   const QWidget *widget) const
 {
     prePolish(widget);
     switch((unsigned)metric) {
     case PM_ToolTipLabelFrameWidth:
-        return !ROUNDED || opts.square&SQUARE_TOOLTIPS ? QCommonStyle::pixelMetric(metric, option, widget) : 3;
+        if (ROUNDED && !(opts.square & SQUARE_TOOLTIPS))
+            return 3;
+        return QCommonStyle::pixelMetric(metric, option, widget);
     case PM_MdiSubWindowFrameWidth:
         return 3;
     case PM_DockWidgetTitleMargin:
@@ -1598,7 +1600,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
             return (opts.square&SQUARE_SCROLLVIEW) ? 1 : 0;
 
         if ((opts.square&SQUARE_SCROLLVIEW) && widget && !opts.etchEntry &&
-            (::qobject_cast<const QAbstractScrollArea *>(widget) ||
+            (qobject_cast<const QAbstractScrollArea *>(widget) ||
              isKontactPreviewPane(widget)))
             return (opts.gtkScrollViews || opts.thinSbarGroove || !opts.borderSbarGroove) && (!opts.highlightScrollViews) ? 1 : 2;
 
@@ -1607,7 +1609,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
 
         if(DO_EFFECT && opts.etchEntry &&
            (!widget || // !isFormWidget(widget) &&
-            ::qobject_cast<const QLineEdit *>(widget) || ::qobject_cast<const QAbstractScrollArea*>(widget) /*|| isKontactPreviewPane(widget)*/))
+            qobject_cast<const QLineEdit *>(widget) || qobject_cast<const QAbstractScrollArea*>(widget) /*|| isKontactPreviewPane(widget)*/))
             return 3;
         else
             return 2;
@@ -4406,7 +4408,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                     else if(constDwtClose!=widget->objectName() &&
                             widget->parentWidget() && widget->parentWidget()->parentWidget() &&
                             widget->parentWidget()->inherits("KoDockWidgetTitleBar") &&
-                            ::qobject_cast<QDockWidget *>(widget->parentWidget()->parentWidget()))
+                            qobject_cast<QDockWidget *>(widget->parentWidget()->parentWidget()))
                     {
                         QDockWidget *dw = (QDockWidget*)widget->parentWidget()->parentWidget();
                         QWidget *koDw = widget->parentWidget();
@@ -5926,7 +5928,7 @@ QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, con
                     // Cant rely on AutoDefaultButton - as VirtualBox does not set this!!!
                     // btn->features&QStyleOptionButton::AutoDefaultButton &&
                     widget && widget->parentWidget() &&
-                    (::qobject_cast<const QDialogButtonBox *>(widget->parentWidget()) || widget->parentWidget()->inherits("KFileWidget"));
+                    (qobject_cast<const QDialogButtonBox *>(widget->parentWidget()) || widget->parentWidget()->inherits("KFileWidget"));
 
                 if(dialogButton)
                 {

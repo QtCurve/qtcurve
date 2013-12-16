@@ -290,7 +290,7 @@ const QAbstractButton*
 getButton(const QWidget *w, const QPainter *p)
 {
     const QWidget *widget = w ? w : getWidget(p);
-    return widget ? ::qobject_cast<const QAbstractButton*>(widget) : 0L;
+    return widget ? qobject_cast<const QAbstractButton*>(widget) : 0L;
 }
 
 void

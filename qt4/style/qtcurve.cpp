@@ -849,16 +849,18 @@ static const QImage * getImage(const QPainter *p)
 static const QAbstractButton * getButton(const QWidget *w, const QPainter *p)
 {
     const QWidget *widget=w ? w : getWidget(p);
-    return widget ? ::qobject_cast<const QAbstractButton*>(widget) : 0L;
+    return widget ? qobject_cast<const QAbstractButton*>(widget) : 0L;
 }
 
 inline bool isMultiTabBarTab(const QAbstractButton *button)
 {
     // Check for isFlat fails in KDE SC4.5
-    return button && ((::qobject_cast<const QPushButton*>(button) && // ((QPushButton*)button)->isFlat() &&
-                            button->inherits("KMultiTabBarTab")) ||
-                       (APP_KDEVELOP==theThemedApp && ::qobject_cast<const QToolButton*>(button) &&
-                            button->inherits("Sublime::IdealToolButton")));
+    return button && ((qobject_cast<const QPushButton*>(button) &&
+                       // ((QPushButton*)button)->isFlat() &&
+                       button->inherits("KMultiTabBarTab")) ||
+                      (theThemedApp == APP_KDEVELOP &&
+                       qobject_cast<const QToolButton*>(button) &&
+                       button->inherits("Sublime::IdealToolButton")));
 }
 
 #ifdef QTC_QT4_STYLE_SUPPORT
@@ -3029,7 +3031,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
                 return (opts.square&SQUARE_SCROLLVIEW) ? 1 : 0;
 
             if ((opts.square&SQUARE_SCROLLVIEW) && widget && !opts.etchEntry &&
-                (::qobject_cast<const QAbstractScrollArea*>(widget) ||
+                (qobject_cast<const QAbstractScrollArea*>(widget) ||
                  isKontactPreviewPane(widget) ||
                  widget->inherits("Q3ScrollView")))
                 return (opts.gtkScrollViews || opts.thinSbarGroove ||
@@ -3044,7 +3046,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
 
             if(DO_EFFECT && opts.etchEntry &&
                 (!widget || // !isFormWidget(widget) &&
-                ::qobject_cast<const QLineEdit*>(widget) || ::qobject_cast<const QAbstractScrollArea*>(widget) ||
+                qobject_cast<const QLineEdit*>(widget) || qobject_cast<const QAbstractScrollArea*>(widget) ||
                 widget->inherits("Q3ScrollView") /*|| isKontactPreviewPane(widget)*/))
                 return 3;
             else
@@ -4012,7 +4014,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                     bool kateView(isKateView(widget)),
                          kontactPreview(!kateView && isKontactPreviewPane(widget)),
                          sv(isOOWidget(widget) ||
-                            ::qobject_cast<const QAbstractScrollArea*>(widget) ||
+                            qobject_cast<const QAbstractScrollArea*>(widget) ||
                             (widget && widget->inherits("Q3ScrollView")) ||
                             ((opts.square&SQUARE_SCROLLVIEW) && (kateView || kontactPreview))),
                         squareSv(sv && ((opts.square&SQUARE_SCROLLVIEW) || (widget && widget->isWindow()))),
@@ -4656,19 +4658,19 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
 
                 if(widget && FOCUS_GLOW==opts.focus)
                 {
-                    if(::qobject_cast<const QAbstractButton*>(widget))
+                    if(qobject_cast<const QAbstractButton*>(widget))
                     {
-                        if(!::qobject_cast<const QToolButton*>(widget) || !static_cast<const QToolButton*>(widget)->autoRaise())
+                        if(!qobject_cast<const QToolButton*>(widget) || !static_cast<const QToolButton*>(widget)->autoRaise())
                             return;
                     }
-                    else if(::qobject_cast<const QComboBox*>(widget) || ::qobject_cast<const QGroupBox*>(widget) ||
-                            ::qobject_cast<const QDial*>(widget))
+                    else if(qobject_cast<const QComboBox*>(widget) || qobject_cast<const QGroupBox*>(widget) ||
+                            qobject_cast<const QDial*>(widget))
                         return;
                 }
 
                 QRect r2(r);
 
-                if(widget && (::qobject_cast<const QCheckBox*>(widget) || ::qobject_cast<const QRadioButton*>(widget)) &&
+                if(widget && (qobject_cast<const QCheckBox*>(widget) || qobject_cast<const QRadioButton*>(widget)) &&
                    ((QAbstractButton*)widget)->text().isEmpty() && r.height()<=widget->rect().height()-2 && r.width()<=widget->rect().width()-2 &&
                    r.x()>=1 && r.y()>=1)
                 {
@@ -4676,7 +4678,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                     r2.adjust(-adjust, -adjust, adjust, adjust);
                 }
 
-                if(widget && ::qobject_cast<const QGroupBox*>(widget))
+                if(widget && qobject_cast<const QGroupBox*>(widget))
                    r2.adjust(0, 2, 0, 0);
 
                 if(FOCUS_STANDARD==opts.focus)
@@ -4842,7 +4844,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                     use=itsTitleBarButtonsCols[TITLEBAR_MAX];
                 else if(widget->parentWidget() && widget->parentWidget()->parentWidget() &&
                         widget->parentWidget()->inherits("KoDockWidgetTitleBar") &&
-                        ::qobject_cast<QDockWidget*>(widget->parentWidget()->parentWidget()))
+                        qobject_cast<QDockWidget*>(widget->parentWidget()->parentWidget()))
                 {
                     QDockWidget              *dw   = (QDockWidget*)widget->parentWidget()->parentWidget();
                     QWidget                  *koDw = widget->parentWidget();
@@ -5009,7 +5011,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
 
             if(const QStyleOptionTabWidgetFrame *twf = qstyleoption_cast<const QStyleOptionTabWidgetFrame*>(option))
                 if((opts.round || (/*qtcIsCustomBgnd(&opts) && */0==opts.tabBgnd)) &&
-                    widget && ::qobject_cast<const QTabWidget*>(widget))
+                    widget && qobject_cast<const QTabWidget*>(widget))
                 {
                     struct QtcTabWidget : public QTabWidget
                     {
@@ -7648,7 +7650,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                         else if(constDwtClose!=widget->objectName() &&
                                 widget->parentWidget() && widget->parentWidget()->parentWidget() &&
                                 widget->parentWidget()->inherits("KoDockWidgetTitleBar") &&
-                                ::qobject_cast<QDockWidget*>(widget->parentWidget()->parentWidget()))
+                                qobject_cast<QDockWidget*>(widget->parentWidget()->parentWidget()))
                         {
                             QDockWidget              *dw   = (QDockWidget*)widget->parentWidget()->parentWidget();
                             QWidget                  *koDw = widget->parentWidget();
@@ -9331,7 +9333,7 @@ QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, con
                             // Cant rely on AutoDefaultButton - as VirtualBox does not set this!!!
                             // btn->features&QStyleOptionButton::AutoDefaultButton &&
                             widget && widget->parentWidget() &&
-                            (::qobject_cast<const QDialogButtonBox*>(widget->parentWidget()) || widget->parentWidget()->inherits("KFileWidget"));
+                            (qobject_cast<const QDialogButtonBox*>(widget->parentWidget()) || widget->parentWidget()->inherits("KFileWidget"));
 
                     if(dialogButton)
                     {
@@ -11083,7 +11085,7 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
     if(doEtch || glowFocus)
     {
         if(!(opts.thin&THIN_FRAMES) && (!sunken || sunkenToggleMo ||
-               (sunken && glowFocus && widget && ::qobject_cast<const QAbstractButton*>(widget) &&
+               (sunken && glowFocus && widget && qobject_cast<const QAbstractButton*>(widget) &&
                 static_cast<const QAbstractButton*>(widget)->isCheckable())) &&
             ((WIDGET_OTHER!=w && WIDGET_SLIDER_TROUGH!=w && MO_GLOW==opts.coloredMouseOver && option->state&State_MouseOver) ||
             (WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator) ||

@@ -197,11 +197,11 @@ static inline bool
 isMultiTabBarTab(const QAbstractButton *button)
 {
     // Check for isFlat fails in KDE SC4.5
-    return button && ((::qobject_cast<const QPushButton*>(button) &&
+    return button && ((qobject_cast<const QPushButton*>(button) &&
                        // ((QPushButton *)button)->isFlat() &&
                        button->inherits("KMultiTabBarTab")) ||
                       (APP_KDEVELOP == theThemedApp &&
-                       ::qobject_cast<const QToolButton *>(button) &&
+                       qobject_cast<const QToolButton *>(button) &&
                        button->inherits("Sublime::IdealToolButton")));
 }
 
@@ -262,7 +262,7 @@ static inline bool
 isKateView(const QWidget *widget)
 {
     return (widget && widget->parentWidget() &&
-            ::qobject_cast<const QFrame*>(widget) &&
+            qobject_cast<const QFrame*>(widget) &&
             widget->parentWidget()->inherits("KateView"));
 }
 
@@ -273,7 +273,7 @@ isKontactPreviewPane(const QWidget *widget)
             widget && widget->parentWidget() &&
             widget->parentWidget()->parentWidget() &&
             widget->inherits("KHBox") &&
-            ::qobject_cast<const QSplitter*>(widget->parentWidget()) &&
+            qobject_cast<const QSplitter*>(widget->parentWidget()) &&
             widget->parentWidget()->parentWidget()->inherits("KMReaderWin"));
 }
 

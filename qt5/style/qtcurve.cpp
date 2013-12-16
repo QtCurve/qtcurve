@@ -1891,7 +1891,7 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
     if(doEtch || glowFocus)
     {
         if( !(opts.thin&THIN_FRAMES) && (!sunken || sunkenToggleMo ||
-                                         (sunken && glowFocus && widget && ::qobject_cast<const QAbstractButton *>(widget) &&
+                                         (sunken && glowFocus && widget && qobject_cast<const QAbstractButton *>(widget) &&
                                           static_cast<const QAbstractButton *>(widget)->isCheckable())) &&
             ((WIDGET_OTHER!=w && WIDGET_SLIDER_TROUGH!=w && MO_GLOW==opts.coloredMouseOver && option->state&State_MouseOver) ||
              (WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator) ||
