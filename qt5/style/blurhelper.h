@@ -176,6 +176,8 @@ BlurHelper::isTransparent(const QWidget *widget) const
             // flags and special widgets
             (widget->testAttribute(Qt::WA_StyledBackground) ||
              qobject_cast<const QMenu*>(widget) ||
+             // TODO temporary solution only
+             widget->inherits("QComboBoxPrivateContainer") ||
              qobject_cast<const QDockWidget*>(widget) ||
              qobject_cast<const QToolBar*>(widget) ||
              // konsole (thought that should be handled

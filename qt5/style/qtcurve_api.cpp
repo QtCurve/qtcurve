@@ -376,9 +376,12 @@ void Style::polish(QWidget *widget)
     // Note: that the helper does nothing as long as compositing and ARGB are
     // not enabled
     const bool isDialog = qtcIsDialog(widget->window());
-    if ((100 != opts.menuBgndOpacity && qobject_cast<QMenu*>(widget)) ||
-        (100 != opts.bgndOpacity && (!widget->window() || !isDialog)) ||
-        (100 != opts.dlgOpacity && (!widget->window() || isDialog))) {
+    if ((opts.menuBgndOpacity != 100 &&
+         (qobject_cast<QMenu*>(widget) ||
+          // TODO temporary solution only
+          widget->inherits("QComboBoxPrivateContainer"))) ||
+        (opts.bgndOpacity != 100 && (!widget->window() || !isDialog)) ||
+        (opts.dlgOpacity != 100 && (!widget->window() || isDialog))) {
         itsBlurHelper->registerWidget(widget);
     }
 
@@ -980,7 +983,7 @@ void Style::unpolish(QWidget *widget)
         }
 
     if (qobject_cast<QMenu*>(widget)) {
-        widget->removeEventFilter(this);
+        // TODO remove these
         widget->setAttribute(Qt::WA_PaintOnScreen, false);
         widget->setAttribute(Qt::WA_NoSystemBackground, false);
         widget->setAttribute(Qt::WA_TranslucentBackground, false);
@@ -1205,8 +1208,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
              opts.menuBgndImage.type != IMG_NONE ||
              opts.menuBgndOpacity != 100 ||
              !(opts.square & SQUARE_POPUP_MENUS)) &&
-            (qobject_cast<QMenu*>(object) ||
-             (object->inherits("QComboBoxPrivateContainer")))) {
+            object->inherits("QComboBoxPrivateContainer")) {
             QWidget *widget = qtcToWidget(object);
             QPainter p(widget);
             QRect r(widget->rect());
@@ -4670,7 +4672,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                 const QToolButton *btn = qobject_cast<const QToolButton *>(widget);
 
                 if(btn && btn->isDown() && Qt::ToolButtonTextBesideIcon==btn->toolButtonStyle() &&
-                   widget->parentWidget() && qobject_cast<QMenu *>(widget->parentWidget()))
+                   widget->parentWidget() && qobject_cast<QMenu*>(widget->parentWidget()))
                 {
                     painter->save();
                     if(opts.menuStripe)
@@ -5865,38 +5867,47 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
         }
         break;
     case CC_ComboBox:
-        if (const QStyleOptionComboBox *comboBox = qstyleoption_cast<const QStyleOptionComboBox *>(option))
-        {
+        if (const QStyleOptionComboBox *comboBox =
+            qstyleoption_cast<const QStyleOptionComboBox*>(option)) {
             painter->save();
 
-            QRect        frame(subControlRect(CC_ComboBox, option, SC_ComboBoxFrame, widget)),
-                arrow(subControlRect(CC_ComboBox, option, SC_ComboBoxArrow, widget)),
-                field(subControlRect(CC_ComboBox, option, SC_ComboBoxEditField, widget));
-            const QColor *use(buttonColors(option));
-            bool         sunken(state&State_On), // comboBox->listBox() ? comboBox->listBox()->isShown() : false),
-                glowOverFocus(state&State_MouseOver && FULL_FOCUS &&
-                              MO_GLOW==opts.coloredMouseOver && DO_EFFECT && !sunken && !comboBox->editable &&
-                              state&State_Enabled && state&State_HasFocus),
-                doEffect(DO_EFFECT && (!comboBox->editable || opts.etchEntry)),
-                isOO(isOOWidget(widget)),
-                isOO31(isOO);
+            QRect frame(subControlRect(CC_ComboBox, option,
+                                       SC_ComboBoxFrame, widget));
+            QRect arrow(subControlRect(CC_ComboBox, option,
+                                       SC_ComboBoxArrow, widget));
+            QRect field(subControlRect(CC_ComboBox, option,
+                                       SC_ComboBoxEditField, widget));
+            const QColor *use = buttonColors(option);
+            bool sunken = state & State_On;
+            bool glowOverFocus = (state & State_MouseOver && FULL_FOCUS &&
+                                  opts.coloredMouseOver == MO_GLOW &&
+                                  DO_EFFECT && !sunken &&
+                                  !comboBox->editable &&
+                                  state & State_Enabled &&
+                                  state & State_HasFocus);
+            bool doEffect = DO_EFFECT && (!comboBox->editable ||
+                                          opts.etchEntry);
+            bool isOO = isOOWidget(widget);
+            bool isOO31 = isOO;
 
-            if(isOO)
-            {
-                // This (hopefull) checks is we're OO.o 3.2 - in which case no adjustment is required...
-                const QImage *img=getImage(painter);
+            if (isOO) {
+                // This (hopefull) checks is we're OO.o 3.2 -
+                // in which case no adjustment is required...
+                const QImage *img = getImage(painter);
 
-                isOO31=!img || img->rect()!=r;
+                isOO31 = !img || img->rect() != r;
 
-                if(isOO31)
-                    frame.adjust(0, 0, 0, -2), arrow.adjust(0, 0, 0, -2), field.adjust(0, 0, 0, -2);
-                else
+                if (isOO31) {
+                    frame.adjust(0, 0, 0, -2);
+                    arrow.adjust(0, 0, 0, -2);
+                    field.adjust(0, 0, 0, -2);
+                } else {
                     arrow.adjust(1, 0, 0, 0);
+                }
             }
 
-//                 painter->fillRect(r, Qt::transparent);
-            if(doEffect)
-            {
+            // painter->fillRect(r, Qt::transparent);
+            if (doEffect) {
                 bool glowFocus(state&State_HasFocus && state&State_Enabled && USE_GLOW_FOCUS(state&State_MouseOver));
 
                 if(!glowOverFocus && !(opts.thin&THIN_FRAMES) && !sunken && MO_GLOW==opts.coloredMouseOver &&

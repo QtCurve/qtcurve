@@ -1620,7 +1620,10 @@ Style::polish(QWidget *widget)
     // Note: that the helper does nothing as long as compositing and ARGB
     // are not enabled
     const bool isDialog = qtcIsDialog(widget->window());
-    if ((opts.menuBgndOpacity != 100 && qobject_cast<QMenu*>(widget)) ||
+    if ((opts.menuBgndOpacity != 100 &&
+         (qobject_cast<QMenu*>(widget) ||
+          // TODO temporary solution only
+          widget->inherits("QComboBoxPrivateContainer"))) ||
         (opts.bgndOpacity != 100 && (!widget->window() || !isDialog)) ||
         (opts.dlgOpacity != 100 && (!widget->window() || isDialog))) {
         itsBlurHelper->registerWidget(widget);
