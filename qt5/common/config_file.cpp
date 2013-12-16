@@ -1641,11 +1641,12 @@ void qtcDefaultSettings(Options *opts)
     opts->titlebarEffect=EFFECT_SHADOW;
     opts->centerTabText=false;
     opts->dwtSettings=DWT_BUTTONS_AS_PER_TITLEBAR|DWT_ROUND_TOP_ONLY;
-    opts->menubarApps << "amarok" << "arora" << "kaffeine" << "kcalc" << "smplayer" << "VirtualBox";
+    opts->menubarApps << "smplayer" << "VirtualBox";
     opts->statusbarApps << "kde";
-    opts->useQtFileDialogApps << "googleearth-bin";
-    opts->noMenuBgndOpacityApps << "inkscape" << "sonata" << "totem" << "vmware" << "vmplayer" << "gtk";
-    opts->noBgndOpacityApps << "smplayer" << "kaffeine" << "dragon" << "kscreenlocker" << "inkscape" << "sonata" << "totem" << "vmware" << "vmplayer";
+    opts->noMenuBgndOpacityApps << "inkscape" << "sonata" << "totem"
+                                << "vmware" << "vmplayer" << "gtk";
+    opts->noBgndOpacityApps << "smplayer" << "inkscape" << "sonata" << "totem"
+                            << "vmware" << "vmplayer";
     opts->noMenuStripeApps << "gtk" << "soffice.bin";
 
 #if defined CONFIG_DIALOG
@@ -1671,26 +1672,26 @@ void qtcDefaultSettings(Options *opts)
 #include <KDE/KConfig>
 #include <KDE/KConfigGroup>
 
-static const char *toStr(EDefBtnIndicator ind)
+static const char*
+toStr(EDefBtnIndicator ind)
 {
-    switch(ind)
-    {
-        case IND_NONE:
-            return "none";
-        case IND_FONT_COLOR:
-            return "fontcolor";
-        case IND_CORNER:
-            return "corner";
-        case IND_TINT:
-            return "tint";
-        case IND_GLOW:
-            return "glow";
-        case IND_DARKEN:
-            return "darken";
-        case IND_SELECTED:
-            return "origselected";
-        default:
-            return "colored";
+    switch (ind) {
+    case IND_NONE:
+        return "none";
+    case IND_FONT_COLOR:
+        return "fontcolor";
+    case IND_CORNER:
+        return "corner";
+    case IND_TINT:
+        return "tint";
+    case IND_GLOW:
+        return "glow";
+    case IND_DARKEN:
+        return "darken";
+    case IND_SELECTED:
+        return "origselected";
+    default:
+        return "colored";
     }
 }
 

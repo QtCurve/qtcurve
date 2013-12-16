@@ -5414,8 +5414,10 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
         {
             const QColor *use(buttonColors(option));
             const QColor *border(borderColors(option, use));
-            // In Amarok nightly (2.2) State_Horizontal doesn't seem to always be set...
-            bool         horiz(state&State_Horizontal || (r.height()>6 && r.height()>r.width()));
+            // In Amarok nightly (2.2) State_Horizontal doesn't seem to
+            // always be set...
+            bool horiz(state & State_Horizontal ||
+                       (r.height() > 6 && r.height() > r.width()));
 
             painter->save();
             if(/*qtcIsFlatBgnd(opts.bgndAppearance) || */state&State_MouseOver && state&State_Enabled)

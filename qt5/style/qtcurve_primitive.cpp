@@ -1766,8 +1766,7 @@ Style::drawPrimitiveFrameLineEdit(PrimitiveElement element,
                 opt.state ^= State_Enabled;
             if (DO_EFFECT && opts.etchEntry && APP_ARORA == theThemedApp &&
                 widget && widget->parentWidget() &&
-                strcmp(widget->metaObject()->className(),
-                       "LocationBar") == 0) {
+                strcmp(widget->metaObject()->className(), "LocationBar") == 0) {
                 const QToolBar *tb = getToolBar(widget->parentWidget());
                 if (tb) {
                     QRect r2(r);
