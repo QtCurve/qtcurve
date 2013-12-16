@@ -119,9 +119,13 @@ Style::polish(QApplication *app)
     } else if("soffice.bin" == appName) {
         theThemedApp = APP_OPENOFFICE;
     } else if("kdmgreet" == appName) {
-        opts.forceAlternateLvCols=false;
+        opts.forceAlternateLvCols = false;
     }
-    if(APP_REKONQ == theThemedApp)
+
+    qtcInfo("QtCurve: Application name: \"%s\"\n",
+            appName.toLatin1().constData());
+
+    if (theThemedApp == APP_REKONQ)
         opts.statusbarHiding=0;
     if(opts.menubarHiding)
         itsSaveMenuBarStatus=opts.menubarApps.contains("kde") || opts.menubarApps.contains(appName);

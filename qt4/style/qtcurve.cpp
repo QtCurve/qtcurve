@@ -1830,16 +1830,16 @@ Style::polish(QWidget *widget)
         if (!opts.gtkScrollViews && (((QFrame*)widget)->frameWidth() > 0)) {
             widget->installEventFilter(this);
         }
-        if(APP_KONTACT==theThemedApp && widget->parentWidget())
-        {
-            QWidget *frame=scrollViewFrame(widget->parentWidget());
+        if (theThemedApp == APP_KONTACT && widget->parentWidget()) {
+            QWidget *frame = scrollViewFrame(widget->parentWidget());
 
-            if(frame)
-            {
+            if (frame) {
                 frame->installEventFilter(this);
                 itsSViewContainers[frame].insert(widget);
-                connect(widget, SIGNAL(destroyed(QObject*)), this, SLOT(widgetDestroyed(QObject*)));
-                connect(frame, SIGNAL(destroyed(QObject*)), this, SLOT(widgetDestroyed(QObject*)));
+                connect(widget, SIGNAL(destroyed(QObject*)),
+                        this, SLOT(widgetDestroyed(QObject*)));
+                connect(frame, SIGNAL(destroyed(QObject*)),
+                        this, SLOT(widgetDestroyed(QObject*)));
             }
         }
     } else if(qobject_cast<QDialog*>(widget) &&
@@ -2307,16 +2307,14 @@ void Style::unpolish(QWidget *widget)
         {
             QWidget *frame=scrollViewFrame(widget->parentWidget());
 
-            if(frame)
-            {
-                if(itsSViewContainers.contains(frame))
-                {
+            if (frame) {
+                if (itsSViewContainers.contains(frame)) {
                     itsSViewContainers[frame].remove(widget);
-                    if(0==itsSViewContainers[frame].count())
-                    {
+                    if (itsSViewContainers[frame].count() == 0) {
                         frame->removeEventFilter(this);
                         itsSViewContainers.remove(frame);
-                        disconnect(frame, SIGNAL(destroyed(QObject*)), this, SLOT(widgetDestroyed(QObject*)));
+                        disconnect(frame, SIGNAL(destroyed(QObject*)),
+                                   this, SLOT(widgetDestroyed(QObject*)));
                     }
                 }
             }
@@ -2440,11 +2438,10 @@ static bool updateMenuBarEvent(QMouseEvent *event, QMenuBar *menu)
 
 bool Style::eventFilter(QObject *object, QEvent *event)
 {
-    bool isSViewCont=APP_KONTACT==theThemedApp && itsSViewContainers.contains((QWidget*)object);
-
     if (qobject_cast<QMenuBar*>(object) && dynamic_cast<QMouseEvent*>(event)) {
-        if(updateMenuBarEvent((QMouseEvent*)event, (QMenuBar*)object))
+        if (updateMenuBarEvent((QMouseEvent*)event, (QMenuBar*)object)) {
             return true;
+        }
     }
 
     if (event->type() == QEvent::Show &&
@@ -2462,6 +2459,8 @@ bool Style::eventFilter(QObject *object, QEvent *event)
         object->removeEventFilter(this);
     }
 
+    bool isSViewCont = (theThemedApp == APP_KONTACT &&
+                        itsSViewContainers.contains((QWidget*)object));
     if ((!opts.gtkScrollViews &&
          qobject_cast<QAbstractScrollArea*>(object)) || isSViewCont) {
         QPoint pos;

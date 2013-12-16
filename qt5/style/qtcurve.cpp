@@ -152,29 +152,34 @@ QtcThemedApp theThemedApp = APP_OTHER;
 static QString getFile(const QString &f);
 QString appName = getFile(qApp->arguments()[0]);
 
-static QColor checkColour(const QStyleOption *option, QPalette::ColorRole role)
+static QColor
+checkColour(const QStyleOption *option, QPalette::ColorRole role)
 {
     QColor col(option->palette.brush(role).color());
 
-    if(col.alpha()==255 && IS_BLACK(col))
+    if (col.alpha() == 255 && IS_BLACK(col))
         return QApplication::palette().brush(role).color();
     return col;
 }
 
-static void addStripes(QPainter *p, const QPainterPath &path, const QRect &rect, bool horizontal)
+static void
+addStripes(QPainter *p, const QPainterPath &path,
+           const QRect &rect, bool horizontal)
 {
-    QColor          col(Qt::white);
-    QLinearGradient patternGradient(rect.topLeft(), rect.topLeft()+(horizontal ? QPoint(STRIPE_WIDTH, 0) : QPoint(0, STRIPE_WIDTH)));
+    QColor col(Qt::white);
+    QLinearGradient patternGradient(rect.topLeft(),
+                                    rect.topLeft() +
+                                    (horizontal ? QPoint(STRIPE_WIDTH, 0) :
+                                     QPoint(0, STRIPE_WIDTH)));
 
     col.setAlphaF(0.0);
     patternGradient.setColorAt(0.0, col);
     col.setAlphaF(0.15);
     patternGradient.setColorAt(1.0, col);
     patternGradient.setSpread(QGradient::ReflectSpread);
-    if(path.isEmpty())
+    if (path.isEmpty()) {
         p->fillRect(rect, patternGradient);
-    else
-    {
+    } else {
         p->save();
         p->setRenderHint(QPainter::Antialiasing, true);
         p->fillPath(path, patternGradient);
@@ -183,21 +188,22 @@ static void addStripes(QPainter *p, const QPainterPath &path, const QRect &rect,
 }
 
 #ifndef QTC_QT5_ENABLE_KDE
-static void setRgb(QColor *col, const QStringList &rgb)
+static void
+setRgb(QColor *col, const QStringList &rgb)
 {
-    if (3 == rgb.size()) {
+    if (rgb.size() == 3) {
         *col = QColor(rgb[0].toInt(), rgb[1].toInt(), rgb[2].toInt());
     }
 }
-static QString kdeHome()
+
+static QString
+kdeHome()
 {
     static QString kdeHomePath;
-    if (kdeHomePath.isEmpty())
-    {
+    if (kdeHomePath.isEmpty()) {
         kdeHomePath = QString::fromLocal8Bit(qgetenv("KDEHOME"));
-        if (kdeHomePath.isEmpty())
-        {
-            QDir    homeDir(QDir::homePath());
+        if (kdeHomePath.isEmpty()) {
+            QDir homeDir(QDir::homePath());
             QString kdeConfDir(QLatin1String("/.kde"));
             if (homeDir.exists(QLatin1String(".kde4")))
                 kdeConfDir = QLatin1String("/.kde4");
@@ -3681,92 +3687,85 @@ const QColor * Style::menuColors(const QStyleOption *option, bool active) const
         : itsMenubarCols;
 }
 
-bool Style::coloredMdiButtons(bool active, bool mouseOver) const
+bool
+Style::coloredMdiButtons(bool active, bool mouseOver) const
 {
-    return opts.titlebarButtons&TITLEBAR_BUTTON_COLOR &&
-        (active
-         ? (mouseOver || !(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR_MOUSE_OVER))
-         : ( (opts.titlebarButtons&TITLEBAR_BUTTON_COLOR_MOUSE_OVER && mouseOver) ||
-             (!(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR_MOUSE_OVER) &&
-              opts.titlebarButtons&TITLEBAR_BUTTON_COLOR_INACTIVE)) );
+    return (opts.titlebarButtons & TITLEBAR_BUTTON_COLOR &&
+            (active ?
+             (mouseOver || !(opts.titlebarButtons &
+                             TITLEBAR_BUTTON_COLOR_MOUSE_OVER)) :
+             ((opts.titlebarButtons & TITLEBAR_BUTTON_COLOR_MOUSE_OVER &&
+               mouseOver) ||
+              (!(opts.titlebarButtons & TITLEBAR_BUTTON_COLOR_MOUSE_OVER) &&
+               opts.titlebarButtons & TITLEBAR_BUTTON_COLOR_INACTIVE))));
 }
 
-const QColor * Style::getMdiColors(const QStyleOption *option, bool active) const
+const QColor*
+Style::getMdiColors(const QStyleOption *option, bool active) const
 {
-    if(!itsActiveMdiColors)
-    {
+    if (!itsActiveMdiColors) {
 #ifndef QTC_QT5_ENABLE_KDE
-        itsActiveMdiTextColor=option ? option->palette.text().color() : QApplication::palette().text().color();
-        itsMdiTextColor=option ? option->palette.text().color() : QApplication::palette().text().color();
+        itsActiveMdiTextColor = (option ? option->palette.text().color() :
+                                 QApplication::palette().text().color());
+        itsMdiTextColor = (option ? option->palette.text().color() :
+                           QApplication::palette().text().color());
 
-        QFile f(kdeHome()+"/share/config/kdeglobals");
+        QFile f(kdeHome() + "/share/config/kdeglobals");
 
-        if(f.open(QIODevice::ReadOnly))
-        {
+        if (f.open(QIODevice::ReadOnly)) {
             QTextStream in(&f);
-            bool        inPal(false);
+            bool inPal = false;
 
-            while (!in.atEnd())
-            {
+            while (!in.atEnd()) {
                 QString line(in.readLine());
-
-                if(inPal)
-                {
-                    if(!itsActiveMdiColors && 0==line.indexOf("activeBackground="))
-                    {
+                if (inPal) {
+                    if (!itsActiveMdiColors &&
+                        line.indexOf("activeBackground=") == 0) {
                         QColor col;
-
                         setRgb(&col, line.mid(17).split(","));
-
-                        if(col!=itsHighlightCols[ORIGINAL_SHADE])
-                        {
-                            itsActiveMdiColors=new QColor [TOTAL_SHADES+1];
+                        if (col != itsHighlightCols[ORIGINAL_SHADE]) {
+                            itsActiveMdiColors = new QColor[TOTAL_SHADES + 1];
                             shadeColors(col, itsActiveMdiColors);
                         }
-                    }
-                    else if(!itsMdiColors && 0==line.indexOf("inactiveBackground="))
-                    {
+                    } else if (!itsMdiColors &&
+                               line.indexOf("inactiveBackground=") == 0) {
                         QColor col;
-
                         setRgb(&col, line.mid(19).split(","));
-                        if(col!=itsButtonCols[ORIGINAL_SHADE])
-                        {
-                            itsMdiColors=new QColor [TOTAL_SHADES+1];
+                        if (col != itsButtonCols[ORIGINAL_SHADE]) {
+                            itsMdiColors = new QColor[TOTAL_SHADES+1];
                             shadeColors(col, itsMdiColors);
                         }
-                    }
-                    else if(0==line.indexOf("activeForeground="))
+                    } else if(line.indexOf("activeForeground=") == 0) {
                         setRgb(&itsActiveMdiTextColor, line.mid(17).split(","));
-                    else if(0==line.indexOf("inactiveForeground="))
+                    } else if(line.indexOf("inactiveForeground=") == 0) {
                         setRgb(&itsMdiTextColor, line.mid(19).split(","));
-                    else if (-1!=line.indexOf('['))
+                    } else if (line.indexOf('[') != -1) {
                         break;
+                    }
+                } else if(line.indexOf("[WM]") == 0) {
+                    inPal = true;
                 }
-                else if(0==line.indexOf("[WM]"))
-                    inPal=true;
             }
             f.close();
         }
 #else
-        Q_UNUSED(option)
+        Q_UNUSED(option);
 
-            QColor col=KGlobalSettings::activeTitleColor();
+        QColor col = KGlobalSettings::activeTitleColor();
 
-        if(col!=itsBackgroundCols[ORIGINAL_SHADE])
-        {
-            itsActiveMdiColors=new QColor [TOTAL_SHADES+1];
+        if (col != itsBackgroundCols[ORIGINAL_SHADE]) {
+            itsActiveMdiColors = new QColor[TOTAL_SHADES + 1];
             shadeColors(col, itsActiveMdiColors);
         }
 
-        col=KGlobalSettings::inactiveTitleColor();
-        if(col!=itsBackgroundCols[ORIGINAL_SHADE])
-        {
-            itsMdiColors=new QColor [TOTAL_SHADES+1];
+        col = KGlobalSettings::inactiveTitleColor();
+        if (col != itsBackgroundCols[ORIGINAL_SHADE]) {
+            itsMdiColors = new QColor[TOTAL_SHADES+1];
             shadeColors(col, itsMdiColors);
         }
 
-        itsActiveMdiTextColor=KGlobalSettings::activeTextColor();
-        itsMdiTextColor=KGlobalSettings::inactiveTextColor();
+        itsActiveMdiTextColor = KGlobalSettings::activeTextColor();
+        itsMdiTextColor = KGlobalSettings::inactiveTextColor();
 #endif
 
         if(!itsActiveMdiColors)
@@ -3784,8 +3783,7 @@ const QColor * Style::getMdiColors(const QStyleOption *option, bool active) cons
 
 void Style::readMdiPositions() const
 {
-    if(0==itsMdiButtons[0].size() && 0==itsMdiButtons[1].size())
-    {
+    if (0==itsMdiButtons[0].size() && 0==itsMdiButtons[1].size()) {
         // Set defaults...
         itsMdiButtons[0].append(SC_TitleBarSysMenu);
         itsMdiButtons[0].append(SC_TitleBarShadeButton);
@@ -4029,7 +4027,7 @@ int Style::getFrameRound(const QWidget *widget) const
 void Style::widgetDestroyed(QObject *o)
 {
     QWidget *w = static_cast<QWidget*>(o);
-    if (APP_KONTACT == theThemedApp) {
+    if (theThemedApp == APP_KONTACT) {
         itsSViewContainers.remove(w);
         QMap<QWidget*, QSet<QWidget*> >::Iterator it(itsSViewContainers.begin());
         QMap<QWidget*, QSet<QWidget*> >::Iterator end(itsSViewContainers.end());
