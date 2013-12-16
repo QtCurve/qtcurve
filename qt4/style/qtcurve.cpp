@@ -1620,9 +1620,9 @@ Style::polish(QWidget *widget)
     // Note: that the helper does nothing as long as compositing and ARGB
     // are not enabled
     const bool isDialog = qtcIsDialog(widget->window());
-    if ((100 != opts.menuBgndOpacity && qobject_cast<QMenu*>(widget)) ||
-        (100 != opts.bgndOpacity && (!widget->window() || !isDialog)) ||
-        (100 != opts.dlgOpacity && (!widget->window() || isDialog))) {
+    if ((opts.menuBgndOpacity != 100 && qobject_cast<QMenu*>(widget)) ||
+        (opts.bgndOpacity != 100 && (!widget->window() || !isDialog)) ||
+        (opts.dlgOpacity != 100 && (!widget->window() || isDialog))) {
         itsBlurHelper->registerWidget(widget);
     }
     // Sometimes get background errors with QToolBox (e.g. in Bespin config),
@@ -11502,7 +11502,7 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
 
     drawBackground(p, isWindow ? window->palette().window().color() :
                    popupMenuCols()[ORIGINAL_SHADE], bgndRect, opacity, type,
-                   BGND_MENU != type ? opts.bgndAppearance :
+                   type != BGND_MENU ? opts.bgndAppearance :
                    opts.menuBgndAppearance);
     drawBackgroundImage(p, isWindow, imgRect);
 }
