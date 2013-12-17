@@ -66,6 +66,7 @@
 #include <QPixmapCache>
 #include <QTextStream>
 #include <QFileDialog>
+#include <QToolBox>
 
 #include <QDebug>
 
@@ -411,12 +412,11 @@ void Style::polish(QWidget *widget)
             widget->setBackgroundRole(QPalette::NoRole);
 
         if (widget->autoFillBackground() && widget->parentWidget() &&
-            "qt_scrollarea_viewport"==widget->parentWidget()->objectName() &&
-            widget->parentWidget()->parentWidget() && //grampa
-            qobject_cast<QAbstractScrollArea*>(widget->parentWidget()
-                                               ->parentWidget()) &&
-            widget->parentWidget()->parentWidget()->parentWidget() && // grangrampa
-            widget->parentWidget()->parentWidget()->parentWidget()->inherits("QToolBox")) {
+            widget->parentWidget()->objectName() == "qt_scrollarea_viewport" &&
+            qtcCheckType0<QAbstractScrollArea>(
+                widget->parentWidget()->parentWidget()) &&
+            qtcCheckType0<QToolBox>(
+                widget->parentWidget()->parentWidget()->parentWidget())) {
             widget->parentWidget()->setAutoFillBackground(false);
             widget->setAutoFillBackground(false);
         }
@@ -823,8 +823,8 @@ void Style::unpolish(QWidget *widget)
 #endif
     itsBlurHelper->unregisterWidget(widget);
 
-    // Sometimes get background errors with QToolBox (e.g. in Bespin config), and setting WA_StyledBackground seems to
-    // fix this,..
+    // Sometimes get background errors with QToolBox (e.g. in Bespin config),
+    // and setting WA_StyledBackground seems to fix this,..
     if (qtcIsCustomBgnd(&opts) || opts.groupBox == FRAME_SHADED ||
         opts.groupBox == FRAME_FADED) {
         switch (widget->windowType()) {
