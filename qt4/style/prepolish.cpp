@@ -81,19 +81,18 @@ inline QWidget*
 QtcX11Info::rgbaDummy()
 {
     static QWidget **dummies = NULL;
-    creatingDummy = true;
-    QDesktopWidget *desktop = qApp->desktop();
-    int screenCount = desktop->screenCount();
     int scrno = screen();
-    if (qtcUnlikely(!dummies))
-        dummies = (QWidget**)calloc(screenCount, sizeof(QWidget*));
-    if (qtcUnlikely(!dummies[scrno])) {
+    if (qtcUnlikely(!dummies || !dummies[scrno])) {
+        creatingDummy = true;
+        QDesktopWidget *desktop = qApp->desktop();
+        if (qtcUnlikely(!dummies))
+            dummies = qtcNew(QWidget*, desktop->screenCount());
         dummies[scrno] = new QWidget(desktop->screen(scrno));
         dummies[scrno]->setAttribute(Qt::WA_TranslucentBackground);
         dummies[scrno]->setAttribute(Qt::WA_WState_Polished);
         dummies[scrno]->winId();
+        creatingDummy = false;
     }
-    creatingDummy = false;
     return dummies[scrno];
 }
 
