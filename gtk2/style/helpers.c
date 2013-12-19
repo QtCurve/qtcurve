@@ -1354,8 +1354,8 @@ void generateColors()
     switch(opts.shadeMenubars)
     {
         case SHADE_WINDOW_BORDER:
-            qtcPalette.wborder[0]=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
-            qtcPalette.wborder[1]=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+            qtcPalette.wborder[0] = qtcNew(GdkColor, TOTAL_SHADES + 1);
+            qtcPalette.wborder[1] = qtcNew(GdkColor, TOTAL_SHADES + 1);
             qtcShadeColors(&qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW_BORDER], qtcPalette.wborder[0]);
             qtcShadeColors(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER], qtcPalette.wborder[1]);
             break;
@@ -1400,7 +1400,7 @@ void generateColors()
             qtcPalette.slider=qtcPalette.highlight;
             break;
         case SHADE_CUSTOM:
-            qtcPalette.slider=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+            qtcPalette.slider = qtcNew(GdkColor, TOTAL_SHADES + 1);
             qtcShadeColors(&opts.customSlidersColor, qtcPalette.slider);
             break;
         case SHADE_BLEND_SELECTED:
@@ -1408,7 +1408,7 @@ void generateColors()
             GdkColor mid=midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
                                   &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]);
 
-            qtcPalette.slider=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+            qtcPalette.slider = qtcNew(GdkColor, TOTAL_SHADES + 1);
             qtcShadeColors(&mid, qtcPalette.slider);
         }
         default:
@@ -1426,7 +1426,7 @@ void generateColors()
                 qtcPalette.combobtn=qtcPalette.slider;
             else
             {
-                qtcPalette.combobtn=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+                qtcPalette.combobtn = qtcNew(GdkColor, TOTAL_SHADES + 1);
                 qtcShadeColors(&opts.customComboBtnColor, qtcPalette.combobtn);
             }
             break;
@@ -1438,7 +1438,7 @@ void generateColors()
                 GdkColor mid=midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
                                       &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]);
 
-                qtcPalette.combobtn=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+                qtcPalette.combobtn = qtcNew(GdkColor, TOTAL_SHADES + 1);
                 qtcShadeColors(&mid, qtcPalette.combobtn);
             }
         default:
@@ -1452,11 +1452,11 @@ void generateColors()
         {
             GdkColor color;
 
-            qtcPalette.sortedlv=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+            qtcPalette.sortedlv = qtcNew(GdkColor, TOTAL_SHADES + 1);
             qtcShade(opts.lvButton ?
-                      &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE] :
-                      &qtcPalette.background[ORIGINAL_SHADE],
-                      &color, LV_HEADER_DARK_FACTOR, opts.shading);
+                     &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE] :
+                     &qtcPalette.background[ORIGINAL_SHADE],
+                     &color, LV_HEADER_DARK_FACTOR, opts.shading);
             qtcShadeColors(&color, qtcPalette.sortedlv);
             break;
         }
@@ -1470,7 +1470,7 @@ void generateColors()
                 qtcPalette.sortedlv=qtcPalette.combobtn;
             else
             {
-                qtcPalette.sortedlv=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+                qtcPalette.sortedlv = qtcNew(GdkColor, TOTAL_SHADES + 1);
                 qtcShadeColors(&opts.customSortedLvColor, qtcPalette.sortedlv);
             }
             break;
@@ -1485,7 +1485,7 @@ void generateColors()
                                       opts.lvButton ? &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]
                                                     : &qtcPalette.background[ORIGINAL_SHADE]);
 
-                qtcPalette.sortedlv=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+                qtcPalette.sortedlv = qtcNew(GdkColor, TOTAL_SHADES + 1);
                 qtcShadeColors(&mid, qtcPalette.sortedlv);
             }
         default:
@@ -1498,7 +1498,7 @@ void generateColors()
         {
             GdkColor col=tint(&qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE],
                             &qtcPalette.highlight[ORIGINAL_SHADE], DEF_BNT_TINT);
-            qtcPalette.defbtn=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+            qtcPalette.defbtn = qtcNew(GdkColor, TOTAL_SHADES + 1);
             qtcShadeColors(&col, qtcPalette.defbtn);
             break;
         }
@@ -1516,15 +1516,15 @@ void generateColors()
                 GdkColor mid=midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
                                       &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]);
 
-                qtcPalette.defbtn=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+                qtcPalette.defbtn = qtcNew(GdkColor, TOTAL_SHADES + 1);
                 qtcShadeColors(&mid, qtcPalette.defbtn);
             }
     }
 
-    if(opts.coloredMouseOver)
-    {
-        qtcPalette.mouseover=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
-        qtcShadeColors(&qtSettings.colors[PAL_ACTIVE][COLOR_HOVER], qtcPalette.mouseover);
+    if (opts.coloredMouseOver) {
+        qtcPalette.mouseover = qtcNew(GdkColor, TOTAL_SHADES + 1);
+        qtcShadeColors(&qtSettings.colors[PAL_ACTIVE][COLOR_HOVER],
+                       qtcPalette.mouseover);
     }
 
     switch(opts.shadeCheckRadio)
@@ -1565,11 +1565,10 @@ void generateColors()
                                     "widget_class \"*Menu.*Label\" style \""RC_SETTING"Mnu\""
                                     " style  \""RC_SETTING"CView\" = \""RC_SETTING"Mnu\" { text[NORMAL]=\"#%02X%02X%02X\" } "
                                     " widget_class \"*<GtkMenuItem>*<GtkCellView>\" style \""RC_SETTING"CView\"";
-        char *str=(char *)malloc(strlen(format)+24+1);
+        char *str = (char*)malloc(strlen(format) + 24 + 1);
 
-        if(str)
-        {
-            GdkColor *col=&qtcPalette.menu[ORIGINAL_SHADE];
+        if (str) {
+            GdkColor *col = &qtcPalette.menu[ORIGINAL_SHADE];
             GdkColor text=opts.shadePopupMenu
                             ? SHADE_WINDOW_BORDER == opts.shadeMenubars
                                 ? qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER_TEXT]
@@ -1619,9 +1618,7 @@ void generateColors()
     switch (opts.crColor) {
     case SHADE_DARKEN: {
         GdkColor color;
-
-        qtcPalette.selectedcr =
-            (GdkColor*)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+        qtcPalette.selectedcr = qtcNew(GdkColor, TOTAL_SHADES + 1);
         qtcShade(&qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE], &color,
                  LV_HEADER_DARK_FACTOR, opts.shading);
         qtcShadeColors(&color, qtcPalette.selectedcr);
@@ -1640,10 +1637,9 @@ void generateColors()
             else if(SHADE_CUSTOM == opts.comboBtn && EQUAL_COLOR(opts.customComboBtnColor, opts.customCrBgndColor))
                 qtcPalette.selectedcr=qtcPalette.combobtn;
             else if(SHADE_CUSTOM == opts.sortedLv && EQUAL_COLOR(opts.customSortedLvColor, opts.customCrBgndColor))
-                qtcPalette.selectedcr=qtcPalette.sortedlv;
-            else
-            {
-                qtcPalette.selectedcr=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+                qtcPalette.selectedcr = qtcPalette.sortedlv;
+            else {
+                qtcPalette.selectedcr = qtcNew(GdkColor, TOTAL_SHADES + 1);
                 qtcShadeColors(&opts.customCrBgndColor, qtcPalette.selectedcr);
             }
             break;
@@ -1656,9 +1652,10 @@ void generateColors()
                 qtcPalette.selectedcr=qtcPalette.sortedlv;
             else
             {
-                GdkColor mid=midColor(&qtcPalette.highlight[ORIGINAL_SHADE], &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]);
-
-                qtcPalette.selectedcr=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+                GdkColor mid =
+                    midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
+                             &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]);
+                qtcPalette.selectedcr = qtcNew(GdkColor, TOTAL_SHADES + 1);
                 qtcShadeColors(&mid, qtcPalette.selectedcr);
             }
     }
@@ -1672,7 +1669,7 @@ void generateColors()
         } else {
             GdkColor mid=midColor(&qtcPalette.highlight[ORIGINAL_SHADE], &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]);
 
-            qtcPalette.sidebar=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+            qtcPalette.sidebar = qtcNew(GdkColor, TOTAL_SHADES + 1);
             qtcShadeColors(&mid, qtcPalette.sidebar);
         }
     }
@@ -1694,9 +1691,8 @@ void generateColors()
                 qtcPalette.progress=qtcPalette.sortedlv;
             else if(SHADE_CUSTOM == opts.crColor && EQUAL_COLOR(opts.customCrBgndColor, opts.customProgressColor))
                 qtcPalette.progress=qtcPalette.selectedcr;
-            else
-            {
-                qtcPalette.progress=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+            else {
+                qtcPalette.progress = qtcNew(GdkColor, TOTAL_SHADES + 1);
                 qtcShadeColors(&opts.customProgressColor, qtcPalette.progress);
             }
             break;
@@ -1713,7 +1709,7 @@ void generateColors()
             {
                 GdkColor mid=midColor(&qtcPalette.highlight[ORIGINAL_SHADE], &qtcPalette.background[ORIGINAL_SHADE]);
 
-                qtcPalette.progress=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+                qtcPalette.progress = qtcNew(GdkColor, TOTAL_SHADES + 1);
                 qtcShadeColors(&mid, qtcPalette.progress);
             }
     }

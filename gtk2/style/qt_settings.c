@@ -470,7 +470,7 @@ static void setFont(QtFontDetails *font, int f)
         qtSettings.fonts[FONT_BOLD]=NULL;
     }
 
-    qtSettings.fonts[f]=(char *)malloc(
+    qtSettings.fonts[f] = (char*)malloc(
         strlen(font->family) + 1 +
         strlen(weightStr(font->weight)) + 1 +
         strlen(italicStr(font->italic)) + 1 +
@@ -485,7 +485,7 @@ static void setFont(QtFontDetails *font, int f)
     /* Qt uses a bold font for progressbars, try to mimic this... */
     if(FONT_GENERAL==f && font->weight>=WEIGHT_NORMAL && font->weight<WEIGHT_DEMIBOLD)
     {
-        qtSettings.fonts[FONT_BOLD]=(char *)malloc(
+        qtSettings.fonts[FONT_BOLD] = (char*)malloc(
             strlen(font->family) + 1 +
             strlen(weightStr(WEIGHT_BOLD)) + 1 +
             strlen(italicStr(font->italic)) + 1 +
@@ -659,15 +659,14 @@ static void readKdeGlobals(const char *rc, int rd, bool first)
                 }
             }
             else if (SECT_ICONS==section && rd&RD_ICONS && !(found&RD_ICONS) &&
-                     0==strncasecmp(line, "Theme=", 6))
-            {
-                char *eq=strstr(line, "=");
+                     0==strncasecmp(line, "Theme=", 6)) {
+                char *eq = strstr(line, "=");
 
-                if(eq && ++eq)
-                {
-                    unsigned int len=strlen(eq);
+                if(eq && ++eq) {
+                    unsigned int len = strlen(eq);
 
-                    qtSettings.icons=(char *)realloc(qtSettings.icons, len+1);
+                    qtSettings.icons = (char*)realloc(qtSettings.icons,
+                                                      len + 1);
                     strcpy(qtSettings.icons, eq);
                     if('\n'==qtSettings.icons[len-1])
                         qtSettings.icons[len-1]='\0';

@@ -46,7 +46,7 @@ static QtCTreeView * qtcTreeViewLookupHash(void *hash, gboolean create)
 
     if(!rv && create)
     {
-        rv=(QtCTreeView *)malloc(sizeof(QtCTreeView));
+        rv = qtcNew(QtCTreeView);
         rv->path=NULL;
         rv->column=NULL;
         rv->fullWidth=FALSE;
@@ -208,7 +208,7 @@ qtcTreeViewLeave(GtkWidget *widget, GdkEventMotion *event, gpointer data)
         {
             GtkTreeView   *treeView=GTK_TREE_VIEW(widget);
             GdkRectangle  rect={0, 0, -1, -1 };
-            GtkAllocation alloc=qtcWidgetGetAllocation(widget);
+            GtkAllocation alloc = qtcWidgetGetAllocation(widget);
 
             if(tv->path && tv->column)
                 gtk_tree_view_get_background_area(treeView, tv->path, tv->column, &rect);

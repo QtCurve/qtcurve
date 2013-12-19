@@ -920,24 +920,29 @@ checkAppearance(EAppearance *ap, Options *opts)
 
 void qtcDefaultSettings(Options *opts);
 
-static void copyGradients(Options *src, Options *dest)
+static void
+copyGradients(Options *src, Options *dest)
 {
-    if(src && dest && src!=dest)
-    {
+    if (src && dest && src != dest) {
         int i;
 
-        for(i=0; i<NUM_CUSTOM_GRAD; ++i)
-            if(src->customGradient[i] && src->customGradient[i]->numStops>0)
-            {
-                dest->customGradient[i]=malloc(sizeof(Gradient));
-                dest->customGradient[i]->numStops=src->customGradient[i]->numStops;
-                dest->customGradient[i]->stops=malloc(sizeof(GradientStop) * dest->customGradient[i]->numStops);
-                memcpy(dest->customGradient[i]->stops, src->customGradient[i]->stops,
-                        sizeof(GradientStop) * dest->customGradient[i]->numStops);
-                dest->customGradient[i]->border=src->customGradient[i]->border;
+        for (i = 0;i < NUM_CUSTOM_GRAD;++i) {
+            if (src->customGradient[i] &&
+                src->customGradient[i]->numStops > 0) {
+                dest->customGradient[i] = qtcNew(Gradient);
+                dest->customGradient[i]->numStops =
+                    src->customGradient[i]->numStops;
+                dest->customGradient[i]->stops =
+                    qtcNew(GradientStop, dest->customGradient[i]->numStops);
+                memcpy(dest->customGradient[i]->stops,
+                       src->customGradient[i]->stops,
+                       sizeof(GradientStop) * dest->customGradient[i]->numStops);
+                dest->customGradient[i]->border =
+                    src->customGradient[i]->border;
+            } else {
+                dest->customGradient[i] = NULL;
             }
-            else
-                dest->customGradient[i]=NULL;
+        }
     }
 }
 
@@ -1498,20 +1503,21 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                     {
                         char *c=strchr(str, ',');
 
-                        if(c)
-                        {
-                            bool            haveAlpha=false;
-                            EGradientBorder border=toGradientBorder(str, &haveAlpha);
-                            int             parts=haveAlpha ? 3 : 2;
-                            bool            ok=0==comma%parts;
+                        if (c) {
+                            bool haveAlpha = false;
+                            EGradientBorder border =
+                                toGradientBorder(str, &haveAlpha);
+                            int parts = haveAlpha ? 3 : 2;
+                            bool ok = 0 == comma % parts;
 
-                            *c='\0';
+                            *c = '\0';
 
-                            if(ok)
-                            {
-                                opts->customGradient[i]=malloc(sizeof(Gradient));
-                                opts->customGradient[i]->numStops=comma/parts;
-                                opts->customGradient[i]->stops=malloc(sizeof(GradientStop) * opts->customGradient[i]->numStops);
+                            if (ok) {
+                                opts->customGradient[i] = qtcNew(Gradient);
+                                opts->customGradient[i]->numStops = comma / parts;
+                                opts->customGradient[i]->stops =
+                                    qtcNew(GradientStop,
+                                           opts->customGradient[i]->numStops);
                                 opts->customGradient[i]->border=border;
                                 str=c+1;
                                 for(j=0; j<comma && str && ok; j+=parts)
@@ -1569,16 +1575,16 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                                     if(opts->customGradient[i]->stops[opts->customGradient[i]->numStops-1].pos<0.999)
                                         addEnd=1;
 
-                                    if(addStart || addEnd)
-                                    {
-                                        int          newSize=opts->customGradient[i]->numStops+addStart+addEnd;
-                                        GradientStop *stops=malloc(sizeof(GradientStop) * newSize);
-
-                                        if(addStart)
-                                        {
-                                            stops[0].pos=0.0;
-                                            stops[0].val=1.0;
-                                            stops[0].alpha=1.0;
+                                    if (addStart || addEnd) {
+                                        int newSize =
+                                            (opts->customGradient[i]->numStops +
+                                             addStart + addEnd);
+                                        GradientStop *stops =
+                                            qtcNew(GradientStop, newSize);
+                                        if (addStart) {
+                                            stops[0].pos = 0.0;
+                                            stops[0].val = 1.0;
+                                            stops[0].alpha = 1.0;
                                         }
                                         memcpy(&stops[addStart], opts->customGradient[i]->stops, sizeof(GradientStop) * opts->customGradient[i]->numStops);
                                         if(addEnd)
@@ -1650,8 +1656,8 @@ void qtcDefaultSettings(Options *opts)
 
     for(i=0; i<NUM_CUSTOM_GRAD; ++i)
         opts->customGradient[i]=0L;
-    opts->customGradient[APPEARANCE_CUSTOM1]=malloc(sizeof(Gradient));
-    opts->customGradient[APPEARANCE_CUSTOM2]=malloc(sizeof(Gradient));
+    opts->customGradient[APPEARANCE_CUSTOM1] = qtcNew(Gradient);
+    opts->customGradient[APPEARANCE_CUSTOM2] = qtcNew(Gradient);
     qtcSetupGradient(opts->customGradient[APPEARANCE_CUSTOM1], GB_3D,3,0.0,1.2,0.5,1.0,1.0,1.0);
     qtcSetupGradient(opts->customGradient[APPEARANCE_CUSTOM2], GB_3D,3,0.0,0.9,0.5,1.0,1.0,1.0);
     opts->customShades[0]=1.16;

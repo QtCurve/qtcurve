@@ -32,7 +32,7 @@ qtcSetupGradient(Gradient *grad, EGradientBorder border, int numStops, ...)
     grad->border = border;
 #ifndef __cplusplus
     grad->numStops = numStops;
-    grad->stops = malloc(sizeof(GradientStop) * numStops);
+    grad->stops = qtcNew(GradientStop, numStops);
 #endif
     va_start(ap, numStops);
     for (i = 0;i < numStops;++i) {

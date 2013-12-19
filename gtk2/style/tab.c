@@ -45,10 +45,10 @@ static QtCTab * qtcTabLookupHash(void *hash, gboolean create)
     {
         int p;
 
-        rv=(QtCTab *)malloc(sizeof(QtCTab));
-        rv->numRects=gtk_notebook_get_n_pages(GTK_NOTEBOOK(hash));
-        rv->rects=(GdkRectangle *)malloc(sizeof(GdkRectangle) * rv->numRects);
-        rv->id=-1;
+        rv = qtcNew(QtCTab);
+        rv->numRects = gtk_notebook_get_n_pages(GTK_NOTEBOOK(hash));
+        rv->rects = qtcNew(GdkRectangle, rv->numRects);
+        rv->id = -1;
 
         for(p=0; p<rv->numRects; ++p)
         {
@@ -373,9 +373,8 @@ GdkRectangle qtcTabGetTabbarRect(GtkNotebook *notebook)
         return empty;
 
     // removes page allocated size from rect, based on tabwidget orientation
-    pageAllocation=qtcWidgetGetAllocation(page);
-    switch(gtk_notebook_get_tab_pos(notebook))
-    {
+    pageAllocation = qtcWidgetGetAllocation(page);
+    switch (gtk_notebook_get_tab_pos(notebook)) {
         case GTK_POS_BOTTOM:
             rect.y += pageAllocation.height;
             rect.height -= pageAllocation.height;

@@ -58,7 +58,7 @@ qtcWindowLookupHash(void *hash, gboolean create)
     rv = (QtCWindow*)g_hash_table_lookup(qtcWindowTable, hash);
 
     if (!rv && create) {
-        rv = (QtCWindow*)malloc(sizeof(QtCWindow));
+        rv = qtcNew(QtCWindow);
         rv->width = rv->height = rv->timer = 0;
         rv->widget = NULL;
         rv->locked = FALSE;

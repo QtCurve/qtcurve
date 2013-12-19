@@ -70,8 +70,9 @@ qtcFree(void *p)
 }
 
 #define qtcNewSize(type, size) ((type*)qtcAlloc0(size))
-#define qtcNew(type) qtcNewSize(type, sizeof(type))
-#define qtcNewN(type, n) qtcNewSize(type, sizeof(type) * n)
+#define qtcNew(type, n...)                              \
+    QTC_SWITCH(n, qtcNewSize(type, sizeof(type) * n),       \
+               qtcNewSize(type, sizeof(type)))
 
 #ifdef __cplusplus
 
@@ -95,7 +96,7 @@ qtcFree(void *p)
 
 #ifdef __cplusplus
 template <class T>
-const T&
+static inline const T&
 const_(const T &t)
 {
     return t;

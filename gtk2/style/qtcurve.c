@@ -963,14 +963,14 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 widget && !isFixedWidget(widget) && /* Don't do for Firefox, etc. */
                 WIDGET_SB_SLIDER==widgetType && GTK_STATE_INSENSITIVE!=state && GTK_IS_RANGE(widget))
             {
-                GtkAllocation alloc         = qtcWidgetGetAllocation(widget);
-                gboolean      horizontal    = qtcRangeGetOrientation(widget) != GTK_ORIENTATION_HORIZONTAL;
-                int           sbarTroughLen = (horizontal ? alloc.height : alloc.width)-
-                                                ( (qtcRangeHasStepperA(widget) ? opts.sliderWidth : 0)+
-                                                (qtcRangeHasStepperB(widget) ? opts.sliderWidth : 0)+
-                                                (qtcRangeHasStepperC(widget) ? opts.sliderWidth : 0)+
-                                                (qtcRangeHasStepperD(widget) ? opts.sliderWidth : 0)),
-                              sliderLen     = (horizontal ? height : width);
+                GtkAllocation alloc = qtcWidgetGetAllocation(widget);
+                gboolean horizontal = qtcRangeGetOrientation(widget) != GTK_ORIENTATION_HORIZONTAL;
+                int sbarTroughLen = (horizontal ? alloc.height : alloc.width) -
+                    ((qtcRangeHasStepperA(widget) ? opts.sliderWidth : 0) +
+                     (qtcRangeHasStepperB(widget) ? opts.sliderWidth : 0) +
+                     (qtcRangeHasStepperC(widget) ? opts.sliderWidth : 0) +
+                     (qtcRangeHasStepperD(widget) ? opts.sliderWidth : 0));
+                int sliderLen = horizontal ? height : width;
 
                 if(sbarTroughLen==sliderLen)
                 {
