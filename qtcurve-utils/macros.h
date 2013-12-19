@@ -68,5 +68,21 @@
  * restrictions.
  **/
 #define QTC_SWITCH_(v, f) QTC_SWITCH(v, f, _##f)
+#define QTC_EXPORT __attribute__((visibility("default")))
+
+// For public c headers
+#ifdef __cplusplus
+#  define QTC_BEGIN_DECLS extern "C" {
+#  define QTC_END_DECLS }
+#else
+#  define QTC_BEGIN_DECLS
+#  define QTC_END_DECLS
+#endif
+
+// For small functions
+#define QTC_ALWAYS_INLINE __attribute__((always_inline))
+
+// Suppress unused parameter warning.
+#define QTC_UNUSED(x) ((void)(x))
 
 #endif

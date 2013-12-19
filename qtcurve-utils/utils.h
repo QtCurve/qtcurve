@@ -53,19 +53,6 @@ typedef struct {
 #define qtcLikely(x) qtcExpect(!!(x), 1)
 #define qtcUnlikely(x) qtcExpect(!!(x), 0)
 
-#define QTC_EXPORT __attribute__((visibility("default")))
-
-#ifdef __cplusplus
-#  define QTC_BEGIN_DECLS extern "C" {
-#  define QTC_END_DECLS }
-#else
-#  define QTC_BEGIN_DECLS
-#  define QTC_END_DECLS
-#endif
-
-#define QTC_ALWAYS_INLINE __attribute__((always_inline))
-#define QTC_UNUSED(x) ((void)(x))
-
 QTC_ALWAYS_INLINE static inline void*
 qtcAlloc0(size_t size)
 {
