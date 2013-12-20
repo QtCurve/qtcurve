@@ -52,6 +52,7 @@ compositingActive()
 #endif
 }
 
+#ifdef QTC_ENABLE_X11
 static inline WId
 findWid(const QWidget *w)
 {
@@ -63,6 +64,7 @@ findWid(const QWidget *w)
     } while ((w = w->parentWidget()));
     return (WId)0;
 }
+#endif
 
 static QWindow*
 findWindowHandle(const QWidget *w)
