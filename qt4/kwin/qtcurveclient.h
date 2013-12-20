@@ -118,23 +118,23 @@ private:
 
     static const int constNumButtonStates = 2;
 
-    QtCurveSizeGrip *itsResizeGrip;
-    ButtonBgnd itsButtonBackground[constNumButtonStates];
-    QRect itsCaptionRect;
-    QString itsCaption;
-    QString itsWindowClass;
-    QFont itsTitleFont;
-    int itsMenuBarSize;
-    QtCurveToggleButton *itsToggleMenuBarButton;
-    QtCurveToggleButton *itsToggleStatusBarButton;
-    // bool itsHover;
+    QtCurveSizeGrip *m_resizeGrip;
+    ButtonBgnd m_buttonBackground[constNumButtonStates];
+    QRect m_captionRect;
+    QString m_caption;
+    QString m_windowClass;
+    QFont m_titleFont;
+    int m_menuBarSize;
+    QtCurveToggleButton *m_toggleMenuBarButton;
+    QtCurveToggleButton *m_toggleStatusBarButton;
+    // bool m_hover;
 #if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
-    QList<QtCurveButton*> itsCloseButtons;
-    bool itsClickInProgress;
-    bool itsDragInProgress;
-    Qt::MouseButton itsMouseButton;
-    QPoint itsClickPoint;
-    int itsTargetTab;
+    QList<QtCurveButton*> m_closeButtons;
+    bool m_clickInProgress;
+    bool m_dragInProgress;
+    Qt::MouseButton m_mouseButton;
+    QPoint m_clickPoint;
+    int m_targetTab;
 #endif
 };
 

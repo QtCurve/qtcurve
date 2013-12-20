@@ -55,61 +55,61 @@ public:
     void load(const KConfig *cfg, const char *grp=0L);
     void save(KConfig *cfg, const char *grp=0L);
 
-    Size  borderSize() const        { return (Size)itsBorderSize; }
-    bool  roundBottom() const       { return itsRoundBottom; }
-    Shade outerBorder() const       { return itsOuterBorder; }
-    Shade innerBorder() const       { return itsInnerBorder; }
-    bool  borderlessMax() const     { return itsBorderlessMax; }
-    bool  customShadows() const     { return itsCustomShadows; }
-    bool  grouping() const          { return itsGrouping; }
-    int   titleBarPad() const       { return itsTitleBarPad; }
-    int   opacity(bool a) const     { return a ? itsActiveOpacity : itsInactiveOpacity; }
-    bool  opaqueBorder() const      { return itsOpaqueBorder; }
-    int   edgePad() const           { return itsEdgePad; }
-    void  setBorderSize(Size v)     { itsBorderSize=v; }
-    void  setRoundBottom(bool v)    { itsRoundBottom=v; }
-    void  setOuterBorder(Shade v)   { itsOuterBorder=v; }
-    void  setInnerBorder(Shade v)   { itsInnerBorder=v; }
-    void  setBorderlessMax(bool v)  { itsBorderlessMax=v; }
-    void  setCustomShadows(bool v)  { itsCustomShadows=v; }
-    void  setGrouping(bool v)       { itsGrouping=v; }
-    void  setTitleBarPad(int v)     { itsTitleBarPad=v; }
-    void  setOpacity(int v, bool a) { a ? itsActiveOpacity=v : itsInactiveOpacity=v; }
-    void  setOpaqueBorder(bool v)   { itsOpaqueBorder=v; }
-    void  setEdgePad(int v)         { itsEdgePad=v; }
+    Size  borderSize() const        { return (Size)m_borderSize; }
+    bool  roundBottom() const       { return m_roundBottom; }
+    Shade outerBorder() const       { return m_outerBorder; }
+    Shade innerBorder() const       { return m_innerBorder; }
+    bool  borderlessMax() const     { return m_borderlessMax; }
+    bool  customShadows() const     { return m_customShadows; }
+    bool  grouping() const          { return m_grouping; }
+    int   titleBarPad() const       { return m_titleBarPad; }
+    int   opacity(bool a) const     { return a ? m_activeOpacity : m_inactiveOpacity; }
+    bool  opaqueBorder() const      { return m_opaqueBorder; }
+    int   edgePad() const           { return m_edgePad; }
+    void  setBorderSize(Size v)     { m_borderSize=v; }
+    void  setRoundBottom(bool v)    { m_roundBottom=v; }
+    void  setOuterBorder(Shade v)   { m_outerBorder=v; }
+    void  setInnerBorder(Shade v)   { m_innerBorder=v; }
+    void  setBorderlessMax(bool v)  { m_borderlessMax=v; }
+    void  setCustomShadows(bool v)  { m_customShadows=v; }
+    void  setGrouping(bool v)       { m_grouping=v; }
+    void  setTitleBarPad(int v)     { m_titleBarPad=v; }
+    void  setOpacity(int v, bool a) { a ? m_activeOpacity=v : m_inactiveOpacity=v; }
+    void  setOpaqueBorder(bool v)   { m_opaqueBorder=v; }
+    void  setEdgePad(int v)         { m_edgePad=v; }
 
     bool operator==(const QtCurveConfig &o) const
     {
-        return itsBorderSize==o.itsBorderSize &&
-               itsRoundBottom==o.itsRoundBottom &&
-               itsOuterBorder==o.itsOuterBorder &&
-               itsInnerBorder==o.itsInnerBorder &&
-               itsBorderlessMax==o.itsBorderlessMax &&
-               itsCustomShadows==o.itsCustomShadows &&
-               itsGrouping==o.itsGrouping &&
-               itsTitleBarPad==o.itsTitleBarPad &&
-               itsActiveOpacity==o.itsActiveOpacity &&
-               itsInactiveOpacity==o.itsInactiveOpacity &&
-               itsOpaqueBorder==o.itsOpaqueBorder &&
-               itsEdgePad==o.itsEdgePad;
+        return m_borderSize==o.m_borderSize &&
+               m_roundBottom==o.m_roundBottom &&
+               m_outerBorder==o.m_outerBorder &&
+               m_innerBorder==o.m_innerBorder &&
+               m_borderlessMax==o.m_borderlessMax &&
+               m_customShadows==o.m_customShadows &&
+               m_grouping==o.m_grouping &&
+               m_titleBarPad==o.m_titleBarPad &&
+               m_activeOpacity==o.m_activeOpacity &&
+               m_inactiveOpacity==o.m_inactiveOpacity &&
+               m_opaqueBorder==o.m_opaqueBorder &&
+               m_edgePad==o.m_edgePad;
     }
 
     bool operator!=(const QtCurveConfig &o) const { return !(*this==o); }
 
     private:
 
-    int   itsBorderSize,
-          itsActiveOpacity,
-          itsInactiveOpacity;
-    bool  itsRoundBottom,
-          itsBorderlessMax,
-          itsCustomShadows,
-          itsGrouping,
-          itsOpaqueBorder;
-    Shade itsOuterBorder,
-          itsInnerBorder;
-    int   itsTitleBarPad,
-          itsEdgePad;
+    int   m_borderSize,
+          m_activeOpacity,
+          m_inactiveOpacity;
+    bool  m_roundBottom,
+          m_borderlessMax,
+          m_customShadows,
+          m_grouping,
+          m_opaqueBorder;
+    Shade m_outerBorder,
+          m_innerBorder;
+    int   m_titleBarPad,
+          m_edgePad;
 };
 
 }

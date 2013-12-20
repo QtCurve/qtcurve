@@ -64,8 +64,8 @@ static const char * constDBusService="org.kde.kcontrol.QtCurve";
 
 QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
                  : QWidget(parent)
-                 , itsActiveShadows(QPalette::Active)
-                 , itsInactiveShadows(QPalette::Inactive)
+                 , m_activeShadows(QPalette::Active)
+                 , m_inactiveShadows(QPalette::Inactive)
 {
     Q_UNUSED(config);
 
@@ -74,14 +74,14 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
 
     if(!QDBusConnection::sessionBus().registerService(constDBusService))
     {
-        itsOk=false;
+        m_ok=false;
         QBoxLayout *layout=new QBoxLayout(QBoxLayout::TopToBottom, this);
         layout->addWidget(new QLabel(i18n("<h3>Already Open</h3><p>Another QtCurve configuration dialog is already open. "
                                           "Please close the other before proceeding."), this));
     }
     else
     {
-        itsOk=true;
+        m_ok=true;
 
         setupUi(this);
 
@@ -143,7 +143,7 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
 
 QtCurveKWinConfig::~QtCurveKWinConfig()
 {
-    if(itsOk)
+    if(m_ok)
         QDBusConnection::sessionBus().unregisterService(constDBusService);
 }
 
@@ -154,13 +154,13 @@ void QtCurveKWinConfig::load(const KConfigGroup &)
 
 void QtCurveKWinConfig::load(KConfig *c)
 {
-    if(!itsOk)
+    if(!m_ok)
         return;
 
     KConfig *cfg=c ? c : new KConfig("kwinqtcurverc");
 
-    itsActiveShadows.load(cfg);
-    itsInactiveShadows.load(cfg);
+    m_activeShadows.load(cfg);
+    m_inactiveShadows.load(cfg);
     setShadows();
     KWinQtCurve::QtCurveConfig config;
 
@@ -177,7 +177,7 @@ void QtCurveKWinConfig::save(KConfigGroup &)
 
 void QtCurveKWinConfig::save(KConfig *c)
 {
-    if(!itsOk)
+    if(!m_ok)
         return;
 
     KConfig *cfg=c ? c : new KConfig("kwinqtcurverc");
@@ -195,29 +195,29 @@ void QtCurveKWinConfig::save(KConfig *c)
     config.setCustomShadows(useShadows->isChecked());
     if(useShadows->isChecked())
     {
-        itsActiveShadows.setShadowSize(activeShadowSize->value());
-        itsActiveShadows.setHorizontalOffset(activeShadowHOffset->value());
-        itsActiveShadows.setVerticalOffset(activeShadowVOffset->value());
-        itsActiveShadows.setColorType((KWinQtCurve::QtCurveShadowConfiguration::ColorType)activeShadowColorType->currentIndex());
+        m_activeShadows.setShadowSize(activeShadowSize->value());
+        m_activeShadows.setHorizontalOffset(activeShadowHOffset->value());
+        m_activeShadows.setVerticalOffset(activeShadowVOffset->value());
+        m_activeShadows.setColorType((KWinQtCurve::QtCurveShadowConfiguration::ColorType)activeShadowColorType->currentIndex());
         if(KWinQtCurve::QtCurveShadowConfiguration::CT_CUSTOM==activeShadowColorType->currentIndex())
-            itsActiveShadows.setColor(activeShadowColor->color());
-        itsInactiveShadows.setShadowSize(inactiveShadowSize->value());
-        itsInactiveShadows.setHorizontalOffset(inactiveShadowHOffset->value());
-        itsInactiveShadows.setVerticalOffset(inactiveShadowVOffset->value());
-        itsInactiveShadows.setColorType((KWinQtCurve::QtCurveShadowConfiguration::ColorType)inactiveShadowColorType->currentIndex());
-        itsInactiveShadows.setShadowType(inactiveUsesActiveGradients->isChecked()
+            m_activeShadows.setColor(activeShadowColor->color());
+        m_inactiveShadows.setShadowSize(inactiveShadowSize->value());
+        m_inactiveShadows.setHorizontalOffset(inactiveShadowHOffset->value());
+        m_inactiveShadows.setVerticalOffset(inactiveShadowVOffset->value());
+        m_inactiveShadows.setColorType((KWinQtCurve::QtCurveShadowConfiguration::ColorType)inactiveShadowColorType->currentIndex());
+        m_inactiveShadows.setShadowType(inactiveUsesActiveGradients->isChecked()
                                             ? KWinQtCurve::QtCurveShadowConfiguration::SH_ACTIVE
                                             : KWinQtCurve::QtCurveShadowConfiguration::SH_INACTIVE);
         if(KWinQtCurve::QtCurveShadowConfiguration::CT_CUSTOM==inactiveShadowColorType->currentIndex())
-            itsInactiveShadows.setColor(inactiveShadowColor->color());
+            m_inactiveShadows.setColor(inactiveShadowColor->color());
     }
     else
     {
-        itsActiveShadows.defaults();
-        itsInactiveShadows.defaults();
+        m_activeShadows.defaults();
+        m_inactiveShadows.defaults();
     }
-    itsActiveShadows.save(cfg);
-    itsInactiveShadows.save(cfg);
+    m_activeShadows.save(cfg);
+    m_inactiveShadows.save(cfg);
 #if !KDE_IS_VERSION(4, 8, 80)
     config.setGrouping(grouping->isChecked());
 #endif
@@ -232,12 +232,12 @@ void QtCurveKWinConfig::save(KConfig *c)
 
 void QtCurveKWinConfig::defaults()
 {
-    if(!itsOk)
+    if(!m_ok)
         return;
 
     setWidgets(KWinQtCurve::QtCurveConfig());
-    itsActiveShadows.defaults();
-    itsInactiveShadows.defaults();
+    m_activeShadows.defaults();
+    m_inactiveShadows.defaults();
     setShadows();
 }
 
@@ -276,14 +276,14 @@ void QtCurveKWinConfig::shadowsChanged()
 void QtCurveKWinConfig::activeShadowColorTypeChanged()
 {
     activeShadowColor->setEnabled(KWinQtCurve::QtCurveShadowConfiguration::CT_CUSTOM==activeShadowColorType->currentIndex());
-    if(itsActiveShadows.colorType()!=activeShadowColorType->currentIndex())
+    if(m_activeShadows.colorType()!=activeShadowColorType->currentIndex())
         emit changed();
 }
 
 void QtCurveKWinConfig::inactiveShadowColorTypeChanged()
 {
     inactiveShadowColor->setEnabled(KWinQtCurve::QtCurveShadowConfiguration::CT_CUSTOM==inactiveShadowColorType->currentIndex());
-    if(itsInactiveShadows.colorType()!=inactiveShadowColorType->currentIndex())
+    if(m_inactiveShadows.colorType()!=inactiveShadowColorType->currentIndex())
         emit changed();
 }
 
@@ -339,17 +339,17 @@ void QtCurveKWinConfig::setNote(const QString &txt)
 
 void QtCurveKWinConfig::setShadows()
 {
-    activeShadowSize->setValue(itsActiveShadows.shadowSize());
-    activeShadowHOffset->setValue(itsActiveShadows.horizontalOffset());
-    activeShadowVOffset->setValue(itsActiveShadows.verticalOffset());
-    activeShadowColor->setColor(itsActiveShadows.color());
-    activeShadowColorType->setCurrentIndex(itsActiveShadows.colorType());
-    inactiveShadowSize->setValue(itsInactiveShadows.shadowSize());
-    inactiveShadowHOffset->setValue(itsInactiveShadows.horizontalOffset());
-    inactiveShadowVOffset->setValue(itsInactiveShadows.verticalOffset());
-    inactiveShadowColor->setColor(itsInactiveShadows.color());
-    inactiveShadowColorType->setCurrentIndex(itsInactiveShadows.colorType());
-    inactiveUsesActiveGradients->setChecked(KWinQtCurve::QtCurveShadowConfiguration::SH_ACTIVE==itsInactiveShadows.shadowType());
+    activeShadowSize->setValue(m_activeShadows.shadowSize());
+    activeShadowHOffset->setValue(m_activeShadows.horizontalOffset());
+    activeShadowVOffset->setValue(m_activeShadows.verticalOffset());
+    activeShadowColor->setColor(m_activeShadows.color());
+    activeShadowColorType->setCurrentIndex(m_activeShadows.colorType());
+    inactiveShadowSize->setValue(m_inactiveShadows.shadowSize());
+    inactiveShadowHOffset->setValue(m_inactiveShadows.horizontalOffset());
+    inactiveShadowVOffset->setValue(m_inactiveShadows.verticalOffset());
+    inactiveShadowColor->setColor(m_inactiveShadows.color());
+    inactiveShadowColorType->setCurrentIndex(m_inactiveShadows.colorType());
+    inactiveUsesActiveGradients->setChecked(KWinQtCurve::QtCurveShadowConfiguration::SH_ACTIVE==m_inactiveShadows.shadowType());
 }
 
 extern "C"

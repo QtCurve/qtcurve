@@ -43,9 +43,9 @@ point2Pixel(double point)
 
 QtCurveToggleButton::QtCurveToggleButton(bool menubar, QtCurveClient *parent)
                    : KCommonDecorationButton(AboveButton, parent),
-                     itsClient(parent),
+                     m_client(parent),
                      isMenuBar(menubar),
-                     itsHover(false)
+                     m_hover(false)
 {
 //     setAttribute(Qt::WA_PaintOnScreen, false);
     setAttribute(Qt::WA_NoSystemBackground, true);
@@ -66,7 +66,7 @@ void QtCurveToggleButton::reset(unsigned long changed)
 
 void QtCurveToggleButton::enterEvent(QEvent *e)
 {
-    itsHover = true;
+    m_hover = true;
     KCommonDecorationButton::enterEvent(e);
     update();
     // Hacky NVIDIA fix - sometimes mouseover state gets 'stuck' - but only for some windows!!!
@@ -75,7 +75,7 @@ void QtCurveToggleButton::enterEvent(QEvent *e)
 
 void QtCurveToggleButton::leaveEvent(QEvent *e)
 {
-    itsHover = false;
+    m_hover = false;
     KCommonDecorationButton::leaveEvent(e);
     update();
     // Hacky NVIDIA fix - sometimes mouseover state gets 'stuck' - but only for some windows!!!
@@ -92,11 +92,11 @@ void QtCurveToggleButton::paintEvent(QPaintEvent *ev)
 void QtCurveToggleButton::drawButton(QPainter *painter)
 {
     QRect  r(0, 0, width(), height());
-    bool   active(itsClient->isActive()),
+    bool   active(m_client->isActive()),
            sunken(isDown());
     QColor col(KDecoration::options()->color(KDecoration::ColorFont, active/* || faded*/));
 
-    col.setAlphaF(itsHover ? 0.99 : 0.15);
+    col.setAlphaF(m_hover ? 0.99 : 0.15);
     painter->setRenderHint(QPainter::Antialiasing, true);
     //painter->setPen(QPen(col, (isChecked() ? 2.0 : 1.0)));
     painter->setPen(col);
@@ -127,7 +127,7 @@ void QtCurveToggleButton::drawButton(QPainter *painter)
     double       squareRad=round || Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, 0L, 0L)<ROUND_FULL ? 0.0 : 2.0;
     QPainterPath path;
 
-    bgnd.setAlphaF(itsHover ? 0.9 : 0.4);
+    bgnd.setAlphaF(m_hover ? 0.9 : 0.4);
 
 
     if(round)

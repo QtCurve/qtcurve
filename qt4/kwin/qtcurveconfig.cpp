@@ -31,21 +31,22 @@ namespace KWinQtCurve
 
 void QtCurveConfig::defaults()
 {
-    itsBorderSize=BORDER_NORMAL;
-    itsRoundBottom=true;
-    itsOuterBorder=SHADE_NONE;
-    itsInnerBorder=SHADE_NONE;
-    itsBorderlessMax=false;
-    itsCustomShadows=false;
-    itsGrouping=true;
-    itsTitleBarPad=0;
-    itsActiveOpacity=itsInactiveOpacity=100;
-    itsOpaqueBorder=true;
-    itsEdgePad=0;
+    m_borderSize=BORDER_NORMAL;
+    m_roundBottom=true;
+    m_outerBorder=SHADE_NONE;
+    m_innerBorder=SHADE_NONE;
+    m_borderlessMax=false;
+    m_customShadows=false;
+    m_grouping=true;
+    m_titleBarPad=0;
+    m_activeOpacity=m_inactiveOpacity=100;
+    m_opaqueBorder=true;
+    m_edgePad=0;
 }
 
-#define READ_ENTRY(ENTRY) \
-    its##ENTRY=group.readEntry(#ENTRY, def.its##ENTRY);
+#define READ_ENTRY(name, field) do {                    \
+        field = group.readEntry(name, def.field);       \
+    } while (0)
 
 static QtCurveConfig::Shade readShade(KConfigGroup &group, const char *key)
 {
@@ -67,7 +68,7 @@ void QtCurveConfig::load(const KConfig *cfg, const char *grp)
     QtCurveConfig def;
 
     if(group.hasKey("BorderSize"))
-        itsBorderSize=(Size)group.readEntry("BorderSize", (int)def.borderSize());
+        m_borderSize=(Size)group.readEntry("BorderSize", (int)def.borderSize());
     else
     {
         KConfig      kwin("kwinrc");
@@ -77,72 +78,74 @@ void QtCurveConfig::load(const KConfig *cfg, const char *grp)
         if(0==size) // KDecorationDefines::BorderTiny
         {
             if(group.readEntry("DrawBottom", false))
-                itsBorderSize=BORDER_NO_SIDES;
+                m_borderSize=BORDER_NO_SIDES;
             else
-                itsBorderSize=BORDER_NONE;
+                m_borderSize=BORDER_NONE;
         }
         else
-            itsBorderSize=(Size)(size+2);
+            m_borderSize=(Size)(size+2);
     }
 
-    if(itsBorderSize<BORDER_NONE || itsBorderSize>BORDER_OVERSIZED)
-        itsBorderSize=BORDER_NORMAL;
-    READ_ENTRY(BorderlessMax)
-    READ_ENTRY(CustomShadows)
-    READ_ENTRY(Grouping)
-    READ_ENTRY(TitleBarPad)
-    READ_ENTRY(ActiveOpacity)
-    READ_ENTRY(InactiveOpacity)
-    READ_ENTRY(OpaqueBorder)
-    READ_ENTRY(EdgePad)
+    if(m_borderSize<BORDER_NONE || m_borderSize>BORDER_OVERSIZED)
+        m_borderSize=BORDER_NORMAL;
+    READ_ENTRY("BorderlessMax", m_borderlessMax);
+    READ_ENTRY("CustomShadows", m_customShadows);
+    READ_ENTRY("Grouping", m_grouping);
+    READ_ENTRY("TitleBarPad", m_titleBarPad);
+    READ_ENTRY("ActiveOpacity", m_activeOpacity);
+    READ_ENTRY("InactiveOpacity", m_inactiveOpacity);
+    READ_ENTRY("OpaqueBorder", m_opaqueBorder);
+    READ_ENTRY("EdgePad", m_edgePad);
 
-    if(itsTitleBarPad<-5 || itsTitleBarPad>10)
-        itsTitleBarPad=0;
-    if(itsEdgePad<0 || itsEdgePad>10)
-        itsEdgePad=0;
-    if(BORDER_NONE==itsBorderSize)
-        itsRoundBottom=false;
+    if(m_titleBarPad<-5 || m_titleBarPad>10)
+        m_titleBarPad=0;
+    if(m_edgePad<0 || m_edgePad>10)
+        m_edgePad=0;
+    if(BORDER_NONE==m_borderSize)
+        m_roundBottom=false;
     else
-        READ_ENTRY(RoundBottom)
+        READ_ENTRY("RoundBottom", m_roundBottom);
 
-    itsOuterBorder=readShade(group, "OuterBorder");
-    if(itsBorderSize<BORDER_TINY || SHADE_NONE==itsOuterBorder)
-        itsInnerBorder=SHADE_NONE;
+    m_outerBorder=readShade(group, "OuterBorder");
+    if(m_borderSize<BORDER_TINY || SHADE_NONE==m_outerBorder)
+        m_innerBorder=SHADE_NONE;
     else
-        itsInnerBorder=readShade(group, "InnerBorder");
+        m_innerBorder=readShade(group, "InnerBorder");
 
-    if(itsActiveOpacity<0 || itsActiveOpacity>100)
-        itsActiveOpacity=100;
-    if(itsInactiveOpacity<0 || itsInactiveOpacity>100)
-        itsInactiveOpacity=100;
+    if(m_activeOpacity<0 || m_activeOpacity>100)
+        m_activeOpacity=100;
+    if(m_inactiveOpacity<0 || m_inactiveOpacity>100)
+        m_inactiveOpacity=100;
 }
 
-#define WRITE_ENTRY(ENTRY) \
-    if (def.its##ENTRY==its##ENTRY) \
-        group.deleteEntry(#ENTRY); \
-    else \
-        group.writeEntry(#ENTRY, its##ENTRY);
+#define WRITE_ENTRY(name, field) do {           \
+        if (def.field == field) {               \
+            group.deleteEntry(name);            \
+        } else {                                \
+            group.writeEntry(name, field);      \
+        }                                       \
+    } while (0)
 
 void QtCurveConfig::save(KConfig *cfg, const char *grp)
 {
     KConfigGroup  group(cfg, grp ? grp : GROUP);
     QtCurveConfig def;
 
-    //WRITE_ENTRY(BorderSize)
+    //WRITE_ENTRY("BorderSize", m_borderSize);
     // Have to write BorderSize, because if not found we read the kwin setting - to be
     // compatible with QtCurve<1.4
-    group.writeEntry("BorderSize", itsBorderSize);
-    WRITE_ENTRY(RoundBottom)
-    group.writeEntry("OuterBorder", (int)itsOuterBorder);
-    group.writeEntry("InnerBorder", (int)itsInnerBorder);
-    WRITE_ENTRY(BorderlessMax)
-    WRITE_ENTRY(CustomShadows)
-    WRITE_ENTRY(Grouping)
-    WRITE_ENTRY(TitleBarPad)
-    WRITE_ENTRY(ActiveOpacity)
-    WRITE_ENTRY(InactiveOpacity)
-    WRITE_ENTRY(OpaqueBorder)
-    WRITE_ENTRY(EdgePad)
+    group.writeEntry("BorderSize", m_borderSize);
+    WRITE_ENTRY("RoundBottom", m_roundBottom);
+    group.writeEntry("OuterBorder", (int)m_outerBorder);
+    group.writeEntry("InnerBorder", (int)m_innerBorder);
+    WRITE_ENTRY("BorderlessMax", m_borderlessMax);
+    WRITE_ENTRY("CustomShadows", m_customShadows);
+    WRITE_ENTRY("Grouping", m_grouping);
+    WRITE_ENTRY("TitleBarPad", m_titleBarPad);
+    WRITE_ENTRY("ActiveOpacity", m_activeOpacity);
+    WRITE_ENTRY("InactiveOpacity", m_inactiveOpacity);
+    WRITE_ENTRY("OpaqueBorder", m_opaqueBorder);
+    WRITE_ENTRY("EdgePad", m_edgePad);
 }
 
 }

@@ -243,17 +243,17 @@ QtCurveClient::QtCurveClient(KDecorationBridge *bridge, QtCurveHandler *factory)
 #else
              : KCommonDecoration(bridge, factory)
 #endif
-             , itsResizeGrip(0L)
-             , itsTitleFont(QFont())
-             , itsMenuBarSize(-1)
-             , itsToggleMenuBarButton(0L)
-             , itsToggleStatusBarButton(0L)
-//              , itsHover(false)
+             , m_resizeGrip(0L)
+             , m_titleFont(QFont())
+             , m_menuBarSize(-1)
+             , m_toggleMenuBarButton(0L)
+             , m_toggleStatusBarButton(0L)
+//              , m_hover(false)
 #if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
-             , itsClickInProgress(false)
-             , itsDragInProgress(false)
-             , itsMouseButton(Qt::NoButton)
-             , itsTargetTab(constInvalidTab)
+             , m_clickInProgress(false)
+             , m_dragInProgress(false)
+             , m_mouseButton(Qt::NoButton)
+             , m_targetTab(constInvalidTab)
 #endif
 {
     Handler()->addClient(this);
@@ -350,7 +350,7 @@ KCommonDecorationButton *QtCurveClient::createButton(ButtonType type)
 
 void QtCurveClient::init()
 {
-    itsTitleFont=isToolWindow() ? Handler()->titleFontTool() : Handler()->titleFont();
+    m_titleFont=isToolWindow() ? Handler()->titleFontTool() : Handler()->titleFont();
 
     KCommonDecoration::init();
     widget()->setAutoFillBackground(false);
@@ -364,7 +364,7 @@ void QtCurveClient::init()
     if(Handler()->showResizeGrip())
         createSizeGrip();
     if (isPreview())
-        itsCaption =  isActive() ? i18n("Active Window") : i18n("Inactive Window");
+        m_caption =  isActive() ? i18n("Active Window") : i18n("Inactive Window");
     else
         captionChange();
 }
@@ -372,24 +372,24 @@ void QtCurveClient::init()
 void QtCurveClient::maximizeChange()
 {
     reset(SettingBorder);
-    if(itsResizeGrip)
-        itsResizeGrip->setVisible(!(isShade() || isMaximized()));
+    if(m_resizeGrip)
+        m_resizeGrip->setVisible(!(isShade() || isMaximized()));
     KCommonDecoration::maximizeChange();
 }
 
 void QtCurveClient::shadeChange()
 {
-    if(itsResizeGrip)
-        itsResizeGrip->setVisible(!(isShade() || isMaximized()));
+    if(m_resizeGrip)
+        m_resizeGrip->setVisible(!(isShade() || isMaximized()));
     KCommonDecoration::shadeChange();
 }
 
 void QtCurveClient::activeChange()
 {
-    if(itsResizeGrip && !(isShade() || isMaximized()))
+    if(m_resizeGrip && !(isShade() || isMaximized()))
     {
-        itsResizeGrip->activeChange();
-        itsResizeGrip->update();
+        m_resizeGrip->activeChange();
+        m_resizeGrip->update();
     }
 
     informAppOfActiveChange();
@@ -398,7 +398,7 @@ void QtCurveClient::activeChange()
 
 void QtCurveClient::captionChange()
 {
-    itsCaption=caption();
+    m_caption=caption();
     widget()->update();
 }
 
@@ -485,7 +485,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     r.getCoords(&rectX, &rectY, &rectX2, &rectY2);
 
-    if(!preview && (blend||menuColor) && -1==itsMenuBarSize)
+    if(!preview && (blend||menuColor) && -1==m_menuBarSize)
     {
         QString wc(windowClass());
         if(wc==QLatin1String("W Navigator Firefox browser") ||
@@ -496,7 +496,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
            wc==QLatin1String("D Calendar Thunderbird EventDialog") ||
            wc==QLatin1String("W Msgcompose Thunderbird Msgcompose") ||
            wc==QLatin1String("D Msgcompose Thunderbird Msgcompose"))
-            itsMenuBarSize=QFontMetrics(QApplication::font()).height()+8;
+            m_menuBarSize=QFontMetrics(QApplication::font()).height()+8;
 
         else if(
 #if 0 // Currently LibreOffice does not seem to pain menubar backgrounds for KDE - so disable check here...
@@ -507,16 +507,16 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                 wc.startsWith(QLatin1String("W VCLSalFrame.DocumentWindow OpenOffice.org")) ||
                 wc.startsWith(QLatin1String("W VCLSalFrame OpenOffice.org")) ||
                 wc==QLatin1String("W soffice.bin Soffice.bin"))
-            itsMenuBarSize=QFontMetrics(QApplication::font()).height()+7;
+            m_menuBarSize=QFontMetrics(QApplication::font()).height()+7;
         else
         {
             int val=getMenubarSizeProperty(windowId());
             if(val>-1)
-                itsMenuBarSize=val;
+                m_menuBarSize=val;
         }
     }
 
-    if(menuColor && itsMenuBarSize>0 &&
+    if(menuColor && m_menuBarSize>0 &&
        (active || !Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_ShadeMenubarOnlyWhenActive, NULL, NULL)))
         col=QColor(QRgb(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_MenubarColor, NULL, NULL)));
 
@@ -668,8 +668,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     opt.rect=QRect(r.x(), r.y(), r.width(), titleBarHeight);
     opt.titleBarState=(active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;
 
-    if(!preview && !isShade() && blend && -1!=itsMenuBarSize)
-        opt.rect.adjust(0, 0, 0, itsMenuBarSize);
+    if(!preview && !isShade() && blend && -1!=m_menuBarSize)
+        opt.rect.adjust(0, 0, 0, m_menuBarSize);
 
     // Remove QtC_StateKWinNotFull settings - as its the same value as QtC_StateKWinFillBgnd, and it is not
     // used in CC_TitleBar...
@@ -679,7 +679,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 #ifdef DRAW_INTO_PIXMAPS
     if(!compositing && !preview && !customBgnd)
     {
-        QPixmap  tPix(32, titleBarHeight+(!blend || itsMenuBarSize<0 ? 0 : itsMenuBarSize));
+        QPixmap  tPix(32, titleBarHeight+(!blend || m_menuBarSize<0 ? 0 : m_menuBarSize));
         QPainter tPainter(&tPix);
         tPainter.setRenderHint(QPainter::Antialiasing, true);
         if(!customBgnd)
@@ -742,9 +742,9 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     const int              tabCount = tabList.count();
 
     // Delete unneeded tab close buttons
-    while(tabCount < itsCloseButtons.size() || (1==tabCount && itsCloseButtons.size() > 0))
+    while(tabCount < m_closeButtons.size() || (1==tabCount && m_closeButtons.size() > 0))
     {
-        QtCurveButton *btn = itsCloseButtons.takeFirst();
+        QtCurveButton *btn = m_closeButtons.takeFirst();
         btn->hide();
         btn->deleteLater();
     }
@@ -770,14 +770,14 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                                                   -(iconSize+(showIcon ? constTitlePad : 0)), 0), QRect(), tabList[i].title(),
                        showIcon ? tabList[i].icon().pixmap(iconSize) : QPixmap(),  0, true, activeTab==i);
 
-            if(i >= itsCloseButtons.size())
-                itsCloseButtons.append(new QtCurveButton(ItemCloseButton, this));
-            //itsCloseButtons[i]->setActive(isActive() && visibleClientGroupItem()==i);
-            itsCloseButtons[i]->setFixedSize(iconSize, iconSize);
-            itsCloseButtons[i]->move(tabGeom.right() - iconSize,
+            if(i >= m_closeButtons.size())
+                m_closeButtons.append(new QtCurveButton(ItemCloseButton, this));
+            //m_closeButtons[i]->setActive(isActive() && visibleClientGroupItem()==i);
+            m_closeButtons[i]->setFixedSize(iconSize, iconSize);
+            m_closeButtons[i]->move(tabGeom.right() - iconSize,
                                      tabGeom.top() + titleEdgeTop + ((tabGeom.height()-iconSize)/2));
-            itsCloseButtons[i]->installEventFilter(this);
-            itsCloseButtons[i]->show();
+            m_closeButtons[i]->installEventFilter(this);
+            m_closeButtons[i]->show();
 
             QRect br(tabGeom);
 
@@ -791,29 +791,29 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                 painter.fillRect(br.adjusted(0==i ? 1 : 0, 0, 0, 0), gray);
             }
 
-            if(itsDragInProgress && itsTargetTab>constInvalidTab &&
-                (i==itsTargetTab || ((i==tabCount-1) && itsTargetTab==tabCount)))
+            if(m_dragInProgress && m_targetTab>constInvalidTab &&
+                (i==m_targetTab || ((i==tabCount-1) && m_targetTab==tabCount)))
             {
                 QPixmap arrow(SmallIcon("arrow-down"));
-                painter.drawPixmap(br.x()+(itsTargetTab==tabCount ? tabGeom.width() : 0)-(arrow.width()/2), br.y()+2, arrow);
+                painter.drawPixmap(br.x()+(m_targetTab==tabCount ? tabGeom.width() : 0)-(arrow.width()/2), br.y()+2, arrow);
             }
         }
     }
     else
     {
 #endif
-        itsCaptionRect=captionRect(); // also update itsCaptionRect!
-        paintTitle(&painter, itsCaptionRect, QRect(rectX+titleEdgeLeft, itsCaptionRect.y(),
+        m_captionRect=captionRect(); // also update m_captionRect!
+        paintTitle(&painter, m_captionRect, QRect(rectX+titleEdgeLeft, m_captionRect.y(),
                                                    rectX2-(titleEdgeRight+rectX+titleEdgeLeft),
-                                                   itsCaptionRect.height()),
-                   itsCaption, showIcon ? icon().pixmap(iconSize) : QPixmap(), shadowSize);
+                                                   m_captionRect.height()),
+                   m_caption, showIcon ? icon().pixmap(iconSize) : QPixmap(), shadowSize);
 #if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
 
-        if(constAddToEmpty==itsTargetTab)
+        if(constAddToEmpty==m_targetTab)
         {
             QPixmap arrow(SmallIcon("list-add"));
-            painter.drawPixmap(itsCaptionRect.x(),
-                               itsCaptionRect.y()+((itsCaptionRect.height()-arrow.height())/2),
+            painter.drawPixmap(m_captionRect.x(),
+                               m_captionRect.y()+((m_captionRect.height()-arrow.height())/2),
                                arrow);
         }
     }
@@ -824,22 +824,22 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     if(toggleButtons)
     {
-        if(!itsToggleMenuBarButton && toggleButtons&0x01 && (Handler()->wasLastMenu(windowId()) || getMenubarSizeProperty(windowId())>-1))
-            itsToggleMenuBarButton=createToggleButton(true);
-        if(!itsToggleStatusBarButton && toggleButtons&0x02 && (Handler()->wasLastStatus(windowId()) || getStatusbarSizeProperty(windowId())>-1))
-            itsToggleStatusBarButton=createToggleButton(false);
+        if(!m_toggleMenuBarButton && toggleButtons&0x01 && (Handler()->wasLastMenu(windowId()) || getMenubarSizeProperty(windowId())>-1))
+            m_toggleMenuBarButton=createToggleButton(true);
+        if(!m_toggleStatusBarButton && toggleButtons&0x02 && (Handler()->wasLastStatus(windowId()) || getStatusbarSizeProperty(windowId())>-1))
+            m_toggleStatusBarButton=createToggleButton(false);
 
-    //     if(itsHover)
+    //     if(m_hover)
         {
             if(
 #if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
                 1==tabCount &&
 #endif
-                active && (itsToggleMenuBarButton||itsToggleStatusBarButton))
+                active && (m_toggleMenuBarButton||m_toggleStatusBarButton))
             {
                 if( (buttonsLeftWidth()+buttonsRightWidth()+constTitlePad+
-                    (itsToggleMenuBarButton ? itsToggleMenuBarButton->width() : 0) +
-                    (itsToggleStatusBarButton ? itsToggleStatusBarButton->width() : 0)) < r.width())
+                    (m_toggleMenuBarButton ? m_toggleMenuBarButton->width() : 0) +
+                    (m_toggleStatusBarButton ? m_toggleStatusBarButton->width() : 0)) < r.width())
                 {
                     int  align(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleAlignment, 0L, 0L));
                     bool onLeft(align&Qt::AlignRight);
@@ -856,23 +856,23 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                     QRect   cr(onLeft
                                 ? r.left()+buttonsLeftWidth()+posAdjust+constTitlePad+2
                                 : r.right()-(buttonsRightWidth()+posAdjust+constTitlePad+2+
-                                            (itsToggleMenuBarButton ? itsToggleMenuBarButton->width() : 0)+
-                                            (itsToggleStatusBarButton ? itsToggleStatusBarButton->width() : 0)),
+                                            (m_toggleMenuBarButton ? m_toggleMenuBarButton->width() : 0)+
+                                            (m_toggleStatusBarButton ? m_toggleStatusBarButton->width() : 0)),
                             r.top()+offset,
-                            (itsToggleMenuBarButton ? itsToggleMenuBarButton->width() : 0)+
-                            (itsToggleStatusBarButton ? itsToggleStatusBarButton->width() : 0),
+                            (m_toggleMenuBarButton ? m_toggleMenuBarButton->width() : 0)+
+                            (m_toggleStatusBarButton ? m_toggleStatusBarButton->width() : 0),
                             titleBarHeight-2*offset);
 
-                    if(itsToggleMenuBarButton)
+                    if(m_toggleMenuBarButton)
                     {
-                        itsToggleMenuBarButton->move(cr.x(), r.y()+3+(outerBorder ? 2 : 0));
-                        itsToggleMenuBarButton->show();
+                        m_toggleMenuBarButton->move(cr.x(), r.y()+3+(outerBorder ? 2 : 0));
+                        m_toggleMenuBarButton->show();
                     }
-                    if(itsToggleStatusBarButton)
+                    if(m_toggleStatusBarButton)
                     {
-                        itsToggleStatusBarButton->move(cr.x()+(itsToggleMenuBarButton ? itsToggleMenuBarButton->width()+2 : 0),
+                        m_toggleStatusBarButton->move(cr.x()+(m_toggleMenuBarButton ? m_toggleMenuBarButton->width()+2 : 0),
                                                        r.y()+3+(outerBorder ? 2 : 0));
-                        itsToggleStatusBarButton->show();
+                        m_toggleStatusBarButton->show();
                     }
                     hideToggleButtons=false;
                 }
@@ -881,10 +881,10 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     }
     if(hideToggleButtons)
     {
-        if(itsToggleMenuBarButton)
-            itsToggleMenuBarButton->hide();
-        if(itsToggleStatusBarButton)
-            itsToggleStatusBarButton->hide();
+        if(m_toggleMenuBarButton)
+            m_toggleMenuBarButton->hide();
+        if(m_toggleStatusBarButton)
+            m_toggleStatusBarButton->hide();
     }
 
     if(separator)
@@ -911,7 +911,7 @@ QtCurveClient::paintTitle(QPainter *painter, const QRect &capRect,
 
     if(!cap.isEmpty())
     {
-        painter->setFont(itsTitleFont);
+        painter->setFont(m_titleFont);
 
         QFontMetrics  fm(painter->fontMetrics());
         QString       str(fm.elidedText(cap, Qt::ElideRight,
@@ -1177,12 +1177,12 @@ QRect QtCurveClient::captionRect() const
 
 void QtCurveClient::updateCaption()
 {
-    QRect oldCaptionRect(itsCaptionRect);
+    QRect oldCaptionRect(m_captionRect);
 
-    itsCaptionRect=QtCurveClient::captionRect();
+    m_captionRect=QtCurveClient::captionRect();
 
-    if (oldCaptionRect.isValid() && itsCaptionRect.isValid())
-        widget()->update(oldCaptionRect|itsCaptionRect);
+    if (oldCaptionRect.isValid() && m_captionRect.isValid())
+        widget()->update(oldCaptionRect|m_captionRect);
     else
         widget()->update();
 }
@@ -1194,15 +1194,15 @@ bool QtCurveClient::eventFilter(QObject *o, QEvent *e)
 
 //     if(widget()==o)
 //     {
-//         if(itsToggleMenuBarButton || itsToggleStatusBarButton)
+//         if(m_toggleMenuBarButton || m_toggleStatusBarButton)
 //             switch(e->type())
 //             {
 //                 case QEvent::Enter:
-//                     itsHover=true;
+//                     m_hover=true;
 //                     widget()->update();
 //                     break;
 //                 case QEvent::Leave:
-//                     itsHover=false;
+//                     m_hover=false;
 //                     widget()->update();
 //                 default:
 //                     break;
@@ -1221,7 +1221,7 @@ bool QtCurveClient::eventFilter(QObject *o, QEvent *e)
             {
                 const QMouseEvent *me = static_cast<QMouseEvent *>(e);
                 if(Qt::LeftButton==me->button() && btn->rect().contains(me->pos()))
-                    closeClientGroupItem(itsCloseButtons.indexOf(btn));
+                    closeClientGroupItem(m_closeButtons.indexOf(btn));
                 return true;
             }
         }
@@ -1251,22 +1251,22 @@ bool QtCurveClient::eventFilter(QObject *o, QEvent *e)
 #if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
 bool QtCurveClient::mouseButtonPressEvent(QMouseEvent *e)
 {
-    itsClickPoint = widget()->mapToParent(e->pos());
+    m_clickPoint = widget()->mapToParent(e->pos());
 
-    int item = itemClicked(itsClickPoint);
+    int item = itemClicked(m_clickPoint);
 
     if(OperationsOp==buttonToWindowOperation(e->button()))
     {
-        displayClientMenu(item, widget()->mapToGlobal(itsClickPoint));
+        displayClientMenu(item, widget()->mapToGlobal(m_clickPoint));
         return true;
     }
     if(item >= 0)
     {
-        itsClickInProgress = true;
-        itsMouseButton = e->button();
+        m_clickInProgress = true;
+        m_mouseButton = e->button();
         return true;
     }
-    itsClickInProgress = false;
+    m_clickInProgress = false;
     return false;
 }
 
@@ -1274,13 +1274,13 @@ bool QtCurveClient::mouseButtonReleaseEvent(QMouseEvent *e)
 {
     int item = itemClicked(widget()->mapToParent(e->pos()));
 
-    if(itsClickInProgress && item >= 0)
+    if(m_clickInProgress && item >= 0)
     {
-        itsClickInProgress = false;
+        m_clickInProgress = false;
         setVisibleClientGroupItem(item);
         return true;
     }
-    itsClickInProgress = false;
+    m_clickInProgress = false;
     return false;
 }
 
@@ -1289,11 +1289,11 @@ bool QtCurveClient::mouseMoveEvent(QMouseEvent *e)
     QPoint c    = e->pos();
     int    item = itemClicked(c);
 
-    if(item >= 0 && itsClickInProgress && ClientGroupDragOp==buttonToWindowOperation(itsMouseButton) &&
-       (c - itsClickPoint).manhattanLength() >= 4)
+    if(item >= 0 && m_clickInProgress && ClientGroupDragOp==buttonToWindowOperation(m_mouseButton) &&
+       (c - m_clickPoint).manhattanLength() >= 4)
     {
-        itsClickInProgress = false;
-        itsDragInProgress = true;
+        m_clickInProgress = false;
+        m_dragInProgress = true;
 
         QDrag     *drag      = new QDrag(widget());
         QMimeData *groupData = new QMimeData();
@@ -1344,12 +1344,12 @@ bool QtCurveClient::mouseMoveEvent(QMouseEvent *e)
         drag->setHotSpot(QPoint(c.x() - geom.x(), -1));
 
         drag->exec(Qt::MoveAction);
-        itsDragInProgress = false;
+        m_dragInProgress = false;
         if(drag->target()==0 && tabList.count() > 1)
         { // Remove window from group and move to where the cursor is located
             QPoint pos = QCursor::pos();
             frame.moveTo(pos.x() - c.x(), pos.y() - c.y());
-            removeFromClientGroup(itemClicked(itsClickPoint), frame);
+            removeFromClientGroup(itemClicked(m_clickPoint), frame);
         }
         return true;
     }
@@ -1360,12 +1360,12 @@ bool QtCurveClient::dragEnterEvent(QDragEnterEvent *e)
 {
     if(e->mimeData()->hasFormat(clientGroupItemDragMimeType()))
     {
-        itsDragInProgress = true;
+        m_dragInProgress = true;
         e->acceptProposedAction();
         if(1==clientGroupItems().count() && widget()!=e->source())
-            itsTargetTab = constAddToEmpty;
+            m_targetTab = constAddToEmpty;
         else
-            itsTargetTab = itemClicked(widget()->mapToParent(e->pos()), true, true);
+            m_targetTab = itemClicked(widget()->mapToParent(e->pos()), true, true);
         widget()->update();
         return true;
     }
@@ -1377,24 +1377,24 @@ bool QtCurveClient::dropEvent(QDropEvent *e)
     QPoint point    = widget()->mapToParent(e->pos());
     int    tabClick = itemClicked(point, true, true);
 
-    itsDragInProgress = false;
+    m_dragInProgress = false;
     if(tabClick >= 0)
     {
         const QMimeData *groupData = e->mimeData();
         if(groupData->hasFormat(clientGroupItemDragMimeType()))
         {
             if(widget()==e->source())
-                moveItemInClientGroup(itemClicked(itsClickPoint), itemClicked(point, true, true));
+                moveItemInClientGroup(itemClicked(m_clickPoint), itemClicked(point, true, true));
             else
                 moveItemToClientGroup(QString(groupData->data(clientGroupItemDragMimeType())).toLong(), itemClicked(point, true, true));
-            itsTargetTab=constInvalidTab;
+            m_targetTab=constInvalidTab;
             widget()->update();
             return true;
         }
     }
-    else if(constInvalidTab!=itsTargetTab)
+    else if(constInvalidTab!=m_targetTab)
     {
-        itsTargetTab=constInvalidTab;
+        m_targetTab=constInvalidTab;
         widget()->update();
     }
     return false;
@@ -1408,9 +1408,9 @@ bool QtCurveClient::dragMoveEvent(QDragMoveEvent *e)
         int tt = 1==clientGroupItems().count() && widget()!=e->source()
                     ? constAddToEmpty
                     : itemClicked(widget()->mapToParent(e->pos()), true, true);
-        if(itsTargetTab!=tt)
+        if(m_targetTab!=tt)
         {
-            itsTargetTab=tt;
+            m_targetTab=tt;
             widget()->update();
         }
         return true;
@@ -1420,8 +1420,8 @@ bool QtCurveClient::dragMoveEvent(QDragMoveEvent *e)
 
 bool QtCurveClient::dragLeaveEvent(QDragLeaveEvent *)
 {
-    itsDragInProgress = false;
-    itsTargetTab = constInvalidTab;
+    m_dragInProgress = false;
+    m_targetTab = constInvalidTab;
     widget()->update();
     return false;
 }
@@ -1480,18 +1480,18 @@ void QtCurveClient::reset(unsigned long changed)
     {
         // Reset button backgrounds...
         for(int i=0; i<constNumButtonStates; ++i)
-           itsButtonBackground[i].pix=QPixmap();
+           m_buttonBackground[i].pix=QPixmap();
     }
 
     if (changed&SettingBorder)
     {
         if (maximizeMode()==MaximizeFull)
         {
-            if (!options()->moveResizeMaximizedWindows() && itsResizeGrip)
-                itsResizeGrip->hide();
+            if (!options()->moveResizeMaximizedWindows() && m_resizeGrip)
+                m_resizeGrip->hide();
         }
-        else if (itsResizeGrip)
-                itsResizeGrip->show();
+        else if (m_resizeGrip)
+                m_resizeGrip->show();
     }
 
     if (changed&SettingColors)
@@ -1503,7 +1503,7 @@ void QtCurveClient::reset(unsigned long changed)
     else if (changed&SettingFont)
     {
         // font has changed -- update title height and font
-        itsTitleFont=isToolWindow() ? Handler()->titleFontTool() : Handler()->titleFont();
+        m_titleFont=isToolWindow() ? Handler()->titleFontTool() : Handler()->titleFont();
 
         updateLayout();
         widget()->update();
@@ -1519,19 +1519,19 @@ void QtCurveClient::reset(unsigned long changed)
 
 void QtCurveClient::createSizeGrip()
 {
-    if(!itsResizeGrip && ((isResizable() && 0!=windowId()) || isPreview()))
+    if(!m_resizeGrip && ((isResizable() && 0!=windowId()) || isPreview()))
     {
-        itsResizeGrip=new QtCurveSizeGrip(this);
-        itsResizeGrip->setVisible(!(isMaximized() || isShade()));
+        m_resizeGrip=new QtCurveSizeGrip(this);
+        m_resizeGrip->setVisible(!(isMaximized() || isShade()));
     }
 }
 
 void QtCurveClient::deleteSizeGrip()
 {
-    if(itsResizeGrip)
+    if(m_resizeGrip)
     {
-        delete itsResizeGrip;
-        itsResizeGrip=0L;
+        delete m_resizeGrip;
+        m_resizeGrip=0L;
     }
 }
 
@@ -1601,35 +1601,35 @@ void QtCurveClient::sendToggleToApp(bool menubar)
 
 const QString & QtCurveClient::windowClass()
 {
-    if (itsWindowClass.isEmpty()) {
+    if (m_windowClass.isEmpty()) {
         KWindowInfo info(windowId(), NET::WMWindowType,
                          NET::WM2WindowClass | NET::WM2WindowRole);
 
         switch (info.windowType((int)NET::AllTypesMask)) {
             case NET::Dialog:
-                itsWindowClass="D "+info.windowClassName()+' '+info.windowClassClass()+' '+info.windowRole();
+                m_windowClass="D "+info.windowClassName()+' '+info.windowClassClass()+' '+info.windowRole();
                 break;
             case NET::Normal:
-                itsWindowClass="W "+info.windowClassName()+' '+info.windowClassClass()+' '+info.windowRole();
+                m_windowClass="W "+info.windowClassName()+' '+info.windowClassClass()+' '+info.windowRole();
                 break;
             default:
-                itsWindowClass="<>";
+                m_windowClass="<>";
                 break;
         }
     }
 
-    return itsWindowClass;
+    return m_windowClass;
 }
 
 void QtCurveClient::menuBarSize(int size)
 {
-    itsMenuBarSize=size;
+    m_menuBarSize=size;
     if(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_ToggleButtons, NULL, NULL) &0x01)
     {
-        if(!itsToggleMenuBarButton)
-            itsToggleMenuBarButton=createToggleButton(true);
-        //if(itsToggleMenuBarButton)
-        //    itsToggleMenuBarButton->setChecked(itsMenuBarSize>0);
+        if(!m_toggleMenuBarButton)
+            m_toggleMenuBarButton=createToggleButton(true);
+        //if(m_toggleMenuBarButton)
+        //    m_toggleMenuBarButton->setChecked(m_menuBarSize>0);
     }
     KCommonDecoration::activeChange();
 }
@@ -1639,10 +1639,10 @@ void QtCurveClient::statusBarState(bool state)
     Q_UNUSED(state)
     if(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_ToggleButtons, NULL, NULL) &0x02)
     {
-        if(!itsToggleStatusBarButton)
-            itsToggleStatusBarButton=createToggleButton(false);
-        //if(itsToggleStatusBarButton)
-        //    itsToggleStatusBarButton->setChecked(state);
+        if(!m_toggleStatusBarButton)
+            m_toggleStatusBarButton=createToggleButton(false);
+        //if(m_toggleStatusBarButton)
+        //    m_toggleStatusBarButton->setChecked(state);
     }
     KCommonDecoration::activeChange();
 }

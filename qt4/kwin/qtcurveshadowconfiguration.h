@@ -69,44 +69,44 @@ class QtCurveShadowConfiguration
     void                 load(KConfig *cfg);
     void                 save(KConfig *cfg);
 
-    QPalette::ColorGroup colorGroup() const           { return itsColorGroup; }
-    int                  shadowSize() const           { return itsSize; }
-    void                 setShadowSize(int v)         { itsSize = v; }
-    int                  horizontalOffset() const     { return itsHOffset; }
-    void                 setHorizontalOffset(int v)   { itsHOffset = v; }
-    int                  verticalOffset() const       { return itsVOffset; }
-    void                 setVerticalOffset(int v)     { itsVOffset = v; }
-    void                 setColor(const QColor &c)    { itsColor=c; }
-    const QColor &       color() const                { return itsColor; }
-    ColorType            colorType() const            { return (ColorType)itsColorType; }
+    QPalette::ColorGroup colorGroup() const           { return m_colorGroup; }
+    int                  shadowSize() const           { return m_size; }
+    void                 setShadowSize(int v)         { m_size = v; }
+    int                  horizontalOffset() const     { return m_hOffset; }
+    void                 setHorizontalOffset(int v)   { m_hOffset = v; }
+    int                  verticalOffset() const       { return m_vOffset; }
+    void                 setVerticalOffset(int v)     { m_vOffset = v; }
+    void                 setColor(const QColor &c)    { m_color=c; }
+    const QColor &       color() const                { return m_color; }
+    ColorType            colorType() const            { return (ColorType)m_colorType; }
     void                 setColorType(ColorType ct);
-    ShadowType           shadowType() const           { return (ShadowType)itsShadowType; }
-    void                 setShadowType(ShadowType st) { itsShadowType=st; }
+    ShadowType           shadowType() const           { return (ShadowType)m_shadowType; }
+    void                 setShadowType(ShadowType st) { m_shadowType=st; }
 
     // Keep compatible with Oxygen Shadow Cache code...
-    const QColor &       innerColor() const           { return itsColor; }
-    const QColor &       midColor() const             { return itsColor; }
-    const QColor &       outerColor() const           { return itsColor; }
+    const QColor &       innerColor() const           { return m_color; }
+    const QColor &       midColor() const             { return m_color; }
+    const QColor &       outerColor() const           { return m_color; }
 
     bool operator == (const QtCurveShadowConfiguration& other) const
     {
-        return  itsColorGroup == other.itsColorGroup &&
-                itsSize == other.itsSize &&
-                itsHOffset == other.itsHOffset &&
-                itsVOffset == other.itsVOffset &&
-                itsColor == other.itsColor &&
-                itsShadowType == other.itsShadowType;
+        return  m_colorGroup == other.m_colorGroup &&
+                m_size == other.m_size &&
+                m_hOffset == other.m_hOffset &&
+                m_vOffset == other.m_vOffset &&
+                m_color == other.m_color &&
+                m_shadowType == other.m_shadowType;
     }
 
     private:
 
-    QPalette::ColorGroup itsColorGroup;
-    int                  itsSize,
-                         itsHOffset,
-                         itsVOffset,
-                         itsColorType,
-                         itsShadowType;
-    QColor               itsColor;
+    QPalette::ColorGroup m_colorGroup;
+    int                  m_size,
+                         m_hOffset,
+                         m_vOffset,
+                         m_colorType,
+                         m_shadowType;
+    QColor               m_color;
 };
 
 }

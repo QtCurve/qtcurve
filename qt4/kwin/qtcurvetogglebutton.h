@@ -39,7 +39,7 @@ class QtCurveToggleButton : public KCommonDecorationButton
     ~QtCurveToggleButton() { }
 
     void reset(unsigned long changed);
-    QtCurveClient * client() { return itsClient; }
+    QtCurveClient * client() { return m_client; }
 
     protected:
 
@@ -54,9 +54,9 @@ class QtCurveToggleButton : public KCommonDecorationButton
 
     private:
 
-    QtCurveClient *itsClient;
+    QtCurveClient *m_client;
     bool          isMenuBar,
-                  itsHover;
+                  m_hover;
 };
 
 }

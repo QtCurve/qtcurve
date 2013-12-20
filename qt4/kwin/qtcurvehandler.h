@@ -96,98 +96,98 @@ public:
     int
     titleHeight() const
     {
-        return itsTitleHeight;
+        return m_titleHeight;
     }
     int
     titleHeightTool() const
     {
-        return itsTitleHeightTool;
+        return m_titleHeightTool;
     }
     const QFont&
     titleFont()
     {
-        return itsTitleFont;
+        return m_titleFont;
     }
     const QFont&
     titleFontTool()
     {
-        return itsTitleFontTool;
+        return m_titleFontTool;
     }
     int borderSize(bool bot=false) const;
     bool
     showResizeGrip() const
     {
-        return QtCurveConfig::BORDER_NONE == itsConfig.borderSize();
+        return QtCurveConfig::BORDER_NONE == m_config.borderSize();
     }
     bool
     haveBottomBorder() const
     {
-        return QtCurveConfig::BORDER_NONE!=itsConfig.borderSize();
+        return QtCurveConfig::BORDER_NONE!=m_config.borderSize();
     }
     bool
     roundBottom() const
     {
-        return (itsConfig.roundBottom() &&
-                itsConfig.borderSize() > QtCurveConfig::BORDER_NONE);
+        return (m_config.roundBottom() &&
+                m_config.borderSize() > QtCurveConfig::BORDER_NONE);
     }
     QtCurveConfig::Shade
     outerBorder() const
     {
-        return itsConfig.outerBorder();
+        return m_config.outerBorder();
     }
     QtCurveConfig::Shade
     innerBorder() const
     {
-        return itsConfig.innerBorder();
+        return m_config.innerBorder();
     }
     QStyle*
     wStyle() const
     {
-        return itsStyle ? itsStyle : QApplication::style();
+        return m_style ? m_style : QApplication::style();
     }
     int borderEdgeSize() const;
     int
     titleBarPad() const
     {
-        return itsConfig.titleBarPad();
+        return m_config.titleBarPad();
     }
     int
     edgePad() const
     {
-        return itsConfig.edgePad();
+        return m_config.edgePad();
     }
     bool
     borderlessMax() const
     {
-        return itsConfig.borderlessMax();
+        return m_config.borderlessMax();
     }
     int
     opacity(bool active) const
     {
-        return itsConfig.opacity(active);
+        return m_config.opacity(active);
     }
     bool
     opaqueBorder() const
     {
-        return itsConfig.opaqueBorder();
+        return m_config.opaqueBorder();
     }
 #if KDE_IS_VERSION(4, 3, 0)
     bool
     customShadows() const
     {
-        return itsConfig.customShadows();
+        return m_config.customShadows();
     }
     QtCurveShadowCache&
     shadowCache()
     {
-        return itsShadowCache;
+        return m_shadowCache;
     }
 #endif
 #if KDE_IS_VERSION(4, 3, 85)
     bool
     grouping() const
     {
-        return itsConfig.grouping();
+        return m_config.grouping();
     }
 #endif
     void menuBarSize(unsigned int xid, int size);
@@ -198,42 +198,42 @@ public:
     void
     addClient(QtCurveClient *c)
     {
-        itsClients.append(c);
+        m_clients.append(c);
     }
     void removeClient(QtCurveClient *c);
     bool wasLastMenu(unsigned int id)
     {
-        return id == itsLastMenuXid;
+        return id == m_lastMenuXid;
     }
     bool
     wasLastStatus(unsigned int id)
     {
-        return id == itsLastStatusXid;
+        return id == m_lastStatusXid;
     }
     const QColor&
     hoverCol(bool active)
     {
-        return itsHoverCols[active ? 1 : 0];
+        return m_hoverCols[active ? 1 : 0];
     }
 private:
     bool readConfig(bool compositingToggled=false);
 
-    int itsBorderSize;
-    int itsTitleHeight;
-    int itsTitleHeightTool;
-    int itsTimeStamp;
-    unsigned int itsLastMenuXid;
-    unsigned int itsLastStatusXid;
-    QFont itsTitleFont;
-    QFont itsTitleFontTool;
-    QStyle *itsStyle;
-    QBitmap itsBitmaps[2][NumButtonIcons];
-    QtCurveConfig itsConfig;
-    QList<QtCurveClient*> itsClients;
-    QtCurveDBus *itsDBus;
-    QColor itsHoverCols[2];
+    int m_borderSize;
+    int m_titleHeight;
+    int m_titleHeightTool;
+    int m_timeStamp;
+    unsigned int m_lastMenuXid;
+    unsigned int m_lastStatusXid;
+    QFont m_titleFont;
+    QFont m_titleFontTool;
+    QStyle *m_style;
+    QBitmap m_bitmaps[2][NumButtonIcons];
+    QtCurveConfig m_config;
+    QList<QtCurveClient*> m_clients;
+    QtCurveDBus *m_dBus;
+    QColor m_hoverCols[2];
 #if KDE_IS_VERSION(4, 3, 0)
-    QtCurveShadowCache itsShadowCache;
+    QtCurveShadowCache m_shadowCache;
 #endif
 };
 QtCurveHandler *Handler();

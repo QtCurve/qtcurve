@@ -42,9 +42,9 @@ namespace KWinQtCurve {
 
 QtCurveButton::QtCurveButton(ButtonType type, QtCurveClient *parent)
     : KCommonDecorationButton(type, parent),
-      itsClient(parent),
-      itsIconType(NumButtonIcons),
-      itsHover(false)
+      m_client(parent),
+      m_iconType(NumButtonIcons),
+      m_hover(false)
 {
     // setAttribute(Qt::WA_PaintOnScreen, false);
     setAttribute(Qt::WA_NoSystemBackground, true);
@@ -63,45 +63,44 @@ void QtCurveButton::reset(unsigned long changed)
         switch (type()) {
 #if KDE_IS_VERSION(4, 9, 85)
         case AppMenuButton:
-            itsIconType = MenuIcon;
+            m_iconType = MenuIcon;
             break;
 #endif
 #if KDE_IS_VERSION(4, 3, 85)
             // TODO ItemMenuButton?
         case ItemCloseButton:
-            itsIconType = CloseTabIcon;
+            m_iconType = CloseTabIcon;
             break;
 #endif
         case CloseButton:
-            itsIconType = CloseIcon;
+            m_iconType = CloseIcon;
             break;
         case HelpButton:
-            itsIconType = HelpIcon;
+            m_iconType = HelpIcon;
             break;
         case MinButton:
-            itsIconType = MinIcon;
+            m_iconType = MinIcon;
             break;
         case MaxButton:
-            itsIconType = isChecked() ? MaxRestoreIcon : MaxIcon;
+            m_iconType = isChecked() ? MaxRestoreIcon : MaxIcon;
             break;
         case OnAllDesktopsButton:
-            itsIconType = (isChecked() ? NotOnAllDesktopsIcon :
-                           OnAllDesktopsIcon);
+            m_iconType = isChecked() ? NotOnAllDesktopsIcon : OnAllDesktopsIcon;
             break;
         case ShadeButton:
-            itsIconType = isChecked() ? UnShadeIcon : ShadeIcon;
+            m_iconType = isChecked() ? UnShadeIcon : ShadeIcon;
             break;
         case AboveButton:
-            itsIconType = isChecked() ? NoKeepAboveIcon : KeepAboveIcon;
+            m_iconType = isChecked() ? NoKeepAboveIcon : KeepAboveIcon;
             break;
         case BelowButton:
-            itsIconType = isChecked() ? NoKeepBelowIcon : KeepBelowIcon;
+            m_iconType = isChecked() ? NoKeepBelowIcon : KeepBelowIcon;
             break;
         case MenuButton:
-            itsIconType = MenuIcon;
+            m_iconType = MenuIcon;
             break;
         default:
-            itsIconType = NumButtonIcons; // empty...
+            m_iconType = NumButtonIcons; // empty...
             break;
         }
 
@@ -111,7 +110,7 @@ void QtCurveButton::reset(unsigned long changed)
 
 void QtCurveButton::enterEvent(QEvent *e)
 {
-    itsHover = true;
+    m_hover = true;
     KCommonDecorationButton::enterEvent(e);
     update();
     // Hacky NVIDIA fix - sometimes mouseover state gets 'stuck' -
@@ -121,7 +120,7 @@ void QtCurveButton::enterEvent(QEvent *e)
 
 void QtCurveButton::leaveEvent(QEvent *e)
 {
-    itsHover = false;
+    m_hover = false;
     KCommonDecorationButton::leaveEvent(e);
     update();
     // Hacky NVIDIA fix - sometimes mouseover state gets 'stuck' -
@@ -131,7 +130,7 @@ void QtCurveButton::leaveEvent(QEvent *e)
 
 void QtCurveButton::paintEvent(QPaintEvent *ev)
 {
-    if (itsClient->compositingActive()) {
+    if (m_client->compositingActive()) {
         QPainter p(this);
         p.setClipRect(rect().intersected(ev->rect()));
         drawButton(&p);
@@ -166,16 +165,16 @@ void QtCurveButton::drawButton(QPainter *painter)
 {
     int flags = Handler()->wStyle()->pixelMetric(
         (QStyle::PixelMetric)QtC_TitleBarButtons, 0L, 0L);
-    bool active(itsClient->isActive());
+    bool active(m_client->isActive());
 
-    if(!active && !itsHover && flags & TITLEBAR_BUTTOM_HIDE_ON_INACTIVE_WINDOW)
+    if(!active && !m_hover && flags & TITLEBAR_BUTTOM_HIDE_ON_INACTIVE_WINDOW)
         return;
 
     QRect r(0, 0, width(), height());
     int versionHack = 0;
     bool sunken(isDown());
     bool drawFrame(!(flags & TITLEBAR_BUTTON_NO_FRAME) &&
-                   (itsHover || sunken ||
+                   (m_hover || sunken ||
                     !(flags & TITLEBAR_BUTTON_HOVER_FRAME)));
     bool drewFrame(false);
     bool iconForMenu(TITLEBAR_ICON_MENU_BUTTON ==
@@ -190,7 +189,7 @@ void QtCurveButton::drawButton(QPainter *painter)
     bool isTabClose(ItemCloseButton == type());
 
     // isItemMenu?
-    if (isTabClose && drawFrame && !(sunken || itsHover))
+    if (isTabClose && drawFrame && !(sunken || m_hover))
         drawFrame = false;
 #endif
     // if(CloseButton == type())
@@ -238,7 +237,7 @@ void QtCurveButton::drawButton(QPainter *painter)
             MenuButton!=type() || !iconForMenu)) {
         QStyleOption opt;
         int offset = flags & TITLEBAR_BUTTON_ROUND &&
-            !itsClient->isToolWindow() ? 1 : 0;
+            !m_client->isToolWindow() ? 1 : 0;
 
         if (flags & TITLEBAR_BUTTON_SUNKEN_BACKGROUND)
             // && flags & TITLEBAR_BUTTON_ROUND)
@@ -248,14 +247,14 @@ void QtCurveButton::drawButton(QPainter *painter)
                          height() - (2 * offset));
         opt.state |= (isDown() ? QStyle::State_Sunken : QStyle::State_Raised) |
             (active ? QStyle::State_Active : QStyle::State_None) |
-            (itsHover ? QStyle::State_MouseOver : QStyle::State_None) |
+            (m_hover ? QStyle::State_MouseOver : QStyle::State_None) |
             QStyle::State_Horizontal | QtC_StateKWin;
         opt.state &= ~QStyle::State_HasFocus;
         if (!isEnabled()) {
             opt.palette.setColor(QPalette::Button, buttonColor);
         } else {
             if (!(flags & TITLEBAR_BUTTON_STD_COLOR) ||
-                (flags & TITLEBAR_BUTTON_COLOR_MOUSE_OVER && !itsHover &&
+                (flags & TITLEBAR_BUTTON_COLOR_MOUSE_OVER && !m_hover &&
                  !(flags&TITLEBAR_BUTTON_COLOR)))
                 opt.palette.setColor(QPalette::Button, buttonColor);
             if (flags & TITLEBAR_BUTTON_COLOR &&
@@ -268,7 +267,7 @@ void QtCurveButton::drawButton(QPainter *painter)
     }
 
     if (MenuButton == type() && iconForMenu) {
-        QPixmap menuIcon(itsClient->icon().pixmap(
+        QPixmap menuIcon(m_client->icon().pixmap(
                              style()->pixelMetric(QStyle::PM_SmallIconSize)));
         if (width() < menuIcon.width() || height() < menuIcon.height())
             menuIcon = menuIcon.scaled(width(), height());
@@ -282,10 +281,12 @@ void QtCurveButton::drawButton(QPainter *painter)
         }
         bP.drawPixmap(dX, dY, menuIcon);
     } else if(isEnabled() && (!(flags & TITLEBAR_BUTTON_HOVER_SYMBOL_FULL) ||
-                              sunken || itsHover)) {
-        const QBitmap &icon(Handler()->buttonBitmap(itsIconType, size(), decoration()->isToolWindow()));
+                              sunken || m_hover)) {
+        const QBitmap &icon =
+            Handler()->buttonBitmap(m_iconType, size(),
+                                    decoration()->isToolWindow());
         bool          customCol(false),
-                      faded(!itsHover && flags&TITLEBAR_BUTTON_HOVER_SYMBOL);
+                      faded(!m_hover && flags&TITLEBAR_BUTTON_HOVER_SYMBOL);
         QColor        col(KDecoration::options()->color(KDecoration::ColorFont, active/* || faded*/));
         int           dX(r.x()+(r.width()-icon.width())/2),
                       dY(r.y()+(r.height()-icon.height())/2);
@@ -294,7 +295,7 @@ void QtCurveButton::drawButton(QPainter *painter)
         if(EFFECT_ETCH==effect && drewFrame)
             effect=EFFECT_SHADOW;
 
-        if(itsHover || !(flags&TITLEBAR_BUTTON_HOVER_SYMBOL))
+        if(m_hover || !(flags&TITLEBAR_BUTTON_HOVER_SYMBOL))
         {
             bool userDefined=flags&TITLEBAR_BUTTON_ICON_COLOR;
 
@@ -326,7 +327,7 @@ void QtCurveButton::drawButton(QPainter *painter)
             bP.drawPixmap(EFFECT_SHADOW==effect ? dX+1 : dX, dY+1, icon);
         }
 
-        if (itsHover && !sunken && !(flags&TITLEBAR_BUTTON_COLOR) && !customCol) {
+        if (m_hover && !sunken && !(flags&TITLEBAR_BUTTON_COLOR) && !customCol) {
             if (CloseButton == type()
 #if KDE_IS_VERSION(4, 3, 85)
                 || isTabClose

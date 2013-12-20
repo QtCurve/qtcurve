@@ -34,106 +34,108 @@ namespace KWinQtCurve
 {
 
 QtCurveShadowConfiguration::QtCurveShadowConfiguration(QPalette::ColorGroup colorGroup)
-                          : itsColorGroup(colorGroup)
+                          : m_colorGroup(colorGroup)
 {
     defaults();
 }
 
 void QtCurveShadowConfiguration::defaults()
 {
-    itsHOffset = 0;
-    itsVOffset = 5;
-    if(QPalette::Active==itsColorGroup)
+    m_hOffset = 0;
+    m_vOffset = 5;
+    if(QPalette::Active==m_colorGroup)
     {
-        itsSize = 35;
+        m_size = 35;
         setColorType(CT_FOCUS);
-        itsShadowType = SH_ACTIVE;
+        m_shadowType = SH_ACTIVE;
     }
     else
     {
-        itsSize = 30;
+        m_size = 30;
         setColorType(CT_GRAY);
-        itsShadowType = SH_INACTIVE;
+        m_shadowType = SH_INACTIVE;
     }
 }
 
 void QtCurveShadowConfiguration::setColorType(ColorType ct)
 {
-    itsColorType=ct;
-    switch(itsColorType)
+    m_colorType=ct;
+    switch(m_colorType)
     {
         default:
         case CT_FOCUS:
-            itsColor = KColorScheme(itsColorGroup).decoration(KColorScheme::FocusColor).color();
+            m_color = KColorScheme(m_colorGroup).decoration(KColorScheme::FocusColor).color();
             break;
         case CT_HOVER:
-            itsColor = KColorScheme(itsColorGroup).decoration(KColorScheme::HoverColor).color();
+            m_color = KColorScheme(m_colorGroup).decoration(KColorScheme::HoverColor).color();
             break;
         case CT_SELECTION:
-            itsColor = QApplication::palette().color(itsColorGroup, QPalette::Highlight);
+            m_color = QApplication::palette().color(m_colorGroup, QPalette::Highlight);
             break;
         case CT_TITLEBAR:
-            itsColor = QPalette::Active==itsColorGroup
+            m_color = QPalette::Active==m_colorGroup
                         ? KGlobalSettings::activeTitleColor()
                         : KGlobalSettings::inactiveTitleColor();
             break;
         case CT_GRAY:
-            itsColor = QColor("#393835");
+            m_color = QColor("#393835");
             break;
         case CT_CUSTOM:
             break;
     }
 }
 
-#define CFG_GROUP (QPalette::Active==itsColorGroup ? "ActiveShadows" : "InactiveShadows")
+#define CFG_GROUP (QPalette::Active==m_colorGroup ? "ActiveShadows" : "InactiveShadows")
 
-#define READ_ENTRY(ENTRY) \
-    its##ENTRY=group.readEntry(#ENTRY, def.its##ENTRY);
+#define READ_ENTRY(name, field) do {                    \
+        field = group.readEntry(name, def.field);       \
+    } while (0)
 
 void QtCurveShadowConfiguration::load(KConfig *cfg)
 {
     KConfigGroup               group(cfg, CFG_GROUP);
-    QtCurveShadowConfiguration def(itsColorGroup);
+    QtCurveShadowConfiguration def(m_colorGroup);
 
-    READ_ENTRY(Size)
-    READ_ENTRY(HOffset)
-    READ_ENTRY(VOffset)
-    READ_ENTRY(ColorType)
-    READ_ENTRY(ShadowType)
+    READ_ENTRY("Size", m_size);
+    READ_ENTRY("HOffset", m_hOffset);
+    READ_ENTRY("VOffset", m_vOffset);
+    READ_ENTRY("ColorType", m_colorType);
+    READ_ENTRY("ShadowType", m_shadowType);
 
-    if(CT_CUSTOM==itsColorType)
-        READ_ENTRY(Color)
-    if(itsSize<MIN_SIZE || itsSize>MAX_SIZE)
-        itsSize=def.shadowSize();
-    if(itsHOffset<MIN_OFFSET || itsHOffset>MAX_OFFSET)
-        itsHOffset=def.horizontalOffset();
-    if(itsVOffset<MIN_OFFSET || itsVOffset>MAX_OFFSET)
-        itsVOffset=def.verticalOffset();
-    setColorType((ColorType)itsColorType);
+    if(CT_CUSTOM==m_colorType)
+        READ_ENTRY("Color", m_color);
+    if(m_size<MIN_SIZE || m_size>MAX_SIZE)
+        m_size=def.shadowSize();
+    if(m_hOffset<MIN_OFFSET || m_hOffset>MAX_OFFSET)
+        m_hOffset=def.horizontalOffset();
+    if(m_vOffset<MIN_OFFSET || m_vOffset>MAX_OFFSET)
+        m_vOffset=def.verticalOffset();
+    setColorType((ColorType)m_colorType);
 }
 
-#define WRITE_ENTRY(ENTRY) \
-    if (def.its##ENTRY==its##ENTRY) \
-        group.deleteEntry(#ENTRY); \
-    else \
-        group.writeEntry(#ENTRY, its##ENTRY);
+#define WRITE_ENTRY(name, field) do {           \
+        if (def.field == field) {               \
+            group.deleteEntry(name);            \
+        } else {                                \
+            group.writeEntry(name, field);      \
+        }                                       \
+    } while (0)
 
 void QtCurveShadowConfiguration::save(KConfig *cfg)
 {
     KConfigGroup               group(cfg, CFG_GROUP);
-    QtCurveShadowConfiguration def(itsColorGroup);
+    QtCurveShadowConfiguration def(m_colorGroup);
 
-    WRITE_ENTRY(Size)
-    WRITE_ENTRY(HOffset)
-    WRITE_ENTRY(VOffset)
-    WRITE_ENTRY(ColorType)
-    WRITE_ENTRY(ShadowType)
+    WRITE_ENTRY("Size", m_size);
+    WRITE_ENTRY("HOffset", m_hOffset);
+    WRITE_ENTRY("VOffset", m_vOffset);
+    WRITE_ENTRY("ColorType", m_colorType);
+    WRITE_ENTRY("ShadowType", m_shadowType);
 
-    if(CT_CUSTOM!=itsColorType)
+    if (m_colorType != CT_CUSTOM) {
         group.deleteEntry("Color");
-    else
-    {
-        WRITE_ENTRY(Color);
+    } else {
+        WRITE_ENTRY("Color", m_color);
     }
 }
 

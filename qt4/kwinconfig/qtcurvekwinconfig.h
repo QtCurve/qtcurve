@@ -47,7 +47,7 @@ class QtCurveKWinConfig : public QWidget, public Ui::QtCurveKWinConfigWidget
     QtCurveKWinConfig(KConfig *config, QWidget *parent);
     ~QtCurveKWinConfig();
 
-    bool ok() { return itsOk; }
+    bool ok() { return m_ok; }
 
     Q_SIGNALS:
 
@@ -79,9 +79,9 @@ class QtCurveKWinConfig : public QWidget, public Ui::QtCurveKWinConfigWidget
 
     private:
 
-    bool                                    itsOk;
-    KWinQtCurve::QtCurveShadowConfiguration itsActiveShadows,
-                                            itsInactiveShadows;
+    bool                                    m_ok;
+    KWinQtCurve::QtCurveShadowConfiguration m_activeShadows,
+                                            m_inactiveShadows;
 };
 
 #endif // KNIFTYCONFIG_H

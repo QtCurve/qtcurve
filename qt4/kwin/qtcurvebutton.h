@@ -47,7 +47,11 @@ public:
     ~QtCurveButton() {}
 
     void reset(unsigned long changed);
-    QtCurveClient *client() { return itsClient; }
+    QtCurveClient*
+    client()
+    {
+        return m_client;
+    }
 
 protected:
     void paintEvent(QPaintEvent *);
@@ -59,9 +63,9 @@ private:
     void updateMask();
 
 private:
-    QtCurveClient *itsClient;
-    ButtonIcon itsIconType;
-    bool itsHover;
+    QtCurveClient *m_client;
+    ButtonIcon m_iconType;
+    bool m_hover;
 
     friend class IconEngine;
 };
@@ -73,23 +77,20 @@ private:
  * it has the important advantage that icons are more scalable and at the same
  * time sharp and not blurred.
  */
-class IconEngine
-{
-    public:
-
+class IconEngine {
+public:
     static QBitmap icon(ButtonIcon icon, int size, QStyle *style);
 
-    private:
-
-    enum Object
-    {
+private:
+    enum Object {
         HorizontalLine,
         VerticalLine,
         DiagonalLine,
         CrossDiagonalLine
     };
 
-    static void drawObject(QPainter &p, Object object, int x, int y, int length, int lineWidth);
+    static void drawObject(QPainter &p, Object object, int x, int y,
+                           int length, int lineWidth);
 };
 
 }
