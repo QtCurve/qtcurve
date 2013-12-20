@@ -58,17 +58,14 @@ compositingActive()
 bool
 hasAlphaChannel(const QWidget *widget)
 {
-    if (compositingActive()) {
-#ifdef QTC_ENABLE_X11
-        return (32 == (widget ? widget->x11Info().depth() :
-                       QX11Info().appDepth()));
-#else
-        QTC_UNUSED(widget);
-        return true;
-#endif
-    } else {
+    if (!widget)
         return false;
-    }
+#ifdef QTC_ENABLE_X11
+    return widget->x11Info().depth() == 32;
+#else
+    QTC_UNUSED(widget);
+    return compositingActive();
+#endif
 }
 
 QString kdeHome()

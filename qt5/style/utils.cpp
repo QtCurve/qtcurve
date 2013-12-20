@@ -28,6 +28,7 @@
 #  include <QApplication>
 #  include <QDesktopWidget>
 #endif
+#include <QWindow>
 
 #ifdef QTC_QT5_ENABLE_KDE
 #  include <kdeversion.h>
@@ -37,7 +38,8 @@
 namespace QtCurve {
 namespace Utils {
 
-bool compositingActive()
+bool
+compositingActive()
 {
 #ifndef QTC_QT5_ENABLE_KDE
 #ifdef QTC_ENABLE_X11
@@ -50,20 +52,44 @@ bool compositingActive()
 #endif
 }
 
-bool hasAlphaChannel(const QWidget *widget)
+static inline WId
+findWid(const QWidget *w)
 {
-#ifdef QTC_ENABLE_X11
-    QWidget *window;
-    if (!(widget && (window = widget->window())))
+    do {
+        WId wid = qtcGetWid(w);
+        if (wid || w->isWindow()) {
+            return wid;
+        }
+    } while ((w = w->parentWidget()));
+    return (WId)0;
+}
+
+static QWindow*
+findWindowHandle(const QWidget *w)
+{
+    do {
+        QWindow *window = w->windowHandle();
+        if (window || w->isWindow()) {
+            return window;
+        }
+    } while ((w = w->parentWidget()));
+    return NULL;
+}
+
+bool
+hasAlphaChannel(const QWidget *widget)
+{
+    if (!widget)
         return false;
-    if (WId wid = qtcGetWid(window)) {
+    if (QWindow *window = findWindowHandle(widget)) {
+        return window->format().alphaBufferSize() > 0;
+    }
+#ifdef QTC_ENABLE_X11
+    if (WId wid = findWid(widget)) {
         return qtcX11HasAlpha(wid);
     }
-    return window->testAttribute(Qt::WA_TranslucentBackground);
-#else
-    Q_UNUSED(widget);
-    return compositingActive();
 #endif
+    return compositingActive();
 }
 
 }
