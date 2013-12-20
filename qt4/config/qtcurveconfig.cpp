@@ -87,14 +87,11 @@
 #define IMAGE_FILE "-img"
 #define MENU_FILE  "-menu"
 
-extern "C"
+extern "C" KDE_EXPORT QObject*
+allocate_kstyle_config(QWidget *parent)
 {
-    KDE_EXPORT QObject * allocate_kstyle_config(QWidget* parent)
-    {
-        KGlobal::locale()->insertCatalog("qtcurve");
-
-        return new QtCurveConfig(parent);
-    }
+    KGlobal::locale()->insertCatalog("qtcurve");
+    return new QtCurveConfig(parent);
 }
 
 static QString getExt(const QString &file)
@@ -290,10 +287,8 @@ class CWorkspace : public QMdiArea
     }
 };
 
-class CharSelectDialog : public KDialog
-{
-    public:
-
+class CharSelectDialog : public KDialog {
+public:
     CharSelectDialog(QWidget *parent, int v)
         : KDialog(parent)
     {
@@ -306,26 +301,26 @@ class CharSelectDialog : public KDialog
         QFrame *page = new QFrame(this);
         setMainWidget(page);
 
-        QBoxLayout *layout=new QBoxLayout(QBoxLayout::TopToBottom, page);
+        QBoxLayout *layout = new QBoxLayout(QBoxLayout::TopToBottom, page);
         layout->setMargin(0);
         layout->setSpacing(KDialog::spacingHint());
 
-        itsSelector=new KCharSelect(page, NULL);
-        itsSelector->setCurrentChar(QChar(v));
-        layout->addWidget(itsSelector);
+        m_selector = new KCharSelect(page, NULL);
+        m_selector->setCurrentChar(QChar(v));
+        layout->addWidget(m_selector);
     }
 
-    int currentChar() const { return itsSelector->currentChar().unicode(); }
-
-    private:
-
-    KCharSelect *itsSelector;
+    int
+    currentChar() const
+    {
+        return m_selector->currentChar().unicode();
+    }
+private:
+    KCharSelect *m_selector;
 };
 
-class CGradItem : public QTreeWidgetItem
-{
-    public:
-
+class CGradItem : public QTreeWidgetItem {
+public:
     CGradItem(QTreeWidget *p, const QStringList &vals)
         : QTreeWidgetItem(p, vals)
     {
@@ -334,33 +329,32 @@ class CGradItem : public QTreeWidgetItem
 
     virtual ~CGradItem() { }
 
-    bool operator<(const QTreeWidgetItem &i) const
+    bool
+    operator<(const QTreeWidgetItem &i) const
     {
-        return text(0).toDouble()<i.text(0).toDouble() ||
-               (qtcEqual(text(0).toDouble(), i.text(0).toDouble()) &&
-               (text(1).toDouble()<i.text(1).toDouble() ||
-               (qtcEqual(text(1).toDouble(), i.text(1).toDouble()) &&
-               (text(2).toDouble()<i.text(2).toDouble()))));
+        return (text(0).toDouble() < i.text(0).toDouble() ||
+                (qtcEqual(text(0).toDouble(), i.text(0).toDouble()) &&
+                 (text(1).toDouble()<i.text(1).toDouble() ||
+                  (qtcEqual(text(1).toDouble(), i.text(1).toDouble()) &&
+                   (text(2).toDouble()<i.text(2).toDouble())))));
     }
 };
 
-static QStringList toList(const QString &str)
+static QStringList
+toList(const QString &str)
 {
     QStringList lst;
     lst.append(str);
     return lst;
 }
 
-class CStackItem : public QTreeWidgetItem
-{
-    public:
-
+class CStackItem : public QTreeWidgetItem {
+public:
     CStackItem(QTreeWidget *p, const QString &text, int s)
         : QTreeWidgetItem(p, toList(text)),
           stackId(s)
     {
-        if(0==s)
-        {
+        if (s == 0) {
             QFont fnt(font(0));
 
             fnt.setBold(true);
@@ -369,15 +363,17 @@ class CStackItem : public QTreeWidgetItem
         setTextAlignment(0, Qt::AlignRight);
     }
 
-    bool operator<(const QTreeWidgetItem &o) const
+    bool
+    operator<(const QTreeWidgetItem &o) const
     {
-        return stackId<((CStackItem &)o).stackId;
+        return stackId < ((CStackItem&)o).stackId;
     }
-
-    int stack() { return stackId; }
-
-    private:
-
+    int
+    stack()
+    {
+        return stackId;
+    }
+private:
     int stackId;
 };
 
@@ -386,7 +382,7 @@ CGradientPreview::CGradientPreview(QtCurveConfig *c, QWidget *p)
                   cfg(c),
                   style(0L)
 {
-//     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+    // setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
     setObjectName("QtCurveConfigDialog-GradientPreview");
 }
 
@@ -1231,38 +1227,35 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
 
     setupStack();
 
-    if(kwin->ok())
-    {
-        Options currentStyle,
-                defaultStyle;
+    if (kwin->ok()) {
+        Options currentStyle;
+        Options defaultStyle;
 
         kwin->load(0L);
         qtcDefaultSettings(&defaultStyle);
-        if(!qtcReadConfig(NULL, &currentStyle, &defaultStyle))
-            currentStyle=defaultStyle;
+        if (!qtcReadConfig(NULL, &currentStyle, &defaultStyle))
+            currentStyle = defaultStyle;
 
-        previewStyle=currentStyle;
+        previewStyle = currentStyle;
         setupShadesTab();
         setWidgetOptions(currentStyle);
 
         setupGradientsTab();
         setupPresets(currentStyle, defaultStyle);
         setupPreview();
-        readyForPreview=true;
+        readyForPreview = true;
         updatePreview();
-    }
-    else
-    {
+    } else {
         stack->setCurrentIndex(kwinPage);
         titleLabel->setVisible(false);
         stackList->setVisible(false);
     }
-    // KMainWindow dereferences KGlobal when it closes. When KGlobal's refs get to 0 it quits!
-    // ...running kcmshell4 style does not seem to increase ref count of KGlobal - therefore we
-    // do it here - otherwse kcmshell4 would exit immediately after QtCurve's config dialog was
-    // closed :-(
-    if(0==refCount && QLatin1String("kcmshell")==QCoreApplication::applicationName())
-    {
+    // KMainWindow dereferences KGlobal when it closes. When KGlobal's refs get
+    // to 0 it quits! ...running kcmshell4 style does not seem to increase ref
+    // count of KGlobal - therefore we do it here - otherwse kcmshell4 would
+    // exit immediately after QtCurve's config dialog was closed :-(
+    if (refCount == 0 &&
+        QCoreApplication::applicationName() == QLatin1String("kcmshell")) {
         refCount++;
         KGlobal::ref();
     }
@@ -1270,14 +1263,15 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
 
 QtCurveConfig::~QtCurveConfig()
 {
-    // Remove QTCURVE_PREVIEW_CONFIG setting, so that main kcmstyle preview does not revert to
-    // default settings!
+    // Remove QTCURVE_PREVIEW_CONFIG setting, so that main kcmstyle preview
+    // does not revert to default settings!
     qputenv(QTCURVE_PREVIEW_CONFIG, "");
     previewFrame->hide();
     previewFrame->setParent(0);
     delete previewFrame;
-    if(!mdiWindow)
+    if (!mdiWindow) {
         delete stylePreview;
+    }
 }
 
 QSize QtCurveConfig::sizeHint() const
