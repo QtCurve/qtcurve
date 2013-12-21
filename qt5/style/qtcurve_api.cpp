@@ -354,13 +354,9 @@ void Style::polish(QWidget *widget)
     if (!widget)
         return;
 
+    prePolish(widget);
     QtcWidgetProps qtcProps(widget);
     bool enableMouseOver(opts.highlightFactor || opts.coloredMouseOver);
-    if (qtcCheckLogLevel(QTC_LOG_INFO) && qtcGetWid(widget) &&
-        widget->windowType() != Qt::Desktop && !qtcProps->prePolished) {
-        qDebug() << "Window Created before polishing:" << widget;
-    }
-    qtcProps->prePolished = true;
 
     if (EFFECT_NONE != opts.buttonEffect &&
         !USE_CUSTOM_ALPHAS(opts) && isNoEtchWidget(widget)) {
@@ -422,8 +418,7 @@ void Style::polish(QWidget *widget)
         }
     }
 
-    if (// itsIsPreview &&
-        qobject_cast<QMdiSubWindow*>(widget))
+    if (qobject_cast<QMdiSubWindow*>(widget))
         widget->setAttribute(Qt::WA_StyledBackground);
 
     if (opts.menubarHiding && qobject_cast<QMainWindow*>(widget) &&
@@ -964,7 +959,6 @@ void Style::unpolish(QWidget *widget)
 
     if (qobject_cast<QMenu*>(widget)) {
         // TODO remove these
-        widget->setAttribute(Qt::WA_PaintOnScreen, false);
         widget->setAttribute(Qt::WA_NoSystemBackground, false);
         widget->setAttribute(Qt::WA_TranslucentBackground, false);
         widget->clearMask();
@@ -976,7 +970,6 @@ void Style::unpolish(QWidget *widget)
 
     if((!qtcIsFlatBgnd(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) &&
        widget->inherits("QComboBoxPrivateContainer")) {
-        widget->setAttribute(Qt::WA_PaintOnScreen, false);
         widget->setAttribute(Qt::WA_NoSystemBackground, false);
         widget->setAttribute(Qt::WA_TranslucentBackground, false);
         widget->clearMask();

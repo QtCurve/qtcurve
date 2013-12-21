@@ -168,12 +168,6 @@ public:
                                              const QStyleOptionComplex *option,
                                              const QPoint &pos,
                                              const QWidget *widget) const override;
-
-    Options&
-    options()
-    {
-        return opts;
-    }
     void prePolish(QWidget *w) const;
     void
     prePolish(const QWidget *w) const
@@ -414,7 +408,6 @@ private:
     }
 
 private:
-
     mutable Options opts;
     QColor m_highlightCols[TOTAL_SHADES + 1],
         m_backgroundCols[TOTAL_SHADES + 1],
