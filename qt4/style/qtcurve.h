@@ -36,15 +36,18 @@
 typedef qulonglong QtcKey;
 #include <common/common.h>
 
+#ifdef QTC_ENABLE_X11
+#  include <QDBusInterface>
+#endif
+
 #ifdef QTC_QT4_ENABLE_KDE
-#include <KDE/KComponentData>
+#  include <KDE/KComponentData>
 #endif
 
 class QStyleOptionSlider;
 class QLabel;
 class QMenuBar;
 class QScrollBar;
-class QDBusInterface;
 class QMainWindow;
 class QStatusBar;
 class QAbstractScrollArea;
@@ -321,7 +324,7 @@ private:
     {
         return (option ?
                 backgroundColors(option->palette.background().color()) :
-                itsBackgroundCols);
+                m_backgroundCols);
     }
     const QColor *highlightColors(const QColor &col) const;
     const QColor*
@@ -389,7 +392,7 @@ private:
         if (!(state & State_Enabled)) {
             return palette.color(QPalette::Disabled, rol);
         } else if (opts.coloredMouseOver != MO_NONE && mo) {
-            return itsMouseOverCols[ARROW_MO_SHADE];
+            return m_mouseOverCols[ARROW_MO_SHADE];
         } else {
             return palette.color(rol);
         }
@@ -400,67 +403,76 @@ private:
     {
         return MOArrow(state, palette, state & State_MouseOver, rol);
     }
+    QDBusInterface*
+    getKWinDBus()
+    {
+        if (qtcUnlikely(!m_dBus)) {
+            m_dBus = new QDBusInterface("org.kde.kwin", "/QtCurve",
+                                        "org.kde.QtCurve");
+        }
+        return m_dBus;
+    }
 
 private:
 
     mutable Options opts;
-    QColor itsHighlightCols[TOTAL_SHADES + 1],
-        itsBackgroundCols[TOTAL_SHADES + 1],
-        itsMenubarCols[TOTAL_SHADES + 1],
-        itsFocusCols[TOTAL_SHADES + 1],
-        itsMouseOverCols[TOTAL_SHADES + 1],
-        *itsPopupMenuCols,
-        *itsSliderCols,
-        *itsDefBtnCols,
-        *itsComboBtnCols,
-        *itsCheckRadioSelCols,
-        *itsSortedLvColors,
-        *itsOOMenuCols,
-        *itsProgressCols,
-        itsButtonCols[TOTAL_SHADES + 1],
-        itsCheckRadioCol;
-    bool itsSaveMenuBarStatus,
-        itsSaveStatusBarStatus,
-        itsUsePixmapCache,
-        itsInactiveChangeSelectionColor;
-    PreviewType itsIsPreview;
-    mutable QColor *itsSidebarButtonsCols;
-    mutable QColor *itsActiveMdiColors;
-    mutable QColor *itsMdiColors;
-    mutable QColor itsActiveMdiTextColor;
-    mutable QColor itsMdiTextColor;
-    mutable QColor itsColoredButtonCols[TOTAL_SHADES + 1];
-    mutable QColor itsColoredBackgroundCols[TOTAL_SHADES + 1];
-    mutable QColor itsColoredHighlightCols[TOTAL_SHADES + 1];
-    mutable QCache<QtcKey, QPixmap> itsPixmapCache;
-    mutable bool itsActive;
-    mutable const QWidget *itsSbWidget;
-    mutable QLabel *itsClickedLabel;
-    QSet<QProgressBar*> itsProgressBars;
-    int itsProgressBarAnimateTimer,
-        itsAnimateStep;
-    QTime itsTimer;
-    mutable QMap<int, QColor*> itsTitleBarButtonsCols;
-    mutable QList<int> itsMdiButtons[2]; // 0=left, 1=right
-    mutable int itsTitlebarHeight;
+    QColor m_highlightCols[TOTAL_SHADES + 1],
+        m_backgroundCols[TOTAL_SHADES + 1],
+        m_menubarCols[TOTAL_SHADES + 1],
+        m_focusCols[TOTAL_SHADES + 1],
+        m_mouseOverCols[TOTAL_SHADES + 1],
+        *m_popupMenuCols,
+        *m_sliderCols,
+        *m_defBtnCols,
+        *m_comboBtnCols,
+        *m_checkRadioSelCols,
+        *m_sortedLvColors,
+        *m_oOMenuCols,
+        *m_progressCols,
+        m_buttonCols[TOTAL_SHADES + 1],
+        m_checkRadioCol;
+    bool m_saveMenuBarStatus,
+        m_saveStatusBarStatus,
+        m_usePixmapCache,
+        m_inactiveChangeSelectionColor;
+    PreviewType m_isPreview;
+    mutable QColor *m_sidebarButtonsCols;
+    mutable QColor *m_activeMdiColors;
+    mutable QColor *m_mdiColors;
+    mutable QColor m_activeMdiTextColor;
+    mutable QColor m_mdiTextColor;
+    mutable QColor m_coloredButtonCols[TOTAL_SHADES + 1];
+    mutable QColor m_coloredBackgroundCols[TOTAL_SHADES + 1];
+    mutable QColor m_coloredHighlightCols[TOTAL_SHADES + 1];
+    mutable QCache<QtcKey, QPixmap> m_pixmapCache;
+    mutable bool m_active;
+    mutable const QWidget *m_sbWidget;
+    mutable QLabel *m_clickedLabel;
+    QSet<QProgressBar*> m_progressBars;
+    int m_progressBarAnimateTimer,
+        m_animateStep;
+    QTime m_timer;
+    mutable QMap<int, QColor*> m_titleBarButtonsCols;
+    mutable QList<int> m_mdiButtons[2]; // 0=left, 1=right
+    mutable int m_titlebarHeight;
 
     // Required for Q3Header hover...
-    QPoint itsPos;
-    QWidget *itsHoverWidget;
+    QPoint m_pos;
+    QWidget *m_hoverWidget;
 #ifdef QTC_ENABLE_X11
-    QDBusInterface *itsDBus;
-    QtCurve::ShadowHelper *itsShadowHelper;
+    QDBusInterface *m_dBus;
+    QtCurve::ShadowHelper *m_shadowHelper;
 #endif
-    mutable QScrollBar *itsSViewSBar;
-    mutable QMap<QWidget*, QSet<QWidget*> > itsSViewContainers;
+    mutable QScrollBar *m_sViewSBar;
+    mutable QMap<QWidget*, QSet<QWidget*> > m_sViewContainers;
 #ifdef QTC_QT4_ENABLE_KDE
-    KComponentData itsComponentData;
+    KComponentData m_componentData;
 #endif
-    QtCurve::WindowManager *itsWindowManager;
-    QtCurve::BlurHelper *itsBlurHelper;
-    QtCurve::ShortcutHandler *itsShortcutHandler;
+    QtCurve::WindowManager *m_windowManager;
+    QtCurve::BlurHelper *m_blurHelper;
+    QtCurve::ShortcutHandler *m_shortcutHandler;
 #ifdef QTC_QT4_STYLE_SUPPORT
-    QString itsName;
+    QString m_name;
 #endif
 };
 }
