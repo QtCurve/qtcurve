@@ -860,13 +860,9 @@ void Style::unpolish(QWidget *widget)
     }
 
     if (opts.statusbarHiding && qobject_cast<QMainWindow*>(widget)) {
-        QList<QStatusBar*> sb=getStatusBars(widget);
-
-        if (sb.count()) {
-            if (itsSaveStatusBarStatus) {
-                for (QStatusBar *statusBar: const_(sb)) {
-                    statusBar->removeEventFilter(this);
-                }
+        if (itsSaveStatusBarStatus) {
+            for (QStatusBar *statusBar: getStatusBars(widget)) {
+                statusBar->removeEventFilter(this);
             }
         }
     }
