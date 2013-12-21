@@ -53,8 +53,7 @@ qtcEventCallback(void **cbdata)
         }
     }
     QWidget *widget = qtcToWidget(receiver);
-    if (qtcUnlikely(widget && !widget->testAttribute(Qt::WA_WState_Polished) &&
-                    !qtcGetWid(widget))) {
+    if (qtcUnlikely(widget && !qtcGetWid(widget))) {
         if (Style *style = qtcGetStyle(widget)) {
             style->prePolish(widget);
         }

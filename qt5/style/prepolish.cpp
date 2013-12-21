@@ -48,16 +48,17 @@ Style::prePolish(QWidget *widget) const
     //     as a child of a RGBA window. However, since Qt5 will not recreate
     //     native window, this is probably easier to deal with than Qt4.
     //     (After we create a RGB window, Qt5 will not override it).
-    if (!widget->testAttribute(Qt::WA_WState_Polished) &&
-        !(widget->windowFlags() & Qt::MSWindowsOwnDC) &&
-        !qtcGetWid(widget) && !props->prePolished) {
+    if (!(widget->windowFlags() & Qt::MSWindowsOwnDC) &&
+        !qtcGetWid(widget) && !props->prePolishing) {
         // Skip MSWindowsOwnDC since it is set for QGLWidget and not likely to
         // be used in other cases.
         if ((opts.bgndOpacity != 100 && (qtcIsWindow(widget) ||
                                          qtcIsToolTip(widget))) ||
             (opts.dlgOpacity != 100 && qtcIsDialog(widget)) ||
-            (opts.menuBgndOpacity != 100 && qobject_cast<QMenu*>(widget))) {
-            props->prePolished = true;
+            (opts.menuBgndOpacity != 100 &&
+             (qobject_cast<QMenu*>(widget) ||
+              widget->inherits("QComboBoxPrivateContainer")))) {
+            props->prePolishing = true;
             // Set this for better efficiency for now
             widget->setAutoFillBackground(false);
             QWindow *window = widget->windowHandle();
@@ -80,7 +81,7 @@ Style::prePolish(QWidget *widget) const
             // QWidgetPrivate::updateIsTranslucent sets the format back
             // is Qt::WA_TranslucentBackground is not set. So we need to do
             // this repeatedly
-            props->prePolished = false;
+            props->prePolishing = false;
         }
     }
 }

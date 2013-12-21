@@ -30,15 +30,23 @@
 struct _QtcWidgetProps {
     _QtcWidgetProps():
         opacity(100),
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+        prePolishing(false),
+#else
         prePolished(false),
         prePolishStarted(false),
+#endif
         shadowRegistered(false),
         noEtch(false)
     {
     }
     int opacity;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    bool prePolishing: 1;
+#else
     bool prePolished: 1;
     bool prePolishStarted: 1;
+#endif
     bool shadowRegistered: 1;
     // OK, Etching looks cr*p on plasma widgets, and khtml...
     // CPD:TODO WebKit?
