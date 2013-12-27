@@ -22,27 +22,28 @@
 #include "x11shadow_p.h"
 #include "x11wmmove.h"
 #include "x11blur.h"
-#include "x11icccm.h"
 #include "log.h"
 #include "number.h"
 #include "shadow_p.h"
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 
-/*!
-  shadow atom and property specification available at
-  http://community.kde.org/KWin/Shadow
-*/
+/**
+ * shadow atom and property specification available at
+ * http://community.kde.org/KWin/Shadow
+ **/
 
 static uint32_t shadow_xpixmaps[8];
 static uint32_t shadow_data_xcb[8 + 4];
-// Use XCB to set window property recieves BadWindow errors for menus in
-// Qt4 kpartsplugin here, probably because of the order of some pending
-// event/requests in Xlib. Calling XFlush() before xcb_change_property()
-// doesn't solve the problem for unknown reason but using XChangeProperty
-// works.
-// NOTE: XChangeProperty want `unsigned long` for format 32. So we need
-// two seperate data buffers.
+/**
+ * Use XCB to set window property recieves BadWindow errors for menus in
+ * Qt4 kpartsplugin here, probably because of the order of some pending
+ * event/requests in Xlib. Calling #XFlush before #xcb_change_property
+ * doesn't solve the problem for unknown reason but using #XChangeProperty
+ * works.
+ * NOTE: #XChangeProperty want `unsigned long` for format 32. So we need
+ * two seperate data buffers.
+ **/
 static unsigned long shadow_data_xlib[8 + 4];
 
 static xcb_pixmap_t
@@ -218,64 +219,4 @@ qtcX11BlurTrigger(xcb_window_t wid, bool enable, unsigned prop_num,
         qtcX11CallVoid(delete_property, wid, atom);
     }
     qtcX11Flush();
-}
-
-QTC_EXPORT void
-qtcX11GetSizeHint(xcb_window_t wid, QtcX11SizeHint *hint)
-{
-    if (qtcUnlikely(!wid))
-        return;
-    memset(hint, 0, sizeof(QtcX11SizeHint));
-    xcb_get_property_reply_t *reply =
-        qtcX11Call(get_property, 0, wid, XCB_ATOM_WM_NORMAL_HINTS,
-                   XCB_ATOM_WM_SIZE_HINTS, 0, QTC_X11_SIZE_HINTS_ELEMENTS);
-    if (!reply)
-        return;
-    if (!(reply->type == XCB_ATOM_WM_SIZE_HINTS && reply->format == 32)) {
-        free(reply);
-        return;
-    }
-    int length = qtcMin(QTC_X11_SIZE_HINTS_ELEMENTS,
-                        xcb_get_property_value_length(reply) / 4);
-    memcpy(hint, xcb_get_property_value(reply), length * 4);
-    uint32_t flags =
-        (QTC_X11_SIZE_HINT_US_POSITION | QTC_X11_SIZE_HINT_US_SIZE |
-         QTC_X11_SIZE_HINT_P_POSITION | QTC_X11_SIZE_HINT_P_SIZE |
-         QTC_X11_SIZE_HINT_P_MIN_SIZE | QTC_X11_SIZE_HINT_P_MAX_SIZE |
-         QTC_X11_SIZE_HINT_P_RESIZE_INC | QTC_X11_SIZE_HINT_P_ASPECT);
-
-    /* NumPropSizeElements = 18 (ICCCM version 1) */
-    if (length >= 18) {
-        flags |= QTC_X11_SIZE_HINT_BASE_SIZE | QTC_X11_SIZE_HINT_P_WIN_GRAVITY;
-    } else {
-        hint->base_width = 0;
-        hint->base_height = 0;
-        hint->win_gravity = 0;
-    }
-    /* get rid of unwanted bits */
-    hint->flags &= flags;
-    free(reply);
-}
-
-QTC_EXPORT void
-qtcX11SetSizeHint(xcb_window_t wid, const QtcX11SizeHint *hint)
-{
-    if (qtcUnlikely(!wid))
-        return;
-    Display *disp = qtcX11GetDisp();
-    if (disp) {
-        unsigned long xlib_hint[QTC_X11_SIZE_HINTS_ELEMENTS];
-        for (unsigned i = 0;i < QTC_X11_SIZE_HINTS_ELEMENTS;i++) {
-            xlib_hint[i] = ((uint32_t*)hint)[i];
-        }
-        XChangeProperty(disp, wid, XA_WM_NORMAL_HINTS, XA_WM_SIZE_HINTS, 32,
-                        PropModeReplace, (unsigned char*)xlib_hint,
-                        QTC_X11_SIZE_HINTS_ELEMENTS);
-        XFlush(disp);
-    } else {
-        qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, wid,
-                       XCB_ATOM_WM_NORMAL_HINTS, XCB_ATOM_WM_SIZE_HINTS, 32,
-                       QTC_X11_SIZE_HINTS_ELEMENTS, hint);
-        qtcX11Flush();
-    }
 }
