@@ -33,24 +33,6 @@ _qtcMakeVersionReal(int a, int b, int c)
 #define qtcMakeVersion(a, b, arg...)            \
     _qtcMakeVersionV(a, b, ##arg, 0)
 
-QTC_ALWAYS_INLINE static inline double
-qtcLimit(double d, double l)
-{
-    if (d <= 0) {
-        return 0;
-    }
-    if (d >= l) {
-        return l;
-    }
-    return d;
-}
-
-QTC_ALWAYS_INLINE static inline bool
-qtcEqual(double d1, double d2)
-{
-    return (fabs(d1 - d2) < 0.0001);
-}
-
 #ifdef __cplusplus
 template <typename T>
 QTC_ALWAYS_INLINE static inline const T&
@@ -76,6 +58,12 @@ qtcMin(const T1 &a, const T2 &b)
 {
     return (a < b) ? a : b;
 }
+template <typename T>
+QTC_ALWAYS_INLINE static inline T
+qtcAbs(const T &a)
+{
+    return (a > 0) ? a : -a;
+}
 #else
 #define qtcMax(a, b)                            \
     ({                                          \
@@ -89,8 +77,15 @@ qtcMin(const T1 &a, const T2 &b)
         typeof(b) _b = (b);                     \
         (_a < _b) ? _a : _b;                    \
     })
+#define qtcAbs(a)                               \
+    ({                                          \
+        typeof(a) _a = (a);                     \
+        (_a > 0) ? _a : -_a;                    \
+    })
 #endif
 #define qtcBound(a, b, c) qtcMax(a, qtcMin(b, c))
+#define qtcLimit(v, l) qtcBound(0, v, l)
+#define qtcEqual(v1, v2) (qtcAbs(v1 - v2) < 0.0001)
 
 QTC_ALWAYS_INLINE static inline uintptr_t
 qtcGetPadding(uintptr_t len, uintptr_t align)

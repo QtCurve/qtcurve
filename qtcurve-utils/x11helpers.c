@@ -68,11 +68,11 @@ void
 qtcX11ShadowInit()
 {
     int shadow_size = 6;
-    int shadow_padding = 4;
+    int shadow_radius = 4;
     QtcColor c1 = {0.65, 0.65, 0.65};
     QtcColor c2 = {0.2, 0.2, 0.2};
     QtcPixmap *shadow_pixmaps[8];
-    qtcShadowCreate(shadow_size, &c1, &c2, shadow_padding,
+    qtcShadowCreate(shadow_size, &c1, &c2, shadow_radius, false,
                     QTC_PIXEL_XCB, shadow_pixmaps);
     for (int i = 0;i < 8;i++) {
         shadow_xpixmaps[i] = qtcX11ShadowCreatePixmap(shadow_pixmaps[i]);

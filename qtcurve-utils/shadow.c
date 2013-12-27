@@ -71,15 +71,15 @@ qtcFillShadowPixel(uint8_t *pixel, const QtcColor *c1,
 }
 
 static inline float
-_qtcDistance(int x, int y, int x0, int y0)
+_qtcDistance(int x, int y, int x0, int y0, bool square)
 {
     int dx = x - x0;
     int dy = y - y0;
     if (dx == 0)
-        return dy > 0 ? dy : -dy;
+        return qtcAbs(dy);
     if (dy == 0)
-        return dx > 0 ? dx : -dx;
-    return sqrtf(dx * dx + dy * dy);
+        return qtcAbs(dx);
+    return square ? qtcMax(qtcAbs(dx), qtcAbs(dy)) : sqrtf(dx * dx + dy * dy);
 }
 
 static inline float
@@ -98,7 +98,7 @@ _qtcGradientGetValue(float *gradient, size_t size, float distance)
 static QtcPixmap*
 qtcShadowSubPixmap(size_t size, float *gradient, int vertical_align,
                    int horizontal_align, const QtcColor *c1, const QtcColor *c2,
-                   QtcPixelByteOrder order)
+                   bool square, QtcPixelByteOrder order)
 {
     int height = vertical_align ? size : 1;
     int y0 = vertical_align == -1 ? height - 1 : 0;
@@ -110,7 +110,7 @@ qtcShadowSubPixmap(size_t size, float *gradient, int vertical_align,
             qtcFillShadowPixel(
                 res->data + (x + y * width) * 4, c1, c2,
                 _qtcGradientGetValue(
-                    gradient, size, _qtcDistance(x, y, x0, y0)), order);
+                    gradient, size, _qtcDistance(x, y, x0, y0, square)), order);
         }
     }
     return res;
@@ -118,14 +118,15 @@ qtcShadowSubPixmap(size_t size, float *gradient, int vertical_align,
 
 void
 qtcShadowCreate(size_t size, const QtcColor *c1, const QtcColor *c2,
-                size_t padding, QtcPixelByteOrder order, QtcPixmap **pixmaps)
+                size_t radius, bool square, QtcPixelByteOrder order,
+                QtcPixmap **pixmaps)
 {
-    size_t full_size = size + padding;
+    size_t full_size = size + radius;
     QTC_DEF_LOCAL_BUFF(float, gradient, 128, full_size);
-    for (size_t i = 0;i < padding;i++) {
+    for (size_t i = 0;i < radius;i++) {
         gradient.p[i] = 0;
     }
-    qtcCreateShadowGradient(gradient.p + padding, size);
+    qtcCreateShadowGradient(gradient.p + radius, size);
     int aligns[8][2] = {
         {0, -1},
         {1, -1},
@@ -138,7 +139,7 @@ qtcShadowCreate(size_t size, const QtcColor *c1, const QtcColor *c2,
     };
     for (int i = 0;i < 8;i++) {
         pixmaps[i] = qtcShadowSubPixmap(full_size, gradient.p, aligns[i][1],
-                                        aligns[i][0], c1, c2, order);
+                                        aligns[i][0], c1, c2, square, order);
     }
     QTC_FREE_LOCAL_BUFF(gradient);
 }
