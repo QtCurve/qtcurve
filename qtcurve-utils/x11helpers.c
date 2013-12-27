@@ -25,16 +25,9 @@
 #include "x11icccm.h"
 #include "log.h"
 #include "number.h"
+#include "shadow_p.h"
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
-#include <shadow0-png.h>
-#include <shadow1-png.h>
-#include <shadow2-png.h>
-#include <shadow3-png.h>
-#include <shadow4-png.h>
-#include <shadow5-png.h>
-#include <shadow6-png.h>
-#include <shadow7-png.h>
 
 /*!
   shadow atom and property specification available at
@@ -42,7 +35,6 @@
 */
 
 static uint32_t shadow_pixmaps[8];
-static int shadow_size = 0;
 static uint32_t shadow_data_xcb[8 + 4];
 // Use XCB to set window property recieves BadWindow errors for menus in
 // Qt4 kpartsplugin here, probably because of the order of some pending
@@ -57,7 +49,6 @@ static xcb_pixmap_t
 qtcX11ShadowCreatePixmap(const QtcPixmap *data)
 {
     xcb_pixmap_t pixmap = qtcX11GenerateId();
-    shadow_size = data->width;
 
     // create X11 pixmap
     qtcX11CallVoid(create_pixmap, 32, pixmap, qtcX11RootWindow(),
@@ -75,21 +66,24 @@ qtcX11ShadowCreatePixmap(const QtcPixmap *data)
 void
 qtcX11ShadowInit()
 {
-    shadow_pixmaps[0] = qtcX11ShadowCreatePixmap(&qtc_shadow0);
-    shadow_pixmaps[1] = qtcX11ShadowCreatePixmap(&qtc_shadow1);
-    shadow_pixmaps[2] = qtcX11ShadowCreatePixmap(&qtc_shadow2);
-    shadow_pixmaps[3] = qtcX11ShadowCreatePixmap(&qtc_shadow3);
-    shadow_pixmaps[4] = qtcX11ShadowCreatePixmap(&qtc_shadow4);
-    shadow_pixmaps[5] = qtcX11ShadowCreatePixmap(&qtc_shadow5);
-    shadow_pixmaps[6] = qtcX11ShadowCreatePixmap(&qtc_shadow6);
-    shadow_pixmaps[7] = qtcX11ShadowCreatePixmap(&qtc_shadow7);
+    int shadow_size = 6;
+    int shadow_padding = 4;
+    QtcColor c1 = {0.65, 0.65, 0.65};
+    QtcColor c2 = {0.2, 0.2, 0.2};
+    QtcPixmap *shadow_buffer[8];
+    qtcShadowCreate(shadow_size, &c1, &c2, shadow_padding,
+                    QTC_PIXEL_XCB, shadow_buffer);
+    for (int i = 0;i < 8;i++) {
+        shadow_pixmaps[i] = qtcX11ShadowCreatePixmap(shadow_buffer[i]);
+        free(shadow_buffer[i]);
+    }
 
     memcpy(shadow_data_xcb, shadow_pixmaps, sizeof(shadow_pixmaps));
     for (int i = 0;i < 8;i++) {
         shadow_data_xlib[i] = shadow_pixmaps[i];
     }
     for (int i = 8;i < 12;i++) {
-        shadow_data_xlib[i] = shadow_data_xcb[i] = shadow_size - 4;
+        shadow_data_xlib[i] = shadow_data_xcb[i] = shadow_size - 1;
     }
 }
 

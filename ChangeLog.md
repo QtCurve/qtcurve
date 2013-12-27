@@ -21,6 +21,8 @@
 15. Remove parentless dialog fix
 16. Fix kscreenlocker. Second version of prepolishing
 17. Improve shadow of QBalloonTip
+18. Draw shadow at runtime. Prepare for more advanced shadow feature and
+    configuration.
 
 ## 1.8.17
 1. **Add Qt5 support!!**.
