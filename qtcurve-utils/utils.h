@@ -38,7 +38,7 @@ typedef struct {
     int width;
     int height;
     int depth;
-    const unsigned char *data;
+    unsigned char *data;
 } QtcPixmap;
 
 #define qtcContainerOf(ptr, type, member)               \

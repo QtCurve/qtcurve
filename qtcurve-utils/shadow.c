@@ -105,11 +105,10 @@ qtcShadowSubPixmap(size_t size, float *gradient, int vertical_align,
     int width = horizontal_align ? size : 1;
     int x0 = horizontal_align == -1 ? width - 1 : 0;
     QtcPixmap *res = qtcPixmapNew(width, height, 32);
-    uint8_t *data = (uint8_t*)res->data;
     for (int x = 0;x < width;x++) {
         for (int y = 0;y < height;y++) {
             qtcFillShadowPixel(
-                data + (x + y * width) * 4, c1, c2,
+                res->data + (x + y * width) * 4, c1, c2,
                 _qtcGradientGetValue(
                     gradient, size, _qtcDistance(x, y, x0, y0)), order);
         }

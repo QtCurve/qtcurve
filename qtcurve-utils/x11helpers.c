@@ -34,7 +34,7 @@
   http://community.kde.org/KWin/Shadow
 */
 
-static uint32_t shadow_pixmaps[8];
+static uint32_t shadow_xpixmaps[8];
 static uint32_t shadow_data_xcb[8 + 4];
 // Use XCB to set window property recieves BadWindow errors for menus in
 // Qt4 kpartsplugin here, probably because of the order of some pending
@@ -70,17 +70,17 @@ qtcX11ShadowInit()
     int shadow_padding = 4;
     QtcColor c1 = {0.65, 0.65, 0.65};
     QtcColor c2 = {0.2, 0.2, 0.2};
-    QtcPixmap *shadow_buffer[8];
+    QtcPixmap *shadow_pixmaps[8];
     qtcShadowCreate(shadow_size, &c1, &c2, shadow_padding,
-                    QTC_PIXEL_XCB, shadow_buffer);
+                    QTC_PIXEL_XCB, shadow_pixmaps);
     for (int i = 0;i < 8;i++) {
-        shadow_pixmaps[i] = qtcX11ShadowCreatePixmap(shadow_buffer[i]);
-        free(shadow_buffer[i]);
+        shadow_xpixmaps[i] = qtcX11ShadowCreatePixmap(shadow_pixmaps[i]);
+        free(shadow_pixmaps[i]);
     }
 
-    memcpy(shadow_data_xcb, shadow_pixmaps, sizeof(shadow_pixmaps));
+    memcpy(shadow_data_xcb, shadow_xpixmaps, sizeof(shadow_xpixmaps));
     for (int i = 0;i < 8;i++) {
-        shadow_data_xlib[i] = shadow_pixmaps[i];
+        shadow_data_xlib[i] = shadow_xpixmaps[i];
     }
     for (int i = 8;i < 12;i++) {
         shadow_data_xlib[i] = shadow_data_xcb[i] = shadow_size - 1;
@@ -95,8 +95,8 @@ qtcX11ShadowDestroy()
         return;
     }
     for (unsigned int i = 0;
-         i < sizeof(shadow_pixmaps) / sizeof(shadow_pixmaps[0]);i++) {
-        qtcX11CallVoid(free_pixmap, shadow_pixmaps[i]);
+         i < sizeof(shadow_xpixmaps) / sizeof(shadow_xpixmaps[0]);i++) {
+        qtcX11CallVoid(free_pixmap, shadow_xpixmaps[i]);
     }
     qtcX11Flush();
 }
