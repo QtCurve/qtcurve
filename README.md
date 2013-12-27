@@ -143,10 +143,6 @@ CMake to use `clang`/`clang++` and `libc++` correctly,
 
     CC=clang CXX=clang++ CPP=clang++ CXXFLAGS="${CXXFLAGS} -stdlib=libc++" LDFLAGS="${LDFLAGS} -lc++abi" cmake .. <other compile options...>
 
-## Creating Distribution Packages
-Support for creating `deb` or `rpm` package have been removed. Please make
-package in the same way as any other cmake packages.
-
 # Additional Features
 ## XBar/MacMenu
 The XBar support was copied directly from Bespin. The relevant files are named
@@ -195,7 +191,7 @@ Usage:
 
     QTCURVE_CONFIG_FILE=~/testfile kcalc
 
-## License
+# License
 QtCurve `1.8.17` and earlier was licensed under GPLv2+. It was relicensed under
 LGPLv2.1+ on Nov. 14th 2013 in order to avoid confusion for moving into
 KDE-infrastructure. This relicensing have got permissions from all contributors
