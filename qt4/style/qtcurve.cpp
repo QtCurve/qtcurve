@@ -2358,27 +2358,34 @@ void Style::unpolish(QWidget *widget)
 // adjsut its position...
 static bool updateMenuBarEvent(QMouseEvent *event, QMenuBar *menu)
 {
-    struct HackEvent : public QMouseEvent
-    {
-        bool adjust()
+    struct HackEvent : public QMouseEvent {
+        bool
+        adjust()
         {
-            if(p.x()<2 || p.y()<2)
-            {
-                p=QPoint(p.x()<2 ? p.x()+2 : p.x(), p.y()<2 ? p.y()+2 : p.y());
-                g=QPoint(p.x()<2 ? g.x()+2 : g.x(), p.y()<2 ? g.y()+2 : g.y());
-                return true;
+            bool res = false;
+            if (p.x() < 2) {
+                p.rx() += 2;
+                g.rx() += 2;
+                res = true;
             }
-            return false;
+            if (p.y() < 2) {
+                p.ry() += 2;
+                g.ry() += 2;
+                res = true;
+            }
+            return res;
         }
     };
 
-    struct HackedMenu : public QMenuBar
-    {
-        void send(QMouseEvent *ev) { event(ev); }
+    struct HackedMenu : public QMenuBar {
+        void
+        send(QMouseEvent *ev)
+        {
+            event(ev);
+        }
     };
 
-    if(((HackEvent*)event)->adjust())
-    {
+    if (((HackEvent*)event)->adjust()) {
         ((HackedMenu*)menu)->send(event);
         return true;
     }
@@ -2493,7 +2500,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 object->inherits("QComboBoxPrivateContainer")) {
                 QWidget *widget = static_cast<QWidget*>(object);
                 if (Utils::hasAlphaChannel(widget)) {
-                   widget->clearMask();
+                    widget->clearMask();
                 } else {
                     widget->setMask(windowMask(widget->rect(),
                                                opts.round > ROUND_SLIGHT));
