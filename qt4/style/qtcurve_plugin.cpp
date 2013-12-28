@@ -102,9 +102,9 @@ qtcEventCallback(void **cbdata)
     if (qtcUnlikely(event->type() == QEvent::DynamicPropertyChange)) {
         QDynamicPropertyChangeEvent *prop_event =
             static_cast<QDynamicPropertyChangeEvent*>(event);
-        // ignore the property change events from ourselves
+        // eat the property change events from ourselves
         if (prop_event->propertyName() == QTC_PROP_NAME) {
-            return false;
+            return true;
         }
     }
     QWidget *widget = qtcToWidget(receiver);
