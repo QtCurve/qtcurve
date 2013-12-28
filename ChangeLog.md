@@ -8,7 +8,7 @@
 6. Relicense under LGPL. With permission from all contributors in the git log.
 7. Treat `Qt::Sheet` as `Qt::Dialog`. This fixes translucent background for
    close confirmation dialog in QtDesigner.
-8. Remove backward compatible options for deprecated options.
+8. Remove backward compatible options.
 9. Introduce `prePolish()` to Workaround a bug in Qt5 which make it impossible
    for QMainWindow and QDialog to be transparent.
    [Qt-Bug](https://bugreports.qt-project.org/browse/QTBUG-34064)

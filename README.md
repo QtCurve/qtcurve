@@ -125,15 +125,6 @@ recommanded to turn on in distribution packages.
 
     (Default: `Off`)
 
-## Backward compatible options
-These options are provided to have better backward compatibility with the
-configure options before the merging of repositories. They **WILL** be removed
-in a few major releases.
-
-1. `QTC_QT_ONLY`:
-
-    The opposite of `QTC_QT4_ENABLE_KDE`.
-
 ## Tips for compiling with `clang`/`clang++`
 As of clang version 3.3, `clang++` does not seem to be compatible with the c++
 standard library headers shipped with gcc in c++0x mode. If you have problems
