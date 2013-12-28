@@ -34,89 +34,140 @@
 #define CAIRO_GRAD_END 1.0
 #endif
 
-#if GTK_CHECK_VERSION(2, 90, 0)
-    #define CAIRO_BEGIN \
-        { \
-        GdkRectangle *area=NULL; \
-        cairo_set_line_width(cr, 1.0);
+#define CAIRO_BEGIN                             \
+    if (GDK_IS_DRAWABLE(window)) {              \
+    cairo_t *cr = gdk_cairo_create(window);     \
+    setCairoClipping(cr, area);                 \
+    cairo_set_line_width(cr, 1.0);
 
-    #define CAIRO_END }
-#else
-    #define CAIRO_BEGIN \
-        if(GDK_IS_DRAWABLE(window)) \
-        { \
-        cairo_t *cr=(cairo_t*)gdk_cairo_create(window); \
-        setCairoClipping(cr, area); \
-        cairo_set_line_width(cr, 1.0);
-
-    #define CAIRO_END \
-        cairo_destroy(cr); \
-        }
-#endif
+#define CAIRO_END                               \
+    cairo_destroy(cr);                          \
+    }
 
 void clipToRegion(cairo_t *cr, QtcRegion *region);
 void setCairoClippingRegion(cairo_t *cr, QtcRegion *region);
 void setCairoClipping(cairo_t *cr, GdkRectangle *area);
-#define unsetCairoClipping(A) cairo_restore(A)
-void drawHLine(cairo_t *cr, double r, double g, double b, double a, int x, int y, int w);
-void drawVLine(cairo_t *cr, double r, double g, double b, double a, int x, int y, int h);
-#define drawAreaColor(cr, area, col, x, y, width, height) \
-        drawAreaColorAlpha(cr, area, col, x, y, width, height, 1.0)
-void drawAreaColorAlpha(cairo_t *cr, GdkRectangle *area, GdkColor *col, gint x, gint y, gint width, gint height, double alpha);
-void drawBgnd(cairo_t *cr, GdkColor *col, GtkWidget *widget, GdkRectangle *area, int x, int y, int width, int height);
-void drawAreaModColor(cairo_t *cr, GdkRectangle *area, GdkColor *orig, double mod, gint x, gint y, gint width, gint height);
-#define drawAreaMod(/*cairo_t *       */  cr, \
-                    /* GtkStyle *     */  style, \
-                    /* GtkStateType   */  state, \
-                    /* GdkRectangle * */  area, \
-                    /* double         */  mod, \
-                    /* gint           */  x, \
-                    /* gint           */  y, \
-                    /* gint           */  width, \
-                    /* gint           */  height) \
-    drawAreaModColor(cr, area, &style->bg[state], mod, x, y, width, height)
-
-#define drawBevelGradient(cr, area, x, y, width, height, base, horiz, sel, bevApp, w) \
-        drawBevelGradientAlpha(cr, area, x, y, width, height, base, horiz, sel, bevApp, w, 1.0)
-void drawBevelGradientAlpha(cairo_t *cr, GdkRectangle *area, int x, int y, int width, int height, GdkColor *base, gboolean horiz,
-                                   gboolean sel, EAppearance bevApp, EWidget w, double alpha);
-
-typedef enum
+void drawHLine(cairo_t *cr, double r, double g, double b, double a,
+               int x, int y, int w);
+void drawVLine(cairo_t *cr, double r, double g, double b, double a,
+               int x, int y, int h);
+void drawAreaColor(cairo_t *cr, GdkRectangle *area, GdkColor *col,
+                   gint x, gint y, gint width, gint height, double alpha);
+QTC_ALWAYS_INLINE static inline void
+_drawAreaColor(cairo_t *cr, GdkRectangle *area, GdkColor *col,
+               gint x, gint y, gint width, gint height)
 {
-    DF_DRAW_INSIDE     = 0x001,
-    DF_BLEND           = 0x002,
-    DF_SUNKEN          = 0x004,
-    DF_DO_BORDER       = 0x008,
-    DF_VERT            = 0x010,
-    DF_HIDE_EFFECT     = 0x020,
-    DF_HAS_FOCUS       = 0x040
+    drawAreaColor(cr, area, col, x, y, width, height, 1);
+}
+#define drawAreaColor(cr, area, col, x, y, width, height, alpha...)     \
+    QTC_SWITCH_(alpha, drawAreaColor)                                   \
+    (cr, area, col, x, y, width, height, ##alpha)
+
+void drawBgnd(cairo_t *cr, GdkColor *col, GtkWidget *widget,
+              GdkRectangle *area, int x, int y, int width, int height);
+void drawAreaModColor(cairo_t *cr, GdkRectangle *area, GdkColor *orig,
+                      double mod, gint x, gint y, gint width, gint height);
+QTC_ALWAYS_INLINE static inline void
+drawAreaMod(cairo_t *cr, GtkStyle *style, GtkStateType state,
+            GdkRectangle *area, double mod, gint x, gint y,
+            gint width, gint height)
+{
+    drawAreaModColor(cr, area, &style->bg[state], mod, x, y, width, height);
+}
+
+void drawBevelGradient(cairo_t *cr, GdkRectangle *area, int x, int y, int width,
+                       int height, GdkColor *base, gboolean horiz, gboolean sel,
+                       EAppearance bevApp, EWidget w, double alpha);
+QTC_ALWAYS_INLINE static inline void
+_drawBevelGradient(cairo_t *cr, GdkRectangle *area, int x, int y, int width,
+                   int height, GdkColor *base, gboolean horiz, gboolean sel,
+                   EAppearance bevApp, EWidget w)
+{
+    drawBevelGradient(cr, area, x, y, width, height, base, horiz, sel,
+                      bevApp, w, 1);
+}
+#define drawBevelGradient(cr, area, x, y, width, height, base, horiz, sel, \
+                          bevApp, w, alpha...)                          \
+    QTC_SWITCH_(alpha, drawBevelGradient)                               \
+    (cr, area, x, y, width, height, base, horiz, sel, bevApp, w, ##alpha)
+
+typedef enum {
+    DF_DRAW_INSIDE = 0x001,
+    DF_BLEND = 0x002,
+    DF_SUNKEN = 0x004,
+    DF_DO_BORDER = 0x008,
+    DF_VERT = 0x010,
+    DF_HIDE_EFFECT = 0x020,
+    DF_HAS_FOCUS = 0x040
 } EDrawFlags;
 
-#define drawBorder(a, b, c, d, e, f, g, h, i, j, k, l, m) \
-    realDrawBorder(a, b, c, d, e, f, g, h, i, j, k, l, m, QTC_STD_BORDER)
-
 void plotPoints(cairo_t *cr, GdkPoint *pts, int count);
-void createTLPath(cairo_t *cr, double xd, double yd, double width, double height, double radius, int round);
-void createBRPath(cairo_t *cr, double xd, double yd, double width, double height, double radius, int round);
-void createPath(cairo_t *cr, double xd, double yd, double width, double height, double radius, int round);
-void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangle *area,
-                           gint x, gint y, gint width, gint height, GdkColor *c_colors, int round, EBorder borderProfile,
-                           EWidget widget, int flags, int borderVal);
-#define drawGlow(cr, area, x, y, w, h, round, widget) \
-        drawGlowReal(cr, area, x, y, w, h, round, widget, NULL)
-void drawGlowReal(cairo_t *cr, GdkRectangle *area, int x, int y, int w, int h, int round, EWidget widget, const GdkColor *colors);
-void drawEtch(cairo_t *cr, GdkRectangle *area, GtkWidget *widget, int x, int y, int w, int h, gboolean raised, int round, EWidget wid);
-void clipPathRadius(cairo_t *cr, double x, double y, int w, int h, double radius, int round);
-void clipPath(cairo_t *cr, int x, int y, int w, int h, EWidget widget, int rad, int round);
-void addStripes(cairo_t *cr, int x, int y, int w, int h, bool horizontal);
-void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangle *area, gint x, gint y,
-                           gint width, gint height, GdkColor *base, GdkColor *colors, int round, EWidget widget,
-                           EBorder borderProfile, int flags, GtkWidget *wid);
-#define drawFadedLine(cr, x, y, width, height, col, area, gap, fadeStart, fadeEnd, horiz) \
-        drawFadedLineReal(cr, x, y, width, height, col, area, gap, fadeStart, fadeEnd, horiz, 1.0)
+void createTLPath(cairo_t *cr, double xd, double yd, double width,
+                  double height, double radius, int round);
+void createBRPath(cairo_t *cr, double xd, double yd, double width,
+                  double height, double radius, int round);
+void createPath(cairo_t *cr, double xd, double yd, double width,
+                double height, double radius, int round);
 
-void drawFadedLineReal(cairo_t *cr, int x, int y, int width, int height, GdkColor *col, GdkRectangle *area, GdkRectangle *gap,
-                              gboolean fadeStart, gboolean fadeEnd, gboolean horiz, double alpha);
+void drawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state,
+                GdkRectangle *area, gint x, gint y, gint width, gint height,
+                GdkColor *c_colors, int round, EBorder borderProfile,
+                EWidget widget, int flags, int borderVal);
+QTC_ALWAYS_INLINE static inline void
+_drawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state,
+            GdkRectangle *area, gint x, gint y, gint width, gint height,
+            GdkColor *c_colors, int round, EBorder borderProfile,
+            EWidget widget, int flags)
+{
+    drawBorder(cr, style, state, area, x, y, width, height, c_colors, round,
+               borderProfile, widget, flags, QTC_STD_BORDER);
+}
+#define drawBorder(cr, style, state, area, x, y, width, height, c_colors, \
+                   round, borderProfile, widget, flags, borderVal...)   \
+    QTC_SWITCH_(borderVal, drawBorder)                                  \
+    (cr, style, state, area, x, y, width, height, c_colors,             \
+     round, borderProfile, widget, flags, ##borderVal)
+
+void drawGlow(cairo_t *cr, GdkRectangle *area, int x, int y, int w, int h,
+              int round, EWidget widget, const GdkColor *colors);
+QTC_ALWAYS_INLINE static inline void
+_drawGlow(cairo_t *cr, GdkRectangle *area, int x, int y, int w, int h,
+          int round, EWidget widget)
+{
+    drawGlow(cr, area, x, y, w, h, round, widget, NULL);
+}
+#define drawGlow(cr, area, x, y, w, h, round, widget, colors...)        \
+    QTC_SWITCH_(colors, drawGlow)(cr, area, x, y, w, h, round, widget, ##colors)
+
+void drawEtch(cairo_t *cr, GdkRectangle *area, GtkWidget *widget,
+              int x, int y, int w, int h, gboolean raised, int round, EWidget wid);
+void clipPathRadius(cairo_t *cr, double x, double y, int w, int h,
+                    double radius, int round);
+void clipPath(cairo_t *cr, int x, int y, int w, int h, EWidget widget,
+              int rad, int round);
+void addStripes(cairo_t *cr, int x, int y, int w, int h, bool horizontal);
+void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
+                    GdkRectangle *area, gint x, gint y, gint width, gint height,
+                    GdkColor *base, GdkColor *colors, int round, EWidget widget,
+                    EBorder borderProfile, int flags, GtkWidget *wid);
+
+void drawFadedLine(cairo_t *cr, int x, int y, int width, int height,
+                   GdkColor *col, GdkRectangle *area, GdkRectangle *gap,
+                   gboolean fadeStart, gboolean fadeEnd, gboolean horiz,
+                   double alpha);
+QTC_ALWAYS_INLINE static inline void
+_drawFadedLine(cairo_t *cr, int x, int y, int width, int height, GdkColor *col,
+               GdkRectangle *area, GdkRectangle *gap, gboolean fadeStart,
+               gboolean fadeEnd, gboolean horiz)
+{
+    drawFadedLine(cr, x, y, width, height, col, area, gap, fadeStart,
+                  fadeEnd, horiz, 1.0);
+}
+#define drawFadedLine(cr, x, y, width, height, col, area, gap, fadeStart, \
+                      fadeEnd, horiz, alpha...)                         \
+    QTC_SWITCH_(alpha, drawFadedLine)(cr, x, y, width, height, col, area, \
+                                      gap, fadeStart, fadeEnd, horiz, ##alpha)
+
 void drawHighlight(cairo_t *cr, int x, int y, int width, int height, GdkRectangle *area, gboolean horiz, gboolean inc);
 void setLineCol(cairo_t *cr, cairo_pattern_t *pt, GdkColor *col);
 void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight, gboolean horiz,

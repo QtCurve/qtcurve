@@ -327,7 +327,7 @@ enum {
 
 #ifdef __cplusplus
 
-#include <qstyle.h>
+#include <QStyle>
 typedef enum {
     QtC_Round = QStyle::PM_CustomBase,
     QtC_TitleBarButtonAppearance,

@@ -105,7 +105,11 @@ qtcLogHandler(const gchar *domain, GLogLevelFlags level, const gchar *msg,
 static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area,
                            GtkWidget *widget, const gchar *detail, gint x, gint y, gint width, gint height)
 {
-    CAIRO_BEGIN
+    g_return_if_fail(GTK_IS_STYLE(style));
+    g_return_if_fail(GDK_IS_DRAWABLE(window));
+    cairo_t *cr = gdk_cairo_create(window);
+    setCairoClipping(cr, area);
+    cairo_set_line_width(cr, 1.0);
 
     gboolean isMenuOrToolTipWindow =
         (widget && GTK_IS_WINDOW(widget) &&
@@ -379,7 +383,7 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
         }
 */
     }
-    CAIRO_END
+    cairo_destroy(cr);
 }
 
 static void gtkDrawHandle(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area,
@@ -387,9 +391,11 @@ static void gtkDrawHandle(GtkStyle *style, GdkWindow *window, GtkStateType state
 {
     QTC_UNUSED(orientation);
     g_return_if_fail(GTK_IS_STYLE(style));
-    g_return_if_fail(window != NULL);
-    gboolean paf=WIDGET_TYPE_NAME("PanelAppletFrame");
-    CAIRO_BEGIN
+    g_return_if_fail(GDK_IS_WINDOW(window));
+    gboolean paf = WIDGET_TYPE_NAME("PanelAppletFrame");
+    cairo_t *cr = gdk_cairo_create(window);
+    setCairoClipping(cr, area);
+    cairo_set_line_width(cr, 1.0);
 
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %s  ", __FUNCTION__, state, shadow, width, height, detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 10);
@@ -445,7 +451,7 @@ static void gtkDrawHandle(GtkStyle *style, GdkWindow *window, GtkStateType state
                 drawLines(cr, x, y, width, height, height<width, 2, 4, qtcPalette.background, area, 3, opts.handles);
         }
     }
-    CAIRO_END
+    cairo_destroy(cr);
 }
 
 static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area,
@@ -806,7 +812,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
 #if !GTK_CHECK_VERSION(2, 90, 0)
             if(moz)
 #endif
-                unsetCairoClipping(cr);
+                cairo_restore(cr);
         }
         else if(opts.unifySpinBtns)
         {
@@ -1232,7 +1238,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                                    &cols[bg], cols, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_COMBO,
                                    BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER|DF_HIDE_EFFECT, widget);
                     if(!opts.comboSplitter)
-                        unsetCairoClipping(cr);
+                        cairo_restore(cr);
                 }
                 else if(opts.comboSplitter)
                 {
@@ -1291,7 +1297,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                                        &cols[bg], cols, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_COMBO,
                                        BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER|DF_HIDE_EFFECT, widget);
                         if(!opts.comboSplitter)
-                            unsetCairoClipping(cr);
+                            cairo_restore(cr);
                     }
                     else if(opts.comboSplitter)
                     {
@@ -1363,22 +1369,18 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                     qtcWindowMenuBarDBus(widget, height);
             }
 
-            if(widget && (opacity!=100 || qtcIsCustomBgnd(&opts)))
-                drawWindowBgnd(cr, style, area, window, widget, x, y, width, height);
+            if (widget && (opacity!=100 || qtcIsCustomBgnd(&opts)))
+                drawWindowBgnd(cr, style, area, window, widget, x, y,
+                               width, height);
 
-            if(drawGradient)
-            {
-                drawBevelGradientAlpha(cr, area, x, y-menuBarAdjust, width, height+menuBarAdjust, col,
-                                menubar
-                                    ? TRUE
-                                    : DETAIL("handlebox")
-                                            ? width<height
-                                            : width>height,
-                                FALSE, MODIFY_AGUA(app), WIDGET_OTHER, alpha);
-            }
-            else if(fillBackground)
-            {
-                drawAreaColorAlpha(cr, area, col, x, y, width, height, alpha);
+            if (drawGradient) {
+                drawBevelGradient(cr, area, x, y - menuBarAdjust, width,
+                                  height + menuBarAdjust, col,
+                                  (menubar ? TRUE : DETAIL("handlebox") ?
+                                   width < height : width > height),
+                                  FALSE, MODIFY_AGUA(app), WIDGET_OTHER, alpha);
+            } else if (fillBackground) {
+                drawAreaColor(cr, area, col, x, y, width, height, alpha);
             }
 
             if(GTK_SHADOW_NONE!=shadow && TB_NONE!=opts.toolbarBorders)
@@ -1439,7 +1441,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
             if(widget && IMG_NONE!=opts.bgndImage.type)
                 drawWindowBgnd(cr, style, area, window, widget, x, y, width, height);
         }
-        unsetCairoClipping(cr);
+        cairo_restore(cr);
 
         if(WIDGET_PBAR_TROUGH==wt)
             drawProgressGroove(cr, style, state, window, widget, area, x, y, width, height, TRUE, TRUE);
@@ -2625,53 +2627,61 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
     }
 }
 
-static void gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType state, GdkRectangle *area, GtkWidget *widget,
-                              const gchar *detail, GdkWindowEdge edge, gint x, gint y, gint width, gint height)
+static void
+gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType state,
+                  GdkRectangle *area, GtkWidget *widget, const gchar *detail,
+                  GdkWindowEdge edge, gint x, gint y, gint width, gint height)
 {
     g_return_if_fail(GTK_IS_STYLE(style));
-    g_return_if_fail(window != NULL);
-    CAIRO_BEGIN
+    g_return_if_fail(GDK_IS_DRAWABLE(window));
+    cairo_t *cr = gdk_cairo_create(window);
+    setCairoClipping(cr, area);
+    cairo_set_line_width(cr, 1.0);
 
-    int size=SIZE_GRIP_SIZE-2;
+    int size = SIZE_GRIP_SIZE - 2;
 
     /* Clear background */
-    if(qtcIsFlatBgnd(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, window, widget, x, y, width, height)))
-    {
-//         gtk_style_apply_default_background(style, window, FALSE, state, area, x, y, width, height);
-        if(widget && IMG_NONE!=opts.bgndImage.type)
-            drawWindowBgnd(cr, style, area, window, widget, x, y, width, height);
+    if (qtcIsFlatBgnd(opts.bgndAppearance) ||
+        !(widget && drawWindowBgnd(cr, style, area, window, widget,
+                                   x, y, width, height))) {
+        /* gtk_style_apply_default_background(style, window, FALSE, state, */
+        /*                                    area, x, y, width, height); */
+        if (widget && opts.bgndImage.type != IMG_NONE) {
+            drawWindowBgnd(cr, style, area, window, widget,
+                           x, y, width, height);
+        }
     }
 
-    switch(edge)
-    {
-        case GDK_WINDOW_EDGE_SOUTH_EAST:
-        // Adjust Firefox's resize grip so that it can be completely covered by QtCurve's KWin resize grip.
-        if(isMozilla())
-            x++, y++;
-        {
-            GdkPoint a[]={{ x+width,       (y+height)-size},
-                          { x+width,        y+height},
-                          {(x+width)-size,  y+height}};
-            drawPolygon(window, style, &qtcPalette.background[2], area, a, 3, TRUE);
-            break;
+    switch (edge) {
+    case GDK_WINDOW_EDGE_SOUTH_EAST: {
+        // Adjust Firefox's resize grip so that it can be completely covered
+        // by QtCurve's KWin resize grip.
+        if (isMozilla()) {
+            x++;
+            y++;
         }
-        case GDK_WINDOW_EDGE_SOUTH_WEST:
-        {
-            GdkPoint a[]={{(x+width)-size, (y+height)-size},
-                          { x+width,        y+height},
-                          {(x+width)-size,  y+height}};
-            drawPolygon(window, style, &qtcPalette.background[2], area, a, 3, TRUE);
-            break;
-        }
-        case GDK_WINDOW_EDGE_NORTH_EAST:
-            // TODO!!
-        case GDK_WINDOW_EDGE_NORTH_WEST:
-            // TODO!!
-        default:
-            parent_class->draw_resize_grip(style, window, state, area, widget, detail, edge, x, y, width, height);
+        GdkPoint a[] = {{x + width, y + height - size},
+                        {x + width, y + height},
+                        {x + width - size,  y + height}};
+        drawPolygon(window, style, &qtcPalette.background[2], area, a, 3, TRUE);
+        break;
     }
-
-    CAIRO_END
+    case GDK_WINDOW_EDGE_SOUTH_WEST: {
+        GdkPoint a[]={{x + width - size, y + height - size},
+                      {x + width, y + height},
+                      {x + width - size, y + height}};
+        drawPolygon(window, style, &qtcPalette.background[2], area, a, 3, TRUE);
+        break;
+    }
+    case GDK_WINDOW_EDGE_NORTH_EAST:
+        // TODO!!
+    case GDK_WINDOW_EDGE_NORTH_WEST:
+        // TODO!!
+    default:
+        parent_class->draw_resize_grip(style, window, state, area, widget,
+                                       detail, edge, x, y, width, height);
+    }
+    cairo_destroy(cr);
 }
 
 static void gtkDrawExpander(GtkStyle *style, GdkWindow *window, GtkStateType state, GdkRectangle *area, GtkWidget *widget,
