@@ -649,32 +649,39 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
         const gchar *detail, gint x, gint y, gint width, gint height,
         gboolean btnDown)
 {
-    gboolean sbar=isSbarDetail(detail),
-             pbar=DETAIL("bar"), //  && GTK_IS_PROGRESS_BAR(widget),
-             qtcSlider=!pbar && DETAIL("qtc-slider"),
-             slider=qtcSlider || (!pbar && DETAIL("slider")),
-             hscale=!slider && DETAIL("hscale"),
-             vscale=!hscale && DETAIL("vscale"),
-             menubar=!vscale && DETAIL("menubar"),
-             button=!menubar && DETAIL("button"),
-             togglebutton=!button && DETAIL("togglebutton"),
-             optionmenu=!togglebutton && DETAIL("optionmenu"),
-             stepper=!optionmenu && DETAIL("stepper"),
-             vscrollbar=!optionmenu && detail && detail==strstr(detail, "vscrollbar"),
-             hscrollbar=!vscrollbar && detail && detail==strstr(detail, "hscrollbar"),
-             spinUp=!hscrollbar && DETAIL("spinbutton_up"),
-             spinDown=!spinUp && DETAIL("spinbutton_down"),
-             menuScroll=detail && NULL!=strstr(detail, "menu_scroll_arrow_"),
-             rev=reverseLayout(widget) || (widget && reverseLayout(gtk_widget_get_parent(widget))),
-             activeWindow=TRUE;
-    GdkColor new_cols[TOTAL_SHADES+1],
-             *btnColors;
-    int      bgnd=getFill(state, btnDown),
-             round=getRound(detail, widget, x, y, width, height, rev);
-    gboolean lvh=isListViewHeader(widget) || isEvolutionListViewHeader(widget, detail),
-             sunken=btnDown || (GTK_IS_BUTTON(widget) && qtcButtonIsDepressed(widget)) ||
-                    GTK_STATE_ACTIVE==state || (2==bgnd || 3==bgnd);
-    GtkWidget *parent=NULL;
+    g_return_if_fail(style != NULL);
+    gboolean sbar = isSbarDetail(detail);
+    gboolean pbar = DETAIL("bar"); //  && GTK_IS_PROGRESS_BAR(widget);
+    gboolean qtcSlider = !pbar && DETAIL("qtc-slider");
+    gboolean slider = qtcSlider || (!pbar && DETAIL("slider"));
+    gboolean hscale = !slider && DETAIL("hscale");
+    gboolean vscale = !hscale && DETAIL("vscale");
+    gboolean menubar = !vscale && DETAIL("menubar");
+    gboolean button = !menubar && DETAIL("button");
+    gboolean togglebutton = !button && DETAIL("togglebutton");
+    gboolean optionmenu = !togglebutton && DETAIL("optionmenu");
+    gboolean stepper = !optionmenu && DETAIL("stepper");
+    gboolean vscrollbar = (!optionmenu && detail &&
+                           strstr(detail, "vscrollbar") == detail);
+    gboolean hscrollbar = (!vscrollbar && detail &&
+                           strstr(detail, "hscrollbar") == detail);
+    gboolean spinUp = !hscrollbar && DETAIL("spinbutton_up");
+    gboolean spinDown = !spinUp && DETAIL("spinbutton_down");
+    gboolean menuScroll = (detail &&
+                           strstr(detail, "menu_scroll_arrow_") != NULL);
+    gboolean rev = (reverseLayout(widget) ||
+                    (widget && reverseLayout(gtk_widget_get_parent(widget))));
+    gboolean activeWindow = TRUE;
+    GdkColor new_cols[TOTAL_SHADES + 1];
+    GdkColor *btnColors = qtcPalette.background;
+    int bgnd = getFill(state, btnDown);
+    int round = getRound(detail, widget, x, y, width, height, rev);
+    gboolean lvh = (isListViewHeader(widget) ||
+                    isEvolutionListViewHeader(widget, detail));
+    gboolean sunken = (btnDown || (GTK_IS_BUTTON(widget) &&
+                                   qtcButtonIsDepressed(widget)) ||
+                       state == GTK_STATE_ACTIVE || (bgnd == 2 || bgnd == 3));
+    GtkWidget *parent = NULL;
 
     if (button && GTK_IS_TOGGLE_BUTTON(widget)) {
         button = FALSE;
@@ -685,34 +692,28 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                                            detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 10);
 
-    if(useButtonColor(detail))
-    {
-        if(slider|hscale|vscale|sbar && GTK_STATE_INSENSITIVE==state)
-            btnColors=qtcPalette.background;
-        else if(QT_CUSTOM_COLOR_BUTTON(style))
-        {
+    // FIXME, need to update useButtonColor if the logic below changes right now
+    if (useButtonColor(detail)) {
+        if (slider | hscale | vscale | sbar && state == GTK_STATE_INSENSITIVE) {
+            btnColors = qtcPalette.background;
+        } else if (QT_CUSTOM_COLOR_BUTTON(style)) {
             qtcShadeColors(&(style->bg[state]), new_cols);
-            btnColors=new_cols;
+            btnColors = new_cols;
+        } else {
+            SET_BTN_COLS(slider, hscale | vscale, lvh, state);
         }
-        else
-            SET_BTN_COLS(slider, hscale|vscale, lvh, state)
     }
 
-    g_return_if_fail(style != NULL);
+    if (menubar && !isFakeGtk() && opts.shadeMenubarOnlyWhenActive) {
+        GtkWindow *topLevel = GTK_WINDOW(gtk_widget_get_toplevel(widget));
 
-    if(menubar && !isFakeGtk() && opts.shadeMenubarOnlyWhenActive)
-    {
-        GtkWindow *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(widget));
-
-        if(topLevel && GTK_IS_WINDOW(topLevel))
-        {
-            #define SHADE_ACTIVE_MB_HACK_SET "QTC_SHADE_ACTIVE_MB_HACK_SET"
-            if (!g_object_get_data(G_OBJECT(topLevel), SHADE_ACTIVE_MB_HACK_SET))
-            {
+        if (topLevel && GTK_IS_WINDOW(topLevel)) {
+#define SHADE_ACTIVE_MB_HACK_SET "QTC_SHADE_ACTIVE_MB_HACK_SET"
+            if (!g_object_get_data(G_OBJECT(topLevel), SHADE_ACTIVE_MB_HACK_SET)) {
                 g_object_set_data(G_OBJECT(topLevel), SHADE_ACTIVE_MB_HACK_SET, (gpointer)1);
                 g_signal_connect(G_OBJECT(topLevel), "event", G_CALLBACK(windowEvent), widget);
             }
-            activeWindow=qtcWindowIsActive(GTK_WIDGET(topLevel));
+            activeWindow = qtcWindowIsActive(GTK_WIDGET(topLevel));
         }
     }
 
@@ -720,10 +721,8 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
         qtcMenuShellSetup(widget);
 
     CAIRO_BEGIN
-    if(spinUp || spinDown)
-    {
-        if(!opts.unifySpin && (!opts.unifySpinBtns || sunken/* || GTK_STATE_PRELIGHT==state*/))
-        {
+    if (spinUp || spinDown) {
+        if(!opts.unifySpin && (!opts.unifySpinBtns || sunken/* || GTK_STATE_PRELIGHT==state*/)) {
             EWidget      wid=spinUp ? WIDGET_SPIN_UP : WIDGET_SPIN_DOWN;
             GdkRectangle *a=area,
                          b,
@@ -2146,8 +2145,11 @@ static void gtkDrawExtension(GtkStyle *style, GdkWindow *window, GtkStateType st
     }
 }
 
-static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area,
-                          GtkWidget *widget, const gchar *detail, gint x, gint y, gint width, gint height, GtkOrientation orientation)
+static void
+gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state,
+              GtkShadowType shadow, GdkRectangle *area, GtkWidget *widget,
+              const gchar *detail, gint x, gint y, gint width, gint height,
+              GtkOrientation orientation)
 {
     g_return_if_fail(GTK_IS_STYLE(style));
     g_return_if_fail(window != NULL);
@@ -2162,22 +2164,21 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
 
     sanitizeSize(window, &width, &height);
 
-    if(scrollbar || SLIDER_TRIANGULAR!=opts.sliderStyle)
-    {
-        GdkColor newColors[TOTAL_SHADES+1],
-                *btnColors;
-        int      min=MIN_SLIDER_SIZE(opts.sliderThumbs);
+    if (scrollbar || SLIDER_TRIANGULAR!=opts.sliderStyle) {
+        GdkColor newColors[TOTAL_SHADES + 1];
+        GdkColor *btnColors = qtcPalette.background;
+        int min = MIN_SLIDER_SIZE(opts.sliderThumbs);
 
-    #ifdef INCREASE_SB_SLIDER
-        if(scrollbar)
-            lastSlider.widget=NULL;
-    #endif
+#ifdef INCREASE_SB_SLIDER
+        if (scrollbar)
+            lastSlider.widget = NULL;
+#endif
         /* Fix Java swing sliders looking pressed */
         if(!scrollbar && GTK_STATE_ACTIVE==state)
             state=GTK_STATE_PRELIGHT;
 
-        if(useButtonColor(detail))
-        {
+        // FIXME, need to update useButtonColor if the logic below changes
+        if (useButtonColor(detail)) {
             if(scrollbar|scale && GTK_STATE_INSENSITIVE==state)
                 btnColors=qtcPalette.background;
             else if(QT_CUSTOM_COLOR_BUTTON(style))
