@@ -34,16 +34,6 @@
 #define CAIRO_GRAD_END 1.0
 #endif
 
-#define CAIRO_BEGIN                             \
-    if (GDK_IS_DRAWABLE(window)) {              \
-    cairo_t *cr = gdk_cairo_create(window);     \
-    setCairoClipping(cr, area);                 \
-    cairo_set_line_width(cr, 1.0);
-
-#define CAIRO_END                               \
-    cairo_destroy(cr);                          \
-    }
-
 void clipToRegion(cairo_t *cr, QtcRegion *region);
 void setCairoClippingRegion(cairo_t *cr, QtcRegion *region);
 void setCairoClipping(cairo_t *cr, GdkRectangle *area);

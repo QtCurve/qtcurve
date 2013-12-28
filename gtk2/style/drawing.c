@@ -2682,43 +2682,41 @@ void drawTreeViewLines(cairo_t *cr, GdkColor *col, int x, int y, int h, int dept
 
 void drawPolygon(GdkWindow *window, GtkStyle *style, GdkColor *col, GdkRectangle *area, GdkPoint *points, int npoints, gboolean fill)
 {
+    g_return_if_fail(GTK_IS_STYLE(style));
+    g_return_if_fail(GDK_IS_DRAWABLE(window));
 #if (defined QTC_GTK2_USE_CAIRO_FOR_ARROWS) || GTK_CHECK_VERSION(2, 90, 0)
-    CAIRO_BEGIN
-        int i;
-    cairo_antialias_t aa = cairo_get_antialias(cr);
+    cairo_t *cr = gdk_cairo_create(window);
+    cairo_set_line_width(cr, 1.0);
     setCairoClipping(cr, area);
     cairo_set_source_rgb(cr, CAIRO_COL(*col));
     cairo_set_antialias(cr, CAIRO_ANTIALIAS_NONE);
-    cairo_move_to(cr, points[0].x+0.5, points[0].y+0.5);
-    for(i=0; i<npoints; ++i)
-        cairo_line_to(cr, points[i].x+0.5, points[i].y+0.5);
+    cairo_move_to(cr, points[0].x + 0.5, points[0].y + 0.5);
+    for (int i = 0;i < npoints;i++)
+        cairo_line_to(cr, points[i].x + 0.5, points[i].y + 0.5);
     cairo_close_path(cr);
     cairo_stroke_preserve(cr);
-    if(fill)
+    if (fill)
         cairo_fill(cr);
-    cairo_set_antialias(cr, aa);
-    cairo_restore(cr);
-    CAIRO_END
+    cairo_destroy(cr);
 #else
-        QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
+    QtCurveStyle *qtcurveStyle = (QtCurveStyle*)style;
 
-    if(!qtcurveStyle->arrow_gc)
-    {
-        qtcurveStyle->arrow_gc=gdk_gc_new(window);
+    if (!qtcurveStyle->arrow_gc) {
+        qtcurveStyle->arrow_gc = gdk_gc_new(window);
         g_object_ref(qtcurveStyle->arrow_gc);
     }
 
     gdk_rgb_find_color(style->colormap, col);
     gdk_gc_set_foreground(qtcurveStyle->arrow_gc, col);
 
-    if(area)
+    if (area)
         gdk_gc_set_clip_rectangle(qtcurveStyle->arrow_gc, area);
 
     gdk_draw_polygon(window, qtcurveStyle->arrow_gc, FALSE, points, npoints);
-    if(fill)
+    if (fill)
         gdk_draw_polygon(window, qtcurveStyle->arrow_gc, TRUE, points, npoints);
 
-    if(area)
+    if (area)
         gdk_gc_set_clip_rectangle(qtcurveStyle->arrow_gc, NULL);
 #endif
 }
@@ -2851,14 +2849,23 @@ static void ge_cairo_transform_for_layout(cairo_t *cr, PangoLayout *layout, int 
         cairo_translate(cr, x, y);
 }
 
-void drawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state, gboolean use_text, GdkRectangle *area, gint x, gint y, PangoLayout *layout)
+void
+drawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state,
+           gboolean use_text, GdkRectangle *area, gint x, gint y,
+           PangoLayout *layout)
 {
-    CAIRO_BEGIN
-        gdk_cairo_set_source_color(cr, use_text || GTK_STATE_INSENSITIVE==state ? &style->text[state] : &style->fg[state]);
+    g_return_if_fail(GTK_IS_STYLE(style));
+    g_return_if_fail(GDK_IS_DRAWABLE(window));
+    cairo_t *cr = gdk_cairo_create(window);
+    setCairoClipping(cr, area);
+    cairo_set_line_width(cr, 1.0);
+    gdk_cairo_set_source_color(cr, use_text ||
+                               state == GTK_STATE_INSENSITIVE ?
+                               &style->text[state] : &style->fg[state]);
     ge_cairo_transform_for_layout(cr, layout, x, y);
     pango_cairo_show_layout(cr, layout);
-    CAIRO_END
-        }
+    cairo_destroy(cr);
+}
 
 void fillTab(cairo_t *cr, GtkStyle *style, GtkWidget *widget, GdkRectangle *area, GtkStateType state,
              GdkColor *col, int x, int y, int width, int height, gboolean horiz, EWidget tab, gboolean grad)
