@@ -82,13 +82,6 @@ typedef struct
 static QtCSlider lastSlider;
 #endif
 
-#if GTK_CHECK_VERSION(2, 90, 0)
-    #define FN_CHECK g_return_if_fail(GTK_IS_STYLE(style));
-#else
-    #define FN_CHECK g_return_if_fail(GTK_IS_STYLE(style)); g_return_if_fail(window != NULL);
-#endif
-
-#define STYLE style
 #define WIDGET_TYPE_NAME(xx) (widget && !strcmp(g_type_name (G_TYPE_FROM_INSTANCE(widget)), (xx)))
 
 static void gtkDrawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area,
@@ -393,10 +386,10 @@ static void gtkDrawHandle(GtkStyle *style, GdkWindow *window, GtkStateType state
                           GtkWidget *widget, const gchar *detail, gint x, gint y, gint width, gint height, GtkOrientation orientation)
 {
     QTC_UNUSED(orientation);
+    g_return_if_fail(GTK_IS_STYLE(style));
+    g_return_if_fail(window != NULL);
     gboolean paf=WIDGET_TYPE_NAME("PanelAppletFrame");
     CAIRO_BEGIN
-
-    FN_CHECK
 
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %s  ", __FUNCTION__, state, shadow, width, height, detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 10);
@@ -1219,8 +1212,8 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                     int          bg=SHADE_DARKEN==opts.comboBtn || (GTK_STATE_INSENSITIVE==state && SHADE_NONE!=opts.comboBtn)
                                         ? getFillReal(state, btnDown, true) : bgnd;
 
-                    btn.x=cx + (rev ? ind_width+STYLE->xthickness
-                                    : (cwidth - ind_width - STYLE->xthickness)+1),
+                    btn.x=cx + (rev ? ind_width + style->xthickness
+                                    : (cwidth - ind_width - style->xthickness)+1),
                     btn.y=y, btn.width=ind_width+3, btn.height=height;
 
                     if(!opts.comboSplitter)
@@ -1246,13 +1239,13 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                     if(sunken)
                         cx++, cy++, cheight--;
 
-                    drawFadedLine(cr, cx + (rev ? ind_width+STYLE->xthickness : (cwidth - ind_width - STYLE->xthickness)),
-                                      cy + STYLE->ythickness-1, 1, cheight-3,
+                    drawFadedLine(cr, cx + (rev ? ind_width+style->xthickness : (cwidth - ind_width - style->xthickness)),
+                                      cy + style->ythickness-1, 1, cheight-3,
                                   &btnColors[darkLine], area, NULL, TRUE, TRUE, FALSE);
 
                     if(!sunken)
-                        drawFadedLine(cr, cx + 1 + (rev ? ind_width+STYLE->xthickness : (cwidth - ind_width - STYLE->xthickness)),
-                                          cy + STYLE->ythickness-1, 1, cheight-3,
+                        drawFadedLine(cr, cx + 1 + (rev ? ind_width+style->xthickness : (cwidth - ind_width - style->xthickness)),
+                                          cy + style->ythickness-1, 1, cheight-3,
                                       &btnColors[0], area, NULL, TRUE, TRUE, FALSE);
                 }
             } else if((button || togglebutton) && (combo || combo_entry)) {
@@ -2109,8 +2102,9 @@ gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state,
               GtkPositionType gapSide, gint gapX, gint gapWidth)
 {
     QTC_UNUSED(shadow);
+    g_return_if_fail(GTK_IS_STYLE(style));
+    g_return_if_fail(window != NULL);
     CAIRO_BEGIN
-    FN_CHECK
 
     if((opts.thin&THIN_FRAMES) && 0==gapX)
         gapX--, gapWidth+=2;
@@ -2131,26 +2125,30 @@ gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state,
 static void gtkDrawExtension(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area,
                              GtkWidget *widget, const gchar *detail, gint x, gint y, gint width, gint height, GtkPositionType gapSide)
 {
+    g_return_if_fail(GTK_IS_STYLE(style));
+    g_return_if_fail(window != NULL);
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %s  ", __FUNCTION__, state, shadow, gapSide, x, y, width, height,
                                            detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 10);
 
     sanitizeSize(window, &width, &height);
 
-    if (DETAIL ("tab"))
-    {
-        FN_CHECK
-        CAIRO_BEGIN
-        drawTab(cr, state, style, widget, detail, area, x, y, width, height, gapSide);
-        CAIRO_END
+    if (DETAIL("tab")) {
+        CAIRO_BEGIN;
+        drawTab(cr, state, style, widget, detail, area, x, y, width, height,
+                gapSide);
+        CAIRO_END;
+    } else {
+        parent_class->draw_extension(style, window, state, shadow, area, widget,
+                                     detail, x, y, width, height, gapSide);
     }
-    else
-        parent_class->draw_extension(style, window, state, shadow, area, widget, detail, x, y, width, height, gapSide);
 }
 
 static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area,
                           GtkWidget *widget, const gchar *detail, gint x, gint y, gint width, gint height, GtkOrientation orientation)
 {
+    g_return_if_fail(GTK_IS_STYLE(style));
+    g_return_if_fail(window != NULL);
     gboolean scrollbar=DETAIL("slider"),
              scale=DETAIL("hscale") || DETAIL("vscale");
 
@@ -2160,7 +2158,6 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
 
     CAIRO_BEGIN
 
-    FN_CHECK
     sanitizeSize(window, &width, &height);
 
     if(scrollbar || SLIDER_TRIANGULAR!=opts.sliderStyle)
@@ -2279,11 +2276,12 @@ gtkDrawShadowGap(GtkStyle *style, GdkWindow *window, GtkStateType state,
 static void gtkDrawHLine(GtkStyle *style, GdkWindow *window, GtkStateType state, GdkRectangle *area, GtkWidget *widget,
                          const gchar *detail, gint x1, gint x2, gint y)
 {
+    g_return_if_fail(GTK_IS_STYLE(style));
+    g_return_if_fail(window != NULL);
     gboolean tbar=DETAIL("toolbar");
     int      light=0,
              dark=tbar ? (LINE_FLAT==opts.toolbarSeparators ? 4 : 3) : 5;
 
-    FN_CHECK
     CAIRO_BEGIN
 
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %s  ", __FUNCTION__, state, x1, x2, y, detail ? detail : "NULL"),
@@ -2350,7 +2348,8 @@ static void gtkDrawHLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
 static void gtkDrawVLine(GtkStyle *style, GdkWindow *window, GtkStateType state, GdkRectangle *area, GtkWidget *widget,
                          const gchar *detail, gint y1, gint y2, gint x)
 {
-    FN_CHECK
+    g_return_if_fail(GTK_IS_STYLE(style));
+    g_return_if_fail(window != NULL);
     CAIRO_BEGIN
 
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %s  ", __FUNCTION__, state, x, y1, y2, detail ? detail : "NULL"),
@@ -2629,7 +2628,8 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
 static void gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType state, GdkRectangle *area, GtkWidget *widget,
                               const gchar *detail, GdkWindowEdge edge, gint x, gint y, gint width, gint height)
 {
-    FN_CHECK
+    g_return_if_fail(GTK_IS_STYLE(style));
+    g_return_if_fail(window != NULL);
     CAIRO_BEGIN
 
     int size=SIZE_GRIP_SIZE-2;
@@ -2722,7 +2722,7 @@ static void styleRealize(GtkStyle *style)
         qtcurveStyle->menutext[0]=NULL;
 
 #if !GTK_CHECK_VERSION(2, 90, 0) && !defined QTC_GTK2_USE_CAIRO_FOR_ARROWS
-    qtcurveStyle->arrow_gc=NULL;
+    qtcurveStyle->arrow_gc = NULL;
 #endif
 }
 
