@@ -1753,17 +1753,22 @@ gboolean qtSettingsInit()
 */
 
             /* Check if we're firefox... */
-            if((qtSettings.appName=getAppName()))
-            {
-                gboolean firefox=isMozApp(qtSettings.appName, "firefox") || isMozApp(qtSettings.appName, "iceweasel") ||
-                                 isMozApp(qtSettings.appName, "swiftfox") || isMozApp(qtSettings.appName, "xulrunner") ||
-                                 isMozApp(qtSettings.appName, "abrowser"),
-                         thunderbird=!firefox && (isMozApp(qtSettings.appName, "thunderbird") || isMozApp(qtSettings.appName, "icedove")),
-                         mozThunderbird=!thunderbird && !firefox && isMozApp(qtSettings.appName, "mozilla-thunderbird"),
-                         seamonkey=!thunderbird && !firefox && !mozThunderbird && isMozApp(qtSettings.appName, "seamonkey");
+            if ((qtSettings.appName = getAppName())) {
+                bool firefox = (isMozApp(qtSettings.appName, "firefox") ||
+                                isMozApp(qtSettings.appName, "iceweasel") ||
+                                isMozApp(qtSettings.appName, "swiftfox") ||
+                                isMozApp(qtSettings.appName, "xulrunner") ||
+                                isMozApp(qtSettings.appName, "abrowser"));
+                bool thunderbird =
+                    (!firefox && (isMozApp(qtSettings.appName, "thunderbird") ||
+                                  isMozApp(qtSettings.appName, "icedove")));
+                bool mozThunderbird =
+                    (!thunderbird && !firefox &&
+                     isMozApp(qtSettings.appName, "mozilla-thunderbird"));
+                bool seamonkey = (!thunderbird && !firefox && !mozThunderbird &&
+                                  isMozApp(qtSettings.appName, "seamonkey"));
 
-                if(firefox || thunderbird || mozThunderbird || seamonkey)
-                {
+                if (firefox || thunderbird || mozThunderbird || seamonkey) {
                     GdkColor *menu_col=SHADE_CUSTOM==opts.shadeMenubars
                                         ? &opts.customMenubarsColor
                                         : &qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED];
@@ -1775,11 +1780,13 @@ gboolean qtSettingsInit()
 
                     if (firefox) {
                         processMozillaApp(0, add_menu_colors, "firefox", TRUE);
+                    } else if (thunderbird) {
+                        processMozillaApp(add_btn_css, add_menu_colors,
+                                          "thunderbird", FALSE);
+                    } else if (mozThunderbird) {
+                        processMozillaApp(add_btn_css, add_menu_colors,
+                                          "mozilla-thunderbird", FALSE);
                     }
-                    else if(thunderbird)
-                        processMozillaApp(add_btn_css, add_menu_colors, "thunderbird", FALSE);
-                    else if(mozThunderbird)
-                        processMozillaApp(add_btn_css, add_menu_colors, "mozilla-thunderbird", FALSE);
 
                     qtSettings.app = (firefox ?
                                       GTK_APP_NEW_MOZILLA : GTK_APP_MOZILLA);
@@ -1840,12 +1847,15 @@ gboolean qtSettingsInit()
             if(IMG_NONE!=opts.bgndImage.type && excludedApp(opts.noBgndImageApps))
                 opts.bgndImage.type=IMG_NONE;
 
-            if (isMozilla() || GTK_APP_FLASH_PLUGIN == qtSettings.app ||
-                GTK_APP_OPEN_OFFICE == qtSettings.app ||
-                GTK_APP_JAVA == qtSettings.app ||
-                GTK_APP_JAVA_SWT == qtSettings.app) {
-                opts.bgndOpacity=opts.dlgOpacity=opts.menuBgndOpacity=100;
-                qtSettings.useAlpha=false;
+            if (/* isMozilla() || */ qtSettings.app == GTK_APP_FLASH_PLUGIN ||
+                qtSettings.app == GTK_APP_OPEN_OFFICE ||
+                qtSettings.app == GTK_APP_JAVA ||
+                qtSettings.app == GTK_APP_JAVA_SWT) {
+                opts.bgndOpacity = opts.dlgOpacity = opts.menuBgndOpacity = 100;
+                qtSettings.useAlpha = false;
+            } else if (isMozilla() && !getenv("QTCURVE_MOZ_TEST")) {
+                opts.bgndOpacity = opts.dlgOpacity = opts.menuBgndOpacity = 100;
+                qtSettings.useAlpha = false;
             }
 
             if(excludedApp(opts.noBgndOpacityApps))
