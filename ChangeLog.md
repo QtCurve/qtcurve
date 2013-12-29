@@ -1,26 +1,26 @@
 ## 1.8.18 (WIP)
-1. Remove mozilla version detection.
-2. Remove `QTC_GTK2_OLD_MOZILLA`.
+1. Gtk2: Remove mozilla version detection.
+2. Gtk2: Remove `QTC_GTK2_OLD_MOZILLA`.
 3. Remove `xcb-image` dependency. It is never used.
-4. Fix old configure file loading in gtk2 version.
+4. Gtk2: Fix old configure file loading in gtk2 version.
    Thanks to Lars Wendler for noticing this.
-5. Fix compile without Qt
+5. Qt4: Fix compile without Qt
 6. Relicense under LGPL. With permission from all contributors in the git log.
-7. Treat `Qt::Sheet` as `Qt::Dialog`. This fixes translucent background for
+7. Qt: Treat `Qt::Sheet` as `Qt::Dialog`. This fixes translucent background for
    close confirmation dialog in QtDesigner.
 8. Remove backward compatible options.
-9. Introduce `prePolish()` to Workaround a bug in Qt5 which make it impossible
-   for QMainWindow and QDialog to be transparent.
+9. Qt5: Introduce `prePolish()` to Workaround a bug in Qt5 which make it
+   impossible for QMainWindow and QDialog to be transparent.
    [Qt-Bug](https://bugreports.qt-project.org/browse/QTBUG-34064)
-10. Fix compilation without X11 enabled.
-11. Use `prePolish()` in qt4, this fixes most of application crashes.
-12. Fix Qt menubar background when translucency is enabled.
-13. Fix flash plugin in non-chromium/firefox browsers in linux when translucent
-    background is enabled for gtk.
-14. Fix (workaround) kaffeine with translucent background.
+10. Qt4: Fix compilation without X11 enabled.
+11. Qt4: Use `prePolish()` in qt4, this fixes most of application crashes.
+12. Qt: Fix Qt menubar background when translucency is enabled.
+13. Gtk2: Fix flash plugin in non-chromium/firefox browsers in linux when
+    translucent background is enabled for gtk.
+14. Qt4: Fix (workaround) kaffeine with translucent background.
 15. Remove parentless dialog fix
-16. Fix kscreenlocker. Second version of prepolishing
-17. Improve shadow of QBalloonTip
+16. Qt4: Fix kscreenlocker. Second version of prepolishing
+17. Qt: Improve shadow of QBalloonTip
 18. Draw shadow at runtime. Prepare for more advanced shadow feature and
     configuration.
 

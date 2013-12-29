@@ -118,7 +118,7 @@ bool haveAlternateListViewCol();
 gboolean isMozilla();
 gboolean isMozillaTab(GtkWidget *widget);
 gboolean isFakeGtk();
-GdkColor * menuColors(gboolean active);
+GdkColor *menuColors(gboolean active);
 EBorder shadowToBorder(GtkShadowType shadow);
 gboolean useButtonColor(const gchar *detail);
 void qtcShadeColors(GdkColor *base, GdkColor *vals);

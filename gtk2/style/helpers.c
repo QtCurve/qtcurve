@@ -244,8 +244,8 @@ isOnToolbar(GtkWidget *widget, gboolean *horiz, int level)
     if (widget) {
         if (GTK_IS_TOOLBAR(widget)) {
             if (horiz)
-                *horiz = (GTK_ORIENTATION_HORIZONTAL ==
-                          qtcToolbarGetOrientation(widget));
+                *horiz = (qtcToolbarGetOrientation(widget) ==
+                          GTK_ORIENTATION_HORIZONTAL);
             return TRUE;
         } else if (level < 4) {
             return isOnToolbar(gtk_widget_get_parent(widget), horiz, level + 1);
