@@ -1829,9 +1829,8 @@ gboolean qtSettingsInit()
             if(GTK_APP_JAVA==qtSettings.app)
                 opts.sliderStyle=SLIDER_PLAIN;
 
-            if (GTK_APP_JAVA == qtSettings.app ||
-                GTK_APP_JAVA_SWT == qtSettings.app || isMozilla() ||
-                GTK_APP_OPEN_OFFICE == qtSettings.app) {
+            if (qtcOneOf(qtSettings.app, GTK_APP_JAVA, GTK_APP_JAVA_SWT,
+                         GTK_APP_OPEN_OFFICE) || isMozilla()) {
                 opts.square |= SQUARE_POPUP_MENUS;
                 opts.bgndAppearance = APPEARANCE_FLAT;
                 opts.bgndImage.type = IMG_NONE;
@@ -1847,13 +1846,9 @@ gboolean qtSettingsInit()
             if(IMG_NONE!=opts.bgndImage.type && excludedApp(opts.noBgndImageApps))
                 opts.bgndImage.type=IMG_NONE;
 
-            if (/* isMozilla() || */ qtSettings.app == GTK_APP_FLASH_PLUGIN ||
-                qtSettings.app == GTK_APP_OPEN_OFFICE ||
-                qtSettings.app == GTK_APP_JAVA ||
-                qtSettings.app == GTK_APP_JAVA_SWT) {
-                opts.bgndOpacity = opts.dlgOpacity = opts.menuBgndOpacity = 100;
-                qtSettings.useAlpha = false;
-            } else if (isMozilla() && !getenv("QTCURVE_MOZ_TEST")) {
+            if (qtcOneOf(qtSettings.app, GTK_APP_FLASH_PLUGIN,
+                         GTK_APP_OPEN_OFFICE, GTK_APP_JAVA, GTK_APP_JAVA_SWT) ||
+                (isMozilla() && !getenv("QTCURVE_MOZ_TEST"))) {
                 opts.bgndOpacity = opts.dlgOpacity = opts.menuBgndOpacity = 100;
                 qtSettings.useAlpha = false;
             }

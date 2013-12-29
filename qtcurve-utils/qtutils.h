@@ -65,31 +65,35 @@ qtcGetWid(const QWidget *w)
     return w->internalWinId();
 }
 
+QTC_ALWAYS_INLINE static inline Qt::WindowType
+qtcGetWindowType(const QWidget *w)
+{
+    return w ? w->windowType() : (Qt::WindowType)0;
+}
+
 QTC_ALWAYS_INLINE static inline bool
 qtcIsDialog(const QWidget *w)
 {
-    Qt::WindowType type = w ? w->windowType() : (Qt::WindowType)0;
-    return type == Qt::Dialog || type == Qt::Sheet;
+    return qtcOneOf(qtcGetWindowType(w), Qt::Dialog, Qt::Sheet);
 }
 
 QTC_ALWAYS_INLINE static inline bool
 qtcIsWindow(const QWidget *w)
 {
-    return w && w->windowType() == Qt::Window;
+    return qtcOneOf(qtcGetWindowType(w), Qt::Window);
 }
 
 QTC_ALWAYS_INLINE static inline bool
 qtcIsToolTip(const QWidget *w)
 {
-    Qt::WindowType type = w ? w->windowType() : (Qt::WindowType)0;
-    return (type == Qt::Tool || type == Qt::SplashScreen ||
-            type == Qt::ToolTip || type == Qt::Drawer);
+    return qtcOneOf(qtcGetWindowType(w), Qt::Tool, Qt::SplashScreen,
+                    Qt::ToolTip, Qt::Drawer);
 }
 
 QTC_ALWAYS_INLINE static inline bool
 qtcIsPopup(const QWidget *w)
 {
-    return w && w->windowType() == Qt::Popup;
+    return qtcOneOf(qtcGetWindowType(w), Qt::Popup);
 }
 
 QTC_ALWAYS_INLINE static inline QWidget*

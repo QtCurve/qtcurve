@@ -208,4 +208,35 @@ int qtcStrMapSearch(const QtcStrMap *map, const char *key, int def);
 
 QTC_END_DECLS
 
+#ifdef __cplusplus
+template<typename T, typename First>
+QTC_ALWAYS_INLINE static inline bool
+qtcOneOf(T &&value, First &&first)
+{
+    return value == first;
+}
+template<typename T, typename First, typename... Rest>
+QTC_ALWAYS_INLINE static inline bool
+qtcOneOf(T &&value, First &&first, Rest &&...rest...)
+{
+    return value == first || qtcOneOf(std::forward<T>(value),
+                                      std::forward<Rest>(rest)...);
+}
+#else
+#define qtcOneOf(exp, args...)                                  \
+    ({                                                          \
+        const typeof((exp)) __val = (exp);                      \
+        const typeof((exp)) __args[] = {args};                  \
+        size_t __arg_n = sizeof(__args) / sizeof(__args[0]);    \
+        bool __res = false;                                     \
+        for (size_t __i = 0;__i < __arg_n;__i++) {              \
+            if (__val == __args[__i]) {                         \
+                __res = true;                                   \
+                break;                                          \
+            }                                                   \
+        }                                                       \
+        __res;                                                  \
+    })
+#endif
+
 #endif
