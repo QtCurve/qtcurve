@@ -37,14 +37,12 @@
 void clipToRegion(cairo_t *cr, QtcRegion *region);
 void setCairoClippingRegion(cairo_t *cr, QtcRegion *region);
 void setCairoClipping(cairo_t *cr, GdkRectangle *area);
-void drawHLine(cairo_t *cr, double r, double g, double b, double a,
-               int x, int y, int w);
-void drawVLine(cairo_t *cr, double r, double g, double b, double a,
-               int x, int y, int h);
-void drawAreaColor(cairo_t *cr, GdkRectangle *area, GdkColor *col,
+void drawHLine(cairo_t *cr, const GdkColor *col, double a, int x, int y, int w);
+void drawVLine(cairo_t *cr, const GdkColor *col, double a, int x, int y, int h);
+void drawAreaColor(cairo_t *cr, GdkRectangle *area, const GdkColor *col,
                    gint x, gint y, gint width, gint height, double alpha);
 QTC_ALWAYS_INLINE static inline void
-_drawAreaColor(cairo_t *cr, GdkRectangle *area, GdkColor *col,
+_drawAreaColor(cairo_t *cr, GdkRectangle *area, const GdkColor *col,
                gint x, gint y, gint width, gint height)
 {
     drawAreaColor(cr, area, col, x, y, width, height, 1);
@@ -165,7 +163,8 @@ void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight, gbool
 void drawDot(cairo_t *cr, int x, int y, int w, int h, GdkColor *cols);
 void drawDots(cairo_t *cr, int rx, int ry, int rwidth, int rheight, gboolean horiz, int nLines, int offset, GdkColor *cols, GdkRectangle *area,
                      int startOffset, int dark);
-void drawEntryCorners(cairo_t *cr, GdkRectangle *area, int round, int x, int y, int width, int height, double r, double g, double b, double a);
+void drawEntryCorners(cairo_t *cr, GdkRectangle *area, int round, int x, int y,
+                      int width, int height, const GdkColor *col, double a);
 void drawBgndRing(cairo_t *cr, int x, int y, int size, int size2, gboolean isWindow);
 void drawBgndRings(cairo_t *cr, gint x, gint y, gint width, gint height, gboolean isWindow);
 void drawBgndImage(cairo_t *cr, GtkStyle *style, GdkRectangle *area, gint x, gint y, gint w, gint h, GdkColor *col,

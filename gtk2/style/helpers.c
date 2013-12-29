@@ -973,7 +973,7 @@ void setLowerEtchCol(cairo_t *cr, GtkWidget *widget)
         if (parentBg) {
             GdkColor col;
             qtcShade(parentBg, &col, 1.06, opts.shading);
-            cairo_set_source_rgb(cr, CAIRO_COL(col));
+            qtcCairoSetColor(cr, &col);
         } else {
             cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 0.1); // 0.25);
         }

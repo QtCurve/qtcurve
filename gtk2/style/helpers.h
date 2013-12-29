@@ -29,7 +29,38 @@
 #include "config.h"
 #include "compatability.h"
 
-#define CAIRO_COL(A)  (A).red/65535.0, (A).green/65535.0, (A).blue/65535.0
+QTC_ALWAYS_INLINE static inline void
+qtcCairoSetColor(cairo_t *cr, const GdkColor *col, double a)
+{
+    cairo_set_source_rgba(cr, col->red / 65535.0, col->green / 65535.0,
+                          col->blue / 65535.0, a);
+}
+QTC_ALWAYS_INLINE static inline void
+_qtcCairoSetColor(cairo_t *cr, const GdkColor *col)
+{
+    qtcCairoSetColor(cr, col, 1);
+}
+#define qtcCairoSetColor(cr, col, a...)                 \
+    QTC_SWITCH_(a, qtcCairoSetColor)(cr, col, ##a)
+
+QTC_ALWAYS_INLINE static inline void
+qtcCairoPatternAddColorStop(cairo_pattern_t *pt, double offset,
+                            const GdkColor *col, double a)
+{
+    cairo_pattern_add_color_stop_rgba(pt, offset, col->red / 65535.0,
+                                      col->green / 65535.0,
+                                      col->blue / 65535.0, a);
+}
+
+QTC_ALWAYS_INLINE static inline void
+_qtcCairoPatternAddColorStop(cairo_pattern_t *pt, double offset,
+                             const GdkColor *col)
+{
+    qtcCairoPatternAddColorStop(pt, offset, col, 1);
+}
+#define qtcCairoPatternAddColorStop(pt, offset, col, a...)              \
+    QTC_SWITCH_(a, qtcCairoPatternAddColorStop)(pt, offset, col, ##a)
+
 #define DETAIL(xx)    ((detail) &&(!strcmp(xx, detail)))
 #define DETAILHAS(xx) ((detail) && (strstr(detail, xx)))
 
