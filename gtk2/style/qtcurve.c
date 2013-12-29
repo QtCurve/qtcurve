@@ -679,9 +679,8 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
     int round = getRound(detail, widget, x, y, width, height, rev);
     gboolean lvh = (isListViewHeader(widget) ||
                     isEvolutionListViewHeader(widget, detail));
-    gboolean sunken = (btnDown || (GTK_IS_BUTTON(widget) &&
-                                   qtcButtonIsDepressed(widget)) ||
-                       state == GTK_STATE_ACTIVE || (bgnd == 2 || bgnd == 3));
+    gboolean sunken = (btnDown || shadow == GTK_SHADOW_IN ||
+                       state == GTK_STATE_ACTIVE || bgnd == 2 || bgnd == 3);
     GtkWidget *parent = NULL;
 
     if (button && GTK_IS_TOGGLE_BUTTON(widget)) {
@@ -781,15 +780,18 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
             drawLightBevel(cr, style, state, area, x, y, width, height-(WIDGET_SPIN_UP==wid && DO_EFFECT ? 1 : 0), &btnColors[bgnd],
                            btnColors, round, wid, BORDER_FLAT, DF_DO_BORDER|(sunken ? DF_SUNKEN : 0), widget);
         }
-    }
-    else if(DETAIL("spinbutton"))
-    {
-        if(qtcIsFlatBgnd(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, window, widget, x, y, width, height)))
-        {
-            qtcStyleApplyDefBgnd(widget && gtk_widget_get_has_window(widget),
-                                 GTK_STATE_INSENSITIVE==state ? GTK_STATE_INSENSITIVE : GTK_STATE_NORMAL);
-            if(widget && IMG_NONE!=opts.bgndImage.type)
-                drawWindowBgnd(cr, style, area, window, widget, x, y, width, height);
+    } else if (DETAIL("spinbutton")) {
+        if (qtcIsFlatBgnd(opts.bgndAppearance) ||
+            !(widget && drawWindowBgnd(cr, style, area, window, widget,
+                                       x, y, width, height))) {
+            gtk_style_apply_default_background(
+                style, window, widget && gtk_widget_get_has_window(widget),
+                state == GTK_STATE_INSENSITIVE ? GTK_STATE_INSENSITIVE :
+                GTK_STATE_NORMAL, area, x, y, width, height);
+            if (widget && opts.bgndImage.type != IMG_NONE) {
+                drawWindowBgnd(cr, style, area, window, widget, x, y,
+                               width, height);
+            }
         }
 
         if(opts.unifySpin)
@@ -965,7 +967,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 WIDGET_SB_SLIDER==widgetType && GTK_STATE_INSENSITIVE!=state && GTK_IS_RANGE(widget))
             {
                 GtkAllocation alloc = qtcWidgetGetAllocation(widget);
-                gboolean horizontal = qtcRangeGetOrientation(widget) != GTK_ORIENTATION_HORIZONTAL;
+                gboolean horizontal = !qtcWidgetIsHorizontal(widget);
                 int sbarTroughLen = (horizontal ? alloc.height : alloc.width) -
                     ((qtcRangeHasStepperA(widget) ? opts.sliderWidth : 0) +
                      (qtcRangeHasStepperB(widget) ? opts.sliderWidth : 0) +
@@ -985,7 +987,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 /*&& !(GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver)*/)
             {
                 GtkAdjustment *adj = gtk_range_get_adjustment(GTK_RANGE(widget));
-                gboolean horizontal = GTK_ORIENTATION_HORIZONTAL==qtcRangeGetOrientation(widget),
+                gboolean horizontal = qtcWidgetIsHorizontal(widget),
 #if GTK_CHECK_VERSION(2, 90, 0)
                               hasStartStepper = SCROLLBAR_PLATINUM!=opts.scrollbarType,
                               hasEndStepper   = SCROLLBAR_NEXT!=opts.scrollbarType,
@@ -1022,12 +1024,14 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
 #if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
             if(GTK_APP_OPEN_OFFICE==qtSettings.app && opts.flatSbarButtons && slider &&
                 (SCROLLBAR_KDE==opts.scrollbarType || SCROLLBAR_WINDOWS==opts.scrollbarType) &&
-                widget && GTK_IS_RANGE(widget) && isFixedWidget(widget))
-            {
-                if (qtcRangeGetOrientation(widget)!=GTK_ORIENTATION_HORIZONTAL)
-                    y++, height--;
-                else
-                    x+=2, width-=2;
+                widget && GTK_IS_RANGE(widget) && isFixedWidget(widget)) {
+                if (!qtcWidgetIsHorizontal(widget)) {
+                    y++;
+                    height--;
+                } else {
+                    x += 2;
+                    width -= 2;
+                }
             }
 #endif
             if(WIDGET_COMBO==widgetType && !opts.gtkComboMenus && !isMozilla() &&
@@ -1323,9 +1327,8 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                  pbar=list || GTK_IS_PROGRESS_BAR(widget),
                  scale=!pbar && GTK_IS_SCALE(widget);
         /* int border = BORDER_VAL(GTK_STATE_INSENSITIVE != state || !scale); */
-        gboolean horiz=GTK_IS_RANGE(widget)
-                        ? GTK_ORIENTATION_HORIZONTAL==qtcRangeGetOrientation(widget)
-                        : width>height;
+        gboolean horiz = (GTK_IS_RANGE(widget) ?
+                          qtcWidgetIsHorizontal(widget) : width > height);
 
         if(scale)
             drawSliderGroove(cr, style, state, window, widget, detail, area, x, y, width, height, horiz);
@@ -1454,12 +1457,15 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
     cairo_destroy(cr);
 }
 
-static void gtkDrawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area,
-                       GtkWidget *widget, const gchar *detail, gint x, gint y, gint width, gint height)
+static void
+gtkDrawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
+           GtkShadowType shadow, GdkRectangle *area, GtkWidget *widget,
+           const gchar *detail, gint x, gint y, gint width, gint height)
 {
     sanitizeSize(window, &width, &height);
-    drawBox(style, window, state, shadow, area, widget, detail, x, y, width, height,
-            GTK_STATE_ACTIVE==state || (GTK_IS_BUTTON(widget) && qtcButtonIsDepressed(widget)));
+    drawBox(style, window, state, shadow, area, widget, detail, x, y,
+            width, height,
+            state == GTK_STATE_ACTIVE || shadow == GTK_SHADOW_IN);
 }
 
 static void

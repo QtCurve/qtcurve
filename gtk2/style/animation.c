@@ -178,14 +178,14 @@ qtcAnimationUpdateInfo(gpointer key, gpointer value, gpointer user_data)
         return TRUE;
 
     if (GTK_IS_PROGRESS_BAR(widget)) {
-        gfloat fraction =
+        float fraction =
             gtk_progress_bar_get_fraction(GTK_PROGRESS_BAR(widget));
         /* stop animation for filled/not filled progress bars */
         if (fraction <= 0.0 || fraction >= 1.0) {
             return TRUE;
         }
     } else if (GTK_IS_ENTRY(widget)) {
-        gfloat fraction = gtk_entry_get_progress_fraction(GTK_ENTRY(widget));
+        float fraction = gtk_entry_get_progress_fraction(GTK_ENTRY(widget));
 
         /* stop animation for filled/not filled progress bars */
         if(fraction <= 0.0 || fraction >= 1.0) {

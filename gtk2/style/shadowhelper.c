@@ -39,31 +39,31 @@ installX11Shadows(GtkWidget* widget)
     qtcX11ShadowInstall(GDK_WINDOW_XID(window));
 }
 
-static gboolean
+static bool
 acceptWidget(GtkWidget* widget)
 {
     if (DEBUG_ALL == qtSettings.debug)
         printf(DEBUG_PREFIX "%s %p\n", __FUNCTION__, widget);
 
     if (widget && GTK_IS_WINDOW(widget)) {
-        if (GTK_APP_OPEN_OFFICE == qtSettings.app) {
-            return TRUE;
+        if (qtSettings.app == GTK_APP_OPEN_OFFICE) {
+            return true;
         } else {
             GdkWindowTypeHint hint =
                 gtk_window_get_type_hint(GTK_WINDOW(widget));
             if (DEBUG_ALL == qtSettings.debug)
                 printf(DEBUG_PREFIX "%s %d\n", __FUNCTION__, (int)hint);
-            return
-                hint == GDK_WINDOW_TYPE_HINT_MENU ||
-                hint == GDK_WINDOW_TYPE_HINT_DROPDOWN_MENU ||
-                hint == GDK_WINDOW_TYPE_HINT_POPUP_MENU ||
-                hint == GDK_WINDOW_TYPE_HINT_COMBO ||
-                hint == GDK_WINDOW_TYPE_HINT_TOOLTIP /* || */
-                /* (hint == GDK_WINDOW_TYPE_HINT_UTILITY && !qtcWidgetGetParent(widget) && isMozilla()) */ // Firefox URL combo
-                ;
+            return (hint == GDK_WINDOW_TYPE_HINT_MENU ||
+                    hint == GDK_WINDOW_TYPE_HINT_DROPDOWN_MENU ||
+                    hint == GDK_WINDOW_TYPE_HINT_POPUP_MENU ||
+                    hint == GDK_WINDOW_TYPE_HINT_COMBO ||
+                    hint == GDK_WINDOW_TYPE_HINT_TOOLTIP /* || */
+                    /* (hint == GDK_WINDOW_TYPE_HINT_UTILITY && */
+                    /*  !qtcWidgetGetParent(widget) && isMozilla()) */
+                    /* // Firefox URL combo */);
         }
     }
-    return FALSE;
+    return false;
 }
 
 static gboolean

@@ -59,12 +59,39 @@ qtcWidgetGetRequisition(GtkWidget *widget)
     return req;
 }
 
-static inline gfloat
+static inline float
 qtcFrameGetLabelYAlign(GtkFrame *f)
 {
-    gfloat x, y;
+    float x, y;
     gtk_frame_get_label_align(f, &x, &y);
     return y;
+}
+
+static inline GtkOrientation
+qtcWidgetGetOrientation(GtkWidget *widget)
+{
+    return gtk_orientable_get_orientation(GTK_ORIENTABLE(widget));
+}
+
+static inline bool
+qtcWidgetIsHorizontal(GtkWidget *widget)
+{
+    return qtcWidgetGetOrientation(widget) == GTK_ORIENTATION_HORIZONTAL;
+}
+
+static inline bool
+qtcIsProgressBar(GtkWidget *w)
+{
+#if GTK_CHECK_VERSION(2, 90, 0)
+    if (!GTK_IS_PROGRESS_BAR(w))
+        return false;
+#else
+    if (!GTK_IS_PROGRESS(w))
+        return false;
+#endif
+    GtkAllocation alloc;
+    gtk_widget_get_allocation(w, &alloc);
+    return alloc.x != -1 && alloc.y != -1;
 }
 
 #endif

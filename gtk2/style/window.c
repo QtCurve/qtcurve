@@ -465,11 +465,11 @@ qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
         !event->is_modifier && 0 == (event->state & 0xFF00)) {
         gboolean toggled = FALSE;
         if (opts.menubarHiding & HIDE_KEYBOARD &&
-            (QTC_KEY_m == event->keyval || QTC_KEY_M == event->keyval)) {
+            (GDK_KEY_m == event->keyval || GDK_KEY_M == event->keyval)) {
             toggled = qtcWindowToggleMenuBar(widget);
         }
         if (opts.statusbarHiding & HIDE_KEYBOARD &&
-            (QTC_KEY_s == event->keyval || QTC_KEY_S == event->keyval)) {
+            (GDK_KEY_s == event->keyval || GDK_KEY_S == event->keyval)) {
             toggled = qtcWindowToggleStatusBar(widget);
         }
         if (toggled) {

@@ -54,26 +54,6 @@ haveAlternateListViewCol()
             qtSettings.colors[PAL_ACTIVE][COLOR_LV].blue != 0);
 }
 
-gboolean
-isMozilla()
-{
-    return (GTK_APP_MOZILLA == qtSettings.app ||
-            GTK_APP_NEW_MOZILLA == qtSettings.app);
-}
-
-gboolean
-isMozillaTab(GtkWidget *widget)
-{
-    return isFixedWidget(widget) && GTK_IS_NOTEBOOK(widget);
-}
-
-gboolean
-isFakeGtk()
-{
-    return (isMozilla() || GTK_APP_OPEN_OFFICE == qtSettings.app ||
-            GTK_APP_JAVA == qtSettings.app);
-}
-
 GdkColor*
 menuColors(gboolean active)
 {
@@ -244,8 +224,7 @@ isOnToolbar(GtkWidget *widget, gboolean *horiz, int level)
     if (widget) {
         if (GTK_IS_TOOLBAR(widget)) {
             if (horiz)
-                *horiz = (qtcToolbarGetOrientation(widget) ==
-                          GTK_ORIENTATION_HORIZONTAL);
+                *horiz = qtcWidgetIsHorizontal(widget);
             return TRUE;
         } else if (level < 4) {
             return isOnToolbar(gtk_widget_get_parent(widget), horiz, level + 1);
@@ -656,8 +635,8 @@ EStepper getStepper(GtkWidget *widget, int x, int y, int width, int height)
         GdkRectangle   tmp;
         GdkRectangle   check_rectangle,
                        stepper;
-        GtkOrientation orientation=qtcRangeGetOrientation(widget);
-        GtkAllocation  alloc=qtcWidgetGetAllocation(widget);
+        GtkOrientation orientation = qtcWidgetGetOrientation(widget);
+        GtkAllocation alloc = qtcWidgetGetAllocation(widget);
 
         stepper.x=x;
         stepper.y=y;
@@ -815,23 +794,22 @@ int getRound(const char *detail, GtkWidget *widget, int x, int y, int width, int
     return ROUNDED_NONE;
 }
 
-gboolean isHorizontalProgressbar(GtkWidget *widget)
+gboolean
+isHorizontalProgressbar(GtkWidget *widget)
 {
     if (!widget || isMozilla() || !GTK_IS_PROGRESS_BAR(widget))
         return TRUE;
-
 #if GTK_CHECK_VERSION(2, 90, 0)
-    return GTK_ORIENTATION_HORIZONTAL == qtcGetWidgetOrientation(widget);
+    return qtcWidgetIsHorizontal(widget);
 #else
-    switch(GTK_PROGRESS_BAR(widget)->orientation)
-    {
-        default:
-        case GTK_PROGRESS_LEFT_TO_RIGHT:
-        case GTK_PROGRESS_RIGHT_TO_LEFT:
-            return TRUE;
-        case GTK_PROGRESS_BOTTOM_TO_TOP:
-        case GTK_PROGRESS_TOP_TO_BOTTOM:
-            return FALSE;
+    switch (GTK_PROGRESS_BAR(widget)->orientation) {
+    default:
+    case GTK_PROGRESS_LEFT_TO_RIGHT:
+    case GTK_PROGRESS_RIGHT_TO_LEFT:
+        return TRUE;
+    case GTK_PROGRESS_BOTTOM_TO_TOP:
+    case GTK_PROGRESS_TOP_TO_BOTTOM:
+        return FALSE;
     }
 #endif
 }
@@ -993,24 +971,24 @@ shadeColor(GdkColor *orig, double mod)
     return *orig;
 }
 
-void constrainRect(QtcRect *rect, QtcRect *con)
+void
+constrainRect(GdkRectangle *rect, GdkRectangle *con)
 {
-    if(rect && con)
-    {
-        if(rect->x<con->x)
-        {
-            rect->width-=(con->x-rect->x);
-            rect->x=con->x;
+    if (rect && con) {
+        if (rect->x < con->x) {
+            rect->width -= con->x - rect->x;
+            rect->x = con->x;
         }
-        if(rect->y<con->y)
-        {
-            rect->height-=(rect->y-con->y);
-            rect->y=con->y;
+        if(rect->y < con->y) {
+            rect->height -= rect->y - con->y;
+            rect->y = con->y;
         }
-        if((rect->x+rect->width)>(con->x+con->width))
-            rect->width-=(rect->x+rect->width)-(con->x+con->width);
-        if((rect->y+rect->height)>(con->y+con->height))
-            rect->height-=(rect->y+rect->height)-(con->y+con->height);
+        if ((rect->x + rect->width) > (con->x + con->width)) {
+            rect->width -= (rect->x + rect->width) - (con->x + con->width);
+        }
+        if ((rect->y + rect->height) > (con->y + con->height)) {
+            rect->height -= (rect->y + rect->height) - (con->y + con->height);
+        }
     }
 }
 

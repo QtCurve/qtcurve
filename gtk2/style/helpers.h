@@ -28,6 +28,7 @@
 #include <common/common.h>
 #include "config.h"
 #include "compatability.h"
+#include "qt_settings.h"
 
 QTC_ALWAYS_INLINE static inline void
 qtcCairoSetColor(cairo_t *cr, const GdkColor *col, double a)
@@ -72,19 +73,20 @@ _qtcCairoPatternAddColorStop(cairo_pattern_t *pt, double offset,
 #endif
 
 #if GTK_CHECK_VERSION(2, 90, 0)
-    #define QTC_IS_COMBO(X)    GTK_IS_COMBO_BOX_TEXT(X)
-    #define QTC_COMBO_ENTRY(X) GTK_IS_COMBO_BOX_TEXT(X)
+#  define QTC_IS_COMBO(X) GTK_IS_COMBO_BOX_TEXT(X)
+#  define QTC_COMBO_ENTRY(X) GTK_IS_COMBO_BOX_TEXT(X)
 #elif GTK_CHECK_VERSION(2, 24, 0)
-    #define QTC_IS_COMBO(X)    (GTK_IS_COMBO(X) || GTK_IS_COMBO_BOX_TEXT(X))
-    #define QTC_COMBO_ENTRY(X) (GTK_IS_COMBO_BOX_ENTRY(X) || GTK_IS_COMBO_BOX_TEXT(X))
+#  define QTC_IS_COMBO(X) (GTK_IS_COMBO(X) || GTK_IS_COMBO_BOX_TEXT(X))
+#  define QTC_COMBO_ENTRY(X) (GTK_IS_COMBO_BOX_ENTRY(X) ||      \
+                              GTK_IS_COMBO_BOX_TEXT(X))
 #else
-    #define QTC_IS_COMBO(X)    GTK_IS_COMBO(X)
-    #define QTC_COMBO_ENTRY(X) GTK_IS_COMBO_BOX_ENTRY(X)
+#  define QTC_IS_COMBO(X) GTK_IS_COMBO(X)
+#  define QTC_COMBO_ENTRY(X) GTK_IS_COMBO_BOX_ENTRY(X)
 #endif
 
-#define QT_CUSTOM_COLOR_BUTTON(style) \
-    (style && \
-    !(COL_EQ(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW].red,(style->bg[GTK_STATE_SELECTED==state ? state : GTK_STATE_NORMAL].red)) && \
+#define QT_CUSTOM_COLOR_BUTTON(style)           \
+    (style &&                                                           \
+     !(COL_EQ(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW].red,(style->bg[GTK_STATE_SELECTED==state ? state : GTK_STATE_NORMAL].red)) && \
       COL_EQ(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW].green,(style->bg[GTK_STATE_SELECTED==state ? state : GTK_STATE_NORMAL].green)) && \
       COL_EQ(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW].blue,(style->bg[GTK_STATE_SELECTED==state ? state : GTK_STATE_NORMAL].blue))))
 
@@ -115,9 +117,24 @@ _qtcCairoPatternAddColorStop(cairo_pattern_t *pt, double offset,
 
 void debugDisplayWidget(GtkWidget *widget, int level);
 bool haveAlternateListViewCol();
-gboolean isMozilla();
-gboolean isMozillaTab(GtkWidget *widget);
-gboolean isFakeGtk();
+gboolean isFixedWidget(GtkWidget *widget);
+QTC_ALWAYS_INLINE static inline bool
+isMozilla()
+{
+    return (qtSettings.app == GTK_APP_MOZILLA ||
+            qtSettings.app == GTK_APP_NEW_MOZILLA);
+}
+QTC_ALWAYS_INLINE static inline bool
+isMozillaTab(GtkWidget *widget)
+{
+    return isFixedWidget(widget) && GTK_IS_NOTEBOOK(widget);
+}
+QTC_ALWAYS_INLINE static inline bool
+isFakeGtk()
+{
+    return (isMozilla() || qtSettings.app == GTK_APP_OPEN_OFFICE ||
+            qtSettings.app == GTK_APP_JAVA);
+}
 GdkColor *menuColors(gboolean active);
 EBorder shadowToBorder(GtkShadowType shadow);
 gboolean useButtonColor(const gchar *detail);
@@ -193,7 +210,6 @@ gboolean isComboPopupWindow(GtkWidget *widget, int level);
 gboolean isComboList(GtkWidget *widget);
 gboolean isComboMenu(GtkWidget *widget);
 gboolean isComboFrame(GtkWidget *widget);
-gboolean isFixedWidget(GtkWidget *widget);
 gboolean isGimpDockable(GtkWidget *widget);
 #define isMozillaWidget(widget) (isMozilla() && isFixedWidget(widget))
 GdkColor * getParentBgCol(GtkWidget *widget);
@@ -201,7 +217,7 @@ int getOpacity(GtkWidget *widget);
 gboolean eqRect(GdkRectangle *a, GdkRectangle *b);
 void setLowerEtchCol(cairo_t *cr, GtkWidget *widget);
 GdkColor shadeColor(GdkColor *orig, double mod);
-void constrainRect(QtcRect *rect, QtcRect *con);
+void constrainRect(GdkRectangle *rect, GdkRectangle *con);
 gboolean windowEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data);
 void adjustToolbarButtons(GtkWidget *widget, int *x, int *y, int *width, int *height, int *round, gboolean horiz);
 void getEntryParentBgCol(GtkWidget *widget, GdkColor *color);
