@@ -23,10 +23,8 @@
 #include <qtcurve-utils/qtprops.h>
 
 #include "qtcurve_p.h"
+#include "argbhelper.h"
 #include <QMenu>
-#include <QWindow>
-
-#include "private/qwidget_p.h"
 
 namespace QtCurve {
 
@@ -59,25 +57,7 @@ Style::prePolish(QWidget *widget) const
              (qobject_cast<QMenu*>(widget) ||
               widget->inherits("QComboBoxPrivateContainer")))) {
             props->prePolishing = true;
-            // Set this for better efficiency for now
-            widget->setAutoFillBackground(false);
-            QWindow *window = widget->windowHandle();
-            QWidgetPrivate *widgetPrivate =
-                static_cast<QWidgetPrivate*>(QObjectPrivate::get(widget));
-            widgetPrivate->updateIsOpaque();
-            if (!window) {
-                widgetPrivate->createTLExtra();
-                widgetPrivate->createTLSysExtra();
-                window = widget->windowHandle();
-            }
-            if (window) {
-                // Maybe we can register event filters and/or listen for signals
-                // like parent change or screen change on the QWidgetWindow
-                // so that we have a better change to update the alpha info
-                QSurfaceFormat format = window->format();
-                format.setAlphaBufferSize(8);
-                window->setFormat(format);
-            }
+            addAlphaChannel(widget);
             // QWidgetPrivate::updateIsTranslucent sets the format back
             // is Qt::WA_TranslucentBackground is not set. So we need to do
             // this repeatedly

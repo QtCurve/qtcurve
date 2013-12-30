@@ -110,12 +110,6 @@ void setBgndProp(QWidget *w, EAppearance app, bool haveBgndImage);
 void setSbProp(QWidget *w);
 #endif
 
-static inline void
-setTranslucentBackground(QWidget *widget)
-{
-    widget->setAttribute(Qt::WA_TranslucentBackground);
-}
-
 static inline QList<QStatusBar*>
 getStatusBars(QWidget *w)
 {

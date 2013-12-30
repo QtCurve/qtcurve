@@ -8,14 +8,16 @@ set(qtcurve_SRCS
   windowmanager.cpp
   blurhelper.cpp
   utils.cpp
-  shortcuthandler.cpp)
+  shortcuthandler.cpp
+  argbhelper.cpp)
 set(qtcurve_MOC_HDRS
   qtcurve.h
   qtcurve_p.h
   qtcurve_plugin.h
   windowmanager.h
   blurhelper.h
-  shortcuthandler.h)
+  shortcuthandler.h
+  argbhelper.h)
 set(qtcurve_X11_SRCS
   shadowhelper.cpp)
 set(qtcurve_X11_MOC_HDRS

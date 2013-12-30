@@ -28,10 +28,13 @@
 #  include <QApplication>
 #  include <QX11Info>
 #  include <qtcurve-utils/x11utils.h>
+#  include <qtcurve-utils/x11shadow.h>
 #  include <qtcurve-utils/x11blur.h>
 #endif
 
 #include <QQuickWindow>
+#include <QQuickItem>
+#include <QDebug>
 
 namespace QtCurve {
 
@@ -65,18 +68,37 @@ qtcEventCallback(void **cbdata)
         // This is still VERY experimental.
         // Need a lot more testing and refactoring.
         if (Style *style = qtcGetStyle(qApp)) {
-            QColor color = window->color();
-            int opacity = style->options().bgndOpacity;
-            if (color.alpha() == 255 && opacity != 100) {
-                qreal opacityF = opacity / 100.0;
-                window->setColor(QColor::fromRgbF(color.redF() * opacityF,
-                                                  color.greenF() * opacityF,
-                                                  color.blueF() * opacityF,
-                                                  opacityF));
+            if (window->inherits("QQuickPopupWindow")) {
+                if (window->inherits("QQuickMenuPopupWindow")) {
+                    window->setColor(QColor(0, 0, 0, 0));
+                }
 #ifdef QTC_ENABLE_X11
-                qtcX11BlurTrigger(window->winId(), true, 0, NULL);
+                qtcX11ShadowInstall(window->winId());
 #endif
+            } else {
+                QColor color = window->color();
+                int opacity = style->options().bgndOpacity;
+                if (color.alpha() == 255 && opacity != 100) {
+                    qreal opacityF = opacity / 100.0;
+                    window->setColor(QColor::fromRgbF(color.redF() * opacityF,
+                                                      color.greenF() * opacityF,
+                                                      color.blueF() * opacityF,
+                                                      opacityF));
+#ifdef QTC_ENABLE_X11
+                    qtcX11BlurTrigger(window->winId(), true, 0, NULL);
+#endif
+                }
             }
+        }
+    } else if (QQuickItem *item = qobject_cast<QQuickItem*>(receiver)) {
+        QQuickWindow *window = item->window();
+        if (!window)
+            return false;
+        if (qtcGetStyle(qApp)) {
+            window->setColor(QColor(0, 0, 0, 0));
+#ifdef QTC_ENABLE_X11
+            qtcX11BlurTrigger(window->winId(), true, 0, NULL);
+#endif
         }
     }
     return false;
