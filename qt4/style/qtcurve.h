@@ -346,7 +346,7 @@ private:
     QPixmap *getPixmap(const QColor col, EPixmap p, double shade=1.0) const;
     const QColor &checkRadioCol(const QStyleOption *opt) const;
     QColor shade(const QColor &a, double k) const;
-    void shade(const color &ca, color *cb, double k) const;
+    void shade(const QColor &ca, QColor *cb, double k) const;
     QColor getLowerEtchCol(const QWidget *widget) const;
     int getFrameRound(const QWidget *widget) const;
 

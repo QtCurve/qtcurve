@@ -24,12 +24,11 @@
 
 #include "utils.h"
 #include <QtGlobal>
-#include <QObject>
 #include <QWidget>
 #include <config.h>
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && defined QTC_QT5_ENABLE_KDE) || \
-    (QT_VERSION < QT_VERSION_CHECK(5, 0, 0) && defined QTC_QT4_ENABLE_KDE)
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0) && defined QTC_QT4_ENABLE_KDE) || \
+    (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && defined QTC_QT5_ENABLE_KDE)
 #define _QTC_QT_ENABLE_KDE 1
 #else
 #define _QTC_QT_ENABLE_KDE 0

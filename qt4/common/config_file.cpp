@@ -55,7 +55,7 @@ static int c2h(char ch)
 #define ATOH(str) ((c2h(*str)<<4)+c2h(*(str+1)))
 
 void
-qtcSetRgb(color *col, const char *str)
+qtcSetRgb(QColor *col, const char *str)
 {
     if (str && strlen(str) > 6) {
         int offset = '#' == str[0] ? 1 : 0;
@@ -201,7 +201,9 @@ static EAppearance toAppearance(const char *str, EAppearance def, EAppAllow allo
     return def;
 }
 
-static EShade toShade(const char *str, bool allowMenu, EShade def, bool menuShade, color *col)
+static EShade
+toShade(const char *str, bool allowMenu, EShade def,
+        bool menuShade, QColor *col)
 {
     if(str && 0!=str[0])
     {
@@ -606,7 +608,8 @@ void qtcLoadBgndImage(QtCImage *img)
 
 #endif
 
-static void checkColor(EShade *s, color *c)
+static void
+checkColor(EShade *s, QColor *c)
 {
     if(SHADE_CUSTOM==*s && IS_BLACK(*c))
         *s=SHADE_NONE;

@@ -39,7 +39,7 @@
 bool qtcBarHidden(const QString &app, const char *prefix);
 void qtcSetBarHidden(const QString &app, bool hidden, const char *prefix);
 void qtcLoadBgndImage(QtCImage *img);
-void qtcSetRgb(color *col, const char *str);
+void qtcSetRgb(QColor *col, const char *str);
 void qtcDefaultSettings(Options *opts);
 void qtcCheckConfig(Options *opts);
 bool qtcReadConfig(const QString &file, Options *opts, Options *defOpts=0L,

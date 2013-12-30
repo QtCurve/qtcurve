@@ -40,7 +40,7 @@ bool qtcBarHidden(const char *app, const char *prefix);
 void qtcSetBarHidden(const char *app, bool hidden, const char *prefix);
 void qtcLoadBgndImage(QtCImage *img);
 
-void qtcSetRgb(color *col, const char *str);
+void qtcSetRgb(GdkColor *col, const char *str);
 void qtcDefaultSettings(Options *opts);
 void qtcCheckConfig(Options *opts);
 bool qtcReadConfig(const char *file, Options *opts, Options *defOpts);

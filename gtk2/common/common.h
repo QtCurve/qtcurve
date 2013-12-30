@@ -44,7 +44,6 @@
 
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
-typedef GdkColor color;
 typedef char **Strings;
 
 #define SETTINGS_GROUP        "Settings"
@@ -746,7 +745,7 @@ typedef struct {
                      tbarBtnEffect;
     EScrollbar       scrollbarType;
     EFocus           focus;
-    color            customMenubarsColor,
+    GdkColor customMenubarsColor,
                      customSlidersColor,
                      customMenuNormTextColor,
                      customMenuSelTextColor,

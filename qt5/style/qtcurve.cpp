@@ -3962,7 +3962,7 @@ QColor Style::shade(const QColor &a, double k) const
     return mod;
 }
 
-void Style::shade(const color &ca, color *cb, double k) const
+void Style::shade(const QColor &ca, QColor *cb, double k) const
 {
     qtcShade(&ca, cb, k, opts.shading);
 }

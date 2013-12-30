@@ -49,7 +49,6 @@
 
 #include <QPixmap>
 class QColor;
-typedef QColor color;
 
 #include <QSet>
 typedef QSet<QString> Strings;
@@ -922,7 +921,7 @@ typedef struct {
                      tbarBtnEffect;
     EScrollbar       scrollbarType;
     EFocus           focus;
-    color            customMenubarsColor,
+    QColor customMenubarsColor,
                      customSlidersColor,
                      customMenuNormTextColor,
                      customMenuSelTextColor,
@@ -984,7 +983,6 @@ qtcIsCustomBgnd(const Options *opts)
 #include <qtcurve-utils/color.h>
 #define tint(COLA, COLB, FACTOR) qtcColorTint(&(COLA), &(COLB), (FACTOR))
 #define midColor(COLA, COLB) qtcColorMix(&(COLA), &(COLB), 0.5)
-#define midColorF(COLA, COLB, FACTOR) qtcColorMix(&(COLA), &(COLB), FACTOR-0.5)
 #endif
 
 EAppearance qtcWidgetApp(EWidget w, const Options *opts, bool active=true);
