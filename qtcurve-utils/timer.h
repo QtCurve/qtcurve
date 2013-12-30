@@ -33,7 +33,7 @@ uint64_t qtcGetElapse(uint64_t prev);
 #define qtcGetElapse(prev...)                                   \
     QTC_SWITCH(prev, qtcGetElapse(prev), qtcGetElapse(0))
 #define qtcPrintTime(time)                      \
-    qtcInfo("Time: " PRTime "\n", time)
+    qtcForceLog("Time: %" PRTime "\n", time)
 #define qtcPrintElapse(prev...)                 \
     qtcPrintTime(qtcGetElapse(prev))
 
