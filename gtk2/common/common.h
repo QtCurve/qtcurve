@@ -122,7 +122,7 @@ enum {
 #define FADE_SIZE              0.4
 #define ETCHED_DARK            0.95
 
-#define IS_GLASS(A) (APPEARANCE_DULL_GLASS==(A) || APPEARANCE_SHINY_GLASS==(A))
+#define IS_GLASS(A) qtcOneOf(A, APPEARANCE_DULL_GLASS, APPEARANCE_SHINY_GLASS)
 #define IS_CUSTOM(A) ((A)>=APPEARANCE_CUSTOM1 && (A)<(APPEARANCE_CUSTOM1+NUM_CUSTOM_GRAD))
 
 #define MENUBAR_DARK_LIMIT (160<<8)
@@ -169,27 +169,31 @@ enum {
 
 #define USE_GLOW_FOCUS(mouseOver) (FOCUS_GLOW==opts.focus && (MO_GLOW!=opts.coloredMouseOver || !(mouseOver)))
 
-#define USE_SHADED_MENU_BAR_COLORS (SHADE_CUSTOM==opts.shadeMenubars || SHADE_BLEND_SELECTED==opts.shadeMenubars)
+#define USE_SHADED_MENU_BAR_COLORS                                      \
+    qtcOneOf(opts.shadeMenubars, SHADE_CUSTOM, SHADE_BLEND_SELECTED)
 #define MENUBAR_GLASS_SELECTED_DARK_FACTOR 0.9
 
 #define MENUITEM_FADE_SIZE 48
 
 #define NUM_SPLITTER_DASHES 21
 
-#define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || \
-                          WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || \
-                          WIDGET_RADIO_BUTTON==(w) || WIDGET_COMBO==(w) || WIDGET_COMBO_BUTTON==(w) || WIDGET_UNCOLOURED_MO_BUTTON==(w) || \
-                          WIDGET_TOOLBAR_BUTTON==(w))
-#define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || WIDGET_SLIDER_TROUGH==(w) || \
-                        WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || \
-                        (WIDGET_SLIDER==(w) && MO_GLOW==opts.coloredMouseOver) || \
-                        WIDGET_FILLED_SLIDER_TROUGH==(w) || WIDGET_COMBO==(w) || WIDGET_UNCOLOURED_MO_BUTTON==(w) || \
-                        WIDGET_TOOLBAR_BUTTON==(w))
-#define AGUA_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || IS_SLIDER((w)) || \
-                        WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || \
-                        WIDGET_COMBO==(w) WIDGET_COMBO_BUTTON==(w))
+#define WIDGET_BUTTON(w)                                                \
+    qtcOneOf(w, WIDGET_STD_BUTTON, WIDGET_DEF_BUTTON, WIDGET_TOGGLE_BUTTON, \
+             WIDGET_CHECKBOX, WIDGET_RADIO_BUTTON, WIDGET_RADIO_BUTTON, \
+             WIDGET_COMBO, WIDGET_COMBO_BUTTON, WIDGET_UNCOLOURED_MO_BUTTON, \
+             WIDGET_TOOLBAR_BUTTON)
+#define ETCH_WIDGET(w)                                                  \
+    (qtcOneOf(w, WIDGET_STD_BUTTON, WIDGET_DEF_BUTTON, WIDGET_TOGGLE_BUTTON, \
+              WIDGET_SLIDER_TROUGH, WIDGET_CHECKBOX, WIDGET_RADIO_BUTTON, \
+              WIDGET_FILLED_SLIDER_TROUGH, WIDGET_COMBO,                \
+              WIDGET_TOOLBAR_BUTTON, WIDGET_UNCOLOURED_MO_BUTTON) ||    \
+     ((w) == WIDGET_SLIDER && opts.coloredMouseOver == MO_GLOW))
+#define AGUA_WIDGET(w)                                                  \
+    (qtcOneOf(w, WIDGET_STD_BUTTON, WIDGET_DEF_BUTTON, WIDGET_TOGGLE_BUTTON, \
+              WIDGET_CHECKBOX, WIDGET_RADIO_BUTTON, WIDGET_COMBO,       \
+              WIDGET_COMBO_BUTTON) || IS_SLIDER(w))
 
-#define SLIDER(w) (WIDGET_SB_SLIDER==(w) || WIDGET_SLIDER==(w))
+#define SLIDER(w) qtcOneOf(w, WIDGET_SB_SLIDER, WIDGET_SLIDER)
 #define CIRCULAR_SLIDER(w) (WIDGET_SLIDER==(w) && SLIDER_CIRCULAR==opts.sliderStyle)
 
 #define MODIFY_AGUA_X(A, X) (APPEARANCE_AGUA==(A) ?  (X) : (A))
@@ -200,9 +204,10 @@ enum {
 #define COLORED_BORDER_SIZE 3
 #define PROGRESS_CHUNK_WIDTH 10
 #define STRIPE_WIDTH 10
-#define DRAW_LIGHT_BORDER(SUKEN, WIDGET, APP) \
-    (!(SUKEN) && (GB_LIGHT==qtcGetGradient(APP, &opts)->border) && WIDGET_MENU_ITEM!=(WIDGET) && !IS_TROUGH(WIDGET) && \
-                          (WIDGET_DEF_BUTTON!=(WIDGET) || IND_COLORED!=opts.defBtnIndicator))
+#define DRAW_LIGHT_BORDER(SUKEN, WIDGET, APP)                           \
+    (!(SUKEN) && (qtcGetGradient(APP, &opts)->border == GB_LIGHT) &&    \
+     (WIDGET) != WIDGET_MENU_ITEM && !IS_TROUGH(WIDGET) &&              \
+     ((WIDGET) != WIDGET_DEF_BUTTON || opts.defBtnIndicator != IND_COLORED))
 
 #define DRAW_3D_FULL_BORDER(SUNKEN, APP) \
     (!(SUNKEN) && GB_3D_FULL==qtcGetGradient((APP), &opts)->border)
@@ -221,30 +226,29 @@ enum {
 #define CR_SMALL_SIZE 13
 #define CR_LARGE_SIZE 15
 
-#define TAB_APP(A)   (APPEARANCE_BEVELLED==(A) || APPEARANCE_SPLIT_GRADIENT==(A) ? APPEARANCE_GRADIENT : (A))
+#define TAB_APP(A)                                                      \
+    (qtcOneOf(A, APPEARANCE_BEVELLED, APPEARANCE_SPLIT_GRADIENT) ?      \
+     APPEARANCE_GRADIENT : (A))
 #define NORM_TAB_APP TAB_APP(opts.tabAppearance)
 #define SEL_TAB_APP  TAB_APP(opts.activeTabAppearance)
 
 #define SLIDER_MO_SHADE  (SHADE_SELECTED==opts.shadeSliders ? 1 : (SHADE_BLEND_SELECTED==opts.shadeSliders ? 0 : ORIGINAL_SHADE))
 #define SLIDER_MO_PLASTIK_BORDER (SHADE_SELECTED==opts.shadeSliders || SHADE_BLEND_SELECTED==opts.shadeSliders ? 2 : 1)
 #define SLIDER_MO_LEN    (SLIDER_TRIANGULAR==opts.sliderStyle ? 2 : (SHADE_SELECTED==opts.shadeSliders || SHADE_BLEND_SELECTED==opts.shadeSliders ? 4 : 3))
-#define SB_SLIDER_MO_LEN(A) ((A)<22 && !FULLLY_ROUNDED \
-                                    ? 2 \
-                                    : ((A)<32 || (SHADE_SELECTED!=opts.shadeSliders && SHADE_BLEND_SELECTED!=opts.shadeSliders) \
-                                        ? 4 \
-                                        : 6))
+#define SB_SLIDER_MO_LEN(A)                                             \
+    ((A) < 22 && !FULLLY_ROUNDED ? 2 :                                  \
+     ((A) < 32 || qtcNoneOf(opts.shadeSliders, SHADE_SELECTED,          \
+                            SHADE_BLEND_SELECTED) ? 4 : 6))
 
 #define CR_MO_FILL          1
 #define MO_DEF_BTN          2
 #define MO_PLASTIK_DARK(W)  (WIDGET_DEF_BUTTON==(W) && IND_COLORED==opts.defBtnIndicator ? 3 : 2) /*? 2 : 1) */
 #define MO_PLASTIK_LIGHT(W) (WIDGET_DEF_BUTTON==(W) && IND_COLORED==opts.defBtnIndicator ? 4 : 1) /*? 2 : 0) */
 
-#define MO_STD_DARK(W)     (MO_GLOW==opts.coloredMouseOver \
-                                    ? 1 \
-                                    : MO_PLASTIK_DARK(W))
-#define MO_STD_LIGHT(W, S) (MO_GLOW==opts.coloredMouseOver \
-                                    ? 1 \
-                                    : MO_PLASTIK_LIGHT(W))
+#define MO_STD_DARK(W)                                          \
+    (opts.coloredMouseOver == MO_GLOW ? 1 : MO_PLASTIK_DARK(W))
+#define MO_STD_LIGHT(W, S)                                              \
+    (opts.coloredMouseOver == MO_GLOW ? 1 : MO_PLASTIK_LIGHT(W))
 
 #define FULLLY_ROUNDED     (opts.round>=ROUND_FULL)
 #define DO_EFFECT          (EFFECT_NONE!=opts.buttonEffect)
@@ -255,7 +259,9 @@ enum {
 
 #define FOCUS_ALPHA              0.08
 #define FOCUS_GLOW_LINE_ALPHA    0.5
-#define BORDER_BLEND_ALPHA(W)    (WIDGET_ENTRY==(W) || WIDGET_SCROLLVIEW==(W) || WIDGET_SPIN==(W) || WIDGET_COMBO_BUTTON==(W) ? 0.4 : 0.7)
+#define BORDER_BLEND_ALPHA(W)                                   \
+    (qtcOneOf(W, WIDGET_ENTRY, WIDGET_SCROLLVIEW,               \
+              WIDGET_SPIN, WIDGET_COMBO_BUTTON) ? 0.4 : 0.7)
 
 #define ETCH_TOP_ALPHA           0.055
 #define ETCH_BOTTOM_ALPHA        0.1
@@ -414,12 +420,12 @@ typedef enum
     APP_ALLOW_NONE
 } EAppAllow;
 
-#define IS_SLIDER(W)        (WIDGET_SLIDER==(W) || WIDGET_SB_SLIDER==(W))
-#define IS_TROUGH(W)        (WIDGET_SLIDER_TROUGH==(W) || WIDGET_PBAR_TROUGH==(W) || WIDGET_TROUGH==(W) || WIDGET_FILLED_SLIDER_TROUGH==(W))
-#define IS_TOGGLE_BUTTON(W) (WIDGET_TOGGLE_BUTTON==(W) || WIDGET_CHECKBOX==(W))
+#define IS_SLIDER(w) qtcOneOf(w, WIDGET_SLIDER, WIDGET_SB_SLIDER)
+#define IS_TROUGH(w) qtcOneOf(w, WIDGET_SLIDER_TROUGH, WIDGET_PBAR_TROUGH, \
+                              WIDGET_TROUGH, WIDGET_FILLED_SLIDER_TROUGH)
+#define IS_TOGGLE_BUTTON(W) qtcOneOf(W, WIDGET_TOGGLE_BUTTON, WIDGET_CHECKBOX)
 
-typedef enum
-{
+typedef enum {
     CORNER_TL = 0x1,
     CORNER_TR = 0x2,
     CORNER_BR = 0x4,
@@ -549,7 +555,8 @@ typedef enum
     SLIDER_CIRCULAR
 } ESliderStyle;
 
-#define ROTATED_SLIDER (SLIDER_PLAIN_ROTATED==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle)
+#define ROTATED_SLIDER                                                  \
+    qtcOneOf(opts.sliderStyle, SLIDER_PLAIN_ROTATED, SLIDER_ROUND_ROTATED)
 
 typedef enum
 {
@@ -582,7 +589,7 @@ typedef enum
     GLOW_END
 } EGlow;
 
-#define FULL_FOCUS     (FOCUS_FULL==opts.focus  || FOCUS_FILLED==opts.focus)
+#define FULL_FOCUS qtcOneOf(opts.focus, FOCUS_FULL, FOCUS_FILLED)
 
 enum
 {
@@ -809,12 +816,15 @@ typedef enum {
 #define BGND_SHINE_STEPS  8
 
 #define MIN_ROUND_FULL_SIZE     8
-#define MIN_ROUND_EXTRA_SIZE(W) (WIDGET_SPIN_UP==(W) || WIDGET_SPIN_DOWN==(W) || WIDGET_SPIN==(W) ? 7 : 14)
+#define MIN_ROUND_EXTRA_SIZE(W)                                         \
+    (qtcOneOf(W, WIDGET_SPIN_UP, WIDGET_SPIN_DOWN, WIDGET_SPIN) ? 7 : 14)
 
-#define IS_MAX_ROUND_WIDGET(A) \
-            (WIDGET_STD_BUTTON==A || WIDGET_DEF_BUTTON==A || WIDGET_TOGGLE_BUTTON==A /*|| WIDGET_MENU_BUTTON==A*/)
-#define IS_EXTRA_ROUND_WIDGET(A) \
-            (A!=WIDGET_MENU_ITEM && A!=WIDGET_TAB_FRAME && A!=WIDGET_PBAR_TROUGH && A!=WIDGET_PROGRESSBAR)
+#define IS_MAX_ROUND_WIDGET(A)                                  \
+    qtcOneOf(A, WIDGET_STD_BUTTON, WIDGET_DEF_BUTTON,           \
+             WIDGET_TOGGLE_BUTTON/*, WIDGET_MENU_BUTTON*/)
+#define IS_EXTRA_ROUND_WIDGET(A)                                        \
+    qtcNoneOf(A, WIDGET_MENU_ITEM, WIDGET_TAB_FRAME, WIDGET_PBAR_TROUGH, \
+              WIDGET_PROGRESSBAR)
 
 #define EXTRA_INNER_RADIUS   4
 #define EXTRA_OUTER_RADIUS   5

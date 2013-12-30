@@ -108,19 +108,19 @@ typedef enum {
 QTC_ALWAYS_INLINE static inline bool
 qtcUseBorder(EGradientBorder border)
 {
-    return border != GB_SHINE && border != GB_NONE;
+    return qtcNoneOf(border, GB_SHINE, GB_NONE);
 }
 
 QTC_ALWAYS_INLINE static inline bool
 qtcNoFrame(EFrame frame)
 {
-    return frame == FRAME_NONE || frame == FRAME_LINE;
+    return qtcOneOf(frame, FRAME_NONE, FRAME_LINE);
 }
 
 QTC_ALWAYS_INLINE static inline bool
 qtcIsFlatBgnd(EAppearance appear)
 {
-    return appear == APPEARANCE_FLAT || appear == APPEARANCE_RAISED;
+    return qtcOneOf(appear, APPEARANCE_FLAT, APPEARANCE_RAISED);
 }
 
 QTC_ALWAYS_INLINE static inline bool

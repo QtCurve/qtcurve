@@ -209,6 +209,12 @@ int qtcStrMapSearch(const QtcStrMap *map, const char *key, int def);
 QTC_END_DECLS
 
 #ifdef __cplusplus
+template<typename T>
+QTC_ALWAYS_INLINE static inline bool
+qtcOneOf(T &&value)
+{
+    return false;
+}
 template<typename T, typename First>
 QTC_ALWAYS_INLINE static inline bool
 qtcOneOf(T &&value, First &&first)
@@ -238,5 +244,6 @@ qtcOneOf(T &&value, First &&first, Rest &&...rest...)
         __res;                                                  \
     })
 #endif
+#define qtcNoneOf(args...) (!qtcOneOf(args))
 
 #endif

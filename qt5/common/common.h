@@ -39,36 +39,20 @@
 */
 #define INCREASE_SB_SLIDER
 
-#ifdef __cplusplus
-#include <qconfig.h>
-#include <qapplication.h>
+#include <QtConfig>
+#include <QApplication>
 #include <map>
 #include <set>
 #include <QString>
-#else // __cplusplus
-#include <glib.h>
-#endif // __cplusplus
 
-#ifdef __cplusplus
 #define IS_BLACK(A) (0==(A).red() && 0==(A).green() && 0==(A).blue())
-#else
-#define IS_BLACK(A) (0==(A).red && 0==(A).green && 0==(A).blue)
-#endif
 
-#ifdef __cplusplus
-#include <qpixmap.h>
+#include <QPixmap>
 class QColor;
 typedef QColor color;
 
 #include <QSet>
 typedef QSet<QString> Strings;
-
-#else // __cplusplus
-#include <gtk/gtk.h>
-#include <gdk/gdk.h>
-typedef GdkColor color;
-typedef gchar ** Strings;
-#endif // __cplusplus
 
 #define SETTINGS_GROUP        "Settings"
 #define KWIN_GROUP            "KWin"
@@ -90,19 +74,18 @@ typedef gchar ** Strings;
 
 #define NUM_EXTRA_SHADES 3
 
-enum
-{
+enum {
     ALPHA_ETCH_LIGHT = 0,
     ALPHA_ETCH_DARK,
     NUM_STD_ALPHAS
 };
 
-#define TOTAL_SHADES     QTC_NUM_STD_SHADES+NUM_EXTRA_SHADES
+#define TOTAL_SHADES (QTC_NUM_STD_SHADES + NUM_EXTRA_SHADES)
 #define ORIGINAL_SHADE   TOTAL_SHADES
 
-#define SHADE_ORIG_HIGHLIGHT QTC_NUM_STD_SHADES
-#define SHADE_4_HIGHLIGHT    QTC_NUM_STD_SHADES+1
-#define SHADE_2_HIGHLIGHT    QTC_NUM_STD_SHADES+2
+#define SHADE_ORIG_HIGHLIGHT (QTC_NUM_STD_SHADES)
+#define SHADE_4_HIGHLIGHT (QTC_NUM_STD_SHADES + 1)
+#define SHADE_2_HIGHLIGHT (QTC_NUM_STD_SHADES + 2)
 
 #define SIMPLE_SHADING (!shading)
 #define DEFAULT_CONTRAST 7
@@ -147,16 +130,11 @@ enum
 #define FADE_SIZE              0.4
 #define ETCHED_DARK            0.95
 
-#define IS_GLASS(A) (APPEARANCE_DULL_GLASS==(A) || APPEARANCE_SHINY_GLASS==(A))
+#define IS_GLASS(A) qtcOneOf(A, APPEARANCE_DULL_GLASS, APPEARANCE_SHINY_GLASS)
 #define IS_CUSTOM(A) ((A)>=APPEARANCE_CUSTOM1 && (A)<(APPEARANCE_CUSTOM1+NUM_CUSTOM_GRAD))
 
-#ifdef __cplusplus
 #define MENUBAR_DARK_LIMIT 160
 #define TOO_DARK(A) ((A).red()<MENUBAR_DARK_LIMIT || (A).green()<MENUBAR_DARK_LIMIT || (A).blue()<MENUBAR_DARK_LIMIT)
-#else // __cplusplus
-#define MENUBAR_DARK_LIMIT (160<<8)
-#define TOO_DARK(A) ((A).red<MENUBAR_DARK_LIMIT || (A).green<MENUBAR_DARK_LIMIT || (A).blue<MENUBAR_DARK_LIMIT)
-#endif // __cplusplus
 
 #define TO_FACTOR(A) ((100.0+((double)(A)))/100.0)
 #define DEFAULT_HIGHLIGHT_FACTOR                   3
@@ -199,41 +177,31 @@ enum
 
 #define USE_GLOW_FOCUS(mouseOver) (FOCUS_GLOW==opts.focus && (MO_GLOW!=opts.coloredMouseOver || !(mouseOver)))
 
-#define USE_SHADED_MENU_BAR_COLORS (SHADE_CUSTOM==opts.shadeMenubars || SHADE_BLEND_SELECTED==opts.shadeMenubars)
+#define USE_SHADED_MENU_BAR_COLORS                                      \
+    qtcOneOf(opts.shadeMenubars, SHADE_CUSTOM, SHADE_BLEND_SELECTED)
 #define MENUBAR_GLASS_SELECTED_DARK_FACTOR 0.9
 
 #define MENUITEM_FADE_SIZE 48
 
 #define NUM_SPLITTER_DASHES 21
 
-#ifdef __cplusplus
-#define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || \
-                          WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || WIDGET_DIAL==(w) || \
-                          WIDGET_COMBO==(w) || WIDGET_COMBO_BUTTON==(w) || WIDGET_MDI_WINDOW_BUTTON==(w) || \
-                          WIDGET_TOOLBAR_BUTTON==(w) )
-#define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_SLIDER_TROUGH==(w) || \
-                        WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || WIDGET_DIAL==(w) || \
-                        (WIDGET_SLIDER==(w) && MO_GLOW==opts.coloredMouseOver) || \
-                        WIDGET_FILLED_SLIDER_TROUGH==(w) || WIDGET_MDI_WINDOW_BUTTON==(w) || WIDGET_TOOLBAR_BUTTON==(w))
-#define AGUA_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || IS_SLIDER((w)) || \
-                        WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || \
-                        WIDGET_COMBO==(w) WIDGET_COMBO_BUTTON==(w) || WIDGET_MDI_WINDOW_BUTTON==(w))
-#else // __cplusplus
-#define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || \
-                          WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || \
-                          WIDGET_RADIO_BUTTON==(w) || WIDGET_COMBO==(w) || WIDGET_COMBO_BUTTON==(w) || WIDGET_UNCOLOURED_MO_BUTTON==(w) || \
-                          WIDGET_TOOLBAR_BUTTON==(w))
-#define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || WIDGET_SLIDER_TROUGH==(w) || \
-                        WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || \
-                        (WIDGET_SLIDER==(w) && MO_GLOW==opts.coloredMouseOver) || \
-                        WIDGET_FILLED_SLIDER_TROUGH==(w) || WIDGET_COMBO==(w) || WIDGET_UNCOLOURED_MO_BUTTON==(w) || \
-                        WIDGET_TOOLBAR_BUTTON==(w))
-#define AGUA_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || IS_SLIDER((w)) || \
-                        WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || \
-                        WIDGET_COMBO==(w) WIDGET_COMBO_BUTTON==(w))
-#endif // __cplusplus
+#define WIDGET_BUTTON(w)                                                \
+    qtcOneOf(w, WIDGET_STD_BUTTON, WIDGET_DEF_BUTTON, WIDGET_CHECKBOX,  \
+             WIDGET_RADIO_BUTTON, WIDGET_DIAL, WIDGET_COMBO,            \
+             WIDGET_COMBO_BUTTON, WIDGET_MDI_WINDOW_BUTTON,             \
+             WIDGET_TOOLBAR_BUTTON)
+#define ETCH_WIDGET(w)                                                  \
+    (qtcOneOf(w, WIDGET_STD_BUTTON, WIDGET_DEF_BUTTON, WIDGET_SLIDER_TROUGH, \
+              WIDGET_CHECKBOX, WIDGET_RADIO_BUTTON, WIDGET_DIAL,        \
+              WIDGET_FILLED_SLIDER_TROUGH, WIDGET_MDI_WINDOW_BUTTON,    \
+              WIDGET_TOOLBAR_BUTTON) ||                                 \
+     ((w) == WIDGET_SLIDER && opts.coloredMouseOver == MO_GLOW))
+#define AGUA_WIDGET(w)                                                  \
+    (qtcOneOf(w, WIDGET_STD_BUTTON, WIDGET_DEF_BUTTON, WIDGET_CHECKBOX, \
+              WIDGET_RADIO_BUTTON, WIDGET_COMBO, WIDGET_COMBO_BUTTON,   \
+              WIDGET_MDI_WINDOW_BUTTON) || IS_SLIDER(w))
 
-#define SLIDER(w) (WIDGET_SB_SLIDER==(w) || WIDGET_SLIDER==(w))
+#define SLIDER(w) qtcOneOf(w, WIDGET_SB_SLIDER, WIDGET_SLIDER)
 #define CIRCULAR_SLIDER(w) (WIDGET_SLIDER==(w) && SLIDER_CIRCULAR==opts.sliderStyle)
 
 #define MODIFY_AGUA_X(A, X) (APPEARANCE_AGUA==(A) ?  (X) : (A))
@@ -244,9 +212,10 @@ enum
 #define COLORED_BORDER_SIZE 3
 #define PROGRESS_CHUNK_WIDTH 10
 #define STRIPE_WIDTH 10
-#define DRAW_LIGHT_BORDER(SUKEN, WIDGET, APP) \
-    (!(SUKEN) && (GB_LIGHT==qtcGetGradient(APP, &opts)->border) && WIDGET_MENU_ITEM!=(WIDGET) && !IS_TROUGH(WIDGET) && \
-                          (WIDGET_DEF_BUTTON!=(WIDGET) || IND_COLORED!=opts.defBtnIndicator))
+#define DRAW_LIGHT_BORDER(SUKEN, WIDGET, APP)                           \
+    (!(SUKEN) && (qtcGetGradient(APP, &opts)->border == GB_LIGHT) &&    \
+     (WIDGET) != WIDGET_MENU_ITEM && !IS_TROUGH(WIDGET) &&              \
+     ((WIDGET) != WIDGET_DEF_BUTTON || opts.defBtnIndicator != IND_COLORED))
 
 #define DRAW_3D_FULL_BORDER(SUNKEN, APP) \
     (!(SUNKEN) && GB_3D_FULL==qtcGetGradient((APP), &opts)->border)
@@ -265,30 +234,33 @@ enum
 #define CR_SMALL_SIZE 13
 #define CR_LARGE_SIZE 15
 
-#define TAB_APP(A)   (APPEARANCE_BEVELLED==(A) || APPEARANCE_SPLIT_GRADIENT==(A) ? APPEARANCE_GRADIENT : (A))
+#define TAB_APP(A)                                                      \
+    (qtcOneOf(A, APPEARANCE_BEVELLED, APPEARANCE_SPLIT_GRADIENT) ?      \
+     APPEARANCE_GRADIENT : (A))
 #define NORM_TAB_APP TAB_APP(opts.tabAppearance)
 #define SEL_TAB_APP  TAB_APP(opts.activeTabAppearance)
 
 #define SLIDER_MO_SHADE  (SHADE_SELECTED==opts.shadeSliders ? 1 : (SHADE_BLEND_SELECTED==opts.shadeSliders ? 0 : ORIGINAL_SHADE))
-#define SLIDER_MO_PLASTIK_BORDER (SHADE_SELECTED==opts.shadeSliders || SHADE_BLEND_SELECTED==opts.shadeSliders ? 2 : 1)
-#define SLIDER_MO_LEN    (SLIDER_TRIANGULAR==opts.sliderStyle ? 2 : (SHADE_SELECTED==opts.shadeSliders || SHADE_BLEND_SELECTED==opts.shadeSliders ? 4 : 3))
-#define SB_SLIDER_MO_LEN(A) ((A)<22 && !FULLLY_ROUNDED \
-                                    ? 2 \
-                                    : ((A)<32 || (SHADE_SELECTED!=opts.shadeSliders && SHADE_BLEND_SELECTED!=opts.shadeSliders) \
-                                        ? 4 \
-                                        : 6))
+#define SLIDER_MO_PLASTIK_BORDER                                        \
+    (qtcOneOf(opts.shadeSliders, SHADE_SELECTED, SHADE_BLEND_SELECTED) ? 2 : 1)
+#define SLIDER_MO_LEN                                   \
+    (opts.sliderStyle == SLIDER_TRIANGULAR ? 2 :        \
+     (qtcOneOf(opts.shadeSliders, SHADE_SELECTED,       \
+               SHADE_BLEND_SELECTED) ? 4 : 3))
+#define SB_SLIDER_MO_LEN(A)                                             \
+    ((A) < 22 && !FULLLY_ROUNDED ? 2 :                                  \
+     ((A) < 32 || qtcNoneOf(opts.shadeSliders, SHADE_SELECTED,          \
+                            SHADE_BLEND_SELECTED) ? 4 : 6))
 
 #define CR_MO_FILL          1
 #define MO_DEF_BTN          2
 #define MO_PLASTIK_DARK(W)  (WIDGET_DEF_BUTTON==(W) && IND_COLORED==opts.defBtnIndicator ? 3 : 2) /*? 2 : 1) */
 #define MO_PLASTIK_LIGHT(W) (WIDGET_DEF_BUTTON==(W) && IND_COLORED==opts.defBtnIndicator ? 4 : 1) /*? 2 : 0) */
 
-#define MO_STD_DARK(W)     (MO_GLOW==opts.coloredMouseOver \
-                                    ? 1 \
-                                    : MO_PLASTIK_DARK(W))
-#define MO_STD_LIGHT(W, S) (MO_GLOW==opts.coloredMouseOver \
-                                    ? 1 \
-                                    : MO_PLASTIK_LIGHT(W))
+#define MO_STD_DARK(W)                                          \
+    (opts.coloredMouseOver == MO_GLOW ? 1 : MO_PLASTIK_DARK(W))
+#define MO_STD_LIGHT(W, S)                                              \
+    (opts.coloredMouseOver == MO_GLOW ? 1 : MO_PLASTIK_LIGHT(W))
 
 #define FULLLY_ROUNDED     (opts.round>=ROUND_FULL)
 #define DO_EFFECT          (EFFECT_NONE!=opts.buttonEffect)
@@ -298,11 +270,8 @@ enum
 
 #define FOCUS_ALPHA              0.08
 #define FOCUS_GLOW_LINE_ALPHA    0.5
-#if !defined __cplusplus
-#define BORDER_BLEND_ALPHA(W)    (WIDGET_ENTRY==(W) || WIDGET_SCROLLVIEW==(W) || WIDGET_SPIN==(W) || WIDGET_COMBO_BUTTON==(W) ? 0.4 : 0.7)
-#else // !defined __cplusplus
-#define BORDER_BLEND_ALPHA(W)    (WIDGET_ENTRY==(W) || WIDGET_SCROLLVIEW==(W) ? 0.45 : 0.7)
-#endif // !defined __cplusplus
+#define BORDER_BLEND_ALPHA(W)                                   \
+    (qtcOneOf(W, WIDGET_ENTRY, WIDGET_SCROLLVIEW) ? 0.45 : 0.7)
 
 #define ETCH_TOP_ALPHA           0.055
 #define ETCH_BOTTOM_ALPHA        0.1
@@ -323,19 +292,12 @@ enum
 #define RINGS_SQUARE_LARGE_SIZE  120.0
 #define RINGS_SQUARE_SMALL_SIZE  100.0
 
-#if !defined __cplusplus
-#define MENU_AND_TOOLTIP_RADIUS   (opts.round>=ROUND_FULL ? 5.0 : 3.5)
-#else // !defined __cplusplus
 #define MENU_AND_TOOLTIP_RADIUS   (opts.round>=ROUND_FULL ? 5.0 : 2.5)
-#endif // !defined __cplusplus
 
 #define GLOW_PROG_ALPHA 0.55
 
-#ifdef __cplusplus
-
 #include <QStyle>
-typedef enum
-{
+typedef enum {
     QtC_Round = QStyle::PM_CustomBase,
     QtC_TitleBarButtonAppearance,
     QtC_TitleAlignment,
@@ -368,8 +330,6 @@ typedef enum
 #define HOVER_BUTTON_ALPHA(A)    (DARK_WINDOW_TEXT(A) ? 0.25 : 0.65)
 #define WINDOW_TEXT_SHADOW_ALPHA(A) (EFFECT_SHADOW==(A) ? 0.10 : 0.60)
 #define WINDOW_SHADOW_COLOR(A)      (EFFECT_SHADOW==(A) ? Qt::black : Qt::white)
-
-#endif
 
 #define QTCURVE_PREVIEW_CONFIG      "QTCURVE_PREVIEW_CONFIG"
 #define QTCURVE_PREVIEW_CONFIG_FULL "QTCURVE_PREVIEW_CONFIG_FULL"
@@ -445,15 +405,9 @@ typedef enum
     IMG_FILE
 } EImageType;
 
-typedef struct
-{
-#if defined __cplusplus
+typedef struct {
     QString   file;
     QPixmap   img;
-#else // __cplusplus
-    const char *file;
-    GdkPixbuf *img;
-#endif // __cplusplus
 } QtCPixmap;
 
 #define BGND_IMG_ON_BORDER (IMG_FILE==opts.bgndImage.type && opts.bgndImage.onBorder)
@@ -522,14 +476,9 @@ typedef enum
     EFFECT_SHADOW
 } EEffect;
 
-typedef enum
-{
+typedef enum {
     PIX_CHECK,
-#ifdef __cplusplus
     PIX_DOT
-#else // __cplusplus
-    PIX_BLANK
-#endif // __cplusplus
 } EPixmap;
 
 typedef enum
@@ -589,11 +538,9 @@ typedef enum
     APP_ALLOW_NONE
 } EAppAllow;
 
-#define IS_SLIDER(W)        (WIDGET_SLIDER==(W) || WIDGET_SB_SLIDER==(W))
-#define IS_TROUGH(W)        (WIDGET_SLIDER_TROUGH==(W) || WIDGET_PBAR_TROUGH==(W) || WIDGET_TROUGH==(W) || WIDGET_FILLED_SLIDER_TROUGH==(W))
-#ifndef __cplusplus
-#define IS_TOGGLE_BUTTON(W) (WIDGET_TOGGLE_BUTTON==(W) || WIDGET_CHECKBOX==(W))
-#endif // __cplusplus
+#define IS_SLIDER(w) qtcOneOf(w, WIDGET_SLIDER, WIDGET_SB_SLIDER)
+#define IS_TROUGH(w) qtcOneOf(w, WIDGET_SLIDER_TROUGH, WIDGET_PBAR_TROUGH, \
+                              WIDGET_TROUGH, WIDGET_FILLED_SLIDER_TROUGH)
 
 typedef enum
 {
@@ -726,7 +673,8 @@ typedef enum
     SLIDER_CIRCULAR
 } ESliderStyle;
 
-#define ROTATED_SLIDER (SLIDER_PLAIN_ROTATED==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle)
+#define ROTATED_SLIDER                                                  \
+    qtcOneOf(opts.sliderStyle, SLIDER_PLAIN_ROTATED, SLIDER_ROUND_ROTATED)
 
 typedef enum
 {
@@ -759,7 +707,7 @@ typedef enum
     GLOW_END
 } EGlow;
 
-#define FULL_FOCUS     (FOCUS_FULL==opts.focus  || FOCUS_FILLED==opts.focus)
+#define FULL_FOCUS qtcOneOf(opts.focus, FOCUS_FULL, FOCUS_FILLED)
 
 enum
 {
@@ -768,53 +716,33 @@ enum
     HIDE_KWIN     = 0x02
 };
 
-#if defined __cplusplus
-typedef enum
-{
+typedef enum {
     ALIGN_LEFT,
     ALIGN_CENTER,
     ALIGN_FULL_CENTER,
     ALIGN_RIGHT
 } EAlign;
-#endif
 
-#ifdef __cplusplus
-struct GradientStop
-#else // __cplusplus
-typedef struct
-#endif // __cplusplus
-{
-#ifdef __cplusplus
+struct GradientStop {
     GradientStop(double p=0.0, double v=0.0, double a=1.0) : pos(p), val(v), alpha(a) { }
 
     bool operator==(const GradientStop &o) const
     {
-        return qtcEqual(pos, o.pos) && qtcEqual(val, o.val) && qtcEqual(alpha, o.alpha);
+        return (qtcEqual(pos, o.pos) && qtcEqual(val, o.val) &&
+                qtcEqual(alpha, o.alpha));
     }
 
     bool operator<(const GradientStop &o) const
     {
-        return pos<o.pos || (qtcEqual(pos, o.pos) && (val<o.val || (qtcEqual(val, o.val) && alpha<o.alpha)));
+        return pos<o.pos || (qtcEqual(pos, o.pos) &&
+                             (val < o.val || (qtcEqual(val, o.val) &&
+                                              alpha < o.alpha)));
     }
-#endif //__cplusplus
 
     double pos,
            val,
            alpha;
-}
-#ifndef __cplusplus
-GradientStop
-#endif // __cplusplus
-;
-
-#if 0
-typedef enum
-{
-    LV_NONE,
-    LV_NEW,
-    LV_OLD
-} ELvLines;
-#endif
+};
 
 typedef struct
 {
@@ -824,7 +752,6 @@ typedef struct
         sides;
 } WindowBorders;
 
-#ifdef __cplusplus
 struct GradientStopCont : public std::set<GradientStop>
 {
     GradientStopCont fix() const
@@ -843,38 +770,21 @@ struct GradientStopCont : public std::set<GradientStop>
         return c;
     }
 };
-struct Gradient
-#else // __cplusplus
-typedef struct
-#endif // __cplusplus
-{
-#ifdef __cplusplus
+struct Gradient {
     Gradient() : border(GB_3D) { }
 
     bool operator==(const Gradient &o) const
     {
         return border==o.border && stops==o.stops;
     }
-#endif // __cplusplus
     EGradientBorder  border;
-#ifdef __cplusplus
     GradientStopCont stops;
-#else // __cplusplus
-    int              numStops;
-    GradientStop     *stops;
-#endif // __cplusplus
-}
-#ifndef __cplusplus
-Gradient
-#endif // __cplusplus
-;
+};
 
 #define USE_CUSTOM_SHADES(A) ((A).customShades[0]>0.00001)
 #define USE_CUSTOM_ALPHAS(A) ((A).customAlphas[0]>0.00001)
 
-#ifdef __cplusplus
 typedef std::map<EAppearance, Gradient> GradientCont;
-#endif
 typedef struct {
     int              version,
                      contrast,
@@ -987,10 +897,8 @@ typedef struct {
                      sliderAppearance,
                      titlebarAppearance,
                      inactiveTitlebarAppearance,
-#ifdef __cplusplus
                      titlebarButtonAppearance,
                      dwtAppearance,
-#endif // __cplusplus
                      selectionAppearance,
                      menuStripeAppearance,
                      progressAppearance,
@@ -1025,18 +933,12 @@ typedef struct {
                      customCrBgndColor,
                      customProgressColor;
     EShading         shading;
-#if defined __cplusplus
     EAlign           titlebarAlignment;
     EEffect          titlebarEffect;
     bool             centerTabText;
-#endif //__cplusplus
     double           customShades[QTC_NUM_STD_SHADES],
                      customAlphas[NUM_STD_ALPHAS];
-#ifdef __cplusplus
     GradientCont     customGradient;
-#else // __cplusplus
-    Gradient         *customGradient[NUM_CUSTOM_GRAD];
-#endif // __cplusplus
     QtCPixmap        bgndPixmap;
     QtCPixmap        menuBgndPixmap;
     QtCImage         bgndImage,
@@ -1055,7 +957,7 @@ typedef struct {
 } Options;
 
 void qtcSetupGradient(Gradient *grad, EGradientBorder border, int numStops, ...);
-const Gradient * qtcGetGradient(EAppearance app, const Options *opts);
+const Gradient *qtcGetGradient(EAppearance app, const Options *opts);
 
 QTC_ALWAYS_INLINE static inline bool
 qtcDrawMenuBorder(const Options *opts)
@@ -1080,21 +982,12 @@ qtcIsCustomBgnd(const Options *opts)
 #define midColor(COLA, COLB) KColorUtils::mix((COLA), (COLB), 0.5)
 #else
 #include <qtcurve-utils/color.h>
-#ifdef __cplusplus
 #define tint(COLA, COLB, FACTOR) qtcColorTint(&(COLA), &(COLB), (FACTOR))
 #define midColor(COLA, COLB) qtcColorMix(&(COLA), &(COLB), 0.5)
 #define midColorF(COLA, COLB, FACTOR) qtcColorMix(&(COLA), &(COLB), FACTOR-0.5)
-#else // __cplusplus
-#define tint(COLA, COLB, FACTOR) qtcColorTint((COLA), (COLB), (FACTOR))
-#define midColor(COLA, COLB) qtcColorMix((COLA), (COLB), 0.5)
-#endif // __cplusplus
 #endif
 
-#ifdef __cplusplus
 EAppearance qtcWidgetApp(EWidget w, const Options *opts, bool active=true);
-#else
-EAppearance qtcWidgetApp(EWidget w, const Options *opts);
-#endif
 
 typedef enum
 {
@@ -1110,18 +1003,13 @@ typedef enum
 #define BGND_SHINE_STEPS  8
 
 #define MIN_ROUND_FULL_SIZE     8
-#ifdef __cplusplus
 #define MIN_ROUND_EXTRA_SIZE(W) (WIDGET_SPIN==(W) ? 7 : 14)
-#else // __cplusplus
-#define MIN_ROUND_EXTRA_SIZE(W) (WIDGET_SPIN_UP==(W) || WIDGET_SPIN_DOWN==(W) || WIDGET_SPIN==(W) ? 7 : 14)
-#endif // __cplusplus
 
-#if defined __cplusplus
-#define IS_MAX_ROUND_WIDGET(A) \
-            (WIDGET_STD_BUTTON==A || WIDGET_DEF_BUTTON==A /*|| WIDGET_MENU_BUTTON==A*/)
+#define IS_MAX_ROUND_WIDGET(A)                                          \
+    qtcOneOf(A, WIDGET_STD_BUTTON, WIDGET_DEF_BUTTON/*, WIDGET_MENU_BUTTON*/)
 #define IS_EXTRA_ROUND_WIDGET(A) \
-            (A!=WIDGET_MENU_ITEM && A!=WIDGET_TAB_FRAME && A!=WIDGET_PBAR_TROUGH && A!=WIDGET_PROGRESSBAR && \
-             A!=WIDGET_MDI_WINDOW && A!=WIDGET_MDI_WINDOW_TITLE)
+    qtcNoneOf(A, WIDGET_MENU_ITEM, WIDGET_TAB_FRAME, WIDGET_PBAR_TROUGH, \
+              WIDGET_PROGRESSBAR, WIDGET_MDI_WINDOW, WIDGET_MDI_WINDOW_TITLE)
 
 #define EXTRA_INNER_RADIUS   3.5
 #define EXTRA_OUTER_RADIUS   4.5
@@ -1134,29 +1022,11 @@ typedef enum
 #define SLIGHT_OUTER_RADIUS  1.75
 #define SLIGHT_ETCH_RADIUS   2.75
 
-#else // __cplusplus
-
-#define IS_MAX_ROUND_WIDGET(A) \
-            (WIDGET_STD_BUTTON==A || WIDGET_DEF_BUTTON==A || WIDGET_TOGGLE_BUTTON==A /*|| WIDGET_MENU_BUTTON==A*/)
-#define IS_EXTRA_ROUND_WIDGET(A) \
-            (A!=WIDGET_MENU_ITEM && A!=WIDGET_TAB_FRAME && A!=WIDGET_PBAR_TROUGH && A!=WIDGET_PROGRESSBAR)
-
-#define EXTRA_INNER_RADIUS   4
-#define EXTRA_OUTER_RADIUS   5
-#define EXTRA_ETCH_RADIUS    6
-#define FULL_INNER_RADIUS    2
-#define FULL_OUTER_RADIUS    3
-#define FULL_ETCH_RADIUS     4
-#define SLIGHT_INNER_RADIUS  1
-#define SLIGHT_OUTER_RADIUS  2
-#define SLIGHT_ETCH_RADIUS   3
-
-#endif // __cplusplus
-
 #define MAX_RADIUS_INTERNAL 9.0
 #define MAX_RADIUS_EXTERNAL (MAX_RADIUS_INTERNAL+2.0)
 
 ERound qtcGetWidgetRound(const Options *opts, int w, int h, EWidget widget);
-double qtcGetRadius(const Options *opts, int w, int h, EWidget widget, ERadius rad);
+double qtcGetRadius(const Options *opts, int w, int h, EWidget widget,
+                    ERadius rad);
 
 #endif // __COMMON_H__

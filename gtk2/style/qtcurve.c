@@ -1394,11 +1394,11 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
     }
     else if(widget && pbar)
         drawProgress(cr, style, state, widget, area, x, y, width, height, rev, FALSE);
-    else if(DETAIL("menuitem"))
+    else if(DETAIL("menuitem")) {
         drawMenuItem(cr, state, style, widget, area, x, y, width, height);
-    else if(DETAIL("menu"))
+    } else if(DETAIL("menu")) {
         drawMenu(cr, state, style, widget, area, x, y, width, height);
-    else if(detail &&(!strcmp(detail, "paned") || !strcmp(detail+1, "paned")))
+    } else if(detail &&(!strcmp(detail, "paned") || !strcmp(detail+1, "paned")))
     {
         GtkOrientation orientation = GTK_ORIENTATION_HORIZONTAL;
 
