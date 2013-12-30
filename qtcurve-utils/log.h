@@ -86,7 +86,7 @@ void _qtcLogV(QtcLogLevel level, const char *fname, int line, const char *func,
             break;                                                      \
         }                                                               \
         _qtcLog((QtcLogLevel)level, __FILE__, __LINE__, __FUNCTION__,   \
-                fmt,##args);                                            \
+                fmt, ##args);                                           \
     } while (0)
 
 #define qtcDebug(fmt, args...)                  \

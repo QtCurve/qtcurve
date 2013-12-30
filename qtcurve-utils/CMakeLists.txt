@@ -4,9 +4,10 @@ set(qtcurve_utils_SRCS
   log.c
   utils.c
   strs.c
-  shadow.c)
+  shadow.c
+  timer.c)
 set(qtcurve_utils_LINKS
-  m ${LIBEXECINFO_LIBRARIES})
+  m rt ${LIBEXECINFO_LIBRARIES})
 
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 

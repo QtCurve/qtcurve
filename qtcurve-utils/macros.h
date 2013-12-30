@@ -50,7 +50,7 @@
 #define __QTC_IS_EMPTY_PAREN_FALSE(ret_true, ret_false, arg)    \
     __QTC_IS_SEP(ret_false, ret_true, arg)
 /**
- * Test if @arg is empty, evaluate to @ret_true if is empty,
+ * Test if @arg is empty, evaluate to @ret_true if it is not empty,
  * evaluate to @ret_false otherwise. NOTE, this may not work if arg is a macro
  * that can be evaluated to a comma separate list without parentheses or is
  * the name of a function like macro.
