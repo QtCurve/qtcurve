@@ -21,8 +21,6 @@
  *****************************************************************************/
 
 #include <qtcurve-utils/gtkutils.h>
-#include <gtk/gtk.h>
-#include "compatability.h"
 
 static GHashTable *qtcWidgetMapHashTable[2] = {NULL, NULL};
 

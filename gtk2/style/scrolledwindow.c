@@ -21,8 +21,6 @@
  *****************************************************************************/
 
 #include <qtcurve-utils/gtkutils.h>
-
-#include "compatability.h"
 #include <common/common.h>
 
 extern Options opts;
@@ -152,7 +150,7 @@ static void qtcScrolledWindowSetupConnections(GtkWidget *widget, GtkWidget *pare
         qtcConnectToData(obj, "QTC_SCROLLED_WINDOW_FOCUS_OUT_ID",
                          "focus-out-event", qtcScrolledWindowFocusOut, parent);
         if (parent && ENTRY_MO) {
-            gint x, y;
+            int x, y;
             GtkAllocation alloc = qtcWidgetGetAllocation(parent);
 
             gdk_window_get_pointer(gtk_widget_get_window(parent), &x, &y, 0L);
@@ -188,7 +186,7 @@ void qtcScrolledWindowSetup(GtkWidget *widget)
                 qtcScrolledWindowSetupConnections(child, widget);
             else
             {
-                const gchar *type=g_type_name(G_OBJECT_TYPE(child));
+                const char *type=g_type_name(G_OBJECT_TYPE(child));
 
                 if(type && (0==strcmp(type, "ExoIconView") || 0==strcmp(type, "FMIconContainer")))
                     qtcScrolledWindowSetupConnections(child, widget);

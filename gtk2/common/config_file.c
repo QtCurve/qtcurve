@@ -766,7 +766,7 @@ readDoubleList(GHashTable *cfg, const char *key, double *list, int count)
     } while (0)
 
 #define CFG_READ_STRING_LIST(ENTRY) do {                 \
-        const gchar *str = readStringEntry(cfg, #ENTRY); \
+        const char *str = readStringEntry(cfg, #ENTRY); \
         if (str && 0 != str[0]) {                        \
             opts->ENTRY = g_strsplit(str, ",", -1);      \
         } else if (def->ENTRY) {                         \

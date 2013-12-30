@@ -22,7 +22,6 @@
 
 #include <qtcurve-utils/gtkutils.h>
 #include "combobox.h"
-#include "compatability.h"
 
 /**
  * Setting appears-as-list on a non-editable combo creates a view over the

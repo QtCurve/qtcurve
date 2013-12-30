@@ -61,9 +61,7 @@ windowMask(int x, int y, int w, int h, gboolean full)
     }
     return cairo_region_create_rectangles(rects, numRects);
 }
-#endif
 
-#if GTK_CHECK_VERSION(2, 90, 0)
 void clipToRegion(cairo_t *cr, cairo_region_t *region)
 {
     cairo_new_path(cr);
@@ -133,7 +131,7 @@ drawVLine(cairo_t *cr, const GdkColor *col, double a, int x, int y, int h)
 }
 
 void drawAreaColor(cairo_t *cr, GdkRectangle *area, const GdkColor *col,
-                   gint x, gint y, gint width, gint height, double alpha)
+                   int x, int y, int width, int height, double alpha)
 {
     setCairoClipping(cr, area);
     cairo_rectangle(cr, x, y, width, height);
@@ -153,7 +151,7 @@ drawBgnd(cairo_t *cr, GdkColor *col, GtkWidget *widget, GdkRectangle *area,
 
 void
 drawAreaModColor(cairo_t *cr, GdkRectangle *area, GdkColor *orig,
-                 double mod, gint x, gint y, gint width, gint height)
+                 double mod, int x, int y, int width, int height)
 {
     GdkColor modified = shadeColor(orig, mod);
 
@@ -351,7 +349,7 @@ void createPath(cairo_t *cr, double xd, double yd, double width, double height, 
 
 void
 drawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state,
-           GdkRectangle *area, gint x, gint y, gint width, gint height,
+           GdkRectangle *area, int x, int y, int width, int height,
            GdkColor *c_colors, int round, EBorder borderProfile,
            EWidget widget, int flags, int borderVal)
 {
@@ -565,8 +563,8 @@ void addStripes(cairo_t *cr, int x, int y, int w, int h, bool horizontal)
 
 void
 drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
-               GdkRectangle *area, gint x, gint y,
-               gint width, gint height, GdkColor *base, GdkColor *colors,
+               GdkRectangle *area, int x, int y,
+               int width, int height, GdkColor *base, GdkColor *colors,
                int round, EWidget widget, EBorder borderProfile, int flags,
                GtkWidget *wid)
 {
@@ -1254,7 +1252,7 @@ void drawBgndRing(cairo_t *cr, int x, int y, int size, int size2, gboolean isWin
     }
 }
 
-void drawBgndRings(cairo_t *cr, gint x, gint y, gint width, gint height, gboolean isWindow)
+void drawBgndRings(cairo_t *cr, int x, int y, int width, int height, gboolean isWindow)
 {
     static cairo_surface_t *bgndImage=NULL;
     static cairo_surface_t *menuBgndImage=NULL;
@@ -1392,8 +1390,8 @@ void drawBgndRings(cairo_t *cr, gint x, gint y, gint width, gint height, gboolea
 }
 
 void
-drawBgndImage(cairo_t *cr, GtkStyle *style, GdkRectangle *area, gint x, gint y,
-              gint w, gint h, GdkColor *col, gboolean isWindow, double alpha)
+drawBgndImage(cairo_t *cr, GtkStyle *style, GdkRectangle *area, int x, int y,
+              int w, int h, GdkColor *col, gboolean isWindow, double alpha)
 {
     QTC_UNUSED(style);
     QTC_UNUSED(area);
@@ -1416,7 +1414,7 @@ drawBgndImage(cairo_t *cr, GtkStyle *style, GdkRectangle *area, gint x, gint y,
 
 void
 drawStripedBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
-                gint x, gint y, gint w, gint h, GdkColor *col,
+                int x, int y, int w, int h, GdkColor *col,
                 gboolean isWindow, double alpha)
 {
     QTC_UNUSED(style);
@@ -1473,7 +1471,7 @@ drawStripedBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
 }
 
 gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, GdkWindow *window, GtkWidget *widget,
-                        gint x, gint y, gint width, gint height)
+                        int x, int y, int width, int height)
 {
     GtkWidget *parent=NULL;
     if(widget && (parent=gtk_widget_get_parent(widget)) && isOnHandlebox(parent, NULL, 0))
@@ -1580,7 +1578,7 @@ gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, GdkWin
 void
 drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
                GdkWindow *window, GtkWidget *widget, GdkRectangle *area,
-               gint x, gint y, gint width, gint height, int round, EWidget w)
+               int x, int y, int width, int height, int round, EWidget w)
 {
     gboolean enabled = !(GTK_STATE_INSENSITIVE == state ||
                          (widget && !gtk_widget_is_sensitive(widget)));
@@ -1992,7 +1990,7 @@ void drawProgressGroove(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkWin
 
 void
 drawSliderGroove(cairo_t *cr, GtkStyle *style, GtkStateType state,
-                 GdkWindow *window, GtkWidget *widget, const gchar *detail,
+                 GdkWindow *window, GtkWidget *widget, const char *detail,
                  GdkRectangle *area, int x, int y, int width, int height,
                  gboolean horiz)
 {
@@ -2079,7 +2077,7 @@ drawSliderGroove(cairo_t *cr, GtkStyle *style, GtkStateType state,
 
 void
 drawTriangularSlider(cairo_t *cr, GtkStyle *style, GtkStateType state,
-                     const gchar *detail, GdkRectangle *area, int x, int y,
+                     const char *detail, GdkRectangle *area, int x, int y,
                      int width, int height)
 {
     QTC_UNUSED(area);
@@ -2269,7 +2267,7 @@ drawTriangularSlider(cairo_t *cr, GtkStyle *style, GtkStateType state,
 
 void
 drawScrollbarGroove(cairo_t *cr, GtkStyle *style, GtkStateType state,
-                    GdkWindow *window, GtkWidget *widget, const gchar *detail,
+                    GdkWindow *window, GtkWidget *widget, const char *detail,
                     GdkRectangle *area, int x, int y, int width, int height,
                     gboolean horiz)
 {
@@ -2526,8 +2524,8 @@ void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangl
 #define QTC_MASK_PROP "QTC_WIDGET_MASK"
 
 void
-createRoundedMask(cairo_t *cr, GtkWidget *widget, gint x, gint y, gint width,
-                  gint height, double radius, gboolean isToolTip)
+createRoundedMask(cairo_t *cr, GtkWidget *widget, int x, int y, int width,
+                  int height, double radius, gboolean isToolTip)
 {
     QTC_UNUSED(cr);
     if (widget) {
@@ -2719,7 +2717,7 @@ void drawPolygon(GdkWindow *window, GtkStyle *style, GdkColor *col, GdkRectangle
 }
 
 void drawArrow(GdkWindow *window, GtkStyle *style, GdkColor *col, GdkRectangle *area, GtkArrowType arrow_type,
-               gint x, gint y, gboolean small, gboolean fill)
+               int x, int y, gboolean small, gboolean fill)
 {
     if(small)
         switch(arrow_type)
@@ -2820,18 +2818,18 @@ static void setGapClip(cairo_t *cr, GdkRectangle *area, GtkPositionType gapSide,
     }
 }
 
-static void ge_cairo_transform_for_layout(cairo_t *cr, PangoLayout *layout, int x, int y)
+static void
+ge_cairo_transform_for_layout(cairo_t *cr, PangoLayout *layout, int x, int y)
 {
-#if GTK_CHECK_VERSION(2, 12, 0)
     const PangoMatrix *matrix;
 
     matrix = pango_context_get_matrix(pango_layout_get_context(layout));
-    if (matrix)
-    {
+    if (matrix) {
         cairo_matrix_t cairo_matrix;
         PangoRectangle rect;
 
-        cairo_matrix_init(&cairo_matrix, matrix->xx, matrix->yx, matrix->xy, matrix->yy, matrix->x0, matrix->y0);
+        cairo_matrix_init(&cairo_matrix, matrix->xx, matrix->yx,
+                          matrix->xy, matrix->yy, matrix->x0, matrix->y0);
         pango_layout_get_extents(layout, NULL, &rect);
         pango_matrix_transform_rectangle(matrix, &rect);
         pango_extents_to_pixels(&rect, NULL);
@@ -2840,15 +2838,14 @@ static void ge_cairo_transform_for_layout(cairo_t *cr, PangoLayout *layout, int 
         cairo_matrix.y0 += y - rect.y;
 
         cairo_set_matrix(cr, &cairo_matrix);
-    }
-    else
-#endif
+    } else {
         cairo_translate(cr, x, y);
+    }
 }
 
 void
 drawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state,
-           gboolean use_text, GdkRectangle *area, gint x, gint y,
+           gboolean use_text, GdkRectangle *area, int x, int y,
            PangoLayout *layout)
 {
     g_return_if_fail(GTK_IS_STYLE(style));
@@ -2929,54 +2926,48 @@ void drawToolTip(cairo_t *cr, GtkWidget *widget, GdkRectangle *area, int x, int 
 {
     GdkColor *col=&qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP];
 
-#if GTK_CHECK_VERSION(2,9,0)
-    gboolean nonGtk=isFakeGtk(),
-        rounded=!nonGtk && widget && !(opts.square&SQUARE_TOOLTIPS),
-        useAlpha=!nonGtk && qtSettings.useAlpha && isRgbaWidget(widget) && compositingActive(widget);
+    gboolean nonGtk = isFakeGtk();
+    gboolean rounded = !nonGtk && widget && !(opts.square & SQUARE_TOOLTIPS);
+    gboolean useAlpha = (!nonGtk && qtSettings.useAlpha &&
+                         isRgbaWidget(widget) && compositingActive(widget));
 
-#if GTK_CHECK_VERSION(2,12,0)
-    if(!nonGtk && !useAlpha && GTK_IS_WINDOW(widget))
+    if (!nonGtk && !useAlpha && GTK_IS_WINDOW(widget))
         gtk_window_set_opacity(GTK_WINDOW(widget), 0.875);
-#endif
 
-    if(rounded)
-    {
-        if(useAlpha)
-        {
+    if (rounded) {
+        if (useAlpha) {
             cairo_rectangle(cr, x, y, width, height);
             cairo_set_operator(cr, CAIRO_OPERATOR_CLEAR);
             cairo_set_source_rgba(cr, 0, 0, 0, 1);
             cairo_fill(cr);
             clearRoundedMask(widget, TRUE);
+        } else {
+            createRoundedMask(cr, widget, x, y, width, height,
+                              MENU_AND_TOOLTIP_RADIUS, TRUE);
         }
-        else
-            createRoundedMask(cr, widget, x, y, width, height, MENU_AND_TOOLTIP_RADIUS, TRUE);
-        clipPathRadius(cr, x, y, width, height, MENU_AND_TOOLTIP_RADIUS, ROUNDED_ALL);
+        clipPathRadius(cr, x, y, width, height, MENU_AND_TOOLTIP_RADIUS,
+                       ROUNDED_ALL);
     }
-#endif
     if(useAlpha)
         cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
 
     drawBevelGradient(cr, area, x, y, width, height, col, true, FALSE,
                       opts.tooltipAppearance, WIDGET_TOOLTIP,
                       useAlpha ? 0.875 : 1.0);
-#if GTK_CHECK_VERSION(2,9,0)
-    if(!rounded)
-#endif
-        if(qtcIsFlat(opts.tooltipAppearance))
-        {
-            cairo_new_path(cr);
-            /*if(qtcIsFlat(opts.tooltipAppearance))*/
-            qtcCairoSetColor(
-                cr, &qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT]);
-            /*else
-              cairo_set_source_rgba(cr, 0, 0, 0, 0.25);*/
-            cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
-            cairo_stroke(cr);
-        }
+    if (!rounded && qtcIsFlat(opts.tooltipAppearance)) {
+        cairo_new_path(cr);
+        /*if(qtcIsFlat(opts.tooltipAppearance))*/
+        qtcCairoSetColor(cr,
+                         &qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT]);
+        /*else
+          cairo_set_source_rgba(cr, 0, 0, 0, 0.25);*/
+        cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
+        cairo_stroke(cr);
+    }
 
-    if(useAlpha)
+    if (useAlpha) {
         cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
+    }
 }
 
 void drawSplitter(cairo_t *cr, GtkStateType state, GtkStyle *style, GdkRectangle *area, int x, int y, int width, int height)
@@ -3344,8 +3335,8 @@ drawMenu(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
 }
 
 void drawBoxGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow, GtkStateType state,
-                GtkWidget *widget, GdkRectangle *area, gint x, gint y, gint width, gint height, GtkPositionType gapSide,
-                gint gapX, gint gapWidth, EBorder borderProfile, gboolean isTab)
+                GtkWidget *widget, GdkRectangle *area, int x, int y, int width, int height, GtkPositionType gapSide,
+                int gapX, int gapWidth, EBorder borderProfile, gboolean isTab)
 {
     g_return_if_fail(GTK_IS_STYLE(style));
 
@@ -3398,9 +3389,9 @@ void drawBoxGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow, GtkStateType
 }
 
 void
-drawBoxGapFixes(cairo_t *cr, GtkWidget *widget,  gint x, gint y,
-                gint width, gint height, GtkPositionType gapSide, gint gapX,
-                gint gapWidth)
+drawBoxGapFixes(cairo_t *cr, GtkWidget *widget,  int x, int y,
+                int width, int height, GtkPositionType gapSide, int gapX,
+                int gapWidth)
 {
     GdkColor *col1 = &qtcPalette.background[0],
         *col2 = &qtcPalette.background[opts.borderTab ? 0 : (APPEARANCE_FLAT==opts.appearance ? ORIGINAL_SHADE : FRAME_DARK_SHADOW)],
@@ -3529,8 +3520,8 @@ drawBoxGapFixes(cairo_t *cr, GtkWidget *widget,  gint x, gint y,
 }
 
 void drawShadowGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow, GtkStateType state,
-                   GtkWidget *widget, GdkRectangle *area, gint x, gint y, gint width, gint height, GtkPositionType gapSide,
-                   gint gapX, gint gapWidth)
+                   GtkWidget *widget, GdkRectangle *area, int x, int y, int width, int height, GtkPositionType gapSide,
+                   int gapX, int gapWidth)
 {
     gboolean drawFrame=TRUE,
         isGroupBox=IS_GROUP_BOX(widget);
@@ -3552,7 +3543,7 @@ void drawShadowGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow, GtkStateT
             {
                 GtkFrame       *frame=GTK_FRAME(widget);
                 GtkRequisition child_requisition;
-                gint           height_extra;
+                int           height_extra;
                 GtkStyle       *style=frame ? gtk_widget_get_style(GTK_WIDGET(frame)) : NULL;
                 GtkWidget      *label=frame ? gtk_frame_get_label_widget(frame) : NULL;
 
@@ -3631,7 +3622,7 @@ void drawShadowGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow, GtkStateT
     }
 }
 
-void drawCheckBox(cairo_t *cr, GtkStateType state, GtkShadowType shadow, GtkStyle *style, GtkWidget *widget, const gchar *detail,
+void drawCheckBox(cairo_t *cr, GtkStateType state, GtkShadowType shadow, GtkStyle *style, GtkWidget *widget, const char *detail,
                   GdkRectangle *area, int x, int y, int width, int height)
 {
     if(GTK_STATE_PRELIGHT==state && (GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app))
@@ -3770,7 +3761,7 @@ void drawCheckBox(cairo_t *cr, GtkStateType state, GtkShadowType shadow, GtkStyl
     }
 }
 
-void drawRadioButton(cairo_t *cr, GtkStateType state, GtkShadowType shadow, GtkStyle *style, GtkWidget *widget, const gchar *detail,
+void drawRadioButton(cairo_t *cr, GtkStateType state, GtkShadowType shadow, GtkStyle *style, GtkWidget *widget, const char *detail,
                      GdkRectangle *area, int x, int y, int width, int height)
 {
     if(GTK_STATE_PRELIGHT==state && (GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app))
@@ -3927,7 +3918,7 @@ void drawRadioButton(cairo_t *cr, GtkStateType state, GtkShadowType shadow, GtkS
 
 void
 drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
-        const gchar *detail, GdkRectangle *area, int x, int y, int width,
+        const char *detail, GdkRectangle *area, int x, int y, int width,
         int height, GtkPositionType gapSide)
 {
     QTC_UNUSED(detail);
@@ -4078,10 +4069,6 @@ drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
             : lastTab
             ? ROUNDED_BOTTOMRIGHT
             : ROUNDED_NONE;
-#if GTK_CHECK_VERSION(2, 10, 0) && !GTK_CHECK_VERSION(2, 10, 11)
-        if(!active)
-            height-=2;
-#endif
         clipPath(cr, x, y-4, width, height+4, WIDGET_TAB_BOT, RADIUS_EXTERNAL, round);
         fillTab(cr, style, widget, area, state, col, x+mod+sizeAdjust, y, width-(2*mod+(sizeAdjust)), height-1, TRUE,
                 WIDGET_TAB_BOT, NULL!=notebook);
@@ -4127,13 +4114,6 @@ drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
             : lastTab
             ? ROUNDED_TOPRIGHT
             : ROUNDED_NONE;
-#if GTK_CHECK_VERSION(2, 10, 0) && !GTK_CHECK_VERSION(2, 10, 11)
-        if(!active)
-        {
-            y+=2;
-            height-=2;
-        }
-#endif
         clipPath(cr, x+mod+sizeAdjust, y, width-(2*(mod+(mozTab ? 2 *sizeAdjust : sizeAdjust))), height+5, WIDGET_TAB_TOP, RADIUS_EXTERNAL, round);
         fillTab(cr, style, widget, area, state, col, x+mod+sizeAdjust, y+1,
                 width-(2*(mod+(mozTab ? 2 *sizeAdjust : sizeAdjust))), height-1, TRUE, WIDGET_TAB_TOP, NULL!=notebook);
@@ -4177,10 +4157,6 @@ drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
             : lastTab
             ? ROUNDED_BOTTOMRIGHT
             : ROUNDED_NONE;
-#if GTK_CHECK_VERSION(2, 10, 0) && !GTK_CHECK_VERSION(2, 10, 11)
-        if(!active)
-            width-=2;
-#endif
         clipPath(cr, x-4, y, width+4, height, WIDGET_TAB_BOT, RADIUS_EXTERNAL, round);
         fillTab(cr, style, widget, area, state, col, x, y+mod+sizeAdjust, width-1, height-(2*(mod+sizeAdjust)), FALSE,
                 WIDGET_TAB_BOT, NULL!=notebook);
@@ -4224,13 +4200,6 @@ drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
             : lastTab
             ? ROUNDED_BOTTOMLEFT
             : ROUNDED_NONE;
-#if GTK_CHECK_VERSION(2, 10, 0) && !GTK_CHECK_VERSION(2, 10, 11)
-        if(!active)
-        {
-            x+=2;
-            width-=2;
-        }
-#endif
         clipPath(cr, x, y, width+4, height, WIDGET_TAB_TOP, RADIUS_EXTERNAL, round);
         fillTab(cr, style, widget, area, state, col, x+1, y+mod+sizeAdjust, width-1, height-(2*(mod+sizeAdjust)),
                 FALSE, WIDGET_TAB_TOP, NULL!=notebook);
@@ -4408,7 +4377,8 @@ static GdkPixbuf * scaleOrRef(GdkPixbuf *src, int width, int height)
         return gdk_pixbuf_scale_simple(src, width, height, GDK_INTERP_BILINEAR);
 }
 
-static GdkPixbuf * setTransparency(const GdkPixbuf *pixbuf, gdouble alpha_percent)
+static GdkPixbuf*
+setTransparency(const GdkPixbuf *pixbuf, double alpha_percent)
 {
     GdkPixbuf *target;
 

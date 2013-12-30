@@ -24,7 +24,6 @@
 #include <qtcurve-utils/x11wmmove.h>
 
 #include <gdk/gdkx.h>
-#include "compatability.h"
 #include "helpers.h"
 #include "qt_settings.h"
 #include "menu.h"
@@ -98,14 +97,6 @@ qtcWMMoveStore(GtkWidget *widget, GdkEventButton *event)
     qtcWMMoveLastY = event ? event->y_root : -1;
     qtcWMMoveDragWidget = widget;
 }
-
-#if !GTK_CHECK_VERSION(2, 12, 0)
-GdkWindow*
-gtk_widget_get_window(GtkWidget *widget)
-{
-    return widget->window;
-}
-#endif
 
 static void
 qtcWMMoveTrigger(GtkWidget *w, int x, int y)

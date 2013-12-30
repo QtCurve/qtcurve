@@ -23,10 +23,8 @@
 #ifndef __QTC_ANIMATION_H__
 #define __QTC_ANIMATION_H__
 
-#include <gtk/gtk.h>
-
 void qtcAnimationAddProgressBar();
 void qtcAnimationCleanup();
-gdouble qtcAnimationElapsed(gpointer data);
+double qtcAnimationElapsed(void *data);
 
 #endif

@@ -81,7 +81,7 @@ shadowToBorder(GtkShadowType shadow)
 }
 
 gboolean
-useButtonColor(const gchar *detail)
+useButtonColor(const char *detail)
 {
     return (detail &&
             (strcmp(detail, "optionmenu") == 0 ||
@@ -135,7 +135,7 @@ isSortColumn(GtkWidget *button)
             for (GList *child = children;child && !found;
                  child = g_list_next(child)) {
                 if (GTK_IS_ARROW(child->data)) {
-                    gint val;
+                    int val;
                     g_object_get(child->data, "arrow-type", &val, NULL);
                     if (GTK_ARROW_NONE != val) {
                         found = TRUE;
@@ -170,7 +170,7 @@ isSortColumn(GtkWidget *button)
 };
 
 GdkColor*
-getCellCol(GdkColor *std, const gchar *detail)
+getCellCol(GdkColor *std, const char *detail)
 {
     static GdkColor shaded;
 
@@ -312,7 +312,7 @@ gboolean isListViewHeader(GtkWidget *widget)
              (parent=gtk_widget_get_parent(parent)) && 0 == strcmp(g_type_name(G_OBJECT_TYPE(parent)), "GimpThumbBox")));
 }
 
-gboolean isEvolutionListViewHeader(GtkWidget *widget, const gchar *detail)
+gboolean isEvolutionListViewHeader(GtkWidget *widget, const char *detail)
 {
     GtkWidget *parent=NULL;
     return GTK_APP_EVOLUTION == qtSettings.app && widget && DETAIL("button") &&
@@ -478,8 +478,7 @@ isOnCombo(GtkWidget *w, int level)
 #if !GTK_CHECK_VERSION(2, 90, 0)
 gboolean isOnOptionMenu(GtkWidget *w, int level)
 {
-    if(w)
-    {
+    if (w) {
         if(GTK_IS_OPTION_MENU(w))
             return TRUE;
         else if(level<4)
@@ -682,13 +681,13 @@ EStepper getStepper(GtkWidget *widget, int x, int y, int width, int height)
 }
 
 #if GTK_CHECK_VERSION(2, 90, 0)
-void gdk_drawable_get_size(GdkWindow *window, gint *width, gint *height)
+void gdk_drawable_get_size(GdkWindow *window, int *width, int *height)
 {
     *width=gdk_window_get_width(window);
     *height=gdk_window_get_height(window);
 }
 
-void sanitizeSizeReal(GtkWidget *widget, gint *width, gint *height)
+void sanitizeSizeReal(GtkWidget *widget, int *width, int *height)
 {
     if(-1 == *width || -1 == *height)
     {
@@ -706,7 +705,7 @@ void sanitizeSizeReal(GtkWidget *widget, gint *width, gint *height)
     }
 }
 #else
-void sanitizeSize(GdkWindow *window, gint *width, gint *height)
+void sanitizeSize(GdkWindow *window, int *width, int *height)
 {
     if((-1 == *width) && (-1 == *height))
         gdk_window_get_size(window, width, height);
@@ -1157,7 +1156,7 @@ enableBlurBehind(GtkWidget *w, gboolean enable)
 }
 
 void
-getTopLevelSize(GdkWindow *window, gint *w, gint *h)
+getTopLevelSize(GdkWindow *window, int *w, int *h)
 {
     if (!(window && GDK_IS_WINDOW(window))) {
         if (w) {
@@ -1177,7 +1176,7 @@ getTopLevelSize(GdkWindow *window, gint *w, gint *h)
     }
 }
 
-// void getTopLevelFrameSize(GdkWindow *window, gint *w, gint *h)
+// void getTopLevelFrameSize(GdkWindow *window, int *w, int *h)
 // {
 //     if(!(window && GDK_IS_WINDOW(window)))
 //     {
@@ -1203,7 +1202,7 @@ getTopLevelSize(GdkWindow *window, gint *w, gint *h)
 //     }
 // }
 
-void getTopLevelOrigin(GdkWindow *window, gint *x, gint *y)
+void getTopLevelOrigin(GdkWindow *window, int *x, int *y)
 {
     if(x)
         *x = 0;
@@ -1214,8 +1213,8 @@ void getTopLevelOrigin(GdkWindow *window, gint *x, gint *y)
         while(window && GDK_IS_WINDOW(window) && gdk_window_get_window_type(window) != GDK_WINDOW_TOPLEVEL &&
               gdk_window_get_window_type(window) != GDK_WINDOW_TEMP)
         {
-            gint xloc;
-            gint yloc;
+            int xloc;
+            int yloc;
             gdk_window_get_position(window, &xloc, &yloc);
             if(x)
                 *x += xloc;
@@ -1226,7 +1225,7 @@ void getTopLevelOrigin(GdkWindow *window, gint *x, gint *y)
     }
 }
 
-gboolean mapToTopLevel(GdkWindow *window, GtkWidget *widget, gint *x, gint *y, gint *w, gint *h) //, gboolean frame)
+gboolean mapToTopLevel(GdkWindow *window, GtkWidget *widget, int *x, int *y, int *w, int *h) //, gboolean frame)
 {
     // always initialize arguments (to invalid values)
     if(x) *x=0;

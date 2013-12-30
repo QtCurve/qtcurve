@@ -45,7 +45,7 @@
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 typedef GdkColor color;
-typedef gchar ** Strings;
+typedef char **Strings;
 
 #define SETTINGS_GROUP        "Settings"
 #define KWIN_GROUP            "KWin"

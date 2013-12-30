@@ -21,7 +21,6 @@
  *****************************************************************************/
 
 #include <qtcurve-utils/gtkutils.h>
-#include "compatability.h"
 
 static void
 qtcScrollbarCleanup(GtkWidget *widget)

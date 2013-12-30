@@ -21,7 +21,6 @@
  *****************************************************************************/
 
 #include <qtcurve-utils/gtkutils.h>
-#include "compatability.h"
 
 static GtkWidget *qtcEntryLastMo = NULL;
 

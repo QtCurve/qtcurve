@@ -23,7 +23,6 @@
 #ifndef __QTCURVE_H__
 #define __QTCURVE_H__
 
-#include <gtk/gtk.h>
 #include <common/common.h>
 #include "config.h"
 

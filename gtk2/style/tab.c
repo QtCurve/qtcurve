@@ -22,8 +22,6 @@
 
 #include <qtcurve-utils/gtkutils.h>
 
-#include "compatability.h"
-
 typedef struct {
     int id;
     int numRects;

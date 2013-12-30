@@ -23,11 +23,8 @@
 #ifndef __QTC_HELPERS_H__
 #define __QTC_HELPERS_H__
 
-#include <gtk/gtk.h>
-#include <gdk/gdk.h>
 #include <common/common.h>
 #include "config.h"
-#include "compatability.h"
 #include "qt_settings.h"
 
 QTC_ALWAYS_INLINE static inline void
@@ -137,10 +134,10 @@ isFakeGtk()
 }
 GdkColor *menuColors(gboolean active);
 EBorder shadowToBorder(GtkShadowType shadow);
-gboolean useButtonColor(const gchar *detail);
+gboolean useButtonColor(const char *detail);
 void qtcShadeColors(GdkColor *base, GdkColor *vals);
 gboolean isSortColumn(GtkWidget *button);
-GdkColor * getCellCol(GdkColor *std, const gchar *detail);
+GdkColor * getCellCol(GdkColor *std, const char *detail);
 gboolean reverseLayout(GtkWidget *widget);
 gboolean isOnToolbar(GtkWidget *widget, gboolean *horiz, int level);
 gboolean isOnHandlebox(GtkWidget *widget, gboolean *horiz, int level);
@@ -149,7 +146,7 @@ gboolean isButtonOnHandlebox(GtkWidget *widget, gboolean *horiz);
 gboolean isOnStatusBar(GtkWidget *widget, int level);
 gboolean isList(GtkWidget *widget);
 gboolean isListViewHeader(GtkWidget *widget);
-gboolean isEvolutionListViewHeader(GtkWidget *widget, const gchar *detail);
+gboolean isEvolutionListViewHeader(GtkWidget *widget, const char *detail);
 gboolean isOnListViewHeader(GtkWidget *w, int level);
 gboolean isPathButton(GtkWidget *widget);
 GtkWidget * getComboEntry(GtkWidget *widget);
@@ -192,12 +189,12 @@ typedef enum
 
 #if GTK_CHECK_VERSION(2, 90, 0)
 #define sanitizeSize(A, B, C) sanitizeSizeReal(widget, B, C)
-void gdk_drawable_get_size(GdkWindow *window, gint *width, gint *height);
-void sanitizeSizeReal(GtkWidget *widget, gint *width, gint *height);
+void gdk_drawable_get_size(GdkWindow *window, int *width, int *height);
+void sanitizeSizeReal(GtkWidget *widget, int *width, int *height);
 EStepper getStepper(const char *detail);
 #else
 EStepper getStepper(GtkWidget *widget, int x, int y, int width, int height);
-void sanitizeSize(GdkWindow *window, gint *width, gint *height);
+void sanitizeSize(GdkWindow *window, int *width, int *height);
 #endif
 
 int getFillReal(GtkStateType state, gboolean set, gboolean darker);
@@ -224,9 +221,9 @@ void getEntryParentBgCol(GtkWidget *widget, GdkColor *color);
 gboolean compositingActive(GtkWidget *widget);
 gboolean isRgbaWidget(GtkWidget *widget);
 void enableBlurBehind(GtkWidget *w, gboolean enable);
-void getTopLevelSize(GdkWindow *window, gint *w, gint *h);
-void getTopLevelOrigin(GdkWindow *window, gint *x, gint *y);
-gboolean mapToTopLevel(GdkWindow *window, GtkWidget *widget, gint *x, gint *y, gint *w, gint *h); //, gboolean frame)
+void getTopLevelSize(GdkWindow *window, int *w, int *h);
+void getTopLevelOrigin(GdkWindow *window, int *x, int *y);
+gboolean mapToTopLevel(GdkWindow *window, GtkWidget *widget, int *x, int *y, int *w, int *h); //, gboolean frame)
 int getRound(const char *detail, GtkWidget *widget, int x, int y,
              int width, int height, gboolean rev);
 

@@ -27,7 +27,6 @@
 #include <qtcurve-utils/dirs.h>
 #include <qtcurve-utils/strs.h>
 
-#include <gtk/gtk.h>
 #include <common/common.h>
 #include <common/config_file.h>
 #include "qt_settings.h"

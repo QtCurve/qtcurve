@@ -24,7 +24,6 @@
 #include <qtcurve-utils/x11qtc.h>
 
 #include <gdk/gdkx.h>
-#include "compatability.h"
 #include <common/common.h>
 
 gboolean
@@ -52,7 +51,7 @@ qtcMenuEmitSize(GtkWidget *w, unsigned int size)
 }
 
 gboolean
-objectIsA(const GObject *object, const gchar *type_name)
+objectIsA(const GObject *object, const char *type_name)
 {
     if (object) {
         GType tmp = g_type_from_name(type_name);
@@ -184,7 +183,7 @@ qtcMenuShellMotion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
     QTC_UNUSED(data);
     QTC_UNUSED(event);
     if (GTK_IS_MENU_SHELL(widget)) {
-        gint pointer_x, pointer_y;
+        int pointer_x, pointer_y;
         GdkModifierType pointer_mask;
 
         gdk_window_get_pointer(gtk_widget_get_window(widget), &pointer_x,

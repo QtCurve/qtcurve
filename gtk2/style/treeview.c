@@ -22,12 +22,7 @@
 
 #include <qtcurve-utils/gtkutils.h>
 
-#include "compatability.h"
-
-#if GTK_CHECK_VERSION(2, 12, 0)
-
-typedef struct
-{
+typedef struct {
     GtkTreePath       *path;
     GtkTreeViewColumn *column;
     gboolean          fullWidth;
@@ -238,7 +233,7 @@ qtcTreeViewSetup(GtkWidget *widget)
         GtkWidget *parent = gtk_widget_get_parent(widget);
 
         if (tv) {
-            gint x, y;
+            int x, y;
 #if GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
             tv->fullWidth = TRUE;
 #else
@@ -316,5 +311,3 @@ gboolean qtcTreeViewCellIsLeftOfExpanderColumn(GtkTreeView *treeView, GtkTreeVie
         return isLeft;
     }
 }
-
-#endif // GTK_CHECK_VERSION(2, 12, 0)

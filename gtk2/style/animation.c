@@ -35,14 +35,12 @@
 #include "animation.h"
 #include <qtcurve-utils/utils.h>
 #include <common/common.h>
-#include "compatability.h"
 
-#if GTK_CHECK_VERSION(2, 12, 0)
 typedef struct {
     GTimer *timer;
 
-    gdouble start_modifier;
-    gdouble stop_time;
+    double start_modifier;
+    double stop_time;
     GtkWidget *widget;
 } AnimationInfo;
 
@@ -135,7 +133,7 @@ qtcAnimationLookupInfo(const GtkWidget *widget)
 /* Create all the relevant information for the animation,
  * and insert it into the hash table. */
 static void
-qtcAnimationAdd(const GtkWidget *widget, gdouble stop_time)
+qtcAnimationAdd(const GtkWidget *widget, double stop_time)
 {
     AnimationInfo *value;
 
@@ -270,26 +268,19 @@ qtcAnimationDisconnect()
     connected_widgets = NULL;
 }
 
-
-#endif
 /* external interface */
 
 /* adds a progress bar */
 void
 qtcAnimationAddProgressBar(GtkWidget *progressbar, gboolean isEntry)
 {
-#if GTK_CHECK_VERSION(2, 12, 0)
-    gdouble fraction = isEntry ?
+    double fraction = isEntry ?
         gtk_entry_get_progress_fraction(GTK_ENTRY(progressbar)) :
         gtk_progress_bar_get_fraction(GTK_PROGRESS_BAR(progressbar));
 
     if (fraction < 1.0 && fraction > 0.0) {
         qtcAnimationAdd((GtkWidget*) progressbar, 0.0);
     }
-#else
-    QTC_UNUSED(progressbar);
-    QTC_UNUSED(isEntry);
-#endif
 }
 
 /* helper function for qtcAnimationConnectCheckbox */
@@ -326,24 +317,18 @@ static void qtcAnimationConnectCheckbox(GtkWidget *widget)
 /* static gboolean */
 /* qtcAnimationIsAnimated(GtkWidget *widget) */
 /* { */
-/* #if GTK_CHECK_VERSION(2, 12, 0) */
 /*     return qtcAnimationLookupInfo(widget) != NULL ? TRUE : FALSE; */
-/* #else */
-/*     return FALSE; */
-/* #endif */
 /* } */
 
 /* returns the elapsed time for the animation */
-gdouble
-qtcAnimationElapsed(gpointer data)
+double
+qtcAnimationElapsed(void *data)
 {
-#if GTK_CHECK_VERSION(2, 12, 0)
     AnimationInfo *animation_info = qtcAnimationLookupInfo(data);
 
     if(animation_info)
         return (g_timer_elapsed(animation_info->timer, NULL) -
                 animation_info->start_modifier);
-#endif
     return 0.0;
 }
 
@@ -351,7 +336,6 @@ qtcAnimationElapsed(gpointer data)
 void
 qtcAnimationCleanup()
 {
-#if GTK_CHECK_VERSION(2, 12, 0)
     qtcAnimationDisconnect();
 
     if (animated_widgets != NULL) {
@@ -359,5 +343,4 @@ qtcAnimationCleanup()
         animated_widgets = NULL;
     }
     qtcAnimationStopTimer();
-#endif
 }

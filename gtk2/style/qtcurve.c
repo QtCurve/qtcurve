@@ -71,11 +71,11 @@ typedef struct
     GtkStateType state;
     GtkShadowType shadow;
     GtkWidget *widget;
-    const gchar *detail;
-    gint x;
-    gint y;
-    gint width;
-    gint height;
+    const char *detail;
+    int x;
+    int y;
+    int width;
+    int height;
     GtkOrientation orientation;
 } QtCSlider;
 
@@ -85,15 +85,15 @@ static QtCSlider lastSlider;
 #define WIDGET_TYPE_NAME(xx) (widget && !strcmp(g_type_name (G_TYPE_FROM_INSTANCE(widget)), (xx)))
 
 static void gtkDrawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area,
-                       GtkWidget *widget, const gchar *detail, gint x, gint y, gint width, gint height);
+                       GtkWidget *widget, const char *detail, int x, int y, int width, int height);
 
 
 
 static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area,
-                          GtkWidget *widget, const gchar *detail, gint x, gint y, gint width, gint height, GtkOrientation orientation);
+                          GtkWidget *widget, const char *detail, int x, int y, int width, int height, GtkOrientation orientation);
 
 static void
-qtcLogHandler(const gchar *domain, GLogLevelFlags level, const gchar *msg,
+qtcLogHandler(const char *domain, GLogLevelFlags level, const char *msg,
               gpointer data)
 {
     QTC_UNUSED(domain);
@@ -103,7 +103,7 @@ qtcLogHandler(const gchar *domain, GLogLevelFlags level, const gchar *msg,
 }
 
 static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area,
-                           GtkWidget *widget, const gchar *detail, gint x, gint y, gint width, gint height)
+                           GtkWidget *widget, const char *detail, int x, int y, int width, int height)
 {
     g_return_if_fail(GTK_IS_STYLE(style));
     g_return_if_fail(GDK_IS_DRAWABLE(window));
@@ -126,7 +126,6 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
 #define MODAL_HACK "QTC_MODAL_HACK_SET"
 #define BUTTON_HACK "QTC_BUTTON_ORDER_HACK_SET"
 
-#if GTK_CHECK_VERSION(2, 6, 0)
     if (!opts.gtkButtonOrder && opts.reorderGtkButtons && GTK_IS_WINDOW(widget) && detail && 0==strcmp(detail, "base"))
     {
         GtkWidget *topLevel=gtk_widget_get_toplevel(widget);
@@ -146,7 +145,6 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
             g_log_set_handler("Gtk", G_LOG_LEVEL_CRITICAL, g_log_default_handler, NULL);
         }
     }
-#endif
 
     if(opts.windowDrag>WM_DRAG_MENU_AND_TOOLBAR && (DETAIL("base") || DETAIL("eventbox") || DETAIL("viewportbin")))
         qtcWMMoveSetup(widget);
@@ -278,7 +276,6 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
             gboolean forceCellStart=FALSE,
                      forceCellEnd=FALSE;
 
-#if GTK_CHECK_VERSION(2, 12, 0)
             if(!isFixedWidget(widget))
             {
                 GtkTreePath       *path=NULL;
@@ -322,7 +319,6 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
                 if(path)
                     gtk_tree_path_free(path);
             }
-#endif
 
             if(GTK_STATE_SELECTED==state || alpha<1.0)
             {
@@ -387,7 +383,7 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
 }
 
 static void gtkDrawHandle(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area,
-                          GtkWidget *widget, const gchar *detail, gint x, gint y, gint width, gint height, GtkOrientation orientation)
+                          GtkWidget *widget, const char *detail, int x, int y, int width, int height, GtkOrientation orientation)
 {
     QTC_UNUSED(orientation);
     g_return_if_fail(GTK_IS_STYLE(style));
@@ -455,8 +451,8 @@ static void gtkDrawHandle(GtkStyle *style, GdkWindow *window, GtkStateType state
 }
 
 static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area,
-                         GtkWidget *widget, const gchar *detail, GtkArrowType arrow_type, gboolean fill, gint x, gint y,
-                         gint width, gint height)
+                         GtkWidget *widget, const char *detail, GtkArrowType arrow_type, gboolean fill, int x, int y,
+                         int width, int height)
 {
     QTC_UNUSED(fill);
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %s  ", __FUNCTION__, state, shadow, arrow_type, x, y, width, height,
@@ -646,7 +642,7 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
 static void
 drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
         GtkShadowType shadow, GdkRectangle *area, GtkWidget *widget,
-        const gchar *detail, gint x, gint y, gint width, gint height,
+        const char *detail, int x, int y, int width, int height,
         gboolean btnDown)
 {
     g_return_if_fail(GTK_IS_STYLE(style));
@@ -1460,7 +1456,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
 static void
 gtkDrawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
            GtkShadowType shadow, GdkRectangle *area, GtkWidget *widget,
-           const gchar *detail, gint x, gint y, gint width, gint height)
+           const char *detail, int x, int y, int width, int height)
 {
     sanitizeSize(window, &width, &height);
     drawBox(style, window, state, shadow, area, widget, detail, x, y,
@@ -1471,7 +1467,7 @@ gtkDrawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
 static void
 gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state,
               GtkShadowType shadow, GdkRectangle *area, GtkWidget *widget,
-              const gchar *detail, gint x, gint y, gint width, gint height)
+              const char *detail, int x, int y, int width, int height)
 {
     g_return_if_fail(GTK_IS_STYLE(style));
     g_return_if_fail(GDK_IS_DRAWABLE(window));
@@ -1849,7 +1845,7 @@ gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state,
 static void
 gtkDrawCheck(GtkStyle *style, GdkWindow *window, GtkStateType state,
              GtkShadowType shadow, GdkRectangle *area, GtkWidget *widget,
-             const gchar *detail, gint x, gint y, gint width, gint height)
+             const char *detail, int x, int y, int width, int height)
 {
     g_return_if_fail(GTK_IS_STYLE(style));
     g_return_if_fail(GDK_IS_DRAWABLE(window));
@@ -1864,7 +1860,7 @@ gtkDrawCheck(GtkStyle *style, GdkWindow *window, GtkStateType state,
 static void
 gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state,
               GtkShadowType shadow, GdkRectangle *area, GtkWidget *widget,
-              const gchar *detail, gint x, gint y, gint width, gint height)
+              const char *detail, int x, int y, int width, int height)
 {
     g_return_if_fail(GTK_IS_STYLE(style));
     g_return_if_fail(GDK_IS_DRAWABLE(window));
@@ -1879,7 +1875,7 @@ gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state,
 #define NUM_GCS 5
 
 static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state, gboolean use_text, GdkRectangle *area, GtkWidget *widget,
-                          const gchar *detail, gint x, gint y, PangoLayout *layout)
+                          const char *detail, int x, int y, PangoLayout *layout)
 {
     if(IS_PROGRESS)
         drawLayout(style, window, state, use_text, area, x, y, layout);
@@ -1906,9 +1902,6 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         if(!opts.colorMenubarMouseOver && mb && !activeMb && GTK_STATE_PRELIGHT==state)
             state=GTK_STATE_NORMAL;
 
-#if GTK_CHECK_VERSION(2, 10, 0) && !GTK_CHECK_VERSION(2, 10, 11)
-        GtkNotebook *nb=mb || isMenuItem || !GTK_IS_LABEL(widget) || !parent || !GTK_IS_NOTEBOOK(parent) ? NULL : GTK_NOTEBOOK(parent);
-#endif
         GdkColor      prevColors[NUM_GCS];
         int           i=0;
 
@@ -1996,59 +1989,6 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
                     selectedText=TRUE;
             }
         }
-#if GTK_CHECK_VERSION(2, 10, 0) && !GTK_CHECK_VERSION(2, 10, 11)
-        else if(nb)
-        {
-            int      numChildren=g_list_length(nb->children),
-                     i;
-            gboolean active=TRUE;
-
-            for(i=0; i<numChildren; ++i)
-            {
-                GtkWidget *page=gtk_notebook_get_nth_page(nb, i),
-                          *tabLabel=gtk_notebook_get_tab_label(nb, page);
-
-                if(tabLabel==widget)
-                {
-                    active=GTK_STATE_NORMAL==gtk_widget_get_state(tabLabel);
-                    break;
-                }
-            }
-
-            if(active)
-                switch(gtk_notebook_get_tab_pos(nb))
-                {
-                    case GTK_POS_LEFT:
-                        x-=1;
-                        break;
-                    case GTK_POS_RIGHT:
-                        x+=1;
-                        break;
-                    case GTK_POS_TOP:
-                        y-=1;
-                        break;
-                    case GTK_POS_BOTTOM:
-                        y+=1;
-                        break;
-                }
-            else
-                switch(gtk_notebook_get_tab_pos(nb))
-                {
-                    case GTK_POS_LEFT:
-                        x+=1;
-                        break;
-                    case GTK_POS_RIGHT:
-                        x-=1;
-                        break;
-                    case GTK_POS_TOP:
-                        y+=1;
-                        break;
-                    case GTK_POS_BOTTOM:
-                        y-=1;
-                        break;
-                }
-        }
-#endif
 
         if(parent && GTK_IS_LABEL(widget) && GTK_IS_FRAME(parent) && !isOnStatusBar(widget, 0))
         {
@@ -2104,7 +2044,7 @@ static GdkPixbuf * gtkRenderIcon(GtkStyle *style, const GtkIconSource *source, G
 }
 
 static void gtkDrawTab(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area,
-                       GtkWidget *widget, const gchar *detail, gint x, gint y, gint width, gint height)
+                       GtkWidget *widget, const char *detail, int x, int y, int width, int height)
 {
     /* QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style; */
     GdkColor     *arrowColor=MO_ARROW(false, &qtSettings.colors[GTK_STATE_INSENSITIVE==state
@@ -2137,8 +2077,8 @@ static void gtkDrawTab(GtkStyle *style, GdkWindow *window, GtkStateType state, G
 static void
 gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state,
               GtkShadowType shadow, GdkRectangle *area, GtkWidget *widget,
-              const gchar *detail, gint x, gint y, gint width, gint height,
-              GtkPositionType gapSide, gint gapX, gint gapWidth)
+              const char *detail, int x, int y, int width, int height,
+              GtkPositionType gapSide, int gapX, int gapWidth)
 {
     QTC_UNUSED(shadow);
     g_return_if_fail(GTK_IS_STYLE(style));
@@ -2169,7 +2109,7 @@ gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state,
 static void
 gtkDrawExtension(GtkStyle *style, GdkWindow *window, GtkStateType state,
                  GtkShadowType shadow, GdkRectangle *area, GtkWidget *widget,
-                 const gchar *detail, gint x, gint y, gint width, gint height,
+                 const char *detail, int x, int y, int width, int height,
                  GtkPositionType gapSide)
 {
     g_return_if_fail(GTK_IS_STYLE(style));
@@ -2196,7 +2136,7 @@ gtkDrawExtension(GtkStyle *style, GdkWindow *window, GtkStateType state,
 static void
 gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state,
               GtkShadowType shadow, GdkRectangle *area, GtkWidget *widget,
-              const gchar *detail, gint x, gint y, gint width, gint height,
+              const char *detail, int x, int y, int width, int height,
               GtkOrientation orientation)
 {
     g_return_if_fail(GTK_IS_STYLE(style));
@@ -2316,8 +2256,8 @@ gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state,
 static void
 gtkDrawShadowGap(GtkStyle *style, GdkWindow *window, GtkStateType state,
                  GtkShadowType shadow, GdkRectangle *area, GtkWidget *widget,
-                 const gchar *detail, gint x, gint y, gint width, gint height,
-                 GtkPositionType gapSide, gint gapX, gint gapWidth)
+                 const char *detail, int x, int y, int width, int height,
+                 GtkPositionType gapSide, int gapX, int gapWidth)
 {
     QTC_UNUSED(detail);
     g_return_if_fail(GTK_IS_STYLE(style));
@@ -2333,8 +2273,8 @@ gtkDrawShadowGap(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
 static void
 gtkDrawHLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
-             GdkRectangle *area, GtkWidget *widget, const gchar *detail,
-             gint x1, gint x2, gint y)
+             GdkRectangle *area, GtkWidget *widget, const char *detail,
+             int x1, int x2, int y)
 {
     g_return_if_fail(GTK_IS_STYLE(style));
     g_return_if_fail(GDK_IS_DRAWABLE(window));
@@ -2407,8 +2347,8 @@ gtkDrawHLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
 static void
 gtkDrawVLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
-             GdkRectangle *area, GtkWidget *widget, const gchar *detail,
-             gint y1, gint y2, gint x)
+             GdkRectangle *area, GtkWidget *widget, const char *detail,
+             int y1, int y2, int x)
 {
     g_return_if_fail(GTK_IS_STYLE(style));
     g_return_if_fail(GDK_IS_DRAWABLE(window));
@@ -2454,8 +2394,8 @@ gtkDrawVLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
     cairo_destroy(cr);
 }
 
-static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state, GdkRectangle *area, GtkWidget *widget, const gchar *detail,
-                         gint x, gint y, gint width, gint height)
+static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state, GdkRectangle *area, GtkWidget *widget, const char *detail,
+                         int x, int y, int width, int height)
 {
     if (GTK_IS_EDITABLE(widget))
         return;
@@ -2538,7 +2478,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
         if(GTK_IS_RADIO_BUTTON(widget) || GTK_IS_CHECK_BUTTON(widget))
         {
             // Gimps buttons in its toolbox are
-            const gchar *text=NULL;
+            const char *text=NULL;
             toolbarBtn=GTK_APP_GIMP==qtSettings.app && (NULL==(text=gtk_button_get_label(GTK_BUTTON(widget))) ||
                                                         '\0'==text[0]);
 
@@ -2601,7 +2541,6 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
         cairo_set_line_width(cr, 1.0);
 
 
-#if GTK_CHECK_VERSION(2, 12, 0)
         if(GTK_APP_JAVA_SWT==qtSettings.app && view && widget && GTK_IS_TREE_VIEW(widget))
         {
             GtkTreeView       *treeView=GTK_TREE_VIEW(widget);
@@ -2626,7 +2565,6 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
             if(path)
                 gtk_tree_path_free(path);
         }
-#endif
 
         if(FOCUS_LINE==opts.focus || FOCUS_GLOW==opts.focus)
         {
@@ -2695,8 +2633,8 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
 static void
 gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType state,
-                  GdkRectangle *area, GtkWidget *widget, const gchar *detail,
-                  GdkWindowEdge edge, gint x, gint y, gint width, gint height)
+                  GdkRectangle *area, GtkWidget *widget, const char *detail,
+                  GdkWindowEdge edge, int x, int y, int width, int height)
 {
     g_return_if_fail(GTK_IS_STYLE(style));
     g_return_if_fail(GDK_IS_DRAWABLE(window));
@@ -2751,7 +2689,7 @@ gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType state,
 }
 
 static void gtkDrawExpander(GtkStyle *style, GdkWindow *window, GtkStateType state, GdkRectangle *area, GtkWidget *widget,
-                            const gchar *detail, gint x, gint y, GtkExpanderStyle expander_style)
+                            const char *detail, int x, int y, GtkExpanderStyle expander_style)
 {
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %s  ", __FUNCTION__, state, detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 10);
@@ -2899,7 +2837,7 @@ static void qtcurve_rc_style_merge(GtkRcStyle *dest, GtkRcStyle *src)
 {
 
     GtkRcStyle  copy;
-    const gchar *typeName=src ? g_type_name(G_TYPE_FROM_INSTANCE(src)) : NULL;
+    const char *typeName=src ? g_type_name(G_TYPE_FROM_INSTANCE(src)) : NULL;
     bool        destIsQtc=QTCURVE_IS_RC_STYLE(dest),
                 srcIsQtc=!src->name || src->name==strstr(src->name, RC_SETTING) ||
                          (getAppName() && src->name==strstr(src->name, getAppName())),
@@ -3041,18 +2979,21 @@ void qtcurve_rc_style_register_type(GTypeModule *module)
     qtcurve_type_rc_style = g_type_module_register_type(module, GTK_TYPE_RC_STYLE, "QtCurveRcStyle", &object_info, 0);
 }
 
-G_MODULE_EXPORT void theme_init(GTypeModule *module)
+G_MODULE_EXPORT void
+theme_init(GTypeModule *module)
 {
     qtcX11InitXlib(GDK_DISPLAY_XDISPLAY(gdk_display_get_default()));
     qtcurve_rc_style_register_type(module);
     qtcurve_style_register_type(module);
 }
 
-G_MODULE_EXPORT void theme_exit()
+G_MODULE_EXPORT void
+theme_exit()
 {
 }
 
-G_MODULE_EXPORT GtkRcStyle * theme_create_rc_style()
+G_MODULE_EXPORT GtkRcStyle*
+theme_create_rc_style()
 {
     return GTK_RC_STYLE(g_object_new(QTCURVE_TYPE_RC_STYLE, NULL));
 }
@@ -3060,9 +3001,7 @@ G_MODULE_EXPORT GtkRcStyle * theme_create_rc_style()
 /* The following function will be called by GTK+ when the module is loaded and
  * checks to see if we are compatible with the version of GTK+ that loads us.
  */
-G_MODULE_EXPORT const gchar * g_module_check_init(GModule *module);
-
-const gchar*
+G_MODULE_EXPORT const char*
 g_module_check_init(GModule *module)
 {
     QTC_UNUSED(module);

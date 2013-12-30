@@ -26,7 +26,6 @@
 
 #include <gdk/gdkkeysyms.h>
 #include <gdk/gdkx.h>
-#include "compatability.h"
 #include <common/common.h>
 #include <common/config_file.h>
 #include "qt_settings.h"

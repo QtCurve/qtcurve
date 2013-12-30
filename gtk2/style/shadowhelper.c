@@ -20,7 +20,6 @@
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
 
-#include <gtk/gtk.h>
 #include <gdk/gdkx.h>
 #include <common/common.h>
 #include "qt_settings.h"
@@ -128,11 +127,6 @@ realizeHook(GSignalInvocationHint *sih, guint x, const GValue *params,
 
 void qtcShadowInitialize()
 {
-#if !GTK_CHECK_VERSION(2, 12, 0)
-    // Getting crashes with old Gtk and eclipse :-(
-    if (GTK_APP_JAVA_SWT == qtSettings.app)
-        return;
-#endif
     if (DEBUG_ALL == qtSettings.debug)
         printf(DEBUG_PREFIX "%s %d\n", __FUNCTION__, qtSettings.app);
     if (!realizeSignalId) {
