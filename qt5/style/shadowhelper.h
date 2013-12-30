@@ -49,10 +49,7 @@
 // IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
 
-#include "config.h"
 #include <QObject>
-#include <QMap>
-#include <qwindowdefs.h>
 
 namespace QtCurve {
 //! handle shadow pixmaps passed to window manager via X property

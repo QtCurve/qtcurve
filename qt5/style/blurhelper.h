@@ -55,7 +55,6 @@
 #include <qtcurve-utils/log.h>
 #include "utils.h"
 
-#include <QObject>
 #include <QPointer>
 #include <QHash>
 #include <QBasicTimer>
@@ -98,7 +97,8 @@ public:
 protected:
     //! timer event
     /*! used to perform delayed blur region update of pending widgets */
-    virtual void timerEvent(QTimerEvent *event) override {
+    virtual void timerEvent(QTimerEvent *event) override
+    {
         if (event->timerId() == _timer.timerId()) {
             _timer.stop();
             update();
@@ -115,7 +115,8 @@ protected:
 
     //! update blur region for all pending widgets
     /*! a timer is used to allow some buffering of the update requests */
-    void delayedUpdate() {
+    void delayedUpdate()
+    {
         if(!_timer.isActive()) {
             _timer.start(10, this);
         }

@@ -56,7 +56,6 @@
 
 #include <QEvent>
 #include <QBasicTimer>
-#include <QObject>
 #include <QSet>
 #include <QString>
 #include <QWeakPointer>

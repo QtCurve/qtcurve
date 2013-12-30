@@ -31,7 +31,6 @@
 #ifndef QTCURVE_KWIN_CONFIG_WIDGET_H
 #define QTCURVE_KWIN_CONFIG_WIDGET_H
 
-#include <QObject>
 #include "ui_qtcurvekwinconfigwidget.h"
 #include "../kwin/qtcurveshadowconfiguration.h"
 #include "../kwin/qtcurveconfig.h"

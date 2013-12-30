@@ -55,7 +55,6 @@
 #include <qtcurve-utils/log.h>
 #include "utils.h"
 
-#include <QObject>
 #include <QPointer>
 #include <QHash>
 #include <QBasicTimer>
