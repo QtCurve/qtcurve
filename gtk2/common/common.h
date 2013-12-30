@@ -79,7 +79,6 @@ enum {
 #define SHADE_4_HIGHLIGHT (QTC_NUM_STD_SHADES + 1)
 #define SHADE_2_HIGHLIGHT (QTC_NUM_STD_SHADES + 2)
 
-#define SIMPLE_SHADING (!shading)
 #define DEFAULT_CONTRAST 7
 
 #define THIN_SBAR_MOD  ((opts.sliderWidth<DEFAULT_SLIDER_WIDTH ? 3 : opts.sliderWidth>DEFAULT_SLIDER_WIDTH ? (opts.sliderWidth-9)/2 : 4)+(EFFECT_NONE==opts.buttonEffect ? 1 : 0))
@@ -91,9 +90,6 @@ enum {
 #define DEF_BNT_TINT      0.4
 #define ENTRY_INNER_ALPHA 0.4
 #define INACTIVE_SEL_ALPHA 0.5
-
-#define SUNKEN_BEVEL_DARK_ALPHA(X)  (X.value()/800.0) // 0.25
-#define SUNKEN_BEVEL_LIGHT_ALPHA(X) (X.value()/500.0) // 0.40
 
 #define BLEND_TITLEBAR     (opts.menubarAppearance==opts.titlebarAppearance && opts.menubarAppearance==opts.inactiveTitlebarAppearance && \
                            !(opts.windowBorder&WINDOW_BORDER_BLEND_TITLEBAR) && SHADE_WINDOW_BORDER==opts.shadeMenubars && opts.windowDrag)
@@ -146,7 +142,7 @@ enum {
 #define MAX_GB_FACTOR  50
 #define DEF_GB_FACTOR  -3
 
-#define TO_ALPHA(A) (((double)((A)<0 ? -(A) : (A)))/100.0)
+#define TO_ALPHA(A) (qtcAbs(A) / 100.0)
 #define DEF_COLOR_SEL_TAB_FACTOR  25
 #define MIN_COLOR_SEL_TAB_FACTOR   0
 #define MAX_COLOR_SEL_TAB_FACTOR 100

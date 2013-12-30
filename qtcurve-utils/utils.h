@@ -33,14 +33,6 @@
 
 #include "macros.h"
 
-typedef struct {
-    int len;
-    int width;
-    int height;
-    int depth;
-    unsigned char *data;
-} QtcPixmap;
-
 #define qtcContainerOf(ptr, type, member)               \
     ((type*)(((void*)(ptr)) - offsetof(type, member)))
 

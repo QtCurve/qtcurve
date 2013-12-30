@@ -21,17 +21,25 @@
 
 #include "utils.h"
 
-QTC_ALWAYS_INLINE static inline QtcPixmap*
-qtcPixmapNew(int width, int height, int depth)
+typedef struct {
+    int len;
+    int width;
+    int height;
+    int depth;
+    unsigned char *data;
+} QtcImage;
+
+QTC_ALWAYS_INLINE static inline QtcImage*
+qtcImageNew(int width, int height, int depth)
 {
     if (qtcUnlikely(width <= 0 || height <= 0 || depth <= 0 || depth % 8 != 0))
         return NULL;
     int len = width * height * depth / 8;
-    QtcPixmap *res = qtcNewSize(QtcPixmap, sizeof(QtcPixmap) + len);
+    QtcImage *res = qtcNewSize(QtcImage, sizeof(QtcImage) + len);
     res->len = len;
     res->width = width;
     res->height = height;
     res->depth = depth;
-    res->data = ((unsigned char*)res) + sizeof(QtcPixmap);
+    res->data = ((unsigned char*)res) + sizeof(QtcImage);
     return res;
 }

@@ -87,7 +87,6 @@ enum {
 #define SHADE_4_HIGHLIGHT (QTC_NUM_STD_SHADES + 1)
 #define SHADE_2_HIGHLIGHT (QTC_NUM_STD_SHADES + 2)
 
-#define SIMPLE_SHADING (!shading)
 #define DEFAULT_CONTRAST 7
 
 #define THIN_SBAR_MOD  ((opts.sliderWidth<DEFAULT_SLIDER_WIDTH ? 3 : opts.sliderWidth>DEFAULT_SLIDER_WIDTH ? (opts.sliderWidth-9)/2 : 4)+(EFFECT_NONE==opts.buttonEffect ? 1 : 0))
@@ -154,7 +153,7 @@ enum {
 #define MAX_GB_FACTOR  50
 #define DEF_GB_FACTOR  -3
 
-#define TO_ALPHA(A) (((double)((A)<0 ? -(A) : (A)))/100.0)
+#define TO_ALPHA(A) (qtcAbs(A) / 100.0)
 #define DEF_COLOR_SEL_TAB_FACTOR  25
 #define MIN_COLOR_SEL_TAB_FACTOR   0
 #define MAX_COLOR_SEL_TAB_FACTOR 100

@@ -19,12 +19,13 @@
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
 
+#include "image.h"
 #include "color.h"
 
 QTC_BEGIN_DECLS
 
 void qtcShadowCreate(size_t size, const QtcColor *c1, const QtcColor *c2,
                      size_t radius, bool square, QtcPixelByteOrder order,
-                     QtcPixmap *pixmaps[8]);
+                     QtcImage *images[8]);
 
 QTC_END_DECLS

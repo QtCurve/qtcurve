@@ -47,7 +47,7 @@ static uint32_t shadow_data_xcb[8 + 4];
 static unsigned long shadow_data_xlib[8 + 4];
 
 static xcb_pixmap_t
-qtcX11ShadowCreatePixmap(const QtcPixmap *data)
+qtcX11ShadowCreatePixmap(const QtcImage *data)
 {
     xcb_pixmap_t pixmap = qtcX11GenerateId();
 
@@ -71,12 +71,12 @@ qtcX11ShadowInit()
     int shadow_radius = 4;
     QtcColor c1 = {0.65, 0.65, 0.65};
     QtcColor c2 = {0.2, 0.2, 0.2};
-    QtcPixmap *shadow_pixmaps[8];
+    QtcImage *shadow_images[8];
     qtcShadowCreate(shadow_size, &c1, &c2, shadow_radius, false,
-                    QTC_PIXEL_XCB, shadow_pixmaps);
+                    QTC_PIXEL_XCB, shadow_images);
     for (int i = 0;i < 8;i++) {
-        shadow_xpixmaps[i] = qtcX11ShadowCreatePixmap(shadow_pixmaps[i]);
-        free(shadow_pixmaps[i]);
+        shadow_xpixmaps[i] = qtcX11ShadowCreatePixmap(shadow_images[i]);
+        free(shadow_images[i]);
     }
 
     memcpy(shadow_data_xcb, shadow_xpixmaps, sizeof(shadow_xpixmaps));

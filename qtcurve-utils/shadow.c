@@ -20,7 +20,6 @@
  *****************************************************************************/
 
 #include "shadow_p.h"
-#include "pixmap.h"
 #include "log.h"
 
 static void
@@ -95,16 +94,16 @@ _qtcGradientGetValue(float *gradient, size_t size, float distance)
             gradient[index + 1] * (distance - index));
 }
 
-static QtcPixmap*
-qtcShadowSubPixmap(size_t size, float *gradient, int vertical_align,
-                   int horizontal_align, const QtcColor *c1, const QtcColor *c2,
-                   bool square, QtcPixelByteOrder order)
+static QtcImage*
+qtcShadowSubImage(size_t size, float *gradient, int vertical_align,
+                  int horizontal_align, const QtcColor *c1, const QtcColor *c2,
+                  bool square, QtcPixelByteOrder order)
 {
     int height = vertical_align ? size : 1;
     int y0 = vertical_align == -1 ? height - 1 : 0;
     int width = horizontal_align ? size : 1;
     int x0 = horizontal_align == -1 ? width - 1 : 0;
-    QtcPixmap *res = qtcPixmapNew(width, height, 32);
+    QtcImage *res = qtcImageNew(width, height, 32);
     for (int x = 0;x < width;x++) {
         for (int y = 0;y < height;y++) {
             qtcFillShadowPixel(
@@ -119,7 +118,7 @@ qtcShadowSubPixmap(size_t size, float *gradient, int vertical_align,
 void
 qtcShadowCreate(size_t size, const QtcColor *c1, const QtcColor *c2,
                 size_t radius, bool square, QtcPixelByteOrder order,
-                QtcPixmap **pixmaps)
+                QtcImage **images)
 {
     size_t full_size = size + radius;
     QTC_DEF_LOCAL_BUFF(float, gradient, 128, full_size);
@@ -138,8 +137,8 @@ qtcShadowCreate(size_t size, const QtcColor *c1, const QtcColor *c2,
         {-1, -1},
     };
     for (int i = 0;i < 8;i++) {
-        pixmaps[i] = qtcShadowSubPixmap(full_size, gradient.p, aligns[i][1],
-                                        aligns[i][0], c1, c2, square, order);
+        images[i] = qtcShadowSubImage(full_size, gradient.p, aligns[i][1],
+                                      aligns[i][0], c1, c2, square, order);
     }
     QTC_FREE_LOCAL_BUFF(gradient);
 }
