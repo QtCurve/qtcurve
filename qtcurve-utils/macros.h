@@ -84,7 +84,7 @@
 /** @} */
 
 #define qtcMakeVersion(a, b, c...)              \
-    ((a) << 16 | (b) << 8 | QTC_DEFAULT(c, 0))
+    ((a) << 16 | (b) << 8 | (QTC_DEFAULT(c, 0)))
 #ifdef __GNUC__
 #  define QTC_GCC_VERSION                                               \
     qtcMakeVersion(__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__)
