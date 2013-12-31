@@ -43,7 +43,6 @@
 #include <common/config_file.h>
 
 namespace QtCurve {
-
 bool
 Style::drawPrimitiveIndicatorTabClose(PrimitiveElement element,
                                       const QStyleOption *option,
@@ -56,8 +55,9 @@ Style::drawPrimitiveIndicatorTabClose(PrimitiveElement element,
     QIcon::Mode mode = (state & State_Enabled ? state & State_Raised ?
                         QIcon::Active : QIcon::Normal : QIcon::Disabled);
     if (!(state & State_Raised) && !(state & State_Sunken) &&
-        !(state & State_Selected))
+        !(state & State_Selected)) {
         mode = QIcon::Disabled;
+    }
     drawItemPixmap(painter, option->rect, Qt::AlignCenter,
                    KIcon("dialog-close").pixmap(size, mode,
                                                 state & State_Sunken ?
@@ -141,7 +141,7 @@ Style::drawPrimitiveIndicatorBranch(PrimitiveElement element,
         QRect ar(r.x() + (r.width() - LV_SIZE - 4) / 2,
                  r.y() + (r.height() - LV_SIZE - 4) / 2,
                  LV_SIZE + 4, LV_SIZE + 4);
-        if (/*LV_OLD == */opts.lvLines) {
+        if (opts.lvLines) {
             beforeV = ar.y() - 1;
             afterH = ar.x() + LV_SIZE + 4;
             afterV = ar.y() + LV_SIZE + 4;
@@ -182,12 +182,12 @@ Style::drawPrimitiveIndicatorBranch(PrimitiveElement element,
             }
 #endif
         }
-        drawArrow(painter, ar, state&State_Open ? PE_IndicatorArrowDown :
+        drawArrow(painter, ar, state & State_Open ? PE_IndicatorArrowDown :
                   reverse ? PE_IndicatorArrowLeft :
                   PE_IndicatorArrowRight,
                   MOArrow(state, palette, QPalette::ButtonText));
     }
-    const int constStep = (/*LV_OLD==*/opts.lvLines ? 0 :
+    const int constStep = (opts.lvLines ? 0 :
                            widget && qobject_cast<const QTreeView*>(widget) ?
                            ((QTreeView*)widget)->indentation() : 20);
 
@@ -218,13 +218,13 @@ Style::drawPrimitiveIndicatorBranch(PrimitiveElement element,
 #endif
             }
         }
-        if (state & State_Sibling && afterV < r.bottom())
+        if (state & State_Sibling && afterV < r.bottom()) {
             painter->drawLine(middleH - constStep, afterV,
                               middleH - constStep, r.bottom());
+        }
         if (state & (State_Open | State_Children | State_Item |
-                     State_Sibling) &&
-            (/*LV_NEW==opts.lvLines || */beforeV > r.y())) {
-            painter->drawLine(middleH-constStep, r.y(),
+                     State_Sibling) && beforeV > r.y()) {
+            painter->drawLine(middleH - constStep, r.y(),
                               middleH - constStep, beforeV);
         }
     }
@@ -274,8 +274,9 @@ Style::drawPrimitiveIndicatorArrow(PrimitiveElement element,
     State state = option->state;
     QRect r = option->rect;
     const QPalette &palette = option->palette;
-    if (state == State_None)
+    if (state == State_None) {
         state |= State_Enabled;
+    }
     if (state == (State_Enabled | QtC_StateKWin)) {
         drawArrow(painter, r, element, Qt::color1, false, true);
     } else {
@@ -319,7 +320,7 @@ Style::drawPrimitiveIndicatorSpin(PrimitiveElement element,
                        ROUNDED_TOPLEFT : ROUNDED_TOPRIGHT,
                        getFill(option, use), use, true, WIDGET_SPIN);
     }
-    if (element == PE_IndicatorSpinUp || element ==PE_IndicatorSpinDown) {
+    if (element == PE_IndicatorSpinUp || element == PE_IndicatorSpinDown) {
         sr.setY(sr.y() + (down ? -2 : 1));
         if (opts.unifySpin) {
             sr.adjust(reverse ? 1 : -1, 0, reverse ? 1 : -1, 0);
@@ -339,8 +340,9 @@ Style::drawPrimitiveIndicatorSpin(PrimitiveElement element,
         if (l % 2 != 0) {
             --l;
         }
-        if (state & State_Sunken && !opts.unifySpin)
+        if (state & State_Sunken && !opts.unifySpin) {
             c += QPoint(1, 1);
+        }
         painter->setPen(col);
         painter->drawLine(c.x() - l, c.y(), c.x() + l, c.y());
         if (!down) {
@@ -408,8 +410,9 @@ Style::drawPrimitiveFrameGroupBox(PrimitiveElement element,
                                   const QWidget *widget) const
 {
     QTC_UNUSED(element);
-    if (opts.groupBox == FRAME_NONE)
+    if (opts.groupBox == FRAME_NONE) {
         return true;
+    }
     bool reverse = option->direction == Qt::RightToLeft;
     QRect r = option->rect;
     if (const QStyleOptionFrame *_frame =
@@ -452,8 +455,9 @@ Style::drawPrimitiveFrameGroupBox(PrimitiveElement element,
                     }
                 }
 
-                if (!(opts.gbLabel & (GB_LBL_INSIDE | GB_LBL_OUTSIDE)))
+                if (!(opts.gbLabel & (GB_LBL_INSIDE | GB_LBL_OUTSIDE))) {
                     painter->restore();
+                }
                 if (FRAME_SHADED == opts.groupBox) {
                     drawBorder(painter, r, option, round,
                                backgroundColors(option), WIDGET_FRAME,
@@ -470,7 +474,7 @@ Style::drawPrimitiveFrameGroupBox(PrimitiveElement element,
                     painter->setPen(QPen(QBrush(grad), 1));
                     painter->drawPath(path);
                 }
-                if (opts.gbLabel & (GB_LBL_INSIDE|GB_LBL_OUTSIDE)) {
+                if (opts.gbLabel & (GB_LBL_INSIDE | GB_LBL_OUTSIDE)) {
                     painter->restore();
                 }
             } else {
@@ -494,8 +498,9 @@ Style::drawPrimitiveFrame(PrimitiveElement element,
     State state = option->state;
 
     // Dont draw OO.o status bar frames...
-    if (isOOWidget(widget) && r.height() < 22)
+    if (isOOWidget(widget) && r.height() < 22) {
         return true;
+    }
     if (widget && qtcCheckKDEType0(widget->parent(), KTitleWidget)) {
         return true;
     } else if (widget && qtcCheckType0<QComboBox>(widget->parent())) {
@@ -603,7 +608,7 @@ Style::drawPrimitiveFrame(PrimitiveElement element,
                 }
                 if (opts.round && qtcIsFlatBgnd(opts.bgndAppearance) &&
                     opts.bgndOpacity == 100 && widget &&
-                    widget->parentWidget() && !inQAbstractItemView//  &&
+                    widget->parentWidget() && !inQAbstractItemView // &&
                     // widget->palette().background().color() !=
                     // widget->parentWidget()->palette().background().color()
                     ) {
@@ -629,7 +634,7 @@ Style::drawPrimitiveFrame(PrimitiveElement element,
                     painter->setRenderHint(QPainter::Antialiasing, false);
                 }
                 drawBorder(painter, r, &opt,
-                           opts.round ?  getFrameRound(widget) : ROUND_NONE,
+                           opts.round ? getFrameRound(widget) : ROUND_NONE,
                            backgroundColors(option),
                            sv || kateView || kontactPreview ?
                            WIDGET_SCROLLVIEW : WIDGET_FRAME,
@@ -702,10 +707,12 @@ Style::drawPrimitivePanelTipLabel(PrimitiveElement element,
         itsShadowHelper->registerWidget(widget->window());
     }
 #endif
-    if (rounded)
+    if (rounded) {
         painter->setRenderHint(QPainter::Antialiasing, true);
-    if (haveAlpha)
+    }
+    if (haveAlpha) {
         col.setAlphaF(0.875);
+    }
     drawBevelGradient(col, painter, r, path, true, false,
                       opts.tooltipAppearance, WIDGET_TOOLTIP, !haveAlpha);
     if (qtcIsFlat(opts.tooltipAppearance)) {
@@ -801,7 +808,7 @@ Style::drawPrimitivePanelItemViewItem(PrimitiveElement element,
                         v4Opt->backgroundBrush.color() :
                         palette.color(cg, QPalette::Highlight));
         bool square = ((opts.square & SQUARE_LISTVIEW_SELECTION) &&
-                       (/*(!widget && r.height()<=40 && r.width()>=48) || */
+                       ( /*(!widget && r.height()<=40 && r.width()>=48) || */
                            (widget && !widget->inherits("KFilePlacesView") &&
                             (qobject_cast<const QTreeView*>(widget) ||
                              (qobject_cast<const QListView*>(widget) &&
@@ -856,14 +863,15 @@ Style::drawPrimitivePanelItemViewItem(PrimitiveElement element,
             bool roundedLeft = false;
             bool roundedRight = false;
             if (v4Opt) {
-                roundedLeft = (QStyleOptionViewItemV4::Beginning ==
-                               v4Opt->viewItemPosition);
-                roundedRight = (QStyleOptionViewItemV4::End ==
-                                v4Opt->viewItemPosition);
-                if (QStyleOptionViewItemV4::OnlyOne == v4Opt->viewItemPosition ||
-                    QStyleOptionViewItemV4::Invalid == v4Opt->viewItemPosition ||
-                    (view && view->selectionBehavior() !=
-                     QAbstractItemView::SelectRows)) {
+                roundedLeft = (v4Opt->viewItemPosition ==
+                               QStyleOptionViewItemV4::Beginning);
+                roundedRight = (v4Opt->viewItemPosition ==
+                                QStyleOptionViewItemV4::End);
+                if (qtcOneOf(v4Opt->viewItemPosition,
+                             QStyleOptionViewItemV4::OnlyOne,
+                             QStyleOptionViewItemV4::Invalid) ||
+                    (view && (view->selectionBehavior() !=
+                              QAbstractItemView::SelectRows))) {
                     roundedLeft = roundedRight = true;
                 }
             }
@@ -900,9 +908,10 @@ Style::drawPrimitiveFrameTabWidget(PrimitiveElement element,
 
     if (const QStyleOptionTabWidgetFrame *twf =
         qstyleoption_cast<const QStyleOptionTabWidgetFrame*>(option)) {
-        if ((opts.round || (/*qtcIsCustomBgnd(&opts) && */opts.tabBgnd == 0)) &&
+        if ((opts.round ||
+             (/*qtcIsCustomBgnd(&opts) && */ opts.tabBgnd == 0)) &&
             widget && qobject_cast<const QTabWidget*>(widget)) {
-            struct QtcTabWidget : public QTabWidget {
+            struct QtcTabWidget: public QTabWidget {
                 bool
                 tabsVisible() const
                 {
@@ -923,7 +932,7 @@ Style::drawPrimitiveFrameTabWidget(PrimitiveElement element,
                     QRect tabRect =
                         ((const QtcTabWidget*)widget)->currentTabRect();
                     int adjust = (opts.tabMouseOver == TAB_MO_GLOW &&
-                                  !(opts.thin&THIN_FRAMES) ? 2 : 1);
+                                  !(opts.thin & THIN_FRAMES) ? 2 : 1);
                     switch (tw->tabPosition()) {
                     case QTabWidget::South:
                         tabRect = QRect(tabRect.x() + adjust,
@@ -958,7 +967,7 @@ Style::drawPrimitiveFrameTabWidget(PrimitiveElement element,
                             round -= CORNER_TR;
                         } else if (!reverse &&
                                    twf->leftCornerWidgetSize.isEmpty()) {
-                            round-=CORNER_TL;
+                            round -= CORNER_TL;
                         }
                         break;
                     case QTabWidget::South:
@@ -1094,13 +1103,14 @@ Style::drawPrimitiveButton(PrimitiveElement element, const QStyleOption *option,
     if (option->palette.button().color().alpha() == 0) {
         if (state & State_MouseOver && state & State_Enabled &&
             opts.coloredMouseOver == MO_GLOW && doEtch &&
-            !(opts.thin&THIN_FRAMES)) {
+            !(opts.thin & THIN_FRAMES)) {
             drawGlow(painter, r, WIDGET_STD_BUTTON);
         }
         return true;
     }
-    if (!widget)
+    if (!widget) {
         widget = getWidget(painter);
+    }
     const QColor *use = buttonColors(option);
     bool isDefault = false;
     bool isFlat = false;
@@ -1109,29 +1119,34 @@ Style::drawPrimitiveButton(PrimitiveElement element, const QStyleOption *option,
     bool isOnListView = (!isKWin && widget &&
                          qobject_cast<const QAbstractItemView*>(widget));
     QStyleOption opt(*option);
-    if (element == PE_PanelButtonBevel)
+    if (element == PE_PanelButtonBevel) {
         opt.state |= State_Enabled;
+    }
     if (const QStyleOptionButton *button =
         qstyleoption_cast<const QStyleOptionButton*>(option)) {
         isDefault = ((button->features & QStyleOptionButton::DefaultButton) &&
                      (button->state & State_Enabled));
         isFlat = button->features & QStyleOptionButton::Flat;
     }
-    if (!(opt.state & State_Enabled))
+    if (!(opt.state & State_Enabled)) {
         opt.state &= ~State_MouseOver;
+    }
     // For some reason with OO.o not all buttons are set as raised!
-    if (!(opt.state & State_AutoRaise))
+    if (!(opt.state & State_AutoRaise)) {
         opt.state |= State_Raised;
+    }
 
     isDefault = (isDefault ||
                  (doEtch && FULL_FOCUS && MO_GLOW == opts.coloredMouseOver &&
                   opt.state & State_HasFocus && opt.state & State_Enabled));
-    if (isFlat && !isDown && !(opt.state & State_MouseOver))
+    if (isFlat && !isDown && !(opt.state & State_MouseOver)) {
         return true;
+    }
 
-    if (isOnListView)
+    if (isOnListView) {
         opt.state |= State_Horizontal | State_Raised;
-    if (isDefault && state&State_Enabled &&
+    }
+    if (isDefault && state & State_Enabled &&
         (IND_TINT == opts.defBtnIndicator ||
          IND_SELECTED == opts.defBtnIndicator)) {
         use = itsDefBtnCols;
@@ -1144,11 +1159,11 @@ Style::drawPrimitiveButton(PrimitiveElement element, const QStyleOption *option,
             use = itsTitleBarButtonsCols[TITLEBAR_CLOSE];
         } else if (constDwtFloat == widget->objectName()) {
             use = itsTitleBarButtonsCols[TITLEBAR_MAX];
-        }else if (widget->parentWidget() &&
-                  widget->parentWidget()->parentWidget() &&
-                  widget->parentWidget()->inherits("KoDockWidgetTitleBar") &&
-                  qobject_cast<QDockWidget*>(widget->parentWidget()
-                                             ->parentWidget())) {
+        } else if (widget->parentWidget() &&
+                   widget->parentWidget()->parentWidget() &&
+                   widget->parentWidget()->inherits("KoDockWidgetTitleBar") &&
+                   qobject_cast<QDockWidget*>(widget->parentWidget()
+                                              ->parentWidget())) {
             QDockWidget *dw =
                 (QDockWidget*)widget->parentWidget()->parentWidget();
             QWidget *koDw = widget->parentWidget();
@@ -1185,11 +1200,12 @@ Style::drawPrimitiveButton(PrimitiveElement element, const QStyleOption *option,
     if (isKWin) {
         opt.state |= STATE_KWIN_BUTTON;
     }
-    bool coloredDef = (isDefault && state&State_Enabled &&
+    bool coloredDef = (isDefault && state & State_Enabled &&
                        IND_COLORED == opts.defBtnIndicator);
     if (widget && qobject_cast<const QAbstractButton*>(widget) &&
-        static_cast<const QAbstractButton*>(widget)->isCheckable())
+        static_cast<const QAbstractButton*>(widget)->isCheckable()) {
         opt.state |= STATE_TOGGLE_BUTTON;
+    }
 
     drawLightBevel(painter, r, &opt, widget, ROUNDED_ALL,
                    coloredDef ? itsDefBtnCols[MO_DEF_BTN] :
@@ -1197,7 +1213,7 @@ Style::drawPrimitiveButton(PrimitiveElement element, const QStyleOption *option,
                            isDefault && state & State_Enabled &&
                            IND_DARKEN == opts.defBtnIndicator),
                    coloredDef ? itsDefBtnCols : use, true,
-                   isKWin || state&STATE_DWT_BUTTON ?
+                   isKWin || state & STATE_DWT_BUTTON ?
                    WIDGET_MDI_WINDOW_BUTTON :
                    isOnListView ? WIDGET_NO_ETCH_BTN :
                    isDefault && state & State_Enabled ?
@@ -1205,7 +1221,7 @@ Style::drawPrimitiveButton(PrimitiveElement element, const QStyleOption *option,
                    state & STATE_TBAR_BUTTON ? WIDGET_TOOLBAR_BUTTON :
                    WIDGET_STD_BUTTON);
 
-    if (isDefault && state&State_Enabled)
+    if (isDefault && state & State_Enabled) {
         switch (opts.defBtnIndicator) {
         case IND_CORNER: {
             QPainterPath path;
@@ -1236,6 +1252,7 @@ Style::drawPrimitiveButton(PrimitiveElement element, const QStyleOption *option,
         default:
             break;
         }
+    }
     return true;
 }
 
@@ -1265,8 +1282,9 @@ Style::drawPrimitivePanelMenu(PrimitiveElement element,
 
     // In case the gradient uses alpha, we need to fill with the background
     // colour - this makes it consistent with Gtk.
-    if (opts.menuBgndOpacity == 100)
+    if (opts.menuBgndOpacity == 100) {
         painter->fillRect(r, option->palette.brush(QPalette::Background));
+    }
     drawBackground(painter, popupMenuCols()[ORIGINAL_SHADE], r,
                    opts.menuBgndOpacity, BGND_MENU, opts.menuBgndAppearance);
     drawBackgroundImage(painter, false, r);
@@ -1311,8 +1329,9 @@ Style::drawPrimitivePanelMenu(PrimitiveElement element,
                 QPainterPath tl;
                 QPainterPath br;
                 buildSplitPath(ri, ROUNDED_ALL, radius - 1.0, tl, br);
-                if (GB_3D != border)
+                if (GB_3D != border) {
                     painter->drawPath(tl);
+                }
                 painter->setPen(use[FRAME_DARK_SHADOW]);
                 painter->drawPath(br);
             }
@@ -1334,12 +1353,13 @@ Style::drawPrimitiveFrameFocusRect(PrimitiveElement element,
     if (const QStyleOptionFocusRect *focusFrame =
         qstyleoption_cast<const QStyleOptionFocusRect*>(option)) {
         if (!(focusFrame->state & State_KeyboardFocusChange) ||
-            (widget && widget->inherits("QComboBoxListView")))
+            (widget && widget->inherits("QComboBoxListView"))) {
             return true;
+        }
         if (widget && opts.focus == FOCUS_GLOW) {
             if (qobject_cast<const QAbstractButton*>(widget)) {
-                if(!qobject_cast<const QToolButton*>(widget) ||
-                   !static_cast<const QToolButton*>(widget)->autoRaise()) {
+                if (!qobject_cast<const QToolButton*>(widget) ||
+                    !static_cast<const QToolButton*>(widget)->autoRaise()) {
                     return true;
                 }
             } else if (qobject_cast<const QComboBox*>(widget) ||
@@ -1360,14 +1380,16 @@ Style::drawPrimitiveFrameFocusRect(PrimitiveElement element,
             r2.adjust(-adjust, -adjust, adjust, adjust);
         }
 
-        if (widget && qobject_cast<const QGroupBox*>(widget))
+        if (widget && qobject_cast<const QGroupBox*>(widget)) {
             r2.adjust(0, 2, 0, 0);
+        }
         if (opts.focus == FOCUS_STANDARD) {
             // Taken from QWindowsStyle...
             painter->setBackgroundMode(Qt::TransparentMode);
             QColor bgCol(focusFrame->backgroundColor);
-            if (!bgCol.isValid())
+            if (!bgCol.isValid()) {
                 bgCol = painter->background().color();
+            }
             // Create an "XOR" color.
             QColor patternCol((bgCol.red() ^ 0xff) & 0xff,
                               (bgCol.green() ^ 0xff) & 0xff,
@@ -1380,7 +1402,7 @@ Style::drawPrimitiveFrameFocusRect(PrimitiveElement element,
             painter->drawRect(r.left(), r.top(), 1, r.height());   // Left
             painter->drawRect(r.right(), r.top(), 1, r.height());  // Right
         } else {
-            //Figuring out in what beast we are painting...
+            // Figuring out in what beast we are painting...
             bool view(state & State_Item ||
                       ((widget &&
                         qobject_cast<const QAbstractScrollArea*>(widget)) ||
@@ -1397,7 +1419,7 @@ Style::drawPrimitiveFrameFocusRect(PrimitiveElement element,
                         view = true;
                     } else if (theThemedApp == APP_KONTACT &&
                                (wid->parentWidget()->inherits(
-                                   "KMail::MainFolderView") ||
+                                    "KMail::MainFolderView") ||
                                 wid->parentWidget()->inherits(
                                     "MessageList::Core::View"))) {
                         view = true;
@@ -1422,12 +1444,12 @@ Style::drawPrimitiveFrameFocusRect(PrimitiveElement element,
                 }
             } else {
                 painter->setPen(c);
-                if (FOCUS_FILLED==opts.focus) {
+                if (FOCUS_FILLED == opts.focus) {
                     c.setAlphaF(FOCUS_ALPHA);
                     painter->setBrush(c);
                 }
                 if (ROUNDED) {
-                    bool square((opts.square&SQUARE_LISTVIEW_SELECTION) &&
+                    bool square((opts.square & SQUARE_LISTVIEW_SELECTION) &&
                                 (((widget &&
                                    !widget->inherits("KFilePlacesView") &&
                                    (qobject_cast<const QTreeView*>(widget) ||
@@ -1508,11 +1530,12 @@ Style::drawPrimitiveIndicatorRadioButton(PrimitiveElement element,
                 --x;
                 --y;
             }
-            if (menu || selectedOOMenu)
-                opt.state &= ~(State_MouseOver|State_Sunken);
-            opt.state&=~State_On;
-            opt.state|=State_Raised;
-            opt.rect=rect;
+            if (menu || selectedOOMenu) {
+                opt.state &= ~(State_MouseOver | State_Sunken);
+            }
+            opt.state &= ~State_On;
+            opt.state |= State_Raised;
+            opt.rect = rect;
 
             if (doEtch) {
                 x++;
@@ -1575,8 +1598,9 @@ Style::drawPrimitiveIndicatorRadioButton(PrimitiveElement element,
                 painter->setPen(topCol);
                 painter->drawArc(QRectF(x - 0.5, y - 0.5, opts.crSize + 1,
                                         opts.crSize + 1), 45 * 16, 180 * 16);
-                if (!glow)
+                if (!glow) {
                     painter->setPen(getLowerEtchCol(widget));
+                }
                 painter->drawArc(QRectF(x - 0.5, y - 0.5, opts.crSize + 1,
                                         opts.crSize + 1), 225 * 16, 180 * 16);
             }
@@ -1629,7 +1653,7 @@ Style::drawPrimitiveIndicatorCheckBox(PrimitiveElement element,
                             state == (State_Sunken | State_Enabled |
                                       State_Selected)));
     int crSize = opts.crSize + (doEtch ? 2 : 0);
-    QRect rect(r.x(), r.y()+(view ? -1 : 0), crSize, crSize);
+    QRect rect(r.x(), r.y() + (view ? -1 : 0), crSize, crSize);
 
     // For OO.o 3.2 need to fill widget background!
     if (isOO) {
@@ -1637,8 +1661,9 @@ Style::drawPrimitiveIndicatorCheckBox(PrimitiveElement element,
     }
 
     if (selectedOOMenu) {
-        if (r == QRect(0, 0, 14, 15)) // OO.o 3.2 =14x15?
+        if (r == QRect(0, 0, 14, 15)) { // OO.o 3.2 =14x15?
             rect.adjust(-1, -1, -1, -1);
+        }
         painter->setPen(option ? option->palette.text().color() :
                         QApplication::palette().text().color());
         drawRect(painter, r);
@@ -1647,8 +1672,9 @@ Style::drawPrimitiveIndicatorCheckBox(PrimitiveElement element,
             rect.adjust(-1, -1, -1, -1);
         }
     } else {
-        if (isOO && r == QRect(0, 0, opts.crSize, opts.crSize))
+        if (isOO && r == QRect(0, 0, opts.crSize, opts.crSize)) {
             rect.adjust(0, -1, 0, -1);
+        }
 
         if (opts.crSize != CR_SMALL_SIZE) {
             if (menu) {
@@ -1663,8 +1689,9 @@ Style::drawPrimitiveIndicatorCheckBox(PrimitiveElement element,
         if (opts.crButton) {
             const QColor *use(checkRadioColors(option));
             QStyleOption opt(*option);
-            if (menu || selectedOOMenu)
+            if (menu || selectedOOMenu) {
                 opt.state &= ~(State_MouseOver | State_Sunken);
+            }
             opt.state &= ~State_On;
             opt.state |= State_Raised;
             opt.rect = rect;
@@ -1673,7 +1700,8 @@ Style::drawPrimitiveIndicatorCheckBox(PrimitiveElement element,
                            use, true, WIDGET_CHECKBOX);
         } else {
             bool sunken = !menu && !selectedOOMenu && (state & State_Sunken);
-            bool mo = !sunken && state&State_MouseOver && state&State_Enabled;
+            bool mo = (!sunken && state & State_MouseOver &&
+                       state & State_Enabled);
             bool glow = doEtch && opts.coloredMouseOver == MO_GLOW && mo;
             const QColor *bc = sunken ? 0L : borderColors(option, 0L);
             const QColor *btn = checkRadioColors(option);
@@ -1729,7 +1757,7 @@ Style::drawPrimitiveIndicatorCheckBox(PrimitiveElement element,
                        WIDGET_CHECKBOX);
         }
     }
-    if (state &State_On || selectedOOMenu) {
+    if (state & State_On || selectedOOMenu) {
         QPixmap *pix = getPixmap(checkRadioCol(option), PIX_CHECK, 1.0);
 
         painter->drawPixmap(rect.center().x() - pix->width() / 2,
@@ -1762,15 +1790,16 @@ Style::drawPrimitiveFrameLineEdit(PrimitiveElement element,
                qobject_cast<const QAbstractSpinBox*>(
                    widget->parentWidget())))) {
             QStyleOptionFrame opt(*lineEdit);
-            if (opt.state & State_Enabled && state & State_ReadOnly)
+            if (opt.state & State_Enabled && state & State_ReadOnly) {
                 opt.state ^= State_Enabled;
+            }
             if (DO_EFFECT && opts.etchEntry && APP_ARORA == theThemedApp &&
                 widget && widget->parentWidget() &&
                 strcmp(widget->metaObject()->className(), "LocationBar") == 0) {
                 const QToolBar *tb = getToolBar(widget->parentWidget());
                 if (tb) {
                     QRect r2(r);
-                    struct TB : public QToolBar {
+                    struct TB: public QToolBar {
                         void
                         initOpt(QStyleOptionToolBar *opt)
                         {
@@ -1778,7 +1807,7 @@ Style::drawPrimitiveFrameLineEdit(PrimitiveElement element,
                         }
                     };
                     QStyleOptionToolBar opt;
-                    ((TB *)tb)->initOpt(&opt);
+                    ((TB*)tb)->initOpt(&opt);
                     painter->save();
                     // Only need to adjust coords if toolbar has a gradient...
                     if (!qtcIsFlat(opts.toolbarAppearance)) {
@@ -1885,10 +1914,11 @@ Style::drawPrimitiveButtonTool(PrimitiveElement element,
     bool koDwt = (!dwt && widget && widget->parentWidget() &&
                   widget->parentWidget()->inherits("KoDockWidgetTitleBar"));
     if (((state & State_Enabled) || !(state & State_AutoRaise)) &&
-        (!widget || !(dwt || koDwt)|| (state & State_MouseOver)) ) {
+        (!widget || !(dwt || koDwt) || (state & State_MouseOver))) {
         QStyleOption opt(*option);
-        if (dwt || koDwt)
+        if (dwt || koDwt) {
             opt.state |= STATE_DWT_BUTTON;
+        }
         drawPrimitive(PE_PanelButtonCommand, &opt, painter, widget);
     }
     return true;
@@ -1944,7 +1974,7 @@ Style::drawPrimitiveFrameStatusBarOrMenu(PrimitiveElement element,
             } else {
                 if (GB_3D != border) {
                     painter->drawLine(r.x() + 1, r.y() + 1,
-                                      r.x() + r.width() - 2,  r.y() + 1);
+                                      r.x() + r.width() - 2, r.y() + 1);
                     painter->drawLine(r.x() + 1, r.y() + 1, r.x() + 1,
                                       r.y() + r.height() - 2);
                 }
@@ -1990,7 +2020,7 @@ Style::drawPrimitiveFrameTabBarBase(PrimitiveElement element,
                                   tbb->tabBarRect.height());
             double tabFadeSize = (tabRectSize + constSidePad > size ? 0.0 :
                                   1.0 - (tabRectSize + constSidePad) / size);
-            double minFadeSize = 1.0- (size - constSidePad) / size;
+            double minFadeSize = 1.0 - (size - constSidePad) / size;
             double fadeSizeStart = minFadeSize;
             double fadeSizeEnd = (tabFadeSize < minFadeSize ? minFadeSize :
                                   (tabFadeSize > FADE_SIZE ? FADE_SIZE :
@@ -2032,5 +2062,4 @@ Style::drawPrimitiveFrameTabBarBase(PrimitiveElement element,
     }
     return true;
 }
-
 }
