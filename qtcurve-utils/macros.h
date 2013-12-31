@@ -83,6 +83,17 @@
 
 /** @} */
 
+#define qtcMakeVersion(a, b, c...)              \
+    ((a) << 16 | (b) << 8 | QTC_DEFAULT(c, 0))
+#ifdef __GNUC__
+#  define QTC_GCC_VERSION                                               \
+    qtcMakeVersion(__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__)
+#else
+#  define QTC_GCC_VERSION 0
+#endif
+#define QTC_CHECK_GCC_VERSION(args...)          \
+    (QTC_GCC_VERSION >= qtcMakeVersion(args))
+
 /**
  * \brief Export symbol.
  */
@@ -127,7 +138,7 @@
 /**
  * Tell the compiler that \param exp is likely to be \param var.
  */
-#if defined(__GNUC__) && (__GNUC__ > 2)
+#if QTC_CHECK_GCC_VERSION(3, 0)
 #  define qtcExpect(exp, var) __builtin_expect(exp, var)
 #else
 #  define qtcExpect(exp, var) (exp)

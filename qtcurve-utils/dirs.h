@@ -22,21 +22,56 @@
 #ifndef _QTC_UTILS_DIRS_H_
 #define _QTC_UTILS_DIRS_H_
 
+/**
+ * \file dirs.h
+ * \author Yichao Yu <yyc1992@gmail.com>
+ * \brief Standard directories and file system related functions.
+ */
+
 #include "utils.h"
 #include <unistd.h>
 #include <sys/stat.h>
 
 QTC_BEGIN_DECLS
 
+/**
+ * Get home directory. The returned string is guaranteed to end with '/'
+ */
 const char *qtcGetHome();
+/**
+ * Get XDG_DATA_HOME directory. This is usually `~/.local/share/`
+ * The returned string is guaranteed to end with '/'
+ */
 const char *qtcGetXDGDataHome();
+/**
+ * Get XDG_CONFIG_HOME directory. This is usually `~/.config/`
+ * The returned string is guaranteed to end with '/'
+ */
 const char *qtcGetXDGConfigHome();
+/**
+ * Get QtCurve configure directory. The directory will be created if it doesn't
+ * exist. The returned string is guaranteed to end with '/'
+ */
 const char *qtcConfDir();
+/**
+ * Create directory \param path with mode \param mode. Its parent directories
+ * will also be created as needed.
+ */
 void qtcMakePath(const char *path, int mode);
+/**
+ * Return the absolute path of \param file with the QtCurve configure directory
+ * as the current directory. If the optional argument \param buff is not NULL
+ * it will be realloc'ed to hold the result. If \param path is a relative path
+ * the QtCurve configure directory will be created.
+ */
 char *qtcGetConfFile(const char *file, char *buff);
 #define qtcGetConfFile(file, buff...)                   \
     qtcGetConfFile(file, QTC_DEFAULT(buff, NULL))
 
+/**
+ * Check whether \param path is (or is a symlink that is pointing to)
+ * a directory with read and execute permissions.
+ */
 static inline bool
 qtcIsDir(const char *path)
 {
@@ -45,6 +80,10 @@ qtcIsDir(const char *path)
             access(path, R_OK | X_OK) == 0);
 }
 
+/**
+ * Check whether \param path is (or is a symlink that is pointing to)
+ * a regular file with read permission.
+ */
 static inline bool
 qtcIsRegFile(const char *path)
 {
@@ -53,6 +92,9 @@ qtcIsRegFile(const char *path)
             access(path, R_OK) == 0);
 }
 
+/**
+ * Check whether \param path is a symlink.
+ */
 static inline bool
 qtcIsSymLink(const char *path)
 {

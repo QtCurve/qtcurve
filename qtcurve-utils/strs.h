@@ -74,13 +74,8 @@ _qtcCatStrsFill(int n, const char **strs, size_t *lens,
     } while (0)
 
 // Gcc 4.4.5 produce error when using sizeof array in variadic template
-#if defined __cplusplus && defined __GNUC__ && !defined __clang__
-#if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 8)
-#define __QTC_CAT_STR_NO_TEMPLATE
-#endif
-#endif
-
-#if !defined __cplusplus || defined __QTC_CAT_STR_NO_TEMPLATE
+#if !defined __cplusplus ||                             \
+    !(defined __clang__ || QTC_CHECK_GCC_VERSION(4, 8))
 #define qtcCatStrs(strs...)                     \
     ({                                          \
         char *__cat_str_res;                    \

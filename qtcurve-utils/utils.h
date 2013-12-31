@@ -54,26 +54,6 @@ qtcFree(void *p)
     qtcNewSize(type, sizeof(type) * QTC_DEFAULT(n, 1))
 
 #ifdef __cplusplus
-
-#define __QTC_USE_DECLVAL
-#if defined __cplusplus && defined __GNUC__ && !defined __clang__
-#if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 8) ||            \
-    (__GNUC__ == 4 && __GNUC_MINOR__ == 8 && __GNUC_PATCHLEVEL__ < 1)
-#undef __QTC_USE_DECLVAL
-#endif
-#endif
-
-#ifdef __QTC_USE_DECLVAL
-#include <utility>
-#define _QTC_COMP_TYPE(T1, T2)                                  \
-    decltype(0 ? std::declval<T1>() : std::declval<T2>())
-#else
-#define _QTC_COMP_TYPE(T1, T2)                  \
-    decltype(0 ? T1() : T2())
-#endif
-#endif
-
-#ifdef __cplusplus
 template <class T>
 static inline const T&
 const_(const T &t)
@@ -188,6 +168,7 @@ int qtcStrMapSearch(const QtcStrMap *map, const char *key, int def);
 QTC_END_DECLS
 
 #ifdef __cplusplus
+#include <utility>
 template<typename T>
 QTC_ALWAYS_INLINE static inline bool
 qtcOneOf(T &&value)

@@ -23,17 +23,15 @@
 
 #include "utils.h"
 
-QTC_ALWAYS_INLINE static inline int
-_qtcMakeVersionReal(int a, int b, int c)
-{
-    return a << 16 | b << 8 | c;
-}
-#define _qtcMakeVersionV(a, b, c, ...)          \
-    _qtcMakeVersionReal(a, b, c)
-#define qtcMakeVersion(a, b, arg...)            \
-    _qtcMakeVersionV(a, b, ##arg, 0)
-
 #ifdef __cplusplus
+
+#if defined __clang__ || QTC_CHECK_GCC_VERSION(4, 8, 1)
+#  define _QTC_COMP_TYPE(T1, T2)                                \
+    decltype(0 ? std::declval<T1>() : std::declval<T2>())
+#else
+#  define _QTC_COMP_TYPE(T1, T2) decltype(0 ? T1() : T2())
+#endif
+
 template <typename T>
 QTC_ALWAYS_INLINE static inline const T&
 qtcMax(const T &a, const T &b)

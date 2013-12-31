@@ -92,7 +92,7 @@ qtcGetHome()
 {
     if (qtcUnlikely(!qtc_home)) {
         const char *env_home = getenv("HOME");
-        if (qtcUnlikely(env_home && *env_home == '/')) {
+        if (qtcLikely(env_home && *env_home == '/')) {
             qtc_home = qtcCatStrs(env_home, "/");
         } else {
             struct passwd *pw = getpwuid(getuid());
