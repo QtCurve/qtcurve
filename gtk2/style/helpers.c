@@ -196,9 +196,7 @@ getCellCol(GdkColor *std, const char *detail)
         }
 
         if (v > 1.0) {
-            s -= v - 1.0;
-            if (s < 0)
-                s = 0;
+            s = qtcMax(0, s - (v - 1.0));
             v = 1.0;
         }
 
@@ -214,7 +212,7 @@ gboolean
 reverseLayout(GtkWidget *widget)
 {
     if (widget)
-        return GTK_TEXT_DIR_RTL == gtk_widget_get_direction(widget);
+        return gtk_widget_get_direction(widget) == GTK_TEXT_DIR_RTL;
     return FALSE;
 }
 
@@ -239,9 +237,9 @@ isOnHandlebox(GtkWidget *widget, gboolean *horiz, int level)
     if (widget) {
         if (GTK_IS_HANDLE_BOX(widget)) {
             if (horiz) {
-                GtkPositionType pos =
-                    gtk_handle_box_get_handle_position(GTK_HANDLE_BOX(widget));
-                *horiz = (GTK_POS_LEFT == pos || GTK_POS_RIGHT == pos);
+                *horiz = qtcOneOf(gtk_handle_box_get_handle_position(
+                                      GTK_HANDLE_BOX(widget)),
+                                  GTK_POS_LEFT, GTK_POS_RIGHT);
             }
             return TRUE;
         } else if (level < 4) {

@@ -125,7 +125,7 @@ EBorder shadowToBorder(GtkShadowType shadow);
 gboolean useButtonColor(const char *detail);
 void qtcShadeColors(GdkColor *base, GdkColor *vals);
 gboolean isSortColumn(GtkWidget *button);
-GdkColor * getCellCol(GdkColor *std, const char *detail);
+GdkColor *getCellCol(GdkColor *std, const char *detail);
 gboolean reverseLayout(GtkWidget *widget);
 gboolean isOnToolbar(GtkWidget *widget, gboolean *horiz, int level);
 gboolean isOnHandlebox(GtkWidget *widget, gboolean *horiz, int level);
