@@ -54,18 +54,6 @@ static const double _qtc_yc[3] = {0.34375, 0.5, 0.15625};
 #undef HCY_REC
 
 QTC_ALWAYS_INLINE static inline double
-qtcColorNormalize(double a)
-{
-    if (a >= 1.0) {
-        return 1;
-    }
-    if (qtcUnlikely(a < 0.0)) {
-        return 0;
-    }
-    return a;
-}
-
-QTC_ALWAYS_INLINE static inline double
 qtcColorWrap(double a, double d)
 {
     double r = fmod(a, d);
@@ -81,13 +69,13 @@ qtcColorMixF(double a, double b, double bias)
 QTC_ALWAYS_INLINE static inline double
 qtcColorHCYGamma(double n)
 {
-    return pow(qtcColorNormalize(n), 2.2);
+    return pow(qtcBound(0, n, 1), 2.2);
 }
 
 QTC_ALWAYS_INLINE static inline double
 qtcColorHCYIGamma(double n)
 {
-    return pow(qtcColorNormalize(n), 1.0 / 2.2);
+    return pow(qtcBound(0, n, 1), 1.0 / 2.2);
 }
 
 QTC_ALWAYS_INLINE static inline double

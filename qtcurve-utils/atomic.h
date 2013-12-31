@@ -22,10 +22,16 @@
 #ifndef _QTC_UTILS_ATOMIC_H_
 #define _QTC_UTILS_ATOMIC_H_
 
+/**
+ * \file atomic.h
+ * \author Yichao Yu <yyc1992@gmail.com>
+ * \brief Atomic operations.
+ */
+
 #include "utils.h"
 
 #ifdef __QTC_ATOMIC_USE_SYNC_FETCH
-# undef __QTC_ATOMIC_USE_SYNC_FETCH
+#  undef __QTC_ATOMIC_USE_SYNC_FETCH
 #endif
 
 #if defined __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
@@ -64,12 +70,28 @@ QTC_DECLARE_ATOMIC(And, and, uint32_t);
 QTC_DECLARE_ATOMIC(Or, or, uint32_t);
 QTC_DECLARE_ATOMIC(Xor, xor, uint32_t);
 
+/**
+ * Add \param val to the variable pointed by \param atomic and return the old
+ * value atomically.
+ */
 #define qtcAtomicAdd(atomic, val)               \
     __qtcAtomicAdd(atomic, val)
+/**
+ * "And" \param val with the variable pointed by \param atomic and return
+ * the old value atomically.
+ */
 #define qtcAtomicAnd(atomic, val)               \
     __qtcAtomicAnd(atomic, val)
+/**
+ * "Or" \param val with the variable pointed by \param atomic and return
+ * the old value atomically.
+ */
 #define qtcAtomicOr(atomic, val)                \
     __qtcAtomicOr(atomic, val)
+/**
+ * "Xor" \param val with the variable pointed by \param atomic and return
+ * the old value atomically.
+ */
 #define qtcAtomicXor(atomic, val)               \
     __qtcAtomicXor(atomic, val)
 

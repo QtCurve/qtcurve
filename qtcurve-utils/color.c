@@ -59,8 +59,8 @@ qtcColorHCYToColor(const QtcColorHCY *hcy, QtcColor *color)
 {
     // start with sane component values
     double _h = qtcColorWrap(hcy->h, 1);
-    double _c = qtcColorNormalize(hcy->c);
-    double _y = qtcColorNormalize(hcy->y);
+    double _c = qtcBound(0, hcy->c, 1);
+    double _y = qtcBound(0, hcy->y, 1);
 
     // calculate some needed variables
     double _hs = _h * 6.0, th, tm;
@@ -133,8 +133,8 @@ _qtcColorLighten(QtcColor *color, double ky, double kc)
     QtcColorHCY hcy;
     qtcColorHCYFromColor(color, &hcy);
 
-    hcy.y = 1.0 - qtcColorNormalize((1.0 - hcy.y) * (1.0 - ky));
-    hcy.c = 1.0 - qtcColorNormalize((1.0 - hcy.c) * kc);
+    hcy.y = 1.0 - qtcBound(0, (1.0 - hcy.y) * (1.0 - ky), 1);
+    hcy.c = 1.0 - qtcBound(0, (1.0 - hcy.c) * kc, 1);
     qtcColorHCYToColor(&hcy, color);
 }
 
@@ -144,8 +144,8 @@ _qtcColorDarken(QtcColor *color, double ky, double kc)
     QtcColorHCY hcy;
     qtcColorHCYFromColor(color, &hcy);
 
-    hcy.y = qtcColorNormalize(hcy.y * (1.0 - ky));
-    hcy.c = qtcColorNormalize(hcy.c * kc);
+    hcy.y = qtcBound(0, hcy.y * (1.0 - ky), 1);
+    hcy.c = qtcBound(0, hcy.c * kc, 1);
     qtcColorHCYToColor(&hcy, color);
 }
 
@@ -155,8 +155,8 @@ _qtcColorShade(QtcColor *color, double ky, double kc)
     QtcColorHCY hcy;
     qtcColorHCYFromColor(color, &hcy);
 
-    hcy.y = qtcColorNormalize(hcy.y + ky);
-    hcy.c = qtcColorNormalize(hcy.c + kc);
+    hcy.y = qtcBound(0, hcy.y + ky, 1);
+    hcy.c = qtcBound(0, hcy.c + kc, 1);
     return qtcColorHCYToColor(&hcy, color);
 }
 
@@ -312,8 +312,8 @@ _qtcShade(const QtcColor *ca, QtcColor *cb, double k, EShading shading)
         double h, s, l;
 
         rgbToHsl(r, g, b, &h, &s, &l);
-        l = qtcColorNormalize(l * k);
-        s = qtcColorNormalize(s * k);
+        l = qtcBound(0, l * k, 1);
+        s = qtcBound(0, s * k, 1);
         hslToRgb(h, s, l, &r, &g, &b);
         qtcColorFill(cb, qtcLimit(r, 1.0), qtcLimit(g, 1.0),
                      qtcLimit(b, 1.0));
