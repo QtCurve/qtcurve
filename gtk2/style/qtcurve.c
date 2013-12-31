@@ -1206,10 +1206,6 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 if(DO_EFFECT)
                     cx--;
 
-        #if (GTK_MAJOR_VERSION>1) && (GTK_MINOR_VERSION<2)
-                cy++;
-                cheight-=2;
-        #endif
                 cy+=3;
                 cheight-=6;
 
@@ -2926,10 +2922,9 @@ static void qtcurve_rc_style_init(QtCurveRcStyle *qtcurve_rc)
 #endif
     if (qtSettingsInit()) {
         generateColors();
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
         if (opts.dlgOpacity < 100 || opts.bgndOpacity < 100 ||
             opts.menuBgndOpacity < 100 || qtSettings.useAlpha) {
-            GdkScreen   *screen = gdk_screen_get_default();
+            GdkScreen *screen = gdk_screen_get_default();
             GdkColormap *colormap =
                 screen ? gdk_screen_get_rgba_colormap(screen) : NULL;
 
@@ -2938,7 +2933,6 @@ static void qtcurve_rc_style_init(QtCurveRcStyle *qtcurve_rc)
                 gtk_widget_set_default_colormap(colormap);
             }
         }
-#endif
     }
 }
 
@@ -2965,21 +2959,22 @@ static void qtcurve_rc_style_class_init(QtCurveRcStyleClass *klass)
 
 void qtcurve_rc_style_register_type(GTypeModule *module)
 {
-    static const GTypeInfo object_info =
-    {
+    static const GTypeInfo object_info = {
         sizeof(QtCurveRcStyleClass),
-        (GBaseInitFunc) NULL,
-        (GBaseFinalizeFunc) NULL,
-        (GClassInitFunc) qtcurve_rc_style_class_init,
-        NULL,           /* class_finalize */
-        NULL,           /* class_data */
+        NULL,
+        NULL,
+        (GClassInitFunc)qtcurve_rc_style_class_init,
+        NULL, /* class_finalize */
+        NULL, /* class_data */
         sizeof(QtCurveRcStyle),
-        0,              /* n_preallocs */
-        (GInstanceInitFunc) qtcurve_rc_style_init,
+        0, /* n_preallocs */
+        (GInstanceInitFunc)qtcurve_rc_style_init,
         NULL
     };
 
-    qtcurve_type_rc_style = g_type_module_register_type(module, GTK_TYPE_RC_STYLE, "QtCurveRcStyle", &object_info, 0);
+    qtcurve_type_rc_style =
+        g_type_module_register_type(module, GTK_TYPE_RC_STYLE,
+                                    "QtCurveRcStyle", &object_info, 0);
 }
 
 G_MODULE_EXPORT void

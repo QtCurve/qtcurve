@@ -75,8 +75,9 @@ static const struct {
 QTC_EXPORT xcb_window_t
 (qtcX11RootWindow)(int scrn_no)
 {
-    if (scrn_no < 0 || scrn_no == qtc_default_screen_no)
+    if (scrn_no < 0 || scrn_no == qtc_default_screen_no) {
         return qtc_root_window;
+    }
     return qtcX11GetScreen()->root;
 }
 
@@ -210,8 +211,9 @@ qtcX11GenerateId()
 QTC_EXPORT int32_t
 qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom)
 {
-    if (qtcUnlikely(!win))
+    if (qtcUnlikely(!win)) {
         return -1;
+    }
     int32_t res = -1;
     xcb_get_property_reply_t *reply =
         qtcX11Call(get_property, 0, win, atom, XCB_ATOM_CARDINAL, 0, 1);
@@ -231,8 +233,9 @@ qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom)
 QTC_EXPORT void
 qtcX11MapRaised(xcb_window_t win)
 {
-    if (qtcUnlikely(!win))
+    if (qtcUnlikely(!win)) {
         return;
+    }
     static const uint32_t val = XCB_STACK_MODE_ABOVE;
     qtcX11CallVoid(configure_window, win, XCB_CONFIG_WINDOW_STACK_MODE, &val);
     qtcX11CallVoid(map_window, win);
@@ -254,8 +257,9 @@ qtcX11CompositingActive()
 QTC_EXPORT bool
 qtcX11HasAlpha(xcb_window_t win)
 {
-    if (qtcUnlikely(!win))
+    if (qtcUnlikely(!win)) {
         return false;
+    }
     if (!qtcX11CompositingActive()) {
         return false;
     }
@@ -274,8 +278,9 @@ qtcX11HasAlpha(xcb_window_t win)
 QTC_EXPORT bool
 qtcX11IsEmbed(xcb_window_t win)
 {
-    if (qtcUnlikely(!win))
+    if (qtcUnlikely(!win)) {
         return false;
+    }
     xcb_get_property_reply_t *reply =
         qtcX11Call(get_property, 0, win, qtc_x11_xembed_info,
                    qtc_x11_xembed_info, 0, 1);

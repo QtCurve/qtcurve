@@ -53,7 +53,7 @@
 // Check if arg is not empty and does not start with "("
 // Will not work if arg has comma or is the name of a function like macro
 #define __QTC_IS_SEP(ret_true, ret_false, arg)                          \
-    __QTC_HAS_COMMA1(ret_false, ret_true, __QTC_CONVERT_PAREN arg ())
+    __QTC_HAS_COMMA1(ret_false, ret_true, __QTC_CONVERT_PAREN arg())
 #define __QTC_IS_EMPTY_PAREN_TRUE(ret_true, ret_false, arg) ret_false
 #define __QTC_IS_EMPTY_PAREN_FALSE(ret_true, ret_false, arg)    \
     __QTC_IS_SEP(ret_false, ret_true, arg)
@@ -83,7 +83,7 @@
 
 /** @} */
 
-#define qtcMakeVersion(a, b, c...)              \
+#define qtcMakeVersion(a, b, c...)                      \
     ((a) << 16 | (b) << 8 | (QTC_DEFAULT(c, 0)))
 #ifdef __GNUC__
 #  define QTC_GCC_VERSION                                               \

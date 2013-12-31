@@ -40,9 +40,8 @@ static void
 qtcComboBoxClearBgndColor(GtkWidget *widget)
 {
     GList *children = gtk_container_get_children(GTK_CONTAINER(widget));
-    GList *child = children;
 
-    for (;child;child=child->next) {
+    for (GList *child = children;child;child = child->next) {
         GtkWidget *boxChild = (GtkWidget*)child->data;
 
         if (GTK_IS_CELL_VIEW(boxChild) &&
@@ -86,19 +85,22 @@ qtcComboBoxIsHovered(GtkWidget *widget)
     return widget == qtcComboHover;
 }
 
-/* static gboolean */
-/* qtcComboAppearsAsList(GtkWidget *widget) */
-/* { */
-/*     gboolean rv; */
-/*     gtk_widget_style_get(widget, "appears-as-list", &rv, NULL); */
-/*     return rv; */
-/* } */
+#if 0
+static gboolean
+qtcComboAppearsAsList(GtkWidget *widget)
+{
+    gboolean rv;
+    gtk_widget_style_get(widget, "appears-as-list", &rv, NULL);
+    return rv;
+}
+#endif
 
 static void
 qtcComboBoxCleanup(GtkWidget *widget)
 {
-    if (!widget)
+    if (!widget) {
         return;
+    }
     GObject *obj = G_OBJECT(widget);
     if (g_object_get_data(obj, "QTC_COMBO_BOX_SET")) {
         qtcDisconnectFromData(obj, "QTC_COMBO_BOX_DESTROY_ID");
@@ -170,8 +172,9 @@ qtcComboBoxStateChange(GtkWidget *widget, GdkEventMotion *event, gpointer data)
 void
 qtcComboBoxSetup(GtkWidget *frame, GtkWidget *combo)
 {
-    if (!combo || (!frame && qtcComboHasFrame(combo)))
+    if (!combo || (!frame && qtcComboHasFrame(combo))) {
         return;
+    }
     GObject *combo_obj = G_OBJECT(combo);
     if (!g_object_get_data(combo_obj, "QTC_COMBO_BOX_SET")) {
         g_object_set_data(combo_obj, "QTC_COMBO_BOX_SET", GINT_TO_POINTER(1));
@@ -181,9 +184,7 @@ qtcComboBoxSetup(GtkWidget *frame, GtkWidget *combo)
 
         if (frame) {
             GList *children = gtk_container_get_children(GTK_CONTAINER(frame));
-            GList *child = children;
-
-            for (;child;child = child->next) {
+            for (GList *child = children;child;child = child->next) {
                 GObject *boxChild = (GObject*)child->data;
 
                 if (GTK_IS_EVENT_BOX(boxChild)) {
@@ -202,7 +203,7 @@ qtcComboBoxSetup(GtkWidget *frame, GtkWidget *combo)
                 }
             }
 
-            if(children) {
+            if (children) {
                 g_list_free(children);
             }
         }

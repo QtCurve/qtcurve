@@ -32,8 +32,10 @@ typedef struct {
 QTC_ALWAYS_INLINE static inline QtcImage*
 qtcImageNew(int width, int height, int depth)
 {
-    if (qtcUnlikely(width <= 0 || height <= 0 || depth <= 0 || depth % 8 != 0))
+    if (qtcUnlikely(width <= 0 || height <= 0 || depth <= 0 ||
+                    depth % 8 != 0)) {
         return NULL;
+    }
     int len = width * height * depth / 8;
     QtcImage *res = qtcNewSize(QtcImage, sizeof(QtcImage) + len);
     res->len = len;

@@ -98,8 +98,9 @@ qtcStrMapItemCompare(const void *_left, const void *_right, void *_map)
 QTC_EXPORT void
 qtcStrMapInit(QtcStrMap *map)
 {
-    if (qtcUnlikely(!map || map->inited || !map->items))
+    if (qtcUnlikely(!map || map->inited || !map->items)) {
         return;
+    }
     if (map->auto_val) {
         for (unsigned i = 0;i < map->num;i++) {
             map->items[i].val = i;

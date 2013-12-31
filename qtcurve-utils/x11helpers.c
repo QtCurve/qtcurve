@@ -105,8 +105,9 @@ qtcX11ShadowDestroy()
 QTC_EXPORT void
 qtcX11ShadowInstallWithMargin(xcb_window_t win, const int margins[4])
 {
-    if (qtcUnlikely(!win))
+    if (qtcUnlikely(!win)) {
         return;
+    }
     if (qtcUnlikely(!margins)) {
         qtcX11ShadowInstall(win);
         return;
@@ -118,15 +119,17 @@ qtcX11ShadowInstallWithMargin(xcb_window_t win, const int margins[4])
     if (disp) {
         unsigned long shadow_data[8 + 4];
         memcpy(shadow_data, shadow_data_xlib, 12 * sizeof(unsigned long));
-        for (int i = 0;i < 4;i++)
+        for (int i = 0;i < 4;i++) {
             shadow_data[i + 8] -= margins[i];
+        }
         XChangeProperty(disp, win, atom, XA_CARDINAL, 32, PropModeReplace,
                         (unsigned char*)shadow_data, 12);
     } else {
         uint32_t shadow_data[8 + 4];
         memcpy(shadow_data, shadow_data_xcb, 12 * sizeof(uint32_t));
-        for (int i = 0;i < 4;i++)
+        for (int i = 0;i < 4;i++) {
             shadow_data[i + 8] -= margins[i];
+        }
         qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, win,
                        atom, XCB_ATOM_CARDINAL, 32, 12, shadow_data);
         qtcX11Flush();
@@ -136,8 +139,9 @@ qtcX11ShadowInstallWithMargin(xcb_window_t win, const int margins[4])
 QTC_EXPORT void
 qtcX11ShadowInstall(xcb_window_t win)
 {
-    if (qtcUnlikely(!win))
+    if (qtcUnlikely(!win)) {
         return;
+    }
     // In principle, I should check for _KDE_NET_WM_SHADOW in _NET_SUPPORTED.
     // However, it's complicated and we will gain nothing.
     Display *disp = qtcX11GetDisp();
@@ -155,8 +159,9 @@ qtcX11ShadowInstall(xcb_window_t win)
 QTC_EXPORT void
 qtcX11ShadowUninstall(xcb_window_t win)
 {
-    if (qtcUnlikely(!win))
+    if (qtcUnlikely(!win)) {
         return;
+    }
     qtcX11CallVoid(delete_property, win, qtc_x11_kde_net_wm_shadow);
     qtcX11Flush();
 }
@@ -165,8 +170,9 @@ qtcX11ShadowUninstall(xcb_window_t win)
 QTC_EXPORT void
 qtcX11MoveTrigger(xcb_window_t wid, uint32_t x, uint32_t y)
 {
-    if (qtcUnlikely(!wid))
+    if (qtcUnlikely(!wid)) {
         return;
+    }
     qtcX11FlushXlib();
     qtcX11CallVoid(ungrab_pointer, XCB_TIME_CURRENT_TIME);
     union {

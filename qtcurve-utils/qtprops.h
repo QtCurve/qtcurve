@@ -74,7 +74,7 @@ class QtcWidgetProps {
 public:
     QtcWidgetProps(const QWidget *widget): w(widget), p(0) {}
     inline _QtcWidgetProps*
-    operator->() const
+    operator ->() const
     {
         if (!p && w) {
             p = qtcGetWidgetProps(w);

@@ -74,18 +74,21 @@ _qtcDistance(int x, int y, int x0, int y0, bool square)
 {
     int dx = x - x0;
     int dy = y - y0;
-    if (dx == 0)
+    if (dx == 0) {
         return qtcAbs(dy);
-    if (dy == 0)
+    }
+    if (dy == 0) {
         return qtcAbs(dx);
+    }
     return square ? qtcMax(qtcAbs(dx), qtcAbs(dy)) : sqrtf(dx * dx + dy * dy);
 }
 
 static inline float
 _qtcGradientGetValue(float *gradient, size_t size, float distance)
 {
-    if (distance < 0 || distance > size - 1)
+    if (distance < 0 || distance > size - 1) {
         return 0;
+    }
     int index = floorf(distance);
     if (qtcEqual(index, distance)) {
         return gradient[index];

@@ -89,8 +89,9 @@ QTC_ALWAYS_INLINE static inline uintptr_t
 qtcGetPadding(uintptr_t len, uintptr_t align)
 {
     uintptr_t left;
-    if ((left = len % align))
+    if ((left = len % align)) {
         return align - left;
+    }
     return 0;
 }
 

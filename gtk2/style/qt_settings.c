@@ -1810,9 +1810,7 @@ gboolean qtSettingsInit()
                     qtSettings.app = GTK_APP_FLASH_PLUGIN;
                 } else if (strcmp(qtSettings.appName, "ghb") == 0) {
                     qtSettings.app=GTK_APP_GHB;
-                }/*  else if (app == strstr(qtSettings.appName, "gaim")) { */
-                /*    qtSettings.app = GTK_APP_GAIM; */
-                /* } */
+                }
             }
 
             if(qtSettings.debug)

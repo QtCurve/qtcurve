@@ -59,8 +59,9 @@ qtcCheckType0(T2 *obj, const char *name)
 QTC_ALWAYS_INLINE static inline WId
 qtcGetWid(const QWidget *w)
 {
-    if (!(w && w->testAttribute(Qt::WA_WState_Created)))
+    if (!(w && w->testAttribute(Qt::WA_WState_Created))) {
         return (WId)0;
+    }
     return w->internalWinId();
 }
 
@@ -98,16 +99,18 @@ qtcIsPopup(const QWidget *w)
 QTC_ALWAYS_INLINE static inline QWidget*
 qtcToWidget(QObject *obj)
 {
-    if (obj->isWidgetType())
+    if (obj->isWidgetType()) {
         return static_cast<QWidget*>(obj);
+    }
     return NULL;
 }
 
 QTC_ALWAYS_INLINE static inline const QWidget*
 qtcToWidget(const QObject *obj)
 {
-    if (obj->isWidgetType())
+    if (obj->isWidgetType()) {
         return static_cast<const QWidget*>(obj);
+    }
     return NULL;
 }
 

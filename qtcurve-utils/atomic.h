@@ -48,7 +48,7 @@
 #ifdef __QTC_ATOMIC_USE_SYNC_FETCH
 #define QTC_DECLARE_ATOMIC(name1, name2, type)                  \
     type (qtcAtomic##name1)(volatile type *atomic, type val);   \
-    QTC_ALWAYS_INLINE  static inline type                       \
+    QTC_ALWAYS_INLINE static inline type                        \
     __qtcAtomic##name1(volatile type *atomic, type val)         \
     {                                                           \
         return __sync_fetch_and_##name2(atomic, val);           \

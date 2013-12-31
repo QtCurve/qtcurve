@@ -42,7 +42,8 @@ qtcGetTime()
 QTC_EXPORT uint64_t
 qtcGetElapse(uint64_t prev)
 {
-    if (!prev)
+    if (!prev) {
         prev = prev_time;
+    }
     return qtcGetTime() - prev;
 }

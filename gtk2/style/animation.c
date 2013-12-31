@@ -70,7 +70,7 @@ force_widget_redraw(GtkWidget *widget)
 static void
 qtcAnimationStartTimer()
 {
-    if(animation_timer_id == 0) {
+    if (animation_timer_id == 0) {
         animation_timer_id = g_timeout_add(PROGRESS_ANIMATION,
                                            qtcAnimationTimeoutHandler, NULL);
     }
@@ -125,8 +125,9 @@ qtcAnimationDestroyInfoAndWeakUnref(gpointer data)
 static AnimationInfo*
 qtcAnimationLookupInfo(const GtkWidget *widget)
 {
-    if(animated_widgets)
+    if (animated_widgets) {
         return g_hash_table_lookup(animated_widgets, widget);
+    }
     return NULL;
 }
 
@@ -138,23 +139,25 @@ qtcAnimationAdd(const GtkWidget *widget, double stop_time)
     AnimationInfo *value;
 
     /* object already in the list, do not add it twice */
-    if(qtcAnimationLookupInfo(widget))
+    if (qtcAnimationLookupInfo(widget)) {
         return;
+    }
 
-    if(animated_widgets == NULL)
+    if (animated_widgets == NULL) {
         animated_widgets =
-            g_hash_table_new_full(g_direct_hash, g_direct_equal,
-                                  NULL, qtcAnimationDestroyInfoAndWeakUnref);
+            g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL,
+                                  qtcAnimationDestroyInfoAndWeakUnref);
+    }
 
     value = g_new(AnimationInfo, 1);
 
-    value->widget =(GtkWidget*) widget;
+    value->widget = (GtkWidget*)widget;
     value->timer = g_timer_new();
-    value->stop_time= stop_time;
+    value->stop_time = stop_time;
     value->start_modifier = 0.0;
 
     g_object_weak_ref(G_OBJECT(widget), qtcAnimationOnWidgetDestruction, value);
-    g_hash_table_insert(animated_widgets,(GtkWidget*) widget, value);
+    g_hash_table_insert(animated_widgets, (GtkWidget*)widget, value);
 
     qtcAnimationStartTimer();
 }
@@ -168,12 +171,14 @@ qtcAnimationUpdateInfo(gpointer key, gpointer value, gpointer user_data)
     AnimationInfo *animation_info = value;
     GtkWidget *widget = key;
 
-    if ((widget == NULL) || (animation_info == NULL))
+    if ((widget == NULL) || (animation_info == NULL)) {
         g_assert_not_reached();
+    }
 
     /* remove the widget from the hash table if it is not drawable */
-    if (!gtk_widget_is_drawable(widget))
+    if (!gtk_widget_is_drawable(widget)) {
         return TRUE;
+    }
 
     if (GTK_IS_PROGRESS_BAR(widget)) {
         float fraction =
@@ -186,7 +191,7 @@ qtcAnimationUpdateInfo(gpointer key, gpointer value, gpointer user_data)
         float fraction = gtk_entry_get_progress_fraction(GTK_ENTRY(widget));
 
         /* stop animation for filled/not filled progress bars */
-        if(fraction <= 0.0 || fraction >= 1.0) {
+        if (fraction <= 0.0 || fraction >= 1.0) {
             return TRUE;
         }
     }
@@ -194,9 +199,11 @@ qtcAnimationUpdateInfo(gpointer key, gpointer value, gpointer user_data)
     force_widget_redraw(widget);
 
     /* stop at stop_time */
-    if(animation_info->stop_time != 0 &&
-       g_timer_elapsed(animation_info->timer, NULL) > animation_info->stop_time)
+    if (animation_info->stop_time != 0 &&
+        g_timer_elapsed(animation_info->timer,
+                        NULL) > animation_info->stop_time) {
         return TRUE;
+    }
     return FALSE;
 }
 
@@ -205,8 +212,6 @@ static gboolean
 qtcAnimationTimeoutHandler(gpointer data)
 {
     QTC_UNUSED(data);
-    /*g_print("** TICK **\n");*/
-
     /* enter threads as qtcAnimationUpdateInfo will use gtk/gdk. */
     gdk_threads_enter();
     g_hash_table_foreach_remove(animated_widgets, qtcAnimationUpdateInfo, NULL);
@@ -220,24 +225,21 @@ qtcAnimationTimeoutHandler(gpointer data)
     return TRUE;
 }
 
-/*
+#if 0
 static void
 on_checkbox_toggle(GtkWidget *widget, gpointer data)
 {
     AnimationInfo *animation_info = qtcAnimationLookupInfo(widget);
 
-    if(animation_info != NULL)
-    {
+    if (animation_info != NULL) {
         gfloat elapsed = g_timer_elapsed(animation_info->timer, NULL);
-
-        animation_info->start_modifier = elapsed - animation_info->start_modifier;
-    }
-    else
-    {
+        animation_info->start_modifier = (elapsed -
+                                          animation_info->start_modifier);
+    } else {
         qtcAnimationAdd(widget, CHECK_ANIMATION_TIME);
     }
 }
-*/
+#endif
 
 static void
 qtcAnimationOnConnectedWidgetDestruction(gpointer data, GObject *widget)
@@ -252,7 +254,7 @@ qtcAnimationDisconnect()
 {
     GSList *item = connected_widgets;
     while (item != NULL) {
-        SignalInfo *signal_info =(SignalInfo*) item->data;
+        SignalInfo *signal_info = (SignalInfo*)item->data;
 
         g_signal_handler_disconnect(signal_info->widget,
                                     signal_info->handler_id);
@@ -274,51 +276,55 @@ qtcAnimationDisconnect()
 void
 qtcAnimationAddProgressBar(GtkWidget *progressbar, gboolean isEntry)
 {
-    double fraction = isEntry ?
-        gtk_entry_get_progress_fraction(GTK_ENTRY(progressbar)) :
-        gtk_progress_bar_get_fraction(GTK_PROGRESS_BAR(progressbar));
+    double fraction =
+        (isEntry ? gtk_entry_get_progress_fraction(GTK_ENTRY(progressbar)) :
+         gtk_progress_bar_get_fraction(GTK_PROGRESS_BAR(progressbar)));
 
     if (fraction < 1.0 && fraction > 0.0) {
-        qtcAnimationAdd((GtkWidget*) progressbar, 0.0);
+        qtcAnimationAdd((GtkWidget*)progressbar, 0.0);
     }
 }
 
+#if 0
 /* helper function for qtcAnimationConnectCheckbox */
-/* static gint */
-/* qtcAnimationFindSignalInfo(gconstpointer signal_info, gconstpointer widget) */
-/* { */
-/*     if (((SignalInfo*)signal_info)->widget == widget) { */
-/*         return 0; */
-/*     } else { */
-/*         return 1; */
-/*     } */
-/* } */
-/* hooks up the signals for check and radio buttons */
-/*
-static void qtcAnimationConnectCheckbox(GtkWidget *widget)
+static gint
+qtcAnimationFindSignalInfo(gconstpointer signal_info, gconstpointer widget)
 {
-    if(GTK_IS_CHECK_BUTTON(widget))
-    {
-        if(!g_slist_find_custom(connected_widgets, widget, qtcAnimationFindSignalInfo))
-        {
-            SignalInfo * signal_info = g_new(SignalInfo, 1);
+    if (((SignalInfo*)signal_info)->widget == widget) {
+        return 0;
+    } else {
+        return 1;
+    }
+}
+
+/* hooks up the signals for check and radio buttons */
+static void
+qtcAnimationConnectCheckbox(GtkWidget *widget)
+{
+    if (GTK_IS_CHECK_BUTTON(widget)) {
+        if (!g_slist_find_custom(connected_widgets, widget,
+                                 qtcAnimationFindSignalInfo)) {
+            SignalInfo *signal_info = g_new(SignalInfo, 1);
 
             signal_info->widget = widget;
-            signal_info->handler_id = g_signal_connect((GObject*)widget, "toggled", G_CALLBACK(on_checkbox_toggle), NULL);
-
+            signal_info->handler_id =
+                g_signal_connect((GObject*)widget, "toggled",
+                                 G_CALLBACK(on_checkbox_toggle), NULL);
             connected_widgets = g_slist_append(connected_widgets, signal_info);
-            g_object_weak_ref(G_OBJECT(widget), qtcAnimationOnConnectedWidgetDestruction, signal_info);
+            g_object_weak_ref(
+                G_OBJECT(widget), qtcAnimationOnConnectedWidgetDestruction,
+                signal_info);
         }
     }
 }
-*/
 
 /* returns TRUE if the widget is animated, and FALSE otherwise */
-/* static gboolean */
-/* qtcAnimationIsAnimated(GtkWidget *widget) */
-/* { */
-/*     return qtcAnimationLookupInfo(widget) != NULL ? TRUE : FALSE; */
-/* } */
+static gboolean
+qtcAnimationIsAnimated(GtkWidget *widget)
+{
+    return qtcAnimationLookupInfo(widget) != NULL;
+}
+#endif
 
 /* returns the elapsed time for the animation */
 double
@@ -326,9 +332,10 @@ qtcAnimationElapsed(void *data)
 {
     AnimationInfo *animation_info = qtcAnimationLookupInfo(data);
 
-    if(animation_info)
+    if (animation_info) {
         return (g_timer_elapsed(animation_info->timer, NULL) -
                 animation_info->start_modifier);
+    }
     return 0.0;
 }
 

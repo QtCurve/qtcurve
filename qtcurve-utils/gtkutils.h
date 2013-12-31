@@ -83,11 +83,13 @@ static inline bool
 qtcIsProgressBar(GtkWidget *w)
 {
 #if GTK_CHECK_VERSION(2, 90, 0)
-    if (!GTK_IS_PROGRESS_BAR(w))
+    if (!GTK_IS_PROGRESS_BAR(w)) {
         return false;
+    }
 #else
-    if (!GTK_IS_PROGRESS(w))
+    if (!GTK_IS_PROGRESS(w)) {
         return false;
+    }
 #endif
     GtkAllocation alloc;
     gtk_widget_get_allocation(w, &alloc);

@@ -27,13 +27,16 @@
 
 #if GTK_CHECK_VERSION(2, 90, 0)
 
-#define qtcRangeHasStepperA(W) (opts.scrollbarType != SCROLLBAR_NONE && \
-                                opts.scrollbarType != SCROLLBAR_PLATINUM)
+#define qtcRangeHasStepperA(W)               \
+    (opts.scrollbarType != SCROLLBAR_NONE && \
+     opts.scrollbarType != SCROLLBAR_PLATINUM)
 #define qtcRangeHasStepperB(W) (opts.scrollbarType == SCROLLBAR_NEXT)
-#define qtcRangeHasStepperC(W) (opts.scrollbarType == SCROLLBAR_KDE ||  \
-                                opts.scrollbarType == SCROLLBAR_PLATINUM)
-#define qtcRangeHasStepperD(W) (opts.scrollbarType != SCROLLBAR_NONE && \
-                                opts.scrollbarType != SCROLLBAR_NEXT)
+#define qtcRangeHasStepperC(W)              \
+    (opts.scrollbarType == SCROLLBAR_KDE || \
+     opts.scrollbarType == SCROLLBAR_PLATINUM)
+#define qtcRangeHasStepperD(W)               \
+    (opts.scrollbarType != SCROLLBAR_NONE && \
+     opts.scrollbarType != SCROLLBAR_NEXT)
 #define IS_PROGRESS (GTK_IS_PROGRESS_BAR(widget) || DETAIL("progressbar"))
 
 #else

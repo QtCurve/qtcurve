@@ -74,8 +74,9 @@ qtcListLength(const QtcList *list)
 QTC_ALWAYS_INLINE static inline void
 qtcListInsertList(QtcList *list, QtcList *other)
 {
-    if (qtcListEmpty(other))
+    if (qtcListEmpty(other)) {
         return;
+    }
     other->next->prev = list;
     other->prev->next = list->next;
     list->next->prev = other->prev;

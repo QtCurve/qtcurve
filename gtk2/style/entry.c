@@ -33,8 +33,9 @@ qtcEntryIsLastMo(GtkWidget *widget)
 static void
 qtcEntryCleanup(GtkWidget *widget)
 {
-    if (qtcEntryLastMo == widget)
+    if (qtcEntryLastMo == widget) {
         qtcEntryLastMo = NULL;
+    }
     if (GTK_IS_ENTRY(widget)) {
         GObject *obj = G_OBJECT(widget);
         qtcDisconnectFromData(obj, "QTC_ENTRY_ENTER_ID");
@@ -88,7 +89,8 @@ qtcEntryLeave(GtkWidget *widget, GdkEventCrossing *event, gpointer data)
     return FALSE;
 }
 
-void qtcEntrySetup(GtkWidget *widget)
+void
+qtcEntrySetup(GtkWidget *widget)
 {
     GObject *obj = NULL;
     if (GTK_IS_ENTRY(widget) && (obj = G_OBJECT(widget)) &&

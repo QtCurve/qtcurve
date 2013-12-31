@@ -104,16 +104,18 @@ pixbufCacheValueNew(const QtcPixKey *key)
 GdkPixbuf*
 getPixbuf(GdkColor *widgetColor, EPixmap p, double shade)
 {
-    if (p != PIX_CHECK)
+    if (p != PIX_CHECK) {
         return getBlankPixbuf();
+    }
     const QtcPixKey key = {
         .col = *widgetColor,
         .shade = shade
     };
     GHashTable *table = getPixbufTable();
     GdkPixbuf *pixbuf = g_hash_table_lookup(table, &key);
-    if (pixbuf)
+    if (pixbuf) {
         return pixbuf;
+    }
     // TODO: Thread safe?
     pixbuf = pixbufCacheValueNew(&key);
     g_hash_table_insert(table, g_memdup(&key, sizeof(key)), pixbuf);

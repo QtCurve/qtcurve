@@ -82,7 +82,7 @@ typedef enum {
     APPEARANCE_FADE, /* Only for poupmenu items! */
     APPEARANCE_STRIPED = APPEARANCE_FADE, /* Only for windows  and menus */
     APPEARANCE_NONE = APPEARANCE_FADE, /* Only for titlebars */
-    APPEARANCE_FILE,  /* Only for windows  and menus */
+    APPEARANCE_FILE, /* Only for windows  and menus */
     APPEARANCE_LV_BEVELLED, /* To be used only with qtcGetGradient */
     APPEARANCE_AGUA_MOD,
     APPEARANCE_LV_AGUA,
