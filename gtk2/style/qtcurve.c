@@ -1903,7 +1903,6 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
             state=GTK_STATE_NORMAL;
 
         GdkColor      prevColors[NUM_GCS];
-        int           i=0;
 
         if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %s %d %d %d %d %d %s  ", __FUNCTION__, pango_layout_get_text(layout), x, y, state, use_text,
                                                IS_MENU_ITEM(widget), detail ? detail : "NULL"),
@@ -1950,32 +1949,34 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         {
             use_text=TRUE;
             swapColors=TRUE;
-            for(i=0; i<NUM_GCS; ++i)
-            {
-                prevColors[i]=style->text[i];
-                style->text[i]=*qtcurveStyle->button_text[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE];
+            for (int i = 0;i < NUM_GCS;++i) {
+                prevColors[i] = style->text[i];
+                style->text[i] =
+                    *qtcurveStyle->button_text[state == GTK_STATE_INSENSITIVE ?
+                                               PAL_DISABLED : PAL_ACTIVE];
             }
-            if(state==GTK_STATE_INSENSITIVE)
-                state=GTK_STATE_NORMAL;
-        }
-        else if(isMenuItem)
-        {
+            if (state == GTK_STATE_INSENSITIVE) {
+                state = GTK_STATE_NORMAL;
+            }
+        } else if (isMenuItem) {
             gboolean activeWindow=mb && opts.shadeMenubarOnlyWhenActive && widget ? qtcWindowIsActive(gtk_widget_get_toplevel(widget)) : TRUE;
 
             if((opts.shadePopupMenu && GTK_STATE_PRELIGHT==state) || (mb && (activeWindow || SHADE_WINDOW_BORDER==opts.shadeMenubars)))
             {
                 if(SHADE_WINDOW_BORDER==opts.shadeMenubars)
                 {
-                    for(i=0; i<NUM_GCS; ++i)
-                        prevColors[i]=style->text[i];
+                    for (int i = 0;i < NUM_GCS;++i) {
+                        prevColors[i] = style->text[i];
+                    }
                     swapColors=TRUE;
                     style->text[GTK_STATE_NORMAL]=*qtcurveStyle->menutext[activeWindow ? 1 : 0];
                     use_text=TRUE;
                 }
                 else if(opts.customMenuTextColor && qtcurveStyle->menutext[0])
                 {
-                    for(i=0; i<NUM_GCS; ++i)
-                        prevColors[i]=style->text[i];
+                    for (int i = 0;i < NUM_GCS;++i) {
+                        prevColors[i] = style->text[i];
+                    }
                     swapColors=TRUE;
                     style->text[GTK_STATE_NORMAL]=*qtcurveStyle->menutext[0];
                     style->text[GTK_STATE_ACTIVE]=*qtcurveStyle->menutext[1];
@@ -2031,9 +2032,11 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         if(opts.embolden && def_but)
             drawLayout(style, window, selectedText ? GTK_STATE_SELECTED : state, use_text || selectedText, area, x+1, y, layout);
 
-        if(swapColors)
-            for(i=0; i<5; ++i)
-                style->text[i]=prevColors[i];
+        if (swapColors) {
+            for (int i = 0;i < 5;++i) {
+                style->text[i] = prevColors[i];
+            }
+        }
     }
 }
 

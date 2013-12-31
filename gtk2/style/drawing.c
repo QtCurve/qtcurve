@@ -1050,7 +1050,6 @@ void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight, gbool
     {
         int             space = (nLines*2)+(LINE_DASHES!=type ? (nLines-1) : 0),
             step = LINE_DASHES!=type ? 3 : 2,
-            i,
             etchedDisp = LINE_SUNKEN==type ? 1 : 0;
         double          x = (horiz ? rx : rx+((rwidth-space)>>1)),
             y = (horiz ? ry+((rheight-space)>>1) : ry),
@@ -1068,53 +1067,46 @@ void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight, gbool
         setCairoClipping(cr, area);
         setLineCol(cr, pt1, col1);
 
-        if(horiz)
-        {
-            for(i=0; i<space; i+=step)
-            {
-                cairo_move_to(cr, x+offset, y+i);
-                cairo_line_to(cr, x2-offset, y+i);
+        if (horiz) {
+            for (int i = 0;i < space;i += step) {
+                cairo_move_to(cr, x + offset, y + i);
+                cairo_line_to(cr, x2 - offset, y + i);
             }
             cairo_stroke(cr);
 
-            if(LINE_FLAT!=type)
-            {
+            if (type != LINE_FLAT) {
                 setLineCol(cr, pt2, col2);
                 x+=etchedDisp;
                 x2+=etchedDisp;
-                for(i=1; i<space; i+=step)
-                {
-                    cairo_move_to(cr, x+offset, y+i);
-                    cairo_line_to(cr, x2-offset, y+i);
+                for (int i = 1;i < space;i += step) {
+                    cairo_move_to(cr, x + offset, y + i);
+                    cairo_line_to(cr, x2 - offset, y + i);
                 }
                 cairo_stroke(cr);
             }
-        }
-        else
-        {
-            for(i=0; i<space; i+=step)
-            {
-                cairo_move_to(cr, x+i, y+offset);
-                cairo_line_to(cr, x+i, y2-offset);
+        } else {
+            for (int i = 0;i < space;i += step) {
+                cairo_move_to(cr, x + i, y + offset);
+                cairo_line_to(cr, x + i, y2 - offset);
             }
             cairo_stroke(cr);
-            if(LINE_FLAT!=type)
-            {
+            if (type != LINE_FLAT) {
                 setLineCol(cr, pt2, col2);
-                y+=etchedDisp;
-                y2+=etchedDisp;
-                for(i=1; i<space; i+=step)
-                {
-                    cairo_move_to(cr, x+i, y+offset);
-                    cairo_line_to(cr, x+i, y2-offset);
+                y += etchedDisp;
+                y2 += etchedDisp;
+                for (int i = 1;i < space;i += step) {
+                    cairo_move_to(cr, x + i, y + offset);
+                    cairo_line_to(cr, x + i, y2 - offset);
                 }
                 cairo_stroke(cr);
             }
         }
-        if(pt1)
+        if (pt1) {
             cairo_pattern_destroy(pt1);
-        if(pt2)
+        }
+        if (pt2) {
             cairo_pattern_destroy(pt2);
+        }
         cairo_restore(cr);
     }
 }
@@ -1155,48 +1147,52 @@ void drawDots(cairo_t *cr, int rx, int ry, int rwidth, int rheight, gboolean hor
     int      space =(nLines*2)+(nLines-1),
         x = horiz ? rx : rx+((rwidth-space)>>1),
         y = horiz ? ry+((rheight-space)>>1) : ry,
-        i, j,
         numDots=(horiz ? (rwidth-(2*offset))/3 : (rheight-(2*offset))/3)+1;
     GdkColor *col1 = &cols[dark],
         *col2 = &cols[0];
 
     setCairoClipping(cr, area);
-    if(horiz)
-    {
-        if(startOffset && y+startOffset>0)
-            y+=startOffset;
-
+    if (horiz) {
+        if (startOffset && y + startOffset > 0) {
+            y += startOffset;
+        }
         cairo_new_path(cr);
         qtcCairoSetColor(cr, col1);
-        for(i=0; i<space; i+=3)
-            for(j=0; j<numDots; j++)
-                cairo_rectangle(cr, x+offset+(3*j), y+i, 1, 1);
+        for (int i = 0;i < space;i += 3) {
+            for (int j = 0;j < numDots;j++) {
+                cairo_rectangle(cr, x + offset + 3 * j, y + i, 1, 1);
+            }
+        }
         cairo_fill(cr);
 
         cairo_new_path(cr);
         qtcCairoSetColor(cr, col2);
-        for(i=1; i<space; i+=3)
-            for(j=0; j<numDots; j++)
-                cairo_rectangle(cr, x+offset+1+(3*j), y+i, 1, 1);
+        for (int i = 1;i < space;i += 3) {
+            for (int j = 0;j < numDots;j++) {
+                cairo_rectangle(cr, x + offset + 1 + 3 * j, y + i, 1, 1);
+            }
+        }
         cairo_fill(cr);
-    }
-    else
-    {
-        if(startOffset && x+startOffset>0)
-            x+=startOffset;
-
+    } else {
+        if (startOffset && x + startOffset > 0) {
+            x += startOffset;
+        }
         cairo_new_path(cr);
         qtcCairoSetColor(cr, col1);
-        for(i=0; i<space; i+=3)
-            for(j=0; j<numDots; j++)
-                cairo_rectangle(cr, x+i, y+offset+(3*j), 1, 1);
+        for (int i = 0;i < space;i += 3) {
+            for (int j = 0;j < numDots;j++) {
+                cairo_rectangle(cr, x + i, y + offset + 3 * j, 1, 1);
+            }
+        }
         cairo_fill(cr);
 
         cairo_new_path(cr);
         qtcCairoSetColor(cr, col2);
-        for(i=1; i<space; i+=3)
-            for(j=0; j<numDots; j++)
-                cairo_rectangle(cr, x+i, y+offset+1+(3*j), 1, 1);
+        for (int i = 1;i < space;i += 3) {
+            for(int j = 0;j < numDots;j++) {
+                cairo_rectangle(cr, x + i, y + offset + 1 + 3 * j, 1, 1);
+            }
+        }
         cairo_fill(cr);
     }
     cairo_restore(cr);

@@ -1396,8 +1396,7 @@ bool qtcReadConfig(const QString &file, Options *opts, Options *defOpts, bool ch
                     QStringList::ConstIterator it(cols.begin()),
                                                end(cols.end());
 
-                    for(int i=0; it!=end; ++it, ++i)
-                    {
+                    for (int i = 0;it != end;++it, ++i) {
                         QColor col;
                         qtcSetRgb(&col, TO_LATIN1((*it)));
                         opts->titlebarButtonColors[i]=col;

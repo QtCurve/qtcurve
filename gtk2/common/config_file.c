@@ -542,8 +542,7 @@ qtcGetWindowBorderSize(bool force)
             sizes.bottom=atoi(line);
             getline(&line, &len, f);
             sizes.sides=atoi(line);
-            if(line)
-                free(line);
+            qtcFree(line);
             fclose(f);
         }
         free(filename);
@@ -984,14 +983,13 @@ static void freeOpts(Options *opts)
         if(opts->noMenuStripeApps)
             g_strfreev(opts->noMenuStripeApps);
         opts->noBgndGradientApps=opts->noBgndOpacityApps=opts->noMenuBgndOpacityApps=opts->noBgndImageApps=opts->noMenuStripeApps=NULL;
-        for(i=0; i<NUM_CUSTOM_GRAD; ++i)
-            if(opts->customGradient[i])
-            {
-                if(opts->customGradient[i]->stops)
-                    free(opts->customGradient[i]->stops);
+        for (i = 0;i < NUM_CUSTOM_GRAD;++i) {
+            if (opts->customGradient[i]) {
+                qtcFree(opts->customGradient[i]->stops);
                 free(opts->customGradient[i]);
-                opts->customGradient[i]=NULL;
+                opts->customGradient[i] = NULL;
             }
+        }
     }
 }
 
@@ -1218,15 +1216,14 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
         GHashTable *cfg=loadConfig(file);
 
         if (cfg) {
-            int i;
-
             opts->version=readVersionEntry(cfg, VERSION_KEY);
 
             Options newOpts;
             Options *def=&newOpts;
             opts->noBgndGradientApps=opts->noBgndOpacityApps=opts->noMenuBgndOpacityApps=opts->noBgndImageApps=opts->noMenuStripeApps=NULL;
-            for(i=0; i<NUM_CUSTOM_GRAD; ++i)
-                opts->customGradient[i]=NULL;
+            for (int i = 0;i < NUM_CUSTOM_GRAD;++i) {
+                opts->customGradient[i] = NULL;
+            }
 
             if(defOpts)
                 copyOpts(defOpts, &newOpts);
@@ -1478,8 +1475,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             readDoubleList(cfg, "customShades", opts->customShades, QTC_NUM_STD_SHADES);
             readDoubleList(cfg, "customAlphas", opts->customAlphas, NUM_STD_ALPHAS);
 
-            for(i=0; i<NUM_CUSTOM_GRAD; ++i)
-            {
+            for (int i = 0;i < NUM_CUSTOM_GRAD;++i) {
                 char gradKey[18];
                 char *str;
 
@@ -1493,10 +1489,8 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                         if(','==str[j])
                             comma++;
 
-                    if(comma && opts->customGradient[i])
-                    {
-                        if(opts->customGradient[i]->stops)
-                            free(opts->customGradient[i]->stops);
+                    if (comma && opts->customGradient[i]) {
+                        qtcFree(opts->customGradient[i]->stops);
                         free(opts->customGradient[i]);
                         opts->customGradient[i]=0L;
                     }
@@ -1599,9 +1593,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                                         free(opts->customGradient[i]->stops);
                                         opts->customGradient[i]->stops=stops;
                                     }
-                                }
-                                else
-                                {
+                                } else {
                                     free(opts->customGradient[i]->stops);
                                     free(opts->customGradient[i]);
                                     opts->customGradient[i]=0L;
@@ -1614,13 +1606,10 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
 
             qtcCheckConfig(opts);
 
-            if(!defOpts)
-            {
-                int i;
-
-                for(i=0; i<NUM_CUSTOM_GRAD; ++i)
-                    if(def->customGradient[i])
-                        free(def->customGradient[i]);
+            if (!defOpts) {
+                for (int i = 0;i < NUM_CUSTOM_GRAD;++i) {
+                    qtcFree(def->customGradient[i]);
+                }
             }
             releaseConfig(cfg);
             freeOpts(defOpts);
@@ -1643,21 +1632,20 @@ static const char * getSystemConfigFile()
 {
     static const char * constFiles[]={ /*"/etc/qt4/"OLD_CONFIG_FILE, "/etc/qt3/"OLD_CONFIG_FILE, "/etc/qt/"OLD_CONFIG_FILE,*/ "/etc/"OLD_CONFIG_FILE, NULL };
 
-    int i;
-
-    for(i=0; constFiles[i]; ++i)
-        if (qtcIsRegFile(constFiles[i]))
+    for (int i = 0;constFiles[i];++i) {
+        if (qtcIsRegFile(constFiles[i])) {
             return constFiles[i];
+        }
+    }
     return NULL;
 }
 
 void qtcDefaultSettings(Options *opts)
 {
     /* Set hard-coded defaults... */
-    int i;
-
-    for(i=0; i<NUM_CUSTOM_GRAD; ++i)
-        opts->customGradient[i]=0L;
+    for (int i = 0;i < NUM_CUSTOM_GRAD;++i) {
+        opts->customGradient[i] = NULL;
+    }
     opts->customGradient[APPEARANCE_CUSTOM1] = qtcNew(Gradient);
     opts->customGradient[APPEARANCE_CUSTOM2] = qtcNew(Gradient);
     qtcSetupGradient(opts->customGradient[APPEARANCE_CUSTOM1], GB_3D,3,0.0,1.2,0.5,1.0,1.0,1.0);

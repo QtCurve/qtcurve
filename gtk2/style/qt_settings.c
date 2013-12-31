@@ -556,15 +556,15 @@ static void readKwinrc()
 static void readKdeGlobals(const char *rc, int rd, bool first)
 {
     ColorEffect   effects[2];
-    int           found=0,
-                  colorsFound=0,
-                  i;
+    int found = 0;
+    int colorsFound = 0;
     char          line[MAX_CONFIG_INPUT_LINE_LEN+1];
     FILE          *f=fopen(rc, "r");
     QtFontDetails fonts[FONT_NUM_STD];
 
-    for(i=0; i<FONT_NUM_STD; ++i)
+    for (int i = 0;i < FONT_NUM_STD;++i) {
         initFont(&fonts[i], TRUE);
+    }
 
     if(first)
     {
@@ -1366,8 +1366,7 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
                     if(write_line)
                         strcat(contents, line);
                 }
-                if (line)
-                     free(line);
+                qtcFree(line);
             }
         }
 
@@ -1445,9 +1444,7 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
         }
         free(contents);
     }
-
-    if(menu_text_str)
-        free(menu_text_str);
+    qtcFree(menu_text_str);
 }
 
 static void processMozillaApp(gboolean add_btn_css, gboolean add_menu_colors, const char *app, gboolean under_moz)
@@ -1498,8 +1495,7 @@ static void processMozillaApp(gboolean add_btn_css, gboolean add_menu_colors, co
                                 break;
                             }
                         fclose(userJs);
-                        if (line)
-                            free(line);
+                        qtcFree(line);
                     }
 
                     if(alterUserJs && ((userJs=fopen(sub, "a"))))
@@ -1581,12 +1577,13 @@ static gboolean isMozApp(const char *app, const char *check)
 
 static gboolean excludedApp(Strings config)
 {
-    if(qtSettings.appName && config)
-    {
-        int i;
-        for(i=0; config[i]; ++i)
-            if(0==strcmp("gtk", config[i]) || 0==strcmp(qtSettings.appName, config[i]))
+    if (qtSettings.appName && config) {
+        for (int i = 0;config[i];++i) {
+            if (strcmp("gtk", config[i]) == 0 ||
+                strcmp(qtSettings.appName, config[i]) == 0) {
                 return TRUE;
+            }
+        }
     }
     return FALSE;
 }
@@ -1645,7 +1642,6 @@ gboolean qtSettingsInit()
             QTC_DEF_STR_BUFF(str_buff, 4096, 1);
             char *tmpStr = NULL;
             GtkSettings *settings=NULL;
-            int i;
 
             setlocale(LC_NUMERIC, "C");
             qtSettings.icons=NULL;
@@ -1664,12 +1660,13 @@ gboolean qtSettingsInit()
 #endif
             qtSettings.inactiveChangeSelectionColor=FALSE;
             qtSettings.appName=NULL;
-//             qtSettings.startDragDist=4;
+            /* qtSettings.startDragDist=4; */
             qtSettings.startDragTime=500;
             qtSettings.debug=debugLevel();
             opts.contrast=DEFAULT_CONTRAST;
-            for(i=0; i<FONT_NUM_TOTAL; ++i)
-                qtSettings.fonts[i]=NULL;
+            for (int i = 0;i < FONT_NUM_TOTAL;++i) {
+                qtSettings.fonts[i] = NULL;
+            }
 
             qtSettings.qt4 = FALSE;
             qtSettings.useAlpha=opts.bgndOpacity<100 || opts.dlgOpacity<100 || opts.menuBgndOpacity<100 ||
@@ -2490,21 +2487,13 @@ gboolean qtSettingsInit()
 static void qtSettingsExit()
 {
     qt_refs--;
-
-    if(0==qt_refs)
-    {
-        int i;
-
-        for(i=0; i<FONT_NUM_TOTAL; ++i)
-        {
-            if(qtSettings.fonts[i])
-                free(qtSettings.fonts[i]);
-            qtSettings.fonts[i]=NULL;
+    if (!qt_refs) {
+        for(int i = 0;i < FONT_NUM_TOTAL;++i) {
+            qtcFree(qtSettings.fonts[i]);
+            qtSettings.fonts[i] = NULL;
         }
-
-        if(qtSettings.icons)
-            free(qtSettings.icons);
-        qtSettings.icons=NULL;
+        qtcFree(qtSettings.icons);
+        qtSettings.icons = NULL;
     }
 }
 #endif

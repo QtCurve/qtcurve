@@ -62,11 +62,10 @@ static QtCTab * qtcTabLookupHash(void *hash, gboolean create)
 
 static void qtcTabRemoveHash(void *hash)
 {
-    if(qtcTabHashTable)
-    {
-        QtCTab *tab=GTK_IS_NOTEBOOK(hash) ? qtcTabLookupHash(hash, FALSE) : NULL;
+    if (qtcTabHashTable) {
+        QtCTab *tab = GTK_IS_NOTEBOOK(hash) ? qtcTabLookupHash(hash, FALSE) : NULL;
 
-        if(tab)
+        if (tab)
             free(tab->rects);
         g_hash_table_remove(qtcTabHashTable, hash);
     }
@@ -325,12 +324,14 @@ qtcTabSetup(GtkWidget *widget)
 
 gboolean qtcTabIsLabel(GtkNotebook *notebook, GtkWidget *widget)
 {
-    int i,
-        numPages=gtk_notebook_get_n_pages(notebook);
+    int numPages = gtk_notebook_get_n_pages(notebook);
 
-    for(i=0; i < numPages; ++i)
-        if(widget==gtk_notebook_get_tab_label(notebook, gtk_notebook_get_nth_page(notebook, i)))
+    for (int i = 0;i < numPages;++i) {
+        if (gtk_notebook_get_tab_label(
+                notebook, gtk_notebook_get_nth_page(notebook, i)) == widget) {
             return TRUE;
+        }
+    }
     return FALSE;
 }
 

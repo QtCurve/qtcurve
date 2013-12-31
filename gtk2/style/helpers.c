@@ -1002,18 +1002,17 @@ windowEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 
 void adjustToolbarButtons(GtkWidget *widget, int *x, int *y, int *width, int *height, int *round, gboolean horiz)
 {
-    GtkToolbar  *toolbar=NULL;
-    GtkToolItem *toolitem=NULL;
-    GtkWidget   *w=widget;
-    int         i;
+    GtkToolbar *toolbar = NULL;
+    GtkToolItem *toolitem = NULL;
+    GtkWidget *w = widget;
 
-    for(i=0; i<5 && w && (NULL == toolbar || NULL == toolitem); ++i)
-    {
-        if(GTK_IS_TOOLBAR(w))
-            toolbar=GTK_TOOLBAR(w);
-        else if(GTK_IS_TOOL_ITEM(w))
-            toolitem=GTK_TOOL_ITEM(w);
-        w=gtk_widget_get_parent(w);
+    for (int i = 0;i < 5 && w && (!toolbar || !toolitem);++i) {
+        if (GTK_IS_TOOLBAR(w)) {
+            toolbar = GTK_TOOLBAR(w);
+        } else if (GTK_IS_TOOL_ITEM(w)) {
+            toolitem = GTK_TOOL_ITEM(w);
+        }
+        w = gtk_widget_get_parent(w);
     }
 
     if(toolbar && toolitem)

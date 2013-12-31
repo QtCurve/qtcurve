@@ -47,11 +47,11 @@ static GtkWidget * qtcWidgetMapLookupHash(void *hash, void *value, int map)
 
 static void qtcWidgetMapRemoveHash(void *hash)
 {
-    int i;
-
-    for(i=0; i<2; ++i)
-        if(qtcWidgetMapHashTable[i])
+    for (int i = 0;i < 2;++i) {
+        if (qtcWidgetMapHashTable[i]) {
             g_hash_table_remove(qtcWidgetMapHashTable[i], hash);
+        }
+    }
 }
 
 GtkWidget * qtcWidgetMapGetWidget(GtkWidget *widget, int map)
