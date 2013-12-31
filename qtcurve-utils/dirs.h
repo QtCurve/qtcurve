@@ -34,13 +34,8 @@ const char *qtcGetXDGConfigHome();
 const char *qtcConfDir();
 void qtcMakePath(const char *path, int mode);
 char *qtcGetConfFile(const char *file, char *buff);
-QTC_ALWAYS_INLINE static inline char*
-_qtcGetConfFile(const char *file)
-{
-    return qtcGetConfFile(file, NULL);
-}
 #define qtcGetConfFile(file, buff...)                   \
-    QTC_SWITCH_(buff, qtcGetConfFile)(file, ##buff)
+    qtcGetConfFile(file, QTC_DEFAULT(buff, NULL))
 
 static inline bool
 qtcIsDir(const char *path)

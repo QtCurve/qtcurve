@@ -51,8 +51,7 @@ qtcFree(void *p)
 
 #define qtcNewSize(type, size) ((type*)qtcAlloc0(size))
 #define qtcNew(type, n...)                              \
-    QTC_SWITCH(n, qtcNewSize(type, sizeof(type) * n),       \
-               qtcNewSize(type, sizeof(type)))
+    qtcNewSize(type, sizeof(type) * QTC_DEFAULT(n, 1))
 
 #ifdef __cplusplus
 
