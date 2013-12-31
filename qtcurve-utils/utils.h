@@ -33,18 +33,6 @@
 
 #include "macros.h"
 
-#define qtcContainerOf(ptr, type, member)               \
-    ((type*)(((void*)(ptr)) - offsetof(type, member)))
-
-#if (defined(__GNUC__) && (__GNUC__ > 2))
-#  define qtcExpect(exp, var) __builtin_expect(exp, var)
-#else
-#  define qtcExpect(exp, var) (exp)
-#endif
-
-#define qtcLikely(x) qtcExpect(!!(x), 1)
-#define qtcUnlikely(x) qtcExpect(!!(x), 0)
-
 QTC_ALWAYS_INLINE static inline void*
 qtcAlloc0(size_t size)
 {
