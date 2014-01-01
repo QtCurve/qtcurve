@@ -2914,7 +2914,6 @@ static QPolygon rotate(const QPolygon &p, double angle)
 void Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe, QColor col, bool small, bool kwin) const
 {
     QPolygon     a;
-    QPainterPath path;
     QRect        r(rx);
     int          m=!small && kwin ? ((r.height()-7)/2) : 0;
 
@@ -2947,6 +2946,7 @@ void Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe, QColor 
     a.translate((r.x()+(r.width()>>1)), (r.y()+(r.height()>>1)));
 
 #ifdef QTC_QT5_OLD_NVIDIA_ARROW_FIX
+    QPainterPath path;
     path.moveTo(a[0].x()+0.5, a[0].y()+0.5);
     for(int i=1; i<a.size(); ++i)
         path.lineTo(a[i].x()+0.5, a[i].y()+0.5);
@@ -2957,12 +2957,10 @@ void Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe, QColor 
     // slightly blurry, and I dont like that.
     p->save();
     col.setAlpha(255);
-#ifdef QTC_QT5_OLD_NVIDIA_ARROW_FIX
-    p->setRenderHint(QPainter::Antialiasing, true);
-#endif
     p->setPen(col);
     p->setBrush(col);
 #ifdef QTC_QT5_OLD_NVIDIA_ARROW_FIX
+    p->setRenderHint(QPainter::Antialiasing, true);
     p->fillPath(path, col);
 #endif
     // Qt >= 4.8.5 has problem drawing polygons correctly. Enabling
