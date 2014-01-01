@@ -106,8 +106,8 @@ gboolean isFixedWidget(GtkWidget *widget);
 QTC_ALWAYS_INLINE static inline bool
 isMozilla()
 {
-    return (qtSettings.app == GTK_APP_MOZILLA ||
-            qtSettings.app == GTK_APP_NEW_MOZILLA);
+    return (qtcOneOf(qtSettings.app, GTK_APP_MOZILLA, GTK_APP_NEW_MOZILLA) &&
+            !getenv("QTCURVE_MOZ_TEST"));
 }
 QTC_ALWAYS_INLINE static inline bool
 isMozillaTab(GtkWidget *widget)

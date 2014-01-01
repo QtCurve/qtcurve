@@ -1842,7 +1842,7 @@ gboolean qtSettingsInit()
 
             if (qtcOneOf(qtSettings.app, GTK_APP_FLASH_PLUGIN,
                          GTK_APP_OPEN_OFFICE, GTK_APP_JAVA, GTK_APP_JAVA_SWT) ||
-                (isMozilla() && !getenv("QTCURVE_MOZ_TEST"))) {
+                isMozilla()) {
                 opts.bgndOpacity = opts.dlgOpacity = opts.menuBgndOpacity = 100;
                 qtSettings.useAlpha = false;
             }
