@@ -75,17 +75,7 @@ options may crash certain applications. They may also be removed at any time
 (especially the ones to work around old hardware or driver bugs) and are not
 recommanded to turn on in distribution packages.
 
-1. `QTC_QT4_OLD_NVIDIA_ARROW_FIX`:
-
-    Due to QtCurve mixing AA-drawing, with non-AA drawing (specifically for
-    arrows) - sometimes the arrows would not draw correctly under NVidia. To
-    work-around this, QtCurve filled the arrows using AA-ed drawing, and used
-    non-AA drawing for the edges. As of 0.69.0 this code is no longer enabled
-    by default - use this config option to re-enable the code.
-
-    (Default: `Off`)
-
-2. `QTC_QT4_STYLE_SUPPORT`:
+1. `QTC_QT4_STYLE_SUPPORT`:
 
     Support QtCurve style files. These are stored as
     `<kde prefix>/share/apps/kstyle/themes/qtc_<stylename>.themerc`
@@ -93,7 +83,7 @@ recommanded to turn on in distribution packages.
 
     (Default: `Off`)
 
-3. `QTC_GTK2_MODIFY_MOZILLA`:
+2. `QTC_GTK2_MODIFY_MOZILLA`:
 
     1. Modify `userChrome.css`
 

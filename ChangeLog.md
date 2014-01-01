@@ -26,6 +26,9 @@
 19. Remove `QTC_GTK2_USE_CAIRO_FOR_ARROWS`. I cannot reproduce any problems
     on my Intel card. This is also necessary for the Gtk3 port. If it was
     really a bug of the Intel driver, it should rather be fixed there.
+20. Remove `QTC_QT4_OLD_NVIDIA_ARROW_FIX` and `QTC_QT5_OLD_NVIDIA_ARROW_FIX`.
+    They honestly only make things worse. Again, if it was really a bug of
+    the driver, it should rather be fixed there.
 
 ## 1.8.17
 1. **Add Qt5 support!!**.

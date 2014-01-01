@@ -2911,11 +2911,13 @@ static QPolygon rotate(const QPolygon &p, double angle)
     return transform.map(p);
 }
 
-void Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe, QColor col, bool small, bool kwin) const
+void
+Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe,
+                 QColor col, bool small, bool kwin) const
 {
-    QPolygon     a;
-    QRect        r(rx);
-    int          m=!small && kwin ? ((r.height()-7)/2) : 0;
+    QPolygon a;
+    QRect r(rx);
+    int m = !small && kwin ? ((r.height() - 7) / 2) : 0;
 
     if(small)
         a.setPoints(opts.vArrows ? 6 : 3,  2,0,  0,-2,  -2,0,   -2,1, 0,-1, 2,1);
@@ -2942,27 +2944,11 @@ void Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe, QColor 
     default:
         return;
     }
-
     a.translate((r.x()+(r.width()>>1)), (r.y()+(r.height()>>1)));
-
-#ifdef QTC_QT5_OLD_NVIDIA_ARROW_FIX
-    QPainterPath path;
-    path.moveTo(a[0].x()+0.5, a[0].y()+0.5);
-    for(int i=1; i<a.size(); ++i)
-        path.lineTo(a[i].x()+0.5, a[i].y()+0.5);
-    path.lineTo(a[0].x()+0.5, a[0].y()+0.5);
-#endif
-    // This all looks like overkill - but seems to fix issues with plasma and nvidia
-    // Just using 'aa' and drawing the arrows would be fine - but this makes them look
-    // slightly blurry, and I dont like that.
     p->save();
     col.setAlpha(255);
     p->setPen(col);
     p->setBrush(col);
-#ifdef QTC_QT5_OLD_NVIDIA_ARROW_FIX
-    p->setRenderHint(QPainter::Antialiasing, true);
-    p->fillPath(path, col);
-#endif
     // Qt >= 4.8.5 has problem drawing polygons correctly. Enabling
     // antialiasing can work arround the problem although it will also make
     // the arrow blurry.

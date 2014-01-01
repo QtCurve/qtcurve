@@ -12104,28 +12104,11 @@ void Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe,
     default:
         return;
     }
-
     a.translate((r.x() + (r.width() >> 1)), (r.y() + (r.height() >> 1)));
-
-#ifdef QTC_QT4_OLD_NVIDIA_ARROW_FIX
-    QPainterPath path;
-    path.moveTo(a[0].x() + 0.5, a[0].y() + 0.5);
-    for (int i = 1;i < a.size();i++)
-        path.lineTo(a[i].x() + 0.5, a[i].y() + 0.5);
-    path.lineTo(a[0].x() + 0.5, a[0].y() + 0.5);
-#endif
-    // This all looks like overkill - but seems to fix issues with plasma and
-    // nvidia. Just using 'aa' and drawing the arrows would be fine -
-    // but this makes them look slightly blurry, and I dont like that.
-    //   -- Craig
     p->save();
     col.setAlpha(255);
     p->setPen(col);
     p->setBrush(col);
-#ifdef QTC_QT4_OLD_NVIDIA_ARROW_FIX
-    p->setRenderHint(QPainter::Antialiasing, true);
-    p->fillPath(path, col);
-#endif
 #if (QT_VERSION >= QT_VERSION_CHECK(4, 8, 5))
     // Qt >= 4.8.5 has problem drawing polygons correctly. Enabling
     // antialiasing can work arround the problem although it will also make

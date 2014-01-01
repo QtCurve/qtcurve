@@ -27,9 +27,6 @@ option(QTC_INSTALL_PO "Install translation files." On)
 option(QTC_QT4_ENABLE_KDE "Building Qt4 style with KDE4 support." On)
 # option(QTC_QT5_ENABLE_KDE "Building Qt5 style with KDE5 support." Off)
 
-option(QTC_QT4_OLD_NVIDIA_ARROW_FIX "Qt4 old nvidia arrow fix." Off)
-option(QTC_QT5_OLD_NVIDIA_ARROW_FIX "Qt5 old nvidia arrow fix." Off)
-
 option(QTC_QT4_STYLE_SUPPORT
   "Qt4 support for creating a style for each QtCurve theme." Off)
 
