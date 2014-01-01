@@ -24,11 +24,12 @@
 #define __QTC_COMBOBOX_H__
 
 #include <gtk/gtk.h>
+#include <stdbool.h>
 
-gboolean qtcComboBoxIsFocusChanged(GtkWidget *widget);
-gboolean qtcComboBoxIsHovered(GtkWidget *widget);
-gboolean qtcComboBoxHasFocus(GtkWidget *widget, GtkWidget *mapped);
+bool qtcComboBoxIsFocusChanged(GtkWidget *widget);
+bool qtcComboBoxIsHovered(GtkWidget *widget);
+bool qtcComboBoxHasFocus(GtkWidget *widget, GtkWidget *mapped);
 void qtcComboBoxSetup(GtkWidget *frame, GtkWidget *combo);
-gboolean qtcComboHasFrame(GtkWidget *widget);
+bool qtcComboHasFrame(GtkWidget *widget);
 
 #endif

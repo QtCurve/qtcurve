@@ -92,7 +92,7 @@ qtcTreeViewCleanup(GtkWidget *widget)
 }
 
 static gboolean
-qtcTreeViewStyleSet(GtkWidget *widget, GtkStyle *prev_style, gpointer data)
+qtcTreeViewStyleSet(GtkWidget *widget, GtkStyle *prev_style, void *data)
 {
     QTC_UNUSED(prev_style);
     QTC_UNUSED(data);
@@ -101,7 +101,7 @@ qtcTreeViewStyleSet(GtkWidget *widget, GtkStyle *prev_style, gpointer data)
 }
 
 static gboolean
-qtcTreeViewDestroy(GtkWidget *widget, GdkEvent *event, gpointer data)
+qtcTreeViewDestroy(GtkWidget *widget, GdkEvent *event, void *data)
 {
     QTC_UNUSED(event);
     QTC_UNUSED(data);
@@ -182,7 +182,7 @@ gboolean qtcTreeViewIsCellHovered(GtkWidget *widget, GtkTreePath *path, GtkTreeV
 }
 
 static gboolean
-qtcTreeViewMotion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
+qtcTreeViewMotion(GtkWidget *widget, GdkEventMotion *event, void *data)
 {
     QTC_UNUSED(data);
     if (event && event->window && GTK_IS_TREE_VIEW(widget) &&
@@ -193,7 +193,7 @@ qtcTreeViewMotion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
 }
 
 static gboolean
-qtcTreeViewLeave(GtkWidget *widget, GdkEventMotion *event, gpointer data)
+qtcTreeViewLeave(GtkWidget *widget, GdkEventMotion *event, void *data)
 {
     QTC_UNUSED(event);
     QTC_UNUSED(data);
@@ -244,7 +244,7 @@ qtcTreeViewSetup(GtkWidget *widget)
             gtk_tree_view_convert_widget_to_bin_window_coords(treeView, x, y,
                                                               &x, &y);
             qtcTreeViewUpdatePosition(widget, x, y);
-            g_object_set_data(obj, "QTC_TREE_VIEW_SET", (gpointer)1);
+            g_object_set_data(obj, "QTC_TREE_VIEW_SET", (void*)1);
             qtcConnectToData(obj, "QTC_TREE_VIEW_DESTROY_ID", "destroy-event",
                              qtcTreeViewDestroy, NULL);
             qtcConnectToData(obj, "QTC_TREE_VIEW_UNREALIZE_ID", "unrealize",

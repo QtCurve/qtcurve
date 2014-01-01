@@ -28,7 +28,7 @@
  * 'label' which is of 'base' colour. gtk_cell_view_set_background_color
  * removes this
  */
-static gboolean
+static bool
 qtcComboBoxCellViewHasBgnd(GtkWidget *view)
 {
     gboolean val;
@@ -58,35 +58,35 @@ qtcComboBoxClearBgndColor(GtkWidget *widget)
 static GtkWidget *qtcComboFocus = NULL;
 static GtkWidget *qtcComboHover = NULL;
 
-gboolean
+bool
 qtcComboBoxIsFocusChanged(GtkWidget *widget)
 {
     if (qtcComboFocus == widget) {
         if (!gtk_widget_has_focus(widget)) {
             qtcComboFocus = NULL;
-            return TRUE;
+            return true;
         }
     } else if (gtk_widget_has_focus(widget)) {
         qtcComboFocus = widget;
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }
 
-gboolean
+bool
 qtcComboBoxHasFocus(GtkWidget *widget, GtkWidget *mapped)
 {
     return gtk_widget_has_focus(widget) || (mapped && mapped == qtcComboFocus);
 }
 
-gboolean
+bool
 qtcComboBoxIsHovered(GtkWidget *widget)
 {
     return widget == qtcComboHover;
 }
 
 #if 0
-static gboolean
+static bool
 qtcComboAppearsAsList(GtkWidget *widget)
 {
     gboolean rv;
@@ -114,7 +114,7 @@ qtcComboBoxCleanup(GtkWidget *widget)
 }
 
 static gboolean
-qtcComboBoxStyleSet(GtkWidget *widget, GtkStyle *prev_style, gpointer data)
+qtcComboBoxStyleSet(GtkWidget *widget, GtkStyle *prev_style, void *data)
 {
     QTC_UNUSED(data);
     QTC_UNUSED(prev_style);
@@ -123,7 +123,7 @@ qtcComboBoxStyleSet(GtkWidget *widget, GtkStyle *prev_style, gpointer data)
 }
 
 static gboolean
-qtcComboBoxDestroy(GtkWidget *widget, GdkEvent *event, gpointer data)
+qtcComboBoxDestroy(GtkWidget *widget, GdkEvent *event, void *data)
 {
     QTC_UNUSED(data);
     QTC_UNUSED(event);
@@ -132,7 +132,7 @@ qtcComboBoxDestroy(GtkWidget *widget, GdkEvent *event, gpointer data)
 }
 
 static gboolean
-qtcComboBoxEnter(GtkWidget *widget, GdkEventMotion *event, gpointer data)
+qtcComboBoxEnter(GtkWidget *widget, GdkEventMotion *event, void *data)
 {
     QTC_UNUSED(event);
     if (GTK_IS_EVENT_BOX(widget)) {
@@ -146,7 +146,7 @@ qtcComboBoxEnter(GtkWidget *widget, GdkEventMotion *event, gpointer data)
 }
 
 static gboolean
-qtcComboBoxLeave(GtkWidget *widget, GdkEventMotion *event, gpointer data)
+qtcComboBoxLeave(GtkWidget *widget, GdkEventMotion *event, void *data)
 {
     QTC_UNUSED(event);
     if (GTK_IS_EVENT_BOX(widget)) {
@@ -160,7 +160,7 @@ qtcComboBoxLeave(GtkWidget *widget, GdkEventMotion *event, gpointer data)
 }
 
 static void
-qtcComboBoxStateChange(GtkWidget *widget, GdkEventMotion *event, gpointer data)
+qtcComboBoxStateChange(GtkWidget *widget, GdkEventMotion *event, void *data)
 {
     QTC_UNUSED(data);
     QTC_UNUSED(event);
@@ -210,7 +210,7 @@ qtcComboBoxSetup(GtkWidget *frame, GtkWidget *combo)
     }
 }
 
-gboolean
+bool
 qtcComboHasFrame(GtkWidget *widget)
 {
     gboolean val;

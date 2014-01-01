@@ -26,8 +26,8 @@
 #include <qtcurve-utils/x11shadow.h>
 #include <qtcurve-utils/gtkutils.h>
 
-static guint realizeSignalId = 0;
-static gulong realizeHookId = 0;
+static unsigned realizeSignalId = 0;
+static unsigned long realizeHookId = 0;
 
 static void
 installX11Shadows(GtkWidget* widget)
@@ -66,7 +66,7 @@ acceptWidget(GtkWidget* widget)
 }
 
 static gboolean
-shadowDestroy(GtkWidget *widget, gpointer data)
+shadowDestroy(GtkWidget *widget, void *data)
 {
     QTC_UNUSED(data);
     if (DEBUG_ALL == qtSettings.debug)
@@ -101,15 +101,15 @@ registerWidget(GtkWidget* widget)
     // try install shadows
     installX11Shadows(widget);
 
-    g_object_set_data(obj, "QTC_SHADOW_SET", (gpointer)1);
+    g_object_set_data(obj, "QTC_SHADOW_SET", (void*)1);
     qtcConnectToData(obj, "QTC_SHADOW_DESTROY_ID", "destroy",
                      shadowDestroy, NULL);
     return TRUE;
 }
 
 static gboolean
-realizeHook(GSignalInvocationHint *sih, guint x, const GValue *params,
-            gpointer data)
+realizeHook(GSignalInvocationHint *sih, unsigned x,
+            const GValue *params, void *data)
 {
     QTC_UNUSED(sih);
     QTC_UNUSED(x);

@@ -37,7 +37,7 @@ qtcScrollbarCleanup(GtkWidget *widget)
 }
 
 static gboolean
-qtcScrollbarStyleSet(GtkWidget *widget, GtkStyle *previous_style, gpointer data)
+qtcScrollbarStyleSet(GtkWidget *widget, GtkStyle *previous_style, void *data)
 {
     QTC_UNUSED(previous_style);
     QTC_UNUSED(data);
@@ -46,7 +46,7 @@ qtcScrollbarStyleSet(GtkWidget *widget, GtkStyle *previous_style, gpointer data)
 }
 
 static gboolean
-qtcScrollbarDestroy(GtkWidget *widget, GdkEvent *event, gpointer data)
+qtcScrollbarDestroy(GtkWidget *widget, GdkEvent *event, void *data)
 {
     QTC_UNUSED(event);
     QTC_UNUSED(data);
@@ -68,8 +68,7 @@ qtcScrollbarParentScrolledWindow(GtkWidget *widget)
 }
 
 static gboolean
-qtcScrollbarValueChanged(GtkWidget *widget, GdkEventMotion *event,
-                         gpointer data)
+qtcScrollbarValueChanged(GtkWidget *widget, GdkEventMotion *event, void *data)
 {
     QTC_UNUSED(event);
     QTC_UNUSED(data);
@@ -89,7 +88,7 @@ qtcScrollbarSetupSlider(GtkWidget *widget)
     GObject *obj = NULL;
     if (widget && (obj = G_OBJECT(widget)) &&
         !g_object_get_data(obj, "QTC_SCROLLBAR_SET")) {
-        g_object_set_data(obj, "QTC_SCROLLBAR_SET", (gpointer)1);
+        g_object_set_data(obj, "QTC_SCROLLBAR_SET", (void*)1);
         qtcConnectToData(obj, "QTC_SCROLLBAR_DESTROY_ID", "destroy-event",
                          qtcScrollbarDestroy, NULL);
         qtcConnectToData(obj, "QTC_SCROLLBAR_UNREALIZE_ID", "unrealize",

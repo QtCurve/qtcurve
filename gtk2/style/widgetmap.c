@@ -75,7 +75,7 @@ static void qtcWidgetMapCleanup(GtkWidget *widget)
 }
 
 static gboolean
-qtcWidgetMapStyleSet(GtkWidget *widget, GtkStyle *prev_style, gpointer data)
+qtcWidgetMapStyleSet(GtkWidget *widget, GtkStyle *prev_style, void *data)
 {
     QTC_UNUSED(prev_style);
     QTC_UNUSED(data);
@@ -84,7 +84,7 @@ qtcWidgetMapStyleSet(GtkWidget *widget, GtkStyle *prev_style, gpointer data)
 }
 
 static gboolean
-qtcWidgetMapDestroy(GtkWidget *widget, GdkEvent *event, gpointer user_data)
+qtcWidgetMapDestroy(GtkWidget *widget, GdkEvent *event, void *user_data)
 {
     QTC_UNUSED(event);
     QTC_UNUSED(user_data);
@@ -97,7 +97,7 @@ void qtcWidgetMapSetup(GtkWidget *from, GtkWidget *to, int map)
     GObject *from_obj;
     if (from && to && (from_obj = G_OBJECT(from)) &&
         !g_object_get_data(from_obj, MAP_ID(map))) {
-        g_object_set_data(from_obj, MAP_ID(map), (gpointer)1);
+        g_object_set_data(from_obj, MAP_ID(map), (void*)1);
         qtcConnectToData(from_obj, "QTC_WIDGET_MAP_HACK_DESTROY_ID",
                          "destroy-event", qtcWidgetMapDestroy, NULL);
         qtcConnectToData(from_obj, "QTC_WIDGET_MAP_HACK_UNREALIZE_ID",

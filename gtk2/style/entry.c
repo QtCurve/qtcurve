@@ -48,7 +48,7 @@ qtcEntryCleanup(GtkWidget *widget)
 }
 
 static gboolean
-qtcEntryStyleSet(GtkWidget *widget, GtkStyle *previous_style, gpointer data)
+qtcEntryStyleSet(GtkWidget *widget, GtkStyle *previous_style, void *data)
 {
     QTC_UNUSED(previous_style);
     QTC_UNUSED(data);
@@ -57,7 +57,7 @@ qtcEntryStyleSet(GtkWidget *widget, GtkStyle *previous_style, gpointer data)
 }
 
 static gboolean
-qtcEntryDestroy(GtkWidget *widget, GdkEvent *event, gpointer data)
+qtcEntryDestroy(GtkWidget *widget, GdkEvent *event, void *data)
 {
     QTC_UNUSED(event);
     QTC_UNUSED(data);
@@ -66,7 +66,7 @@ qtcEntryDestroy(GtkWidget *widget, GdkEvent *event, gpointer data)
 }
 
 static gboolean
-qtcEntryEnter(GtkWidget *widget, GdkEventCrossing *event, gpointer data)
+qtcEntryEnter(GtkWidget *widget, GdkEventCrossing *event, void *data)
 {
     QTC_UNUSED(event);
     QTC_UNUSED(data);
@@ -78,7 +78,7 @@ qtcEntryEnter(GtkWidget *widget, GdkEventCrossing *event, gpointer data)
 }
 
 static gboolean
-qtcEntryLeave(GtkWidget *widget, GdkEventCrossing *event, gpointer data)
+qtcEntryLeave(GtkWidget *widget, GdkEventCrossing *event, void *data)
 {
     QTC_UNUSED(event);
     QTC_UNUSED(data);
@@ -95,7 +95,7 @@ qtcEntrySetup(GtkWidget *widget)
     GObject *obj = NULL;
     if (GTK_IS_ENTRY(widget) && (obj = G_OBJECT(widget)) &&
         !g_object_get_data(obj, "QTC_ENTRY_HACK_SET")) {
-        g_object_set_data(G_OBJECT(widget), "QTC_ENTRY_HACK_SET", (gpointer)1);
+        g_object_set_data(G_OBJECT(widget), "QTC_ENTRY_HACK_SET", (void*)1);
         qtcConnectToData(obj, "QTC_ENTRY_ENTER_ID", "enter-notify-event",
                          qtcEntryEnter, NULL);
         qtcConnectToData(obj, "QTC_ENTRY_LEAVE_ID", "leave-notify-event",

@@ -82,7 +82,7 @@ menuIsSelectable(GtkWidget *menu)
 }
 
 static gboolean
-qtcMenuShellButtonPress(GtkWidget *widget, GdkEventButton *event, gpointer data)
+qtcMenuShellButtonPress(GtkWidget *widget, GdkEventButton *event, void *data)
 {
     QTC_UNUSED(data);
     if (GTK_IS_MENU_BAR(widget)) {
@@ -161,7 +161,7 @@ qtcMenuShellCleanup(GtkWidget *widget)
 }
 
 static gboolean
-qtcMenuShellStyleSet(GtkWidget *widget, GtkStyle *prev_style, gpointer data)
+qtcMenuShellStyleSet(GtkWidget *widget, GtkStyle *prev_style, void *data)
 {
     QTC_UNUSED(data);
     QTC_UNUSED(prev_style);
@@ -170,7 +170,7 @@ qtcMenuShellStyleSet(GtkWidget *widget, GtkStyle *prev_style, gpointer data)
 }
 
 static gboolean
-qtcMenuShellDestroy(GtkWidget *widget, GdkEvent *event, gpointer data)
+qtcMenuShellDestroy(GtkWidget *widget, GdkEvent *event, void *data)
 {
     QTC_UNUSED(data);
     QTC_UNUSED(event);
@@ -179,7 +179,7 @@ qtcMenuShellDestroy(GtkWidget *widget, GdkEvent *event, gpointer data)
 }
 
 static gboolean
-qtcMenuShellMotion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
+qtcMenuShellMotion(GtkWidget *widget, GdkEventMotion *event, void *data)
 {
     QTC_UNUSED(data);
     QTC_UNUSED(event);
@@ -222,7 +222,7 @@ qtcMenuShellMotion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
 }
 
 static gboolean
-qtcMenuShellLeave(GtkWidget *widget, GdkEventCrossing *event, gpointer data)
+qtcMenuShellLeave(GtkWidget *widget, GdkEventCrossing *event, void *data)
 {
     QTC_UNUSED(data);
     QTC_UNUSED(event);

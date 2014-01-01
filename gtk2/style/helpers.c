@@ -588,24 +588,30 @@ gboolean isOnButton(GtkWidget *w, int level, gboolean *def)
     return FALSE;
 }
 
-static GtkRequisition defaultOptionIndicatorSize    = { 6, 13 };
-static GtkBorder      defaultOptionIndicatorSpacing = { 7, 5, 1, 1 };
+static GtkRequisition defaultOptionIndicatorSize = {6, 13};
+static GtkBorder defaultOptionIndicatorSpacing = {7, 5, 1, 1};
 
-void optionMenuGetProps(GtkWidget *widget, GtkRequisition *indicator_size, GtkBorder *indicator_spacing)
+void
+optionMenuGetProps(GtkWidget *widget, GtkRequisition *indicator_size,
+                   GtkBorder *indicator_spacing)
 {
     GtkRequisition *tmp_size = NULL;
-    GtkBorder      *tmp_spacing = NULL;
+    GtkBorder *tmp_spacing = NULL;
 
-    if(widget)
-        gtk_widget_style_get(widget, "indicator_size", &tmp_size, "indicator_spacing", &tmp_spacing,
+    if (widget)
+        gtk_widget_style_get(widget, "indicator_size", &tmp_size,
+                             "indicator_spacing", &tmp_spacing,
                              NULL);
     *indicator_size= tmp_size ? *tmp_size : defaultOptionIndicatorSize;
-    *indicator_spacing = tmp_spacing ? *tmp_spacing : defaultOptionIndicatorSpacing;
+    *indicator_spacing = (tmp_spacing ? *tmp_spacing :
+                          defaultOptionIndicatorSpacing);
 
-    if (tmp_size)
+    if (tmp_size) {
         gtk_requisition_free(tmp_size);
-    if (tmp_spacing)
+    }
+    if (tmp_spacing) {
         gtk_border_free(tmp_spacing);
+    }
 }
 
 #if GTK_CHECK_VERSION(2, 90, 0)
@@ -615,64 +621,65 @@ EStepper getStepper(GtkWidget *widget, int x, int y, int width, int height)
 #endif
 {
 #if GTK_CHECK_VERSION(2, 90, 0)
-    if(detail && detail[1])
-    {
-        if(0 == strcmp(&detail[11], "end_inner"))
+    if (detail && detail[1]) {
+        if(0 == strcmp(&detail[11], "end_inner")) {
             return STEPPER_C;
-        else if(strstr(&detail[11], "start_inner"))
+        } else if (strstr(&detail[11], "start_inner")) {
             return STEPPER_B;
-        else if(0 == strcmp(&detail[11], "end"))
+        } else if (0 == strcmp(&detail[11], "end")) {
             return STEPPER_D;
-        else if(strstr(&detail[11], "start"))
+        } else if (strstr(&detail[11], "start")) {
             return STEPPER_A;
+        }
     }
 #else
-    if(widget && GTK_IS_RANGE(widget))
-    {
-        GdkRectangle   tmp;
-        GdkRectangle   check_rectangle,
-                       stepper;
+    if (widget && GTK_IS_RANGE(widget)) {
+        GdkRectangle tmp;
+        GdkRectangle check_rectangle;
+        GdkRectangle stepper;
         GtkOrientation orientation = qtcWidgetGetOrientation(widget);
         GtkAllocation alloc = qtcWidgetGetAllocation(widget);
 
-        stepper.x=x;
-        stepper.y=y;
-        stepper.width=width;
-        stepper.height=height;
-        check_rectangle.x      = alloc.x;
-        check_rectangle.y      = alloc.y;
-        check_rectangle.width  = stepper.width;
+        stepper.x = x;
+        stepper.y = y;
+        stepper.width = width;
+        stepper.height = height;
+        check_rectangle.x = alloc.x;
+        check_rectangle.y = alloc.y;
+        check_rectangle.width = stepper.width;
         check_rectangle.height = stepper.height;
 
-        if (-1 == alloc.x && -1 == alloc.y)
+        if (alloc.x == -1 && alloc.y == -1)
             return STEPPER_NONE;
 
         if (gdk_rectangle_intersect(&stepper, &check_rectangle, &tmp))
             return STEPPER_A;
 
-        if (GTK_ORIENTATION_HORIZONTAL == orientation)
+        if (orientation == GTK_ORIENTATION_HORIZONTAL) {
             check_rectangle.x = alloc.x + stepper.width;
-        else
+        } else {
             check_rectangle.y = alloc.y + stepper.height;
+        }
 
         if (gdk_rectangle_intersect(&stepper, &check_rectangle, &tmp))
             return STEPPER_B;
 
-        if (GTK_ORIENTATION_HORIZONTAL == orientation)
-            check_rectangle.x = alloc.x + alloc.width - (stepper.width * 2);
-        else
-            check_rectangle.y = alloc.y + alloc.height - (stepper.height * 2);
-
-        if (gdk_rectangle_intersect(&stepper, &check_rectangle, &tmp))
+        if (orientation == GTK_ORIENTATION_HORIZONTAL) {
+            check_rectangle.x = alloc.x + alloc.width - stepper.width * 2;
+        } else {
+            check_rectangle.y = alloc.y + alloc.height - stepper.height * 2;
+        }
+        if (gdk_rectangle_intersect(&stepper, &check_rectangle, &tmp)) {
             return STEPPER_C;
-
-        if (GTK_ORIENTATION_HORIZONTAL == orientation)
+        }
+        if (orientation == GTK_ORIENTATION_HORIZONTAL) {
             check_rectangle.x = alloc.x + alloc.width - stepper.width;
-        else
+        } else {
             check_rectangle.y = alloc.y + alloc.height - stepper.height;
-
-        if (gdk_rectangle_intersect(&stepper, &check_rectangle, &tmp))
+        }
+        if (gdk_rectangle_intersect(&stepper, &check_rectangle, &tmp)) {
             return STEPPER_D;
+        }
     }
 #endif
     return STEPPER_NONE;
@@ -681,50 +688,52 @@ EStepper getStepper(GtkWidget *widget, int x, int y, int width, int height)
 #if GTK_CHECK_VERSION(2, 90, 0)
 void gdk_drawable_get_size(GdkWindow *window, int *width, int *height)
 {
-    *width=gdk_window_get_width(window);
-    *height=gdk_window_get_height(window);
+    *width = gdk_window_get_width(window);
+    *height = gdk_window_get_height(window);
 }
 
 void sanitizeSizeReal(GtkWidget *widget, int *width, int *height)
 {
-    if(-1 == *width || -1 == *height)
-    {
-        GdkWindow *window=gtk_widget_get_window(widget);
-
-        if(window)
-        {
-            if((-1 == *width) && (-1 == *height))
-                gdk_drawable_get_size(window, width, height);
-            else if(-1 == *width)
-                gdk_drawable_get_size(window, width, NULL);
-            else if(-1 == *height)
-                gdk_drawable_get_size(window, NULL, height);
+    if (*width == -1 || *height == -1) {
+        GdkWindow *window = gtk_widget_get_window(widget);
+        if (window) {
+            if (*width == -1) {
+                *width = gdk_window_get_width(window);
+            }
+            if (*height == -1) {
+                *height = gdk_window_get_height(window);
+            }
         }
     }
 }
 #else
 void sanitizeSize(GdkWindow *window, int *width, int *height)
 {
-    if((-1 == *width) && (-1 == *height))
+    if (*width == -1 && *height == -1) {
         gdk_window_get_size(window, width, height);
-    else if(-1 == *width)
+    } else if (*width == -1) {
         gdk_window_get_size(window, width, NULL);
-    else if(-1 == *height)
+    } else if (*height == -1) {
         gdk_window_get_size(window, NULL, height);
+    }
 }
 #endif
 
 int getFillReal(GtkStateType state, gboolean set, gboolean darker)
 {
-    return GTK_STATE_INSENSITIVE == state
-               ? (darker ? 2 : ORIGINAL_SHADE)
-               : GTK_STATE_PRELIGHT == state
-                   ? set /*&& allow_mouse_over_set*/
-                       ? (darker ? 3 : SHADE_4_HIGHLIGHT)
-                       : (darker ? SHADE_2_HIGHLIGHT : SHADE_ORIG_HIGHLIGHT)
-                   : set || GTK_STATE_ACTIVE == state
-                       ? (darker ? 5 : 4)
-                       : (darker ? 2 : ORIGINAL_SHADE);
+    if (state == GTK_STATE_INSENSITIVE) {
+        return darker ? 2 : ORIGINAL_SHADE;
+    } else if (state == GTK_STATE_PRELIGHT) {
+        if (set) {
+            return darker ? 3 : SHADE_4_HIGHLIGHT;
+        } else {
+            return darker ? SHADE_2_HIGHLIGHT : SHADE_ORIG_HIGHLIGHT;
+        }
+    } else if (set || state == GTK_STATE_ACTIVE) {
+        return darker ? 5 : 4;
+    } else {
+        return darker ? 2 : ORIGINAL_SHADE;
+    }
 }
 
 gboolean isSbarDetail(const char *detail)
@@ -990,7 +999,7 @@ constrainRect(GdkRectangle *rect, GdkRectangle *con)
 }
 
 gboolean
-windowEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data)
+windowEvent(GtkWidget *widget, GdkEvent *event, void *user_data)
 {
     QTC_UNUSED(widget);
     if (GDK_FOCUS_CHANGE == event->type)
@@ -1112,20 +1121,20 @@ gboolean isRgbaWidget(GtkWidget *widget)
     if (widget) {
         GdkVisual *visual = gtk_widget_get_visual(widget);
 #if GTK_CHECK_VERSION(2, 90, 0)
-        guint32 redMask;
-        guint32 greenMask;
-        guint32 blueMask;
+        uint32_t redMask;
+        uint32_t greenMask;
+        uint32_t blueMask;
 
         gdk_visual_get_red_pixel_details(visual, &redMask, NULL, NULL);
         gdk_visual_get_green_pixel_details(visual, &greenMask, NULL, NULL);
         gdk_visual_get_blue_pixel_details(visual, &blueMask, NULL, NULL);
 
-        return (32 == gdk_visual_get_depth(visual) && 0xff0000 == redMask &&
-                0x00ff00 == greenMask && 0x0000ff == blueMask);
+        return (gdk_visual_get_depth(visual) == 32 && redMask == 0xff0000 &&
+                greenMask == 0x00ff00 && blueMask == 0x0000ff);
 #else
-        return (32 == visual->depth && 0xff0000 == visual->red_mask &&
-                0x00ff00 == visual->green_mask &&
-                0x0000ff == visual->blue_mask);
+        return (visual->depth == 32 && visual->red_mask == 0xff0000 &&
+                visual->green_mask == 0x00ff00 &&
+                visual->blue_mask == 0x0000ff);
 #endif
     }
     return FALSE;

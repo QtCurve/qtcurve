@@ -45,7 +45,7 @@ qtcScrolledWindowCleanup(GtkWidget *widget)
 }
 
 static gboolean
-qtcScrolledWindowStyleSet(GtkWidget *widget, GtkStyle *prev, gpointer data)
+qtcScrolledWindowStyleSet(GtkWidget *widget, GtkStyle *prev, void *data)
 {
     QTC_UNUSED(prev);
     QTC_UNUSED(data);
@@ -54,7 +54,7 @@ qtcScrolledWindowStyleSet(GtkWidget *widget, GtkStyle *prev, gpointer data)
 }
 
 static gboolean
-qtcScrolledWindowDestroy(GtkWidget *widget, GdkEvent *event, gpointer data)
+qtcScrolledWindowDestroy(GtkWidget *widget, GdkEvent *event, void *data)
 {
     QTC_UNUSED(event);
     QTC_UNUSED(data);
@@ -76,7 +76,7 @@ gboolean qtcScrolledWindowHovered(GtkWidget *widget)
 }
 
 static gboolean
-qtcScrolledWindowEnter(GtkWidget *widget, GdkEventMotion *event, gpointer data)
+qtcScrolledWindowEnter(GtkWidget *widget, GdkEventMotion *event, void *data)
 {
     QTC_UNUSED(event);
     GtkWidget *w = data ? (GtkWidget*)data : widget;
@@ -88,7 +88,7 @@ qtcScrolledWindowEnter(GtkWidget *widget, GdkEventMotion *event, gpointer data)
 }
 
 static gboolean
-qtcScrolledWindowLeave(GtkWidget *widget, GdkEventMotion *event, gpointer data)
+qtcScrolledWindowLeave(GtkWidget *widget, GdkEventMotion *event, void *data)
 {
     QTC_UNUSED(event);
     GtkWidget *w = data ? (GtkWidget*)data : widget;
@@ -100,7 +100,7 @@ qtcScrolledWindowLeave(GtkWidget *widget, GdkEventMotion *event, gpointer data)
 }
 
 static gboolean
-qtcScrolledWindowFocusIn(GtkWidget *widget, GdkEventMotion *e, gpointer data)
+qtcScrolledWindowFocusIn(GtkWidget *widget, GdkEventMotion *e, void *data)
 {
     QTC_UNUSED(e);
     GtkWidget *w = data ? (GtkWidget*)data : widget;
@@ -112,7 +112,7 @@ qtcScrolledWindowFocusIn(GtkWidget *widget, GdkEventMotion *e, gpointer data)
 }
 
 static gboolean
-qtcScrolledWindowFocusOut(GtkWidget *widget, GdkEventMotion *e, gpointer data)
+qtcScrolledWindowFocusOut(GtkWidget *widget, GdkEventMotion *e, void *data)
 {
     QTC_UNUSED(e);
     GtkWidget *w = data ? (GtkWidget*)data : widget;
@@ -130,7 +130,7 @@ static void qtcScrolledWindowSetupConnections(GtkWidget *widget, GtkWidget *pare
         !g_object_get_data(obj, "QTC_SCROLLED_WINDOW_SET")) {
         gtk_widget_add_events(widget, GDK_LEAVE_NOTIFY_MASK |
                               GDK_ENTER_NOTIFY_MASK | GDK_FOCUS_CHANGE_MASK);
-        g_object_set_data(obj, "QTC_SCROLLED_WINDOW_SET", (gpointer)1);
+        g_object_set_data(obj, "QTC_SCROLLED_WINDOW_SET", (void*)1);
         qtcConnectToData(obj, "QTC_SCROLLED_WINDOW_DESTROY_ID",
                          "destroy-event", qtcScrolledWindowDestroy, parent);
         qtcConnectToData(obj, "QTC_SCROLLED_WINDOW_UNREALIZE_ID",
@@ -193,6 +193,6 @@ void qtcScrolledWindowSetup(GtkWidget *widget)
             }
         }
 
-        g_object_set_data(G_OBJECT(widget), "QTC_SCROLLED_WINDOW_SET", (gpointer)1);
+        g_object_set_data(G_OBJECT(widget), "QTC_SCROLLED_WINDOW_SET", (void*)1);
     }
 }

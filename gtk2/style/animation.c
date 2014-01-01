@@ -53,7 +53,7 @@ static GSList *connected_widgets = NULL;
 static GHashTable *animated_widgets = NULL;
 static int animation_timer_id = 0;
 
-static gboolean qtcAnimationTimeoutHandler(gpointer data);
+static gboolean qtcAnimationTimeoutHandler(void *data);
 
 /* This forces a redraw on a widget */
 static void
@@ -97,7 +97,7 @@ qtcAnimationDestroyInfo(AnimationInfo *animation_info)
 /* This function does not unref the weak reference, because the object
  * is beeing destroyed currently. */
 static void
-qtcAnimationOnWidgetDestruction(gpointer data, GObject *object)
+qtcAnimationOnWidgetDestruction(void *data, GObject *object)
 {
     /* steal the animation info from the hash table(destroying it would
      * result in the weak reference to be unrefed, which does not work
@@ -108,7 +108,7 @@ qtcAnimationOnWidgetDestruction(gpointer data, GObject *object)
 
 /* This function also needs to unref the weak reference. */
 static void
-qtcAnimationDestroyInfoAndWeakUnref(gpointer data)
+qtcAnimationDestroyInfoAndWeakUnref(void *data)
 {
     AnimationInfo *animation_info = data;
 
@@ -165,7 +165,7 @@ qtcAnimationAdd(const GtkWidget *widget, double stop_time)
 /* update the animation information for each widget. This will also queue a redraw
  * and stop the animation if it is done. */
 static gboolean
-qtcAnimationUpdateInfo(gpointer key, gpointer value, gpointer user_data)
+qtcAnimationUpdateInfo(void *key, void *value, void *user_data)
 {
     QTC_UNUSED(user_data);
     AnimationInfo *animation_info = value;
@@ -209,7 +209,7 @@ qtcAnimationUpdateInfo(gpointer key, gpointer value, gpointer user_data)
 
 /* This gets called by the glib main loop every once in a while. */
 static gboolean
-qtcAnimationTimeoutHandler(gpointer data)
+qtcAnimationTimeoutHandler(void *data)
 {
     QTC_UNUSED(data);
     /* enter threads as qtcAnimationUpdateInfo will use gtk/gdk. */
@@ -227,7 +227,7 @@ qtcAnimationTimeoutHandler(gpointer data)
 
 #if 0
 static void
-on_checkbox_toggle(GtkWidget *widget, gpointer data)
+on_checkbox_toggle(GtkWidget *widget, void *data)
 {
     AnimationInfo *animation_info = qtcAnimationLookupInfo(widget);
 
@@ -242,7 +242,7 @@ on_checkbox_toggle(GtkWidget *widget, gpointer data)
 #endif
 
 static void
-qtcAnimationOnConnectedWidgetDestruction(gpointer data, GObject *widget)
+qtcAnimationOnConnectedWidgetDestruction(void *data, GObject *widget)
 {
     QTC_UNUSED(widget);
     connected_widgets = g_slist_remove(connected_widgets, data);
@@ -287,8 +287,8 @@ qtcAnimationAddProgressBar(GtkWidget *progressbar, gboolean isEntry)
 
 #if 0
 /* helper function for qtcAnimationConnectCheckbox */
-static gint
-qtcAnimationFindSignalInfo(gconstpointer signal_info, gconstpointer widget)
+static int
+qtcAnimationFindSignalInfo(const void *signal_info, const void *widget)
 {
     if (((SignalInfo*)signal_info)->widget == widget) {
         return 0;
@@ -319,7 +319,7 @@ qtcAnimationConnectCheckbox(GtkWidget *widget)
 }
 
 /* returns TRUE if the widget is animated, and FALSE otherwise */
-static gboolean
+static bool
 qtcAnimationIsAnimated(GtkWidget *widget)
 {
     return qtcAnimationLookupInfo(widget) != NULL;

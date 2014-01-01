@@ -42,8 +42,8 @@ getBlankPixbuf()
     return _blankPixbuf;
 }
 
-static guint
-pixbufCacheHashKey(gconstpointer k)
+static unsigned
+pixbufCacheHashKey(const void *k)
 {
     const QtcPixKey *key = k;
     int hash = (((key->col.red >> 8) << 16) + ((key->col.green >> 8) << 8) +
@@ -52,7 +52,7 @@ pixbufCacheHashKey(gconstpointer k)
 }
 
 static gboolean
-pixbufCacheKeyEqual(gconstpointer k1, gconstpointer k2)
+pixbufCacheKeyEqual(const void *k1, const void *k2)
 {
     return memcmp(k1, k2, sizeof(QtcPixKey)) == 0;
 }

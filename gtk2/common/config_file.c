@@ -687,12 +687,11 @@ readVersionEntry(GHashTable *cfg, const char *key)
             : 0;
 }
 
-static gboolean
-readBoolEntry(GHashTable *cfg, const char *key, gboolean def)
+static bool
+readBoolEntry(GHashTable *cfg, const char *key, bool def)
 {
-    char *str=readStringEntry(cfg, key);
-
-    return str ? (0==memcmp(str, "true", 4) ? true : false) : def;
+    char *str = readStringEntry(cfg, key);
+    return str ? (memcmp(str, "true", 4) == 0 ? true : false) : def;
 }
 
 static void

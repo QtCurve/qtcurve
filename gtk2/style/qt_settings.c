@@ -2127,10 +2127,10 @@ gboolean qtSettingsInit()
                 gtk_rc_parse_string("style \""RC_SETTING"Cmbf\" { xthickness=5 } widget_class \"*.GtkComboBox.GtkFrame\" style \""RC_SETTING"Cmbf\"");
             }
 
-            if(GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app || (SCROLLBAR_NONE==opts.scrollbarType && isMozilla()))
-                opts.scrollbarType=SCROLLBAR_WINDOWS;
-            else
-            {
+            if (qtcOneOf(qtSettings.app, GTK_APP_MOZILLA, GTK_APP_JAVA) ||
+                (opts.scrollbarType == SCROLLBAR_NONE && isMozilla())) {
+                opts.scrollbarType = SCROLLBAR_WINDOWS;
+            } else {
                 static const char *constSbStrFormat="style \""RC_SETTING"SBt\" "
                                                     "{ GtkScrollbar::has-backward-stepper=%d "
                                                       "GtkScrollbar::has-forward-stepper=%d "

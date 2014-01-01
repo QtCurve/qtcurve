@@ -106,7 +106,7 @@ qtcWindowCleanup(GtkWidget *widget)
 }
 
 static gboolean
-qtcWindowStyleSet(GtkWidget *widget, GtkStyle *prev_style, gpointer data)
+qtcWindowStyleSet(GtkWidget *widget, GtkStyle *prev_style, void *data)
 {
     QTC_UNUSED(prev_style);
     QTC_UNUSED(data);
@@ -118,7 +118,7 @@ static gboolean qtcWindowToggleMenuBar(GtkWidget *widget);
 static gboolean qtcWindowToggleStatusBar(GtkWidget *widget);
 
 static gboolean
-qtcWindowClientEvent(GtkWidget *widget, GdkEventClient *event, gpointer data)
+qtcWindowClientEvent(GtkWidget *widget, GdkEventClient *event, void *data)
 {
     QTC_UNUSED(data);
     if (gdk_x11_atom_to_xatom(event->message_type) ==
@@ -153,7 +153,7 @@ qtcWindowClientEvent(GtkWidget *widget, GdkEventClient *event, gpointer data)
 }
 
 static gboolean
-qtcWindowDestroy(GtkWidget *widget, GdkEvent *event, gpointer data)
+qtcWindowDestroy(GtkWidget *widget, GdkEvent *event, void *data)
 {
     QTC_UNUSED(event);
     QTC_UNUSED(data);
@@ -224,7 +224,7 @@ qtcWindowSizeRequest(GtkWidget *widget)
 }
 
 static gboolean
-qtcWindowDelayedUpdate(gpointer user_data)
+qtcWindowDelayedUpdate(void *user_data)
 {
     QtCWindow *window = (QtCWindow*)user_data;
 
@@ -246,7 +246,7 @@ qtcWindowDelayedUpdate(gpointer user_data)
 }
 
 static gboolean
-qtcWindowConfigure(GtkWidget *widget, GdkEventConfigure *event, gpointer data)
+qtcWindowConfigure(GtkWidget *widget, GdkEventConfigure *event, void *data)
 {
     QTC_UNUSED(widget);
     QtCWindow *window = (QtCWindow*)data;
@@ -456,7 +456,7 @@ qtcWindowSetProperties(GtkWidget *w, unsigned short opacity)
 }
 
 static gboolean
-qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
+qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, void *user_data)
 {
     QTC_UNUSED(user_data);
     // Ensure only ctrl/alt/shift/capsLock are pressed...
@@ -479,7 +479,7 @@ qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 }
 
 static gboolean
-qtcWindowMap(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
+qtcWindowMap(GtkWidget *widget, GdkEventKey *event, void *user_data)
 {
     QTC_UNUSED(event);
     QTC_UNUSED(user_data);
@@ -516,7 +516,7 @@ qtcWindowSetup(GtkWidget *widget, int opacity)
     GObject *obj = NULL;
     if (widget && (obj = G_OBJECT(widget)) &&
         !g_object_get_data(obj, "QTC_WINDOW_HACK_SET")) {
-        g_object_set_data(obj, "QTC_WINDOW_HACK_SET", (gpointer)1);
+        g_object_set_data(obj, "QTC_WINDOW_HACK_SET", (void*)1);
         if (!(qtcIsFlatBgnd(opts.bgndAppearance)) ||
             IMG_NONE != opts.bgndImage.type) {
             QtCWindow *window = qtcWindowLookupHash(widget, TRUE);

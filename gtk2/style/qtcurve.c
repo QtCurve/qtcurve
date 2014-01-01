@@ -94,7 +94,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
 
 static void
 qtcLogHandler(const char *domain, GLogLevelFlags level, const char *msg,
-              gpointer data)
+              void *data)
 {
     QTC_UNUSED(domain);
     QTC_UNUSED(level);
@@ -135,8 +135,9 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
             // gtk_dialog_set_alternative_button_order will cause errors to be
             // logged, but dont want these so register ur own error handler,
             // and then unregister afterwards...
-            guint id=g_log_set_handler("Gtk", G_LOG_LEVEL_CRITICAL, qtcLogHandler, NULL);
-            g_object_set_data(G_OBJECT(topLevel), BUTTON_HACK, (gpointer)1);
+            unsigned id = g_log_set_handler("Gtk", G_LOG_LEVEL_CRITICAL,
+                                            qtcLogHandler, NULL);
+            g_object_set_data(G_OBJECT(topLevel), BUTTON_HACK, (void*)1);
 
             gtk_dialog_set_alternative_button_order(GTK_DIALOG(topLevel), GTK_RESPONSE_HELP,
                                                     GTK_RESPONSE_OK, GTK_RESPONSE_YES, GTK_RESPONSE_ACCEPT, GTK_RESPONSE_APPLY,
@@ -706,7 +707,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
         if (topLevel && GTK_IS_WINDOW(topLevel)) {
 #define SHADE_ACTIVE_MB_HACK_SET "QTC_SHADE_ACTIVE_MB_HACK_SET"
             if (!g_object_get_data(G_OBJECT(topLevel), SHADE_ACTIVE_MB_HACK_SET)) {
-                g_object_set_data(G_OBJECT(topLevel), SHADE_ACTIVE_MB_HACK_SET, (gpointer)1);
+                g_object_set_data(G_OBJECT(topLevel), SHADE_ACTIVE_MB_HACK_SET, (void*)1);
                 g_signal_connect(G_OBJECT(topLevel), "event", G_CALLBACK(windowEvent), widget);
             }
             activeWindow = qtcWindowIsActive(GTK_WIDGET(topLevel));
@@ -1042,7 +1043,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                     mod=0, draw=GTK_STATE_ACTIVE==state || GTK_STATE_PRELIGHT==state, qtcComboBoxSetup(NULL, parent);
                 else
                 {
-                    changedFocus=qtcComboBoxIsFocusChanged(widget);
+                    changedFocus = qtcComboBoxIsFocusChanged(widget);
                     mapped=qtcWidgetMapGetWidget(parent, 1);
                     qtcWidgetMapSetup(parent, widget, 0);
 
@@ -2710,36 +2711,38 @@ static void gtkDrawExpander(GtkStyle *style, GdkWindow *window, GtkStateType sta
         drawArrow(window, style, col, area, GTK_ARROW_DOWN, x+(LARGE_ARR_WIDTH>>1), y+LARGE_ARR_HEIGHT, FALSE, fill);
 }
 
-static void styleRealize(GtkStyle *style)
+static void
+styleRealize(GtkStyle *style)
 {
     QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
 
     parent_class->realize(style);
 
-    qtcurveStyle->button_text[PAL_ACTIVE]=&qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON_TEXT];
-    qtcurveStyle->button_text[PAL_DISABLED]=qtSettings.qt4
-                            ? &qtSettings.colors[PAL_DISABLED][COLOR_BUTTON_TEXT]
-                            : &style->text[GTK_STATE_INSENSITIVE];
+    qtcurveStyle->button_text[PAL_ACTIVE] =
+        &qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON_TEXT];
+    qtcurveStyle->button_text[PAL_DISABLED] =
+        (qtSettings.qt4 ? &qtSettings.colors[PAL_DISABLED][COLOR_BUTTON_TEXT] :
+         &style->text[GTK_STATE_INSENSITIVE]);
 
-    if(SHADE_WINDOW_BORDER==opts.shadeMenubars)
-    {
-        qtcurveStyle->menutext[0]=&qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW_BORDER_TEXT];
-        qtcurveStyle->menutext[1]=&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER_TEXT];
+    if (opts.shadeMenubars == SHADE_WINDOW_BORDER) {
+        qtcurveStyle->menutext[0] =
+            &qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW_BORDER_TEXT];
+        qtcurveStyle->menutext[1] =
+            &qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER_TEXT];
+    } else if (opts.customMenuTextColor) {
+        qtcurveStyle->menutext[0] = &opts.customMenuNormTextColor;
+        qtcurveStyle->menutext[1] = &opts.customMenuSelTextColor;
+    } else {
+        qtcurveStyle->menutext[0] = NULL;
     }
-    else if(opts.customMenuTextColor)
-    {
-        qtcurveStyle->menutext[0]=&opts.customMenuNormTextColor;
-        qtcurveStyle->menutext[1]=&opts.customMenuSelTextColor;
-    }
-    else
-        qtcurveStyle->menutext[0]=NULL;
 
 #if !GTK_CHECK_VERSION(2, 90, 0) && !defined QTC_GTK2_USE_CAIRO_FOR_ARROWS
     qtcurveStyle->arrow_gc = NULL;
 #endif
 }
 
-static void styleUnrealize(GtkStyle *style)
+static void
+styleUnrealize(GtkStyle *style)
 {
     QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
 
@@ -2754,7 +2757,8 @@ static void styleUnrealize(GtkStyle *style)
 #endif
 }
 
-static void qtcurve_style_init_from_rc(GtkStyle *style, GtkRcStyle *rc_style)
+static void
+qtcurve_style_init_from_rc(GtkStyle *style, GtkRcStyle *rc_style)
 {
     parent_class->init_from_rc(style, rc_style);
 }
@@ -2792,15 +2796,15 @@ void qtcurve_style_class_init(QtCurveStyleClass *klass)
 static GtkRcStyleClass *parent_rc_class;
 GType qtcurve_type_rc_style = 0;
 
-static guint
+static unsigned
 qtcurve_rc_style_parse(GtkRcStyle *rc_style, GtkSettings *settings,
                        GScanner *scanner)
 {
     QTC_UNUSED(rc_style);
     QTC_UNUSED(settings);
     static GQuark scope_id = 0;
-    guint old_scope,
-          token;
+    unsigned old_scope;
+    unsigned token;
 
     /* Set up a new scope in this scanner. */
     if(!scope_id)

@@ -27,7 +27,7 @@
 
 static inline void
 qtcConnectToData(GObject *obj, const char *name, const char *sig_name,
-                 GCallback cb, gpointer data)
+                 GCallback cb, void *data)
 {
     g_object_set_data(obj, name, GINT_TO_POINTER(g_signal_connect(obj, sig_name,
                                                                   cb, data)));

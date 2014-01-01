@@ -203,7 +203,7 @@ gboolean eqRect(GdkRectangle *a, GdkRectangle *b);
 void setLowerEtchCol(cairo_t *cr, GtkWidget *widget);
 GdkColor shadeColor(GdkColor *orig, double mod);
 void constrainRect(GdkRectangle *rect, GdkRectangle *con);
-gboolean windowEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data);
+gboolean windowEvent(GtkWidget *widget, GdkEvent *event, void *user_data);
 void adjustToolbarButtons(GtkWidget *widget, int *x, int *y, int *width, int *height, int *round, gboolean horiz);
 void getEntryParentBgCol(GtkWidget *widget, GdkColor *color);
 gboolean compositingActive(GtkWidget *widget);

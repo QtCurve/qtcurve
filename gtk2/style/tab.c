@@ -117,7 +117,7 @@ qtcTabCleanup(GtkWidget *widget)
 }
 
 static gboolean
-qtcTabStyleSet(GtkWidget *widget, GtkStyle *prev_style, gpointer data)
+qtcTabStyleSet(GtkWidget *widget, GtkStyle *prev_style, void *data)
 {
     QTC_UNUSED(prev_style);
     QTC_UNUSED(data);
@@ -126,7 +126,7 @@ qtcTabStyleSet(GtkWidget *widget, GtkStyle *prev_style, gpointer data)
 }
 
 static gboolean
-qtcTabDestroy(GtkWidget *widget, GdkEvent *event, gpointer data)
+qtcTabDestroy(GtkWidget *widget, GdkEvent *event, void *data)
 {
     QTC_UNUSED(event);
     QTC_UNUSED(data);
@@ -152,7 +152,7 @@ static void qtcSetHoveredTab(QtCTab *tab, GtkWidget *widget, int index)
 }
 
 static gboolean
-qtcTabMotion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
+qtcTabMotion(GtkWidget *widget, GdkEventMotion *event, void *data)
 {
     QTC_UNUSED(event);
     QTC_UNUSED(data);
@@ -180,7 +180,7 @@ qtcTabMotion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
 }
 
 static gboolean
-qtcTabLeave(GtkWidget *widget, GdkEventCrossing *event, gpointer data)
+qtcTabLeave(GtkWidget *widget, GdkEventCrossing *event, void *data)
 {
     QTC_UNUSED(event);
     QTC_UNUSED(data);
@@ -212,14 +212,14 @@ qtcTabUnRegisterChild(GtkWidget *widget)
 
 static void qtcTabUpdateChildren(GtkWidget *widget);
 
-static gboolean qtcTabChildMotion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
+static gboolean qtcTabChildMotion(GtkWidget *widget, GdkEventMotion *event, void *user_data)
 {
     qtcTabMotion((GtkWidget*)user_data, event, widget);
     return FALSE;
 }
 
 static gboolean
-qtcTabChildDestroy(GtkWidget *widget, GdkEventCrossing *event, gpointer data)
+qtcTabChildDestroy(GtkWidget *widget, GdkEventCrossing *event, void *data)
 {
     QTC_UNUSED(event);
     QTC_UNUSED(data);
@@ -228,7 +228,7 @@ qtcTabChildDestroy(GtkWidget *widget, GdkEventCrossing *event, gpointer data)
 }
 
 static gboolean
-qtcTabChildStyleSet(GtkWidget *widget, GdkEventCrossing *event, gpointer data)
+qtcTabChildStyleSet(GtkWidget *widget, GdkEventCrossing *event, void *data)
 {
     QTC_UNUSED(event);
     QTC_UNUSED(data);
@@ -237,7 +237,7 @@ qtcTabChildStyleSet(GtkWidget *widget, GdkEventCrossing *event, gpointer data)
 }
 
 static gboolean
-qtcTabChildAdd(GtkWidget *widget, GdkEventCrossing *event, gpointer data)
+qtcTabChildAdd(GtkWidget *widget, GdkEventCrossing *event, void *data)
 {
     QTC_UNUSED(widget);
     QTC_UNUSED(event);
@@ -290,7 +290,7 @@ static void qtcTabUpdateChildren(GtkWidget *widget)
 }
 
 static gboolean
-qtcTabPageAdded(GtkWidget *widget, GdkEventCrossing *event, gpointer data)
+qtcTabPageAdded(GtkWidget *widget, GdkEventCrossing *event, void *data)
 {
     QTC_UNUSED(event);
     QTC_UNUSED(data);
@@ -317,7 +317,7 @@ qtcTabSetup(GtkWidget *widget)
                          qtcTabDestroy, NULL);
         qtcConnectToData(obj, "QTC_TAB_STYLE_SET_ID", "style-set",
                          qtcTabStyleSet, NULL);
-        g_object_set_data(obj, "QTC_TAB_HACK_SET", (gpointer)1);
+        g_object_set_data(obj, "QTC_TAB_HACK_SET", (void*)1);
         qtcTabUpdateChildren(widget);
     }
 }
@@ -339,7 +339,7 @@ GdkRectangle qtcTabGetTabbarRect(GtkNotebook *notebook)
 {
     GdkRectangle  rect, empty;
     GtkAllocation pageAllocation;
-    guint         borderWidth;
+    unsigned int         borderWidth;
     int           pageIndex;
     GtkWidget     *page;
 
