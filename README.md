@@ -116,15 +116,6 @@ recommanded to turn on in distribution packages.
 
     (Default: `Off`)
 
-4. `QTC_GTK2_USE_CAIRO_FOR_ARROWS`:
-
-    Use Cairo, and not Gdk, to draw the non-antialised arrows. It has been
-    reported that for intel Xorg drivers >2.8, that drawing these non-antialised
-    arrows with cairo results in nothing being drawn! As of 0.69.0, the default
-    is to use Gdk.
-
-    (Default: `Off`)
-
 ## Tips for compiling with `clang`/`clang++`
 As of clang version 3.3, `clang++` does not seem to be compatible with the c++
 standard library headers shipped with gcc in c++0x mode. If you have problems

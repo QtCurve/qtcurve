@@ -2736,12 +2736,10 @@ drawPolygon(GdkWindow *window, GtkStyle *style, GdkColor *col,
 {
     g_return_if_fail(GTK_IS_STYLE(style));
     g_return_if_fail(GDK_IS_DRAWABLE(window));
-#if (defined QTC_GTK2_USE_CAIRO_FOR_ARROWS) || GTK_CHECK_VERSION(2, 90, 0)
     cairo_t *cr = gdk_cairo_create(window);
     cairo_set_line_width(cr, 1);
     setCairoClipping(cr, area);
     qtcCairoSetColor(cr, col);
-    cairo_set_antialias(cr, CAIRO_ANTIALIAS_NONE);
     cairo_move_to(cr, points[0].x + 0.5, points[0].y + 0.5);
     for (int i = 1;i < npoints;i++) {
         cairo_line_to(cr, points[i].x + 0.5, points[i].y + 0.5);
@@ -2752,27 +2750,6 @@ drawPolygon(GdkWindow *window, GtkStyle *style, GdkColor *col,
         cairo_fill(cr);
     }
     cairo_destroy(cr);
-#else
-    QtCurveStyle *qtcurveStyle = (QtCurveStyle*)style;
-
-    if (!qtcurveStyle->arrow_gc) {
-        qtcurveStyle->arrow_gc = gdk_gc_new(window);
-        g_object_ref(qtcurveStyle->arrow_gc);
-    }
-
-    gdk_rgb_find_color(style->colormap, col);
-    gdk_gc_set_foreground(qtcurveStyle->arrow_gc, col);
-
-    if (area)
-        gdk_gc_set_clip_rectangle(qtcurveStyle->arrow_gc, area);
-
-    gdk_draw_polygon(window, qtcurveStyle->arrow_gc, FALSE, points, npoints);
-    if (fill)
-        gdk_draw_polygon(window, qtcurveStyle->arrow_gc, TRUE, points, npoints);
-
-    if (area)
-        gdk_gc_set_clip_rectangle(qtcurveStyle->arrow_gc, NULL);
-#endif
 }
 
 void

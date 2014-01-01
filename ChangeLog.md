@@ -23,6 +23,9 @@
 17. Qt: Improve shadow of QBalloonTip
 18. Draw shadow at runtime. Prepare for more advanced shadow feature and
     configuration.
+19. Remove `QTC_GTK2_USE_CAIRO_FOR_ARROWS`. I cannot reproduce any problems
+    on my Intel card. This is also necessary for the Gtk3 port. If it was
+    really a bug of the Intel driver, it should rather be fixed there.
 
 ## 1.8.17
 1. **Add Qt5 support!!**.

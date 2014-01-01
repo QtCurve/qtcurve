@@ -2735,26 +2735,12 @@ styleRealize(GtkStyle *style)
     } else {
         qtcurveStyle->menutext[0] = NULL;
     }
-
-#if !GTK_CHECK_VERSION(2, 90, 0) && !defined QTC_GTK2_USE_CAIRO_FOR_ARROWS
-    qtcurveStyle->arrow_gc = NULL;
-#endif
 }
 
 static void
 styleUnrealize(GtkStyle *style)
 {
-    QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
-
     parent_class->unrealize(style);
-
-#if !GTK_CHECK_VERSION(2, 90, 0) && !defined QTC_GTK2_USE_CAIRO_FOR_ARROWS
-    if(qtcurveStyle->arrow_gc)
-    {
-        g_object_unref(qtcurveStyle->arrow_gc);
-        qtcurveStyle->arrow_gc=NULL;
-    }
-#endif
 }
 
 static void

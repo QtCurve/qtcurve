@@ -34,7 +34,6 @@ option(QTC_QT4_STYLE_SUPPORT
   "Qt4 support for creating a style for each QtCurve theme." Off)
 
 option(QTC_GTK2_MODIFY_MOZILLA "Modify Mozilla Gtk2 with js and css." Off)
-option(QTC_GTK2_USE_CAIRO_FOR_ARROWS "Using ciaro to draw arrows." Off)
 
 ## Common settings.
 # Only try to figure out what kde prefix is if not specified at command line.
@@ -162,10 +161,4 @@ if(ENABLE_GTK2 AND QTC_GTK2_MODIFY_MOZILLA)
     "`~/.mozilla/firefox/xxxxxxx.default/chrome/userChrome.css` or \n"
     "`~/.thunderbird/xxxxxxx.default/chrome/userChrome.css`. \n"
     "where xxxxxxx is a series of random characters.")
-endif()
-
-if(ENABLE_GTK2 AND QTC_GTK2_USE_CAIRO_FOR_ARROWS)
-  message(WARNING
-    "Using cairo to draw arrows - this has been reported to fail with intel "
-    "Xorg driver > 2.8")
 endif()
