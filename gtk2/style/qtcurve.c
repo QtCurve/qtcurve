@@ -23,6 +23,7 @@
 #include "config.h"
 
 #include <qtcurve-utils/color.h>
+#include <qtcurve-utils/strs.h>
 #include <qtcurve-utils/gtkprops.h>
 #include <qtcurve-utils/x11utils.h>
 
@@ -668,7 +669,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
     GdkColor new_cols[TOTAL_SHADES + 1];
     GdkColor *btnColors = qtcPalette.background;
     int bgnd = getFill(state, btnDown);
-    int round = getRound(detail, widget, x, y, width, height, rev);
+    int round = getRound(detail, widget, rev);
     gboolean lvh = (isListViewHeader(widget) ||
                     isEvolutionListViewHeader(widget, detail));
     gboolean sunken = (btnDown || shadow == GTK_SHADOW_IN ||
@@ -1142,7 +1143,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                                     (SHADE_NONE!=opts.comboBtn && GTK_STATE_INSENSITIVE==state))) ||
                             (WIDGET_SB_SLIDER==widgetType && SHADE_DARKEN==opts.shadeSliders) ||
                             (defBtn && IND_DARKEN==opts.defBtnIndicator)
-                                ? getFillReal(state, btnDown, true) : bgnd;
+                                ? getFill(state, btnDown, true) : bgnd;
 
                 drawLightBevel(cr, style, state, area, x, y, width, height, &cols[bg], cols, round, widgetType,
                                 BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER|(horiz ? 0 : DF_VERT), widget);
@@ -1211,7 +1212,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                     GdkRectangle btn;
                     GdkColor     *cols=qtcPalette.combobtn && GTK_STATE_INSENSITIVE!=state ? qtcPalette.combobtn : btnColors;
                     int          bg=SHADE_DARKEN==opts.comboBtn || (GTK_STATE_INSENSITIVE==state && SHADE_NONE!=opts.comboBtn)
-                                        ? getFillReal(state, btnDown, true) : bgnd;
+                                        ? getFill(state, btnDown, true) : bgnd;
 
                     btn.x=cx + (rev ? ind_width + style->xthickness
                                     : (cwidth - ind_width - style->xthickness)+1),
@@ -1273,7 +1274,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                                         ? qtcPalette.combobtn : btnColors;
                         int          bg=SHADE_DARKEN==opts.comboBtn ||
                                             (GTK_STATE_INSENSITIVE==state && SHADE_NONE!=opts.comboBtn)
-                                        ? getFillReal(state, btnDown, true) : bgnd;
+                                        ? getFill(state, btnDown, true) : bgnd;
 
                         btn.x=vx+(rev ? LARGE_ARR_WIDTH+4 : 0),
                         btn.y=y, btn.width=20+3, btn.height=height;

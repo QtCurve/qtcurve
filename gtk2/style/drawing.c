@@ -2152,7 +2152,7 @@ drawTriangularSlider(cairo_t *cr, GtkStyle *style, GtkStateType state,
                                  opts.coloredMouseOver &&
                                  !opts.colorSliderMouseOver);
     gboolean horiz = height > width || DETAIL("hscale");
-    int bgnd = getFillReal(state, FALSE, SHADE_DARKEN == opts.shadeSliders);
+    int bgnd = getFill(state, FALSE, opts.shadeSliders == SHADE_DARKEN);
     int xo = horiz ? 8 : 0;
     int yo = horiz ? 0 : 8;
     int size = 15;

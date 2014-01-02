@@ -183,8 +183,9 @@ void sanitizeSize(GdkWindow *window, int *width, int *height);
 #endif
 EStepper getStepper(GtkWidget *widget, int x, int y, int width, int height);
 
-int getFillReal(GtkStateType state, gboolean set, gboolean darker);
-#define getFill(state, set) getFillReal(state, set, FALSE)
+int getFill(GtkStateType state, gboolean set, gboolean darker);
+#define getFill(state, set, darker...)                  \
+    getFill(state, set, QTC_DEFAULT(darker, FALSE))
 gboolean isSbarDetail(const char *detail);
 gboolean isHorizontalProgressbar(GtkWidget *widget);
 gboolean isComboBoxPopupWindow(GtkWidget *widget, int level);
@@ -210,8 +211,7 @@ void enableBlurBehind(GtkWidget *w, gboolean enable);
 void getTopLevelSize(GdkWindow *window, int *w, int *h);
 void getTopLevelOrigin(GdkWindow *window, int *x, int *y);
 gboolean mapToTopLevel(GdkWindow *window, GtkWidget *widget, int *x, int *y, int *w, int *h); //, gboolean frame)
-int getRound(const char *detail, GtkWidget *widget, int x, int y,
-             int width, int height, gboolean rev);
+int getRound(const char *detail, GtkWidget *widget, gboolean rev);
 
 gboolean treeViewCellHasChildren(GtkTreeView *treeView, GtkTreePath *path);
 gboolean treeViewCellIsLast(GtkTreeView *treeView, GtkTreePath *path);

@@ -24,6 +24,7 @@
 #include <qtcurve-utils/x11blur.h>
 #include <qtcurve-utils/color.h>
 #include <qtcurve-utils/log.h>
+#include <qtcurve-utils/strs.h>
 
 #include "helpers.h"
 #include "qt_settings.h"
@@ -700,7 +701,8 @@ void sanitizeSize(GdkWindow *window, int *width, int *height)
 }
 #endif
 
-int getFillReal(GtkStateType state, gboolean set, gboolean darker)
+int
+getFill(GtkStateType state, gboolean set, gboolean darker)
 {
     if (state == GTK_STATE_INSENSITIVE) {
         return darker ? 2 : ORIGINAL_SHADE;
@@ -724,7 +726,8 @@ isSbarDetail(const char *detail)
                                    qtcStrStartsWith(detail + 1, "scrollbar"));
 }
 
-int getRound(const char *detail, GtkWidget *widget, int x, int y, int width, int height, gboolean rev)
+int
+getRound(const char *detail, GtkWidget *widget, gboolean rev)
 {
     if(detail)
     {
