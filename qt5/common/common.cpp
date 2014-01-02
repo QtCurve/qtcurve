@@ -202,38 +202,36 @@ qtcGetWidgetRound(const Options *opts, int w, int h, EWidget widget)
 {
     ERound r = opts->round;
 
-    if (((WIDGET_PBAR_TROUGH == widget ||
-          WIDGET_PROGRESSBAR == widget) && (opts->square & SQUARE_PROGRESS)) ||
-        (WIDGET_ENTRY == widget && (opts->square & SQUARE_ENTRY)) ||
-        (WIDGET_SCROLLVIEW == widget && (opts->square & SQUARE_SCROLLVIEW))) {
+    if ((qtcOneOf(widget, WIDGET_PBAR_TROUGH, WIDGET_PROGRESSBAR) &&
+         (opts->square & SQUARE_PROGRESS)) ||
+        (widget == WIDGET_ENTRY && (opts->square & SQUARE_ENTRY)) ||
+        (widget == WIDGET_SCROLLVIEW && (opts->square & SQUARE_SCROLLVIEW))) {
         return ROUND_NONE;
     }
 
-    if ((WIDGET_CHECKBOX == widget || WIDGET_FOCUS == widget) &&
-        ROUND_NONE != r) {
+    if (qtcOneOf(widget, WIDGET_CHECKBOX, WIDGET_FOCUS) && r != ROUND_NONE) {
         r = ROUND_SLIGHT;
     }
 
 #ifdef __cplusplus
-    if ((WIDGET_MDI_WINDOW_BUTTON == widget &&
+    if ((widget == WIDGET_MDI_WINDOW_BUTTON &&
          (opts->titlebarButtons & TITLEBAR_BUTTON_ROUND)) ||
-        WIDGET_RADIO_BUTTON == widget || WIDGET_DIAL == widget) {
+        qtcOneOf(widget, WIDGET_RADIO_BUTTON, WIDGET_DIAL)) {
         return ROUND_MAX;
     }
 #endif
 #ifndef __cplusplus
-    if (WIDGET_RADIO_BUTTON == widget) {
+    if (widget == WIDGET_RADIO_BUTTON) {
         return ROUND_MAX;
     }
 #endif
-    if (WIDGET_SLIDER == widget &&
-        (SLIDER_ROUND == opts->sliderStyle || SLIDER_ROUND_ROTATED ==
-         opts->sliderStyle || SLIDER_CIRCULAR == opts->sliderStyle)) {
+    if (qtcOneOf(opts->sliderStyle, SLIDER_ROUND, SLIDER_ROUND_ROTATED,
+                 SLIDER_CIRCULAR) && widget == WIDGET_SLIDER) {
         return ROUND_MAX;
     }
     switch (r) {
     case ROUND_MAX:
-        if (IS_SLIDER(widget) || WIDGET_TROUGH == widget ||
+        if (IS_SLIDER(widget) || widget == WIDGET_TROUGH ||
             (w > (MIN_ROUND_MAX_WIDTH + 2) && h > (MIN_ROUND_MAX_HEIGHT + 2) &&
              IS_MAX_ROUND_WIDGET(widget))) {
             return ROUND_MAX;
@@ -259,41 +257,39 @@ qtcGetRadius(const Options *opts, int w, int h, EWidget widget, ERadius rad)
 {
     ERound r = opts->round;
 
-    if ((WIDGET_CHECKBOX == widget || WIDGET_FOCUS ==
-         widget) && ROUND_NONE != r) {
+    if (qtcOneOf(widget, WIDGET_CHECKBOX, WIDGET_FOCUS) && ROUND_NONE != r) {
         r = ROUND_SLIGHT;
     }
 
-    if (((WIDGET_PBAR_TROUGH == widget ||
-          WIDGET_PROGRESSBAR == widget) && (opts->square & SQUARE_PROGRESS)) ||
-        (WIDGET_ENTRY == widget && (opts->square & SQUARE_ENTRY)) ||
-        (WIDGET_SCROLLVIEW == widget && (opts->square & SQUARE_SCROLLVIEW))) {
+    if ((qtcOneOf(widget, WIDGET_PBAR_TROUGH, WIDGET_PROGRESSBAR) &&
+         (opts->square & SQUARE_PROGRESS)) ||
+        (widget == WIDGET_ENTRY && (opts->square & SQUARE_ENTRY)) ||
+        (widget == WIDGET_SCROLLVIEW && (opts->square & SQUARE_SCROLLVIEW))) {
         return 0.0;
     }
 
 #ifdef __cplusplus
-    if ((WIDGET_MDI_WINDOW_BUTTON == widget &&
+    if ((widget == WIDGET_MDI_WINDOW_BUTTON &&
          (opts->titlebarButtons & TITLEBAR_BUTTON_ROUND)) ||
-        WIDGET_RADIO_BUTTON == widget || WIDGET_DIAL == widget) {
+        qtcOneOf(widget, WIDGET_RADIO_BUTTON, WIDGET_DIAL)) {
         return (w > h ? h : w) / 2.0;
     }
 #endif
 #ifndef __cplusplus
-    if (WIDGET_RADIO_BUTTON == widget) {
+    if (widget == WIDGET_RADIO_BUTTON) {
         return (w > h ? h : w) / 2.0;
     }
 #endif
 
-    if (WIDGET_SLIDER == widget &&
-        (SLIDER_ROUND == opts->sliderStyle || SLIDER_ROUND_ROTATED ==
-         opts->sliderStyle || SLIDER_CIRCULAR == opts->sliderStyle)) {
+    if (qtcOneOf(opts->sliderStyle, SLIDER_ROUND, SLIDER_ROUND_ROTATED,
+                 SLIDER_CIRCULAR) && widget == WIDGET_SLIDER) {
         return (w > h ? h : w) / 2.0;
     }
 
-    if (RADIUS_EXTERNAL == rad && !opts->fillProgress &&
-        (WIDGET_PROGRESSBAR == widget
+    if (rad == RADIUS_EXTERNAL && !opts->fillProgress &&
+        (widget == WIDGET_PROGRESSBAR
 #ifndef __cplusplus
-         || WIDGET_ENTRY_PROGRESSBAR == widget
+         || widget == WIDGET_ENTRY_PROGRESSBAR
 #endif
             )) {
         rad = RADIUS_INTERNAL;
