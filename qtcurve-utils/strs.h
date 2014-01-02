@@ -271,4 +271,15 @@ qtcStrToBool(const char *str, bool def)
     return def;
 }
 
+QTC_ALWAYS_INLINE static inline bool
+qtcStrEndsWith(const char *str, const char *tail)
+{
+    size_t len1 = strlen(str);
+    size_t len2 = strlen(tail);
+    if (len2 > len1) {
+        return false;
+    }
+    return memcmp(str + len1 - len2, tail, len2) == 0;
+}
+
 #endif
