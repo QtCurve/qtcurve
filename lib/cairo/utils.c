@@ -66,3 +66,24 @@ qtcCairoPatternAddColorStop(cairo_pattern_t *pt, double offset,
                                       col->green / 65535.0,
                                       col->blue / 65535.0, a);
 }
+
+QTC_EXPORT void
+qtcRectConstrain(QtcRect *rect, const QtcRect *con)
+{
+    if (rect && con) {
+        if (rect->x < con->x) {
+            rect->width -= con->x - rect->x;
+            rect->x = con->x;
+        }
+        if(rect->y < con->y) {
+            rect->height -= rect->y - con->y;
+            rect->y = con->y;
+        }
+        if ((rect->x + rect->width) > (con->x + con->width)) {
+            rect->width -= (rect->x + rect->width) - (con->x + con->width);
+        }
+        if ((rect->y + rect->height) > (con->y + con->height)) {
+            rect->height -= (rect->y + rect->height) - (con->y + con->height);
+        }
+    }
+}

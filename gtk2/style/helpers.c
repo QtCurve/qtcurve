@@ -942,27 +942,6 @@ shadeColor(GdkColor *orig, double mod)
     return *orig;
 }
 
-void
-constrainRect(QtcRect *rect, QtcRect *con)
-{
-    if (rect && con) {
-        if (rect->x < con->x) {
-            rect->width -= con->x - rect->x;
-            rect->x = con->x;
-        }
-        if(rect->y < con->y) {
-            rect->height -= rect->y - con->y;
-            rect->y = con->y;
-        }
-        if ((rect->x + rect->width) > (con->x + con->width)) {
-            rect->width -= (rect->x + rect->width) - (con->x + con->width);
-        }
-        if ((rect->y + rect->height) > (con->y + con->height)) {
-            rect->height -= (rect->y + rect->height) - (con->y + con->height);
-        }
-    }
-}
-
 gboolean
 windowEvent(GtkWidget *widget, GdkEvent *event, void *user_data)
 {

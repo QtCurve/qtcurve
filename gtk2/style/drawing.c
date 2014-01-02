@@ -1747,7 +1747,7 @@ setProgressStripeClipping(cairo_t *cr, GdkRectangle *area, int x, int y,
     case STRIPE_PLAIN: {
         QtcRect rect = {x, y, width - 2, height - 2};
 #if !GTK_CHECK_VERSION(2, 90, 0)
-        constrainRect(&rect, (QtcRect*)area);
+        qtcRectConstrain(&rect, (QtcRect*)area);
 #endif
         cairo_region_t *region = cairo_region_create_rectangle(&rect);
         if (horiz) {
@@ -1756,7 +1756,7 @@ setProgressStripeClipping(cairo_t *cr, GdkRectangle *area, int x, int y,
                 QtcRect innerRect = {x + stripeOffset + animShift, y + 1,
                                      PROGRESS_CHUNK_WIDTH, height - 2};
 #if !GTK_CHECK_VERSION(2, 90, 0)
-                constrainRect(&innerRect, (QtcRect*)area);
+                qtcRectConstrain(&innerRect, (QtcRect*)area);
 #endif
                 if (innerRect.width > 0 && innerRect.height > 0) {
                     cairo_region_xor_rectangle(region, &innerRect);
@@ -1768,7 +1768,7 @@ setProgressStripeClipping(cairo_t *cr, GdkRectangle *area, int x, int y,
                 QtcRect innerRect = {x + 1, y + stripeOffset + animShift,
                                      width - 2, PROGRESS_CHUNK_WIDTH};
 
-                /*constrainRect(&innerRect, area);*/
+                /* qtcRectConstrain(&innerRect, area); */
                 if (innerRect.width > 0 && innerRect.height > 0) {
                     cairo_region_xor_rectangle(region, &innerRect);
                 }
