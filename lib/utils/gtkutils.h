@@ -29,6 +29,7 @@ static inline cairo_rectangle_int_t
 qtcWidgetGetAllocation(GtkWidget *widget)
 {
     cairo_rectangle_int_t alloc;
+    // Binary compatible
     gtk_widget_get_allocation(widget, (GdkRectangle*)&alloc);
     return alloc;
 }

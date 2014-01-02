@@ -50,6 +50,7 @@ qtcRectEqual(const QtcRect *a, const QtcRect *b)
             a->width == b->width && a->height == b->height);
 }
 void qtcRectConstrain(QtcRect *rect, const QtcRect *con);
+void qtcRectUnion(const QtcRect *src1, const QtcRect *src2, QtcRect *dest);
 
 QTC_END_DECLS
 

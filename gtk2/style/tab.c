@@ -27,7 +27,7 @@
 typedef struct {
     int id;
     int numRects;
-    GdkRectangle *rects;
+    QtcRect *rects;
 } QtCTab;
 
 static GHashTable *qtcTabHashTable = NULL;
@@ -35,71 +35,69 @@ static GHashTable *qtcTabHashTable = NULL;
 static QtCTab*
 qtcTabLookupHash(void *hash, gboolean create)
 {
-    QtCTab *rv = NULL;
-
-    if(!qtcTabHashTable)
-        qtcTabHashTable=g_hash_table_new(g_direct_hash, g_direct_equal);
-
-    rv=(QtCTab *)g_hash_table_lookup(qtcTabHashTable, hash);
-
-    if(!rv && create)
-    {
-        int p;
-
-        rv = qtcNew(QtCTab);
-        rv->numRects = gtk_notebook_get_n_pages(GTK_NOTEBOOK(hash));
-        rv->rects = qtcNew(GdkRectangle, rv->numRects);
-        rv->id = -1;
-
-        for(p=0; p<rv->numRects; ++p)
-        {
-            rv->rects[p].x=rv->rects[p].y=0;
-            rv->rects[p].width=rv->rects[p].height=-1;
-        }
-        g_hash_table_insert(qtcTabHashTable, hash, rv);
-        rv=g_hash_table_lookup(qtcTabHashTable, hash);
+    if (!qtcTabHashTable) {
+        qtcTabHashTable = g_hash_table_new(g_direct_hash, g_direct_equal);
     }
 
+    QtCTab *rv = (QtCTab*)g_hash_table_lookup(qtcTabHashTable, hash);
+    if (!rv && create) {
+        rv = qtcNew(QtCTab);
+        rv->numRects = gtk_notebook_get_n_pages(GTK_NOTEBOOK(hash));
+        rv->id = -1;
+        rv->rects = qtcNew(QtcRect, rv->numRects);
+        for (int p = 0;p < rv->numRects;p++) {
+            rv->rects[p].width = rv->rects[p].height = -1;
+        }
+        g_hash_table_insert(qtcTabHashTable, hash, rv);
+        rv = g_hash_table_lookup(qtcTabHashTable, hash);
+    }
     return rv;
 }
 
-static void qtcTabRemoveHash(void *hash)
+static QtCTab*
+qtcWidgetFindTab(GtkWidget *widget)
+{
+    return GTK_IS_NOTEBOOK(widget) ? qtcTabLookupHash(widget, FALSE) : NULL;
+}
+
+static void
+qtcTabRemoveHash(void *hash)
 {
     if (qtcTabHashTable) {
-        QtCTab *tab = GTK_IS_NOTEBOOK(hash) ? qtcTabLookupHash(hash, FALSE) : NULL;
-
-        if (tab)
+        QtCTab *tab = qtcWidgetFindTab(hash);
+        if (tab) {
             free(tab->rects);
+        }
         g_hash_table_remove(qtcTabHashTable, hash);
     }
 }
 
-gboolean qtcTabCurrentHoveredIndex(GtkWidget *widget)
+gboolean
+qtcTabCurrentHoveredIndex(GtkWidget *widget)
 {
-    QtCTab *tab=GTK_IS_NOTEBOOK(widget) ? qtcTabLookupHash(widget, FALSE) : NULL;
-
+    QtCTab *tab = qtcWidgetFindTab(widget);
     return tab ? tab->id : -1;
 }
 
-void qtcTabUpdateRect(GtkWidget *widget, int tabIndex, int x, int y, int width, int height)
+void
+qtcTabUpdateRect(GtkWidget *widget, int tabIndex, int x, int y,
+                 int width, int height)
 {
-    QtCTab *tab=GTK_IS_NOTEBOOK(widget) ? qtcTabLookupHash(widget, FALSE) : NULL;
+    QtCTab *tab = qtcWidgetFindTab(widget);
 
-    if(tab && tabIndex>=0)
-    {
-        if(tabIndex>=tab->numRects)
-        {
-            int p;
-
-            tab->rects=realloc(tab->rects, sizeof(GdkRectangle)*(tabIndex+8));
-            for(p=tab->numRects; p<tabIndex+8; ++p)
-            {
-                tab->rects[p].x=tab->rects[p].y=0;
-                tab->rects[p].width=tab->rects[p].height=-1;
+    if (tab && tabIndex >= 0) {
+        if (tabIndex >= tab->numRects) {
+            tab->rects = realloc(tab->rects, sizeof(QtcRect) * (tabIndex + 8));
+            for (int p = tab->numRects;p < tabIndex + 8;p++) {
+                tab->rects[p].x = tab->rects[p].y = 0;
+                tab->rects[p].width = tab->rects[p].height = -1;
             }
-            tab->numRects=tabIndex+8;
+            tab->numRects = tabIndex + 8;
         }
-        tab->rects[tabIndex].x=x, tab->rects[tabIndex].y=y, tab->rects[tabIndex].width=width, tab->rects[tabIndex].height=height;
+        tab->rects[tabIndex].x = x;
+        tab->rects[tabIndex].y = y;
+        tab->rects[tabIndex].width = width;
+        tab->rects[tabIndex].height = height;
     }
 }
 
@@ -137,20 +135,17 @@ qtcTabDestroy(GtkWidget *widget, GdkEvent *event, void *data)
     return FALSE;
 }
 
-static void qtcSetHoveredTab(QtCTab *tab, GtkWidget *widget, int index)
+static void
+qtcSetHoveredTab(QtCTab *tab, GtkWidget *widget, int index)
 {
-    if (index!=tab->id) {
-        GdkRectangle updateRect;
-        int          p;
-        updateRect.x=updateRect.y=0;
-        updateRect.width=updateRect.height=-1;
-
-        tab->id=index;
-
-        for(p=0; p<tab->numRects; ++p)
-            gdk_rectangle_union(&(tab->rects[p]), &updateRect, &updateRect);
-
-        gtk_widget_queue_draw_area(widget, updateRect.x-4, updateRect.y-4, updateRect.width+8, updateRect.height+8);
+    if (tab->id != index) {
+        QtcRect updateRect = {0, 0, -1, -1};
+        tab->id = index;
+        for (int p = 0;p < tab->numRects;p++) {
+            qtcRectUnion(&tab->rects[p], &updateRect, &updateRect);
+        }
+        gtk_widget_queue_draw_area(widget, updateRect.x - 4, updateRect.y - 4,
+                                   updateRect.width + 8, updateRect.height + 8);
     }
 }
 
@@ -159,26 +154,22 @@ qtcTabMotion(GtkWidget *widget, GdkEventMotion *event, void *data)
 {
     QTC_UNUSED(event);
     QTC_UNUSED(data);
-    QtCTab *tab =
-        GTK_IS_NOTEBOOK(widget) ? qtcTabLookupHash(widget, FALSE) : NULL;
-
-    if(tab)
-    {
-        int px, py, t;
+    QtCTab *tab = qtcWidgetFindTab(widget);
+    if (tab) {
+        int px;
+        int py;
         gdk_window_get_pointer(gtk_widget_get_window(widget), &px, &py, NULL);
 
-        for(t=0; t < tab->numRects; t++)
-        {
-            if(tab->rects[t].x<=px && tab->rects[t].y<=py &&(tab->rects[t].x+tab->rects[t].width)>px &&(tab->rects[t].y+tab->rects[t].height)>py)
-            {
+        for (int t = 0;t < tab->numRects;t++) {
+            if (tab->rects[t].x <= px && tab->rects[t].y <= py &&
+                tab->rects[t].x + tab->rects[t].width > px &&
+                tab->rects[t].y + tab->rects[t].height > py) {
                 qtcSetHoveredTab(tab, widget, t);
                 return FALSE;
             }
         }
-
         qtcSetHoveredTab(tab, widget, -1);
     }
-
     return FALSE;
 }
 
@@ -187,8 +178,7 @@ qtcTabLeave(GtkWidget *widget, GdkEventCrossing *event, void *data)
 {
     QTC_UNUSED(event);
     QTC_UNUSED(data);
-    QtCTab *prevTab =
-        GTK_IS_NOTEBOOK(widget) ? qtcTabLookupHash(widget, FALSE) : NULL;
+    QtCTab *prevTab = qtcWidgetFindTab(widget);
 
     if (prevTab && prevTab->id >= 0) {
         prevTab->id = -1;
@@ -355,14 +345,15 @@ QtcRect qtcTabGetTabbarRect(GtkNotebook *notebook)
 
     rect.x += borderWidth;
     rect.y += borderWidth;
-    rect.height -= 2*borderWidth;
-    rect.width -= 2*borderWidth;
+    rect.height -= 2 * borderWidth;
+    rect.width -= 2 * borderWidth;
 
     // get current page
     pageIndex = gtk_notebook_get_current_page(notebook);
 
-    if (!(pageIndex >= 0 && pageIndex < gtk_notebook_get_n_pages(notebook)))
+    if (!(pageIndex >= 0 && pageIndex < gtk_notebook_get_n_pages(notebook))) {
         return empty;
+    }
     page = gtk_notebook_get_nth_page(notebook, pageIndex);
     if (!page) {
         return empty;
@@ -389,7 +380,8 @@ QtcRect qtcTabGetTabbarRect(GtkNotebook *notebook)
     return rect;
 }
 
-gboolean qtcTabHasVisibleArrows(GtkNotebook *notebook)
+gboolean
+qtcTabHasVisibleArrows(GtkNotebook *notebook)
 {
     if (gtk_notebook_get_show_tabs(notebook)) {
         int numPages = gtk_notebook_get_n_pages(notebook);

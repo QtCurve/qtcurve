@@ -114,63 +114,76 @@ static gboolean qtcTreeViewSamePath(GtkTreePath *a, GtkTreePath *b)
     return a ? (b && !gtk_tree_path_compare(a, b)) : !b;
 }
 
-static void qtcTreeViewUpdatePosition(GtkWidget *widget, int x, int y)
+static void
+qtcTreeViewUpdatePosition(GtkWidget *widget, int x, int y)
 {
-    if(GTK_IS_TREE_VIEW(widget))
-    {
-        QtCTreeView *tv=qtcTreeViewLookupHash(widget, FALSE);
-        if(tv)
-        {
-            GtkTreeView       *treeView=GTK_TREE_VIEW(widget);
-            GtkTreePath       *path=NULL;
-            GtkTreeViewColumn *column=NULL;
+    if (GTK_IS_TREE_VIEW(widget)) {
+        QtCTreeView *tv = qtcTreeViewLookupHash(widget, FALSE);
+        if (tv) {
+            GtkTreeView *treeView = GTK_TREE_VIEW(widget);
+            GtkTreePath *path = NULL;
+            GtkTreeViewColumn *column = NULL;
 
-            gtk_tree_view_get_path_at_pos(treeView, x, y, &path, &column, 0L, 0L);
+            gtk_tree_view_get_path_at_pos(treeView, x, y, &path,
+                                          &column, 0L, 0L);
 
-            if(!qtcTreeViewSamePath(tv->path, path))
-            {
+            if (!qtcTreeViewSamePath(tv->path, path)) {
                 // prepare update area
                 // get old rectangle
-                GdkRectangle  oldRect={0, 0, -1, -1 },
-                              newRect={0, 0, -1, -1 },
-                              updateRect;
-                QtcRect alloc=qtcWidgetGetAllocation(widget);
+                QtcRect oldRect = {0, 0, -1, -1 };
+                QtcRect newRect = {0, 0, -1, -1 };
+                QtcRect updateRect;
+                QtcRect alloc = qtcWidgetGetAllocation(widget);
 
-                if(tv->path && tv->column)
-                    gtk_tree_view_get_background_area(treeView, tv->path, tv->column, &oldRect);
-                if(tv->fullWidth)
-                    oldRect.x = 0, oldRect.width = alloc.width;
+                if (tv->path && tv->column) {
+                    gtk_tree_view_get_background_area(
+                        treeView, tv->path, tv->column,
+                        (GdkRectangle*)&oldRect);
+                }
+                if (tv->fullWidth) {
+                    oldRect.x = 0;
+                    oldRect.width = alloc.width;
+                }
 
                 // get new rectangle and update position
-                if(path && column)
-                    gtk_tree_view_get_background_area(treeView, path, column, &newRect);
-                if(path && column && tv->fullWidth)
-                    newRect.x = 0, newRect.width = alloc.width;
+                if (path && column) {
+                    gtk_tree_view_get_background_area(
+                        treeView, path, column, (GdkRectangle*)&newRect);
+                }
+                if (path && column && tv->fullWidth) {
+                    newRect.x = 0;
+                    newRect.width = alloc.width;
+                }
 
                 // take the union of both rectangles
-                if(oldRect.width > 0 && oldRect.height > 0)
-                {
-                    if(newRect.width > 0 && newRect.height > 0)
-                        gdk_rectangle_union(&oldRect, &newRect, &updateRect);
-                    else
+                if (oldRect.width > 0 && oldRect.height > 0) {
+                    if (newRect.width > 0 && newRect.height > 0) {
+                        qtcRectUnion(&oldRect, &newRect, &updateRect);
+                    } else {
                         updateRect = oldRect;
-                }
-                else
+                    }
+                } else {
                     updateRect = newRect;
+                }
 
                 // store new cell info
-                if(tv->path)
+                if (tv->path)
                     gtk_tree_path_free(tv->path);
-                tv->path=path ? gtk_tree_path_copy(path) : NULL;
-                tv->column=column;
+                tv->path = path ? gtk_tree_path_copy(path) : NULL;
+                tv->column = column;
 
                 // convert to widget coordinates and schedule redraw
-                gtk_tree_view_convert_bin_window_to_widget_coords(treeView, updateRect.x, updateRect.y, &updateRect.x, &updateRect.y);
-                gtk_widget_queue_draw_area(widget, updateRect.x, updateRect.y, updateRect.width, updateRect.height);
+                gtk_tree_view_convert_bin_window_to_widget_coords(
+                    treeView, updateRect.x, updateRect.y,
+                    &updateRect.x, &updateRect.y);
+                gtk_widget_queue_draw_area(
+                    widget, updateRect.x, updateRect.y,
+                    updateRect.width, updateRect.height);
             }
 
-            if(path)
+            if (path) {
                 gtk_tree_path_free(path);
+            }
         }
     }
 }

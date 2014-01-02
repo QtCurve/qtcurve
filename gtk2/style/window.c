@@ -175,9 +175,7 @@ qtcWindowSizeRequest(GtkWidget *widget)
     if (widget && (!(qtcIsFlatBgnd(opts.bgndAppearance)) ||
                    IMG_NONE != opts.bgndImage.type)) {
         QtcRect alloc = qtcWidgetGetAllocation(widget);
-        GdkRectangle rect;
-        rect.x = 0;
-        rect.y = 0;
+        QtcRect rect = {0, 0, 0, 0};
         if (qtcIsFlat(opts.bgndAppearance) &&
             IMG_NONE != opts.bgndImage.type) {
             EPixPos pos = (IMG_FILE == opts.bgndImage.type ?
@@ -219,7 +217,8 @@ qtcWindowSizeRequest(GtkWidget *widget)
         } else {
             rect.width = alloc.width, rect.height = alloc.height;
         }
-        gdk_window_invalidate_rect(gtk_widget_get_window(widget), &rect, FALSE);
+        gdk_window_invalidate_rect(gtk_widget_get_window(widget),
+                                   (GdkRectangle*)&rect, FALSE);
     }
     return FALSE;
 }

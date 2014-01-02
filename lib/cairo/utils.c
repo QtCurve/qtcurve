@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #include "utils_p.h"
+#include <qtcurve-utils/number.h>
 
 QTC_EXPORT void
 qtcCairoRegion(cairo_t *cr, const cairo_region_t *region)
@@ -86,4 +87,19 @@ qtcRectConstrain(QtcRect *rect, const QtcRect *con)
             rect->height -= (rect->y + rect->height) - (con->y + con->height);
         }
     }
+}
+
+QTC_EXPORT void
+qtcRectUnion(const QtcRect *src1, const QtcRect *src2, QtcRect *dest)
+{
+    int dest_x;
+    int dest_y;
+    dest_x = qtcMin(src1->x, src2->x);
+    dest_y = qtcMin(src1->y, src2->y);
+    dest->width = qtcMax(src1->x + src1->width,
+                         src2->x + src2->width) - dest_x;
+    dest->height = qtcMax(src1->y + src1->height,
+                          src2->y + src2->height) - dest_y;
+    dest->x = dest_x;
+    dest->y = dest_y;
 }
