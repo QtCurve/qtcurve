@@ -268,7 +268,7 @@ void
 plotPoints(cairo_t *cr, GdkPoint *pts, int count)
 {
     cairo_move_to(cr, pts[0].x + 0.5, pts[0].y + 0.5);
-    for (int i = 1;i < count;++i) {
+    for (int i = 1;i < count;i++) {
         cairo_line_to(cr, pts[i].x + 0.5, pts[i].y + 0.5);
     }
 }
@@ -2733,10 +2733,7 @@ drawPolygon(GdkWindow *window, GtkStyle *style, GdkColor *col,
     cairo_set_line_width(cr, 1);
     setCairoClipping(cr, area);
     qtcCairoSetColor(cr, col);
-    cairo_move_to(cr, points[0].x + 0.5, points[0].y + 0.5);
-    for (int i = 1;i < npoints;i++) {
-        cairo_line_to(cr, points[i].x + 0.5, points[i].y + 0.5);
-    }
+    plotPoints(cr, points, npoints);
     cairo_close_path(cr);
     cairo_stroke_preserve(cr);
     if (fill) {
