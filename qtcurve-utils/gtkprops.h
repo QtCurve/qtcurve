@@ -135,7 +135,6 @@ _qtcWidgetPropName()
 QTC_ALWAYS_INLINE static inline _QtcGtkWidgetProps*
 qtcWidgetPropsNew(GtkWidget *w)
 {
-    QTC_UNUSED(w);
     _QtcGtkWidgetProps *props = qtcNew(_QtcGtkWidgetProps);
     props->w = w;
     return props;
