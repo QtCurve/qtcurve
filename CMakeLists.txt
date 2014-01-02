@@ -9,6 +9,8 @@ cmake_minimum_required(VERSION 2.8)
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}"
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+include(CMakeCMacros)
+
 ## Version
 set(QTCURVE_VERSION_MAJOR "1")
 set(QTCURVE_VERSION_MINOR "8")
@@ -123,12 +125,10 @@ configure_file(config.h.in config.h @ONLY)
 include_directories(
   "${CMAKE_CURRENT_SOURCE_DIR}"
   "${CMAKE_CURRENT_BINARY_DIR}")
-set(CMAKE_C_FLAGS "-Wall -Wextra ${CMAKE_C_FLAGS} -std=gnu99")
-set(CMAKE_CXX_FLAGS "-Wall -Wextra ${CMAKE_CXX_FLAGS} -std=c++0x")
-set(CMAKE_SHARED_LINKER_FLAGS
-  "-Wl,--as-needed -Wl,--no-undefined ${CMAKE_SHARED_LINKER_FLAGS}")
-set(CMAKE_MODULE_LINKER_FLAGS
-  "-Wl,--as-needed -Wl,--no-undefined ${CMAKE_MODULE_LINKER_FLAGS}")
+cmake_c_add_flags(CMAKE_C_FLAGS -Wall -Wextra -std=gnu99)
+cmake_c_add_flags(CMAKE_CXX_FLAGS -Wall -Wextra -std=c++0x)
+cmake_c_add_flags(CMAKE_SHARED_LINKER_FLAGS -Wl,--as-needed -Wl,--no-undefined)
+cmake_c_add_flags(CMAKE_MODULE_LINKER_FLAGS -Wl,--as-needed -Wl,--no-undefined)
 add_definitions("-D_GNU_SOURCE -pthread")
 
 if(NOT DEFINED LIB_INSTALL_DIR)

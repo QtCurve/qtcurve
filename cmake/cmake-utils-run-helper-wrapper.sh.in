@@ -1,0 +1,6 @@
+#!/bin/sh
+
+export __CMAKE_HELPER_UTILS_CACHE=@cmake_helper_utils_cache_quoted@
+export __CMAKE_HELPER_SCRIPT_DIR=@cmake_helper_script_dir_quoted@
+export CMAKE_GENERAL_BASE=@base_dir_quoted@
+exec "${__CMAKE_HELPER_SCRIPT_DIR}/cmake-utils-run-helper.sh" "$@"
