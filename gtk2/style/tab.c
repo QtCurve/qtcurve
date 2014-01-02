@@ -22,6 +22,8 @@
 
 #include <qtcurve-utils/gtkprops.h>
 
+#include "tab.h"
+
 typedef struct {
     int id;
     int numRects;
@@ -332,27 +334,24 @@ gboolean qtcTabIsLabel(GtkNotebook *notebook, GtkWidget *widget)
     return FALSE;
 }
 
-GdkRectangle qtcTabGetTabbarRect(GtkNotebook *notebook)
+QtcRect qtcTabGetTabbarRect(GtkNotebook *notebook)
 {
-    GdkRectangle  rect, empty;
-    GtkAllocation pageAllocation;
-    unsigned int         borderWidth;
-    int           pageIndex;
-    GtkWidget     *page;
-
-    rect.x=rect.y=0;
-    rect.width=rect.height=-1;
-    empty=rect;
-
+    QtcRect rect = {0, 0, -1, -1};
+    QtcRect empty = rect;
+    QtcRect pageAllocation;
+    unsigned int borderWidth;
+    int pageIndex;
+    GtkWidget *page;
     // check tab visibility
-    if(!(gtk_notebook_get_show_tabs(notebook) && gtk_container_get_children(GTK_CONTAINER(notebook))))
+    if (!(gtk_notebook_get_show_tabs(notebook) &&
+          gtk_container_get_children(GTK_CONTAINER(notebook)))) {
         return empty;
-
+    }
     // get full rect
-    rect=qtcWidgetGetAllocation(GTK_WIDGET(notebook));
+    rect = qtcWidgetGetAllocation(GTK_WIDGET(notebook));
 
     // adjust to account for borderwidth
-    borderWidth=gtk_container_get_border_width(GTK_CONTAINER(notebook));
+    borderWidth = gtk_container_get_border_width(GTK_CONTAINER(notebook));
 
     rect.x += borderWidth;
     rect.y += borderWidth;
@@ -360,33 +359,33 @@ GdkRectangle qtcTabGetTabbarRect(GtkNotebook *notebook)
     rect.width -= 2*borderWidth;
 
     // get current page
-    pageIndex=gtk_notebook_get_current_page(notebook);
+    pageIndex = gtk_notebook_get_current_page(notebook);
 
-    if(!(pageIndex >= 0 && pageIndex < gtk_notebook_get_n_pages(notebook)))
+    if (!(pageIndex >= 0 && pageIndex < gtk_notebook_get_n_pages(notebook)))
         return empty;
-    page=gtk_notebook_get_nth_page(notebook, pageIndex);
-    if(!page)
+    page = gtk_notebook_get_nth_page(notebook, pageIndex);
+    if (!page) {
         return empty;
+    }
 
     // removes page allocated size from rect, based on tabwidget orientation
     pageAllocation = qtcWidgetGetAllocation(page);
     switch (gtk_notebook_get_tab_pos(notebook)) {
-        case GTK_POS_BOTTOM:
-            rect.y += pageAllocation.height;
-            rect.height -= pageAllocation.height;
-            break;
-        case GTK_POS_TOP:
-            rect.height -= pageAllocation.height;
-            break;
-        case GTK_POS_RIGHT:
-            rect.x += pageAllocation.width;
-            rect.width -= pageAllocation.width;
-            break;
-        case GTK_POS_LEFT:
-            rect.width -= pageAllocation.width;
-            break;
+    case GTK_POS_BOTTOM:
+        rect.y += pageAllocation.height;
+        rect.height -= pageAllocation.height;
+        break;
+    case GTK_POS_TOP:
+        rect.height -= pageAllocation.height;
+        break;
+    case GTK_POS_RIGHT:
+        rect.x += pageAllocation.width;
+        rect.width -= pageAllocation.width;
+        break;
+    case GTK_POS_LEFT:
+        rect.width -= pageAllocation.width;
+        break;
     }
-
     return rect;
 }
 

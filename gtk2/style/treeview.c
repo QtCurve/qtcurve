@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #include <qtcurve-utils/gtkprops.h>
+#include <qtcurve-cairo/utils.h>
 
 typedef struct {
     GtkTreePath       *path;
@@ -133,7 +134,7 @@ static void qtcTreeViewUpdatePosition(GtkWidget *widget, int x, int y)
                 GdkRectangle  oldRect={0, 0, -1, -1 },
                               newRect={0, 0, -1, -1 },
                               updateRect;
-                GtkAllocation alloc=qtcWidgetGetAllocation(widget);
+                QtcRect alloc=qtcWidgetGetAllocation(widget);
 
                 if(tv->path && tv->column)
                     gtk_tree_view_get_background_area(treeView, tv->path, tv->column, &oldRect);
@@ -202,7 +203,7 @@ qtcTreeViewLeave(GtkWidget *widget, GdkEventMotion *event, void *data)
         {
             GtkTreeView   *treeView=GTK_TREE_VIEW(widget);
             GdkRectangle  rect={0, 0, -1, -1 };
-            GtkAllocation alloc = qtcWidgetGetAllocation(widget);
+            QtcRect alloc = qtcWidgetGetAllocation(widget);
 
             if(tv->path && tv->column)
                 gtk_tree_view_get_background_area(treeView, tv->path, tv->column, &rect);

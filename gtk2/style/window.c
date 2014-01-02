@@ -23,6 +23,7 @@
 #include <qtcurve-utils/x11qtc.h>
 #include <qtcurve-utils/gtkprops.h>
 #include <qtcurve-utils/log.h>
+#include <qtcurve-cairo/utils.h>
 
 #include <gdk/gdkkeysyms.h>
 #include <gdk/gdkx.h>
@@ -173,7 +174,7 @@ qtcWindowSizeRequest(GtkWidget *widget)
 {
     if (widget && (!(qtcIsFlatBgnd(opts.bgndAppearance)) ||
                    IMG_NONE != opts.bgndImage.type)) {
-        GtkAllocation alloc = qtcWidgetGetAllocation(widget);
+        QtcRect alloc = qtcWidgetGetAllocation(widget);
         GdkRectangle rect;
         rect.x = 0;
         rect.y = 0;
@@ -519,7 +520,7 @@ qtcWindowSetup(GtkWidget *widget, int opacity)
             opts.bgndImage.type != IMG_NONE) {
             QtCWindow *window = qtcWindowLookupHash(widget, TRUE);
             if (window) {
-                GtkAllocation alloc = qtcWidgetGetAllocation(widget);
+                QtcRect alloc = qtcWidgetGetAllocation(widget);
                 qtcConnectToProp(props, windowConfigure, "configure-event",
                                  qtcWindowConfigure, window);
                 window->width = alloc.width;

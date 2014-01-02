@@ -23,7 +23,6 @@
 #include <qtcurve-utils/gtkprops.h>
 #include <qtcurve-utils/color.h>
 #include <qtcurve-utils/log.h>
-#include <qtcurve-cairo/utils.h>
 
 #include "drawing.h"
 #include "qt_settings.h"
@@ -3990,10 +3989,9 @@ drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
                 *tab_label=gtk_notebook_get_tab_label(notebook, page);
             int       diff=-1;
 
-            if(tab_label)
-            {
-                GtkAllocation alloc=qtcWidgetGetAllocation(tab_label);
-                diff=(vertical ? alloc.y-y : alloc.x-x);
+            if (tab_label) {
+                QtcRect alloc = qtcWidgetGetAllocation(tab_label);
+                diff = vertical ? alloc.y - y : alloc.x - x;
             }
 
             if ((diff > 0) && (diff < sdiff))

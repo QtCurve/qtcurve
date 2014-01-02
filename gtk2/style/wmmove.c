@@ -116,7 +116,7 @@ static gboolean qtcWMMoveWithinWidget(GtkWidget *widget, GdkEventButton *event)
 
     if(window)
     {
-        GtkAllocation allocation;
+        QtcRect allocation;
         int           wx=0, wy=0, nx=0, ny=0;
 
         // translate widget position to topLevel
@@ -129,15 +129,12 @@ static gboolean qtcWMMoveWithinWidget(GtkWidget *widget, GdkEventButton *event)
 
         // get widget size.
         // for notebooks, only consider the tabbar rect
-        if(GTK_IS_NOTEBOOK(widget))
-        {
-            GtkAllocation widgetAlloc=qtcWidgetGetAllocation(widget);
-            allocation=qtcTabGetTabbarRect(GTK_NOTEBOOK(widget));
+        if (GTK_IS_NOTEBOOK(widget)) {
+            QtcRect widgetAlloc = qtcWidgetGetAllocation(widget);
+            allocation = qtcTabGetTabbarRect(GTK_NOTEBOOK(widget));
             allocation.x += wx - widgetAlloc.x;
             allocation.y += wy - widgetAlloc.y;
-        }
-        else
-        {
+        } else {
             allocation = qtcWidgetGetAllocation(widget);
             allocation.x = wx;
             allocation.y = wy;

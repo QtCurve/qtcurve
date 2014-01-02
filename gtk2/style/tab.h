@@ -23,11 +23,13 @@
 #ifndef __QTC_TAB_H__
 #define __QTC_TAB_H__
 
+#include <qtcurve-cairo/utils.h>
+
 gboolean qtcTabCurrentHoveredIndex(GtkWidget *widget);
 void qtcTabSetup(GtkWidget *widget);
 void qtcTabUpdateRect(GtkWidget *widget, int tabIndex, int x, int y, int width, int height);
 gboolean qtcTabIsLabel(GtkNotebook *notebook, GtkWidget *widget);
-GdkRectangle qtcTabGetTabbarRect(GtkNotebook *notebook);
+QtcRect qtcTabGetTabbarRect(GtkNotebook *notebook);
 gboolean qtcTabHasVisibleArrows(GtkNotebook *notebook);
 
 #endif

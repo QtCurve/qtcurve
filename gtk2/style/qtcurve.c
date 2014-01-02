@@ -168,7 +168,7 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
                 bool hiddenMenubar =
                     (opts.menubarHiding ?
                      qtcMenuBarHidden(qtSettings.appName) : FALSE);
-                GtkAllocation alloc = qtcWidgetGetAllocation(menuBar);
+                QtcRect alloc = qtcWidgetGetAllocation(menuBar);
 
                 if (hiddenMenubar)
                     gtk_widget_hide(menuBar);
@@ -961,7 +961,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 widget && !isFixedWidget(widget) && /* Don't do for Firefox, etc. */
                 WIDGET_SB_SLIDER==widgetType && GTK_STATE_INSENSITIVE!=state && GTK_IS_RANGE(widget))
             {
-                GtkAllocation alloc = qtcWidgetGetAllocation(widget);
+                QtcRect alloc = qtcWidgetGetAllocation(widget);
                 gboolean horizontal = !qtcWidgetIsHorizontal(widget);
                 int sbarTroughLen = (horizontal ? alloc.height : alloc.width) -
                     ((qtcRangeHasStepperA(widget) ? opts.sliderWidth : 0) +
@@ -1578,8 +1578,8 @@ gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
 #if GTK_CHECK_VERSION(2, 16, 0)
 #if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
-            if(isSpin && widget && width==qtcWidgetGetAllocation(widget).width)
-            {
+            if (isSpin && widget &&
+                width == qtcWidgetGetAllocation(widget).width) {
                 int btnWidth, dummy;
                 gdk_drawable_get_size(GTK_SPIN_BUTTON(widget)->panel, &btnWidth, &dummy);
                 width-=btnWidth;
@@ -1684,11 +1684,10 @@ gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 gboolean  doBorder=!viewport && !drawSquare,
                           windowFrame=parent && !isFixedWidget(widget) && GTK_IS_FRAME(widget) && GTK_IS_WINDOW(parent);
 
-                if(windowFrame)
-                {
-                    GtkAllocation wAlloc=qtcWidgetGetAllocation(widget),
-                                  pAlloc=qtcWidgetGetAllocation(parent);
-                    windowFrame=eqRect(&wAlloc, &pAlloc);
+                if (windowFrame) {
+                    QtcRect wAlloc = qtcWidgetGetAllocation(widget);
+                    QtcRect pAlloc = qtcWidgetGetAllocation(parent);
+                    windowFrame = qtcRectEqual(&wAlloc, &pAlloc);
                 }
 
 //                 if(!drawSquare && widget && gtk_widget_get_parent(widget) && !isFixedWidget(widget) &&
@@ -2442,7 +2441,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
     {
         if((!opts.comboSplitter || FULL_FOCUS) && widget)
         {
-            GtkAllocation alloc=qtcWidgetGetAllocation(widget);
+            QtcRect alloc=qtcWidgetGetAllocation(widget);
 
             if(alloc.width>width)
                 width=alloc.width-(doEtch ? 8 : 4);

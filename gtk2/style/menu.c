@@ -22,6 +22,7 @@
 
 #include <qtcurve-utils/gtkprops.h>
 #include <qtcurve-utils/x11qtc.h>
+#include <qtcurve-cairo/utils.h>
 
 #include <gdk/gdkx.h>
 #include <common/common.h>
@@ -105,7 +106,7 @@ qtcMenuShellButtonPress(GtkWidget *widget, GdkEventButton *event, void *data)
 
             while (child && !rv) {
                 GtkWidget *item = child->data;
-                GtkAllocation alloc = qtcWidgetGetAllocation(item);
+                QtcRect alloc = qtcWidgetGetAllocation(item);
 
                 int cx = alloc.x + nx;
                 int cy = alloc.y + ny;
@@ -196,7 +197,7 @@ qtcMenuShellMotion(GtkWidget *widget, GdkEventMotion *event, void *data)
                 if ((child->data) && GTK_IS_WIDGET(child->data) &&
                     (gtk_widget_get_state(GTK_WIDGET(child->data)) !=
                      GTK_STATE_INSENSITIVE)) {
-                    GtkAllocation alloc =
+                    QtcRect alloc =
                         qtcWidgetGetAllocation(GTK_WIDGET(child->data));
 
                     if ((pointer_x >= alloc.x) && (pointer_y >= alloc.y) &&

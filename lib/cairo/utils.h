@@ -43,6 +43,13 @@ void qtcCairoPatternAddColorStop(cairo_pattern_t *pt, double offset,
 #define qtcCairoPatternAddColorStop(pt, offset, col, a...)              \
     qtcCairoPatternAddColorStop(pt, offset, col, QTC_DEFAULT(a, 1))
 
+QTC_ALWAYS_INLINE static inline bool
+qtcRectEqual(const QtcRect *a, const QtcRect *b)
+{
+    return (a->x == b->x && a->y == b->y &&
+            a->width == b->width && a->height == b->height);
+}
+
 QTC_END_DECLS
 
 #endif

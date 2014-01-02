@@ -25,11 +25,11 @@
 #include "utils.h"
 #include <gtk/gtk.h>
 
-static inline GtkAllocation
+static inline cairo_rectangle_int_t
 qtcWidgetGetAllocation(GtkWidget *widget)
 {
-    GtkAllocation alloc;
-    gtk_widget_get_allocation(widget, &alloc);
+    cairo_rectangle_int_t alloc;
+    gtk_widget_get_allocation(widget, (GdkRectangle*)&alloc);
     return alloc;
 }
 

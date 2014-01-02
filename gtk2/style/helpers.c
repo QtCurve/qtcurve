@@ -25,7 +25,6 @@
 #include <qtcurve-utils/color.h>
 #include <qtcurve-utils/log.h>
 #include <qtcurve-utils/strs.h>
-#include <qtcurve-cairo/utils.h>
 
 #include "helpers.h"
 #include "qt_settings.h"
@@ -622,7 +621,7 @@ getStepper(GtkWidget *widget, int x, int y, int width, int height)
         GdkRectangle check_rectangle;
         GdkRectangle stepper;
         GtkOrientation orientation = qtcWidgetGetOrientation(widget);
-        GtkAllocation alloc = qtcWidgetGetAllocation(widget);
+        QtcRect alloc = qtcWidgetGetAllocation(widget);
 
         stepper.x = x;
         stepper.y = y;
@@ -910,11 +909,6 @@ getOpacity(GtkWidget *widget)
         }
     }
     return 100;
-}
-
-gboolean eqRect(GdkRectangle *a, GdkRectangle *b)
-{
-    return a->x == b->x && a->y == b->y && a->width == b->width && a->height == b->height;
 }
 
 void setLowerEtchCol(cairo_t *cr, GtkWidget *widget)

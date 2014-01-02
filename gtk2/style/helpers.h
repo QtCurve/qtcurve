@@ -179,7 +179,6 @@ gboolean isGimpDockable(GtkWidget *widget);
 #define isMozillaWidget(widget) (isMozilla() && isFixedWidget(widget))
 GdkColor * getParentBgCol(GtkWidget *widget);
 int getOpacity(GtkWidget *widget);
-gboolean eqRect(GdkRectangle *a, GdkRectangle *b);
 void setLowerEtchCol(cairo_t *cr, GtkWidget *widget);
 GdkColor shadeColor(GdkColor *orig, double mod);
 void constrainRect(QtcRect *rect, QtcRect *con);

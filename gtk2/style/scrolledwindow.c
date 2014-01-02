@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #include <qtcurve-utils/gtkprops.h>
+#include <qtcurve-cairo/utils.h>
 #include <common/common.h>
 
 extern Options opts;
@@ -148,7 +149,7 @@ qtcScrolledWindowSetupConnections(GtkWidget *widget, GtkWidget *parent)
                          qtcScrolledWindowFocusOut, parent);
         if (parent && ENTRY_MO) {
             int x, y;
-            GtkAllocation alloc = qtcWidgetGetAllocation(parent);
+            QtcRect alloc = qtcWidgetGetAllocation(parent);
 
             gdk_window_get_pointer(gtk_widget_get_window(parent), &x, &y, 0L);
             if (x >= 0 && x <alloc.width && y >= 0 && y < alloc.height) {
