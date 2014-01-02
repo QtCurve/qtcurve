@@ -20,7 +20,7 @@
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
 
-#include <qtcurve-utils/gtkutils.h>
+#include <qtcurve-utils/gtkprops.h>
 
 static GtkWidget *qtcEntryLastMo = NULL;
 
@@ -37,13 +37,13 @@ qtcEntryCleanup(GtkWidget *widget)
         qtcEntryLastMo = NULL;
     }
     if (GTK_IS_ENTRY(widget)) {
-        GObject *obj = G_OBJECT(widget);
-        qtcDisconnectFromData(obj, "QTC_ENTRY_ENTER_ID");
-        qtcDisconnectFromData(obj, "QTC_ENTRY_LEAVE_ID");
-        qtcDisconnectFromData(obj, "QTC_ENTRY_DESTROY_ID");
-        qtcDisconnectFromData(obj, "QTC_ENTRY_UNREALIZE_ID");
-        qtcDisconnectFromData(obj, "QTC_ENTRY_STYLE_SET_ID");
-        g_object_steal_data(obj, "QTC_ENTRY_HACK_SET");
+        QTC_DEF_WIDGET_PROPS(props, widget);
+        qtcDisconnectFromProp(props, entryEnter);
+        qtcDisconnectFromProp(props, entryLeave);
+        qtcDisconnectFromProp(props, entryDestroy);
+        qtcDisconnectFromProp(props, entryUnrealize);
+        qtcDisconnectFromProp(props, entryStyleSet);
+        qtcGetWidgetProps(props)->entryHacked = false;
     }
 }
 
@@ -92,19 +92,18 @@ qtcEntryLeave(GtkWidget *widget, GdkEventCrossing *event, void *data)
 void
 qtcEntrySetup(GtkWidget *widget)
 {
-    GObject *obj = NULL;
-    if (GTK_IS_ENTRY(widget) && (obj = G_OBJECT(widget)) &&
-        !g_object_get_data(obj, "QTC_ENTRY_HACK_SET")) {
-        g_object_set_data(G_OBJECT(widget), "QTC_ENTRY_HACK_SET", (void*)1);
-        qtcConnectToData(obj, "QTC_ENTRY_ENTER_ID", "enter-notify-event",
+    QTC_DEF_WIDGET_PROPS(props, widget);
+    if (GTK_IS_ENTRY(widget) && !qtcGetWidgetProps(props)->entryHacked) {
+        qtcGetWidgetProps(props)->entryHacked = true;
+        qtcConnectToProp(props, entryEnter, "enter-notify-event",
                          qtcEntryEnter, NULL);
-        qtcConnectToData(obj, "QTC_ENTRY_LEAVE_ID", "leave-notify-event",
+        qtcConnectToProp(props, entryLeave, "leave-notify-event",
                          qtcEntryLeave, NULL);
-        qtcConnectToData(obj, "QTC_ENTRY_DESTROY_ID", "destroy-event",
+        qtcConnectToProp(props, entryDestroy, "destroy-event",
                          qtcEntryDestroy, NULL);
-        qtcConnectToData(obj, "QTC_ENTRY_UNREALIZE_ID", "unrealize",
+        qtcConnectToProp(props, entryUnrealize, "unrealize",
                          qtcEntryDestroy, NULL);
-        qtcConnectToData(obj, "QTC_ENTRY_STYLE_SET_ID", "style-set",
+        qtcConnectToProp(props, entryStyleSet, "style-set",
                          qtcEntryStyleSet, NULL);
     }
 }

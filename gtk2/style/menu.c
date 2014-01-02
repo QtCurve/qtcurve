@@ -20,7 +20,7 @@
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
 
-#include <qtcurve-utils/gtkutils.h>
+#include <qtcurve-utils/gtkprops.h>
 #include <qtcurve-utils/x11qtc.h>
 
 #include <gdk/gdkx.h>
@@ -30,8 +30,8 @@ gboolean
 qtcMenuEmitSize(GtkWidget *w, unsigned int size)
 {
     if (w) {
-        unsigned int oldSize =
-            GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w), QTC_MENUBAR_SIZE));
+        QTC_DEF_WIDGET_PROPS(props, w);
+        unsigned oldSize = qtcGetWidgetProps(props)->menuBarSize;
 
         if (oldSize != size) {
             GtkWidget *topLevel = gtk_widget_get_toplevel(w);
@@ -41,8 +41,7 @@ qtcMenuEmitSize(GtkWidget *w, unsigned int size)
             if (size == 0xFFFF) {
                 size = 0;
             }
-            g_object_set_data(G_OBJECT(w), QTC_MENUBAR_SIZE,
-                              GINT_TO_POINTER(size));
+            qtcGetWidgetProps(props)->menuBarSize = size;
             qtcX11SetMenubarSize(wid, size);
             qtcX11Flush();
             return TRUE;
@@ -147,16 +146,16 @@ static void
 qtcMenuShellCleanup(GtkWidget *widget)
 {
     if (GTK_IS_MENU_BAR(widget)) {
-        GObject *obj = G_OBJECT(widget);
-        qtcDisconnectFromData(obj, "QTC_MENU_SHELL_MOTION_ID");
-        qtcDisconnectFromData(obj, "QTC_MENU_SHELL_LEAVE_ID");
-        qtcDisconnectFromData(obj, "QTC_MENU_SHELL_DESTROY_ID");
-        qtcDisconnectFromData(obj, "QTC_MENU_SHELL_STYLE_SET_ID");
+        QTC_DEF_WIDGET_PROPS(props, widget);
+        qtcDisconnectFromProp(props, menuShellMotion);
+        qtcDisconnectFromProp(props, menuShellLeave);
+        qtcDisconnectFromProp(props, menuShellDestroy);
+        qtcDisconnectFromProp(props, menuShellStyleSet);
 #ifdef EXTEND_MENUBAR_ITEM_HACK
-        qtcDisconnectFromData(obj, "QTC_MENU_SHELL_BUTTON_PRESS_ID");
-        qtcDisconnectFromData(obj, "QTC_MENU_SHELL_BUTTON_RELEASE_ID");
+        qtcDisconnectFromProp(props, menuShellButtonPress);
+        qtcDisconnectFromProp(props, menuShellButtonRelease);
 #endif
-        g_object_steal_data(G_OBJECT(widget), "QTC_MENU_SHELL_HACK_SET");
+        qtcGetWidgetProps(props)->menuShellHacked = true;
     }
 }
 
@@ -259,25 +258,21 @@ qtcMenuShellLeave(GtkWidget *widget, GdkEventCrossing *event, void *data)
 void
 qtcMenuShellSetup(GtkWidget *widget)
 {
-    GObject *obj = G_OBJECT(widget);
-    if (GTK_IS_MENU_BAR(widget) &&
-        !g_object_get_data(obj, "QTC_MENU_SHELL_HACK_SET")) {
-        g_object_set_data(obj, "QTC_MENU_SHELL_HACK_SET",
-                          GINT_TO_POINTER(1));
-        qtcConnectToData(obj, "QTC_MENU_SHELL_MOTION_ID", "motion-notify-event",
+    QTC_DEF_WIDGET_PROPS(props, widget);
+    if (GTK_IS_MENU_BAR(widget) && !qtcGetWidgetProps(props)->menuShellHacked) {
+        qtcGetWidgetProps(props)->menuShellHacked = true;
+        qtcConnectToProp(props, menuShellMotion, "motion-notify-event",
                          qtcMenuShellMotion, NULL);
-        qtcConnectToData(obj, "QTC_MENU_SHELL_LEAVE_ID", "leave-notify-event",
+        qtcConnectToProp(props, menuShellLeave, "leave-notify-event",
                          qtcMenuShellLeave, NULL);
-        qtcConnectToData(obj, "QTC_MENU_SHELL_DESTROY_ID", "destroy-event",
+        qtcConnectToProp(props, menuShellDestroy, "destroy-event",
                          qtcMenuShellDestroy, NULL);
-        qtcConnectToData(obj, "QTC_MENU_SHELL_STYLE_SET_ID", "style-set",
+        qtcConnectToProp(props, menuShellStyleSet, "style-set",
                          qtcMenuShellStyleSet, NULL);
 #ifdef EXTEND_MENUBAR_ITEM_HACK
-        qtcConnectToData(obj, "QTC_MENU_SHELL_BUTTON_PRESS_ID",
-                         "button-press-event",
+        qtcConnectToProp(props, menuShellButtonPress, "button-press-event",
                          qtcMenuShellButtonPress, NULL);
-        qtcConnectToData(obj, "QTC_MENU_SHELL_BUTTON_RELEASE_ID",
-                         "button-release-event",
+        qtcConnectToProp(props, menuShellButtonRelease, "button-release-event",
                          qtcMenuShellButtonPress, NULL);
 #endif
     }

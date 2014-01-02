@@ -20,7 +20,7 @@
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
 
-#include <qtcurve-utils/gtkutils.h>
+#include <qtcurve-utils/gtkprops.h>
 #include <qtcurve-utils/x11qtc.h>
 #include <qtcurve-utils/x11blur.h>
 #include <qtcurve-utils/color.h>
@@ -1140,20 +1140,16 @@ gboolean isRgbaWidget(GtkWidget *widget)
     return FALSE;
 }
 
-#define BLUR_BEHIND_OBJECT "QTC_BLUR_BEHIND"
 void
 enableBlurBehind(GtkWidget *w, gboolean enable)
 {
     GtkWindow *topLevel = GTK_WINDOW(gtk_widget_get_toplevel(w));
     if (topLevel) {
-        int oldValue =
-            GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w),
-                                              BLUR_BEHIND_OBJECT));
-
+        QTC_DEF_WIDGET_PROPS(props, w);
+        int oldValue = qtcGetWidgetProps(props)->blurBehind;
         if (oldValue == 0 || (enable && oldValue != 1) ||
             (!enable && oldValue != 2)) {
-            g_object_set_data(G_OBJECT(w), QTC_MENUBAR_SIZE,
-                              GINT_TO_POINTER(enable ? 1 : 2));
+            qtcGetWidgetProps(props)->blurBehind = enable ? 1 : 2;
             xcb_window_t wid =
                 GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel)));
             qtcX11BlurTrigger(wid, enable, 0, NULL);

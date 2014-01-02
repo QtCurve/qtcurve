@@ -24,7 +24,6 @@
 
 #include "x11utils.h"
 
-#define QTC_MENUBAR_SIZE "_QTCURVE_MENUBAR_SIZE_"
 #define QTC_STATUSBAR "_QTCURVE_STATUSBAR_"
 
 static inline void

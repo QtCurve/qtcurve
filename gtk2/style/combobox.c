@@ -20,7 +20,7 @@
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
 
-#include <qtcurve-utils/gtkutils.h>
+#include <qtcurve-utils/gtkprops.h>
 #include "combobox.h"
 
 /**
@@ -101,15 +101,15 @@ qtcComboBoxCleanup(GtkWidget *widget)
     if (!widget) {
         return;
     }
-    GObject *obj = G_OBJECT(widget);
-    if (g_object_get_data(obj, "QTC_COMBO_BOX_SET")) {
-        qtcDisconnectFromData(obj, "QTC_COMBO_BOX_DESTROY_ID");
-        qtcDisconnectFromData(obj, "QTC_COMBO_BOX_UNREALIZE_ID");
-        qtcDisconnectFromData(obj, "QTC_COMBO_BOX_STYLE_SET_ID");
-        qtcDisconnectFromData(obj, "QTC_COMBO_BOX_ENTER_ID");
-        qtcDisconnectFromData(obj, "QTC_COMBO_BOX_LEAVE_ID");
-        qtcDisconnectFromData(obj, "QTC_COMBO_BOX_STATE_CHANGE_ID");
-        g_object_steal_data(G_OBJECT(widget), "QTC_COMBO_BOX_SET");
+    QTC_DEF_WIDGET_PROPS(props, widget);
+    if (qtcGetWidgetProps(props)->comboBoxHacked) {
+        qtcDisconnectFromProp(props, comboBoxDestroy);
+        qtcDisconnectFromProp(props, comboBoxUnrealize);
+        qtcDisconnectFromProp(props, comboBoxStyleSet);
+        qtcDisconnectFromProp(props, comboBoxEnter);
+        qtcDisconnectFromProp(props, comboBoxLeave);
+        qtcDisconnectFromProp(props, comboBoxStateChange);
+        qtcGetWidgetProps(props)->comboBoxHacked = false;
     }
 }
 
@@ -175,29 +175,28 @@ qtcComboBoxSetup(GtkWidget *frame, GtkWidget *combo)
     if (!combo || (!frame && qtcComboHasFrame(combo))) {
         return;
     }
-    GObject *combo_obj = G_OBJECT(combo);
-    if (!g_object_get_data(combo_obj, "QTC_COMBO_BOX_SET")) {
-        g_object_set_data(combo_obj, "QTC_COMBO_BOX_SET", GINT_TO_POINTER(1));
+    QTC_DEF_WIDGET_PROPS(props, combo);
+    if (!qtcGetWidgetProps(props)->comboBoxHacked) {
+        qtcGetWidgetProps(props)->comboBoxHacked = true;
         qtcComboBoxClearBgndColor(combo);
-        qtcConnectToData(combo_obj, "QTC_COMBO_BOX_STATE_CHANGE_ID",
-                         "state-changed", qtcComboBoxStateChange, NULL);
+        qtcConnectToProp(props, comboBoxStateChange, "state-changed",
+                         qtcComboBoxStateChange, NULL);
 
         if (frame) {
             GList *children = gtk_container_get_children(GTK_CONTAINER(frame));
             for (GList *child = children;child;child = child->next) {
-                GObject *boxChild = (GObject*)child->data;
-
-                if (GTK_IS_EVENT_BOX(boxChild)) {
-                    qtcConnectToData(boxChild, "QTC_COMBO_BOX_DESTROY_ID",
+                if (GTK_IS_EVENT_BOX(child->data)) {
+                    QTC_DEF_WIDGET_PROPS(child_props, child->data);
+                    qtcConnectToProp(child_props, comboBoxDestroy,
                                      "destroy-event", qtcComboBoxDestroy, NULL);
-                    qtcConnectToData(boxChild, "QTC_COMBO_BOX_UNREALIZE_ID",
+                    qtcConnectToProp(child_props, comboBoxUnrealize,
                                      "unrealize", qtcComboBoxDestroy, NULL);
-                    qtcConnectToData(boxChild, "QTC_COMBO_BOX_STYLE_SET_ID",
+                    qtcConnectToProp(child_props, comboBoxStyleSet,
                                      "style-set", qtcComboBoxStyleSet, NULL);
-                    qtcConnectToData(boxChild, "QTC_COMBO_BOX_ENTER_ID",
+                    qtcConnectToProp(child_props, comboBoxEnter,
                                      "enter-notify-event", qtcComboBoxEnter,
                                      combo);
-                    qtcConnectToData(boxChild, "QTC_COMBO_BOX_LEAVE_ID",
+                    qtcConnectToProp(child_props, comboBoxLeave,
                                      "leave-notify-event", qtcComboBoxLeave,
                                      combo);
                 }
