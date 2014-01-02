@@ -178,11 +178,10 @@ typedef enum {
 #define sanitizeSize(A, B, C) sanitizeSizeReal(widget, B, C)
 void gdk_drawable_get_size(GdkWindow *window, int *width, int *height);
 void sanitizeSizeReal(GtkWidget *widget, int *width, int *height);
-EStepper getStepper(const char *detail);
 #else
-EStepper getStepper(GtkWidget *widget, int x, int y, int width, int height);
 void sanitizeSize(GdkWindow *window, int *width, int *height);
 #endif
+EStepper getStepper(GtkWidget *widget, int x, int y, int width, int height);
 
 int getFillReal(GtkStateType state, gboolean set, gboolean darker);
 #define getFill(state, set) getFillReal(state, set, FALSE)

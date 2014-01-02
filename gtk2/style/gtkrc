@@ -49,8 +49,10 @@ style "qtcurve-default"
   xthickness = 1
   ythickness = 1
 
-  engine "qtcurve" 
-  {
+  # This is gone in gtk3
+  GtkRange::stepper-position-details = 1
+
+  engine "qtcurve" {
   }
 }
 

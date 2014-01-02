@@ -612,25 +612,9 @@ optionMenuGetProps(GtkWidget *widget, GtkRequisition *indicator_size,
     }
 }
 
-#if GTK_CHECK_VERSION(2, 90, 0)
-EStepper getStepper(const char *detail)
-#else
-EStepper getStepper(GtkWidget *widget, int x, int y, int width, int height)
-#endif
+EStepper
+getStepper(GtkWidget *widget, int x, int y, int width, int height)
 {
-#if GTK_CHECK_VERSION(2, 90, 0)
-    if (detail && detail[1]) {
-        if(0 == strcmp(&detail[11], "end_inner")) {
-            return STEPPER_C;
-        } else if (strstr(&detail[11], "start_inner")) {
-            return STEPPER_B;
-        } else if (0 == strcmp(&detail[11], "end")) {
-            return STEPPER_D;
-        } else if (strstr(&detail[11], "start")) {
-            return STEPPER_A;
-        }
-    }
-#else
     if (widget && GTK_IS_RANGE(widget)) {
         GdkRectangle tmp;
         GdkRectangle check_rectangle;
@@ -679,7 +663,6 @@ EStepper getStepper(GtkWidget *widget, int x, int y, int width, int height)
             return STEPPER_D;
         }
     }
-#endif
     return STEPPER_NONE;
 }
 
@@ -763,27 +746,15 @@ int getRound(const char *detail, GtkWidget *widget, int x, int y, int width, int
             return rev ? ROUNDED_TOPLEFT : ROUNDED_TOPRIGHT;
         else if(0 == strcmp(detail, "spinbutton_down"))
             return rev ? ROUNDED_BOTTOMLEFT : ROUNDED_BOTTOMRIGHT;
-        else if(isSbarDetail(detail))
-        {
-
-            switch(getStepper(
-#if GTK_CHECK_VERSION(2, 90, 0)
-                                detail
-#else
-                                widget, x, y, width, height
-#endif
-                              ))
-            {
-                case STEPPER_A:
-                    return 'h' == detail[0] ? ROUNDED_LEFT : ROUNDED_TOP;
-                case STEPPER_D:
-                    return 'v' == detail[0] ? ROUNDED_BOTTOM : ROUNDED_RIGHT;
-                default:
-                    return ROUNDED_NONE;
+        else if (isSbarDetail(detail)) {
+            // Requires `GtkRange::stepper-position-details = 1`
+            if (qtcStrEndsWith(detail, "_start")) {
+                return detail[0] == 'h' ? ROUNDED_LEFT : ROUNDED_TOP;
+            } else if (qtcStrEndsWith(detail, "_end")) {
+                return detail[0] == 'v' ? ROUNDED_BOTTOM : ROUNDED_RIGHT;
             }
-        }
-        else if(0 == strcmp(detail, "button"))
-        {
+            return ROUNDED_NONE;
+        } else if (0 == strcmp(detail, "button")) {
             if(isListViewHeader(widget))
                 return ROUNDED_NONE;
             else if(isComboBoxButton(widget))

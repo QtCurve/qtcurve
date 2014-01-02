@@ -527,13 +527,8 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
         /* int a_height = LARGE_ARR_HEIGHT; */
         gboolean sbar=isSbarDetail(detail),
                  smallArrows=isSpinButton && !opts.unifySpin;
-        int      stepper=sbar ? getStepper(
-#if GTK_CHECK_VERSION(2, 90, 0)
-                                            detail
-#else
-                                            widget, x, y, opts.sliderWidth, opts.sliderWidth
-#endif
-                                          ) : STEPPER_NONE;
+        int stepper = (sbar ? getStepper(widget, x, y, opts.sliderWidth,
+                                         opts.sliderWidth) : STEPPER_NONE);
 
         sanitizeSize(window, &width, &height);
 
@@ -938,28 +933,25 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
             }
             else */ if(WIDGET_SB_BUTTON==widgetType && GTK_APP_MOZILLA!=qtSettings.app)
             {
-                stepper=getStepper(
-#if GTK_CHECK_VERSION(2, 90, 0)
-                                    detail
-#else
-                                    widget, x, y, width, height
-#endif
-                                    );
-                switch(stepper)
-                {
-                    case STEPPER_B:
-                        if(horiz)
-                            x--, width++;
-                        else
-                            y--, height++;
-                        break;
-                    case STEPPER_C:
-                        if(horiz)
-                            width++;
-                        else
-                            height++;
-                    default:
-                        break;
+                stepper = getStepper(widget, x, y, width, height);
+                switch (stepper) {
+                case STEPPER_B:
+                    if (horiz) {
+                        x--;
+                        width++;
+                    } else {
+                        y--;
+                        height++;
+                    }
+                    break;
+                case STEPPER_C:
+                    if (horiz) {
+                        width++;
+                    } else {
+                        height++;
+                    }
+                default:
+                    break;
                 }
             }
 
