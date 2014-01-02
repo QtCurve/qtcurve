@@ -57,7 +57,7 @@ windowMask(int x, int y, int w, int h, gboolean full)
     return cairo_region_create_rectangles(rects, numRects);
 }
 
-void clipToRegion(cairo_t *cr, cairo_region_t *region)
+void clipToRegion(cairo_t *cr, const cairo_region_t *region)
 {
     cairo_new_path(cr);
     int numRects = cairo_region_num_rectangles(region);
@@ -70,18 +70,10 @@ void clipToRegion(cairo_t *cr, cairo_region_t *region)
     cairo_clip(cr);
 }
 #else
-void clipToRegion(cairo_t *cr, GdkRegion *region)
+void clipToRegion(cairo_t *cr, const GdkRegion *region)
 {
     cairo_new_path(cr);
-    int numRects;
-    GdkRectangle *rects;
-
-    gdk_region_get_rectangles(region, &rects, &numRects);
-    while (numRects--) {
-        GdkRectangle *rect = &rects[numRects];
-        cairo_rectangle(cr, rect->x, rect->y, rect->width, rect->height);
-    }
-    g_free(rects);
+    gdk_cairo_region(cr, region);
     cairo_clip(cr);
 }
 #endif
@@ -1031,8 +1023,8 @@ drawFadedLine(cairo_t *cr, int x, int y, int width, int height, GdkColor *col,
               GdkRectangle *area, GdkRectangle *gap, gboolean fadeStart,
               gboolean fadeEnd, gboolean horiz, double alpha)
 {
-    double rx=x+0.5,
-        ry=y+0.5;
+    double rx = x + 0.5;
+    double ry = y + 0.5;
     cairo_pattern_t *pt =
         cairo_pattern_create_linear(rx, ry, horiz ? rx + width - 1 : rx + 1,
                                     horiz ? ry + 1 : ry + height - 1);
@@ -1771,26 +1763,27 @@ drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
         gtk_entry_set_invisible_char(GTK_ENTRY(widget), opts.passwordChar);
 }
 
-void setProgressStripeClipping(cairo_t *cr, GdkRectangle *area, int x, int y, int width, int height, int animShift, gboolean horiz)
+void
+setProgressStripeClipping(cairo_t *cr, GdkRectangle *area, int x, int y,
+                          int width, int height, int animShift, gboolean horiz)
 {
     int stripeOffset;
 
-    switch(opts.stripedProgress)
-    {
+    switch (opts.stripedProgress) {
     default:
-    case STRIPE_PLAIN:
-    {
+    case STRIPE_PLAIN: {
         GdkRectangle rect = {x, y, width - 2, height - 2};
         GdkRegion *region = NULL;
 
 #if !GTK_CHECK_VERSION(2, 90, 0)
         constrainRect(&rect, area);
 #endif
-        region=gdk_region_rectangle(&rect);
-        if(horiz)
-            for(stripeOffset=0; stripeOffset<(width+PROGRESS_CHUNK_WIDTH); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
-            {
-                GdkRectangle innerRect={x+stripeOffset+animShift, y+1, PROGRESS_CHUNK_WIDTH, height-2};
+        region = gdk_region_rectangle(&rect);
+        if (horiz) {
+            for (stripeOffset = 0;stripeOffset < width + PROGRESS_CHUNK_WIDTH;
+                 stripeOffset += PROGRESS_CHUNK_WIDTH * 2) {
+                GdkRectangle innerRect = {x + stripeOffset + animShift, y + 1,
+                                          PROGRESS_CHUNK_WIDTH, height - 2};
 
 #if !GTK_CHECK_VERSION(2, 90, 0)
                 constrainRect(&innerRect, area);
@@ -1802,10 +1795,11 @@ void setProgressStripeClipping(cairo_t *cr, GdkRectangle *area, int x, int y, in
                     gdk_region_destroy(innerRegion);
                 }
             }
-        else
-            for(stripeOffset=0; stripeOffset<(height+PROGRESS_CHUNK_WIDTH); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
-            {
-                GdkRectangle innerRect={x+1, y+stripeOffset+animShift, width-2, PROGRESS_CHUNK_WIDTH};
+        } else {
+            for (stripeOffset = 0;stripeOffset < height + PROGRESS_CHUNK_WIDTH;
+                 stripeOffset += PROGRESS_CHUNK_WIDTH * 2) {
+                GdkRectangle innerRect = {x + 1, y + stripeOffset + animShift,
+                                          width - 2, PROGRESS_CHUNK_WIDTH};
 
                 /*constrainRect(&innerRect, area);*/
                 if (innerRect.width > 0 && innerRect.height > 0) {
@@ -1815,6 +1809,7 @@ void setProgressStripeClipping(cairo_t *cr, GdkRectangle *area, int x, int y, in
                     gdk_region_destroy(innerRegion);
                 }
             }
+        }
         setCairoClippingRegion(cr, region);
         gdk_region_destroy(region);
         break;
