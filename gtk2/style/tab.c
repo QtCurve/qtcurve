@@ -1,6 +1,6 @@
 /*****************************************************************************
  *   Copyright 2003 - 2010 Craig Drummond <craig.p.drummond@gmail.com>       *
- *   Copyright 2013 - 2013 Yichao Yu <yyc1992@gmail.com>                     *
+ *   Copyright 2013 - 2014 Yichao Yu <yyc1992@gmail.com>                     *
  *                                                                           *
  *   This program is free software; you can redistribute it and/or modify    *
  *   it under the terms of the GNU Lesser General Public License as          *
@@ -325,7 +325,6 @@ qtcTabSetup(GtkWidget *widget)
 gboolean qtcTabIsLabel(GtkNotebook *notebook, GtkWidget *widget)
 {
     int numPages = gtk_notebook_get_n_pages(notebook);
-
     for (int i = 0;i < numPages;++i) {
         if (gtk_notebook_get_tab_label(
                 notebook, gtk_notebook_get_nth_page(notebook, i)) == widget) {
