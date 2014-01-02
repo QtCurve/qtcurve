@@ -37,7 +37,11 @@ static inline GtkRequisition
 qtcWidgetGetRequisition(GtkWidget *widget)
 {
     GtkRequisition req;
+#if GTK_CHECK_VERSION(3, 0, 0)
+    gtk_widget_get_preferred_size(widget, &req, NULL);
+#else
     gtk_widget_get_requisition(widget, &req);
+#endif
     return req;
 }
 
@@ -64,7 +68,7 @@ qtcWidgetIsHorizontal(GtkWidget *widget)
 static inline bool
 qtcIsProgressBar(GtkWidget *w)
 {
-#if GTK_CHECK_VERSION(2, 90, 0)
+#if GTK_CHECK_VERSION(3, 0, 0)
     if (!GTK_IS_PROGRESS_BAR(w)) {
         return false;
     }

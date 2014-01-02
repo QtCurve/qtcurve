@@ -312,7 +312,7 @@ qtcCalcRingAlphas(const QColor *bgnd)
 }
 #endif
 
-#if defined QTC_UTILS_GTK2
+#if defined QTC_UTILS_GTK2 ||  defined QTC_UTILS_GTK3
 #include <gdk/gdk.h>
 
 QTC_ALWAYS_INLINE static inline GdkColor
