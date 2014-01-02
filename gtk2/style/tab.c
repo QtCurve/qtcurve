@@ -20,7 +20,7 @@
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
 
-#include <qtcurve-utils/gtkutils.h>
+#include <qtcurve-utils/gtkprops.h>
 
 typedef struct {
     int id;
@@ -30,9 +30,10 @@ typedef struct {
 
 static GHashTable *qtcTabHashTable = NULL;
 
-static QtCTab * qtcTabLookupHash(void *hash, gboolean create)
+static QtCTab*
+qtcTabLookupHash(void *hash, gboolean create)
 {
-    QtCTab *rv=NULL;
+    QtCTab *rv = NULL;
 
     if(!qtcTabHashTable)
         qtcTabHashTable=g_hash_table_new(g_direct_hash, g_direct_equal);
@@ -104,14 +105,14 @@ static void
 qtcTabCleanup(GtkWidget *widget)
 {
     if (widget) {
-        GObject *obj = G_OBJECT(widget);
-        qtcDisconnectFromData(obj, "QTC_TAB_MOTION_ID");
-        qtcDisconnectFromData(obj, "QTC_TAB_LEAVE_ID");
-        qtcDisconnectFromData(obj, "QTC_TAB_PAGE_ADDED_ID");
-        qtcDisconnectFromData(obj, "QTC_TAB_DESTROY_ID");
-        qtcDisconnectFromData(obj, "QTC_TAB_UNREALIZE_ID");
-        qtcDisconnectFromData(obj, "QTC_TAB_STYLE_SET_ID");
-        g_object_steal_data(obj, "QTC_TAB_HACK_SET");
+        QTC_DEF_WIDGET_PROPS(props, widget);
+        qtcDisconnectFromProp(props, tabDestroy);
+        qtcDisconnectFromProp(props, tabUnrealize);
+        qtcDisconnectFromProp(props, tabStyleSet);
+        qtcDisconnectFromProp(props, tabMotion);
+        qtcDisconnectFromProp(props, tabLeave);
+        qtcDisconnectFromProp(props, tabPageAdded);
+        qtcWidgetProps(props)->tabHacked = true;
         qtcTabRemoveHash(widget);
     }
 }
@@ -197,22 +198,23 @@ qtcTabLeave(GtkWidget *widget, GdkEventCrossing *event, void *data)
 static void
 qtcTabUnRegisterChild(GtkWidget *widget)
 {
-    GObject *obj;
-    if (widget && (obj = G_OBJECT(widget)) &&
-        g_object_get_data(obj, "QTC_TAB_HACK_CHILD_SET")) {
-        qtcDisconnectFromData(obj, "QTC_TAB_C_ENTER_ID");
-        qtcDisconnectFromData(obj, "QTC_TAB_C_LEAVE_ID");
-        qtcDisconnectFromData(obj, "QTC_TAB_C_DESTROY_ID");
-        qtcDisconnectFromData(obj, "QTC_TAB_C_STYLE_SET_ID");
-        if (GTK_IS_CONTAINER(widget))
-            qtcDisconnectFromData(obj, "QTC_TAB_C_ADD_ID");
-        g_object_steal_data(obj, "QTC_TAB_HACK_CHILD_SET");
+    QTC_DEF_WIDGET_PROPS(props, widget);
+    if (widget && qtcWidgetProps(props)->tabChildHacked) {
+        qtcDisconnectFromProp(props, tabChildDestroy);
+        qtcDisconnectFromProp(props, tabChildStyleSet);
+        qtcDisconnectFromProp(props, tabChildEnter);
+        qtcDisconnectFromProp(props, tabChildLeave);
+        if (GTK_IS_CONTAINER(widget)) {
+            qtcDisconnectFromProp(props, tabChildAdd);
+        }
+        qtcWidgetProps(props)->tabChildHacked = false;
     }
 }
 
 static void qtcTabUpdateChildren(GtkWidget *widget);
 
-static gboolean qtcTabChildMotion(GtkWidget *widget, GdkEventMotion *event, void *user_data)
+static gboolean
+qtcTabChildMotion(GtkWidget *widget, GdkEventMotion *event, void *user_data)
 {
     qtcTabMotion((GtkWidget*)user_data, event, widget);
     return FALSE;
@@ -248,20 +250,20 @@ qtcTabChildAdd(GtkWidget *widget, GdkEventCrossing *event, void *data)
 static void
 qtcTabRegisterChild(GtkWidget *notebook, GtkWidget *widget)
 {
-    GObject *obj;
-    if(widget && (obj = G_OBJECT(widget)) &&
-       !g_object_get_data(obj, "QTC_TAB_HACK_CHILD_SET")) {
-        qtcConnectToData(obj, "QTC_TAB_C_ENTER_ID", "enter-notify-event",
-                         qtcTabChildMotion, notebook);
-        qtcConnectToData(obj, "QTC_TAB_C_LEAVE_ID", "leave-notify-event",
-                         qtcTabChildMotion, notebook);
-        qtcConnectToData(obj, "QTC_TAB_C_DESTROY_ID", "destroy",
+    QTC_DEF_WIDGET_PROPS(props, widget);
+    if (widget && !qtcWidgetProps(props)->tabChildHacked) {
+        qtcWidgetProps(props)->tabChildHacked = true;
+        qtcConnectToProp(props, tabChildDestroy, "destroy",
                          qtcTabChildDestroy, notebook);
-        qtcConnectToData(obj, "QTC_TAB_C_STYLE_SET_ID", "style-set",
+        qtcConnectToProp(props, tabChildStyleSet, "style-set",
                          qtcTabChildStyleSet, notebook);
+        qtcConnectToProp(props, tabChildEnter, "enter-notify-event",
+                         qtcTabChildMotion, notebook);
+        qtcConnectToProp(props, tabChildLeave, "leave-notify-event",
+                         qtcTabChildMotion, notebook);
         if (GTK_IS_CONTAINER(widget)) {
             GList *children = gtk_container_get_children(GTK_CONTAINER(widget));
-            qtcConnectToData(obj, "QTC_TAB_C_ADD_ID", "add",
+            qtcConnectToProp(props, tabChildAdd, "add",
                              qtcTabChildAdd, notebook);
             for (GList *child = g_list_first(children);child;
                  child = g_list_next(child)) {
@@ -274,17 +276,16 @@ qtcTabRegisterChild(GtkWidget *notebook, GtkWidget *widget)
     }
 }
 
-static void qtcTabUpdateChildren(GtkWidget *widget)
+static void
+qtcTabUpdateChildren(GtkWidget *widget)
 {
-    if(widget && GTK_IS_NOTEBOOK(widget))
-    {
-        GtkNotebook *notebook=GTK_NOTEBOOK(widget);
-        int i,
-            numPages=gtk_notebook_get_n_pages(notebook);
-
-        for(i = 0; i<numPages ; ++i)
-        {
-            qtcTabRegisterChild(widget, gtk_notebook_get_tab_label(notebook, gtk_notebook_get_nth_page(notebook, i)));
+    if (widget && GTK_IS_NOTEBOOK(widget)) {
+        GtkNotebook *notebook = GTK_NOTEBOOK(widget);
+        int numPages = gtk_notebook_get_n_pages(notebook);
+        for (int i = 0;i < numPages;i++) {
+            qtcTabRegisterChild(
+                widget, gtk_notebook_get_tab_label(
+                    notebook, gtk_notebook_get_nth_page(notebook, i)));
         }
     }
 }
@@ -301,23 +302,20 @@ qtcTabPageAdded(GtkWidget *widget, GdkEventCrossing *event, void *data)
 void
 qtcTabSetup(GtkWidget *widget)
 {
-    GObject *obj;
-    if (widget && (obj = G_OBJECT(widget)) &&
-        !g_object_get_data(obj, "QTC_TAB_HACK_SET")) {
+    QTC_DEF_WIDGET_PROPS(props, widget);
+    if (widget && !qtcWidgetProps(props)->tabHacked) {
+        qtcWidgetProps(props)->tabHacked = true;
         qtcTabLookupHash(widget, TRUE);
-        qtcConnectToData(obj, "QTC_TAB_MOTION_ID", "motion-notify-event",
+        qtcConnectToProp(props, tabDestroy, "destroy-event",
+                         qtcTabDestroy, NULL);
+        qtcConnectToProp(props, tabUnrealize, "unrealize", qtcTabDestroy, NULL);
+        qtcConnectToProp(props, tabStyleSet, "style-set", qtcTabStyleSet, NULL);
+        qtcConnectToProp(props, tabMotion, "motion-notify-event",
                          qtcTabMotion, NULL);
-        qtcConnectToData(obj, "QTC_TAB_LEAVE_ID", "leave-notify-event",
+        qtcConnectToProp(props, tabLeave, "leave-notify-event",
                          qtcTabLeave, NULL);
-        qtcConnectToData(obj, "QTC_TAB_PAGE_ADDED_ID", "page-added",
+        qtcConnectToProp(props, tabPageAdded, "page-added",
                          qtcTabPageAdded, NULL);
-        qtcConnectToData(obj, "QTC_TAB_DESTROY_ID", "destroy-event",
-                         qtcTabDestroy, NULL);
-        qtcConnectToData(obj, "QTC_TAB_UNREALIZE_ID", "unrealize",
-                         qtcTabDestroy, NULL);
-        qtcConnectToData(obj, "QTC_TAB_STYLE_SET_ID", "style-set",
-                         qtcTabStyleSet, NULL);
-        g_object_set_data(obj, "QTC_TAB_HACK_SET", (void*)1);
         qtcTabUpdateChildren(widget);
     }
 }

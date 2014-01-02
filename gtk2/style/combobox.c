@@ -102,14 +102,14 @@ qtcComboBoxCleanup(GtkWidget *widget)
         return;
     }
     QTC_DEF_WIDGET_PROPS(props, widget);
-    if (qtcGetWidgetProps(props)->comboBoxHacked) {
+    if (qtcWidgetProps(props)->comboBoxHacked) {
         qtcDisconnectFromProp(props, comboBoxDestroy);
         qtcDisconnectFromProp(props, comboBoxUnrealize);
         qtcDisconnectFromProp(props, comboBoxStyleSet);
         qtcDisconnectFromProp(props, comboBoxEnter);
         qtcDisconnectFromProp(props, comboBoxLeave);
         qtcDisconnectFromProp(props, comboBoxStateChange);
-        qtcGetWidgetProps(props)->comboBoxHacked = false;
+        qtcWidgetProps(props)->comboBoxHacked = false;
     }
 }
 
@@ -176,8 +176,8 @@ qtcComboBoxSetup(GtkWidget *frame, GtkWidget *combo)
         return;
     }
     QTC_DEF_WIDGET_PROPS(props, combo);
-    if (!qtcGetWidgetProps(props)->comboBoxHacked) {
-        qtcGetWidgetProps(props)->comboBoxHacked = true;
+    if (!qtcWidgetProps(props)->comboBoxHacked) {
+        qtcWidgetProps(props)->comboBoxHacked = true;
         qtcComboBoxClearBgndColor(combo);
         qtcConnectToProp(props, comboBoxStateChange, "state-changed",
                          qtcComboBoxStateChange, NULL);
@@ -186,17 +186,17 @@ qtcComboBoxSetup(GtkWidget *frame, GtkWidget *combo)
             GList *children = gtk_container_get_children(GTK_CONTAINER(frame));
             for (GList *child = children;child;child = child->next) {
                 if (GTK_IS_EVENT_BOX(child->data)) {
-                    QTC_DEF_WIDGET_PROPS(child_props, child->data);
-                    qtcConnectToProp(child_props, comboBoxDestroy,
+                    QTC_DEF_WIDGET_PROPS(childProps, child->data);
+                    qtcConnectToProp(childProps, comboBoxDestroy,
                                      "destroy-event", qtcComboBoxDestroy, NULL);
-                    qtcConnectToProp(child_props, comboBoxUnrealize,
+                    qtcConnectToProp(childProps, comboBoxUnrealize,
                                      "unrealize", qtcComboBoxDestroy, NULL);
-                    qtcConnectToProp(child_props, comboBoxStyleSet,
+                    qtcConnectToProp(childProps, comboBoxStyleSet,
                                      "style-set", qtcComboBoxStyleSet, NULL);
-                    qtcConnectToProp(child_props, comboBoxEnter,
+                    qtcConnectToProp(childProps, comboBoxEnter,
                                      "enter-notify-event", qtcComboBoxEnter,
                                      combo);
-                    qtcConnectToProp(child_props, comboBoxLeave,
+                    qtcConnectToProp(childProps, comboBoxLeave,
                                      "leave-notify-event", qtcComboBoxLeave,
                                      combo);
                 }

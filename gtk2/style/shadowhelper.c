@@ -24,7 +24,7 @@
 #include <common/common.h>
 #include "qt_settings.h"
 #include <qtcurve-utils/x11shadow.h>
-#include <qtcurve-utils/gtkutils.h>
+#include <qtcurve-utils/gtkprops.h>
 
 static unsigned realizeSignalId = 0;
 static unsigned long realizeHookId = 0;
@@ -69,13 +69,13 @@ static gboolean
 shadowDestroy(GtkWidget *widget, void *data)
 {
     QTC_UNUSED(data);
-    if (DEBUG_ALL == qtSettings.debug)
+    if (qtSettings.debug == DEBUG_ALL)
         printf(DEBUG_PREFIX "%s %p\n", __FUNCTION__, widget);
 
-    GObject *obj = G_OBJECT(widget);
-    if (g_object_get_data(obj, "QTC_SHADOW_SET")) {
-        qtcDisconnectFromData(obj, "QTC_SHADOW_DESTROY_ID");
-        g_object_steal_data(obj, "QTC_SHADOW_SET");
+    QTC_DEF_WIDGET_PROPS(props, widget);
+    if (qtcWidgetProps(props)->shadowSet) {
+        qtcDisconnectFromProp(props, shadowDestroy);
+        qtcWidgetProps(props)->shadowSet = false;
     }
     return FALSE;
 }
@@ -83,15 +83,15 @@ shadowDestroy(GtkWidget *widget, void *data)
 static gboolean
 registerWidget(GtkWidget* widget)
 {
-    if (DEBUG_ALL == qtSettings.debug)
+    if (qtSettings.debug == DEBUG_ALL)
         printf(DEBUG_PREFIX "%s %p\n", __FUNCTION__, widget);
     // check widget
     if (!(widget && GTK_IS_WINDOW(widget)))
         return FALSE;
 
-    GObject *obj = G_OBJECT(widget);
+    QTC_DEF_WIDGET_PROPS(props, widget);
     // make sure that widget is not already registered
-    if (g_object_get_data(obj, "QTC_SHADOW_SET"))
+    if (qtcWidgetProps(props)->shadowSet)
         return FALSE;
 
     // check if window is accepted
@@ -101,9 +101,8 @@ registerWidget(GtkWidget* widget)
     // try install shadows
     installX11Shadows(widget);
 
-    g_object_set_data(obj, "QTC_SHADOW_SET", (void*)1);
-    qtcConnectToData(obj, "QTC_SHADOW_DESTROY_ID", "destroy",
-                     shadowDestroy, NULL);
+    qtcWidgetProps(props)->shadowSet = true;
+    qtcConnectToProp(props, shadowDestroy, "destroy", shadowDestroy, NULL);
     return TRUE;
 }
 

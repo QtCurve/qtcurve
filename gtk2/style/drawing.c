@@ -20,7 +20,7 @@
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
 
-#include <qtcurve-utils/gtkutils.h>
+#include <qtcurve-utils/gtkprops.h>
 #include <qtcurve-utils/color.h>
 #include <qtcurve-utils/log.h>
 
@@ -2569,8 +2569,6 @@ void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangl
     }
 }
 
-#define QTC_MASK_PROP "QTC_WIDGET_MASK"
-
 void
 createRoundedMask(cairo_t *cr, GtkWidget *widget, int x, int y, int width,
                   int height, double radius, gboolean isToolTip)
@@ -2578,8 +2576,8 @@ createRoundedMask(cairo_t *cr, GtkWidget *widget, int x, int y, int width,
     QTC_UNUSED(cr);
     if (widget) {
         int size = ((width & 0xFFFF) << 16) + (height & 0xFFFF);
-        int old = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget),
-                                                    QTC_MASK_PROP));
+        QTC_DEF_WIDGET_PROPS(props, widget);
+        int old = qtcWidgetProps(props)->widgetMask;
 
         if (size != old) {
 #if GTK_CHECK_VERSION(2, 90, 0)
@@ -2603,15 +2601,14 @@ createRoundedMask(cairo_t *cr, GtkWidget *widget, int x, int y, int width,
             cairo_fill(crMask);
             if (isToolTip) {
                 gtk_widget_shape_combine_mask(widget, mask, x, y);
-            }else {
+            } else {
                 gdk_window_shape_combine_mask(
                     gtk_widget_get_parent_window(widget), mask, 0, 0);
             }
             cairo_destroy(crMask);
             gdk_pixmap_unref(mask);
 #endif
-            g_object_set_data(G_OBJECT(widget), QTC_MASK_PROP,
-                              GINT_TO_POINTER(size));
+            qtcWidgetProps(props)->widgetMask = size;
             /* Setting the window type to 'popup menu' seems to
                re-eanble kwin shadows! */
             if (isToolTip && gtk_widget_get_window(widget)) {
@@ -2626,7 +2623,8 @@ void
 clearRoundedMask(GtkWidget *widget, gboolean isToolTip)
 {
     if (widget) {
-        if (g_object_get_data(G_OBJECT(widget), QTC_MASK_PROP)) {
+        QTC_DEF_WIDGET_PROPS(props, widget);
+        if (qtcWidgetProps(props)->widgetMask) {
 #if GTK_CHECK_VERSION(2, 90, 0)
             gtk_widget_shape_combine_region(widget, NULL);
 #else
@@ -2635,7 +2633,7 @@ clearRoundedMask(GtkWidget *widget, gboolean isToolTip)
             else
                 gdk_window_shape_combine_mask(gtk_widget_get_parent_window(widget), NULL, 0, 0);
 #endif
-            g_object_set_data(G_OBJECT(widget), QTC_MASK_PROP, (void*)0);
+            qtcWidgetProps(props)->widgetMask = 0;
         }
     }
 }

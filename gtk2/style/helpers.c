@@ -21,7 +21,6 @@
  *****************************************************************************/
 
 #include <qtcurve-utils/gtkprops.h>
-#include <qtcurve-utils/x11qtc.h>
 #include <qtcurve-utils/x11blur.h>
 #include <qtcurve-utils/color.h>
 #include <qtcurve-utils/log.h>
@@ -1146,10 +1145,10 @@ enableBlurBehind(GtkWidget *w, gboolean enable)
     GtkWindow *topLevel = GTK_WINDOW(gtk_widget_get_toplevel(w));
     if (topLevel) {
         QTC_DEF_WIDGET_PROPS(props, w);
-        int oldValue = qtcGetWidgetProps(props)->blurBehind;
+        int oldValue = qtcWidgetProps(props)->blurBehind;
         if (oldValue == 0 || (enable && oldValue != 1) ||
             (!enable && oldValue != 2)) {
-            qtcGetWidgetProps(props)->blurBehind = enable ? 1 : 2;
+            qtcWidgetProps(props)->blurBehind = enable ? 1 : 2;
             xcb_window_t wid =
                 GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel)));
             qtcX11BlurTrigger(wid, enable, 0, NULL);

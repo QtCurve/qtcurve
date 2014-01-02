@@ -31,7 +31,7 @@ qtcMenuEmitSize(GtkWidget *w, unsigned int size)
 {
     if (w) {
         QTC_DEF_WIDGET_PROPS(props, w);
-        unsigned oldSize = qtcGetWidgetProps(props)->menuBarSize;
+        unsigned oldSize = qtcWidgetProps(props)->menuBarSize;
 
         if (oldSize != size) {
             GtkWidget *topLevel = gtk_widget_get_toplevel(w);
@@ -41,7 +41,7 @@ qtcMenuEmitSize(GtkWidget *w, unsigned int size)
             if (size == 0xFFFF) {
                 size = 0;
             }
-            qtcGetWidgetProps(props)->menuBarSize = size;
+            qtcWidgetProps(props)->menuBarSize = size;
             qtcX11SetMenubarSize(wid, size);
             qtcX11Flush();
             return TRUE;
@@ -155,7 +155,7 @@ qtcMenuShellCleanup(GtkWidget *widget)
         qtcDisconnectFromProp(props, menuShellButtonPress);
         qtcDisconnectFromProp(props, menuShellButtonRelease);
 #endif
-        qtcGetWidgetProps(props)->menuShellHacked = true;
+        qtcWidgetProps(props)->menuShellHacked = true;
     }
 }
 
@@ -259,8 +259,8 @@ void
 qtcMenuShellSetup(GtkWidget *widget)
 {
     QTC_DEF_WIDGET_PROPS(props, widget);
-    if (GTK_IS_MENU_BAR(widget) && !qtcGetWidgetProps(props)->menuShellHacked) {
-        qtcGetWidgetProps(props)->menuShellHacked = true;
+    if (GTK_IS_MENU_BAR(widget) && !qtcWidgetProps(props)->menuShellHacked) {
+        qtcWidgetProps(props)->menuShellHacked = true;
         qtcConnectToProp(props, menuShellMotion, "motion-notify-event",
                          qtcMenuShellMotion, NULL);
         qtcConnectToProp(props, menuShellLeave, "leave-notify-event",

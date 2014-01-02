@@ -24,8 +24,6 @@
 
 #include "x11utils.h"
 
-#define QTC_STATUSBAR "_QTCURVE_STATUSBAR_"
-
 static inline void
 qtcX11SetShortProp(xcb_window_t win, xcb_atom_t atom, unsigned short prop)
 {

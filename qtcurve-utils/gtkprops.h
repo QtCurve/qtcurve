@@ -23,15 +23,31 @@
 #define __QTC_UTILS_GTK_PROPS_H__
 
 #include "gtkutils.h"
-#include "log.h"
 
 typedef struct {
     GtkWidget *w;
 
     int blurBehind: 2;
+    bool shadowSet: 1;
+    bool tabHacked: 1;
     bool entryHacked: 1;
+    bool statusBarSet: 1;
+    bool wmMoveHacked: 1;
+    bool windowHacked: 1;
     bool comboBoxHacked: 1;
+    bool tabChildHacked: 1;
+    bool treeViewHacked: 1;
     bool menuShellHacked: 1;
+    bool scrollBarHacked: 1;
+    bool buttonOrderHacked: 1;
+    bool shadeActiveMBHacked: 1;
+    unsigned widgetMapHacked: 2;
+    bool scrolledWindowHacked: 1;
+
+    unsigned short windowOpacity;
+
+    int widgetMask;
+    int shadowDestroy;
 
     int entryEnter;
     int entryLeave;
@@ -53,6 +69,55 @@ typedef struct {
     int menuShellStyleSet;
     int menuShellButtonPress;
     int menuShellButtonRelease;
+
+    int scrollBarDestroy;
+    int scrollBarUnrealize;
+    int scrollBarStyleSet;
+    int scrollBarValueChanged;
+
+    int scrolledWindowDestroy;
+    int scrolledWindowUnrealize;
+    int scrolledWindowStyleSet;
+    int scrolledWindowEnter;
+    int scrolledWindowLeave;
+    int scrolledWindowFocusIn;
+    int scrolledWindowFocusOut;
+
+    int tabDestroy;
+    int tabUnrealize;
+    int tabStyleSet;
+    int tabMotion;
+    int tabLeave;
+    int tabPageAdded;
+
+    int tabChildDestroy;
+    int tabChildStyleSet;
+    int tabChildEnter;
+    int tabChildLeave;
+    int tabChildAdd;
+
+    int wmMoveDestroy;
+    int wmMoveStyleSet;
+    int wmMoveMotion;
+    int wmMoveLeave;
+    int wmMoveButtonPress;
+
+    int treeViewDestroy;
+    int treeViewUnrealize;
+    int treeViewStyleSet;
+    int treeViewMotion;
+    int treeViewLeave;
+
+    int widgetMapDestroy;
+    int widgetMapUnrealize;
+    int widgetMapStyleSet;
+
+    int windowConfigure;
+    int windowDestroy;
+    int windowStyleSet;
+    int windowKeyRelease;
+    int windowMap;
+    int windowClientEvent;
 } _QtcGtkWidgetProps;
 
 #define QTC_GTK_PROP_NAME "_gtk__QTCURVE_WIDGET_PROPERTIES__"
@@ -106,7 +171,7 @@ typedef struct {
 } QtcGtkWidgetProps;
 
 static inline _QtcGtkWidgetProps*
-qtcGetWidgetProps(QtcGtkWidgetProps *props)
+qtcWidgetProps(QtcGtkWidgetProps *props)
 {
     if (!props->props && props->obj) {
         props->props = _qtcGetWidgetProps(props->obj);
@@ -127,12 +192,12 @@ qtcConnectToProp(GObject *obj, int *prop, const char *sig_name,
     *prop = g_signal_connect(obj, sig_name, cb, data);
 }
 
-#define qtcConnectToProp(props, field, sig_name, cb, data)              \
-    qtcConnectToProp(props->obj, &qtcGetWidgetProps(props)->field,      \
+#define qtcConnectToProp(props, field, sig_name, cb, data)      \
+    qtcConnectToProp(props->obj, &qtcWidgetProps(props)->field, \
                      sig_name, G_CALLBACK(cb), data)
 
 #define qtcDisconnectFromProp(props, field) do {                        \
-        _QtcGtkWidgetProps *_props = qtcGetWidgetProps(props);          \
+        _QtcGtkWidgetProps *_props = qtcWidgetProps(props);             \
         if (qtcLikely(_props->field)) {                                 \
             g_signal_handler_disconnect(props->obj, _props->field);     \
             _props->field = 0;                                          \

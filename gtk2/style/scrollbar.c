@@ -20,19 +20,18 @@
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
 
-#include <qtcurve-utils/gtkutils.h>
+#include <qtcurve-utils/gtkprops.h>
 
 static void
 qtcScrollbarCleanup(GtkWidget *widget)
 {
-    GObject *obj = NULL;
-    if (widget && (obj = G_OBJECT(widget)) &&
-        g_object_get_data(obj, "QTC_SCROLLBAR_SET")) {
-        qtcDisconnectFromData(obj, "QTC_SCROLLBAR_DESTROY_ID");
-        qtcDisconnectFromData(obj, "QTC_SCROLLBAR_UNREALIZE_ID");
-        qtcDisconnectFromData(obj, "QTC_SCROLLBAR_STYLE_SET_ID");
-        qtcDisconnectFromData(obj, "QTC_SCROLLBAR_VALUE_CHANGED_ID");
-        g_object_steal_data(obj, "QTC_SCROLLBAR_SET");
+    QTC_DEF_WIDGET_PROPS(props, widget);
+    if (widget && qtcWidgetProps(props)->scrollBarHacked) {
+        qtcDisconnectFromProp(props, scrollBarDestroy);
+        qtcDisconnectFromProp(props, scrollBarUnrealize);
+        qtcDisconnectFromProp(props, scrollBarStyleSet);
+        qtcDisconnectFromProp(props, scrollBarValueChanged);
+        qtcWidgetProps(props)->scrollBarHacked = false;
     }
 }
 
@@ -85,17 +84,16 @@ qtcScrollbarValueChanged(GtkWidget *widget, GdkEventMotion *event, void *data)
 static void
 qtcScrollbarSetupSlider(GtkWidget *widget)
 {
-    GObject *obj = NULL;
-    if (widget && (obj = G_OBJECT(widget)) &&
-        !g_object_get_data(obj, "QTC_SCROLLBAR_SET")) {
-        g_object_set_data(obj, "QTC_SCROLLBAR_SET", (void*)1);
-        qtcConnectToData(obj, "QTC_SCROLLBAR_DESTROY_ID", "destroy-event",
+    QTC_DEF_WIDGET_PROPS(props, widget);
+    if (widget && !qtcWidgetProps(props)->scrollBarHacked) {
+        qtcWidgetProps(props)->scrollBarHacked = true;
+        qtcConnectToProp(props, scrollBarDestroy, "destroy-event",
                          qtcScrollbarDestroy, NULL);
-        qtcConnectToData(obj, "QTC_SCROLLBAR_UNREALIZE_ID", "unrealize",
+        qtcConnectToProp(props, scrollBarUnrealize, "unrealize",
                          qtcScrollbarDestroy, NULL);
-        qtcConnectToData(obj, "QTC_SCROLLBAR_STYLE_SET_ID", "style-set",
+        qtcConnectToProp(props, scrollBarStyleSet, "style-set",
                          qtcScrollbarStyleSet, NULL);
-        qtcConnectToData(obj, "QTC_SCROLLBAR_VALUE_CHANGED_ID", "value-changed",
+        qtcConnectToProp(props, scrollBarValueChanged, "value-changed",
                          qtcScrollbarValueChanged, NULL);
     }
 }

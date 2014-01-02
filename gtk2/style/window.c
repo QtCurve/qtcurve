@@ -21,7 +21,7 @@
  *****************************************************************************/
 
 #include <qtcurve-utils/x11qtc.h>
-#include <qtcurve-utils/gtkutils.h>
+#include <qtcurve-utils/gtkprops.h>
 #include <qtcurve-utils/log.h>
 
 #include <gdk/gdkkeysyms.h>
@@ -84,24 +84,24 @@ static void
 qtcWindowCleanup(GtkWidget *widget)
 {
     if (widget) {
-        GObject *obj = G_OBJECT(widget);
+        QTC_DEF_WIDGET_PROPS(props, widget);
         if (!(qtcIsFlatBgnd(opts.bgndAppearance)) ||
-            IMG_NONE!=opts.bgndImage.type) {
+            opts.bgndImage.type != IMG_NONE) {
             qtcWindowRemoveFromHash(widget);
-            qtcDisconnectFromData(obj, "QTC_WINDOW_CONFIGURE_ID");
-            qtcDisconnectFromData(obj, "QTC_WINDOW_DESTROY_ID");
-            qtcDisconnectFromData(obj, "QTC_WINDOW_STYLE_SET_ID");
+            qtcDisconnectFromProp(props, windowConfigure);
         }
+        qtcDisconnectFromProp(props, windowDestroy);
+        qtcDisconnectFromProp(props, windowStyleSet);
         if ((opts.menubarHiding & HIDE_KEYBOARD) ||
             (opts.statusbarHiding & HIDE_KEYBOARD))
-            qtcDisconnectFromData(obj, "QTC_WINDOW_KEY_RELEASE_ID");
+            qtcDisconnectFromProp(props, windowKeyRelease);
         if ((opts.menubarHiding & HIDE_KWIN) ||
             (opts.statusbarHiding & HIDE_KWIN))
-            qtcDisconnectFromData(obj, "QTC_WINDOW_MAP_ID");
+            qtcDisconnectFromProp(props, windowMap);
         if (opts.shadeMenubarOnlyWhenActive || BLEND_TITLEBAR ||
             opts.menubarHiding || opts.statusbarHiding)
-            qtcDisconnectFromData(obj, "QTC_WINDOW_CLIENT_EVENT_ID");
-        g_object_steal_data(obj, "QTC_WINDOW_HACK_SET");
+            qtcDisconnectFromProp(props, windowClientEvent);
+        qtcWidgetProps(props)->windowHacked = false;
     }
 }
 
@@ -397,12 +397,13 @@ qtcWindowToggleMenuBar(GtkWidget *widget)
 gboolean
 qtcWindowSetStatusBarProp(GtkWidget *w)
 {
-    if (w && !g_object_get_data(G_OBJECT(w), QTC_STATUSBAR)) {
+    QTC_DEF_WIDGET_PROPS(props, w);
+    if (w && !qtcWidgetProps(props)->statusBarSet) {
         GtkWindow *topLevel = GTK_WINDOW(gtk_widget_get_toplevel(w));
         xcb_window_t wid =
             GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel)));
 
-        g_object_set_data(G_OBJECT(w), QTC_STATUSBAR, GINT_TO_POINTER(1));
+        qtcWidgetProps(props)->statusBarSet = true;
         qtcX11SetStatusBar(wid);
         qtcX11Flush();
         return TRUE;
@@ -483,17 +484,15 @@ qtcWindowMap(GtkWidget *widget, GdkEventKey *event, void *user_data)
 {
     QTC_UNUSED(event);
     QTC_UNUSED(user_data);
-    int opacity = GPOINTER_TO_INT(
-        g_object_get_data(G_OBJECT(widget), "QTC_WINDOW_OPACITY"));
-    qtcWindowSetProperties(widget, (unsigned short)opacity);
+    QTC_DEF_WIDGET_PROPS(props, widget);
+    qtcWindowSetProperties(widget, qtcWidgetProps(props)->windowOpacity);
 
-    if(opts.menubarHiding&HIDE_KWIN)
-    {
-        GtkWidget *menuBar=qtcWindowGetMenuBar(widget, 0);
+    if (opts.menubarHiding & HIDE_KWIN) {
+        GtkWidget *menuBar = qtcWindowGetMenuBar(widget, 0);
 
-        if(menuBar)
-        {
-            int size=gtk_widget_get_visible(menuBar) ? qtcWidgetGetAllocation(menuBar).height : 0;
+        if (menuBar) {
+            int size = (gtk_widget_get_visible(menuBar) ?
+                        qtcWidgetGetAllocation(menuBar).height : 0);
 
             qtcMenuEmitSize(menuBar, size);
             qtcWindowMenuBarDBus(widget, size);
@@ -513,44 +512,41 @@ qtcWindowMap(GtkWidget *widget, GdkEventKey *event, void *user_data)
 gboolean
 qtcWindowSetup(GtkWidget *widget, int opacity)
 {
-    GObject *obj = NULL;
-    if (widget && (obj = G_OBJECT(widget)) &&
-        !g_object_get_data(obj, "QTC_WINDOW_HACK_SET")) {
-        g_object_set_data(obj, "QTC_WINDOW_HACK_SET", (void*)1);
-        if (!(qtcIsFlatBgnd(opts.bgndAppearance)) ||
-            IMG_NONE != opts.bgndImage.type) {
+    QTC_DEF_WIDGET_PROPS(props, widget);
+    if (widget && !qtcWidgetProps(props)->windowHacked) {
+        qtcWidgetProps(props)->windowHacked = true;
+        if (!qtcIsFlatBgnd(opts.bgndAppearance) ||
+            opts.bgndImage.type != IMG_NONE) {
             QtCWindow *window = qtcWindowLookupHash(widget, TRUE);
             if (window) {
                 GtkAllocation alloc = qtcWidgetGetAllocation(widget);
-                qtcConnectToData(obj, "QTC_WINDOW_CONFIGURE_ID",
-                                 "configure-event", qtcWindowConfigure, window);
+                qtcConnectToProp(props, windowConfigure, "configure-event",
+                                 qtcWindowConfigure, window);
                 window->width = alloc.width;
                 window->height = alloc.height;
                 window->widget = widget;
             }
         }
-        qtcConnectToData(obj, "QTC_WINDOW_DESTROY_ID", "destroy-event",
+        qtcConnectToProp(props, windowDestroy, "destroy-event",
                          qtcWindowDestroy, NULL);
-        qtcConnectToData(obj, "QTC_WINDOW_STYLE_SET_ID", "style-set",
+        qtcConnectToProp(props, windowStyleSet, "style-set",
                          qtcWindowStyleSet, NULL);
         if ((opts.menubarHiding & HIDE_KEYBOARD) ||
-            (opts.statusbarHiding & HIDE_KEYBOARD))
-            qtcConnectToData(obj, "QTC_WINDOW_KEY_RELEASE_ID",
-                             "key-release-event", qtcWindowKeyRelease, NULL);
-        g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_OPACITY",
-                          GINT_TO_POINTER(opacity));
+            (opts.statusbarHiding & HIDE_KEYBOARD)) {
+            qtcConnectToProp(props, windowKeyRelease, "key-release-event",
+                             qtcWindowKeyRelease, NULL);
+        }
+        qtcWidgetProps(props)->windowOpacity = (unsigned short)opacity;
         qtcWindowSetProperties(widget, (unsigned short)opacity);
 
         if ((opts.menubarHiding & HIDE_KWIN) ||
             (opts.statusbarHiding & HIDE_KWIN) || 100 != opacity)
-            qtcConnectToData(obj, "QTC_WINDOW_MAP_ID", "map-event",
-                             qtcWindowMap, NULL);
+            qtcConnectToProp(props, windowMap, "map-event", qtcWindowMap, NULL);
         if (opts.shadeMenubarOnlyWhenActive || BLEND_TITLEBAR ||
             opts.menubarHiding || opts.statusbarHiding)
-            qtcConnectToData(obj, "QTC_WINDOW_CLIENT_EVENT_ID", "client-event",
+            qtcConnectToProp(props, windowClientEvent, "client-event",
                              qtcWindowClientEvent, NULL);
         return TRUE;
     }
-
     return FALSE;
 }

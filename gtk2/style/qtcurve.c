@@ -23,7 +23,7 @@
 #include "config.h"
 
 #include <qtcurve-utils/color.h>
-#include <qtcurve-utils/gtkutils.h>
+#include <qtcurve-utils/gtkprops.h>
 #include <qtcurve-utils/x11utils.h>
 
 #include <gmodule.h>
@@ -123,21 +123,19 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
 
     sanitizeSize(window, &width, &height);
 
-#define MODAL_HACK "QTC_MODAL_HACK_SET"
-#define BUTTON_HACK "QTC_BUTTON_ORDER_HACK_SET"
-
     if (!opts.gtkButtonOrder && opts.reorderGtkButtons && GTK_IS_WINDOW(widget) && detail && 0==strcmp(detail, "base"))
     {
-        GtkWidget *topLevel=gtk_widget_get_toplevel(widget);
+        GtkWidget *topLevel = gtk_widget_get_toplevel(widget);
+        QTC_DEF_WIDGET_PROPS(topProps, topLevel);
 
-        if(topLevel && GTK_IS_DIALOG(topLevel) && !g_object_get_data(G_OBJECT(topLevel), BUTTON_HACK))
-        {
+        if (topLevel && GTK_IS_DIALOG(topLevel) &&
+            !qtcWidgetProps(topProps)->buttonOrderHacked) {
             // gtk_dialog_set_alternative_button_order will cause errors to be
             // logged, but dont want these so register ur own error handler,
             // and then unregister afterwards...
             unsigned id = g_log_set_handler("Gtk", G_LOG_LEVEL_CRITICAL,
                                             qtcLogHandler, NULL);
-            g_object_set_data(G_OBJECT(topLevel), BUTTON_HACK, (void*)1);
+            qtcWidgetProps(topProps)->buttonOrderHacked = true;
 
             gtk_dialog_set_alternative_button_order(GTK_DIALOG(topLevel), GTK_RESPONSE_HELP,
                                                     GTK_RESPONSE_OK, GTK_RESPONSE_YES, GTK_RESPONSE_ACCEPT, GTK_RESPONSE_APPLY,
@@ -707,10 +705,11 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
         GtkWindow *topLevel = GTK_WINDOW(gtk_widget_get_toplevel(widget));
 
         if (topLevel && GTK_IS_WINDOW(topLevel)) {
-#define SHADE_ACTIVE_MB_HACK_SET "QTC_SHADE_ACTIVE_MB_HACK_SET"
-            if (!g_object_get_data(G_OBJECT(topLevel), SHADE_ACTIVE_MB_HACK_SET)) {
-                g_object_set_data(G_OBJECT(topLevel), SHADE_ACTIVE_MB_HACK_SET, (void*)1);
-                g_signal_connect(G_OBJECT(topLevel), "event", G_CALLBACK(windowEvent), widget);
+            QTC_DEF_WIDGET_PROPS(topProps, topLevel);
+            if (!qtcWidgetProps(topProps)->shadeActiveMBHacked) {
+                qtcWidgetProps(topProps)->shadeActiveMBHacked = true;
+                g_signal_connect(G_OBJECT(topLevel), "event",
+                                 G_CALLBACK(windowEvent), widget);
             }
             activeWindow = qtcWindowIsActive(GTK_WIDGET(topLevel));
         }

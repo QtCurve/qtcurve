@@ -28,7 +28,7 @@
 
 #ifdef QTC_ENABLE_X11
 #  include <QX11Info>
-#  include <qtcurve-utils/x11qtc.h>
+#  include <qtcurve-utils/x11utils.h>
 #endif
 
 namespace QtCurve {

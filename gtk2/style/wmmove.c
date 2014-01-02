@@ -20,7 +20,7 @@
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
 
-#include <qtcurve-utils/gtkutils.h>
+#include <qtcurve-utils/gtkprops.h>
 #include <qtcurve-utils/x11wmmove.h>
 
 #include <gdk/gdkx.h>
@@ -292,16 +292,16 @@ static gboolean qtcWMMoveDragEnd()
 
 static void qtcWMMoveCleanup(GtkWidget *widget)
 {
-    GObject *obj = G_OBJECT(widget);
-    if (g_object_get_data(obj, "QTC_WM_MOVE_HACK_SET")) {
+    QTC_DEF_WIDGET_PROPS(props, widget);
+    if (qtcWidgetProps(props)->wmMoveHacked) {
         if (widget == qtcWMMoveDragWidget)
             qtcWMMoveReset();
-        qtcDisconnectFromData(obj, "QTC_WM_MOVE_MOTION_ID");
-        qtcDisconnectFromData(obj, "QTC_WM_MOVE_LEAVE_ID");
-        qtcDisconnectFromData(obj, "QTC_WM_MOVE_DESTROY_ID");
-        qtcDisconnectFromData(obj, "QTC_WM_MOVE_STYLE_SET_ID");
-        qtcDisconnectFromData(obj, "QTC_WM_MOVE_BUTTON_PRESS_ID");
-        g_object_steal_data(obj, "QTC_WM_MOVE_HACK_SET");
+        qtcDisconnectFromProp(props, wmMoveDestroy);
+        qtcDisconnectFromProp(props, wmMoveStyleSet);
+        qtcDisconnectFromProp(props, wmMoveMotion);
+        qtcDisconnectFromProp(props, wmMoveLeave);
+        qtcDisconnectFromProp(props, wmMoveButtonPress);
+        qtcWidgetProps(props)->wmMoveHacked = false;
     }
 }
 
@@ -354,11 +354,15 @@ qtcWMMoveLeave(GtkWidget *widget, GdkEventMotion *event, void *data)
 
 void qtcWMMoveSetup(GtkWidget *widget)
 {
+    if (qtcUnlikely(!widget)) {
+        return;
+    }
     GtkWidget *parent = NULL;
 
-    if (widget && GTK_IS_WINDOW(widget) &&
-        !gtk_window_get_decorated(GTK_WINDOW(widget)))
+    if (GTK_IS_WINDOW(widget) &&
+        !gtk_window_get_decorated(GTK_WINDOW(widget))) {
         return;
+    }
 
     if (GTK_IS_EVENT_BOX(widget) &&
         gtk_event_box_get_above_child(GTK_EVENT_BOX(widget)))
@@ -382,23 +386,22 @@ void qtcWMMoveSetup(GtkWidget *widget)
         (GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK)))
         return;
 
-    GObject *obj = NULL;
-    if (widget && !isFakeGtk() && (obj = G_OBJECT(widget)) &&
-        !g_object_get_data(obj, "QTC_WM_MOVE_HACK_SET")) {
+    QTC_DEF_WIDGET_PROPS(props, widget);
+    if (!isFakeGtk() && !qtcWidgetProps(props)->wmMoveHacked) {
+        qtcWidgetProps(props)->wmMoveHacked = true;
         gtk_widget_add_events(widget, GDK_BUTTON_RELEASE_MASK |
                               GDK_BUTTON_PRESS_MASK | GDK_LEAVE_NOTIFY_MASK |
                               GDK_BUTTON1_MOTION_MASK);
         qtcWMMoveRegisterBtnReleaseHook();
-        g_object_set_data(G_OBJECT(widget), "QTC_WM_MOVE_HACK_SET", (void*)1);
-        qtcConnectToData(obj, "QTC_WM_MOVE_MOTION_ID", "motion-notify-event",
-                         qtcWMMoveMotion, NULL);
-        qtcConnectToData(obj, "QTC_WM_MOVE_LEAVE_ID", "leave-notify-event",
-                         qtcWMMoveLeave, NULL);
-        qtcConnectToData(obj, "QTC_WM_MOVE_DESTROY_ID", "destroy-event",
+        qtcConnectToProp(props, wmMoveDestroy, "destroy-event",
                          qtcWMMoveDestroy, NULL);
-        qtcConnectToData(obj, "QTC_WM_MOVE_STYLE_SET_ID", "style-set",
+        qtcConnectToProp(props, wmMoveStyleSet, "style-set",
                          qtcWMMoveStyleSet, NULL);
-        qtcConnectToData(obj, "QTC_WM_MOVE_BUTTON_PRESS_ID",
-                         "button-press-event", qtcWMMoveButtonPress, NULL);
+        qtcConnectToProp(props, wmMoveMotion, "motion-notify-event",
+                         qtcWMMoveMotion, NULL);
+        qtcConnectToProp(props, wmMoveLeave, "leave-notify-event",
+                         qtcWMMoveLeave, NULL);
+        qtcConnectToProp(props, wmMoveButtonPress, "button-press-event",
+                         qtcWMMoveButtonPress, NULL);
     }
 }

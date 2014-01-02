@@ -43,7 +43,7 @@ qtcEntryCleanup(GtkWidget *widget)
         qtcDisconnectFromProp(props, entryDestroy);
         qtcDisconnectFromProp(props, entryUnrealize);
         qtcDisconnectFromProp(props, entryStyleSet);
-        qtcGetWidgetProps(props)->entryHacked = false;
+        qtcWidgetProps(props)->entryHacked = false;
     }
 }
 
@@ -93,8 +93,8 @@ void
 qtcEntrySetup(GtkWidget *widget)
 {
     QTC_DEF_WIDGET_PROPS(props, widget);
-    if (GTK_IS_ENTRY(widget) && !qtcGetWidgetProps(props)->entryHacked) {
-        qtcGetWidgetProps(props)->entryHacked = true;
+    if (GTK_IS_ENTRY(widget) && !qtcWidgetProps(props)->entryHacked) {
+        qtcWidgetProps(props)->entryHacked = true;
         qtcConnectToProp(props, entryEnter, "enter-notify-event",
                          qtcEntryEnter, NULL);
         qtcConnectToProp(props, entryLeave, "leave-notify-event",

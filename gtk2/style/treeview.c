@@ -20,7 +20,7 @@
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
 
-#include <qtcurve-utils/gtkutils.h>
+#include <qtcurve-utils/gtkprops.h>
 
 typedef struct {
     GtkTreePath       *path;
@@ -78,16 +78,15 @@ void qtcTreeViewGetCell(GtkTreeView *treeView, GtkTreePath **path, GtkTreeViewCo
 static void
 qtcTreeViewCleanup(GtkWidget *widget)
 {
-    GObject *obj;
-    if (widget && (obj = G_OBJECT(widget)) &&
-        g_object_get_data(obj, "QTC_TREE_VIEW_SET")) {
+    QTC_DEF_WIDGET_PROPS(props, widget);
+    if (widget && qtcWidgetProps(props)->treeViewHacked) {
         qtcTreeViewRemoveFromHash(widget);
-        qtcDisconnectFromData(obj, "QTC_TREE_VIEW_DESTROY_ID");
-        qtcDisconnectFromData(obj, "QTC_TREE_VIEW_UNREALIZE_ID");
-        qtcDisconnectFromData(obj, "QTC_TREE_VIEW_STYLE_SET_ID");
-        qtcDisconnectFromData(obj, "QTC_TREE_VIEW_MOTION_ID");
-        qtcDisconnectFromData(obj, "QTC_TREE_VIEW_LEAVE_ID");
-        g_object_steal_data(obj, "QTC_TREE_VIEW_SET");
+        qtcDisconnectFromProp(props, treeViewDestroy);
+        qtcDisconnectFromProp(props, treeViewUnrealize);
+        qtcDisconnectFromProp(props, treeViewStyleSet);
+        qtcDisconnectFromProp(props, treeViewMotion);
+        qtcDisconnectFromProp(props, treeViewLeave);
+        qtcWidgetProps(props)->treeViewHacked = false;
     }
 }
 
@@ -225,14 +224,14 @@ qtcTreeViewLeave(GtkWidget *widget, GdkEventMotion *event, void *data)
 void
 qtcTreeViewSetup(GtkWidget *widget)
 {
-    GObject *obj;
-    if (widget && (obj = G_OBJECT(widget)) &&
-        !g_object_get_data(obj, "QTC_TREE_VIEW_SET")) {
+    QTC_DEF_WIDGET_PROPS(props, widget);
+    if (widget && !qtcWidgetProps(props)->treeViewHacked) {
         QtCTreeView *tv = qtcTreeViewLookupHash(widget, TRUE);
         GtkTreeView *treeView = GTK_TREE_VIEW(widget);
         GtkWidget *parent = gtk_widget_get_parent(widget);
 
         if (tv) {
+            qtcWidgetProps(props)->treeViewHacked = true;
             int x, y;
 #if GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
             tv->fullWidth = TRUE;
@@ -244,17 +243,16 @@ qtcTreeViewSetup(GtkWidget *widget)
             gtk_tree_view_convert_widget_to_bin_window_coords(treeView, x, y,
                                                               &x, &y);
             qtcTreeViewUpdatePosition(widget, x, y);
-            g_object_set_data(obj, "QTC_TREE_VIEW_SET", (void*)1);
-            qtcConnectToData(obj, "QTC_TREE_VIEW_DESTROY_ID", "destroy-event",
+            qtcConnectToProp(props, treeViewDestroy, "destroy-event",
                              qtcTreeViewDestroy, NULL);
-            qtcConnectToData(obj, "QTC_TREE_VIEW_UNREALIZE_ID", "unrealize",
+            qtcConnectToProp(props, treeViewUnrealize, "unrealize",
                              qtcTreeViewDestroy, NULL);
-            qtcConnectToData(obj, "QTC_TREE_VIEW_STYLE_SET_ID", "style-set",
+            qtcConnectToProp(props, treeViewStyleSet, "style-set",
                              qtcTreeViewStyleSet, NULL);
-            qtcConnectToData(obj, "QTC_TREE_VIEW_MOTION_ID",
-                             "motion-notify-event", qtcTreeViewMotion, NULL);
-            qtcConnectToData(obj, "QTC_TREE_VIEW_LEAVE_ID",
-                             "leave-notify-event", qtcTreeViewLeave, NULL);
+            qtcConnectToProp(props, treeViewMotion, "motion-notify-event",
+                             qtcTreeViewMotion, NULL);
+            qtcConnectToProp(props, treeViewLeave, "leave-notify-event",
+                             qtcTreeViewLeave, NULL);
         }
 
         if (!gtk_tree_view_get_show_expanders(treeView))
@@ -263,51 +261,49 @@ qtcTreeViewSetup(GtkWidget *widget)
             gtk_tree_view_set_enable_tree_lines(treeView, FALSE);
 
         if (GTK_IS_SCROLLED_WINDOW(parent) &&
-            GTK_SHADOW_IN !=
-            gtk_scrolled_window_get_shadow_type(GTK_SCROLLED_WINDOW(parent))) {
+            gtk_scrolled_window_get_shadow_type(GTK_SCROLLED_WINDOW(parent)) !=
+            GTK_SHADOW_IN) {
             gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(parent),
                                                 GTK_SHADOW_IN);
         }
     }
 }
 
-gboolean qtcTreeViewCellIsLeftOfExpanderColumn(GtkTreeView *treeView, GtkTreeViewColumn *column)
+gboolean
+qtcTreeViewCellIsLeftOfExpanderColumn(GtkTreeView *treeView,
+                                      GtkTreeViewColumn *column)
 {
     // check expander column
-    GtkTreeViewColumn *expanderColumn=gtk_tree_view_get_expander_column(treeView);
+    GtkTreeViewColumn *expanderColumn =
+        gtk_tree_view_get_expander_column(treeView);
 
-    if(!expanderColumn || column == expanderColumn)
+    if (!expanderColumn || column == expanderColumn) {
         return FALSE;
-    else
-    {
-        gboolean found=FALSE,
-                 isLeft=FALSE;
+    } else {
+        gboolean found = FALSE;
+        gboolean isLeft = FALSE;
 
         // get all columns
-        GList *columns=gtk_tree_view_get_columns(treeView),
-              *child;
-
-        for(child = g_list_first(columns); child; child = g_list_next(child))
-        {
-            if(!GTK_IS_TREE_VIEW_COLUMN(child->data))
+        GList *columns = gtk_tree_view_get_columns(treeView);
+        for (GList *child = g_list_first(columns);child;
+             child = g_list_next(child)) {
+            if (!GTK_IS_TREE_VIEW_COLUMN(child->data)) {
                 continue;
-            else
-            {
-                GtkTreeViewColumn *childCol=GTK_TREE_VIEW_COLUMN(child->data);
-                if(childCol == expanderColumn)
-                {
-                    if(found)
-                        isLeft = TRUE;
+            }
+            GtkTreeViewColumn *childCol = GTK_TREE_VIEW_COLUMN(child->data);
+            if (childCol == expanderColumn) {
+                if (found) {
+                    isLeft = TRUE;
                 }
-                else if(found)
-                    break;
-                else if(column == childCol)
-                    found = TRUE;
+            } else if (found) {
+                break;
+            } else if (column == childCol) {
+                found = TRUE;
             }
         }
-
-        if(columns)
+        if (columns) {
             g_list_free(columns);
+        }
         return isLeft;
     }
 }
