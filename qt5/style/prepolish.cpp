@@ -31,7 +31,7 @@ namespace QtCurve {
 __attribute__((hot)) void
 Style::prePolish(QWidget *widget) const
 {
-    if (!widget || theThemedApp == APP_KWIN)
+    if (!widget)
         return;
     QtcQWidgetProps props(widget);
     // HACK:

@@ -105,7 +105,7 @@ QtcX11Info::setRgba()
 __attribute__((hot)) void
 Style::prePolish(QWidget *widget) const
 {
-    if (!widget || QtcX11Info::creatingDummy || theThemedApp == APP_KWIN)
+    if (!widget || QtcX11Info::creatingDummy)
         return;
 
     QtcX11Info *x11Info = QtcX11Info::getInfo(widget);
