@@ -61,7 +61,7 @@ qtcEventCallback(void **cbdata)
             style->prePolish(widget);
         }
     } else if (widget && event->type() == QEvent::UpdateRequest) {
-        QtcWidgetProps props(widget);
+        QtcQWidgetProps props(widget);
         props->opacity = 100;
     } else if (QQuickWindow *window = qobject_cast<QQuickWindow*>(receiver)) {
         // QtQuickControl support

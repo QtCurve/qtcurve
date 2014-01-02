@@ -464,63 +464,65 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
     {
         gboolean onComboEntry=isOnComboEntry(widget, 0);
 
-        if(isOnComboBox(widget, 0) && !onComboEntry)
-        {
-            if (GTK_STATE_ACTIVE==state)
-                state=GTK_STATE_PRELIGHT;
-
-            {
-            GdkColor *arrowColor=MO_ARROW(false, &qtSettings.colors[GTK_STATE_INSENSITIVE==state
-                                                                            ? PAL_DISABLED : PAL_ACTIVE]
-                                                                       [COLOR_BUTTON_TEXT]);
-            //gboolean moz=isMozilla() && widget && gtk_widget_get_parent(widget) && gtk_widget_get_parent(widget)->parent && gtk_widget_get_parent(widget)->parent->parent &&
-            //             isFixedWidget(gtk_widget_get_parent(widget)->parent->parent);
+        if (isOnComboBox(widget, 0) && !onComboEntry) {
+            if (state == GTK_STATE_ACTIVE)
+                state = GTK_STATE_PRELIGHT;
+            GdkColor *arrowColor =
+                MO_ARROW(false,
+                         &qtSettings.colors[state == GTK_STATE_INSENSITIVE ?
+                                            PAL_DISABLED : PAL_ACTIVE]
+                         [COLOR_BUTTON_TEXT]);
+            /* bool moz = (isMozilla() && widget && */
+            /*             gtk_widget_get_parent(widget) && */
+            /*             gtk_widget_get_parent(widget)->parent && */
+            /*             gtk_widget_get_parent(widget)->parent->parent && */
+            /*             isFixedWidget(gtk_widget_get_parent(widget) */
+            /*                           ->parent->parent)); */
             x++;
 
 #if !GTK_CHECK_VERSION(2, 90, 0)
-            // NOTE: Dont do this for moz - as looks odd fir widgets in HTML pages - arrow is shifted too much :-(
-            if(!DO_EFFECT) // || moz)
-                x+=2;
+            // NOTE: Dont do this for moz - as looks odd fir widgets in
+            // HTML pages - arrow is shifted too much :-(
+            if (!DO_EFFECT) // || moz)
+                x += 2;
 #endif
 
-            if(opts.doubleGtkComboArrow)
-            {
-                int pad=opts.vArrows ? 0 : 1;
-                drawArrow(window, style, arrowColor, area,  GTK_ARROW_UP,
-                          x+(width>>1), y+(height>>1)-(LARGE_ARR_HEIGHT-pad), FALSE, TRUE);
+            if (opts.doubleGtkComboArrow) {
+                int pad = opts.vArrows ? 0 : 1;
+                drawArrow(window, style, arrowColor, area, GTK_ARROW_UP,
+                          x + width / 2, y + height / 2 -
+                          (LARGE_ARR_HEIGHT - pad), FALSE, TRUE);
                 drawArrow(window, style, arrowColor, area,  GTK_ARROW_DOWN,
-                          x+(width>>1), y+(height>>1)+(LARGE_ARR_HEIGHT-pad), FALSE, TRUE);
+                          x + width / 2, y + height / 2 +
+                          (LARGE_ARR_HEIGHT - pad), FALSE, TRUE);
+            } else {
+                GtkWidget *parent = NULL;
+                if (!opts.gtkComboMenus &&
+                    !((parent = gtk_widget_get_parent(widget)) &&
+                      (parent = gtk_widget_get_parent(parent)) &&
+                      !qtcComboHasFrame(parent))) {
+                    x += 2;
+                }
+                drawArrow(window, style, arrowColor, area,  GTK_ARROW_DOWN,
+                          x + width / 2, y + height / 2, FALSE, TRUE);
             }
-            else
-            {
-                GtkWidget *parent=NULL;
-                if(!opts.gtkComboMenus && !((parent=gtk_widget_get_parent(widget)) && (parent=gtk_widget_get_parent(parent)) && !qtcComboHasFrame(parent)))
-                    x+=2;
-                drawArrow(window, style, arrowColor, area,  GTK_ARROW_DOWN, x+(width>>1), y+(height>>1), FALSE, TRUE);
-            }
-            }
-        }
-        else
-        {
+        } else {
             gboolean combo=onComboEntry || isOnCombo(widget, 0);
             int      origState=state;
 
             if (combo && GTK_STATE_ACTIVE==state)
                 state=GTK_STATE_PRELIGHT;
 
-            {
             GdkColor *col=combo || isOnListViewHeader(widget, 0) || isOnButton(widget, 0, 0L)
                                 ? &qtSettings.colors[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]
                                                     [COLOR_BUTTON_TEXT]
                                 : &style->text[ARROW_STATE(state)];
             if(onComboEntry && GTK_STATE_ACTIVE==origState && opts.unifyCombo)
                 x--, y--;
-            drawArrow(window, style, MO_ARROW(false, col), area,  arrow_type, x+(width>>1), y+(height>>1), FALSE, TRUE);
-            }
+            drawArrow(window, style, MO_ARROW(false, col), area, arrow_type,
+                      x + width / 2, y + height / 2, FALSE, TRUE);
         }
-    }
-    else
-    {
+    } else {
         int isSpinButton = DETAIL("spinbutton");
         int isMenuItem = DETAIL("menuitem");
         /* int a_width = LARGE_ARR_WIDTH; */
@@ -561,8 +563,8 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
             }
         }
 
-        x+=width>>1;
-        y+=height>>1;
+        x += width / 2;
+        y += height / 2;
 /*
     CPD 28/02/2008 Commented out as it messes up scrollbar button look
 
@@ -827,7 +829,9 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
             drawLightBevel(cr, style, state, area, x, y+offset, width-offset, height-(2*offset), &btnColors[bgnd],
                            btnColors, ROUNDED_RIGHT, WIDGET_SPIN, BORDER_FLAT,
                            DF_DO_BORDER|(sunken ? DF_SUNKEN : 0), widget);
-            drawFadedLine(cr, x+2, y+(height>>1), width-(offset+4), 1, &btnColors[QTC_STD_BORDER], area, NULL, TRUE, TRUE, TRUE);
+            drawFadedLine(cr, x + 2, y + height / 2, width - (offset + 4), 1,
+                          &btnColors[QTC_STD_BORDER], area, NULL,
+                          TRUE, TRUE, TRUE);
         }
 
     }
@@ -854,8 +858,9 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
             qtcWMMoveSetup(widget);
 
         if(GTK_IS_TOGGLE_BUTTON(widget))
-            drawArrow(window, style, &qtcPalette.background[5], area, GTK_ARROW_RIGHT,
-                      x+width-((LARGE_ARR_WIDTH>>1)+4), y+((height-(LARGE_ARR_HEIGHT>>1))>>1)+1, FALSE, TRUE);
+            drawArrow(window, style, &qtcPalette.background[5], area,
+                      GTK_ARROW_RIGHT, x + width - (LARGE_ARR_WIDTH / 2 + 4),
+                      y + (height - LARGE_ARR_HEIGHT / 2) / 2 + 1, FALSE, TRUE);
     }
     else if(detail &&( button || togglebutton || optionmenu || sbar || hscale || vscale || stepper || slider))
     {
@@ -1424,13 +1429,14 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
             cols = qtcPalette.menu;
         }
 
-        drawFadedLine(cr, x+1+offset, y+(height>>1), width-(1+offset), 1, &cols[isMenuItem ? MENU_SEP_SHADE : QTC_STD_BORDER], area, NULL,
-                      TRUE, TRUE, TRUE);
-    }
-    else if(DETAIL("vseparator"))
-        drawFadedLine(cr, x+(width>>1), y, 1, height, &qtcPalette.background[QTC_STD_BORDER], area, NULL, TRUE, TRUE, FALSE);
-    else
-    {
+        drawFadedLine(cr, x + 1 + offset, y + height / 2, width - (1 + offset),
+                      1, &cols[isMenuItem ? MENU_SEP_SHADE : QTC_STD_BORDER],
+                      area, NULL, TRUE, TRUE, TRUE);
+    } else if (DETAIL("vseparator")) {
+        drawFadedLine(cr, x + width / 2, y, 1, height,
+                      &qtcPalette.background[QTC_STD_BORDER], area, NULL,
+                      TRUE, TRUE, FALSE);
+    } else {
         EWidget wt=!detail && GTK_IS_TREE_VIEW(widget) ? WIDGET_PBAR_TROUGH : WIDGET_FRAME;
         clipPath(cr, x+1, y+1, width-2, height-2, WIDGET_OTHER, RADIUS_INTERNAL, round);
         if(qtcIsFlatBgnd(opts.bgndAppearance) || !widget || !drawWindowBgnd(cr, style, area, window, widget, x+1, y+1, width-2, height-2))
@@ -2056,22 +2062,26 @@ static void gtkDrawTab(GtkStyle *style, GdkWindow *window, GtkStateType state, G
                                     debugDisplayWidget(widget, 10);
 
 #if !GTK_CHECK_VERSION(2, 90, 0)
-    if(isActiveOptionMenu(widget))
-        x++, y++;
+    if (isActiveOptionMenu(widget)) {
+        x++;
+        y++;
+    }
 #endif
 
-    x=reverseLayout(widget) || ((widget=gtk_widget_get_parent(widget)) && reverseLayout(widget))
-                ? x+1
-                : x+(width>>1);
+    x = (reverseLayout(widget) ||
+         ((widget = gtk_widget_get_parent(widget)) && reverseLayout(widget)) ?
+         x + 1 : x + width / 2);
 
-    if(opts.doubleGtkComboArrow)
-    {
-        int pad=opts.vArrows ? 0 : 1;
-        drawArrow(window, style, arrowColor, area,  GTK_ARROW_UP, x, y+(height>>1)-(LARGE_ARR_HEIGHT-pad), FALSE, TRUE);
-        drawArrow(window, style, arrowColor, area,  GTK_ARROW_DOWN, x, y+(height>>1)+(LARGE_ARR_HEIGHT-pad), FALSE, TRUE);
+    if (opts.doubleGtkComboArrow) {
+        int pad = opts.vArrows ? 0 : 1;
+        drawArrow(window, style, arrowColor, area,  GTK_ARROW_UP,
+                  x, y + height / 2 - (LARGE_ARR_HEIGHT - pad), FALSE, TRUE);
+        drawArrow(window, style, arrowColor, area,  GTK_ARROW_DOWN,
+                  x, y + height / 2 + (LARGE_ARR_HEIGHT - pad), FALSE, TRUE);
+    } else {
+        drawArrow(window, style, arrowColor, area,  GTK_ARROW_DOWN,
+                  x, y + height / 2, FALSE, TRUE);
     }
-    else
-        drawArrow(window, style, arrowColor, area,  GTK_ARROW_DOWN, x, y+(height>>1), FALSE, TRUE);
 }
 
 static void

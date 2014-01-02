@@ -2177,7 +2177,8 @@ gboolean qtSettingsInit()
                 "class \"*\" style \""RC_SETTING"Crsr\"";
             tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
 
-            sprintf(tmpStr, constStrFormat, qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].red>>8,
+            sprintf(tmpStr, constStrFormat,
+                    qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].red>>8,
                     qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].green>>8,
                     qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].blue>>8,
                     qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].red>>8,

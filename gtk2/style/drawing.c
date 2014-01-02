@@ -35,12 +35,7 @@
 #include "animation.h"
 
 #if GTK_CHECK_VERSION(2, 90, 0)
-static cairo_rectangle_int_t
-createRect(int x, int y, int w, int h)
-{
-    cairo_rectangle_int_t r = {x, y, w, h};
-    return r;
-}
+#define createRect(x, y, w, h) ((cairo_rectangle_int_t){(x), (y), (w), (h)})
 
 static cairo_region_t*
 windowMask(int x, int y, int w, int h, gboolean full)
@@ -849,7 +844,7 @@ drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
                                       widget) <ROUND_MAX ||
                     (!IS_MAX_ROUND_WIDGET(widget) && !IS_SLIDER(widget))) {
                     rad /= 2.0;
-                    mod = mod >> 1;
+                    mod /= 2;
                 }
 
                 if (horiz) {
@@ -1110,12 +1105,12 @@ void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight, gbool
         int             space = (nLines*2)+(LINE_DASHES!=type ? (nLines-1) : 0),
             step = LINE_DASHES!=type ? 3 : 2,
             etchedDisp = LINE_SUNKEN==type ? 1 : 0;
-        double          x = (horiz ? rx : rx+((rwidth-space)>>1)),
-            y = (horiz ? ry+((rheight-space)>>1) : ry),
-            x2 = rx + rwidth-1,
-            y2 = ry + rheight-1;
-        GdkColor        *col1 = &cols[dark],
-            *col2 = &cols[0];
+        double x = horiz ? rx : rx + (rwidth - space) / 2;
+        double y = horiz ? ry + (rheight - space) / 2 : ry;
+        double x2 = rx + rwidth - 1;
+        double y2 = ry + rheight - 1;
+        GdkColor *col1 = &cols[dark];
+        GdkColor *col2 = &cols[0];
         cairo_pattern_t *pt1=(opts.fadeLines && (horiz ? rwidth : rheight)>(16+etchedDisp))
             ? cairo_pattern_create_linear(rx, ry, horiz ? x2 : rx+1, horiz ? ry+1 : y2)
             : NULL,
@@ -1173,10 +1168,11 @@ void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight, gbool
 
 void drawDot(cairo_t *cr, int x, int y, int w, int h, GdkColor *cols)
 {
-    double          dx=(x+((w-5)>>1))/*+0.5*/,
-        dy=(y+((h-5)>>1))/*+0.5*/;
-    cairo_pattern_t *p1=cairo_pattern_create_linear(dx, dy, dx+4, dy+4),
-        *p2=cairo_pattern_create_linear(dx+2, dy+2, dx+4, dx+4);
+    double dx = x + (w - 5) / 2;
+    double dy = y + (h - 5) / 2;
+    cairo_pattern_t *p1 = cairo_pattern_create_linear(dx, dy, dx + 4, dy + 4);
+    cairo_pattern_t *p2 = cairo_pattern_create_linear(dx + 2, dy + 2,
+                                                      dx + 4, dx + 4);
 
     qtcCairoPatternAddColorStop(p1, 0.0, &cols[QTC_STD_BORDER], 1.0);
     qtcCairoPatternAddColorStop(p1, CAIRO_GRAD_END, &cols[QTC_STD_BORDER], 0.4);
@@ -1203,12 +1199,12 @@ void drawDot(cairo_t *cr, int x, int y, int w, int h, GdkColor *cols)
 void drawDots(cairo_t *cr, int rx, int ry, int rwidth, int rheight, gboolean horiz, int nLines, int offset, GdkColor *cols, GdkRectangle *area,
               int startOffset, int dark)
 {
-    int      space =(nLines*2)+(nLines-1),
-        x = horiz ? rx : rx+((rwidth-space)>>1),
-        y = horiz ? ry+((rheight-space)>>1) : ry,
-        numDots=(horiz ? (rwidth-(2*offset))/3 : (rheight-(2*offset))/3)+1;
-    GdkColor *col1 = &cols[dark],
-        *col2 = &cols[0];
+    int space = nLines * 2 + nLines - 1;
+    int x = horiz ? rx : rx + (rwidth - space) / 2;
+    int y = horiz ? ry + (rheight - space) / 2 : ry;
+    int numDots = ((horiz ? rwidth : rheight) - 2 * offset) / 3 + 1;
+    GdkColor *col1 = &cols[dark];
+    GdkColor *col2 = &cols[0];
 
     setCairoClipping(cr, area);
     if (horiz) {
@@ -2074,19 +2070,16 @@ drawSliderGroove(cairo_t *cr, GtkStyle *style, GtkStateType state,
     if(horiz && rev)
         inverted=!inverted;
 
-    if(horiz)
-    {
-        y +=(height - troughSize)>>1;
+    if (horiz) {
+        y += (height - troughSize) / 2;
         height = troughSize;
-        used_y=y;
-        used_h=height;
-    }
-    else
-    {
-        x +=(width - troughSize)>>1;
+        used_y = y;
+        used_h = height;
+    } else {
+        x += (width - troughSize) / 2;
         width = troughSize;
-        used_x=x;
-        used_w=width;
+        used_x = x;
+        used_w = width;
     }
 
     if(GTK_STATE_INSENSITIVE==state)
@@ -2597,8 +2590,8 @@ createRoundedMask(cairo_t *cr, GtkWidget *widget, int x, int y, int width,
             gtk_widget_shape_combine_region(widget, mask);
             gdk_region_destroy(mask);
 #else
-            GdkBitmap *mask=gdk_pixmap_new(NULL, width, height, 1);
-            cairo_t   *crMask = gdk_cairo_create((GdkDrawable *) mask);
+            GdkBitmap *mask = gdk_pixmap_new(NULL, width, height, 1);
+            cairo_t *crMask = gdk_cairo_create((GdkDrawable*)mask);
 
             cairo_rectangle(crMask, 0, 0, width, height);
             cairo_set_source_rgba(crMask, 1, 1, 1, 0);
@@ -2608,10 +2601,12 @@ createRoundedMask(cairo_t *cr, GtkWidget *widget, int x, int y, int width,
             createPath(crMask, 0, 0, width, height, radius, ROUNDED_ALL);
             cairo_set_source_rgba(crMask, 0, 0, 0, 1);
             cairo_fill(crMask);
-            if(isToolTip)
+            if (isToolTip) {
                 gtk_widget_shape_combine_mask(widget, mask, x, y);
-            else
-                gdk_window_shape_combine_mask(gtk_widget_get_parent_window(widget), mask, 0, 0);
+            }else {
+                gdk_window_shape_combine_mask(
+                    gtk_widget_get_parent_window(widget), mask, 0, 0);
+            }
             cairo_destroy(crMask);
             gdk_pixmap_unref(mask);
 #endif
@@ -3700,8 +3695,8 @@ drawCheckBox(cairo_t *cr, GtkStateType state, GtkShadowType shadow,
         btnColors = qtcPalette.button[state == GTK_STATE_INSENSITIVE ?
                                       PAL_DISABLED : PAL_ACTIVE];
     }
-    x += (width - checkSpace) >> 1;
-    y += (height - checkSpace) >> 1;
+    x += (width - checkSpace) / 2;
+    y += (height - checkSpace) / 2;
     if (qtSettings.debug == DEBUG_ALL) {
         printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %s  ",
                __FUNCTION__, state, shadow, x, y, width, height, mnu,
@@ -3847,8 +3842,8 @@ void drawRadioButton(cairo_t *cr, GtkStateType state, GtkShadowType shadow, GtkS
         int optSpace = doEtch ? opts.crSize + 2 : opts.crSize;
         GdkColor  newColors[TOTAL_SHADES + 1];
         GdkColor *btnColors;
-        x += (width - optSpace) >> 1;
-        y += (height - optSpace) >> 1;
+        x += (width - optSpace) / 2;
+        y += (height - optSpace) / 2;
         if (opts.crColor && state != GTK_STATE_INSENSITIVE && (on || tri)) {
             btnColors = qtcPalette.selectedcr;
         } else if (!mnu && !list && QT_CUSTOM_COLOR_BUTTON(style)) {

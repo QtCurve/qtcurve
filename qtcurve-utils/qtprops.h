@@ -27,8 +27,8 @@
 #include <QVariant>
 #include <QMdiSubWindow>
 
-struct _QtcWidgetProps {
-    _QtcWidgetProps():
+struct _QtcQWidgetProps {
+    _QtcQWidgetProps():
         opacity(100),
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
         prePolishing(false),
@@ -52,28 +52,28 @@ struct _QtcWidgetProps {
     // CPD:TODO WebKit?
     bool noEtch: 1;
 };
-Q_DECLARE_METATYPE(QSharedPointer<_QtcWidgetProps>)
+Q_DECLARE_METATYPE(QSharedPointer<_QtcQWidgetProps>)
 
 #define QTC_PROP_NAME "_q__QTCURVE_WIDGET_PROPERTIES__"
 
-QTC_ALWAYS_INLINE static inline QSharedPointer<_QtcWidgetProps>
+QTC_ALWAYS_INLINE static inline QSharedPointer<_QtcQWidgetProps>
 qtcGetWidgetProps(const QWidget *w)
 {
     // use _q_ to mimic qt internal properties and suppress QtDesigner
     // warning about unsupported properties.
     QVariant val(w->property(QTC_PROP_NAME));
     if (!val.isValid()) {
-        val = QVariant::fromValue(QSharedPointer<_QtcWidgetProps>(
-                                      new _QtcWidgetProps));
+        val = QVariant::fromValue(QSharedPointer<_QtcQWidgetProps>(
+                                      new _QtcQWidgetProps));
         const_cast<QWidget*>(w)->setProperty(QTC_PROP_NAME, val);
     }
-    return val.value<QSharedPointer<_QtcWidgetProps> >();
+    return val.value<QSharedPointer<_QtcQWidgetProps> >();
 }
 
-class QtcWidgetProps {
+class QtcQWidgetProps {
 public:
-    QtcWidgetProps(const QWidget *widget): w(widget), p(0) {}
-    inline _QtcWidgetProps*
+    QtcQWidgetProps(const QWidget *widget): w(widget), p(0) {}
+    inline _QtcQWidgetProps*
     operator ->() const
     {
         if (!p && w) {
@@ -83,14 +83,14 @@ public:
     }
 private:
     const QWidget *w;
-    mutable QSharedPointer<_QtcWidgetProps> p;
+    mutable QSharedPointer<_QtcQWidgetProps> p;
 };
 
 static inline int
 qtcGetOpacity(const QWidget *widget)
 {
     for (const QWidget *w = widget;w;w = w->parentWidget()) {
-        QtcWidgetProps props(w);
+        QtcQWidgetProps props(w);
         if (qobject_cast<const QMdiSubWindow*>(w)) {
             // don't use opacity on QMdiSubWindow menu for now, as it will
             // draw through the background as well.

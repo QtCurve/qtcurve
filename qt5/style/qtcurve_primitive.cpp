@@ -557,7 +557,7 @@ Style::drawPrimitiveFrame(PrimitiveElement element,
                  isInQAbstractItemView(widget->parentWidget()));
 
             if (sv && (opts.etchEntry || squareSv || isOOWidget(widget))) {
-                QtcWidgetProps props(widget);
+                QtcQWidgetProps props(widget);
                 // For some reason, in KPackageKit, the KTextBrower when
                 // polished is not in the scrollview, but is when painted.
                 // So check here if it should not be etched.

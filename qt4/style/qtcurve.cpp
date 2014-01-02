@@ -1590,7 +1590,7 @@ Style::polish(QWidget *widget)
     if (!widget)
         return;
 
-    QtcWidgetProps qtcProps(widget);
+    QtcQWidgetProps qtcProps(widget);
     bool enableMouseOver(opts.highlightFactor || opts.coloredMouseOver);
     if (qtcCheckLogLevel(QTC_LOG_INFO) && qtcGetWid(widget) &&
         widget->windowType() != Qt::Desktop && !qtcProps->prePolished) {
@@ -3975,7 +3975,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                             ((opts.square&SQUARE_SCROLLVIEW) && (kateView || kontactPreview))),
                         squareSv(sv && ((opts.square&SQUARE_SCROLLVIEW) || (widget && widget->isWindow()))),
                         inQAbstractItemView(widget && widget->parentWidget() && isInQAbstractItemView(widget->parentWidget()));
-                    QtcWidgetProps props(widget);
+                    QtcQWidgetProps props(widget);
 
                     if (sv && (opts.etchEntry || squareSv ||
                                isOOWidget(widget))) {
@@ -11430,7 +11430,7 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
                    BGND_DIALOG == type ? opts.dlgOpacity : opts.bgndOpacity);
     QRect bgndRect = widget->rect();
     QRect imgRect = bgndRect;
-    QtcWidgetProps props(widget);
+    QtcQWidgetProps props(widget);
 
     if (100 != opacity && !(qobject_cast<const QMdiSubWindow*>(widget) ||
                             Utils::hasAlphaChannel(window))) {
@@ -12104,7 +12104,7 @@ void Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe,
     default:
         return;
     }
-    a.translate((r.x() + (r.width() >> 1)), (r.y() + (r.height() >> 1)));
+    a.translate(r.x() + r.width() / 2, r.y() + r.height() / 2);
     p->save();
     col.setAlpha(255);
     p->setPen(col);
@@ -13127,7 +13127,7 @@ QColor Style::getLowerEtchCol(const QWidget *widget) const
         return col;
     }
 
-    QtcWidgetProps props(widget);
+    QtcQWidgetProps props(widget);
     if (qtcIsFlatBgnd(opts.bgndAppearance)) {
         bool doEtch = widget && widget->parentWidget() && !props->noEtch;
         // CPD: Don't really want to check here for every widget, when

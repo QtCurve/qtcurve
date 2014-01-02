@@ -67,7 +67,7 @@ const char *const ShadowHelper::netWMSkipShadowPropertyName =
 bool
 ShadowHelper::registerWidget(QWidget *widget, bool force)
 {
-    QtcWidgetProps props(widget);
+    QtcQWidgetProps props(widget);
     // make sure widget is not already registered
     if (props->shadowRegistered)
         return false;
@@ -85,7 +85,7 @@ ShadowHelper::registerWidget(QWidget *widget, bool force)
 void
 ShadowHelper::unregisterWidget(QWidget *widget)
 {
-    QtcWidgetProps props(widget);
+    QtcQWidgetProps props(widget);
     if (props->shadowRegistered) {
         uninstallX11Shadows(widget);
         props->shadowRegistered = false;

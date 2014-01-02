@@ -356,7 +356,7 @@ void Style::polish(QWidget *widget)
         return;
 
     prePolish(widget);
-    QtcWidgetProps qtcProps(widget);
+    QtcQWidgetProps qtcProps(widget);
     bool enableMouseOver(opts.highlightFactor || opts.coloredMouseOver);
 
     if (EFFECT_NONE != opts.buttonEffect &&

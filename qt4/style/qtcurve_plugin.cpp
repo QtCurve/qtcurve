@@ -116,7 +116,7 @@ qtcEventCallback(void **cbdata)
             style->prePolish(widget);
         }
     } else if (event->type() == QEvent::UpdateRequest) {
-        QtcWidgetProps(widget)->opacity = 100;
+        QtcQWidgetProps(widget)->opacity = 100;
     }
     return false;
 }

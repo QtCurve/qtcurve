@@ -109,7 +109,7 @@ Style::prePolish(QWidget *widget) const
         return;
 
     QtcX11Info *x11Info = QtcX11Info::getInfo(widget);
-    QtcWidgetProps props(widget);
+    QtcQWidgetProps props(widget);
     // Don't use XCreateSimpleWindow
     x11Info->fixVisual();
     // HACK:

@@ -2278,7 +2278,7 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
                    BGND_DIALOG == type ? opts.dlgOpacity : opts.bgndOpacity);
     QRect bgndRect(widget->rect());
     QRect imgRect(bgndRect);
-    QtcWidgetProps props(widget);
+    QtcQWidgetProps props(widget);
 
     if (100 != opacity && !(qobject_cast<const QMdiSubWindow*>(widget) ||
                             Utils::hasAlphaChannel(window))) {
@@ -3961,7 +3961,7 @@ QColor Style::getLowerEtchCol(const QWidget *widget) const
     }
 
     if (qtcIsFlatBgnd(opts.bgndAppearance)) {
-        QtcWidgetProps props(widget);
+        QtcQWidgetProps props(widget);
         bool doEtch = widget && widget->parentWidget() && !props->noEtch;
         // CPD: Don't really want to check here for every widget, when
         // (so far) on problem seems to be in KPackageKit, and thats with

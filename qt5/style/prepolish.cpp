@@ -33,7 +33,7 @@ Style::prePolish(QWidget *widget) const
 {
     if (!widget || theThemedApp == APP_KWIN)
         return;
-    QtcWidgetProps props(widget);
+    QtcQWidgetProps props(widget);
     // HACK:
     // Request for RGBA format on toplevel widgets before they
     // create native windows. These windows are typically shown after being
