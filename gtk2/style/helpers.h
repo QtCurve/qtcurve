@@ -166,8 +166,7 @@ gboolean isInGroupBox(GtkWidget *w, int level);
 gboolean isOnButton(GtkWidget *w, int level, gboolean *def);
 void optionMenuGetProps(GtkWidget *widget, GtkRequisition *indicator_size, GtkBorder *indicator_spacing);
 
-typedef enum
-{
+typedef enum {
     STEPPER_A,
     STEPPER_B,
     STEPPER_C,

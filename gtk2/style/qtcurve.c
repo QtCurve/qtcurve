@@ -660,9 +660,9 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
     gboolean optionmenu = !togglebutton && DETAIL("optionmenu");
     gboolean stepper = !optionmenu && DETAIL("stepper");
     gboolean vscrollbar = (!optionmenu && detail &&
-                           strstr(detail, "vscrollbar") == detail);
+                           qtcStrStartsWith(detail, "vscrollbar"));
     gboolean hscrollbar = (!vscrollbar && detail &&
-                           strstr(detail, "hscrollbar") == detail);
+                           qtcStrStartsWith(detail, "hscrollbar"));
     gboolean spinUp = !hscrollbar && DETAIL("spinbutton_up");
     gboolean spinDown = !spinUp && DETAIL("spinbutton_down");
     gboolean menuScroll = (detail &&

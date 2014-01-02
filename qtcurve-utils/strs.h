@@ -282,4 +282,14 @@ qtcStrEndsWith(const char *str, const char *tail)
     return memcmp(str + len1 - len2, tail, len2) == 0;
 }
 
+QTC_ALWAYS_INLINE static inline bool
+qtcStrStartsWith(const char *str, const char *head)
+{
+    size_t len2 = strlen(head);
+    if (len2 > strlen(str)) {
+        return false;
+    }
+    return memcmp(str, head, len2) == 0;
+}
+
 #endif

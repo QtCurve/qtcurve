@@ -95,8 +95,7 @@ useButtonColor(const char *detail)
              strcmp(detail, "spinbutton_down") == 0 ||
              strcmp(detail, "slider") == 0 ||
              strcmp(detail, "qtc-slider") == 0 ||
-             (detail[0] && strncmp(detail + 1, "scrollbar",
-                                   strlen("scrollbar")) == 0) ||
+             (detail[0] && qtcStrStartsWith(detail + 1, "scrollbar")) ||
              strcmp(detail, "stepper") == 0));
 }
 
@@ -735,13 +734,11 @@ int getFillReal(GtkStateType state, gboolean set, gboolean darker)
     }
 }
 
-gboolean isSbarDetail(const char *detail)
+gboolean
+isSbarDetail(const char *detail)
 {
-    return detail && (
-#if GTK_CHECK_VERSION(2, 90, 0)
-                      (detail[1] && &detail[1] == strstr(detail, "scrollbar")) ||
-#endif
-                      0 == strcmp(detail, "hscrollbar") || 0 == strcmp(detail, "vscrollbar") || 0 == strcmp(detail, "stepper"));
+    return detail && detail[0] && (strcmp(detail, "stepper") == 0 ||
+                                   qtcStrStartsWith(detail + 1, "scrollbar"));
 }
 
 int getRound(const char *detail, GtkWidget *widget, int x, int y, int width, int height, gboolean rev)
