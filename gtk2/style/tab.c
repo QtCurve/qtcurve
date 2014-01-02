@@ -312,7 +312,8 @@ qtcTabSetup(GtkWidget *widget)
     }
 }
 
-gboolean qtcTabIsLabel(GtkNotebook *notebook, GtkWidget *widget)
+gboolean
+qtcTabIsLabel(GtkNotebook *notebook, GtkWidget *widget)
 {
     int numPages = gtk_notebook_get_n_pages(notebook);
     for (int i = 0;i < numPages;++i) {
@@ -324,7 +325,8 @@ gboolean qtcTabIsLabel(GtkNotebook *notebook, GtkWidget *widget)
     return FALSE;
 }
 
-QtcRect qtcTabGetTabbarRect(GtkNotebook *notebook)
+QtcRect
+qtcTabGetTabbarRect(GtkNotebook *notebook)
 {
     QtcRect rect = {0, 0, -1, -1};
     QtcRect empty = rect;
@@ -385,7 +387,7 @@ qtcTabHasVisibleArrows(GtkNotebook *notebook)
 {
     if (gtk_notebook_get_show_tabs(notebook)) {
         int numPages = gtk_notebook_get_n_pages(notebook);
-        for(int i = 0;i < numPages;i++) {
+        for (int i = 0;i < numPages;i++) {
             GtkWidget *label = gtk_notebook_get_tab_label(
                 notebook, gtk_notebook_get_nth_page(notebook, i));
 #if GTK_CHECK_VERSION(2, 20, 0)

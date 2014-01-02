@@ -211,25 +211,30 @@ qtcTreeViewLeave(GtkWidget *widget, GdkEventMotion *event, void *data)
     QTC_UNUSED(event);
     QTC_UNUSED(data);
     if (GTK_IS_TREE_VIEW(widget)) {
-        QtCTreeView *tv=qtcTreeViewLookupHash(widget, FALSE);
-        if(tv)
-        {
-            GtkTreeView   *treeView=GTK_TREE_VIEW(widget);
-            GdkRectangle  rect={0, 0, -1, -1 };
+        QtCTreeView *tv = qtcTreeViewLookupHash(widget, FALSE);
+        if (tv) {
+            GtkTreeView *treeView = GTK_TREE_VIEW(widget);
+            QtcRect rect = {0, 0, -1, -1 };
             QtcRect alloc = qtcWidgetGetAllocation(widget);
 
-            if(tv->path && tv->column)
-                gtk_tree_view_get_background_area(treeView, tv->path, tv->column, &rect);
-            if(tv->fullWidth)
-                rect.x = 0, rect.width = alloc.width;
-
-            if(tv->path)
+            if (tv->path && tv->column) {
+                gtk_tree_view_get_background_area(
+                    treeView, tv->path, tv->column, (GdkRectangle*)&rect);
+            }
+            if (tv->fullWidth) {
+                rect.x = 0;
+                rect.width = alloc.width;
+            }
+            if (tv->path) {
                 gtk_tree_path_free(tv->path);
-            tv->path=NULL;
-            tv->column=NULL;
+            }
+            tv->path = NULL;
+            tv->column = NULL;
 
-            gtk_tree_view_convert_bin_window_to_widget_coords(treeView, rect.x, rect.y, &rect.x, &rect.y);
-            gtk_widget_queue_draw_area(widget, rect.x, rect.y, rect.width, rect.height);
+            gtk_tree_view_convert_bin_window_to_widget_coords(
+                treeView, rect.x, rect.y, &rect.x, &rect.y);
+            gtk_widget_queue_draw_area(
+                widget, rect.x, rect.y, rect.width, rect.height);
         }
     }
     return FALSE;
