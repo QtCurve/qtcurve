@@ -1373,14 +1373,13 @@ void Style::polish(QApplication *app)
     if(100!=opts.menuBgndOpacity && opts.noMenuBgndOpacityApps.contains(appName))
         opts.menuBgndOpacity=100;
 
-    if (APP_KWIN == theThemedApp) {
-        opts.bgndOpacity = opts.dlgOpacity = 100;
+    if (theThemedApp == APP_KWIN) {
         opts.bgndAppearance = APPEARANCE_FLAT;
-    } else if(APP_OPENOFFICE==theThemedApp) {
-        opts.scrollbarType=SCROLLBAR_WINDOWS;
-        if(APPEARANCE_FADE==opts.menuitemAppearance)
-            opts.menuitemAppearance=APPEARANCE_FLAT;
-        opts.borderMenuitems=opts.etchEntry=false;
+    } else if (theThemedApp == APP_OPENOFFICE) {
+        opts.scrollbarType = SCROLLBAR_WINDOWS;
+        if (opts.menuitemAppearance == APPEARANCE_FADE)
+            opts.menuitemAppearance = APPEARANCE_FLAT;
+        opts.borderMenuitems = opts.etchEntry = false;
 
         if(opts.useHighlightForMenu && blendOOMenuHighlight(QApplication::palette(), m_highlightCols[ORIGINAL_SHADE]))
         {

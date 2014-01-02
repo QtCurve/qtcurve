@@ -148,7 +148,6 @@ Style::polish(QApplication *app)
         opts.menuBgndOpacity = 100;
 
     if (APP_KWIN == theThemedApp) {
-        opts.bgndOpacity = opts.dlgOpacity = 100;
         opts.bgndAppearance = APPEARANCE_FLAT;
     } else if(APP_OPENOFFICE == theThemedApp) {
         opts.scrollbarType=SCROLLBAR_WINDOWS;
