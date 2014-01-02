@@ -31,8 +31,6 @@
 #define CAIRO_GRAD_END 1.0
 #endif
 
-void clipToRegion(cairo_t *cr, const GdkRegion *region);
-void setCairoClippingRegion(cairo_t *cr, GdkRegion *region);
 void setCairoClipping(cairo_t *cr, GdkRectangle *area);
 void drawHLine(cairo_t *cr, const GdkColor *col, double a, int x, int y, int w);
 void drawVLine(cairo_t *cr, const GdkColor *col, double a, int x, int y, int h);

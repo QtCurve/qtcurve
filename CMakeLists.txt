@@ -126,6 +126,7 @@ configure_file(config.h.in config.h @ONLY)
 include_directories(
   "${CMAKE_CURRENT_BINARY_DIR}")
 cmake_c_fix_include_path(lib/utils qtcurve-utils)
+cmake_c_fix_include_path(lib/cairo qtcurve-cairo)
 cmake_c_add_flags(CMAKE_C_FLAGS -Wall -Wextra -std=gnu99)
 cmake_c_add_flags(CMAKE_CXX_FLAGS -Wall -Wextra -std=c++0x)
 cmake_c_add_flags(CMAKE_SHARED_LINKER_FLAGS -Wl,--as-needed -Wl,--no-undefined)

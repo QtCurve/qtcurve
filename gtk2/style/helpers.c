@@ -25,6 +25,7 @@
 #include <qtcurve-utils/color.h>
 #include <qtcurve-utils/log.h>
 #include <qtcurve-utils/strs.h>
+#include <qtcurve-cairo/utils.h>
 
 #include "helpers.h"
 #include "qt_settings.h"
@@ -948,7 +949,7 @@ shadeColor(GdkColor *orig, double mod)
 }
 
 void
-constrainRect(GdkRectangle *rect, GdkRectangle *con)
+constrainRect(QtcRect *rect, QtcRect *con)
 {
     if (rect && con) {
         if (rect->x < con->x) {

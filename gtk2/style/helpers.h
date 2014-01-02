@@ -26,26 +26,7 @@
 #include <common/common.h>
 #include "config.h"
 #include "qt_settings.h"
-
-QTC_ALWAYS_INLINE static inline void
-qtcCairoSetColor(cairo_t *cr, const GdkColor *col, double a)
-{
-    cairo_set_source_rgba(cr, col->red / 65535.0, col->green / 65535.0,
-                          col->blue / 65535.0, a);
-}
-#define qtcCairoSetColor(cr, col, a...)                 \
-    qtcCairoSetColor(cr, col, QTC_DEFAULT(a, 1))
-
-QTC_ALWAYS_INLINE static inline void
-qtcCairoPatternAddColorStop(cairo_pattern_t *pt, double offset,
-                            const GdkColor *col, double a)
-{
-    cairo_pattern_add_color_stop_rgba(pt, offset, col->red / 65535.0,
-                                      col->green / 65535.0,
-                                      col->blue / 65535.0, a);
-}
-#define qtcCairoPatternAddColorStop(pt, offset, col, a...)              \
-    qtcCairoPatternAddColorStop(pt, offset, col, QTC_DEFAULT(a, 1))
+#include <qtcurve-cairo/utils.h>
 
 #define DETAIL(xx)    ((detail) &&(!strcmp(xx, detail)))
 #define DETAILHAS(xx) ((detail) && (strstr(detail, xx)))
@@ -201,7 +182,7 @@ int getOpacity(GtkWidget *widget);
 gboolean eqRect(GdkRectangle *a, GdkRectangle *b);
 void setLowerEtchCol(cairo_t *cr, GtkWidget *widget);
 GdkColor shadeColor(GdkColor *orig, double mod);
-void constrainRect(GdkRectangle *rect, GdkRectangle *con);
+void constrainRect(QtcRect *rect, QtcRect *con);
 gboolean windowEvent(GtkWidget *widget, GdkEvent *event, void *user_data);
 void adjustToolbarButtons(GtkWidget *widget, int *x, int *y, int *width, int *height, int *round, gboolean horiz);
 void getEntryParentBgCol(GtkWidget *widget, GdkColor *color);

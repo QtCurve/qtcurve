@@ -23,6 +23,7 @@
 #include <qtcurve-utils/gtkprops.h>
 #include <qtcurve-utils/color.h>
 #include <qtcurve-utils/log.h>
+#include <qtcurve-cairo/utils.h>
 
 #include "drawing.h"
 #include "qt_settings.h"
@@ -35,12 +36,12 @@
 #include "animation.h"
 
 #if GTK_CHECK_VERSION(2, 90, 0)
-#define createRect(x, y, w, h) ((cairo_rectangle_int_t){(x), (y), (w), (h)})
+#define createRect(x, y, w, h) ((QtcRect){(x), (y), (w), (h)})
 
 static cairo_region_t*
 windowMask(int x, int y, int w, int h, gboolean full)
 {
-    cairo_rectangle_int_t rects[4];
+    QtcRect rects[4];
     int numRects = 4;
 
     if (full) {
@@ -56,36 +57,7 @@ windowMask(int x, int y, int w, int h, gboolean full)
     }
     return cairo_region_create_rectangles(rects, numRects);
 }
-
-void clipToRegion(cairo_t *cr, const cairo_region_t *region)
-{
-    cairo_new_path(cr);
-    int numRects = cairo_region_num_rectangles(region);
-
-    while (numRects--) {
-        cairo_rectangle_int_t rect;
-        cairo_region_get_rectangle(region, numRects, &rect);
-        cairo_rectangle(cr, rect.x, rect.y, rect.width, rect.height);
-    }
-    cairo_clip(cr);
-}
-#else
-void clipToRegion(cairo_t *cr, const GdkRegion *region)
-{
-    cairo_new_path(cr);
-    gdk_cairo_region(cr, region);
-    cairo_clip(cr);
-}
 #endif
-
-void
-setCairoClippingRegion(cairo_t *cr, GdkRegion *region)
-{
-    cairo_save(cr);
-    if (region)
-        clipToRegion(cr, region);
-    cairo_new_path(cr);
-}
 
 void setCairoClipping(cairo_t *cr, GdkRectangle *area)
 {
@@ -1030,14 +1002,16 @@ drawFadedLine(cairo_t *cr, int x, int y, int width, int height, GdkColor *col,
                                     horiz ? ry + 1 : ry + height - 1);
 
     if (gap) {
-        GdkRectangle r = {x, y, width, height};
-        GdkRegion *region = gdk_region_rectangle(area ? area : &r);
-        GdkRegion *inner = gdk_region_rectangle(gap);
-
-        gdk_region_xor(region, inner);
-        setCairoClippingRegion(cr, region);
-        gdk_region_destroy(inner);
-        gdk_region_destroy(region);
+        QtcRect r = {x, y, width, height};
+        // GdkRectangle and QtcRect(cairo_rectangle_int_t) are either the same
+        // or compatible.
+        const QtcRect *_area =
+            area ? (const QtcRect*)area : &r;
+        cairo_region_t *region = cairo_region_create_rectangle(_area);
+        cairo_region_xor_rectangle(region, (const QtcRect*)gap);
+        cairo_save(cr);
+        qtcCairoClipRegion(cr, region);
+        cairo_region_destroy(region);
     } else {
         setCairoClipping(cr, area);
     }
@@ -1772,46 +1746,38 @@ setProgressStripeClipping(cairo_t *cr, GdkRectangle *area, int x, int y,
     switch (opts.stripedProgress) {
     default:
     case STRIPE_PLAIN: {
-        GdkRectangle rect = {x, y, width - 2, height - 2};
-        GdkRegion *region = NULL;
-
+        QtcRect rect = {x, y, width - 2, height - 2};
 #if !GTK_CHECK_VERSION(2, 90, 0)
-        constrainRect(&rect, area);
+        constrainRect(&rect, (QtcRect*)area);
 #endif
-        region = gdk_region_rectangle(&rect);
+        cairo_region_t *region = cairo_region_create_rectangle(&rect);
         if (horiz) {
             for (stripeOffset = 0;stripeOffset < width + PROGRESS_CHUNK_WIDTH;
                  stripeOffset += PROGRESS_CHUNK_WIDTH * 2) {
-                GdkRectangle innerRect = {x + stripeOffset + animShift, y + 1,
-                                          PROGRESS_CHUNK_WIDTH, height - 2};
-
+                QtcRect innerRect = {x + stripeOffset + animShift, y + 1,
+                                     PROGRESS_CHUNK_WIDTH, height - 2};
 #if !GTK_CHECK_VERSION(2, 90, 0)
-                constrainRect(&innerRect, area);
+                constrainRect(&innerRect, (QtcRect*)area);
 #endif
                 if (innerRect.width > 0 && innerRect.height > 0) {
-                    GdkRegion *innerRegion = gdk_region_rectangle(&innerRect);
-
-                    gdk_region_xor(region, innerRegion);
-                    gdk_region_destroy(innerRegion);
+                    cairo_region_xor_rectangle(region, &innerRect);
                 }
             }
         } else {
             for (stripeOffset = 0;stripeOffset < height + PROGRESS_CHUNK_WIDTH;
                  stripeOffset += PROGRESS_CHUNK_WIDTH * 2) {
-                GdkRectangle innerRect = {x + 1, y + stripeOffset + animShift,
-                                          width - 2, PROGRESS_CHUNK_WIDTH};
+                QtcRect innerRect = {x + 1, y + stripeOffset + animShift,
+                                     width - 2, PROGRESS_CHUNK_WIDTH};
 
                 /*constrainRect(&innerRect, area);*/
                 if (innerRect.width > 0 && innerRect.height > 0) {
-                    GdkRegion *innerRegion = gdk_region_rectangle(&innerRect);
-
-                    gdk_region_xor(region, innerRegion);
-                    gdk_region_destroy(innerRegion);
+                    cairo_region_xor_rectangle(region, &innerRect);
                 }
             }
         }
-        setCairoClippingRegion(cr, region);
-        gdk_region_destroy(region);
+        cairo_save(cr);
+        qtcCairoClipRegion(cr, region);
+        cairo_region_destroy(region);
         break;
     }
     case STRIPE_DIAGONAL:
@@ -2821,7 +2787,7 @@ static void setGapClip(cairo_t *cr, GdkRectangle *area, GtkPositionType gapSide,
 {
     if(gapWidth>0)
     {
-        GdkRectangle gapRect;
+        QtcRect gapRect;
         int          adjust=isTab ? (gapX>1 ? 1 : 2) : 0;
 
         switch(gapSide)
@@ -2842,14 +2808,16 @@ static void setGapClip(cairo_t *cr, GdkRectangle *area, GtkPositionType gapSide,
             break;
         }
 
-        GdkRectangle r={x, y, width, height};
-        GdkRegion *region = gdk_region_rectangle(area ? area : &r);
-        GdkRegion *inner = gdk_region_rectangle(&gapRect);
-
-        gdk_region_xor(region, inner);
-        setCairoClippingRegion(cr, region);
-        gdk_region_destroy(inner);
-        gdk_region_destroy(region);
+        QtcRect r = {x, y, width, height};
+        // GdkRectangle and QtcRect(cairo_rectangle_int_t) are either the same
+        // or compatible.
+        const QtcRect *_area =
+            area ? (const QtcRect*)area : &r;
+        cairo_region_t *region = cairo_region_create_rectangle(_area);
+        cairo_region_xor_rectangle(region, &gapRect);
+        cairo_save(cr);
+        qtcCairoClipRegion(cr, region);
+        cairo_region_destroy(region);
     }
 }
 

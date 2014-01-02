@@ -26,6 +26,7 @@
 #include <qtcurve-utils/strs.h>
 #include <qtcurve-utils/gtkprops.h>
 #include <qtcurve-utils/x11utils.h>
+#include <qtcurve-cairo/utils.h>
 
 #include <gmodule.h>
 #include <gdk/gdk.h>

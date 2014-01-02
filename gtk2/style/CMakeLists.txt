@@ -85,7 +85,8 @@ add_definitions(-Dopts=qtcurve_gtk2_opts)
 target_link_libraries(qtcurve-gtk2
   ${GTK2_LDFLAGS}
   ${GTK2_LIBRARIES}
-  m ${QTC_X11_LIBRARIES} qtcurve-utils dl)
+  ${QTC_X11_LIBRARIES}
+  qtcurve-utils qtcurve-cairo m dl)
 
 install(TARGETS qtcurve-gtk2 LIBRARY DESTINATION
   ${GTK2_LIBDIR}/gtk-2.0/${GTK2_BIN_VERSION}/engines)
