@@ -49,8 +49,13 @@ qtcRectEqual(const QtcRect *a, const QtcRect *b)
     return (a->x == b->x && a->y == b->y &&
             a->width == b->width && a->height == b->height);
 }
-void qtcRectConstrain(QtcRect *rect, const QtcRect *con);
 void qtcRectUnion(const QtcRect *src1, const QtcRect *src2, QtcRect *dest);
+bool qtcRectIntersect(const QtcRect *src1, const QtcRect *src2, QtcRect *dest);
+QTC_ALWAYS_INLINE static inline void
+qtcRectConstrain(QtcRect *rect, const QtcRect *con)
+{
+    qtcRectIntersect(rect, con, rect);
+}
 
 QTC_END_DECLS
 

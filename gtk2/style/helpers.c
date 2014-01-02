@@ -617,50 +617,43 @@ EStepper
 getStepper(GtkWidget *widget, int x, int y, int width, int height)
 {
     if (widget && GTK_IS_RANGE(widget)) {
-        GdkRectangle tmp;
-        GdkRectangle check_rectangle;
-        GdkRectangle stepper;
+        const QtcRect stepper = {x, y, width, height};
         GtkOrientation orientation = qtcWidgetGetOrientation(widget);
         QtcRect alloc = qtcWidgetGetAllocation(widget);
+        QtcRect check_rectangle = {alloc.x, alloc.y,
+                                   stepper.width, stepper.height};
 
-        stepper.x = x;
-        stepper.y = y;
-        stepper.width = width;
-        stepper.height = height;
-        check_rectangle.x = alloc.x;
-        check_rectangle.y = alloc.y;
-        check_rectangle.width = stepper.width;
-        check_rectangle.height = stepper.height;
-
-        if (alloc.x == -1 && alloc.y == -1)
+        if (alloc.x == -1 && alloc.y == -1) {
             return STEPPER_NONE;
-
-        if (gdk_rectangle_intersect(&stepper, &check_rectangle, &tmp))
+        }
+        if (qtcRectIntersect(&stepper, &check_rectangle, NULL)) {
             return STEPPER_A;
+        }
 
         if (orientation == GTK_ORIENTATION_HORIZONTAL) {
             check_rectangle.x = alloc.x + stepper.width;
         } else {
             check_rectangle.y = alloc.y + stepper.height;
         }
-
-        if (gdk_rectangle_intersect(&stepper, &check_rectangle, &tmp))
+        if (qtcRectIntersect(&stepper, &check_rectangle, NULL)) {
             return STEPPER_B;
+        }
 
         if (orientation == GTK_ORIENTATION_HORIZONTAL) {
             check_rectangle.x = alloc.x + alloc.width - stepper.width * 2;
         } else {
             check_rectangle.y = alloc.y + alloc.height - stepper.height * 2;
         }
-        if (gdk_rectangle_intersect(&stepper, &check_rectangle, &tmp)) {
+        if (qtcRectIntersect(&stepper, &check_rectangle, NULL)) {
             return STEPPER_C;
         }
+
         if (orientation == GTK_ORIENTATION_HORIZONTAL) {
             check_rectangle.x = alloc.x + alloc.width - stepper.width;
         } else {
             check_rectangle.y = alloc.y + alloc.height - stepper.height;
         }
-        if (gdk_rectangle_intersect(&stepper, &check_rectangle, &tmp)) {
+        if (qtcRectIntersect(&stepper, &check_rectangle, NULL)) {
             return STEPPER_D;
         }
     }

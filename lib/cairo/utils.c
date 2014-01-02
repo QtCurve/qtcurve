@@ -69,37 +69,37 @@ qtcCairoPatternAddColorStop(cairo_pattern_t *pt, double offset,
 }
 
 QTC_EXPORT void
-qtcRectConstrain(QtcRect *rect, const QtcRect *con)
-{
-    if (rect && con) {
-        if (rect->x < con->x) {
-            rect->width -= con->x - rect->x;
-            rect->x = con->x;
-        }
-        if(rect->y < con->y) {
-            rect->height -= rect->y - con->y;
-            rect->y = con->y;
-        }
-        if ((rect->x + rect->width) > (con->x + con->width)) {
-            rect->width -= (rect->x + rect->width) - (con->x + con->width);
-        }
-        if ((rect->y + rect->height) > (con->y + con->height)) {
-            rect->height -= (rect->y + rect->height) - (con->y + con->height);
-        }
-    }
-}
-
-QTC_EXPORT void
 qtcRectUnion(const QtcRect *src1, const QtcRect *src2, QtcRect *dest)
 {
-    int dest_x;
-    int dest_y;
-    dest_x = qtcMin(src1->x, src2->x);
-    dest_y = qtcMin(src1->y, src2->y);
+    int dest_x = qtcMin(src1->x, src2->x);
+    int dest_y = qtcMin(src1->y, src2->y);
     dest->width = qtcMax(src1->x + src1->width,
                          src2->x + src2->width) - dest_x;
     dest->height = qtcMax(src1->y + src1->height,
                           src2->y + src2->height) - dest_y;
     dest->x = dest_x;
     dest->y = dest_y;
+}
+
+QTC_EXPORT bool
+qtcRectIntersect(const QtcRect *src1, const QtcRect *src2, QtcRect *dest)
+{
+    int dest_x = qtcMax(src1->x, src2->x);
+    int dest_y = qtcMax(src1->y, src2->y);
+    int dest_x2 = qtcMin(src1->x + src1->width, src2->x + src2->width);
+    int dest_y2 = qtcMin(src1->y + src1->height, src2->y + src2->height);
+
+    if (dest_x2 > dest_x && dest_y2 > dest_y) {
+        if (dest) {
+            dest->x = dest_x;
+            dest->y = dest_y;
+            dest->width = dest_x2 - dest_x;
+            dest->height = dest_y2 - dest_y;
+        }
+        return true;
+    } else if (dest) {
+        dest->width = 0;
+        dest->height = 0;
+    }
+    return false;
 }
