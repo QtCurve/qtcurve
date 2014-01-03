@@ -354,11 +354,8 @@ _qtcShade(const QtcColor *ca, QtcColor *cb, double k, EShading shading)
 QTC_EXPORT double
 _qtcShineAlpha(const QtcColor *bgnd)
 {
-    double r = bgnd->red;
-    double g = bgnd->green;
-    double b = bgnd->blue;
     double h = 0, s = 0, v = 0;
-    qtcRgbToHsv(r, g, b, &h, &s, &v);
+    qtcRgbToHsv(bgnd->red, bgnd->green, bgnd->blue, &h, &s, &v);
     return v * 0.8;
 }
 

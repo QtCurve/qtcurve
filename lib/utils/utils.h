@@ -54,11 +54,13 @@ qtcFree(void *p)
     qtcNewSize(type, sizeof(type) * (QTC_DEFAULT(n, 1)))
 
 #ifdef __cplusplus
+namespace QtCurve {
 template <class T>
 static inline const T&
 const_(const T &t)
 {
     return t;
+}
 }
 #endif
 
