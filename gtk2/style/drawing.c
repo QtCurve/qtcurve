@@ -62,17 +62,14 @@ windowMask(int x, int y, int w, int h, gboolean full)
 void setCairoClipping(cairo_t *cr, GdkRectangle *area)
 {
     cairo_save(cr);
-    if (area) {
-        cairo_rectangle(cr, area->x, area->y, area->width, area->height);
-        cairo_clip(cr);
-    }
-    cairo_new_path(cr);
+    qtcCairoClipRectangle(cr, (const QtcRect*)area);
 }
 
 void drawAreaColor(cairo_t *cr, GdkRectangle *area, const GdkColor *col,
                    int x, int y, int width, int height, double alpha)
 {
-    setCairoClipping(cr, area);
+    cairo_save(cr);
+    qtcCairoClipRectangle(cr, (const QtcRect*)area);
     cairo_rectangle(cr, x, y, width, height);
     qtcCairoSetColor(cr, col, alpha);
     cairo_fill(cr);

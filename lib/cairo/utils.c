@@ -48,8 +48,10 @@ QTC_EXPORT void
 qtcCairoClipRectangle(cairo_t *cr, const QtcRect *rect)
 {
     cairo_new_path(cr);
-    cairo_rectangle(cr, rect->x, rect->y, rect->width, rect->height);
-    cairo_clip(cr);
+    if (qtcLikely(rect)) {
+        cairo_rectangle(cr, rect->x, rect->y, rect->width, rect->height);
+        cairo_clip(cr);
+    }
 }
 
 QTC_EXPORT void
