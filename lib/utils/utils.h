@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#ifndef __cplucplus
+#ifndef __cplusplus
 #  include <stdbool.h>
 #endif
 
