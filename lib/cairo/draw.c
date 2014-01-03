@@ -71,3 +71,43 @@ qtcCairoRect(cairo_t *cr, const QtcRect *area, int x, int y,
     cairo_fill(cr);
     cairo_restore(cr);
 }
+
+QTC_EXPORT void
+qtcCairoFadedLine(cairo_t *cr, int x, int y, int width, int height,
+                  const QtcRect *area, const QtcRect *gap, bool fadeStart,
+                  bool fadeEnd, double fadeSize, bool horiz,
+                  GdkColor *col, double alpha)
+{
+    double rx = x + 0.5;
+    double ry = y + 0.5;
+    cairo_pattern_t *pt =
+        cairo_pattern_create_linear(rx, ry, horiz ? rx + width - 1 : rx + 1,
+                                    horiz ? ry + 1 : ry + height - 1);
+    cairo_save(cr);
+
+    if (gap) {
+        QtcRect r = {x, y, width, height};
+        cairo_region_t *region =
+            cairo_region_create_rectangle(area ? area : &r);
+        cairo_region_xor_rectangle(region, gap);
+        qtcCairoClipRegion(cr, region);
+        cairo_region_destroy(region);
+    } else {
+        qtcCairoClipRectangle(cr, area);
+    }
+    qtcCairoPatternAddColorStop(pt, 0, col, fadeStart ? 0.0 : alpha);
+    qtcCairoPatternAddColorStop(pt, fadeSize, col, alpha);
+    qtcCairoPatternAddColorStop(pt, 1 - fadeSize, col, alpha);
+    qtcCairoPatternAddColorStop(pt, 1, col, fadeEnd ? 0.0 : alpha);
+    cairo_set_source(cr, pt);
+    if (horiz) {
+        cairo_move_to(cr, x, ry);
+        cairo_line_to(cr, x + width - 1, ry);
+    } else {
+        cairo_move_to(cr, rx, y);
+        cairo_line_to(cr, rx, y + height - 1);
+    }
+    cairo_stroke(cr);
+    cairo_pattern_destroy(pt);
+    cairo_restore(cr);
+}

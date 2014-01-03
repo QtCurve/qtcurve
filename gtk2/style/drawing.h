@@ -25,11 +25,7 @@
 
 #include <common/common.h>
 
-#if (CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 10, 0))
-#define CAIRO_GRAD_END 0.999
-#else
 #define CAIRO_GRAD_END 1.0
-#endif
 
 void setCairoClipping(cairo_t *cr, GdkRectangle *area);
 void drawBgnd(cairo_t *cr, GdkColor *col, GtkWidget *widget,

@@ -42,6 +42,15 @@ void qtcCairoRect(cairo_t *cr, const QtcRect *area, int x, int y,
 #define qtcCairoRect(cr, area, x, y, width, height, col, alpha...)      \
     qtcCairoRect(cr, area, x, y, width, height, col, QTC_DEFAULT(alpha, 1))
 
+void qtcCairoFadedLine(cairo_t *cr, int x, int y, int width, int height,
+                       const QtcRect *area, const QtcRect *gap, bool fadeStart,
+                       bool fadeEnd, double fadeSize, bool horiz,
+                       GdkColor *col, double alpha);
+#define qtcCairoFadedLine(cr, x, y, width, height, area, gap, fadeStart, \
+                          fadeEnd, fadeSize, horiz, col, alpha...)      \
+    qtcCairoFadedLine(cr, x, y, width, height, area, gap, fadeStart,    \
+                      fadeEnd, fadeSize, horiz, col, QTC_DEFAULT(alpha, 1))
+
 QTC_END_DECLS
 
 #endif

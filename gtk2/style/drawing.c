@@ -134,10 +134,6 @@ drawBevelGradient(cairo_t *cr, GdkRectangle *area, int x, int y,
                          qtcMax(val, 0.9) : val, opts.shading);
             }
 
-#if (CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 10, 0))
-            if (pos > 0.9999)
-                pos = 0.999;
-#endif
             qtcCairoPatternAddColorStop(pt, pos, &col,
                                         qtcOneOf(w, WIDGET_TOOLTIP,
                                                  WIDGET_LISTVIEW_HEADER) ?
@@ -148,11 +144,6 @@ drawBevelGradient(cairo_t *cr, GdkRectangle *area, int x, int y,
             (horiz ? height : width) > AGUA_MAX) {
             GdkColor col;
             double pos = AGUA_MAX / ((horiz ? height : width) * 2.0);
-
-#if (CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 10, 0))
-            if (pos > 0.9999)
-                pos = 0.999;
-#endif
 
             qtcShade(base, &col, AGUA_MID_SHADE, opts.shading);
             qtcCairoPatternAddColorStop(pt, pos, &col, alpha);
@@ -906,7 +897,7 @@ drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
 
         cairo_new_path(cr);
         /* Yuck! this is a mess!!!! */
-// Copied from KDE4 version...
+        // Copied from KDE4 version...
         if (!sunken && state != GTK_STATE_INSENSITIVE && !glowFocus &&
             ((((doEtch && qtcNoneOf(widget, WIDGET_OTHER,
                                     WIDGET_SLIDER_TROUGH)) || SLIDER(widget) ||
@@ -951,43 +942,9 @@ drawFadedLine(cairo_t *cr, int x, int y, int width, int height, GdkColor *col,
               GdkRectangle *area, GdkRectangle *gap, gboolean fadeStart,
               gboolean fadeEnd, gboolean horiz, double alpha)
 {
-    double rx = x + 0.5;
-    double ry = y + 0.5;
-    cairo_pattern_t *pt =
-        cairo_pattern_create_linear(rx, ry, horiz ? rx + width - 1 : rx + 1,
-                                    horiz ? ry + 1 : ry + height - 1);
-
-    if (gap) {
-        QtcRect r = {x, y, width, height};
-        // GdkRectangle and QtcRect(cairo_rectangle_int_t) are either the same
-        // or compatible.
-        const QtcRect *_area =
-            area ? (const QtcRect*)area : &r;
-        cairo_region_t *region = cairo_region_create_rectangle(_area);
-        cairo_region_xor_rectangle(region, (const QtcRect*)gap);
-        cairo_save(cr);
-        qtcCairoClipRegion(cr, region);
-        cairo_region_destroy(region);
-    } else {
-        setCairoClipping(cr, area);
-    }
-    qtcCairoPatternAddColorStop(pt, 0, col,
-                                fadeStart && opts.fadeLines ? 0.0 : alpha);
-    qtcCairoPatternAddColorStop(pt, FADE_SIZE, col, alpha);
-    qtcCairoPatternAddColorStop(pt, 1.0 - FADE_SIZE, col, alpha);
-    qtcCairoPatternAddColorStop(pt, CAIRO_GRAD_END, col,
-                                fadeEnd && opts.fadeLines ? 0.0 : alpha);
-    cairo_set_source(cr, pt);
-    if (horiz) {
-        cairo_move_to(cr, x, ry);
-        cairo_line_to(cr, x + width - 1, ry);
-    } else {
-        cairo_move_to(cr, rx, y);
-        cairo_line_to(cr, rx, y + height - 1);
-    }
-    cairo_stroke(cr);
-    cairo_pattern_destroy(pt);
-    cairo_restore(cr);
+    qtcCairoFadedLine(cr, x, y, width, height, (QtcRect*)area, (QtcRect*)gap,
+                      fadeStart && opts.fadeLines,
+                      fadeEnd && opts.fadeLines, FADE_SIZE, horiz, col, alpha);
 }
 
 void
