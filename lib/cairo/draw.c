@@ -111,3 +111,22 @@ qtcCairoFadedLine(cairo_t *cr, int x, int y, int width, int height,
     cairo_pattern_destroy(pt);
     cairo_restore(cr);
 }
+
+QTC_EXPORT void
+qtcCairoStripes(cairo_t *cr, int x, int y, int w, int h,
+                bool horizontal, int stripeWidth)
+{
+    int endx = horizontal ? stripeWidth : 0;
+    int endy = horizontal ? 0 : stripeWidth;
+
+    cairo_pattern_t *pat =
+        cairo_pattern_create_linear(x, y, x + endx, y + endy);
+
+    cairo_pattern_add_color_stop_rgba(pat, 0.0, 1.0, 1.0, 1.0, 0.0);
+    cairo_pattern_add_color_stop_rgba(pat, 1, 1.0, 1.0, 1.0, 0.15);
+    cairo_pattern_set_extend(pat, CAIRO_EXTEND_REFLECT);
+    cairo_set_source(cr, pat);
+    cairo_rectangle(cr, x, y, w, h);
+    cairo_fill(cr);
+    cairo_pattern_destroy(pat);
+}

@@ -50,6 +50,8 @@ void qtcCairoFadedLine(cairo_t *cr, int x, int y, int width, int height,
                           fadeEnd, fadeSize, horiz, col, alpha...)      \
     qtcCairoFadedLine(cr, x, y, width, height, area, gap, fadeStart,    \
                       fadeEnd, fadeSize, horiz, col, QTC_DEFAULT(alpha, 1))
+void qtcCairoStripes(cairo_t *cr, int x, int y, int w, int h,
+                     bool horizontal, int stripeWidth);
 
 QTC_END_DECLS
 

@@ -387,22 +387,10 @@ clipPath(cairo_t *cr, int x, int y, int w, int h, EWidget widget,
                    qtcGetRadius(&opts, w, h, widget, rad), round);
 }
 
-void
+QTC_ALWAYS_INLINE static inline void
 addStripes(cairo_t *cr, int x, int y, int w, int h, bool horizontal)
 {
-    int endx = horizontal ? STRIPE_WIDTH : 0;
-    int endy = horizontal ? 0 : STRIPE_WIDTH;
-
-    cairo_pattern_t *pat =
-        cairo_pattern_create_linear(x, y, x + endx, y + endy);
-
-    cairo_pattern_add_color_stop_rgba(pat, 0.0, 1.0, 1.0, 1.0, 0.0);
-    cairo_pattern_add_color_stop_rgba(pat, CAIRO_GRAD_END, 1.0, 1.0, 1.0, 0.15);
-    cairo_pattern_set_extend(pat, CAIRO_EXTEND_REFLECT);
-    cairo_set_source(cr, pat);
-    cairo_rectangle(cr, x, y, w, h);
-    cairo_fill(cr);
-    cairo_pattern_destroy(pat);
+    qtcCairoStripes(cr, x, y, w, h, horizontal, STRIPE_WIDTH);
 }
 
 void

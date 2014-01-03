@@ -79,7 +79,6 @@ void clipPathRadius(cairo_t *cr, double x, double y, int w, int h,
                     double radius, int round);
 void clipPath(cairo_t *cr, int x, int y, int w, int h, EWidget widget,
               int rad, int round);
-void addStripes(cairo_t *cr, int x, int y, int w, int h, bool horizontal);
 void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
                     GdkRectangle *area, int x, int y, int width, int height,
                     GdkColor *base, GdkColor *colors, int round, EWidget widget,
