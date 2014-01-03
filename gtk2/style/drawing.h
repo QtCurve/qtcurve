@@ -148,7 +148,6 @@ void createRoundedMask(cairo_t *cr, GtkWidget *widget, int x, int y, int width, 
 void clearRoundedMask(GtkWidget *widget, gboolean isToolTip);
 void drawTreeViewLines(cairo_t *cr, GdkColor *col, int x, int y, int h, int depth, int levelIndent, int expanderSize,
                               GtkTreeView *treeView, GtkTreePath *path, GtkTreeViewColumn *column);
-void drawPolygon(GdkWindow *window, GdkColor *col, GdkRectangle *area, GdkPoint *points, int npoints, gboolean fill);
 void drawArrow(GdkWindow *window, GdkColor *col, QtcRect *area,
                GtkArrowType arrow_type, int x, int y, gboolean small,
                gboolean fill);

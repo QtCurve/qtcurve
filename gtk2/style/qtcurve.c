@@ -2695,14 +2695,16 @@ gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType state,
         GdkPoint a[] = {{x + width, y + height - size},
                         {x + width, y + height},
                         {x + width - size,  y + height}};
-        drawPolygon(window, &qtcPalette.background[2], area, a, 3, TRUE);
+        qtcCairoPolygon(cr, &qtcPalette.background[2],
+                        (QtcRect*)area, a, 3, true);
         break;
     }
     case GDK_WINDOW_EDGE_SOUTH_WEST: {
-        GdkPoint a[]={{x + width - size, y + height - size},
-                      {x + width, y + height},
-                      {x + width - size, y + height}};
-        drawPolygon(window, &qtcPalette.background[2], area, a, 3, TRUE);
+        GdkPoint a[] = {{x + width - size, y + height - size},
+                        {x + width, y + height},
+                        {x + width - size, y + height}};
+        qtcCairoPolygon(cr, &qtcPalette.background[2],
+                        (QtcRect*)area, a, 3, true);
         break;
     }
     case GDK_WINDOW_EDGE_NORTH_EAST:

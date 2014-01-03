@@ -2657,16 +2657,6 @@ void drawTreeViewLines(cairo_t *cr, GdkColor *col, int x, int y, int h, int dept
 }
 
 void
-drawPolygon(GdkWindow *window, GdkColor *col,
-            GdkRectangle *area, GdkPoint *points, int npoints, gboolean fill)
-{
-    g_return_if_fail(GDK_IS_DRAWABLE(window));
-    cairo_t *cr = gdk_cairo_create(window);
-    qtcCairoPolygon(cr, col, (QtcRect*)area, points, npoints, fill);
-    cairo_destroy(cr);
-}
-
-void
 drawArrow(GdkWindow *window, GdkColor *col, QtcRect *area,
           GtkArrowType arrow_type, int x, int y, gboolean small, gboolean fill)
 {
