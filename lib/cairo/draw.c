@@ -20,42 +20,24 @@
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
 
-#ifndef __QTC_CAIRO_UTILS_H__
-#define __QTC_CAIRO_UTILS_H__
+#include "draw.h"
 
-#include <qtcurve-utils/utils.h>
-#include <cairo.h>
-
-QTC_BEGIN_DECLS
-
-typedef struct _GdkColor GdkColor;
-// cairo_rectangle_int_t is toooo long...
-typedef cairo_rectangle_int_t QtcRect;
-
-void qtcCairoClipRegion(cairo_t *cr, const cairo_region_t *region);
-void qtcCairoClipRectangle(cairo_t *cr, const QtcRect *rect);
-void qtcCairoSetColor(cairo_t *cr, const GdkColor *col, double a);
-#define qtcCairoSetColor(cr, col, a...)                 \
-    qtcCairoSetColor(cr, col, QTC_DEFAULT(a, 1))
-void qtcCairoPatternAddColorStop(cairo_pattern_t *pt, double offset,
-                                 const GdkColor *col, double a);
-#define qtcCairoPatternAddColorStop(pt, offset, col, a...)              \
-    qtcCairoPatternAddColorStop(pt, offset, col, QTC_DEFAULT(a, 1))
-
-QTC_ALWAYS_INLINE static inline bool
-qtcRectEqual(const QtcRect *a, const QtcRect *b)
+QTC_EXPORT void
+qtcCairoHLine(cairo_t *cr, int x, int y, int w, const GdkColor *col, double a)
 {
-    return (a->x == b->x && a->y == b->y &&
-            a->width == b->width && a->height == b->height);
-}
-void qtcRectUnion(const QtcRect *src1, const QtcRect *src2, QtcRect *dest);
-bool qtcRectIntersect(const QtcRect *src1, const QtcRect *src2, QtcRect *dest);
-QTC_ALWAYS_INLINE static inline void
-qtcRectConstrain(QtcRect *rect, const QtcRect *con)
-{
-    qtcRectIntersect(rect, con, rect);
+    cairo_new_path(cr);
+    qtcCairoSetColor(cr, col, a);
+    cairo_move_to(cr, x, y + 0.5);
+    cairo_line_to(cr, x + w, y + 0.5);
+    cairo_stroke(cr);
 }
 
-QTC_END_DECLS
-
-#endif
+QTC_EXPORT void
+qtcCairoVLine(cairo_t *cr, int x, int y, int h, const GdkColor *col, double a)
+{
+    cairo_new_path(cr);
+    qtcCairoSetColor(cr, col, a);
+    cairo_move_to(cr, x + 0.5, y);
+    cairo_line_to(cr, x + 0.5, y + h);
+    cairo_stroke(cr);
+}

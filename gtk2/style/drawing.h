@@ -32,8 +32,6 @@
 #endif
 
 void setCairoClipping(cairo_t *cr, GdkRectangle *area);
-void drawHLine(cairo_t *cr, const GdkColor *col, double a, int x, int y, int w);
-void drawVLine(cairo_t *cr, const GdkColor *col, double a, int x, int y, int h);
 void drawAreaColor(cairo_t *cr, GdkRectangle *area, const GdkColor *col,
                    int x, int y, int width, int height, double alpha);
 #define drawAreaColor(cr, area, col, x, y, width, height, alpha...)     \

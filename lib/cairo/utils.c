@@ -23,8 +23,8 @@
 #include "utils_p.h"
 #include <qtcurve-utils/number.h>
 
-QTC_EXPORT void
-qtcCairoRegion(cairo_t *cr, const cairo_region_t *region)
+static void
+qtcCairoPathRegion(cairo_t *cr, const cairo_region_t *region)
 {
     int n_boxes = cairo_region_num_rectangles(region);
     QtcRect box;
@@ -39,7 +39,7 @@ qtcCairoClipRegion(cairo_t *cr, const cairo_region_t *region)
 {
     cairo_new_path(cr);
     if (qtcLikely(region)) {
-        qtcCairoRegion(cr, region);
+        qtcCairoPathRegion(cr, region);
         cairo_clip(cr);
     }
 }

@@ -1,5 +1,6 @@
 set(qtcurve_cairo_SRCS
-  utils.c)
+  utils.c
+  draw.c)
 
 if(NOT ENABLE_GTK2 AND NOT ENABLE_GTK3)
   return()

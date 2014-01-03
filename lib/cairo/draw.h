@@ -20,41 +20,21 @@
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
 
-#ifndef __QTC_CAIRO_UTILS_H__
-#define __QTC_CAIRO_UTILS_H__
+#ifndef __QTC_CAIRO_DRAW_H__
+#define __QTC_CAIRO_DRAW_H__
 
-#include <qtcurve-utils/utils.h>
-#include <cairo.h>
+#include "utils.h"
 
 QTC_BEGIN_DECLS
 
-typedef struct _GdkColor GdkColor;
-// cairo_rectangle_int_t is toooo long...
-typedef cairo_rectangle_int_t QtcRect;
-
-void qtcCairoClipRegion(cairo_t *cr, const cairo_region_t *region);
-void qtcCairoClipRectangle(cairo_t *cr, const QtcRect *rect);
-void qtcCairoSetColor(cairo_t *cr, const GdkColor *col, double a);
-#define qtcCairoSetColor(cr, col, a...)                 \
-    qtcCairoSetColor(cr, col, QTC_DEFAULT(a, 1))
-void qtcCairoPatternAddColorStop(cairo_pattern_t *pt, double offset,
-                                 const GdkColor *col, double a);
-#define qtcCairoPatternAddColorStop(pt, offset, col, a...)              \
-    qtcCairoPatternAddColorStop(pt, offset, col, QTC_DEFAULT(a, 1))
-
-QTC_ALWAYS_INLINE static inline bool
-qtcRectEqual(const QtcRect *a, const QtcRect *b)
-{
-    return (a->x == b->x && a->y == b->y &&
-            a->width == b->width && a->height == b->height);
-}
-void qtcRectUnion(const QtcRect *src1, const QtcRect *src2, QtcRect *dest);
-bool qtcRectIntersect(const QtcRect *src1, const QtcRect *src2, QtcRect *dest);
-QTC_ALWAYS_INLINE static inline void
-qtcRectConstrain(QtcRect *rect, const QtcRect *con)
-{
-    qtcRectIntersect(rect, con, rect);
-}
+void qtcCairoHLine(cairo_t *cr, int x, int y, int w,
+                   const GdkColor *col, double a);
+#define qtcCairoHLine(cr, x, y, w, col, a...)           \
+    qtcCairoHLine(cr, x, y, w, col, QTC_DEFAULT(a, 1))
+void qtcCairoVLine(cairo_t *cr, int x, int y, int w,
+                   const GdkColor *col, double a);
+#define qtcCairoVLine(cr, x, y, w, col, a...)           \
+    qtcCairoVLine(cr, x, y, w, col, QTC_DEFAULT(a, 1))
 
 QTC_END_DECLS
 

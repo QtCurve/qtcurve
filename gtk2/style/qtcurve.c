@@ -26,7 +26,7 @@
 #include <qtcurve-utils/strs.h>
 #include <qtcurve-utils/gtkprops.h>
 #include <qtcurve-utils/x11utils.h>
-#include <qtcurve-cairo/utils.h>
+#include <qtcurve-cairo/draw.h>
 
 #include <gmodule.h>
 #include <gdk/gdk.h>
@@ -375,8 +375,10 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
         if(DO_EFFECT && GTK_STATE_INSENSITIVE!=state && DETAIL("entry_bg") &&
            isSwtComboBoxEntry(widget) && gtk_widget_has_focus(widget))
         {
-            drawHLine(cr, CAIRO_COL(qtcPalette.highlight[FRAME_DARK_SHADOW]), 1.0, x, y, width);
-            drawHLine(cr, CAIRO_COL(qtcPalette.highlight[0]), 1.0, x, y+height-1, width);
+            qtcCairoHLine(cr, x, y, width,
+                          &qtcPalette.highlight[FRAME_DARK_SHADOW]);
+            qtcCairoHLine(cr, x, y + height - 1, width,
+                          &qtcPalette.highlight[0]);
         }
 */
     }
@@ -1781,15 +1783,15 @@ gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state,
                     {
                         double c2Alpha=GTK_SHADOW_IN==shadow ? 1.0 : LOWER_BORDER_ALPHA,
                                c1Alpha=GTK_SHADOW_OUT==shadow ? 1.0 : LOWER_BORDER_ALPHA;
-                        drawHLine(cr, &cols[QTC_STD_BORDER], c2Alpha,
-                                  x, y, width);
-                        drawVLine(cr, &cols[QTC_STD_BORDER], c2Alpha,
-                                  x, y, height);
+                        qtcCairoHLine(cr, x, y, width,
+                                      &cols[QTC_STD_BORDER], c2Alpha);
+                        qtcCairoVLine(cr, x, y, height,
+                                      &cols[QTC_STD_BORDER], c2Alpha);
                         if (opts.appearance != APPEARANCE_FLAT) {
-                            drawHLine(cr, &cols[QTC_STD_BORDER], c1Alpha,
-                                      x, y + height - 1, width);
-                            drawVLine(cr, &cols[QTC_STD_BORDER], c1Alpha,
-                                      x + width - 1, y, height);
+                            qtcCairoHLine(cr, x, y + height - 1, width,
+                                          &cols[QTC_STD_BORDER], c1Alpha);
+                            qtcCairoVLine(cr, x + width - 1, y, height,
+                                          &cols[QTC_STD_BORDER], c1Alpha);
                         }
                     }
                     break;
@@ -2304,11 +2306,13 @@ gtkDrawHLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
             case LINE_SUNKEN:
             {
                 drawFadedLine(cr, x1<x2 ? x1 : x2, y, abs(x2-x1), 1, &qtcPalette.background[dark], area, NULL, true, true, true);
-                //drawHLine(cr, CAIRO_COL(qtcPalette.background[dark]), 1.0, x1<x2 ? x1 : x2, y, abs(x2-x1));
+                /* qtcCairoHLine(cr, x1 < x2 ? x1 : x2, y, abs(x2 - x1), */
+                /*               &qtcPalette.background[dark]); */
                 if(LINE_SUNKEN==opts.toolbarSeparators)
                 {
                     cairo_new_path(cr);
-                    //drawHLine(cr, CAIRO_COL(qtcPalette.background[light]), 1.0, x1<x2 ? x1 : x2, y+1, abs(x2-x1));
+                    /* qtcCairoHLine(cr, x1 < x2 ? x1 : x2, y + 1, abs(x2 - x1), */
+                    /*               &qtcPalette.background[light]); */
                     drawFadedLine(cr, x1<x2 ? x1 : x2, y+1, abs(x2-x1), 1, &qtcPalette.background[light], area, NULL, true, true, true);
                 }
             }
@@ -2317,9 +2321,11 @@ gtkDrawHLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
     else if(DETAIL("label"))
     {
         if(state == GTK_STATE_INSENSITIVE)
-            //drawHLine(cr, CAIRO_COL(qtcPalette.background[light]), 1.0, (x1<x2 ? x1 : x2)+1, y+1, abs(x2-x1));
+            /* qtcCairoHLine(cr, (x1 < x2 ? x1 : x2) + 1, y + 1, abs(x2 - x1), */
+            /*               &qtcPalette.background[light]); */
             drawFadedLine(cr, x1<x2 ? x1 : x2, y+1, abs(x2-x1), 1, &qtcPalette.background[light], area, NULL, true, true, true);
-        //drawHLine(cr, CAIRO_COL(style->text[state]), 1.0, x1<x2 ? x1 : x2, y, abs(x2-x1));
+        /* qtcCairoHLine(cr, x1 < x2 ? x1 : x2, y, abs(x2 - x1), */
+        /*               &style->text[state]); */
         drawFadedLine(cr, x1<x2 ? x1 : x2, y, abs(x2-x1), 1, &qtcPalette.background[dark], area, NULL, true, true, true);
     }
     else if(DETAIL("menuitem") || (widget && DETAIL("hseparator") && IS_MENU_ITEM(widget)))
@@ -2337,12 +2343,15 @@ gtkDrawHLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
             offset += 2;
         }
 
-        //drawHLine(cr, CAIRO_COL(qtcPalette.background[MENU_SEP_SHADE]), 1.0, x1<x2 ? x1 : x2, y, abs(x2-x1));
+        /* qtcCairoHLine(cr, x1 < x2 ? x1 : x2, y, abs(x2 - x1), */
+        /*               &qtcPalette.background[MENU_SEP_SHADE]); */
         drawFadedLine(cr, offset+(x1<x2 ? x1 : x2), y+1, abs(x2-x1)-offset, 1, &cols[MENU_SEP_SHADE], area, NULL, true, true, true);
+    } else {
+        /* qtcCairoHLine(cr, x1 < x2 ? x1 : x2, y, abs(x2 - x1), */
+        /*               qtcPalette.background[dark]); */
+        drawFadedLine(cr, x1 < x2 ? x1 : x2, y, abs(x2 - x1), 1,
+                      &qtcPalette.background[dark], area, NULL, true, true, true);
     }
-    else
-        //drawHLine(cr, CAIRO_COL(qtcPalette.background[dark]), 1.0, x1<x2 ? x1 : x2, y, abs(x2-x1));
-        drawFadedLine(cr, x1<x2 ? x1 : x2, y, abs(x2-x1), 1, &qtcPalette.background[dark],  area, NULL, true, true, true);
 
     cairo_destroy(cr);
 }
@@ -2381,17 +2390,28 @@ gtkDrawVLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 case LINE_FLAT:
                 case LINE_SUNKEN:
                 {
-//                     drawVLine(cr, CAIRO_COL(qtcPalette.background[dark]), 1.0, x, y1<y2 ? y1 : y2, abs(y2-y1));
-                    drawFadedLine(cr, x, y1<y2 ? y1 : y2, 1, abs(y2-y1), &qtcPalette.background[dark], area, NULL, true, true, false);
+                    /* qtcCairoVLine(cr, x, y1 < y2 ? y1 : y2, abs(y2 - y1), */
+                    /*               &qtcPalette.background[dark]); */
+                    drawFadedLine(cr, x, y1 < y2 ? y1 : y2, 1, abs(y2 - y1),
+                                  &qtcPalette.background[dark], area, NULL,
+                                  true, true, false);
                     if(LINE_SUNKEN==opts.toolbarSeparators)
-//                         drawVLine(cr, CAIRO_COL(qtcPalette.background[light]), 1.0, x+1, y1<y2 ? y1 : y2, abs(y2-y1));
-                        drawFadedLine(cr, x+1, y1<y2 ? y1 : y2, 1, abs(y2-y1), &qtcPalette.background[light], area, NULL, true, true, false);
+                        /* qtcCairoVLine(cr, x + 1, y1 < y2 ? y1 : y2, */
+                        /*               abs(y2 - y1), */
+                        /*               &qtcPalette.background[light]); */
+                        drawFadedLine(cr, x + 1, y1 < y2 ? y1 : y2, 1,
+                                      abs(y2 - y1),
+                                      &qtcPalette.background[light],
+                                      area, NULL, true, true, false);
                 }
             }
+        } else {
+            /* qtcCairoVLine(cr, x, y1 < y2 ? y1 : y2, abs(y2 - y1), */
+            /*               &qtcPalette.background[dark]); */
+            drawFadedLine(cr, x, y1 < y2 ? y1 : y2, 1, abs(y2 - y1),
+                          &qtcPalette.background[dark], area, NULL, true,
+                          true, false);
         }
-        else
-//             drawVLine(cr, CAIRO_COL(qtcPalette.background[dark]), 1.0, x, y1<y2 ? y1 : y2, abs(y2-y1));
-            drawFadedLine(cr, x, y1<y2 ? y1 : y2, 1, abs(y2-y1), &qtcPalette.background[dark], area, NULL, true, true, false);
     }
     cairo_destroy(cr);
 }
