@@ -110,7 +110,7 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
     g_return_if_fail(GTK_IS_STYLE(style));
     g_return_if_fail(GDK_IS_DRAWABLE(window));
     cairo_t *cr = gdk_cairo_create(window);
-    setCairoClipping(cr, area);
+    qtcCairoClipRect(cr, (QtcRect*)area);
     cairo_set_line_width(cr, 1.0);
 
     gboolean isMenuOrToolTipWindow =
@@ -394,7 +394,7 @@ static void gtkDrawHandle(GtkStyle *style, GdkWindow *window, GtkStateType state
     g_return_if_fail(GDK_IS_WINDOW(window));
     gboolean paf = WIDGET_TYPE_NAME("PanelAppletFrame");
     cairo_t *cr = gdk_cairo_create(window);
-    setCairoClipping(cr, area);
+    qtcCairoClipRect(cr, (QtcRect*)area);
     cairo_set_line_width(cr, 1.0);
 
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %s  ", __FUNCTION__, state, shadow, width, height, detail ? detail : "NULL"),
@@ -723,7 +723,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
         qtcMenuShellSetup(widget);
 
     cairo_t *cr = gdk_cairo_create(window);
-    setCairoClipping(cr, area);
+    qtcCairoClipRect(cr, (QtcRect*)area);
     cairo_set_line_width(cr, 1.0);
     if (spinUp || spinDown) {
         if(!opts.unifySpin && (!opts.unifySpinBtns || sunken/* || GTK_STATE_PRELIGHT==state*/)) {
@@ -805,23 +805,17 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 x-=4;
             width+=4;
 
+            cairo_save(cr);
 #if !GTK_CHECK_VERSION(2, 90, 0)
-            if(moz)
+            if (moz)
 #endif
             {
-                GdkRectangle a;
-
-                a.x=x+2, a.y=y, a.width=width-2, a.height=height;
-                setCairoClipping(cr, &a);
+                QtcRect a = {x + 2, y, width - 2, height};
+                qtcCairoClipRect(cr, &a);
             }
             drawEntryField(cr, style, state, window, widget, area, x, y, width, height, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_SPIN);
-#if !GTK_CHECK_VERSION(2, 90, 0)
-            if(moz)
-#endif
-                cairo_restore(cr);
-        }
-        else if(opts.unifySpinBtns)
-        {
+            cairo_restore(cr);
+        } else if (opts.unifySpinBtns) {
             int offset=(DO_EFFECT && opts.etchEntry ? 1 : 0);
             if(offset)
                 drawEtch(cr, area, widget, x, y, width, height, FALSE,
@@ -1215,37 +1209,37 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 cy+=3;
                 cheight-=6;
 
-                if(SHADE_NONE!=opts.comboBtn)
-                {
-                    GdkRectangle btn;
-                    GdkColor     *cols=qtcPalette.combobtn && GTK_STATE_INSENSITIVE!=state ? qtcPalette.combobtn : btnColors;
-                    int          bg=SHADE_DARKEN==opts.comboBtn || (GTK_STATE_INSENSITIVE==state && SHADE_NONE!=opts.comboBtn)
-                                        ? getFill(state, btnDown, true) : bgnd;
+                if (opts.comboBtn != SHADE_NONE) {
+                    GdkColor *cols = qtcPalette.combobtn && GTK_STATE_INSENSITIVE!=state ? qtcPalette.combobtn : btnColors;
+                    int bg = SHADE_DARKEN==opts.comboBtn || (GTK_STATE_INSENSITIVE==state && SHADE_NONE!=opts.comboBtn) ? getFill(state, btnDown, true) : bgnd;
 
-                    btn.x=cx + (rev ? ind_width + style->xthickness
-                                    : (cwidth - ind_width - style->xthickness)+1),
-                    btn.y=y, btn.width=ind_width+3, btn.height=height;
-
-                    if(!opts.comboSplitter)
-                        setCairoClipping(cr, &btn);
-                    if(rev)
-                        btn.width+=3;
-                    else
-                    {
-                        btn.x-=3;
-                        if(DO_EFFECT)
-                            btn.width+=3;
-                        else
-                            btn.width+=1;
+                    QtcRect btn = {
+                        cx + (rev ? ind_width + style->xthickness :
+                              (cwidth - ind_width - style->xthickness) + 1),
+                        y, ind_width + 3, height
+                    };
+                    cairo_save(cr);
+                    if (!opts.comboSplitter) {
+                        qtcCairoClipRect(cr, &btn);
                     }
-                    drawLightBevel(cr, style, state, area, btn.x, btn.y, btn.width, btn.height,
-                                   &cols[bg], cols, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_COMBO,
-                                   BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER|DF_HIDE_EFFECT, widget);
-                    if(!opts.comboSplitter)
-                        cairo_restore(cr);
-                }
-                else if(opts.comboSplitter)
-                {
+                    if (rev) {
+                        btn.width += 3;
+                    } else {
+                        btn.x -= 3;
+                        if (DO_EFFECT) {
+                            btn.width += 3;
+                        } else {
+                            btn.width += 1;
+                        }
+                    }
+                    drawLightBevel(cr, style, state, area, btn.x, btn.y,
+                                   btn.width, btn.height, &cols[bg], cols,
+                                   rev ? ROUNDED_LEFT : ROUNDED_RIGHT,
+                                   WIDGET_COMBO, BORDER_FLAT,
+                                   (sunken ? DF_SUNKEN : 0) | DF_DO_BORDER |
+                                   DF_HIDE_EFFECT, widget);
+                    cairo_restore(cr);
+                } else if (opts.comboSplitter) {
                     if(sunken)
                         cx++, cy++, cheight--;
 
@@ -1273,38 +1267,36 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 if(DO_EFFECT)
                     vx-=2;
 
-                if(!combo_entry)
-                {
-                    if(SHADE_NONE!=opts.comboBtn)
-                    {
-                        GdkRectangle btn;
-                        GdkColor     *cols=qtcPalette.combobtn && GTK_STATE_INSENSITIVE!=state
-                                        ? qtcPalette.combobtn : btnColors;
-                        int          bg=SHADE_DARKEN==opts.comboBtn ||
-                                            (GTK_STATE_INSENSITIVE==state && SHADE_NONE!=opts.comboBtn)
-                                        ? getFill(state, btnDown, true) : bgnd;
+                if (!combo_entry) {
+                    if (opts.comboBtn != SHADE_NONE) {
+                        GdkColor *cols = qtcPalette.combobtn && GTK_STATE_INSENSITIVE!=state ? qtcPalette.combobtn : btnColors;
+                        int bg = SHADE_DARKEN==opts.comboBtn ||
+                            (GTK_STATE_INSENSITIVE==state && SHADE_NONE!=opts.comboBtn) ? getFill(state, btnDown, true) : bgnd;
 
-                        btn.x=vx+(rev ? LARGE_ARR_WIDTH+4 : 0),
-                        btn.y=y, btn.width=20+3, btn.height=height;
-
-                        if(!opts.comboSplitter)
-                            setCairoClipping(cr, &btn);
-                        if(rev)
-                            btn.width+=3;
-                        else
-                        {
-                            btn.x-=3;
-                            if(DO_EFFECT)
-                                btn.width+=3;
+                        QtcRect btn = {
+                            vx + (rev ? LARGE_ARR_WIDTH + 4 : 0),
+                            y, 20 + 3, height
+                        };
+                        cairo_save(cr);
+                        if (!opts.comboSplitter) {
+                            qtcCairoClipRect(cr, &btn);
                         }
-                        drawLightBevel(cr, style, state, area, btn.x, btn.y, btn.width, btn.height,
-                                       &cols[bg], cols, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_COMBO,
-                                       BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER|DF_HIDE_EFFECT, widget);
-                        if(!opts.comboSplitter)
-                            cairo_restore(cr);
-                    }
-                    else if(opts.comboSplitter)
-                    {
+                        if (rev) {
+                            btn.width += 3;
+                        } else {
+                            btn.x -= 3;
+                            if (DO_EFFECT) {
+                                btn.width += 3;
+                            }
+                        }
+                        drawLightBevel(cr, style, state, area, btn.x, btn.y,
+                                       btn.width, btn.height, &cols[bg], cols,
+                                       rev ? ROUNDED_LEFT : ROUNDED_RIGHT,
+                                       WIDGET_COMBO, BORDER_FLAT,
+                                       (sunken ? DF_SUNKEN : 0) | DF_DO_BORDER |
+                                       DF_HIDE_EFFECT, widget);
+                        cairo_restore(cr);
+                    } else if (opts.comboSplitter) {
                         drawFadedLine(cr, vx+(rev ? LARGE_ARR_WIDTH+4 : 0), y+4, 1, height-8,
                                       &btnColors[darkLine], area, NULL, TRUE, TRUE, FALSE);
 
@@ -1482,7 +1474,7 @@ gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state,
     sanitizeSize(window, &width, &height);
 
     cairo_t *cr = gdk_cairo_create(window);
-    setCairoClipping(cr, area);
+    qtcCairoClipRect(cr, (QtcRect*)area);
     cairo_set_line_width(cr, 1.0);
 
     gboolean comboBoxList=isComboBoxList(widget),
@@ -1860,7 +1852,7 @@ gtkDrawCheck(GtkStyle *style, GdkWindow *window, GtkStateType state,
     g_return_if_fail(GTK_IS_STYLE(style));
     g_return_if_fail(GDK_IS_DRAWABLE(window));
     cairo_t *cr = gdk_cairo_create(window);
-    setCairoClipping(cr, area);
+    qtcCairoClipRect(cr, (QtcRect*)area);
     cairo_set_line_width(cr, 1.0);
     drawCheckBox(cr, state, shadow, style, widget, detail, area,
                  x, y, width, height);
@@ -1875,7 +1867,7 @@ gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state,
     g_return_if_fail(GTK_IS_STYLE(style));
     g_return_if_fail(GDK_IS_DRAWABLE(window));
     cairo_t *cr = gdk_cairo_create(window);
-    setCairoClipping(cr, area);
+    qtcCairoClipRect(cr, (QtcRect*)area);
     cairo_set_line_width(cr, 1.0);
     drawRadioButton(cr, state, shadow, style, widget, detail, area,
                     x, y, width, height);
@@ -2103,7 +2095,7 @@ gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state,
     g_return_if_fail(GTK_IS_STYLE(style));
     g_return_if_fail(GDK_IS_DRAWABLE(window));
     cairo_t *cr = gdk_cairo_create(window);
-    setCairoClipping(cr, area);
+    qtcCairoClipRect(cr, (QtcRect*)area);
     cairo_set_line_width(cr, 1.0);
 
     if ((opts.thin & THIN_FRAMES) && gapX == 0) {
@@ -2141,7 +2133,7 @@ gtkDrawExtension(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
     if (DETAIL("tab")) {
         cairo_t *cr = gdk_cairo_create(window);
-        setCairoClipping(cr, area);
+        qtcCairoClipRect(cr, (QtcRect*)area);
         cairo_set_line_width(cr, 1.0);
         drawTab(cr, state, style, widget, detail, area,
                 x, y, width, height, gapSide);
@@ -2168,7 +2160,7 @@ gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state,
                                     debugDisplayWidget(widget, 10);
 
     cairo_t *cr = gdk_cairo_create(window);
-    setCairoClipping(cr, area);
+    qtcCairoClipRect(cr, (QtcRect*)area);
     cairo_set_line_width(cr, 1.0);
 
     sanitizeSize(window, &width, &height);
@@ -2282,7 +2274,7 @@ gtkDrawShadowGap(GtkStyle *style, GdkWindow *window, GtkStateType state,
     g_return_if_fail(GTK_IS_STYLE(style));
     g_return_if_fail(GDK_IS_DRAWABLE(window));
     cairo_t *cr = gdk_cairo_create(window);
-    setCairoClipping(cr, area);
+    qtcCairoClipRect(cr, (QtcRect*)area);
     cairo_set_line_width(cr, 1.0);
     sanitizeSize(window, &width, &height);
     drawShadowGap(cr, style, shadow, state, widget, area, x, y,
@@ -2305,7 +2297,7 @@ gtkDrawHLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
                                     debugDisplayWidget(widget, 10);
 
     cairo_t *cr = gdk_cairo_create(window);
-    setCairoClipping(cr, area);
+    qtcCairoClipRect(cr, (QtcRect*)area);
     cairo_set_line_width(cr, 1.0);
 
     if (tbar) {
@@ -2383,7 +2375,7 @@ gtkDrawVLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
                                     debugDisplayWidget(widget, 10);
 
     cairo_t *cr = gdk_cairo_create(window);
-    setCairoClipping(cr, area);
+    qtcCairoClipRect(cr, (QtcRect*)area);
     cairo_set_line_width(cr, 1.0);
 
     if (!(DETAIL("vseparator") && isOnComboBox(widget, 0))) /* CPD: Combo handled in drawBox */
@@ -2612,7 +2604,7 @@ gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
              &qtcPalette.focus[FOCUS_SHADE(state == GTK_STATE_SELECTED)]);
 
         cairo_t *cr = gdk_cairo_create(window);
-        setCairoClipping(cr, area);
+        qtcCairoClipRect(cr, (QtcRect*)area);
         cairo_set_line_width(cr, 1.0);
 
         if (qtSettings.app == GTK_APP_JAVA_SWT && view && widget &&
@@ -2738,7 +2730,7 @@ gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType state,
     g_return_if_fail(GTK_IS_STYLE(style));
     g_return_if_fail(GDK_IS_DRAWABLE(window));
     cairo_t *cr = gdk_cairo_create(window);
-    setCairoClipping(cr, area);
+    qtcCairoClipRect(cr, (QtcRect*)area);
     cairo_set_line_width(cr, 1.0);
 
     int size = SIZE_GRIP_SIZE - 2;

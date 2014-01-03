@@ -45,7 +45,7 @@ qtcCairoClipRegion(cairo_t *cr, const cairo_region_t *region)
 }
 
 QTC_EXPORT void
-qtcCairoClipRectangle(cairo_t *cr, const QtcRect *rect)
+qtcCairoClipRect(cairo_t *cr, const QtcRect *rect)
 {
     cairo_new_path(cr);
     if (qtcLikely(rect)) {

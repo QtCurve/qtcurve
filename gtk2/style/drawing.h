@@ -27,7 +27,7 @@
 
 #define CAIRO_GRAD_END 1.0
 
-void setCairoClipping(cairo_t *cr, GdkRectangle *area);
+void setCairoClipping(cairo_t *cr, const QtcRect *area);
 void drawBgnd(cairo_t *cr, GdkColor *col, GtkWidget *widget,
               GdkRectangle *area, int x, int y, int width, int height);
 void drawAreaModColor(cairo_t *cr, GdkRectangle *area, GdkColor *orig,

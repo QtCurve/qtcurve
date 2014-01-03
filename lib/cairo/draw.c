@@ -49,7 +49,7 @@ qtcCairoPolygon(cairo_t *cr, GdkColor *col, QtcRect *area, GdkPoint *points,
 {
     cairo_save(cr);
     cairo_set_line_width(cr, 1);
-    qtcCairoClipRectangle(cr, area);
+    qtcCairoClipRect(cr, area);
     qtcCairoSetColor(cr, col);
     qtcCairoPathPoints(cr, points, npoints);
     cairo_close_path(cr);
@@ -65,7 +65,7 @@ qtcCairoRect(cairo_t *cr, const QtcRect *area, int x, int y,
              int width, int height, const GdkColor *col, double alpha)
 {
     cairo_save(cr);
-    qtcCairoClipRectangle(cr, area);
+    qtcCairoClipRect(cr, area);
     cairo_rectangle(cr, x, y, width, height);
     qtcCairoSetColor(cr, col, alpha);
     cairo_fill(cr);
@@ -93,7 +93,7 @@ qtcCairoFadedLine(cairo_t *cr, int x, int y, int width, int height,
         qtcCairoClipRegion(cr, region);
         cairo_region_destroy(region);
     } else {
-        qtcCairoClipRectangle(cr, area);
+        qtcCairoClipRect(cr, area);
     }
     qtcCairoPatternAddColorStop(pt, 0, col, fadeStart ? 0.0 : alpha);
     qtcCairoPatternAddColorStop(pt, fadeSize, col, alpha);

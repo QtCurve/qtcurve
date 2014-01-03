@@ -36,7 +36,7 @@ typedef cairo_rectangle_int_t QtcRect;
 
 void qtcCairoPathPoints(cairo_t *cr, GdkPoint *pts, int count);
 void qtcCairoClipRegion(cairo_t *cr, const cairo_region_t *region);
-void qtcCairoClipRectangle(cairo_t *cr, const QtcRect *rect);
+void qtcCairoClipRect(cairo_t *cr, const QtcRect *rect);
 void qtcCairoSetColor(cairo_t *cr, const GdkColor *col, double a);
 #define qtcCairoSetColor(cr, col, a...)                 \
     qtcCairoSetColor(cr, col, QTC_DEFAULT(a, 1))
