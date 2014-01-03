@@ -35,6 +35,8 @@ void qtcCairoVLine(cairo_t *cr, int x, int y, int w,
                    const GdkColor *col, double a);
 #define qtcCairoVLine(cr, x, y, w, col, a...)           \
     qtcCairoVLine(cr, x, y, w, col, QTC_DEFAULT(a, 1))
+void qtcCairoPolygon(cairo_t *cr, GdkColor *col, QtcRect *area,
+                     GdkPoint *points, int npoints, bool fill);
 
 QTC_END_DECLS
 

@@ -105,3 +105,12 @@ qtcRectIntersect(const QtcRect *src1, const QtcRect *src2, QtcRect *dest)
     }
     return false;
 }
+
+QTC_EXPORT void
+qtcCairoPathPoints(cairo_t *cr, GdkPoint *pts, int count)
+{
+    cairo_move_to(cr, pts[0].x + 0.5, pts[0].y + 0.5);
+    for (int i = 1;i < count;i++) {
+        cairo_line_to(cr, pts[i].x + 0.5, pts[i].y + 0.5);
+    }
+}

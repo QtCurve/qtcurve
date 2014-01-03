@@ -453,14 +453,18 @@ static void gtkDrawHandle(GtkStyle *style, GdkWindow *window, GtkStateType state
     cairo_destroy(cr);
 }
 
-static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area,
-                         GtkWidget *widget, const char *detail, GtkArrowType arrow_type, gboolean fill, int x, int y,
+static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
+                         GtkShadowType shadow, GdkRectangle *_area,
+                         GtkWidget *widget, const char *detail,
+                         GtkArrowType arrow_type, gboolean fill, int x, int y,
                          int width, int height)
 {
     QTC_UNUSED(fill);
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %s  ", __FUNCTION__, state, shadow, arrow_type, x, y, width, height,
                                            detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 10);
+
+    QtcRect *area = (QtcRect*)_area;
 
     if(DETAIL("arrow"))
     {
@@ -491,10 +495,10 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
             if (opts.doubleGtkComboArrow) {
                 int pad = opts.vArrows ? 0 : 1;
-                drawArrow(window, style, arrowColor, area, GTK_ARROW_UP,
+                drawArrow(window, arrowColor, area, GTK_ARROW_UP,
                           x + width / 2, y + height / 2 -
                           (LARGE_ARR_HEIGHT - pad), FALSE, TRUE);
-                drawArrow(window, style, arrowColor, area,  GTK_ARROW_DOWN,
+                drawArrow(window, arrowColor, area,  GTK_ARROW_DOWN,
                           x + width / 2, y + height / 2 +
                           (LARGE_ARR_HEIGHT - pad), FALSE, TRUE);
             } else {
@@ -505,7 +509,7 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
                       !qtcComboHasFrame(parent))) {
                     x += 2;
                 }
-                drawArrow(window, style, arrowColor, area,  GTK_ARROW_DOWN,
+                drawArrow(window, arrowColor, area,  GTK_ARROW_DOWN,
                           x + width / 2, y + height / 2, FALSE, TRUE);
             }
         } else {
@@ -521,7 +525,7 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
                                 : &style->text[ARROW_STATE(state)];
             if(onComboEntry && GTK_STATE_ACTIVE==origState && opts.unifyCombo)
                 x--, y--;
-            drawArrow(window, style, MO_ARROW(false, col), area, arrow_type,
+            drawArrow(window, MO_ARROW(false, col), area, arrow_type,
                       x + width / 2, y + height / 2, FALSE, TRUE);
         }
     } else {
@@ -634,7 +638,7 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 col=&style->text[GTK_STATE_SELECTED];
         }
 
-        drawArrow(window, style, MO_ARROW(isMenuItem, col), area, arrow_type, x, y, smallArrows, TRUE);
+        drawArrow(window, MO_ARROW(isMenuItem, col), area, arrow_type, x, y, smallArrows, TRUE);
         }
     }
 }
@@ -856,7 +860,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
             qtcWMMoveSetup(widget);
 
         if(GTK_IS_TOGGLE_BUTTON(widget))
-            drawArrow(window, style, &qtcPalette.background[5], area,
+            drawArrow(window, &qtcPalette.background[5], (QtcRect*)area,
                       GTK_ARROW_RIGHT, x + width - (LARGE_ARR_WIDTH / 2 + 4),
                       y + (height - LARGE_ARR_HEIGHT / 2) / 2 + 1, FALSE, TRUE);
     }
@@ -2043,9 +2047,11 @@ static GdkPixbuf * gtkRenderIcon(GtkStyle *style, const GtkIconSource *source, G
     return renderIcon(style, source, direction, state, size, widget, detail);
 }
 
-static void gtkDrawTab(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area,
+static void gtkDrawTab(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *_area,
                        GtkWidget *widget, const char *detail, int x, int y, int width, int height)
 {
+    QTC_UNUSED(style);
+    QtcRect *area = (QtcRect*)_area;
     /* QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style; */
     GdkColor     *arrowColor=MO_ARROW(false, &qtSettings.colors[GTK_STATE_INSENSITIVE==state
                                                                             ? PAL_DISABLED : PAL_ACTIVE]
@@ -2068,12 +2074,12 @@ static void gtkDrawTab(GtkStyle *style, GdkWindow *window, GtkStateType state, G
 
     if (opts.doubleGtkComboArrow) {
         int pad = opts.vArrows ? 0 : 1;
-        drawArrow(window, style, arrowColor, area,  GTK_ARROW_UP,
+        drawArrow(window, arrowColor, area,  GTK_ARROW_UP,
                   x, y + height / 2 - (LARGE_ARR_HEIGHT - pad), FALSE, TRUE);
-        drawArrow(window, style, arrowColor, area,  GTK_ARROW_DOWN,
+        drawArrow(window, arrowColor, area,  GTK_ARROW_DOWN,
                   x, y + height / 2 + (LARGE_ARR_HEIGHT - pad), FALSE, TRUE);
     } else {
-        drawArrow(window, style, arrowColor, area,  GTK_ARROW_DOWN,
+        drawArrow(window, arrowColor, area,  GTK_ARROW_DOWN,
                   x, y + height / 2, FALSE, TRUE);
     }
 }
@@ -2689,14 +2695,14 @@ gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType state,
         GdkPoint a[] = {{x + width, y + height - size},
                         {x + width, y + height},
                         {x + width - size,  y + height}};
-        drawPolygon(window, style, &qtcPalette.background[2], area, a, 3, TRUE);
+        drawPolygon(window, &qtcPalette.background[2], area, a, 3, TRUE);
         break;
     }
     case GDK_WINDOW_EDGE_SOUTH_WEST: {
         GdkPoint a[]={{x + width - size, y + height - size},
                       {x + width, y + height},
                       {x + width - size, y + height}};
-        drawPolygon(window, style, &qtcPalette.background[2], area, a, 3, TRUE);
+        drawPolygon(window, &qtcPalette.background[2], area, a, 3, TRUE);
         break;
     }
     case GDK_WINDOW_EDGE_NORTH_EAST:
@@ -2710,27 +2716,36 @@ gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType state,
     cairo_destroy(cr);
 }
 
-static void gtkDrawExpander(GtkStyle *style, GdkWindow *window, GtkStateType state, GdkRectangle *area, GtkWidget *widget,
-                            const char *detail, int x, int y, GtkExpanderStyle expander_style)
+static void gtkDrawExpander(GtkStyle *style, GdkWindow *window,
+                            GtkStateType state, GdkRectangle *_area,
+                            GtkWidget *widget, const char *detail,
+                            int x, int y, GtkExpanderStyle expander_style)
 {
-    if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %s  ", __FUNCTION__, state, detail ? detail : "NULL"),
-                                    debugDisplayWidget(widget, 10);
+    if (qtSettings.debug == DEBUG_ALL) {
+        printf(DEBUG_PREFIX "%s %d %s  ", __FUNCTION__, state,
+               detail ? detail : "NULL");
+        debugDisplayWidget(widget, 10);
+    }
+    QtcRect *area = (QtcRect*)_area;
 
-    gboolean isExpander=widget && (GTK_IS_EXPANDER(widget) || GTK_IS_TREE_VIEW(widget)),
+    gboolean isExpander = widget && (GTK_IS_EXPANDER(widget) || GTK_IS_TREE_VIEW(widget)),
              fill=!isExpander || opts.coloredMouseOver || GTK_STATE_PRELIGHT!=state;
     GdkColor *col=isExpander && opts.coloredMouseOver && GTK_STATE_PRELIGHT==state
                     ? &qtcPalette.mouseover[ARROW_MO_SHADE]
                     : &style->text[ARROW_STATE(state)];
 
-    x-=(LV_SIZE/2.0)+0.5;
-    x+=2;
-    y-=(LV_SIZE/2.0)+0.5;
+    x -= LV_SIZE / 2.0 + 0.5;
+    x += 2;
+    y -= LV_SIZE / 2.0 + 0.5;
 
-    if(GTK_EXPANDER_COLLAPSED==expander_style)
-        drawArrow(window, style, col, area, reverseLayout(widget) ? GTK_ARROW_LEFT : GTK_ARROW_RIGHT,
-                  x+(LARGE_ARR_WIDTH>>1), y+LARGE_ARR_HEIGHT, FALSE, fill);
-    else
-        drawArrow(window, style, col, area, GTK_ARROW_DOWN, x+(LARGE_ARR_WIDTH>>1), y+LARGE_ARR_HEIGHT, FALSE, fill);
+    if (expander_style == GTK_EXPANDER_COLLAPSED) {
+        drawArrow(window, col, area,
+                  reverseLayout(widget) ? GTK_ARROW_LEFT : GTK_ARROW_RIGHT,
+                  x + LARGE_ARR_WIDTH / 2, y + LARGE_ARR_HEIGHT, FALSE, fill);
+    } else {
+        drawArrow(window, col, area, GTK_ARROW_DOWN,
+                  x + LARGE_ARR_WIDTH / 2, y + LARGE_ARR_HEIGHT, FALSE, fill);
+    }
 }
 
 static void

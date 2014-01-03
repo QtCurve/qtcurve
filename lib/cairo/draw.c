@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #include "draw.h"
+#include "utils_p.h"
 
 QTC_EXPORT void
 qtcCairoHLine(cairo_t *cr, int x, int y, int w, const GdkColor *col, double a)
@@ -40,4 +41,21 @@ qtcCairoVLine(cairo_t *cr, int x, int y, int h, const GdkColor *col, double a)
     cairo_move_to(cr, x + 0.5, y);
     cairo_line_to(cr, x + 0.5, y + h);
     cairo_stroke(cr);
+}
+
+QTC_EXPORT void
+qtcCairoPolygon(cairo_t *cr, GdkColor *col, QtcRect *area, GdkPoint *points,
+                int npoints, bool fill)
+{
+    cairo_save(cr);
+    cairo_set_line_width(cr, 1);
+    qtcCairoClipRectangle(cr, area);
+    qtcCairoSetColor(cr, col);
+    qtcCairoPathPoints(cr, points, npoints);
+    cairo_close_path(cr);
+    cairo_stroke_preserve(cr);
+    if (fill) {
+        cairo_fill(cr);
+    }
+    cairo_restore(cr);
 }

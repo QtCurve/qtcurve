@@ -67,7 +67,6 @@ typedef enum {
     DF_HAS_FOCUS = 0x040
 } EDrawFlags;
 
-void plotPoints(cairo_t *cr, GdkPoint *pts, int count);
 void createTLPath(cairo_t *cr, double xd, double yd, double width,
                   double height, double radius, int round);
 void createBRPath(cairo_t *cr, double xd, double yd, double width,
@@ -149,9 +148,10 @@ void createRoundedMask(cairo_t *cr, GtkWidget *widget, int x, int y, int width, 
 void clearRoundedMask(GtkWidget *widget, gboolean isToolTip);
 void drawTreeViewLines(cairo_t *cr, GdkColor *col, int x, int y, int h, int depth, int levelIndent, int expanderSize,
                               GtkTreeView *treeView, GtkTreePath *path, GtkTreeViewColumn *column);
-void drawPolygon(GdkWindow *window, GtkStyle *style, GdkColor *col, GdkRectangle *area, GdkPoint *points, int npoints, gboolean fill);
-void drawArrow(GdkWindow *window, GtkStyle *style, GdkColor *col, GdkRectangle *area, GtkArrowType arrow_type,
-                      int x, int y, gboolean small, gboolean fill);
+void drawPolygon(GdkWindow *window, GdkColor *col, GdkRectangle *area, GdkPoint *points, int npoints, gboolean fill);
+void drawArrow(GdkWindow *window, GdkColor *col, QtcRect *area,
+               GtkArrowType arrow_type, int x, int y, gboolean small,
+               gboolean fill);
 void drawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state, gboolean use_text, GdkRectangle *area, int x, int y, PangoLayout *layout);
 void fillTab(cairo_t *cr, GtkStyle *style, GtkWidget *widget, GdkRectangle *area, GtkStateType state,
                     GdkColor *col, int x, int y, int width, int height, gboolean horiz, EWidget tab, gboolean grad);

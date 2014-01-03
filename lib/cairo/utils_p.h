@@ -34,6 +34,11 @@ struct _GdkColor {
     uint16_t blue;
 };
 
+struct _GdkPoint {
+    int x;
+    int y;
+};
+
 QTC_END_DECLS
 
 #endif

@@ -206,15 +206,6 @@ gboolean drawBackgroundPng(const char *png)
 #endif
 
 void
-plotPoints(cairo_t *cr, GdkPoint *pts, int count)
-{
-    cairo_move_to(cr, pts[0].x + 0.5, pts[0].y + 0.5);
-    for (int i = 1;i < count;i++) {
-        cairo_line_to(cr, pts[i].x + 0.5, pts[i].y + 0.5);
-    }
-}
-
-void
 createTLPath(cairo_t *cr, double xd, double yd, double width,
              double height, double radius, int round)
 {
@@ -1772,7 +1763,7 @@ setProgressStripeClipping(cairo_t *cr, GdkRectangle *area, int x, int y,
                                   {(x+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH)-height, y+height-1},
                                   {(x+stripeOffset+animShift)-height,                      y+height-1}};
 
-                plotPoints(cr, pts, 4);
+                qtcCairoPathPoints(cr, pts, 4);
             }
         else
             for(stripeOffset=0; stripeOffset<(height+width+2); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
@@ -1782,7 +1773,7 @@ setProgressStripeClipping(cairo_t *cr, GdkRectangle *area, int x, int y,
                                  {x+width-1, (y+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH)-width},
                                  {x,         y+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH}};
 
-                plotPoints(cr, pts, 4);
+                qtcCairoPathPoints(cr, pts, 4);
             }
 
         cairo_clip(cr);
@@ -2119,7 +2110,7 @@ drawTriangularSlider(cairo_t *cr, GtkStyle *style, GtkStateType state,
         GdkPoint pts[] = {{x, y}, {x, y + 2}, {x + 2, y}, {x + 8, y},
                           {x + 10, y + 2}, {x + 10, y + 9}, {x + 5, y + 14},
                           {x, y + 9}};
-        plotPoints(cr, pts, 8);
+        qtcCairoPathPoints(cr, pts, 8);
     }
         break;
     case GTK_ARROW_RIGHT:
@@ -2128,7 +2119,7 @@ drawTriangularSlider(cairo_t *cr, GtkStyle *style, GtkStateType state,
         GdkPoint pts[] = {{x, y}, {x + 2, y}, {x, y + 2}, {x, y + 8},
                           {x + 2, y + 10}, {x + 9, y + 10}, {x + 14, y + 5},
                           {x + 9, y}};
-        plotPoints(cr, pts, 8);
+        qtcCairoPathPoints(cr, pts, 8);
     }
     }
     cairo_clip(cr);
@@ -2666,61 +2657,49 @@ void drawTreeViewLines(cairo_t *cr, GdkColor *col, int x, int y, int h, int dept
 }
 
 void
-drawPolygon(GdkWindow *window, GtkStyle *style, GdkColor *col,
+drawPolygon(GdkWindow *window, GdkColor *col,
             GdkRectangle *area, GdkPoint *points, int npoints, gboolean fill)
 {
-    g_return_if_fail(GTK_IS_STYLE(style));
     g_return_if_fail(GDK_IS_DRAWABLE(window));
     cairo_t *cr = gdk_cairo_create(window);
-    cairo_set_line_width(cr, 1);
-    setCairoClipping(cr, area);
-    qtcCairoSetColor(cr, col);
-    plotPoints(cr, points, npoints);
-    cairo_close_path(cr);
-    cairo_stroke_preserve(cr);
-    if (fill) {
-        cairo_fill(cr);
-    }
+    qtcCairoPolygon(cr, col, (QtcRect*)area, points, npoints, fill);
     cairo_destroy(cr);
 }
 
 void
-drawArrow(GdkWindow *window, GtkStyle *style, GdkColor *col,
-          GdkRectangle *area, GtkArrowType arrow_type, int x, int y,
-          gboolean small, gboolean fill)
+drawArrow(GdkWindow *window, GdkColor *col, QtcRect *area,
+          GtkArrowType arrow_type, int x, int y, gboolean small, gboolean fill)
 {
+    g_return_if_fail(GDK_IS_DRAWABLE(window));
+    cairo_t *cr = gdk_cairo_create(window);
     if (small) {
         switch (arrow_type) {
         case GTK_ARROW_UP: {
             GdkPoint a[] = {{x + 2, y}, {x, y - 2}, {x - 2, y}, {x - 2, y + 1},
                             {x, y - 1}, {x + 2, y + 1}};
-            drawPolygon(window, style, col, area, a,
-                        opts.vArrows ? 6 : 3, fill);
+            qtcCairoPolygon(cr, col, area, a, opts.vArrows ? 6 : 3, fill);
             break;
         }
         case GTK_ARROW_DOWN: {
             GdkPoint a[] = {{x + 2, y}, {x, y + 2}, {x - 2, y}, {x - 2, y - 1},
                             {x, y + 1}, {x + 2, y - 1}};
-            drawPolygon(window, style, col, area, a,
-                        opts.vArrows ? 6 : 3, fill);
+            qtcCairoPolygon(cr, col, area, a, opts.vArrows ? 6 : 3, fill);
             break;
         }
         case GTK_ARROW_RIGHT: {
             GdkPoint a[] = {{x, y - 2}, {x + 2, y}, {x, y + 2}, {x - 1, y + 2},
                             {x + 1, y}, {x - 1, y - 2}};
-            drawPolygon(window, style, col, area, a,
-                        opts.vArrows ? 6 : 3, fill);
+            qtcCairoPolygon(cr, col, area, a, opts.vArrows ? 6 : 3, fill);
             break;
         }
         case GTK_ARROW_LEFT: {
             GdkPoint a[] = {{x, y - 2}, {x - 2, y}, {x, y + 2}, {x + 1, y + 2},
                             {x - 1, y}, {x + 1, y - 2}};
-            drawPolygon(window, style, col, area, a,
-                        opts.vArrows ? 6 : 3, fill);
+            qtcCairoPolygon(cr, col, area, a, opts.vArrows ? 6 : 3, fill);
             break;
         }
         default:
-            return;
+            break;
         }
     } else {
         /* Large arrows... */
@@ -2729,38 +2708,35 @@ drawArrow(GdkWindow *window, GtkStyle *style, GdkColor *col,
             GdkPoint a[] = {{x + 3, y + 1}, {x, y - 2}, {x - 3, y + 1},
                             {x - 3, y + 2}, {x - 2, y + 2}, {x, y},
                             {x + 2, y + 2}, {x + 3, y + 2}};
-            drawPolygon(window, style, col, area, a,
-                        opts.vArrows ? 8 : 3, fill);
+            qtcCairoPolygon(cr, col, area, a, opts.vArrows ? 8 : 3, fill);
             break;
         }
         case GTK_ARROW_DOWN: {
             GdkPoint a[] = {{x + 3, y - 1}, {x, y + 2}, {x - 3, y - 1},
                             {x - 3, y - 2}, {x - 2, y - 2}, {x, y},
                             {x + 2, y - 2}, {x + 3,y - 2}};
-            drawPolygon(window, style, col, area, a,
-                        opts.vArrows ? 8 : 3, fill);
+            qtcCairoPolygon(cr, col, area, a, opts.vArrows ? 8 : 3, fill);
             break;
         }
         case GTK_ARROW_RIGHT: {
             GdkPoint a[] = {{x - 1, y + 3}, {x + 2, y}, {x - 1, y - 3},
                             {x - 2, y - 3}, {x - 2, y - 2}, {x, y},
                             {x - 2, y + 2}, {x - 2, y + 3}};
-            drawPolygon(window, style, col, area, a,
-                        opts.vArrows ? 8 : 3, fill);
+            qtcCairoPolygon(cr, col, area, a, opts.vArrows ? 8 : 3, fill);
             break;
         }
         case GTK_ARROW_LEFT: {
             GdkPoint a[] = {{x + 1, y - 3}, {x - 2, y}, {x + 1, y + 3},
                             {x + 2, y + 3}, {x + 2, y + 2}, {x, y},
                             {x + 2, y - 2}, {x + 2, y - 3}};
-            drawPolygon(window, style, col, area, a,
-                        opts.vArrows ? 8 : 3, fill);
+            qtcCairoPolygon(cr, col, area, a, opts.vArrows ? 8 : 3, fill);
             break;
         }
         default:
-            return;
+            break;
         }
     }
+    cairo_destroy(cr);
 }
 
 static void setGapClip(cairo_t *cr, GdkRectangle *area, GtkPositionType gapSide, int gapX, int gapWidth, int x, int y, int width,
