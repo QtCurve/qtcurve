@@ -32,11 +32,6 @@
 #endif
 
 void setCairoClipping(cairo_t *cr, GdkRectangle *area);
-void drawAreaColor(cairo_t *cr, GdkRectangle *area, const GdkColor *col,
-                   int x, int y, int width, int height, double alpha);
-#define drawAreaColor(cr, area, col, x, y, width, height, alpha...)     \
-    drawAreaColor(cr, area, col, x, y, width, height, QTC_DEFAULT(alpha, 1))
-
 void drawBgnd(cairo_t *cr, GdkColor *col, GtkWidget *widget,
               GdkRectangle *area, int x, int y, int width, int height);
 void drawAreaModColor(cairo_t *cr, GdkRectangle *area, GdkColor *orig,

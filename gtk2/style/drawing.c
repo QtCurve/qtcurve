@@ -65,24 +65,13 @@ void setCairoClipping(cairo_t *cr, GdkRectangle *area)
     qtcCairoClipRectangle(cr, (const QtcRect*)area);
 }
 
-void drawAreaColor(cairo_t *cr, GdkRectangle *area, const GdkColor *col,
-                   int x, int y, int width, int height, double alpha)
-{
-    cairo_save(cr);
-    qtcCairoClipRectangle(cr, (const QtcRect*)area);
-    cairo_rectangle(cr, x, y, width, height);
-    qtcCairoSetColor(cr, col, alpha);
-    cairo_fill(cr);
-    cairo_restore(cr);
-}
-
 void
 drawBgnd(cairo_t *cr, GdkColor *col, GtkWidget *widget, GdkRectangle *area,
          int x, int y, int width, int height)
 {
     GdkColor *parent_col = getParentBgCol(widget);
-    drawAreaColor(cr, area, parent_col ? parent_col : col,
-                  x, y, width, height);
+    qtcCairoRect(cr, (QtcRect*)area, x, y, width, height,
+                 parent_col ? parent_col : col);
 }
 
 void
@@ -90,8 +79,7 @@ drawAreaModColor(cairo_t *cr, GdkRectangle *area, GdkColor *orig,
                  double mod, int x, int y, int width, int height)
 {
     GdkColor modified = shadeColor(orig, mod);
-
-    drawAreaColor(cr, area, &modified, x, y, width, height);
+    qtcCairoRect(cr, (QtcRect*)area, x, y, width, height, &modified);
 }
 
 void
@@ -106,7 +94,7 @@ drawBevelGradient(cairo_t *cr, GdkRectangle *area, int x, int y,
     if (qtcIsFlat(bevApp)) {
         if ((WIDGET_TAB_TOP != w && WIDGET_TAB_BOT != w) ||
             !qtcIsCustomBgnd(&opts) || opts.tabBgnd || !sel) {
-            drawAreaColor(cr, area, base, x, y, width, height, alpha);
+            qtcCairoRect(cr, (QtcRect*)area, x, y, width, height, base, alpha);
         }
     } else {
         cairo_pattern_t *pt =
@@ -1505,18 +1493,17 @@ gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, GdkWin
             clip.x=x, clip.y=y, clip.width=width, clip.height=height;
             setCairoClipping(cr, &clip);
 
-            if(useAlpha)
-            {
-                alpha=opacity/100.0;
+            if (useAlpha) {
+                alpha = opacity / 100.0;
                 cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
             }
 
-            if(flatBgnd)
-                drawAreaColor(cr, area, col, -wx, -wy, ww, wh, alpha);
-            else if(APPEARANCE_STRIPED==opts.bgndAppearance)
-                drawStripedBgnd(cr, style, area, -wx, -wy, ww, wh, col, TRUE, alpha);
-            else if(APPEARANCE_FILE==opts.bgndAppearance)
-            {
+            if (flatBgnd) {
+                qtcCairoRect(cr, (QtcRect*)area, -wx, -wy, ww, wh, col, alpha);
+            } else if (opts.bgndAppearance == APPEARANCE_STRIPED) {
+                drawStripedBgnd(cr, style, area, -wx, -wy, ww, wh, col,
+                                TRUE, alpha);
+            } else if (opts.bgndAppearance == APPEARANCE_FILE) {
                 cairo_save(cr);
                 cairo_translate(cr, -wx, -wy);
                 drawBgndImage(cr, style, area, 0, 0, ww, wh, col, TRUE, alpha);
@@ -1645,9 +1632,9 @@ drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
         if (opts.round > ROUND_FULL)
             clipPath(cr, x + 1, y + 1, width - 2, height - 2,
                      WIDGET_ENTRY, RADIUS_INTERNAL, ROUNDED_ALL);
-        drawAreaColor(cr, area, enabled ? &style->base[GTK_STATE_NORMAL] :
-                      &style->bg[GTK_STATE_INSENSITIVE], x + 1, y + 1,
-                      width - 2, height - 2);
+        qtcCairoRect(cr, (QtcRect*)area, x + 1, y + 1, width - 2, height - 2,
+                     enabled ? &style->base[GTK_STATE_NORMAL] :
+                     &style->bg[GTK_STATE_INSENSITIVE]);
 
         if (opts.round > ROUND_FULL) {
             cairo_restore(cr);
@@ -1931,7 +1918,8 @@ void drawProgressGroove(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkWin
 
     if(!isList && (qtcIsFlatBgnd(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, window, widget, x, y, width, height)))
        && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
-        drawAreaColor(cr, area, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
+        qtcCairoRect(cr, (QtcRect*)area, x, y, width, height,
+                     &qtcPalette.background[ORIGINAL_SHADE]);
 
     if(doEtch && opts.borderProgress)
         x++, y++, width-=2, height-=2;
@@ -2124,20 +2112,21 @@ drawTriangularSlider(cairo_t *cr, GtkStyle *style, GtkStateType state,
     }
     cairo_clip(cr);
     if (qtcIsFlat(opts.sliderAppearance)) {
-        drawAreaColor(cr, NULL, &colors[bgnd], x+1, y+1, width-2, height-2);
+        qtcCairoRect(cr, NULL, x + 1, y + 1, width - 2, height - 2,
+                     &colors[bgnd]);
         if (MO_PLASTIK == opts.coloredMouseOver && coloredMouseOver) {
             int col = SLIDER_MO_SHADE;
             int len = SLIDER_MO_LEN;
             if (horiz) {
-                drawAreaColor(cr, NULL, &qtcPalette.mouseover[col], x + 1,
-                              y + 1, len, size-2);
-                drawAreaColor(cr, NULL, &qtcPalette.mouseover[col],
-                              x + width - (1 + len), y + 1, len, size - 2);
+                qtcCairoRect(cr, NULL, x + 1, y + 1, len, size - 2,
+                             &qtcPalette.mouseover[col]);
+                qtcCairoRect(cr, NULL, x + width - (1 + len), y + 1, len,
+                             size - 2, &qtcPalette.mouseover[col]);
             } else {
-                drawAreaColor(cr, NULL, &qtcPalette.mouseover[col], x + 1,
-                              y + 1, size - 2, len);
-                drawAreaColor(cr, NULL, &qtcPalette.mouseover[col], x + 1,
-                              y + height - (1 + len), size - 2, len);
+                qtcCairoRect(cr, NULL, x + 1, y + 1, size - 2, len,
+                             &qtcPalette.mouseover[col]);
+                qtcCairoRect(cr, NULL, x + 1, y + height - (1 + len), size - 2,
+                             len, &qtcPalette.mouseover[col]);
             }
         }
     } else {
@@ -2401,7 +2390,8 @@ drawScrollbarGroove(cairo_t *cr, GtkStyle *style, GtkStateType state,
 
             setCairoClipping(cr, area);
 
-            drawAreaColor(cr, area, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
+            qtcCairoRect(cr, (QtcRect*)area, x, y, width, height,
+                         &qtcPalette.background[ORIGINAL_SHADE]);
             if (horiz) {
                 if (qtcOneOf(sbarRound, ROUNDED_LEFT, ROUNDED_ALL)) {
                     qtcCairoVLine(cr, x, y, height, bgnd_col);
@@ -2841,16 +2831,17 @@ void fillTab(cairo_t *cr, GtkStyle *style, GtkWidget *widget, GdkRectangle *area
             alpha=opts.bgndOpacity/150.0;
     }
 
-    if(selected && APPEARANCE_INVERTED==opts.appearance)
-    {
-        if(flatBgnd)
-            drawAreaColor(cr, area, &style->bg[GTK_STATE_NORMAL], x, y, width, height, alpha);
-    }
-    else if(grad)
+    if (selected && opts.appearance == APPEARANCE_INVERTED) {
+        if (flatBgnd) {
+            qtcCairoRect(cr, (QtcRect*)area, x, y, width, height,
+                         &style->bg[GTK_STATE_NORMAL], alpha);
+        }
+    } else if (grad) {
         drawBevelGradient(cr, area, x, y, width, height, c, horiz, selected,
                           selected ? SEL_TAB_APP : NORM_TAB_APP, tab, alpha);
-    else if(!selected || flatBgnd)
-        drawAreaColor(cr, area, c, x, y, width, height, alpha);
+    } else if (!selected || flatBgnd) {
+        qtcCairoRect(cr, (QtcRect*)area, x, y, width, height, c, alpha);
+    }
 }
 
 void colorTab(cairo_t *cr, int x, int y, int width, int height, int round, EWidget tab, gboolean horiz)
@@ -3174,8 +3165,8 @@ drawMenu(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
                               opts.menuBgndGrad == GT_HORIZ, FALSE,
                               opts.menuBgndAppearance, WIDGET_OTHER, alpha);
     } else if (opts.shadePopupMenu || opts.lighterPopupMenuBgnd || useAlpha) {
-        drawAreaColor(cr, area, &qtcPalette.menu[ORIGINAL_SHADE], x, y,
-                      width, height, alpha);
+        qtcCairoRect(cr, (QtcRect*)area, x, y, width, height,
+                     &qtcPalette.menu[ORIGINAL_SHADE], alpha);
     }
     if(/*!comboMenu && */IMG_NONE!=opts.menuBgndImage.type)
         drawBgndRings(cr, x, y, width, height, FALSE);

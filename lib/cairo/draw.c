@@ -59,3 +59,15 @@ qtcCairoPolygon(cairo_t *cr, GdkColor *col, QtcRect *area, GdkPoint *points,
     }
     cairo_restore(cr);
 }
+
+QTC_EXPORT void
+qtcCairoRect(cairo_t *cr, const QtcRect *area, int x, int y,
+             int width, int height, const GdkColor *col, double alpha)
+{
+    cairo_save(cr);
+    qtcCairoClipRectangle(cr, area);
+    cairo_rectangle(cr, x, y, width, height);
+    qtcCairoSetColor(cr, col, alpha);
+    cairo_fill(cr);
+    cairo_restore(cr);
+}

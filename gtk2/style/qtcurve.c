@@ -255,21 +255,22 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
             }
         }
 
-        if(!isCombo || GTK_STATE_SELECTED!=state)
-            drawAreaColor(cr, area,
-                          getCellCol(haveAlternateListViewCol() && checkRules && !isEven
-                                        ? &qtSettings.colors[PAL_ACTIVE][COLOR_LV]
-                                        : &style->base[GTK_STATE_NORMAL], detail),
-                          x, y, width, height);
-
-        if(isCombo)
-        {
-            if(GTK_STATE_SELECTED==state)
-                drawAreaColor(cr, area, &style->base[widget && gtk_widget_has_focus(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE],
-                              x, y, width, height);
+        if (!isCombo || state != GTK_STATE_SELECTED) {
+            qtcCairoRect(cr, (QtcRect*)area, x, y, width, height,
+                         getCellCol(haveAlternateListViewCol() &&
+                                    checkRules && !isEven ?
+                                    &qtSettings.colors[PAL_ACTIVE][COLOR_LV] :
+                                    &style->base[GTK_STATE_NORMAL], detail));
         }
-        else
-        {
+        if (isCombo) {
+            if (state == GTK_STATE_SELECTED) {
+                qtcCairoRect(cr, (QtcRect*)area, x, y, width, height,
+                             &style->base[widget &&
+                                          gtk_widget_has_focus(widget) ?
+                                          GTK_STATE_SELECTED :
+                                          GTK_STATE_ACTIVE]);
+            }
+        } else {
             double   alpha=1.0;
             int      selX=x,
                      selW=width,
@@ -1382,7 +1383,8 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                                    width < height : width > height),
                                   FALSE, MODIFY_AGUA(app), WIDGET_OTHER, alpha);
             } else if (fillBackground) {
-                drawAreaColor(cr, area, col, x, y, width, height, alpha);
+                qtcCairoRect(cr, (QtcRect*)area, x, y, width, height,
+                             col, alpha);
             }
 
             if(GTK_SHADOW_NONE!=shadow && TB_NONE!=opts.toolbarBorders)
@@ -1438,11 +1440,15 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
     } else {
         EWidget wt=!detail && GTK_IS_TREE_VIEW(widget) ? WIDGET_PBAR_TROUGH : WIDGET_FRAME;
         clipPath(cr, x+1, y+1, width-2, height-2, WIDGET_OTHER, RADIUS_INTERNAL, round);
-        if(qtcIsFlatBgnd(opts.bgndAppearance) || !widget || !drawWindowBgnd(cr, style, area, window, widget, x+1, y+1, width-2, height-2))
-        {
-            drawAreaColor(cr, area, &style->bg[state], x+1, y+1, width-2, height-2);
-            if(widget && IMG_NONE!=opts.bgndImage.type)
-                drawWindowBgnd(cr, style, area, window, widget, x, y, width, height);
+        if (qtcIsFlatBgnd(opts.bgndAppearance) || !widget ||
+            !drawWindowBgnd(cr, style, area, window, widget, x + 1, y + 1,
+                            width - 2, height - 2)) {
+            qtcCairoRect(cr, (QtcRect*)area, x + 1, y + 1,
+                         width - 2, height - 2, &style->bg[state]);
+            if (widget && opts.bgndImage.type != IMG_NONE) {
+                drawWindowBgnd(cr, style, area, window, widget, x, y,
+                               width, height);
+            }
         }
         cairo_restore(cr);
 
@@ -1493,30 +1499,30 @@ gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state,
                      isAlphaWidget=!nonGtk && composActive && isRgbaWidget(widget),
                      useAlpha=!nonGtk && qtSettings.useAlpha && isAlphaWidget;
 
-            if(/*(composActive && !useAlpha) || */(opts.popupBorder && square))
-            {
-                drawAreaColor(cr, area, &style->base[state], x, y, width, height);
+            if (opts.popupBorder && square) {
+                qtcCairoRect(cr, (QtcRect*)area, x, y, width, height,
+                             &style->base[state]);
                 cairo_new_path(cr);
                 cairo_rectangle(cr, x + 0.5, y + 0.5, width - 1, height - 1);
                 qtcCairoSetColor(cr, &qtcPalette.background[QTC_STD_BORDER]);
                 cairo_stroke(cr);
-            }
-            else // if(!opts.popupBorder || !(opts.square&SQUARE_POPUP_MENUS))
-            {
-                if(useAlpha)
-                {
+            } else /* if (!opts.popupBorder || */
+                   /*     !(opts.square & SQUARE_POPUP_MENUS)) */ {
+                if (useAlpha) {
                     cairo_rectangle(cr, x, y, width, height);
                     cairo_set_operator(cr, CAIRO_OPERATOR_CLEAR);
                     cairo_set_source_rgba(cr, 0, 0, 0, 1);
                     cairo_fill(cr);
                     cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
                     clearRoundedMask(widget, FALSE);
+                } else {
+                    createRoundedMask(cr, widget, x, y, width, height,
+                                      MENU_AND_TOOLTIP_RADIUS, FALSE);
                 }
-                else
-                    createRoundedMask(cr, widget, x, y, width, height, MENU_AND_TOOLTIP_RADIUS, FALSE);
 
                 clipPathRadius(cr, x, y, width, height, MENU_AND_TOOLTIP_RADIUS, ROUNDED_ALL);
-                drawAreaColor(cr, area, &style->base[state], x, y, width, height);
+                qtcCairoRect(cr, (QtcRect*)area, x, y, width, height,
+                             &style->base[state]);
                 if(useAlpha)
                     cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
                 if (opts.popupBorder) {
@@ -1527,9 +1533,10 @@ gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state,
                     cairo_stroke(cr);
                 }
             }
+        } else {
+            qtcCairoRect(cr, (QtcRect*)area, x, y, width, height,
+                         &style->base[state]);
         }
-        else
-            drawAreaColor(cr, area, &style->base[state], x, y, width, height);
     }
     else if(!opts.gtkComboMenus && !isMozilla() && isComboFrame(widget))
     {
