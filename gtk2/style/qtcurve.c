@@ -1508,11 +1508,12 @@ gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state,
                     cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
                     clearRoundedMask(widget, FALSE);
                 } else {
-                    createRoundedMask(cr, widget, x, y, width, height,
+                    createRoundedMask(widget, x, y, width, height,
                                       MENU_AND_TOOLTIP_RADIUS, FALSE);
                 }
 
-                clipPathRadius(cr, x, y, width, height, MENU_AND_TOOLTIP_RADIUS, ROUNDED_ALL);
+                qtcCairoClipWhole(cr, x, y, width, height,
+                                  MENU_AND_TOOLTIP_RADIUS, ROUNDED_ALL);
                 qtcCairoRect(cr, (QtcRect*)area, x, y, width, height,
                              &style->base[state]);
                 if(useAlpha)

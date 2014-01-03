@@ -27,7 +27,6 @@
 
 #define CAIRO_GRAD_END 1.0
 
-void setCairoClipping(cairo_t *cr, const QtcRect *area);
 void drawBgnd(cairo_t *cr, GdkColor *col, GtkWidget *widget,
               GdkRectangle *area, int x, int y, int width, int height);
 void drawAreaModColor(cairo_t *cr, GdkRectangle *area, GdkColor *orig,
@@ -75,8 +74,6 @@ void drawGlow(cairo_t *cr, GdkRectangle *area, int x, int y, int w, int h,
 
 void drawEtch(cairo_t *cr, GdkRectangle *area, GtkWidget *widget,
               int x, int y, int w, int h, gboolean raised, int round, EWidget wid);
-void clipPathRadius(cairo_t *cr, double x, double y, int w, int h,
-                    double radius, int round);
 void clipPath(cairo_t *cr, int x, int y, int w, int h, EWidget widget,
               int rad, int round);
 void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
@@ -127,7 +124,7 @@ void drawSelectionGradient(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
                                   double alpha, GdkColor *col, gboolean horiz);
 void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangle *area, GtkWidget *widget,
                           int x, int y, int width, int height, int round, gboolean isLvSelection, double alphaMod, int factor);
-void createRoundedMask(cairo_t *cr, GtkWidget *widget, int x, int y, int width, int height, double radius, gboolean isToolTip);
+void createRoundedMask(GtkWidget *widget, int x, int y, int width, int height, double radius, gboolean isToolTip);
 void clearRoundedMask(GtkWidget *widget, gboolean isToolTip);
 void drawTreeViewLines(cairo_t *cr, GdkColor *col, int x, int y, int h, int depth, int levelIndent, int expanderSize,
                               GtkTreeView *treeView, GtkTreePath *path, GtkTreeViewColumn *column);

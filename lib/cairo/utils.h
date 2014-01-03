@@ -64,6 +64,14 @@ void qtcCairoPathBottomRight(cairo_t *cr, double xd, double yd, double width,
                              double height, double radius, ECornerBits round);
 void qtcCairoPathWhole(cairo_t *cr, double xd, double yd, double width,
                        double height, double radius, ECornerBits round);
+QTC_ALWAYS_INLINE static inline void
+qtcCairoClipWhole(cairo_t *cr, double x, double y, int w, int h,
+                  double radius, ECornerBits round)
+{
+    cairo_new_path(cr);
+    qtcCairoPathWhole(cr, x, y, w, h, radius, round);
+    cairo_clip(cr);
+}
 
 QTC_END_DECLS
 
