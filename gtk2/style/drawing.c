@@ -36,23 +36,21 @@
 #include "animation.h"
 
 #if GTK_CHECK_VERSION(2, 90, 0)
-#define createRect(x, y, w, h) ((QtcRect){(x), (y), (w), (h)})
-
 static cairo_region_t*
-windowMask(int x, int y, int w, int h, gboolean full)
+windowMask(int x, int y, int w, int h, bool full)
 {
     QtcRect rects[4];
     int numRects = 4;
 
     if (full) {
-        rects[0] = createRect(x + 4, y + 0, w - 4 * 2, h);
-        rects[1] = createRect(x + 0, y + 4, w, h - 4 * 2);
-        rects[2] = createRect(x + 2, y + 1, w - 2 * 2, h - 2);
-        rects[3] = createRect(x + 1, y + 2, w - 2, h - 2 * 2);
+        rects[0] = qtcRect(x + 4, y + 0, w - 4 * 2, h);
+        rects[1] = qtcRect(x + 0, y + 4, w, h - 4 * 2);
+        rects[2] = qtcRect(x + 2, y + 1, w - 2 * 2, h - 2);
+        rects[3] = qtcRect(x + 1, y + 2, w - 2, h - 2 * 2);
     } else {
-        rects[0] = createRect(x + 1, y + 1, w - 2, h - 2);
-        rects[1] = createRect(x, y + 2, w, h - 4);
-        rects[2] = createRect(x + 2, y, w - 4, h);
+        rects[0] = qtcRect(x + 1, y + 1, w - 2, h - 2);
+        rects[1] = qtcRect(x, y + 2, w, h - 4);
+        rects[2] = qtcRect(x + 2, y, w - 4, h);
         numRects = 3;
     }
     return cairo_region_create_rectangles(rects, numRects);
@@ -337,10 +335,7 @@ drawEtch(cairo_t *cr, GdkRectangle *area, GtkWidget *widget, int x, int y,
 
     if (wid == WIDGET_COMBO_BUTTON && qtSettings.app == GTK_APP_OPEN_OFFICE &&
         widget && isFixedWidget(gtk_widget_get_parent(widget))) {
-        b.x = x + 2;
-        b.y = y;
-        b.width = w - 4;
-        b.height = h;
+        b = qtcRect(x + 2, y, w - 4, h);
         a = &b;
     }
     cairo_save(cr);
@@ -368,10 +363,9 @@ drawEtch(cairo_t *cr, GdkRectangle *area, GtkWidget *widget, int x, int y,
 }
 
 void
-clipPath(cairo_t *cr, int x, int y, int w, int h, EWidget widget,
-         int rad, int round)
+qtcClipPath(cairo_t *cr, int x, int y, int w, int h, EWidget widget,
+            int rad, int round)
 {
-    cairo_save(cr);
     qtcCairoClipWhole(cr, x + 0.5, y + 0.5, w - 1, h - 1,
                       qtcGetRadius(&opts, w, h, widget, rad), round);
 }
@@ -472,18 +466,17 @@ drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
     }
 
     if (width > 0 && height > 0) {
+        cairo_save(cr);
         if (!(flags & DF_DO_BORDER)) {
-            cairo_save(cr);
             qtcCairoClipWhole(cr, x, y, width, height,
                               qtcGetRadius(&opts, width, height, widget,
                                            RADIUS_EXTERNAL), round);
         } else {
-            clipPath(cr, x, y, width, height, widget, RADIUS_EXTERNAL, round);
+            qtcClipPath(cr, x, y, width, height, widget,
+                        RADIUS_EXTERNAL, round);
         }
-
         drawBevelGradient(cr, area, x, y, width, height, base, horiz,
                           sunken && !IS_TROUGH(widget), app, widget);
-
         if (plastikMouseOver) {
             if (SLIDER(widget)) {
                 int len = SB_SLIDER_MO_LEN(horiz ? width : height);
@@ -1466,18 +1459,15 @@ drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
         }
     }
 
-    /*if (GTK_APP_OPEN_OFFICE != qtSettings.app)*/ {
-        if (opts.round > ROUND_FULL) {
-            clipPath(cr, x + 1, y + 1, width - 2, height - 2,
-                     WIDGET_ENTRY, RADIUS_INTERNAL, ROUNDED_ALL);
-        } else {
-            cairo_save(cr);
-        }
-        qtcCairoRect(cr, (QtcRect*)area, x + 1, y + 1, width - 2, height - 2,
-                     enabled ? &style->base[GTK_STATE_NORMAL] :
-                     &style->bg[GTK_STATE_INSENSITIVE]);
-        cairo_restore(cr);
+    cairo_save(cr);
+    if (opts.round > ROUND_FULL) {
+        qtcClipPath(cr, x + 1, y + 1, width - 2, height - 2,
+                    WIDGET_ENTRY, RADIUS_INTERNAL, ROUNDED_ALL);
     }
+    qtcCairoRect(cr, (QtcRect*)area, x + 1, y + 1, width - 2, height - 2,
+                 enabled ? &style->base[GTK_STATE_NORMAL] :
+                 &style->bg[GTK_STATE_INSENSITIVE]);
+    cairo_restore(cr);
 
     cairo_save(cr);
     if (qtSettings.app == GTK_APP_OPEN_OFFICE && comboOrSpin) {
@@ -1627,7 +1617,7 @@ drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
 #if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
         if (isEntryProg || !GTK_PROGRESS(widget)->activity_mode)
 #endif
-            qtcAnimationAddProgressBar((void*)widget, isEntryProg);
+            qtcAnimationAddProgressBar(widget, isEntryProg);
 
         animShift+=(revProg ? -1 : 1)*
             (((int)(qtcAnimationElapsed(widget)*PROGRESS_CHUNK_WIDTH))%(PROGRESS_CHUNK_WIDTH*2));
@@ -1641,11 +1631,15 @@ drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
     int new_state = GTK_STATE_PRELIGHT == state ? GTK_STATE_NORMAL : state;
     int fillVal = grayItem ? 4 : ORIGINAL_SHADE;
 
-    x++, y++, width-=2, height-=2;
+    x++;
+    y++;
+    width -= 2;
+    height -= 2;
 
-    if (opts.borderProgress && opts.round>ROUND_SLIGHT &&
+    cairo_save(cr);
+    if (opts.borderProgress && opts.round > ROUND_SLIGHT &&
         (horiz ? width : height) < 4) {
-        clipPath(cr, x, y, width, height, wid, RADIUS_EXTERNAL, ROUNDED_ALL);
+        qtcClipPath(cr, x, y, width, height, wid, RADIUS_EXTERNAL, ROUNDED_ALL);
     }
 
     if ((horiz ? width : height) > 1)
@@ -1653,7 +1647,7 @@ drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
                        &itemCols[fillVal], itemCols, ROUNDED_ALL, wid,
                        BORDER_FLAT, (horiz ? 0 : DF_VERT), widget);
     if (opts.stripedProgress && width > 4 && height > 4) {
-        if (STRIPE_FADE == opts.stripedProgress) {
+        if (opts.stripedProgress == STRIPE_FADE) {
             int posMod = opts.animatedProgress ? STRIPE_WIDTH - animShift : 0;
             int sizeMod = opts.animatedProgress ? (STRIPE_WIDTH * 2) : 0;
             addStripes(cr, x - (horiz ? posMod : 0), y - (horiz ? 0 : posMod),
@@ -1726,6 +1720,7 @@ drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
             }
         }
     }
+    cairo_restore(cr);
 }
 
 void drawProgressGroove(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkWindow *window, GtkWidget *widget, GdkRectangle *area,
@@ -2682,9 +2677,12 @@ void fillTab(cairo_t *cr, GtkStyle *style, GtkWidget *widget, GdkRectangle *area
 
 void colorTab(cairo_t *cr, int x, int y, int width, int height, int round, EWidget tab, gboolean horiz)
 {
-    cairo_pattern_t *pt=cairo_pattern_create_linear(x, y, horiz ? x : x+width-1, horiz ? y+height-1 : y);
+    cairo_pattern_t *pt =
+        cairo_pattern_create_linear(x, y, horiz ? x : x + width - 1,
+                                    horiz ? y + height - 1 : y);
 
-    clipPath(cr, x, y, width, height, tab, RADIUS_EXTERNAL, round);
+    cairo_save(cr);
+    qtcClipPath(cr, x, y, width, height, tab, RADIUS_EXTERNAL, round);
     qtcCairoPatternAddColorStop(pt, 0, &qtcPalette.highlight[ORIGINAL_SHADE],
                                 tab == WIDGET_TAB_TOP ?
                                 TO_ALPHA(opts.colorSelTab) : 0.0);
@@ -3120,9 +3118,10 @@ void drawBoxGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow, GtkStateType
     if(isTab && isMozilla() && 250==gapWidth && (290==width || 270==width) && 6==height)
         return;
 
-    if(isTab && 0!=opts.tabBgnd)
-    {
-        clipPath(cr, x-1, y-1, width+2, height+2, WIDGET_TAB_FRAME, RADIUS_EXTERNAL, ROUNDED_ALL);
+    if (isTab && opts.tabBgnd != 0) {
+        cairo_save(cr);
+        qtcClipPath(cr, x - 1, y - 1, width + 2, height + 2,
+                    WIDGET_TAB_FRAME, RADIUS_EXTERNAL, ROUNDED_ALL);
         drawAreaMod(cr, style, state, area, TO_FACTOR(opts.tabBgnd), x, y, width, height);
         cairo_restore(cr);
     }
@@ -3622,8 +3621,9 @@ void drawRadioButton(cairo_t *cr, GtkStateType state, GtkShadowType shadow, GtkS
                 x++;
                 y++;
             }
-            clipPath(cr, x, y, opts.crSize, opts.crSize, WIDGET_RADIO_BUTTON,
-                     RADIUS_EXTERNAL, ROUNDED_ALL);
+            cairo_save(cr);
+            qtcClipPath(cr, x, y, opts.crSize, opts.crSize,
+                        WIDGET_RADIO_BUTTON, RADIUS_EXTERNAL, ROUNDED_ALL);
             drawBevelGradient(cr, NULL, x + 1, y + 1, opts.crSize - 2,
                               opts.crSize - 2, bgndCol,TRUE, FALSE,
                               APPEARANCE_INVERTED, WIDGET_TROUGH);
@@ -3843,7 +3843,9 @@ drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
             : lastTab
             ? ROUNDED_BOTTOMRIGHT
             : ROUNDED_NONE;
-        clipPath(cr, x, y-4, width, height+4, WIDGET_TAB_BOT, RADIUS_EXTERNAL, round);
+        cairo_save(cr);
+        qtcClipPath(cr, x, y - 4, width, height + 4, WIDGET_TAB_BOT,
+                    RADIUS_EXTERNAL, round);
         fillTab(cr, style, widget, area, state, col, x+mod+sizeAdjust, y, width-(2*mod+(sizeAdjust)), height-1, TRUE,
                 WIDGET_TAB_BOT, NULL!=notebook);
         cairo_restore(cr);
@@ -3888,7 +3890,10 @@ drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
             : lastTab
             ? ROUNDED_TOPRIGHT
             : ROUNDED_NONE;
-        clipPath(cr, x+mod+sizeAdjust, y, width-(2*(mod+(mozTab ? 2 *sizeAdjust : sizeAdjust))), height+5, WIDGET_TAB_TOP, RADIUS_EXTERNAL, round);
+        cairo_save(cr);
+        qtcClipPath(cr, x + mod + sizeAdjust, y,
+                    width - 2 * (mod + (mozTab ? 2 * sizeAdjust : sizeAdjust)),
+                    height + 5, WIDGET_TAB_TOP, RADIUS_EXTERNAL, round);
         fillTab(cr, style, widget, area, state, col, x+mod+sizeAdjust, y+1,
                 width-(2*(mod+(mozTab ? 2 *sizeAdjust : sizeAdjust))), height-1, TRUE, WIDGET_TAB_TOP, NULL!=notebook);
         cairo_restore(cr);
@@ -3931,7 +3936,9 @@ drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
             : lastTab
             ? ROUNDED_BOTTOMRIGHT
             : ROUNDED_NONE;
-        clipPath(cr, x-4, y, width+4, height, WIDGET_TAB_BOT, RADIUS_EXTERNAL, round);
+        cairo_save(cr);
+        qtcClipPath(cr, x - 4, y, width + 4, height, WIDGET_TAB_BOT,
+                    RADIUS_EXTERNAL, round);
         fillTab(cr, style, widget, area, state, col, x, y+mod+sizeAdjust, width-1, height-(2*(mod+sizeAdjust)), FALSE,
                 WIDGET_TAB_BOT, NULL!=notebook);
         cairo_restore(cr);
@@ -3974,7 +3981,9 @@ drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
             : lastTab
             ? ROUNDED_BOTTOMLEFT
             : ROUNDED_NONE;
-        clipPath(cr, x, y, width+4, height, WIDGET_TAB_TOP, RADIUS_EXTERNAL, round);
+        cairo_save(cr);
+        qtcClipPath(cr, x, y, width + 4, height, WIDGET_TAB_TOP,
+                    RADIUS_EXTERNAL, round);
         fillTab(cr, style, widget, area, state, col, x+1, y+mod+sizeAdjust, width-1, height-(2*(mod+sizeAdjust)),
                 FALSE, WIDGET_TAB_TOP, NULL!=notebook);
         cairo_restore(cr);

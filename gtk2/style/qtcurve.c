@@ -1430,8 +1430,11 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                       &qtcPalette.background[QTC_STD_BORDER], area, NULL,
                       TRUE, TRUE, FALSE);
     } else {
-        EWidget wt=!detail && GTK_IS_TREE_VIEW(widget) ? WIDGET_PBAR_TROUGH : WIDGET_FRAME;
-        clipPath(cr, x+1, y+1, width-2, height-2, WIDGET_OTHER, RADIUS_INTERNAL, round);
+        EWidget wt = (!detail && GTK_IS_TREE_VIEW(widget) ?
+                      WIDGET_PBAR_TROUGH : WIDGET_FRAME);
+        cairo_save(cr);
+        qtcClipPath(cr, x + 1, y + 1, width - 2, height - 2,
+                    WIDGET_OTHER, RADIUS_INTERNAL, round);
         if (qtcIsFlatBgnd(opts.bgndAppearance) || !widget ||
             !drawWindowBgnd(cr, style, area, window, widget, x + 1, y + 1,
                             width - 2, height - 2)) {

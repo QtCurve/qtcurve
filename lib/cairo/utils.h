@@ -33,6 +33,7 @@ typedef struct _GdkColor GdkColor;
 typedef struct _GdkPoint GdkPoint;
 // cairo_rectangle_int_t is toooo long...
 typedef cairo_rectangle_int_t QtcRect;
+#define qtcRect(x, y, w, h) ((QtcRect){(x), (y), (w), (h)})
 
 void qtcCairoPathPoints(cairo_t *cr, GdkPoint *pts, int count);
 void qtcCairoClipRegion(cairo_t *cr, const cairo_region_t *region);
