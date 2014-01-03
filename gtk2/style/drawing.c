@@ -92,7 +92,7 @@ drawBevelGradient(cairo_t *cr, GdkRectangle *area, int x, int y,
     /*                    APPEARANCE_GRADIENT); */
 
     if (qtcIsFlat(bevApp)) {
-        if ((WIDGET_TAB_TOP != w && WIDGET_TAB_BOT != w) ||
+        if (qtcNoneOf(w, WIDGET_TAB_TOP, WIDGET_TAB_BOT) ||
             !qtcIsCustomBgnd(&opts) || opts.tabBgnd || !sel) {
             qtcCairoRect(cr, (QtcRect*)area, x, y, width, height, base, alpha);
         }
@@ -112,11 +112,9 @@ drawBevelGradient(cairo_t *cr, GdkRectangle *area, int x, int y,
                            WIDGET_LISTVIEW_HEADER == w ? bevApp :
                            APPEARANCE_GRADIENT);
         const Gradient *grad = qtcGetGradient(app, &opts);
-        int i = 0;
-
         setCairoClipping(cr, area);
 
-        for (i = 0;i < grad->numStops;++i) {
+        for (int i = 0;i < grad->numStops;i++) {
             GdkColor col;
             double pos = botTab ? 1.0 - grad->stops[i].pos : grad->stops[i].pos;
 
@@ -157,116 +155,6 @@ drawBevelGradient(cairo_t *cr, GdkRectangle *area, int x, int y,
         cairo_fill(cr);
         cairo_pattern_destroy(pt);
         cairo_restore(cr);
-    }
-}
-
-#if 0
-gboolean drawBackgroundPng(const char *png)
-{
-    int size = 512;
-    cairo_surface_t *surface =
-        cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 512, 512);
-    gboolean rv = FALSE;
-
-    if (surface) {
-        cairo_t *cr = cairo_create(surface);
-        if (cr) {
-            drawBevelGradient(cr, NULL, 0, 0, size, size,
-                              &(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]),
-                              opts.bgndGrad == GT_HORIZ, FALSE,
-                              opts.bgndAppearance, WIDGET_OTHER, 1.0);
-            rv = (cairo_surface_write_to_png(surface, png) ==
-                  CAIRO_STATUS_SUCCESS);
-            cairo_destroy(cr);
-        }
-    }
-    return rv;
-}
-#endif
-
-void
-createTLPath(cairo_t *cr, double xd, double yd, double width,
-             double height, double radius, int round)
-{
-    bool rounded = radius > 0.0;
-
-    if (rounded && round & CORNER_BL) {
-        cairo_arc(cr, xd + radius, yd + height - radius, radius,
-                  M_PI * 0.75, M_PI);
-    } else {
-        cairo_move_to(cr, xd, yd + height);
-    }
-    if (rounded && round & CORNER_TL) {
-        cairo_arc(cr, xd + radius, yd + radius, radius, M_PI, M_PI * 1.5);
-    } else {
-        cairo_line_to(cr, xd, yd);
-    }
-    if (rounded && round & CORNER_TR) {
-        cairo_arc(cr, xd + width - radius, yd + radius,
-                  radius, M_PI * 1.5, M_PI * 1.75);
-    } else {
-        cairo_line_to(cr, xd + width, yd);
-    }
-}
-
-void
-createBRPath(cairo_t *cr, double xd, double yd, double width, double height,
-             double radius, int round)
-{
-    bool rounded = radius > 0.0;
-
-    if (rounded && round & CORNER_TR) {
-        cairo_arc(cr, xd + width - radius, yd + radius, radius, M_PI * 1.75, 0);
-    } else {
-        cairo_move_to(cr, xd + width, yd);
-    }
-    if (rounded && round & CORNER_BR) {
-        cairo_arc(cr, xd + width - radius, yd + height - radius,
-                  radius, 0, M_PI * 0.5);
-    } else {
-        cairo_line_to(cr, xd + width, yd + height);
-    }
-    if (rounded && round & CORNER_BL) {
-        cairo_arc(cr, xd + radius, yd + height - radius,
-                  radius, M_PI * 0.5, M_PI * 0.75);
-    } else {
-        cairo_line_to(cr, xd, yd + height);
-    }
-}
-
-void
-createPath(cairo_t *cr, double xd, double yd, double width, double height,
-           double radius, int round)
-{
-    bool rounded = radius > 0.0;
-
-    if (rounded && round & CORNER_TL) {
-        cairo_move_to(cr, xd + radius, yd);
-    } else {
-        cairo_move_to(cr, xd, yd);
-    }
-    if (rounded && round & CORNER_TR) {
-        cairo_arc(cr, xd + width - radius, yd + radius, radius,
-                  M_PI * 1.5, M_PI * 2);
-    } else {
-        cairo_line_to(cr, xd + width, yd);
-    }
-    if (rounded && round & CORNER_BR) {
-        cairo_arc(cr, xd + width - radius, yd + height - radius,
-                  radius, 0, M_PI * 0.5);
-    } else {
-        cairo_line_to(cr, xd + width, yd + height);
-    }
-    if (rounded && round & CORNER_BL) {
-        cairo_arc(cr, xd + radius, yd + height - radius,
-                  radius, M_PI * 0.5, M_PI);
-    } else {
-        cairo_line_to(cr, xd, yd + height);
-    }
-    if (rounded && round & CORNER_TL) {
-        cairo_arc(cr, xd + radius, yd + radius, radius, M_PI, M_PI * 1.5);
-    } else {
-        cairo_line_to(cr, xd, yd);
     }
 }
 
@@ -334,8 +222,8 @@ drawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state,
                     if (qtcOneOf(widget, WIDGET_SPIN, WIDGET_COMBO_BUTTON,
                                  WIDGET_SCROLLVIEW)) {
                         qtcCairoSetColor(cr, &style->base[state]);
-                        createTLPath(cr, xdi, ydi, widthi, heighti, radiusi,
-                                     round);
+                        qtcCairoPathTopLeft(cr, xdi, ydi, widthi, heighti,
+                                            radiusi, round);
                         cairo_stroke(cr);
                     }
                     qtcCairoSetColor(cr, col, alpha);
@@ -346,7 +234,7 @@ drawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state,
                 qtcCairoSetColor(cr, &style->bg[state]);
             }
 
-            createTLPath(cr, xdi, ydi, widthi, heighti, radiusi, round);
+            qtcCairoPathTopLeft(cr, xdi, ydi, widthi, heighti, radiusi, round);
             cairo_stroke(cr);
             if (widget != WIDGET_CHECKBOX) {
                 if(!hasFocus && !hasMouseOver &&
@@ -356,8 +244,8 @@ drawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state,
                          * line on right! */
                         cairo_save(cr);
                         qtcCairoSetColor(cr, &style->base[state]);
-                        createBRPath(cr, xdi, ydi, widthi, heighti, radiusi,
-                                     round);
+                        qtcCairoPathBottomRight(cr, xdi, ydi, widthi, heighti,
+                                                radiusi, round);
                         cairo_stroke(cr);
                         cairo_restore(cr);
                     } else if (qtcOneOf(widget, WIDGET_SCROLLVIEW,
@@ -382,7 +270,8 @@ drawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state,
                     }
                 }
 
-                createBRPath(cr, xdi, ydi, widthi, heighti, radiusi, round);
+                qtcCairoPathBottomRight(cr, xdi, ydi, widthi, heighti,
+                                        radiusi, round);
                 cairo_stroke(cr);
             }
         }
@@ -395,14 +284,14 @@ drawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state,
           !opts.etchEntry && !hasFocus && !hasMouseOver))) {
         qtcCairoSetColor(cr, border_col,
                          /*enabled ? */1.0/* : LOWER_BORDER_ALPHA*/);
-        createTLPath(cr, xd, yd, width, height, radius, round);
+        qtcCairoPathTopLeft(cr, xd, yd, width, height, radius, round);
         cairo_stroke(cr);
         qtcCairoSetColor(cr, border_col, LOWER_BORDER_ALPHA);
-        createBRPath(cr, xd, yd, width, height, radius, round);
+        qtcCairoPathBottomRight(cr, xd, yd, width, height, radius, round);
         cairo_stroke(cr);
     } else {
         qtcCairoSetColor(cr, border_col);
-        createPath(cr, xd, yd, width, height, radius, round);
+        qtcCairoPathWhole(cr, xd, yd, width, height, radius, round);
         cairo_stroke(cr);
     }
     cairo_restore(cr);
@@ -430,7 +319,7 @@ drawGlow(cairo_t *cr, GdkRectangle *area, int x, int y, int w, int h,
 
         setCairoClipping(cr, area);
         qtcCairoSetColor(cr, col, GLOW_ALPHA(defShade));
-        createPath(cr, xd, yd, w - 1, h - 1, radius, round);
+        qtcCairoPathWhole(cr, xd, yd, w - 1, h - 1, radius, round);
         cairo_stroke(cr);
         cairo_restore(cr);
     }
@@ -463,7 +352,7 @@ drawEtch(cairo_t *cr, GdkRectangle *area, GtkWidget *widget, int x, int y,
                           USE_CUSTOM_ALPHAS(opts) ?
                           opts.customAlphas[ALPHA_ETCH_DARK] : ETCH_TOP_ALPHA);
     if (!raised && wid != WIDGET_SLIDER) {
-        createTLPath(cr, xd, yd, w - 1, h - 1, radius, round);
+        qtcCairoPathTopLeft(cr, xd, yd, w - 1, h - 1, radius, round);
         cairo_stroke(cr);
         if (wid == WIDGET_SLIDER_TROUGH && opts.thinSbarGroove &&
             widget && GTK_IS_SCROLLBAR(widget)) {
@@ -475,7 +364,7 @@ drawEtch(cairo_t *cr, GdkRectangle *area, GtkWidget *widget, int x, int y,
             setLowerEtchCol(cr, widget);
         }
     }
-    createBRPath(cr, xd, yd, w - 1, h - 1, radius, round);
+    qtcCairoPathBottomRight(cr, xd, yd, w - 1, h - 1, radius, round);
     cairo_stroke(cr);
     cairo_restore(cr);
 }
@@ -486,7 +375,7 @@ clipPathRadius(cairo_t *cr, double x, double y, int w, int h,
 {
     cairo_new_path(cr);
     cairo_save(cr);
-    createPath(cr, x, y, w, h, radius, round);
+    qtcCairoPathWhole(cr, x, y, w, h, radius, round);
     cairo_clip(cr);
 }
 
@@ -820,9 +709,9 @@ drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
 
         cairo_new_path(cr);
         qtcCairoSetColor(cr, col);
-        createPath(cr, xd, yd, width - 1, height - 1,
-                   qtcGetRadius(&opts, width, height, widget, RADIUS_INTERNAL),
-                   round);
+        qtcCairoPathWhole(cr, xd, yd, width - 1, height - 1,
+                          qtcGetRadius(&opts, width, height, widget,
+                                       RADIUS_INTERNAL), round);
         cairo_stroke(cr);
     }  else if (colouredMouseOver ||
                 (!sunken && (draw3d || flags & DF_DRAW_INSIDE))) {
@@ -834,9 +723,9 @@ drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
 
         cairo_new_path(cr);
         qtcCairoSetColor(cr, col1);
-        createTLPath(cr, xd, yd, width - 1, height - 1,
-                     qtcGetRadius(&opts, width, height, widget,
-                                  RADIUS_INTERNAL), round);
+        qtcCairoPathTopLeft(cr, xd, yd, width - 1, height - 1,
+                            qtcGetRadius(&opts, width, height, widget,
+                                         RADIUS_INTERNAL), round);
         cairo_stroke(cr);
         if (colouredMouseOver || bevelledButton || draw3dfull) {
             GdkColor *col2 = colouredMouseOver ?
@@ -845,9 +734,9 @@ drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
 
             cairo_new_path(cr);
             qtcCairoSetColor(cr, col2);
-            createBRPath(cr, xd, yd, width - 1, height - 1,
-                         qtcGetRadius(&opts, width, height, widget,
-                                      RADIUS_INTERNAL), round);
+            qtcCairoPathBottomRight(cr, xd, yd, width - 1, height - 1,
+                                    qtcGetRadius(&opts, width, height, widget,
+                                                 RADIUS_INTERNAL), round);
             cairo_stroke(cr);
         }
     }
@@ -1282,26 +1171,33 @@ void drawBgndRings(cairo_t *cr, int x, int y, int width, int height, gboolean is
 
             cairo_set_source_rgba(ci, 1.0, 1.0, 1.0, RINGS_SQUARE_SMALL_ALPHA);
             cairo_set_line_width(ci, RINGS_SQUARE_LINE_WIDTH);
-            createPath(ci, halfWidth+0.5, halfWidth+0.5, RINGS_SQUARE_SMALL_SIZE, RINGS_SQUARE_SMALL_SIZE,
-                       RINGS_SQUARE_RADIUS, ROUNDED_ALL);
+            qtcCairoPathWhole(ci, halfWidth + 0.5, halfWidth + 0.5,
+                              RINGS_SQUARE_SMALL_SIZE, RINGS_SQUARE_SMALL_SIZE,
+                              RINGS_SQUARE_RADIUS, ROUNDED_ALL);
             cairo_stroke(ci);
 
             cairo_new_path(ci);
             cairo_set_source_rgba(ci, 1.0, 1.0, 1.0, RINGS_SQUARE_SMALL_ALPHA);
             cairo_set_line_width(ci, RINGS_SQUARE_LINE_WIDTH);
-            createPath(ci, halfWidth+0.5+(imgWidth-(RINGS_SQUARE_SMALL_SIZE+RINGS_SQUARE_LINE_WIDTH)),
-                       halfWidth+0.5+(imgHeight-(RINGS_SQUARE_SMALL_SIZE+RINGS_SQUARE_LINE_WIDTH)),
-                       RINGS_SQUARE_SMALL_SIZE, RINGS_SQUARE_SMALL_SIZE,
-                       RINGS_SQUARE_RADIUS, ROUNDED_ALL);
+            qtcCairoPathWhole(ci, halfWidth + 0.5 + imgWidth -
+                              RINGS_SQUARE_SMALL_SIZE - RINGS_SQUARE_LINE_WIDTH,
+                              halfWidth + 0.5 + imgHeight -
+                              RINGS_SQUARE_SMALL_SIZE - RINGS_SQUARE_LINE_WIDTH,
+                              RINGS_SQUARE_SMALL_SIZE, RINGS_SQUARE_SMALL_SIZE,
+                              RINGS_SQUARE_RADIUS, ROUNDED_ALL);
             cairo_stroke(ci);
 
             cairo_new_path(ci);
             cairo_set_source_rgba(ci, 1.0, 1.0, 1.0, RINGS_SQUARE_LARGE_ALPHA);
             cairo_set_line_width(ci, RINGS_SQUARE_LINE_WIDTH);
-            createPath(ci, halfWidth+0.5+((imgWidth-RINGS_SQUARE_LARGE_SIZE-RINGS_SQUARE_LINE_WIDTH)/2.0),
-                       halfWidth+0.5+((imgHeight-RINGS_SQUARE_LARGE_SIZE-RINGS_SQUARE_LINE_WIDTH)/2.0),
-                       RINGS_SQUARE_LARGE_SIZE, RINGS_SQUARE_LARGE_SIZE,
-                       RINGS_SQUARE_RADIUS, ROUNDED_ALL);
+            qtcCairoPathWhole(ci, halfWidth + 0.5 +
+                              (imgWidth - RINGS_SQUARE_LARGE_SIZE -
+                               RINGS_SQUARE_LINE_WIDTH) / 2.0,
+                              halfWidth + 0.5 +
+                              (imgHeight - RINGS_SQUARE_LARGE_SIZE -
+                               RINGS_SQUARE_LINE_WIDTH) / 2.0,
+                              RINGS_SQUARE_LARGE_SIZE, RINGS_SQUARE_LARGE_SIZE,
+                              RINGS_SQUARE_RADIUS, ROUNDED_ALL);
             cairo_stroke(ci);
 
             cairo_destroy(ci);
@@ -2441,9 +2337,9 @@ void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangl
         cairo_rectangle(cr, xo, y, widtho, height);
         cairo_clip(cr);
         qtcCairoSetColor(cr, &col, alpha);
-        createPath(cr, xd, yd, width - 1, height - 1,
-                   qtcGetRadius(&opts, widtho, height, WIDGET_OTHER,
-                                RADIUS_SELECTION), round);
+        qtcCairoPathWhole(cr, xd, yd, width - 1, height - 1,
+                          qtcGetRadius(&opts, widtho, height, WIDGET_OTHER,
+                                       RADIUS_SELECTION), round);
         cairo_stroke(cr);
         cairo_restore(cr);
     }
@@ -2476,7 +2372,7 @@ createRoundedMask(cairo_t *cr, GtkWidget *widget, int x, int y, int width,
             cairo_set_operator(crMask, CAIRO_OPERATOR_SOURCE);
             cairo_paint(crMask);
             cairo_new_path(crMask);
-            createPath(crMask, 0, 0, width, height, radius, ROUNDED_ALL);
+            qtcCairoPathWhole(crMask, 0, 0, width, height, radius, ROUNDED_ALL);
             cairo_set_source_rgba(crMask, 0, 0, 0, 1);
             cairo_fill(crMask);
             if (isToolTip) {
@@ -3190,25 +3086,28 @@ drawMenu(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
         qtcCairoSetColor(cr, &qtcPalette.menu[QTC_STD_BORDER]);
         /* For now dont round combos - getting weird effects with
          * shadow/clipping :-( */
-        if(roundedMenu && !comboMenu)
-            createPath(cr, x+0.5, y+0.5, width-1, height-1, radius-1, ROUNDED_ALL);
-        else
-            cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
+        if (roundedMenu && !comboMenu) {
+            qtcCairoPathWhole(cr, x + 0.5, y + 0.5, width - 1, height - 1,
+                              radius - 1, ROUNDED_ALL);
+        } else {
+            cairo_rectangle(cr, x + 0.5, y + 0.5, width - 1, height - 1);
+        }
         cairo_stroke(cr);
-        if (qtcUseBorder(border) && APPEARANCE_FLAT!=opts.menuBgndAppearance) {
+        if (qtcUseBorder(border) &&
+            opts.menuBgndAppearance != APPEARANCE_FLAT) {
             if (roundedMenu) {
                 if (border != GB_3D) {
                     cairo_new_path(cr);
                     qtcCairoSetColor(cr, qtcPalette.menu);
-                    createTLPath(cr, x + 1.5, y + 1.5, width - 3, height - 3,
-                                 radius - 2, ROUNDED_ALL);
+                    qtcCairoPathTopLeft(cr, x + 1.5, y + 1.5, width - 3,
+                                        height - 3, radius - 2, ROUNDED_ALL);
                     cairo_stroke(cr);
                 }
                 cairo_new_path(cr);
                 qtcCairoSetColor(cr, &qtcPalette.menu[border == GB_LIGHT ? 0 :
                                                       FRAME_DARK_SHADOW]);
-                createBRPath(cr, x + 1.5, y + 1.5, width - 3, height - 3,
-                             radius - 2, ROUNDED_ALL);
+                qtcCairoPathBottomRight(cr, x + 1.5, y + 1.5, width - 3,
+                                        height - 3, radius - 2, ROUNDED_ALL);
                 cairo_stroke(cr);
             } else {
                 if (border != GB_3D) {
@@ -3495,7 +3394,8 @@ void drawShadowGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow, GtkStateT
                         &qtcPalette.background[QTC_STD_BORDER], 0);
                     setGapClip(cr, area, gapSide, gapX, gapWidth, x, y, width, height, FALSE);
                     cairo_set_source(cr, pt);
-                    createPath(cr, x+0.5, y+0.5, width-1, height-1, radius, round);
+                    qtcCairoPathWhole(cr, x + 0.5, y + 0.5, width - 1,
+                                      height - 1, radius, round);
                     cairo_stroke(cr);
                     cairo_pattern_destroy(pt);
                     drawFrame=false;

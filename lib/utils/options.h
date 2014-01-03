@@ -105,6 +105,13 @@ typedef enum {
     GB_SHINE
 } EGradientBorder;
 
+typedef enum {
+    CORNER_TL = 1 << 0,
+    CORNER_TR = 1 << 1,
+    CORNER_BR = 1 << 2,
+    CORNER_BL = 1 << 3
+} ECornerBits;
+
 QTC_ALWAYS_INLINE static inline bool
 qtcUseBorder(EGradientBorder border)
 {

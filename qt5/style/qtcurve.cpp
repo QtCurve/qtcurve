@@ -220,16 +220,16 @@ static bool isHoriz(const QStyleOption *option, EWidget w, bool joinedTBar)
         (WIDGET_BUTTON(w) && (!joinedTBar || (WIDGET_TOOLBAR_BUTTON!=w && WIDGET_NO_ETCH_BTN!=w && WIDGET_MENU_BUTTON!=w)));
 }
 
-static bool isOnToolbar(const QWidget *widget)
+static bool
+isOnToolbar(const QWidget *widget)
 {
-    const QWidget *wid=widget ? widget->parentWidget() : 0L;
-
-    while(wid) {
-        if(qobject_cast<const QToolBar*>(wid))
+    const QWidget *wid = widget ? widget->parentWidget() : 0L;
+    while (wid) {
+        if (qobject_cast<const QToolBar*>(wid)) {
             return true;
-        wid=wid->parentWidget();
+        }
+        wid = wid->parentWidget();
     }
-
     return false;
 }
 

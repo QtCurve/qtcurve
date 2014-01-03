@@ -1526,8 +1526,9 @@ gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 if(useAlpha)
                     cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
                 if (opts.popupBorder) {
-                    createPath(cr, x + 0.5, y + 0.5, width - 1, height - 1,
-                               MENU_AND_TOOLTIP_RADIUS - 1, ROUNDED_ALL);
+                    qtcCairoPathWhole(cr, x + 0.5, y + 0.5, width - 1,
+                                      height - 1, MENU_AND_TOOLTIP_RADIUS - 1,
+                                      ROUNDED_ALL);
                     qtcCairoSetColor(cr,
                                      &qtcPalette.background[QTC_STD_BORDER]);
                     cairo_stroke(cr);
@@ -1718,15 +1719,16 @@ gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state,
                         */
                         /* 3d... */
                         qtcCairoSetColor(cr, &cols[QTC_STD_BORDER]);
-                        createTLPath(cr, x + 0.5, y + 0.5, width - 1,
-                                     height - 1, 0.0, ROUNDED_NONE);
+                        qtcCairoPathTopLeft(cr, x + 0.5, y + 0.5, width - 1,
+                                            height - 1, 0.0, ROUNDED_NONE);
                         cairo_stroke(cr);
                         if(!opts.gtkScrollViews)
                             qtcCairoSetColor(cr, &cols[QTC_STD_BORDER],
                                              LOWER_BORDER_ALPHA);
                             /* qtcCairoSetColor(cr, &qtcPalette.background[ */
                             /*                      STD_BORDER_BR]); */
-                        createBRPath(cr, x+0.5, y+0.5, width-1, height-1, 0.0, ROUNDED_NONE);
+                        qtcCairoPathBottomRight(cr, x + 0.5, y + 0.5, width - 1,
+                                                height - 1, 0, ROUNDED_NONE);
                         cairo_stroke(cr);
                         doBorder=false;
                     }
@@ -2429,8 +2431,10 @@ gtkDrawVLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
     cairo_destroy(cr);
 }
 
-static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state, GdkRectangle *area, GtkWidget *widget, const char *detail,
-                         int x, int y, int width, int height)
+static void
+gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
+             GdkRectangle *area, GtkWidget *widget, const char *detail,
+             int x, int y, int width, int height)
 {
     if (GTK_IS_EDITABLE(widget))
         return;
@@ -2439,230 +2443,290 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
     sanitizeSize(window, &width, &height);
 
-    if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %s ", __FUNCTION__, state, x, y, width, height, detail ? detail : "NULL"),
-                                    debugDisplayWidget(widget, 10);
-
-    {
-    GtkWidget *parent=widget ? gtk_widget_get_parent(widget) : NULL;
-    gboolean  doEtch=DO_EFFECT,
-              btn=false,
-              comboButton=false,
-              rev=parent && reverseLayout(parent),
-              view=isList(widget),
-              listViewHeader=isListViewHeader(widget),
-              dummy,
-              toolbarBtn=!listViewHeader && !view && isButtonOnToolbar(widget, &dummy);
+    if (qtSettings.debug == DEBUG_ALL) {
+        printf(DEBUG_PREFIX "%s %d %d %d %d %d %s ", __FUNCTION__, state, x, y,
+               width, height, detail ? detail : "NULL");
+        debugDisplayWidget(widget, 10);
+    }
+    GtkWidget *parent = widget ? gtk_widget_get_parent(widget) : NULL;
+    gboolean doEtch = DO_EFFECT;
+    gboolean btn = false;
+    gboolean comboButton = false;
+    gboolean rev = parent && reverseLayout(parent);
+    gboolean view = isList(widget);
+    gboolean listViewHeader = isListViewHeader(widget);
+    gboolean toolbarBtn = (!listViewHeader && !view &&
+                           isButtonOnToolbar(widget, NULL));
 
     if (opts.comboSplitter && !FULL_FOCUS && isComboBox(widget)) {
-/*
-        x++;
-        y++;
-        height-=2;
-*/
-        width+=2; /* Remove if re-add the above */
+        /* x++; */
+        /* y++; */
+        /* height -= 2; */
+        width += 2; /* Remove if re-add the above */
 
-        if(widget && rev)
-            x+=20;
-        width-=22;
+        if (widget && rev) {
+            x += 20;
+        }
+        width -= 22;
 
-        if(isGimpCombo(widget))
-            x+=2, y+=2, width-=4, height-=4;
-        btn=true;
+        if (isGimpCombo(widget)) {
+            x += 2;
+            y += 2;
+            width -= 4;
+            height -= 4;
+        }
+        btn = true;
     }
 #if !GTK_CHECK_VERSION(2, 90, 0)
-    else if(GTK_IS_OPTION_MENU(widget))
-    {
-        if((!opts.comboSplitter || FULL_FOCUS) && widget)
-        {
-            QtcRect alloc=qtcWidgetGetAllocation(widget);
-
-            if(alloc.width>width)
-                width=alloc.width-(doEtch ? 8 : 4);
+    else if (GTK_IS_OPTION_MENU(widget)) {
+        if ((!opts.comboSplitter || FULL_FOCUS) && widget) {
+            QtcRect alloc = qtcWidgetGetAllocation(widget);
+            if (alloc.width > width) {
+                width = alloc.width - (doEtch ? 8 : 4);
+            }
         }
-
-        x++, y++, width-=2, height-=2;
-        btn=true;
+        x++;
+        y++;
+        width -= 2;
+        height -= 2;
+        btn = true;
     }
 #endif
-    if(isComboBoxEntryButton(widget))
-    {
+    if (isComboBoxEntryButton(widget)) {
 #if GTK_CHECK_VERSION(2, 90, 0)
-        if(doEtch)
-            x-=2, y++, width+=3, height-=2;
-        else
-            x-=2, width+=4;
+        if (doEtch) {
+            x -= 2;
+            y++;
+            width += 3;
+            height -= 2;
+        } else {
+            x -= 2;
+            width += 4;
+        }
 #else
-        if(doEtch)
-            x++, y+=2, width-=3, height-=4;
-        else
-            x++, y++, width-=2, height-=2;
+        if (doEtch) {
+            x++;
+            y += 2;
+            width -= 3;
+            height -= 4;
+        } else {
+            x++;
+            y++;
+            width -= 2;
+            height -= 2;
+        }
 #endif
-        btn=comboButton=true;
-    }
-    else if(isGimpCombo(widget))
-    {
-        if(FOCUS_GLOW==opts.focus)
+        comboButton = true;
+        btn = true;
+    } else if (isGimpCombo(widget)) {
+        if (opts.focus == FOCUS_GLOW) {
             return;
-
-        x-=2, width+=4;
-        if(!doEtch)
-            x--, y--, width+=2, height+=2;
-    }
-    else if(GTK_IS_BUTTON(widget))
-    {
-        if(GTK_IS_RADIO_BUTTON(widget) || GTK_IS_CHECK_BUTTON(widget))
-        {
+        }
+        x -= 2;
+        width += 4;
+        if (!doEtch) {
+            x--;
+            y--;
+            width += 2;
+            height += 2;
+        }
+    } else if (GTK_IS_BUTTON(widget)) {
+        if (GTK_IS_RADIO_BUTTON(widget) || GTK_IS_CHECK_BUTTON(widget)) {
             // Gimps buttons in its toolbox are
-            const char *text=NULL;
-            toolbarBtn=GTK_APP_GIMP==qtSettings.app && (NULL==(text=gtk_button_get_label(GTK_BUTTON(widget))) ||
-                                                        '\0'==text[0]);
+            const char *text = NULL;
+            toolbarBtn = (qtSettings.app == GTK_APP_GIMP &&
+                          ((text =
+                            gtk_button_get_label(GTK_BUTTON(widget))) == NULL ||
+                           text[0] == '\0'));
 
-            if(!toolbarBtn && FOCUS_GLOW==opts.focus && !isMozilla())
+            if (!toolbarBtn && opts.focus == FOCUS_GLOW && !isMozilla()) {
                 return;
+            }
 
-            if(toolbarBtn)
-            {
-                if(GTK_APP_GIMP==qtSettings.app && FOCUS_GLOW==opts.focus && toolbarBtn)
-                    x-=2, width+=4, y-=1, height+=2;
+            if (toolbarBtn) {
+                if (qtSettings.app == GTK_APP_GIMP &&
+                    opts.focus == FOCUS_GLOW && toolbarBtn) {
+                    x -= 2;
+                    width += 4;
+                    y -= 1;
+                    height += 2;
+                }
             }
 #if 0 /* Removed in 1.7.2 */
-            else
-            {
-                if(FOCUS_LINE==opts.focus)
+            else {
+                if (opts.focus == FOCUS_LINE) {
                     height--;
-                else if(FULL_FOCUS)
-                {
-                    y--, x-=3, width+=6, height+=2;
-                    if(!doEtch)
-                        y--, x--, width+=2, height+=2;
+                } else if (FULL_FOCUS) {
+                    y--;
+                    x -= 3;
+                    width += 6;
+                    height += 2;
+                    if (!doEtch) {
+                        y--;
+                        x--;
+                        width += 2;
+                        height += 2;
+                    }
                 }
             }
 #endif
-        }
-        else if(FOCUS_GLOW==opts.focus && toolbarBtn)
-            x-=2, width+=4, y-=2, height+=4;
-        else
-        {
-            if(doEtch)
-                x--, width+=2;
-            else
-                x-=2, width+=4;
-            if(doEtch && (opts.thin&THIN_BUTTONS))
-                y++, height-=2;
-            btn=true;
+        } else if (opts.focus == FOCUS_GLOW && toolbarBtn) {
+            x -= 2;
+            width += 4;
+            y -= 2;
+            height += 4;
+        } else {
+            if (doEtch) {
+                x--;
+                width += 2;
+            } else {
+                x -= 2;
+                width += 4;
+            }
+            if (doEtch && (opts.thin & THIN_BUTTONS)) {
+                y++;
+                height -= 2;
+            }
+            btn = true;
         }
     }
-
-    if(GTK_STATE_PRELIGHT==state && FULL_FOCUS && MO_NONE!=opts.coloredMouseOver && !listViewHeader && (btn || comboButton))
+    if (state == GTK_STATE_PRELIGHT && FULL_FOCUS &&
+        opts.coloredMouseOver != MO_NONE && !listViewHeader &&
+        (btn || comboButton)) {
         return;
-
-    if(FOCUS_GLOW==opts.focus && !comboButton && !listViewHeader && !toolbarBtn && (btn || GTK_IS_SCALE(widget)))
+    }
+    if (opts.focus == FOCUS_GLOW && !comboButton && !listViewHeader &&
+        !toolbarBtn && (btn || GTK_IS_SCALE(widget))) {
         return;
-
-    if(FOCUS_GLOW==opts.focus && toolbarBtn && GTK_STATE_NORMAL!=state)
+    }
+    if (opts.focus == FOCUS_GLOW && toolbarBtn && state != GTK_STATE_NORMAL) {
         return;
-
-    if(FOCUS_STANDARD==opts.focus)
-        parent_class->draw_focus(style, window, state, area, widget, detail, x, y, width, height);
-    else
-    {
-        gboolean drawRounded=ROUNDED;
-        GdkColor *col=view && GTK_STATE_SELECTED==state
-                           ? &style->text[state]
-                           : &qtcPalette.focus[FOCUS_SHADE(GTK_STATE_SELECTED==state)];
+    }
+    if (opts.focus == FOCUS_STANDARD) {
+        parent_class->draw_focus(style, window, state, area, widget, detail,
+                                 x, y, width, height);
+    } else {
+        gboolean drawRounded = ROUNDED;
+        GdkColor *col =
+            (view && state == GTK_STATE_SELECTED ? &style->text[state] :
+             &qtcPalette.focus[FOCUS_SHADE(state == GTK_STATE_SELECTED)]);
 
         cairo_t *cr = gdk_cairo_create(window);
         setCairoClipping(cr, area);
         cairo_set_line_width(cr, 1.0);
 
-
-        if(GTK_APP_JAVA_SWT==qtSettings.app && view && widget && GTK_IS_TREE_VIEW(widget))
-        {
-            GtkTreeView       *treeView=GTK_TREE_VIEW(widget);
-            GtkTreePath       *path=NULL;
-            GtkTreeViewColumn *column=NULL,
-                              *expanderColumn=gtk_tree_view_get_expander_column(treeView);
+        if (qtSettings.app == GTK_APP_JAVA_SWT && view && widget &&
+            GTK_IS_TREE_VIEW(widget)) {
+            GtkTreeView *treeView = GTK_TREE_VIEW(widget);
+            GtkTreePath *path = NULL;
+            GtkTreeViewColumn *column = NULL;
+            GtkTreeViewColumn *expanderColumn =
+                gtk_tree_view_get_expander_column(treeView);
 
             qtcTreeViewGetCell(treeView, &path, &column, x, y, width, height);
-            if(column==expanderColumn)
-            {
-                int expanderSize=0;
-                gtk_widget_style_get(widget, "expander-size", &expanderSize, NULL);
-                if(expanderSize>0)
-                {
-                    int depth=path ? (int)gtk_tree_path_get_depth(path) : 0,
-                        offset=3 + expanderSize * depth + ( 4 + gtk_tree_view_get_level_indentation(treeView))*(depth-1);
+            if (column == expanderColumn) {
+                int expanderSize = 0;
+                gtk_widget_style_get(widget, "expander-size",
+                                     &expanderSize, NULL);
+                if (expanderSize > 0) {
+                    int depth = path ? (int)gtk_tree_path_get_depth(path) : 0;
+                    int offset =
+                        (3 + expanderSize * depth +
+                         (4 + gtk_tree_view_get_level_indentation(treeView)) *
+                         (depth - 1));
                     x += offset;
                     width -= offset;
                 }
             }
 
-            if(path)
+            if (path) {
                 gtk_tree_path_free(path);
+            }
         }
 
-        if(FOCUS_LINE==opts.focus || FOCUS_GLOW==opts.focus)
-        {
-            if(view || listViewHeader)
-                height-=2;
-            drawFadedLine(cr, x, y+height-1, width, 1, col, area, NULL, TRUE, TRUE, TRUE);
-        }
-        else
-        {
-            /*double alpha=FOCUS_GLOW==opts.focus ? FOCUS_GLOW_LINE_ALPHA : 1.0;*/
+        if (qtcOneOf(opts.focus, FOCUS_LINE, FOCUS_GLOW)) {
+            if (view || listViewHeader) {
+                height -= 2;
+            }
+            drawFadedLine(cr, x, y + height - 1, width, 1, col, area, NULL,
+                          TRUE, TRUE, TRUE);
+        } else {
+            /* double alpha = (opts.focus == FOCUS_GLOW ? */
+            /*                 FOCUS_GLOW_LINE_ALPHA : 1.0); */
 
-            if(width<3 || height < 3)
-                drawRounded=FALSE;
-
+            if (width < 3 || height < 3) {
+                drawRounded = FALSE;
+            }
             cairo_new_path(cr);
 
-            if(isListViewHeader(widget))
-            {
-                btn=false;
-                y++, x++, width-=2, height-=3;
+            if (isListViewHeader(widget)) {
+                btn = false;
+                y++;
+                x++;
+                width -= 2;
+                height -= 3;
             }
-            if(FULL_FOCUS)
-            {
-                if(btn)
-                {
-                    if(toolbarBtn)
-                    {
-                        x-=2, y-=2, width+=4, height+=4;
-                        if(!doEtch)
-                            x-=2, width+=4, y--, height+=2;
+            if (FULL_FOCUS) {
+                if (btn) {
+                    if (toolbarBtn) {
+                        x -= 2;
+                        y -= 2;
+                        width += 4;
+                        height += 4;
+                        if (!doEtch) {
+                            x -= 2;
+                            width += 4;
+                            y--;
+                            height += 2;
+                        }
+                    } else if (!widget  || !(GTK_IS_RADIO_BUTTON(widget) ||
+                                             GTK_IS_CHECK_BUTTON(widget))) {
+                        /* 1.7.2 - dont asjust fot check/radio */
+                        x -= 3;
+                        y -= 3;
+                        width += 6;
+                        height += 6;
                     }
-                    else if(!widget  || !(GTK_IS_RADIO_BUTTON(widget) || GTK_IS_CHECK_BUTTON(widget))) /* 1.7.2 - dont asjust fot check/radio */
-                        x-=3, y-=3, width+=6, height+=6;
                 }
 
-                if(FOCUS_FILLED==opts.focus)
-                {
-                    if(drawRounded)
-                        createPath(cr, x+0.5, y+0.5, width-1, height-1, qtcGetRadius(&opts, width, height, WIDGET_OTHER,
-                                   RADIUS_EXTERNAL), comboButton ? (rev ? ROUNDED_LEFT : ROUNDED_RIGHT) : ROUNDED_ALL);
-                    else
-                        cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
+                if (opts.focus == FOCUS_FILLED) {
+                    if (drawRounded) {
+                        qtcCairoPathWhole(cr, x + 0.5, y + 0.5, width - 1,
+                                          height - 1,
+                                          qtcGetRadius(&opts, width, height,
+                                                       WIDGET_OTHER,
+                                                       RADIUS_EXTERNAL),
+                                          comboButton ?
+                                          (rev ? ROUNDED_LEFT : ROUNDED_RIGHT) :
+                                          ROUNDED_ALL);
+                    } else {
+                        cairo_rectangle(cr, x + 0.5, y + 0.5,
+                                        width - 1, height - 1);
+                    }
                     qtcCairoSetColor(cr, col, FOCUS_ALPHA);
                     cairo_fill(cr);
                     cairo_new_path(cr);
                 }
             }
-            if(drawRounded)
-                createPath(cr, x+0.5, y+0.5, width-1, height-1,
-                           (view && opts.square&SQUARE_LISTVIEW_SELECTION) && ROUNDED
-                            ? SLIGHT_INNER_RADIUS
-                            : qtcGetRadius(&opts, width, height, WIDGET_OTHER,
-                                        FULL_FOCUS ? RADIUS_EXTERNAL : RADIUS_SELECTION),
-                           FULL_FOCUS && comboButton ? (rev ? ROUNDED_LEFT : ROUNDED_RIGHT) :
-                           ROUNDED_ALL);
-            else
+            if (drawRounded) {
+                qtcCairoPathWhole(cr, x + 0.5, y + 0.5, width - 1, height - 1,
+                                  (view &&
+                                   opts.square & SQUARE_LISTVIEW_SELECTION) &&
+                                  ROUNDED ? SLIGHT_INNER_RADIUS :
+                                  qtcGetRadius(&opts, width, height, WIDGET_OTHER,
+                                               FULL_FOCUS ? RADIUS_EXTERNAL :
+                                               RADIUS_SELECTION),
+                                  FULL_FOCUS && comboButton ?
+                                  (rev ? ROUNDED_LEFT : ROUNDED_RIGHT) :
+                                  ROUNDED_ALL);
+            } else {
                 cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
+            }
             /* qtcCairoSetColor(cr, col, alpha); */
             qtcCairoSetColor(cr, col);
             cairo_stroke(cr);
         }
         cairo_destroy(cr);
-    }
     }
 }
 

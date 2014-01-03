@@ -114,3 +114,89 @@ qtcCairoPathPoints(cairo_t *cr, GdkPoint *pts, int count)
         cairo_line_to(cr, pts[i].x + 0.5, pts[i].y + 0.5);
     }
 }
+
+QTC_EXPORT void
+qtcCairoPathTopLeft(cairo_t *cr, double xd, double yd, double width,
+                    double height, double radius, ECornerBits round)
+{
+    bool rounded = radius > 0.0;
+
+    if (rounded && round & CORNER_BL) {
+        cairo_arc(cr, xd + radius, yd + height - radius, radius,
+                  M_PI * 0.75, M_PI);
+    } else {
+        cairo_move_to(cr, xd, yd + height);
+    }
+    if (rounded && round & CORNER_TL) {
+        cairo_arc(cr, xd + radius, yd + radius, radius, M_PI, M_PI * 1.5);
+    } else {
+        cairo_line_to(cr, xd, yd);
+    }
+    if (rounded && round & CORNER_TR) {
+        cairo_arc(cr, xd + width - radius, yd + radius,
+                  radius, M_PI * 1.5, M_PI * 1.75);
+    } else {
+        cairo_line_to(cr, xd + width, yd);
+    }
+}
+
+QTC_EXPORT void
+qtcCairoPathBottomRight(cairo_t *cr, double xd, double yd, double width,
+                        double height, double radius, ECornerBits round)
+{
+    bool rounded = radius > 0.0;
+
+    if (rounded && round & CORNER_TR) {
+        cairo_arc(cr, xd + width - radius, yd + radius, radius, M_PI * 1.75, 0);
+    } else {
+        cairo_move_to(cr, xd + width, yd);
+    }
+    if (rounded && round & CORNER_BR) {
+        cairo_arc(cr, xd + width - radius, yd + height - radius,
+                  radius, 0, M_PI * 0.5);
+    } else {
+        cairo_line_to(cr, xd + width, yd + height);
+    }
+    if (rounded && round & CORNER_BL) {
+        cairo_arc(cr, xd + radius, yd + height - radius,
+                  radius, M_PI * 0.5, M_PI * 0.75);
+    } else {
+        cairo_line_to(cr, xd, yd + height);
+    }
+}
+
+QTC_EXPORT void
+qtcCairoPathWhole(cairo_t *cr, double xd, double yd, double width,
+                  double height, double radius, ECornerBits round)
+{
+    bool rounded = radius > 0.0;
+
+    if (rounded && round & CORNER_TL) {
+        cairo_move_to(cr, xd + radius, yd);
+    } else {
+        cairo_move_to(cr, xd, yd);
+    }
+    if (rounded && round & CORNER_TR) {
+        cairo_arc(cr, xd + width - radius, yd + radius, radius,
+                  M_PI * 1.5, M_PI * 2);
+    } else {
+        cairo_line_to(cr, xd + width, yd);
+    }
+    if (rounded && round & CORNER_BR) {
+        cairo_arc(cr, xd + width - radius, yd + height - radius,
+                  radius, 0, M_PI * 0.5);
+    } else {
+        cairo_line_to(cr, xd + width, yd + height);
+    }
+    if (rounded && round & CORNER_BL) {
+        cairo_arc(cr, xd + radius, yd + height - radius,
+                  radius, M_PI * 0.5, M_PI);
+    } else {
+        cairo_line_to(cr, xd, yd + height);
+    }
+    if (rounded && round & CORNER_TL) {
+        cairo_arc(cr, xd + radius, yd + radius, radius, M_PI, M_PI * 1.5);
+    } else {
+        cairo_line_to(cr, xd, yd);
+    }
+}

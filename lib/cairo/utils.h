@@ -24,6 +24,7 @@
 #define __QTC_CAIRO_UTILS_H__
 
 #include <qtcurve-utils/utils.h>
+#include <qtcurve-utils/options.h>
 #include <cairo.h>
 
 QTC_BEGIN_DECLS
@@ -57,6 +58,12 @@ qtcRectConstrain(QtcRect *rect, const QtcRect *con)
 {
     qtcRectIntersect(rect, con, rect);
 }
+void qtcCairoPathTopLeft(cairo_t *cr, double xd, double yd, double width,
+                         double height, double radius, ECornerBits round);
+void qtcCairoPathBottomRight(cairo_t *cr, double xd, double yd, double width,
+                             double height, double radius, ECornerBits round);
+void qtcCairoPathWhole(cairo_t *cr, double xd, double yd, double width,
+                       double height, double radius, ECornerBits round);
 
 QTC_END_DECLS
 

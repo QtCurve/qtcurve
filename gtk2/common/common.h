@@ -420,13 +420,6 @@ typedef enum
                               WIDGET_TROUGH, WIDGET_FILLED_SLIDER_TROUGH)
 #define IS_TOGGLE_BUTTON(W) qtcOneOf(W, WIDGET_TOGGLE_BUTTON, WIDGET_CHECKBOX)
 
-typedef enum {
-    CORNER_TL = 0x1,
-    CORNER_TR = 0x2,
-    CORNER_BR = 0x4,
-    CORNER_BL = 0x8
-} ECornerBits;
-
 #define ROUNDED_NONE        0x0
 #define ROUNDED_TOP         (CORNER_TL|CORNER_TR)
 #define ROUNDED_BOTTOM      (CORNER_BL|CORNER_BR)

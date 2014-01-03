@@ -58,13 +58,6 @@ typedef enum {
     DF_HAS_FOCUS = 0x040
 } EDrawFlags;
 
-void createTLPath(cairo_t *cr, double xd, double yd, double width,
-                  double height, double radius, int round);
-void createBRPath(cairo_t *cr, double xd, double yd, double width,
-                  double height, double radius, int round);
-void createPath(cairo_t *cr, double xd, double yd, double width,
-                double height, double radius, int round);
-
 void drawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state,
                 GdkRectangle *area, int x, int y, int width, int height,
                 GdkColor *c_colors, int round, EBorder borderProfile,

@@ -220,8 +220,9 @@ isOnToolbar(GtkWidget *widget, gboolean *horiz, int level)
 {
     if (widget) {
         if (GTK_IS_TOOLBAR(widget)) {
-            if (horiz)
+            if (horiz) {
                 *horiz = qtcWidgetIsHorizontal(widget);
+            }
             return TRUE;
         } else if (level < 4) {
             return isOnToolbar(gtk_widget_get_parent(widget), horiz, level + 1);
