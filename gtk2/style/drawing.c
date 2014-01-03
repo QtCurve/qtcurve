@@ -266,7 +266,7 @@ createPath(cairo_t *cr, double xd, double yd, double width, double height,
     } else {
         cairo_line_to(cr, xd + width, yd + height);
     }
-    if (rounded && round&CORNER_BL) {
+    if (rounded && round & CORNER_BL) {
         cairo_arc(cr, xd + radius, yd + height - radius,
                   radius, M_PI * 0.5, M_PI);
     } else {
@@ -426,7 +426,7 @@ drawGlow(cairo_t *cr, GdkRectangle *area, int x, int y, int w, int h,
         double yd = y + 0.5;
         double radius = qtcGetRadius(&opts, w, h, widget, RADIUS_ETCH);
         bool def = (widget == WIDGET_DEF_BUTTON &&
-                        opts.defBtnIndicator == IND_GLOW);
+                    opts.defBtnIndicator == IND_GLOW);
         bool defShade =
             (def && (!qtcPalette.defbtn ||
                      (qtcPalette.mouseover &&
