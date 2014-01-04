@@ -926,7 +926,7 @@ void setLowerEtchCol(cairo_t *cr, GtkWidget *widget)
 }
 
 GdkColor
-shadeColor(GdkColor *orig, double mod)
+shadeColor(const GdkColor *orig, double mod)
 {
     if (!qtcEqual(mod, 0.0)) {
         GdkColor modified;

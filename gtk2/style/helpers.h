@@ -180,7 +180,7 @@ gboolean isGimpDockable(GtkWidget *widget);
 GdkColor * getParentBgCol(GtkWidget *widget);
 int getOpacity(GtkWidget *widget);
 void setLowerEtchCol(cairo_t *cr, GtkWidget *widget);
-GdkColor shadeColor(GdkColor *orig, double mod);
+GdkColor shadeColor(const GdkColor *orig, double mod);
 gboolean windowEvent(GtkWidget *widget, GdkEvent *event, void *user_data);
 void adjustToolbarButtons(GtkWidget *widget, int *x, int *y, int *width, int *height, int *round, gboolean horiz);
 void getEntryParentBgCol(GtkWidget *widget, GdkColor *color);

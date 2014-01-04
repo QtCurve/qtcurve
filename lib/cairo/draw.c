@@ -44,8 +44,8 @@ qtcCairoVLine(cairo_t *cr, int x, int y, int h, const GdkColor *col, double a)
 }
 
 QTC_EXPORT void
-qtcCairoPolygon(cairo_t *cr, GdkColor *col, QtcRect *area, GdkPoint *points,
-                int npoints, bool fill)
+qtcCairoPolygon(cairo_t *cr, const GdkColor *col, const QtcRect *area,
+                const GdkPoint *points, int npoints, bool fill)
 {
     cairo_save(cr);
     cairo_set_line_width(cr, 1);
@@ -76,7 +76,7 @@ QTC_EXPORT void
 qtcCairoFadedLine(cairo_t *cr, int x, int y, int width, int height,
                   const QtcRect *area, const QtcRect *gap, bool fadeStart,
                   bool fadeEnd, double fadeSize, bool horiz,
-                  GdkColor *col, double alpha)
+                  const GdkColor *col, double alpha)
 {
     double rx = x + 0.5;
     double ry = y + 0.5;

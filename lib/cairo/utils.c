@@ -107,7 +107,7 @@ qtcRectIntersect(const QtcRect *src1, const QtcRect *src2, QtcRect *dest)
 }
 
 QTC_EXPORT void
-qtcCairoPathPoints(cairo_t *cr, GdkPoint *pts, int count)
+qtcCairoPathPoints(cairo_t *cr, const GdkPoint *pts, int count)
 {
     cairo_move_to(cr, pts[0].x + 0.5, pts[0].y + 0.5);
     for (int i = 1;i < count;i++) {

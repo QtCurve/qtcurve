@@ -35,7 +35,7 @@ typedef struct _GdkPoint GdkPoint;
 typedef cairo_rectangle_int_t QtcRect;
 #define qtcRect(x, y, w, h) ((QtcRect){(x), (y), (w), (h)})
 
-void qtcCairoPathPoints(cairo_t *cr, GdkPoint *pts, int count);
+void qtcCairoPathPoints(cairo_t *cr, const GdkPoint *pts, int count);
 void qtcCairoClipRegion(cairo_t *cr, const cairo_region_t *region);
 void qtcCairoClipRect(cairo_t *cr, const QtcRect *rect);
 void qtcCairoSetColor(cairo_t *cr, const GdkColor *col, double a);

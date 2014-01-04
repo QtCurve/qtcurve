@@ -27,21 +27,21 @@
 
 #define CAIRO_GRAD_END 1.0
 
-void drawBgnd(cairo_t *cr, GdkColor *col, GtkWidget *widget,
-              QtcRect *area, int x, int y, int width, int height);
-void drawAreaModColor(cairo_t *cr, QtcRect *area, GdkColor *orig,
+void drawBgnd(cairo_t *cr, const GdkColor *col, GtkWidget *widget,
+              const QtcRect *area, int x, int y, int width, int height);
+void drawAreaModColor(cairo_t *cr, const QtcRect *area, const GdkColor *orig,
                       double mod, int x, int y, int width, int height);
 QTC_ALWAYS_INLINE static inline void
 drawAreaMod(cairo_t *cr, GtkStyle *style, GtkStateType state,
-            QtcRect *area, double mod, int x, int y,
+            const QtcRect *area, double mod, int x, int y,
             int width, int height)
 {
     drawAreaModColor(cr, area, &style->bg[state], mod, x, y, width, height);
 }
 
-void drawBevelGradient(cairo_t *cr, QtcRect *area, int x, int y, int width,
-                       int height, GdkColor *base, gboolean horiz, gboolean sel,
-                       EAppearance bevApp, EWidget w, double alpha);
+void drawBevelGradient(cairo_t *cr, const QtcRect *area, int x, int y,
+                       int width, int height, const GdkColor *base, bool horiz,
+                       bool sel, EAppearance bevApp, EWidget w, double alpha);
 #define drawBevelGradient(cr, area, x, y, width, height, base, horiz, sel, \
                           bevApp, w, alpha...)                          \
     drawBevelGradient(cr, area, x, y, width, height, base, horiz, sel,  \
@@ -58,8 +58,8 @@ typedef enum {
 } EDrawFlags;
 
 void drawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state,
-                QtcRect *area, int x, int y, int width, int height,
-                GdkColor *c_colors, int round, EBorder borderProfile,
+                const QtcRect *area, int x, int y, int width, int height,
+                const GdkColor *c_colors, int round, EBorder borderProfile,
                 EWidget widget, int flags, int borderVal);
 #define drawBorder(cr, style, state, area, x, y, width, height, c_colors, \
                    round, borderProfile, widget, flags, borderVal...)   \
@@ -67,78 +67,103 @@ void drawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state,
                round, borderProfile, widget, flags,                     \
                QTC_DEFAULT(borderVal, QTC_STD_BORDER))
 
-void drawGlow(cairo_t *cr, QtcRect *area, int x, int y, int w, int h,
+void drawGlow(cairo_t *cr, const QtcRect *area, int x, int y, int w, int h,
               int round, EWidget widget, const GdkColor *colors);
 #define drawGlow(cr, area, x, y, w, h, round, widget, colors...)        \
     drawGlow(cr, area, x, y, w, h, round, widget, QTC_DEFAULT(colors, NULL))
 
-void drawEtch(cairo_t *cr, QtcRect *area, GtkWidget *widget,
+void drawEtch(cairo_t *cr, const QtcRect *area, GtkWidget *widget,
               int x, int y, int w, int h, bool raised, int round, EWidget wid);
 void qtcClipPath(cairo_t *cr, int x, int y, int w, int h, EWidget widget,
                  int rad, int round);
 void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
-                    QtcRect *area, int x, int y, int width, int height,
-                    GdkColor *base, GdkColor *colors, int round, EWidget widget,
-                    EBorder borderProfile, int flags, GtkWidget *wid);
+                    const QtcRect *area, int x, int y, int width, int height,
+                    const GdkColor *base, const GdkColor *colors, int round,
+                    EWidget widget, EBorder borderProfile, int flags,
+                    GtkWidget *wid);
 
 void drawFadedLine(cairo_t *cr, int x, int y, int width, int height,
-                   GdkColor *col, QtcRect *area, QtcRect *gap,
-                   bool fadeStart, bool fadeEnd, bool horiz, double alpha);
+                   const GdkColor *col, const QtcRect *area,
+                   const QtcRect *gap, bool fadeStart, bool fadeEnd,
+                   bool horiz, double alpha);
 #define drawFadedLine(cr, x, y, width, height, col, area, gap, fadeStart, \
                       fadeEnd, horiz, alpha...)                         \
     drawFadedLine(cr, x, y, width, height, col, area, gap, fadeStart,   \
                   fadeEnd, horiz, QTC_DEFAULT(alpha, 1))
 
 void drawHighlight(cairo_t *cr, int x, int y, int width, int height,
-                   QtcRect *area, bool horiz, bool inc);
-void setLineCol(cairo_t *cr, cairo_pattern_t *pt, GdkColor *col);
-void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight, gboolean horiz,
-                      int nLines, int offset, GdkColor *cols, GdkRectangle *area, int dark, ELine type);
-void drawDot(cairo_t *cr, int x, int y, int w, int h, GdkColor *cols);
-void drawDots(cairo_t *cr, int rx, int ry, int rwidth, int rheight, gboolean horiz, int nLines, int offset, GdkColor *cols, GdkRectangle *area,
-                     int startOffset, int dark);
-void drawEntryCorners(cairo_t *cr, GdkRectangle *area, int round, int x, int y,
+                   const QtcRect *area, bool horiz, bool inc);
+void setLineCol(cairo_t *cr, cairo_pattern_t *pt, const GdkColor *col);
+void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight,
+               bool horiz, int nLines, int offset, const GdkColor *cols,
+               const QtcRect *area, int dark, ELine type);
+void drawDot(cairo_t *cr, int x, int y, int w, int h, const GdkColor *cols);
+void drawDots(cairo_t *cr, int rx, int ry, int rwidth, int rheight,
+              bool horiz, int nLines, int offset, const GdkColor *cols,
+              const QtcRect *area, int startOffset, int dark);
+void drawEntryCorners(cairo_t *cr, const QtcRect *area, int round, int x, int y,
                       int width, int height, const GdkColor *col, double a);
-void drawBgndRing(cairo_t *cr, int x, int y, int size, int size2, gboolean isWindow);
-void drawBgndRings(cairo_t *cr, int x, int y, int width, int height, gboolean isWindow);
-void drawBgndImage(cairo_t *cr, GtkStyle *style, GdkRectangle *area, int x, int y, int w, int h, GdkColor *col,
-                          gboolean isWindow, double alpha);
-void drawStripedBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, int x, int y, int w, int h, GdkColor *col,
-                            gboolean isWindow, double alpha);
-gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, GdkWindow *window, GtkWidget *widget,
-                               int x, int y, int width, int height);
-void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkWindow *window, GtkWidget *widget, GdkRectangle *area,
-                           int x, int y, int width, int height, int round, EWidget w);
-void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state, GtkWidget *widget, GdkRectangle *area, int x, int y, int width, int height,
-                         gboolean rev, gboolean isEntryProg);
-void drawProgressGroove(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkWindow *window, GtkWidget *widget, GdkRectangle *area,
-                               int x, int y, int width, int height, gboolean isList, gboolean horiz);
-void drawSliderGroove(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkWindow *window, GtkWidget *widget, const char *detail,
-                             GdkRectangle *area, int x, int y, int width, int height, gboolean horiz);
-void drawTriangularSlider(cairo_t *cr, GtkStyle *style, GtkStateType state, const char *detail, GdkRectangle *area, int x, int y, int width, int height);
-void drawScrollbarGroove(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkWindow *window, GtkWidget *widget, const char *detail,
-                                GdkRectangle *area, int x, int y, int width, int height, gboolean horiz);
-void drawSelectionGradient(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangle *area,
-                                  int x, int y, int width, int height, int round, gboolean isLvSelection,
-                                  double alpha, GdkColor *col, gboolean horiz);
-void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangle *area, GtkWidget *widget,
-                          int x, int y, int width, int height, int round, gboolean isLvSelection, double alphaMod, int factor);
-void createRoundedMask(GtkWidget *widget, int x, int y, int width, int height, double radius, gboolean isToolTip);
-void clearRoundedMask(GtkWidget *widget, gboolean isToolTip);
-void drawTreeViewLines(cairo_t *cr, GdkColor *col, int x, int y, int h, int depth, int levelIndent, int expanderSize,
-                              GtkTreeView *treeView, GtkTreePath *path, GtkTreeViewColumn *column);
-void drawArrow(GdkWindow *window, GdkColor *col, QtcRect *area,
-               GtkArrowType arrow_type, int x, int y, gboolean small,
-               gboolean fill);
-void drawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state, gboolean use_text, GdkRectangle *area, int x, int y, PangoLayout *layout);
-void fillTab(cairo_t *cr, GtkStyle *style, GtkWidget *widget, GdkRectangle *area, GtkStateType state,
-                    GdkColor *col, int x, int y, int width, int height, gboolean horiz, EWidget tab, gboolean grad);
-void colorTab(cairo_t *cr, int x, int y, int width, int height, int round, EWidget tab, gboolean horiz);
-void drawToolTip(cairo_t *cr, GtkWidget *widget, GdkRectangle *area, int x, int y, int width, int height);
-void drawSplitter(cairo_t *cr, GtkStateType state, GtkStyle *style, GdkRectangle *area, int x, int y, int width, int height);
-void drawSidebarButton(cairo_t *cr, GtkStateType state, GtkStyle *style, GdkRectangle *area, int x, int y, int width, int height);
+void drawBgndRing(cairo_t *cr, int x, int y, int size,
+                  int size2, bool isWindow);
+void drawBgndRings(cairo_t *cr, int x, int y, int width, int height,
+                   bool isWindow);
+void drawBgndImage(cairo_t *cr, int x, int y, int w, int h, bool isWindow);
+void drawStripedBgnd(cairo_t *cr, int x, int y, int w, int h,
+                     const GdkColor *col, double alpha);
+bool drawWindowBgnd(cairo_t *cr, GtkStyle *style, const QtcRect *area,
+                    GdkWindow *window, GtkWidget *widget, int x, int y,
+                    int width, int height);
+void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
+                    GdkWindow *window, GtkWidget *widget, const QtcRect *area,
+                    int x, int y, int width, int height, int round, EWidget w);
+void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
+                  GtkWidget *widget, const QtcRect *area, int x, int y,
+                  int width, int height, bool rev, bool isEntryProg);
+void drawProgressGroove(cairo_t *cr, GtkStyle *style, GtkStateType state,
+                        GdkWindow *window, GtkWidget *widget,
+                        const QtcRect *area, int x, int y, int width,
+                        int height, bool isList, bool horiz);
+void drawSliderGroove(cairo_t *cr, GtkStyle *style, GtkStateType state,
+                      GtkWidget *widget, const char *detail,
+                      const QtcRect *area, int x, int y, int width, int height,
+                      bool horiz);
+void drawTriangularSlider(cairo_t *cr, GtkStyle *style, GtkStateType state,
+                          const char *detail, int x, int y,
+                          int width, int height);
+void drawScrollbarGroove(cairo_t *cr, GtkStyle *style, GtkStateType state,
+                         GtkWidget *widget, const QtcRect *area, int x, int y,
+                         int width, int height, bool horiz);
+void drawSelectionGradient(cairo_t *cr, const QtcRect *area, int x, int y,
+                           int width, int height, int round, bool isLvSelection,
+                           double alpha, const GdkColor *col, bool horiz);
+void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state,
+                   const QtcRect *area, GtkWidget *widget, int x, int y,
+                   int width, int height, int round, bool isLvSelection,
+                   double alphaMod, int factor);
+void createRoundedMask(GtkWidget *widget, int x, int y, int width, int height,
+                       double radius, bool isToolTip);
+void clearRoundedMask(GtkWidget *widget, bool isToolTip);
+void drawTreeViewLines(cairo_t *cr, const GdkColor *col, int x, int y, int h,
+                       int depth, int levelIndent, int expanderSize,
+                       GtkTreeView *treeView, GtkTreePath *path);
+void drawArrow(GdkWindow *window, const GdkColor *col, const QtcRect *area,
+               GtkArrowType arrow_type, int x, int y, bool small, bool fill);
+void drawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state,
+                bool use_text, const QtcRect *area, int x, int y,
+                PangoLayout *layout);
+void fillTab(cairo_t *cr, GtkStyle *style, GtkWidget *widget,
+             const QtcRect *area, GtkStateType state, const GdkColor *col,
+             int x, int y, int width, int height, bool horiz,
+             EWidget tab, bool grad);
+void drawToolTip(cairo_t *cr, GtkWidget *widget, const QtcRect *area,
+                 int x, int y, int width, int height);
+void drawSplitter(cairo_t *cr, GtkStateType state, GtkStyle *style,
+                  const QtcRect *area, int x, int y, int width, int height);
+void drawSidebarButton(cairo_t *cr, GtkStateType state, GtkStyle *style,
+                       const QtcRect *area, int x, int y,
+                       int width, int height);
 void drawMenuItem(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget, GdkRectangle *area, int x, int y, int width, int height);
-void drawMenu(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget, GdkRectangle *area, int x, int y, int width, int height);
+void drawMenu(cairo_t *cr, GtkWidget *widget, GdkRectangle *area, int x, int y, int width, int height);
 void drawBoxGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow, GtkStateType state,
                        GtkWidget *widget, GdkRectangle *area, int x, int y, int width, int height, GtkPositionType gap_side,
                        int gapX, int gapWidth, EBorder borderProfile, gboolean isTab);

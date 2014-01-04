@@ -35,8 +35,8 @@ void qtcCairoVLine(cairo_t *cr, int x, int y, int w,
                    const GdkColor *col, double a);
 #define qtcCairoVLine(cr, x, y, w, col, a...)           \
     qtcCairoVLine(cr, x, y, w, col, QTC_DEFAULT(a, 1))
-void qtcCairoPolygon(cairo_t *cr, GdkColor *col, QtcRect *area,
-                     GdkPoint *points, int npoints, bool fill);
+void qtcCairoPolygon(cairo_t *cr, const GdkColor *col, const QtcRect *area,
+                     const GdkPoint *points, int npoints, bool fill);
 void qtcCairoRect(cairo_t *cr, const QtcRect *area, int x, int y,
                   int width, int height, const GdkColor *col, double alpha);
 #define qtcCairoRect(cr, area, x, y, width, height, col, alpha...)      \
@@ -45,7 +45,7 @@ void qtcCairoRect(cairo_t *cr, const QtcRect *area, int x, int y,
 void qtcCairoFadedLine(cairo_t *cr, int x, int y, int width, int height,
                        const QtcRect *area, const QtcRect *gap, bool fadeStart,
                        bool fadeEnd, double fadeSize, bool horiz,
-                       GdkColor *col, double alpha);
+                       const GdkColor *col, double alpha);
 #define qtcCairoFadedLine(cr, x, y, width, height, area, gap, fadeStart, \
                           fadeEnd, fadeSize, horiz, col, alpha...)      \
     qtcCairoFadedLine(cr, x, y, width, height, area, gap, fadeStart,    \
