@@ -432,13 +432,15 @@ static void gtkDrawHandle(GtkStyle *style, GdkWindow *window, GtkStateType state
         switch(opts.handles)
         {
             case LINE_1DOT:
-                drawDot(cr, x, y, width, height, qtcPalette.background);
+                qtcCairoDot(cr, x, y, width, height,
+                            &qtcPalette.background[QTC_STD_BORDER]);
                 break;
             case LINE_NONE:
                 break;
             case LINE_DOTS:
-                drawDots(cr, x, y, width, height, height < width, 2, 5,
-                         qtcPalette.background, (QtcRect*)area, 2, 5);
+                qtcCairoDots(cr, x, y, width, height, height < width, 2, 5,
+                             (QtcRect*)area, 2, &qtcPalette.background[5],
+                             qtcPalette.background);
                 break;
             case LINE_DASHES:
                 if (height > width) {
@@ -2301,10 +2303,10 @@ gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 else
                     y++;
 
-            switch(opts.sliderThumbs)
-            {
+            switch (opts.sliderThumbs) {
                 case LINE_1DOT:
-                    drawDot(cr, x, y, width, height, markers);
+                    qtcCairoDot(cr, x, y, width, height,
+                                &markers[QTC_STD_BORDER]);
                     break;
                 case LINE_FLAT:
                     drawLines(cr, x, y, width, height, !horiz, 3, 5, markers,
@@ -2316,8 +2318,9 @@ gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state,
                     break;
                 default:
                 case LINE_DOTS:
-                    drawDots(cr, x, y, width, height, !horiz, scale ? 3 : 5,
-                             scale ? 4 : 2, markers, (QtcRect*)area, 0, 5);
+                    qtcCairoDots(cr, x, y, width, height, !horiz,
+                                 scale ? 3 : 5, scale ? 4 : 2, (QtcRect*)area,
+                                 0, &markers[5], markers);
             }
         }
     } else {
@@ -2366,8 +2369,9 @@ gtkDrawHLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
         switch (opts.toolbarSeparators) {
             default:
             case LINE_DOTS:
-                drawDots(cr, x1, y, x2 - x1, 2, false, (x2 - x1) / 3.0 + 0.5, 0,
-                         qtcPalette.background, (QtcRect*)area, 0, 5);
+                qtcCairoDots(cr, x1, y, x2 - x1, 2, false,
+                             (x2 - x1) / 3.0 + 0.5, 0, (QtcRect*)area, 0,
+                             &qtcPalette.background[5], qtcPalette.background);
                 break;
             case LINE_NONE:
                 break;
@@ -2462,8 +2466,10 @@ gtkDrawVLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
             {
                 default:
                 case LINE_DOTS:
-                    drawDots(cr, x, y1, 2, y2 - y1, true, (y2 - y1) / 3.0 + 0.5,
-                             0, qtcPalette.background, (QtcRect*)area, 0, 5);
+                    qtcCairoDots(cr, x, y1, 2, y2 - y1, true,
+                                 (y2 - y1) / 3.0 + 0.5, 0, (QtcRect*)area, 0,
+                                 &qtcPalette.background[5],
+                                 qtcPalette.background);
                     break;
                 case LINE_NONE:
                     break;

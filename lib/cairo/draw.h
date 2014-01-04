@@ -52,6 +52,10 @@ void qtcCairoFadedLine(cairo_t *cr, int x, int y, int width, int height,
                       fadeEnd, fadeSize, horiz, col, QTC_DEFAULT(alpha, 1))
 void qtcCairoStripes(cairo_t *cr, int x, int y, int w, int h,
                      bool horizontal, int stripeWidth);
+void qtcCairoDot(cairo_t *cr, int x, int y, int w, int h, const GdkColor *col);
+void qtcCairoDots(cairo_t *cr, int rx, int ry, int rwidth, int rheight,
+                  bool horiz, int nLines, int offset, const QtcRect *area,
+                  int startOffset, const GdkColor *col1, const GdkColor *col2);
 
 QTC_END_DECLS
 

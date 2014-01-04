@@ -130,3 +130,92 @@ qtcCairoStripes(cairo_t *cr, int x, int y, int w, int h,
     cairo_fill(cr);
     cairo_pattern_destroy(pat);
 }
+
+QTC_EXPORT void
+qtcCairoDot(cairo_t *cr, int x, int y, int w, int h, const GdkColor *col)
+{
+    double dx = x + (w - 5) / 2;
+    double dy = y + (h - 5) / 2;
+    cairo_pattern_t *p1 = cairo_pattern_create_linear(dx, dy, dx + 4, dy + 4);
+    cairo_pattern_t *p2 = cairo_pattern_create_linear(dx + 2, dy + 2,
+                                                      dx + 4, dx + 4);
+
+    qtcCairoPatternAddColorStop(p1, 0, col, 1);
+    qtcCairoPatternAddColorStop(p1, 1, col, 0.4);
+    cairo_pattern_add_color_stop_rgba(p2, 1, 1, 1, 1, 0.9);
+    cairo_pattern_add_color_stop_rgba(p2, 0, 1, 1, 1, 0.7);
+
+    cairo_new_path(cr);
+    cairo_arc(cr, dx + 2.5, dy + 2.5, 2.5, 0, 2 * M_PI);
+    cairo_clip(cr);
+    cairo_set_source(cr, p1);
+    cairo_rectangle(cr, dx, dy, 5, 5);
+    cairo_fill(cr);
+
+    cairo_new_path(cr);
+    cairo_arc(cr, dx + 3, dy + 3, 2, 0, 2 * M_PI);
+    cairo_clip(cr);
+    cairo_set_source(cr, p2);
+    cairo_rectangle(cr, dx + 1, dy + 1, 4, 4);
+    cairo_fill(cr);
+    cairo_pattern_destroy(p1);
+    cairo_pattern_destroy(p2);
+}
+
+QTC_EXPORT void
+qtcCairoDots(cairo_t *cr, int rx, int ry, int rwidth, int rheight, bool horiz,
+             int nLines, int offset, const QtcRect *area,
+             int startOffset, const GdkColor *col1, const GdkColor *col2)
+{
+    int space = nLines * 2 + nLines - 1;
+    int x = horiz ? rx : rx + (rwidth - space) / 2;
+    int y = horiz ? ry + (rheight - space) / 2 : ry;
+    int numDots = ((horiz ? rwidth : rheight) - 2 * offset) / 3 + 1;
+
+    cairo_save(cr);
+    qtcCairoClipRect(cr, area);
+    if (horiz) {
+        if (startOffset && y + startOffset > 0) {
+            y += startOffset;
+        }
+        cairo_new_path(cr);
+        qtcCairoSetColor(cr, col1);
+        for (int i = 0;i < space;i += 3) {
+            for (int j = 0;j < numDots;j++) {
+                cairo_rectangle(cr, x + offset + 3 * j, y + i, 1, 1);
+            }
+        }
+        cairo_fill(cr);
+
+        cairo_new_path(cr);
+        qtcCairoSetColor(cr, col2);
+        for (int i = 1;i < space;i += 3) {
+            for (int j = 0;j < numDots;j++) {
+                cairo_rectangle(cr, x + offset + 1 + 3 * j, y + i, 1, 1);
+            }
+        }
+        cairo_fill(cr);
+    } else {
+        if (startOffset && x + startOffset > 0) {
+            x += startOffset;
+        }
+        cairo_new_path(cr);
+        qtcCairoSetColor(cr, col1);
+        for (int i = 0;i < space;i += 3) {
+            for (int j = 0;j < numDots;j++) {
+                cairo_rectangle(cr, x + i, y + offset + 3 * j, 1, 1);
+            }
+        }
+        cairo_fill(cr);
+
+        cairo_new_path(cr);
+        qtcCairoSetColor(cr, col2);
+        for (int i = 1;i < space;i += 3) {
+            for(int j = 0;j < numDots;j++) {
+                cairo_rectangle(cr, x + i, y + offset + 1 + 3 * j, 1, 1);
+            }
+        }
+        cairo_fill(cr);
+    }
+    cairo_restore(cr);
+}

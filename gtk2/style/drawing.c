@@ -89,7 +89,7 @@ drawBevelGradient(cairo_t *cr, const QtcRect *area, int x, int y,
         }
     } else {
         cairo_pattern_t *pt =
-            cairo_pattern_create_linear(x, y, horiz ? x : x+width - 1,
+            cairo_pattern_create_linear(x, y, horiz ? x : x + width - 1,
                                         horiz ? y + height - 1 : y);
         bool topTab = w == WIDGET_TAB_TOP;
         bool botTab = w == WIDGET_TAB_BOT;
@@ -902,96 +902,6 @@ drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight,
     cairo_restore(cr);
 }
 
-void drawDot(cairo_t *cr, int x, int y, int w, int h, const GdkColor *cols)
-{
-    double dx = x + (w - 5) / 2;
-    double dy = y + (h - 5) / 2;
-    cairo_pattern_t *p1 = cairo_pattern_create_linear(dx, dy, dx + 4, dy + 4);
-    cairo_pattern_t *p2 = cairo_pattern_create_linear(dx + 2, dy + 2,
-                                                      dx + 4, dx + 4);
-
-    qtcCairoPatternAddColorStop(p1, 0.0, &cols[QTC_STD_BORDER], 1.0);
-    qtcCairoPatternAddColorStop(p1, CAIRO_GRAD_END, &cols[QTC_STD_BORDER], 0.4);
-    cairo_pattern_add_color_stop_rgba(p2, CAIRO_GRAD_END, 1.0, 1.0, 1.0, 0.9);
-    cairo_pattern_add_color_stop_rgba(p2, 0.0, 1.0, 1.0, 1.0, 0.7);
-
-    cairo_new_path(cr);
-    cairo_arc(cr, dx + 2.5, dy + 2.5, 2.5, 0, 2 * M_PI);
-    cairo_clip(cr);
-    cairo_set_source(cr, p1);
-    cairo_rectangle(cr, dx, dy, 5, 5);
-    cairo_fill(cr);
-
-    cairo_new_path(cr);
-    cairo_arc(cr, dx + 3, dy + 3, 2, 0, 2 * M_PI);
-    cairo_clip(cr);
-    cairo_set_source(cr, p2);
-    cairo_rectangle(cr, dx + 1, dy + 1, 4, 4);
-    cairo_fill(cr);
-    cairo_pattern_destroy(p1);
-    cairo_pattern_destroy(p2);
-}
-
-void
-drawDots(cairo_t *cr, int rx, int ry, int rwidth, int rheight, bool horiz,
-         int nLines, int offset, const GdkColor *cols, const QtcRect *area,
-         int startOffset, int dark)
-{
-    int space = nLines * 2 + nLines - 1;
-    int x = horiz ? rx : rx + (rwidth - space) / 2;
-    int y = horiz ? ry + (rheight - space) / 2 : ry;
-    int numDots = ((horiz ? rwidth : rheight) - 2 * offset) / 3 + 1;
-    const GdkColor *col1 = &cols[dark];
-    const GdkColor *col2 = &cols[0];
-
-    cairo_save(cr);
-    qtcCairoClipRect(cr, area);
-    if (horiz) {
-        if (startOffset && y + startOffset > 0) {
-            y += startOffset;
-        }
-        cairo_new_path(cr);
-        qtcCairoSetColor(cr, col1);
-        for (int i = 0;i < space;i += 3) {
-            for (int j = 0;j < numDots;j++) {
-                cairo_rectangle(cr, x + offset + 3 * j, y + i, 1, 1);
-            }
-        }
-        cairo_fill(cr);
-
-        cairo_new_path(cr);
-        qtcCairoSetColor(cr, col2);
-        for (int i = 1;i < space;i += 3) {
-            for (int j = 0;j < numDots;j++) {
-                cairo_rectangle(cr, x + offset + 1 + 3 * j, y + i, 1, 1);
-            }
-        }
-        cairo_fill(cr);
-    } else {
-        if (startOffset && x + startOffset > 0) {
-            x += startOffset;
-        }
-        cairo_new_path(cr);
-        qtcCairoSetColor(cr, col1);
-        for (int i = 0;i < space;i += 3) {
-            for (int j = 0;j < numDots;j++) {
-                cairo_rectangle(cr, x + i, y + offset + 3 * j, 1, 1);
-            }
-        }
-        cairo_fill(cr);
-
-        cairo_new_path(cr);
-        qtcCairoSetColor(cr, col2);
-        for (int i = 1;i < space;i += 3) {
-            for(int j = 0;j < numDots;j++) {
-                cairo_rectangle(cr, x + i, y + offset + 1 + 3 * j, 1, 1);
-            }
-        }
-        cairo_fill(cr);
-    }
-    cairo_restore(cr);
-}
-
 void
 drawEntryCorners(cairo_t *cr, const QtcRect *area, int round, int x, int y,
                  int width, int height, const GdkColor *col, double a)
@@ -1013,7 +923,7 @@ drawEntryCorners(cairo_t *cr, const QtcRect *area, int round, int x, int y,
         if (round & CORNER_TR) {
             cairo_rectangle(cr, x + width - 2.5, y + 2.5, 1, 1);
         }
-        if (round&CORNER_BR) {
+        if (round & CORNER_BR) {
             cairo_rectangle(cr, x + width - 2.5, y + height - 3.5, 1, 1);
         }
     }
@@ -2802,14 +2712,14 @@ drawSplitter(cairo_t *cr, GtkStateType state, GtkStyle *style,
 
     switch (opts.splitters) {
     case LINE_1DOT:
-        drawDot(cr, x, y, width, height, cols);
+        qtcCairoDot(cr, x, y, width, height, &cols[QTC_STD_BORDER]);
         break;
     case LINE_NONE:
         break;
     case LINE_DOTS:
     default:
-        drawDots(cr, x, y, width, height, height > width, NUM_SPLITTER_DASHES,
-                 1, cols, area, 0, 5);
+        qtcCairoDots(cr, x, y, width, height, height > width,
+                     NUM_SPLITTER_DASHES, 1, area, 0, &cols[5], cols);
         break;
     case LINE_FLAT:
     case LINE_SUNKEN:

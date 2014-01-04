@@ -97,10 +97,6 @@ void setLineCol(cairo_t *cr, cairo_pattern_t *pt, const GdkColor *col);
 void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight,
                bool horiz, int nLines, int offset, const GdkColor *cols,
                const QtcRect *area, int dark, ELine type);
-void drawDot(cairo_t *cr, int x, int y, int w, int h, const GdkColor *cols);
-void drawDots(cairo_t *cr, int rx, int ry, int rwidth, int rheight,
-              bool horiz, int nLines, int offset, const GdkColor *cols,
-              const QtcRect *area, int startOffset, int dark);
 void drawEntryCorners(cairo_t *cr, const QtcRect *area, int round, int x, int y,
                       int width, int height, const GdkColor *col, double a);
 void drawBgndRing(cairo_t *cr, int x, int y, int size,
