@@ -2706,9 +2706,11 @@ void colorTab(cairo_t *cr, int x, int y, int width, int height, int round, EWidg
     cairo_restore(cr);
 }
 
-void drawToolTip(cairo_t *cr, GtkWidget *widget, GdkRectangle *area, int x, int y, int width, int height)
+void
+drawToolTip(cairo_t *cr, GtkWidget *widget, GdkRectangle *area,
+            int x, int y, int width, int height)
 {
-    GdkColor *col=&qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP];
+    GdkColor *col = &qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP];
 
     gboolean nonGtk = isFakeGtk();
     gboolean rounded = !nonGtk && widget && !(opts.square & SQUARE_TOOLTIPS);
@@ -2749,7 +2751,7 @@ void drawToolTip(cairo_t *cr, GtkWidget *widget, GdkRectangle *area, int x, int 
         cairo_rectangle(cr, x + 0.5, y + 0.5, width - 1, height - 1);
         cairo_stroke(cr);
     }
-    cairo_save(cr);
+    cairo_restore(cr);
 }
 
 void drawSplitter(cairo_t *cr, GtkStateType state, GtkStyle *style, GdkRectangle *area, int x, int y, int width, int height)
