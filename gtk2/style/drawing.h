@@ -67,30 +67,30 @@ void drawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state,
                round, borderProfile, widget, flags,                     \
                QTC_DEFAULT(borderVal, QTC_STD_BORDER))
 
-void drawGlow(cairo_t *cr, GdkRectangle *area, int x, int y, int w, int h,
+void drawGlow(cairo_t *cr, QtcRect *area, int x, int y, int w, int h,
               int round, EWidget widget, const GdkColor *colors);
 #define drawGlow(cr, area, x, y, w, h, round, widget, colors...)        \
     drawGlow(cr, area, x, y, w, h, round, widget, QTC_DEFAULT(colors, NULL))
 
-void drawEtch(cairo_t *cr, GdkRectangle *area, GtkWidget *widget,
-              int x, int y, int w, int h, gboolean raised, int round, EWidget wid);
+void drawEtch(cairo_t *cr, QtcRect *area, GtkWidget *widget,
+              int x, int y, int w, int h, bool raised, int round, EWidget wid);
 void qtcClipPath(cairo_t *cr, int x, int y, int w, int h, EWidget widget,
                  int rad, int round);
 void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
-                    GdkRectangle *area, int x, int y, int width, int height,
+                    QtcRect *area, int x, int y, int width, int height,
                     GdkColor *base, GdkColor *colors, int round, EWidget widget,
                     EBorder borderProfile, int flags, GtkWidget *wid);
 
 void drawFadedLine(cairo_t *cr, int x, int y, int width, int height,
-                   GdkColor *col, GdkRectangle *area, GdkRectangle *gap,
-                   gboolean fadeStart, gboolean fadeEnd, gboolean horiz,
-                   double alpha);
+                   GdkColor *col, QtcRect *area, QtcRect *gap,
+                   bool fadeStart, bool fadeEnd, bool horiz, double alpha);
 #define drawFadedLine(cr, x, y, width, height, col, area, gap, fadeStart, \
                       fadeEnd, horiz, alpha...)                         \
     drawFadedLine(cr, x, y, width, height, col, area, gap, fadeStart,   \
                   fadeEnd, horiz, QTC_DEFAULT(alpha, 1))
 
-void drawHighlight(cairo_t *cr, int x, int y, int width, int height, GdkRectangle *area, gboolean horiz, gboolean inc);
+void drawHighlight(cairo_t *cr, int x, int y, int width, int height,
+                   QtcRect *area, bool horiz, bool inc);
 void setLineCol(cairo_t *cr, cairo_pattern_t *pt, GdkColor *col);
 void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight, gboolean horiz,
                       int nLines, int offset, GdkColor *cols, GdkRectangle *area, int dark, ELine type);

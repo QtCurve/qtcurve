@@ -726,62 +726,62 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
     qtcCairoClipRect(cr, (QtcRect*)area);
     cairo_set_line_width(cr, 1.0);
     if (spinUp || spinDown) {
-        if(!opts.unifySpin && (!opts.unifySpinBtns || sunken/* || GTK_STATE_PRELIGHT==state*/)) {
-            EWidget      wid=spinUp ? WIDGET_SPIN_UP : WIDGET_SPIN_DOWN;
-            GdkRectangle *a=area,
-                         b,
-                         unified;
-            gboolean     ooOrMoz=isFakeGtk();
+        if (!opts.unifySpin && (!opts.unifySpinBtns || sunken
+                                /* || GTK_STATE_PRELIGHT==state*/)) {
+            EWidget wid = spinUp ? WIDGET_SPIN_UP : WIDGET_SPIN_DOWN;
+            QtcRect *a= (QtcRect*)area;
+            QtcRect b;
+            QtcRect unified;
+            bool ooOrMoz = isFakeGtk();
 
-            if(!a && isFixedWidget(widget) && ooOrMoz)
-            {
-                b.x=x; b.y=y; b.width=width; b.height=height;
-                a=&b;
+            if (!a && isFixedWidget(widget) && ooOrMoz) {
+                b = qtcRect(x, y, width, height);
+                a = &b;
             }
 
-            if(WIDGET_SPIN_UP==wid)
-            {
-                if(DO_EFFECT && opts.etchEntry)
-                {
-                    if(!opts.unifySpinBtns)
-                        drawEtch(cr, a, widget, x-2, y, width+2, height*2, FALSE, ROUNDED_RIGHT, WIDGET_SPIN_UP);
+            if (wid == WIDGET_SPIN_UP) {
+                if (DO_EFFECT && opts.etchEntry) {
+                    if (!opts.unifySpinBtns)
+                        drawEtch(cr, a, widget, x - 2, y, width + 2, height * 2,
+                                 FALSE, ROUNDED_RIGHT, WIDGET_SPIN_UP);
                     y++;
                     width--;
                 }
                 height++;
 
-                if(opts.unifySpinBtns)
-                {
-                    unified.x=x, unified.y=y, unified.width=width, unified.height=height-(GTK_STATE_PRELIGHT==state ? 2 : 1);
-                    height*=2;
-                    area=&unified;
-                }
-                else if(!opts.etchEntry)
+                if (opts.unifySpinBtns) {
+                    unified = qtcRect(x, y, width,
+                                      height -
+                                      (state == GTK_STATE_PRELIGHT ? 2 : 1));
+                    height *= 2;
+                    area = (GdkRectangle*)&unified;
+                } else if (!opts.etchEntry) {
                     height++;
-            }
-            else if (DO_EFFECT && opts.etchEntry)
-            {
-                GdkRectangle clip;
-
-                clip.x=x-2, clip.y=y, clip.width=width+2, clip.height=height;
-                if(!opts.unifySpinBtns)
-                    drawEtch(cr, ooOrMoz ? a : &clip, widget, x-2, y-2, width+2, height+2, FALSE,
+                }
+            } else if (DO_EFFECT && opts.etchEntry) {
+                QtcRect clip = {x - 2, y, width + 2, height};
+                if (!opts.unifySpinBtns)
+                    drawEtch(cr, ooOrMoz ? a : &clip, widget, x - 2, y - 2,
+                             width + 2, height + 2, FALSE,
                              ROUNDED_RIGHT, WIDGET_SPIN_DOWN);
                 height--;
                 width--;
-                if(opts.unifySpinBtns)
-                {
-                    unified.x=x, unified.y=y+((GTK_STATE_PRELIGHT==state ? 1 : 0)),
-                        unified.width=width, unified.height=height-(GTK_STATE_PRELIGHT==state ? 1 : 0);
-                    y-=height, height*=2;
-                    area=&unified;
+                if (opts.unifySpinBtns) {
+                    unified = qtcRect(
+                        x, y + (state == GTK_STATE_PRELIGHT ? 1 : 0),
+                        width, height - (state == GTK_STATE_PRELIGHT ? 1 : 0));
+                    y -= height;
+                    height *= 2;
+                    area = (GdkRectangle*)&unified;
                 }
             }
 
             drawBgnd(cr, &btnColors[bgnd], widget, (QtcRect*)area,
                      x + 1, y + 1, width - 2, height - 2);
-            drawLightBevel(cr, style, state, area, x, y, width, height-(WIDGET_SPIN_UP==wid && DO_EFFECT ? 1 : 0), &btnColors[bgnd],
-                           btnColors, round, wid, BORDER_FLAT, DF_DO_BORDER|(sunken ? DF_SUNKEN : 0), widget);
+            drawLightBevel(cr, style, state, (QtcRect*)area, x, y, width,
+                           height - (WIDGET_SPIN_UP==wid && DO_EFFECT ? 1 : 0),
+                           &btnColors[bgnd], btnColors, round, wid, BORDER_FLAT,
+                           DF_DO_BORDER | (sunken ? DF_SUNKEN : 0), widget);
         }
     } else if (DETAIL("spinbutton")) {
         if (qtcIsFlatBgnd(opts.bgndAppearance) ||
@@ -818,18 +818,21 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
             cairo_restore(cr);
         } else if (opts.unifySpinBtns) {
             int offset=(DO_EFFECT && opts.etchEntry ? 1 : 0);
-            if(offset)
-                drawEtch(cr, area, widget, x, y, width, height, FALSE,
+            if (offset) {
+                drawEtch(cr, (QtcRect*)area, widget, x, y, width, height, FALSE,
                          ROUNDED_RIGHT, WIDGET_SPIN);
+            }
 #if GTK_CHECK_VERSION(2, 90, 0)
             bgnd=getFill(GTK_STATE_ACTIVE==state ? GTK_STATE_NORMAL : state, FALSE);
 #endif
-            drawLightBevel(cr, style, state, area, x, y+offset, width-offset, height-(2*offset), &btnColors[bgnd],
-                           btnColors, ROUNDED_RIGHT, WIDGET_SPIN, BORDER_FLAT,
-                           DF_DO_BORDER|(sunken ? DF_SUNKEN : 0), widget);
+            drawLightBevel(cr, style, state, (QtcRect*)area, x, y + offset,
+                           width - offset, height - 2 * offset,
+                           &btnColors[bgnd], btnColors, ROUNDED_RIGHT,
+                           WIDGET_SPIN, BORDER_FLAT,
+                           DF_DO_BORDER | (sunken ? DF_SUNKEN : 0), widget);
             drawFadedLine(cr, x + 2, y + height / 2, width - (offset + 4), 1,
-                          &btnColors[QTC_STD_BORDER], area, NULL,
-                          TRUE, TRUE, TRUE);
+                          &btnColors[QTC_STD_BORDER], (QtcRect*)area, NULL,
+                          true, true, true);
         }
 
     }
@@ -1051,9 +1054,13 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                         state=GTK_STATE_PRELIGHT;
                 }
 
-                if(draw)
-                    drawLightBevel(cr, style, state, area, x-mod, y, width+mod, height, &btnColors[bgnd], btnColors, round,
-                                   WIDGET_TOOLBAR_BUTTON, BORDER_FLAT, (GTK_STATE_ACTIVE==state ? DF_SUNKEN : 0)|DF_DO_BORDER, widget);
+                if (draw)
+                    drawLightBevel(cr, style, state, (QtcRect*)area, x - mod, y,
+                                   width + mod, height, &btnColors[bgnd],
+                                   btnColors, round, WIDGET_TOOLBAR_BUTTON,
+                                   BORDER_FLAT, (state == GTK_STATE_ACTIVE ?
+                                                 DF_SUNKEN : 0) | DF_DO_BORDER,
+                                   widget);
 
                 if(mapped)
                 {
@@ -1154,8 +1161,10 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                             (defBtn && IND_DARKEN==opts.defBtnIndicator)
                                 ? getFill(state, btnDown, true) : bgnd;
 
-                drawLightBevel(cr, style, state, area, x, y, width, height, &cols[bg], cols, round, widgetType,
-                                BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER|(horiz ? 0 : DF_VERT), widget);
+                drawLightBevel(cr, style, state, (QtcRect*)area, x, y, width,
+                               height, &cols[bg], cols, round, widgetType,
+                               BORDER_FLAT, (sunken ? DF_SUNKEN : 0) |
+                               DF_DO_BORDER | (horiz ? 0 : DF_VERT), widget);
 
                 if(tbar_button && TBTN_JOINED==opts.tbarBtns)
                 {
@@ -1163,13 +1172,23 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                     int xo=x-xAdjust, yo=y-yAdjust, wo=width-wAdjust, ho=height-hAdjust;
 
                     if(xAdjust)
-                        drawFadedLine(cr, xo, yo+constSpace, 1, ho-(2*constSpace), &btnColors[0], area, NULL, TRUE, TRUE, FALSE);
-                    if(yAdjust)
-                        drawFadedLine(cr, xo+constSpace, yo, wo-(2*constSpace), 1, &btnColors[0], area, NULL, TRUE, TRUE, TRUE);
+                        drawFadedLine(cr, xo, yo + constSpace, 1,
+                                      ho - 2 * constSpace, &btnColors[0],
+                                      (QtcRect*)area, NULL, true, true, false);
+                    if (yAdjust)
+                        drawFadedLine(cr, xo + constSpace, yo,
+                                      wo - 2 * constSpace, 1, &btnColors[0],
+                                      (QtcRect*)area, NULL, true, true, true);
                     if(wAdjust && ROUNDED_RIGHT!=round)
-                        drawFadedLine(cr, xo+wo-1, yo+constSpace, 1, ho-(2*constSpace), &btnColors[QTC_STD_BORDER], area, NULL, TRUE, TRUE, FALSE);
-                    if(hAdjust && ROUNDED_BOTTOM!=round)
-                        drawFadedLine(cr, xo+constSpace, yo+ho-1, wo-(2*constSpace), 1, &btnColors[QTC_STD_BORDER], area, NULL, TRUE, TRUE, TRUE);
+                        drawFadedLine(cr, xo + wo - 1, yo + constSpace, 1,
+                                      ho - 2 * constSpace,
+                                      &btnColors[QTC_STD_BORDER],
+                                      (QtcRect*)area, NULL, true, true, false);
+                    if (hAdjust && ROUNDED_BOTTOM!=round)
+                        drawFadedLine(cr, xo + constSpace, yo + ho - 1,
+                                      wo - 2 * constSpace, 1,
+                                      &btnColors[QTC_STD_BORDER],
+                                      (QtcRect*)area, NULL, true, true, true);
                 }
             }
 
@@ -1239,8 +1258,9 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                             btn.width += 1;
                         }
                     }
-                    drawLightBevel(cr, style, state, area, btn.x, btn.y,
-                                   btn.width, btn.height, &cols[bg], cols,
+                    drawLightBevel(cr, style, state, (QtcRect*)area,
+                                   btn.x, btn.y, btn.width, btn.height,
+                                   &cols[bg], cols,
                                    rev ? ROUNDED_LEFT : ROUNDED_RIGHT,
                                    WIDGET_COMBO, BORDER_FLAT,
                                    (sunken ? DF_SUNKEN : 0) | DF_DO_BORDER |
@@ -1250,14 +1270,22 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                     if(sunken)
                         cx++, cy++, cheight--;
 
-                    drawFadedLine(cr, cx + (rev ? ind_width+style->xthickness : (cwidth - ind_width - style->xthickness)),
-                                      cy + style->ythickness-1, 1, cheight-3,
-                                  &btnColors[darkLine], area, NULL, TRUE, TRUE, FALSE);
+                    drawFadedLine(
+                        cr, cx + (rev ? ind_width + style->xthickness :
+                                  cwidth - ind_width - style->xthickness),
+                        cy + style->ythickness - 1, 1, cheight - 3,
+                        &btnColors[darkLine], (QtcRect*)area, NULL,
+                        true, true, false);
 
-                    if(!sunken)
-                        drawFadedLine(cr, cx + 1 + (rev ? ind_width+style->xthickness : (cwidth - ind_width - style->xthickness)),
-                                          cy + style->ythickness-1, 1, cheight-3,
-                                      &btnColors[0], area, NULL, TRUE, TRUE, FALSE);
+                    if (!sunken) {
+                        drawFadedLine(
+                            cr, cx + 1 + (rev ? ind_width + style->xthickness :
+                                          cwidth - ind_width -
+                                          style->xthickness),
+                            cy + style->ythickness-1, 1, cheight - 3,
+                            &btnColors[0], (QtcRect*)area, NULL,
+                            true, true, false);
+                    }
                 }
             } else if((button || togglebutton) && (combo || combo_entry)) {
                 int vx = x + (width - (1 + (combo_entry ? 24 : 20)));
@@ -1296,7 +1324,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                                 btn.width += 3;
                             }
                         }
-                        drawLightBevel(cr, style, state, area, btn.x, btn.y,
+                        drawLightBevel(cr, style, state, (QtcRect*)area, btn.x, btn.y,
                                        btn.width, btn.height, &cols[bg], cols,
                                        rev ? ROUNDED_LEFT : ROUNDED_RIGHT,
                                        WIDGET_COMBO, BORDER_FLAT,
@@ -1304,12 +1332,17 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                                        DF_HIDE_EFFECT, widget);
                         cairo_restore(cr);
                     } else if (opts.comboSplitter) {
-                        drawFadedLine(cr, vx+(rev ? LARGE_ARR_WIDTH+4 : 0), y+4, 1, height-8,
-                                      &btnColors[darkLine], area, NULL, TRUE, TRUE, FALSE);
+                        drawFadedLine(cr, vx + (rev ? LARGE_ARR_WIDTH + 4 : 0),
+                                      y + 4, 1, height - 8,
+                                      &btnColors[darkLine], (QtcRect*)area,
+                                      NULL, true, true, false);
 
                         if(!sunken)
-                            drawFadedLine(cr, vx+1+(rev ? LARGE_ARR_WIDTH+4 : 0), y+4, 1, height-8,
-                                          &btnColors[0], area, NULL, TRUE, TRUE, FALSE);
+                            drawFadedLine(cr, vx + 1 +
+                                          (rev ? LARGE_ARR_WIDTH + 4 : 0),
+                                          y + 4, 1, height - 8, &btnColors[0],
+                                          (QtcRect*)area, NULL,
+                                          true, true, false);
                     }
                 }
             }
@@ -1432,11 +1465,11 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
         drawFadedLine(cr, x + 1 + offset, y + height / 2, width - (1 + offset),
                       1, &cols[isMenuItem ? MENU_SEP_SHADE : QTC_STD_BORDER],
-                      area, NULL, TRUE, TRUE, TRUE);
+                      (QtcRect*)area, NULL, true, true, true);
     } else if (DETAIL("vseparator")) {
         drawFadedLine(cr, x + width / 2, y, 1, height,
-                      &qtcPalette.background[QTC_STD_BORDER], area, NULL,
-                      TRUE, TRUE, FALSE);
+                      &qtcPalette.background[QTC_STD_BORDER], (QtcRect*)area,
+                      NULL, true, true, false);
     } else {
         EWidget wt = (!detail && GTK_IS_TREE_VIEW(widget) ?
                       WIDGET_PBAR_TROUGH : WIDGET_FRAME);
@@ -1566,8 +1599,12 @@ gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state,
         else
             btnColors=qtcPalette.button[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE];
 
-        drawLightBevel(cr, style, state, area, x, y, width+4, height, &btnColors[bgnd], btnColors, ROUNDED_LEFT, WIDGET_TOOLBAR_BUTTON,
-                       BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER|(qtcComboBoxHasFocus(widget, mapped) ? DF_HAS_FOCUS : 0), widget);
+        drawLightBevel(cr, style, state, (QtcRect*)area, x, y, width + 4, height,
+                       &btnColors[bgnd], btnColors, ROUNDED_LEFT,
+                       WIDGET_TOOLBAR_BUTTON, BORDER_FLAT,
+                       (sunken ? DF_SUNKEN : 0) | DF_DO_BORDER |
+                       (qtcComboBoxHasFocus(widget, mapped) ? DF_HAS_FOCUS : 0),
+                       widget);
 
         if(GTK_STATE_PRELIGHT!=state)
         {
@@ -1737,11 +1774,13 @@ gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state,
                                                 height - 1, 0, ROUNDED_NONE);
                         cairo_stroke(cr);
                         doBorder=false;
-                    }
-                    else if(opts.etchEntry)
-                    {
-                        drawEtch(cr, area, widget, x, y, width, height, FALSE, ROUNDED_ALL, WIDGET_SCROLLVIEW);
-                        x++, y++, width-=2, height-=2;
+                    } else if (opts.etchEntry) {
+                        drawEtch(cr, (QtcRect*)area, widget, x, y, width,
+                                 height, FALSE, ROUNDED_ALL, WIDGET_SCROLLVIEW);
+                        x++;
+                        y++;
+                        width -= 2;
+                        height -= 2;
                     }
                 }
                 if (viewport || windowFrame/* || drawSquare*/) {
@@ -2326,7 +2365,9 @@ gtkDrawHLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
             case LINE_FLAT:
             case LINE_SUNKEN:
             {
-                drawFadedLine(cr, x1<x2 ? x1 : x2, y, abs(x2-x1), 1, &qtcPalette.background[dark], area, NULL, true, true, true);
+                drawFadedLine(cr, x1 < x2 ? x1 : x2, y, abs(x2 - x1), 1,
+                              &qtcPalette.background[dark], (QtcRect*)area,
+                              NULL, true, true, true);
                 /* qtcCairoHLine(cr, x1 < x2 ? x1 : x2, y, abs(x2 - x1), */
                 /*               &qtcPalette.background[dark]); */
                 if(LINE_SUNKEN==opts.toolbarSeparators)
@@ -2334,20 +2375,25 @@ gtkDrawHLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
                     cairo_new_path(cr);
                     /* qtcCairoHLine(cr, x1 < x2 ? x1 : x2, y + 1, abs(x2 - x1), */
                     /*               &qtcPalette.background[light]); */
-                    drawFadedLine(cr, x1<x2 ? x1 : x2, y+1, abs(x2-x1), 1, &qtcPalette.background[light], area, NULL, true, true, true);
+                    drawFadedLine(cr, x1 < x2 ? x1 : x2, y + 1, abs(x2 - x1), 1,
+                                  &qtcPalette.background[light], (QtcRect*)area,
+                                  NULL, true, true, true);
                 }
             }
         }
-    }
-    else if(DETAIL("label"))
-    {
-        if(state == GTK_STATE_INSENSITIVE)
+    } else if (DETAIL("label")) {
+        if (state == GTK_STATE_INSENSITIVE) {
             /* qtcCairoHLine(cr, (x1 < x2 ? x1 : x2) + 1, y + 1, abs(x2 - x1), */
             /*               &qtcPalette.background[light]); */
-            drawFadedLine(cr, x1<x2 ? x1 : x2, y+1, abs(x2-x1), 1, &qtcPalette.background[light], area, NULL, true, true, true);
+            drawFadedLine(cr, x1 < x2 ? x1 : x2, y + 1, abs(x2 - x1), 1,
+                          &qtcPalette.background[light], (QtcRect*)area, NULL,
+                          true, true, true);
+        }
         /* qtcCairoHLine(cr, x1 < x2 ? x1 : x2, y, abs(x2 - x1), */
         /*               &style->text[state]); */
-        drawFadedLine(cr, x1<x2 ? x1 : x2, y, abs(x2-x1), 1, &qtcPalette.background[dark], area, NULL, true, true, true);
+        drawFadedLine(cr, x1 < x2 ? x1 : x2, y, abs(x2 - x1), 1,
+                      &qtcPalette.background[dark], (QtcRect*)area, NULL,
+                      true, true, true);
     }
     else if(DETAIL("menuitem") || (widget && DETAIL("hseparator") && IS_MENU_ITEM(widget)))
     {
@@ -2366,12 +2412,15 @@ gtkDrawHLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
         /* qtcCairoHLine(cr, x1 < x2 ? x1 : x2, y, abs(x2 - x1), */
         /*               &qtcPalette.background[MENU_SEP_SHADE]); */
-        drawFadedLine(cr, offset+(x1<x2 ? x1 : x2), y+1, abs(x2-x1)-offset, 1, &cols[MENU_SEP_SHADE], area, NULL, true, true, true);
+        drawFadedLine(cr, offset + (x1 < x2 ? x1 : x2), y + 1,
+                      abs(x2 - x1) - offset, 1, &cols[MENU_SEP_SHADE],
+                      (QtcRect*)area, NULL, true, true, true);
     } else {
         /* qtcCairoHLine(cr, x1 < x2 ? x1 : x2, y, abs(x2 - x1), */
         /*               qtcPalette.background[dark]); */
         drawFadedLine(cr, x1 < x2 ? x1 : x2, y, abs(x2 - x1), 1,
-                      &qtcPalette.background[dark], area, NULL, true, true, true);
+                      &qtcPalette.background[dark], (QtcRect*)area, NULL,
+                      true, true, true);
     }
 
     cairo_destroy(cr);
@@ -2414,8 +2463,8 @@ gtkDrawVLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
                     /* qtcCairoVLine(cr, x, y1 < y2 ? y1 : y2, abs(y2 - y1), */
                     /*               &qtcPalette.background[dark]); */
                     drawFadedLine(cr, x, y1 < y2 ? y1 : y2, 1, abs(y2 - y1),
-                                  &qtcPalette.background[dark], area, NULL,
-                                  true, true, false);
+                                  &qtcPalette.background[dark],
+                                  (QtcRect*)area, NULL, true, true, false);
                     if(LINE_SUNKEN==opts.toolbarSeparators)
                         /* qtcCairoVLine(cr, x + 1, y1 < y2 ? y1 : y2, */
                         /*               abs(y2 - y1), */
@@ -2423,15 +2472,15 @@ gtkDrawVLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
                         drawFadedLine(cr, x + 1, y1 < y2 ? y1 : y2, 1,
                                       abs(y2 - y1),
                                       &qtcPalette.background[light],
-                                      area, NULL, true, true, false);
+                                      (QtcRect*)area, NULL, true, true, false);
                 }
             }
         } else {
             /* qtcCairoVLine(cr, x, y1 < y2 ? y1 : y2, abs(y2 - y1), */
             /*               &qtcPalette.background[dark]); */
             drawFadedLine(cr, x, y1 < y2 ? y1 : y2, 1, abs(y2 - y1),
-                          &qtcPalette.background[dark], area, NULL, true,
-                          true, false);
+                          &qtcPalette.background[dark], (QtcRect*)area,
+                          NULL, true, true, false);
         }
     }
     cairo_destroy(cr);
@@ -2654,8 +2703,8 @@ gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
             if (view || listViewHeader) {
                 height -= 2;
             }
-            drawFadedLine(cr, x, y + height - 1, width, 1, col, area, NULL,
-                          TRUE, TRUE, TRUE);
+            drawFadedLine(cr, x, y + height - 1, width, 1, col,
+                          (QtcRect*)area, NULL, true, true, true);
         } else {
             /* double alpha = (opts.focus == FOCUS_GLOW ? */
             /*                 FOCUS_GLOW_LINE_ALPHA : 1.0); */
