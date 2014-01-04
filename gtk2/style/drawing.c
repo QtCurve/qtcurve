@@ -1515,12 +1515,10 @@ drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
     }
 }
 
-void
-setProgressStripeClipping(cairo_t *cr, GdkRectangle *area, int x, int y,
-                          int width, int height, int animShift, gboolean horiz)
+static void
+qtcSetProgressStripeClipping(cairo_t *cr, GdkRectangle *area, int x, int y,
+                             int width, int height, int animShift, bool horiz)
 {
-    int stripeOffset;
-
     switch (opts.stripedProgress) {
     default:
     case STRIPE_PLAIN: {
@@ -1530,7 +1528,8 @@ setProgressStripeClipping(cairo_t *cr, GdkRectangle *area, int x, int y,
 #endif
         cairo_region_t *region = cairo_region_create_rectangle(&rect);
         if (horiz) {
-            for (stripeOffset = 0;stripeOffset < width + PROGRESS_CHUNK_WIDTH;
+            for (int stripeOffset = 0;
+                 stripeOffset < width + PROGRESS_CHUNK_WIDTH;
                  stripeOffset += PROGRESS_CHUNK_WIDTH * 2) {
                 QtcRect innerRect = {x + stripeOffset + animShift, y + 1,
                                      PROGRESS_CHUNK_WIDTH, height - 2};
@@ -1542,50 +1541,51 @@ setProgressStripeClipping(cairo_t *cr, GdkRectangle *area, int x, int y,
                 }
             }
         } else {
-            for (stripeOffset = 0;stripeOffset < height + PROGRESS_CHUNK_WIDTH;
+            for (int stripeOffset = 0;
+                 stripeOffset < height + PROGRESS_CHUNK_WIDTH;
                  stripeOffset += PROGRESS_CHUNK_WIDTH * 2) {
                 QtcRect innerRect = {x + 1, y + stripeOffset + animShift,
                                      width - 2, PROGRESS_CHUNK_WIDTH};
-
                 /* qtcRectConstrain(&innerRect, area); */
                 if (innerRect.width > 0 && innerRect.height > 0) {
                     cairo_region_xor_rectangle(region, &innerRect);
                 }
             }
         }
-        cairo_save(cr);
         qtcCairoClipRegion(cr, region);
         cairo_region_destroy(region);
         break;
     }
     case STRIPE_DIAGONAL:
         cairo_new_path(cr);
-        cairo_save(cr);
-// #if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
-//             if(area)
-//                 cairo_rectangle(cr, area->x, area->y, area->width, area->height);
-// #endif
-        if(horiz)
-            for(stripeOffset=0; stripeOffset<(width+height+2); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
-            {
-                GdkPoint pts[4]={ {x+stripeOffset+animShift,                               y},
-                                  {x+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH,          y},
-                                  {(x+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH)-height, y+height-1},
-                                  {(x+stripeOffset+animShift)-height,                      y+height-1}};
-
+/* #if !GTK_CHECK_VERSION(2, 90, 0) /\* Gtk3:TODO !!! *\/ */
+/*         if (area) */
+/*             cairo_rectangle(cr, area->x, area->y, */
+/*                             area->width, area->height); */
+/* #endif */
+        if (horiz) {
+            for (int stripeOffset = 0;stripeOffset < width + height + 2;
+                 stripeOffset += PROGRESS_CHUNK_WIDTH * 2) {
+                GdkPoint pts[4] = {
+                    {x + stripeOffset + animShift, y},
+                    {x + stripeOffset + animShift + PROGRESS_CHUNK_WIDTH, y},
+                    {x + stripeOffset + animShift +
+                     PROGRESS_CHUNK_WIDTH - height, y + height - 1},
+                    {x + stripeOffset + animShift - height, y + height - 1}};
                 qtcCairoPathPoints(cr, pts, 4);
             }
-        else
-            for(stripeOffset=0; stripeOffset<(height+width+2); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
-            {
-                GdkPoint pts[4]={{x,         y+stripeOffset+animShift},
-                                 {x+width-1, (y+stripeOffset+animShift)-width},
-                                 {x+width-1, (y+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH)-width},
-                                 {x,         y+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH}};
-
+        } else {
+            for (int stripeOffset = 0;stripeOffset < height + width + 2;
+                 stripeOffset += PROGRESS_CHUNK_WIDTH * 2) {
+                GdkPoint pts[4] = {
+                    {x, y + stripeOffset + animShift},
+                    {x + width - 1, y + stripeOffset + animShift - width},
+                    {x + width - 1, y + stripeOffset + animShift +
+                     PROGRESS_CHUNK_WIDTH - width},
+                    {x, y + stripeOffset + animShift + PROGRESS_CHUNK_WIDTH}};
                 qtcCairoPathPoints(cr, pts, 4);
             }
-
+        }
         cairo_clip(cr);
     }
 }
@@ -1655,8 +1655,9 @@ drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
                        width + (horiz ? sizeMod : 0),
                        height + (horiz ? 0 : sizeMod), horiz);
         } else {
-            setProgressStripeClipping(cr, area, xo, yo, wo, ho,
-                                      animShift, horiz);
+            cairo_save(cr);
+            qtcSetProgressStripeClipping(cr, area, xo, yo, wo, ho,
+                                         animShift, horiz);
             drawLightBevel(cr, style, new_state, NULL, x, y, width, height,
                            &itemCols[1], qtcPalette.highlight, ROUNDED_ALL,
                            wid, BORDER_FLAT,
