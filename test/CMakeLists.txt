@@ -38,3 +38,11 @@ add_test(NAME test-default-arg-cpp COMMAND test-default-arg-cpp)
 add_executable(test-color-str test-color-str.c)
 target_link_libraries(test-color-str qtcurve-utils)
 add_test(NAME test-color-str COMMAND test-color-str)
+
+add_executable(test-default test-default.c)
+target_link_libraries(test-default qtcurve-utils)
+add_test(NAME test-default COMMAND test-default)
+
+add_executable(test-default-cpp test-default.cpp)
+target_link_libraries(test-default-cpp qtcurve-utils)
+add_test(NAME test-default-cpp COMMAND test-default-cpp)

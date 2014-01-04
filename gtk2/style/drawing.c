@@ -61,8 +61,8 @@ void
 drawBgnd(cairo_t *cr, const GdkColor *col, GtkWidget *widget,
          const QtcRect *area, int x, int y, int width, int height)
 {
-    const GdkColor *parent_col = getParentBgCol(widget);
-    qtcCairoRect(cr, area, x, y, width, height, parent_col ? parent_col : col);
+    qtcCairoRect(cr, area, x, y, width, height,
+                 qtcDefault(getParentBgCol(widget), col));
 }
 
 void

@@ -190,6 +190,11 @@ qtcOneOf(T &&value, First &&first, Rest &&...rest...)
     return value == first || qtcOneOf(std::forward<T>(value),
                                       std::forward<Rest>(rest)...);
 }
+#define qtcDefault(val, def)                    \
+    (([&]() {                                   \
+            decltype(val) __val = (val);        \
+            return __val ? __val : (def);       \
+        })())
 #else
 #define qtcOneOf(exp, args...)                                  \
     ({                                                          \
@@ -204,6 +209,11 @@ qtcOneOf(T &&value, First &&first, Rest &&...rest...)
             }                                                   \
         }                                                       \
         __res;                                                  \
+    })
+#define qtcDefault(val, def)                    \
+    ({                                          \
+        typeof(val) __val = (val);              \
+        __val ? __val : (def);                  \
     })
 #endif
 #define qtcNoneOf(args...) (!qtcOneOf(args))
