@@ -28,18 +28,18 @@
 #define CAIRO_GRAD_END 1.0
 
 void drawBgnd(cairo_t *cr, GdkColor *col, GtkWidget *widget,
-              GdkRectangle *area, int x, int y, int width, int height);
-void drawAreaModColor(cairo_t *cr, GdkRectangle *area, GdkColor *orig,
+              QtcRect *area, int x, int y, int width, int height);
+void drawAreaModColor(cairo_t *cr, QtcRect *area, GdkColor *orig,
                       double mod, int x, int y, int width, int height);
 QTC_ALWAYS_INLINE static inline void
 drawAreaMod(cairo_t *cr, GtkStyle *style, GtkStateType state,
-            GdkRectangle *area, double mod, int x, int y,
+            QtcRect *area, double mod, int x, int y,
             int width, int height)
 {
     drawAreaModColor(cr, area, &style->bg[state], mod, x, y, width, height);
 }
 
-void drawBevelGradient(cairo_t *cr, GdkRectangle *area, int x, int y, int width,
+void drawBevelGradient(cairo_t *cr, QtcRect *area, int x, int y, int width,
                        int height, GdkColor *base, gboolean horiz, gboolean sel,
                        EAppearance bevApp, EWidget w, double alpha);
 #define drawBevelGradient(cr, area, x, y, width, height, base, horiz, sel, \
@@ -58,7 +58,7 @@ typedef enum {
 } EDrawFlags;
 
 void drawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state,
-                GdkRectangle *area, int x, int y, int width, int height,
+                QtcRect *area, int x, int y, int width, int height,
                 GdkColor *c_colors, int round, EBorder borderProfile,
                 EWidget widget, int flags, int borderVal);
 #define drawBorder(cr, style, state, area, x, y, width, height, c_colors, \
