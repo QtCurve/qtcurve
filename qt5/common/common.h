@@ -261,8 +261,8 @@ enum {
     (opts.coloredMouseOver == MO_GLOW ? 1 : MO_PLASTIK_LIGHT(W))
 
 #define FULLLY_ROUNDED     (opts.round>=ROUND_FULL)
-#define DO_EFFECT          (EFFECT_NONE!=opts.buttonEffect)
-#define SLIDER_GLOW        (DO_EFFECT && MO_GLOW==opts.coloredMouseOver /*&& SLIDER_TRIANGULAR!=opts.sliderStyle*/ ? 2 : 0)
+#define SLIDER_GLOW        (opts.buttonEffect != EFFECT_NONE &&         \
+                            opts.coloredMouseOver == MO_GLOW ? 2 : 0)
 
 #define ENTRY_MO (opts.unifyCombo && opts.unifySpin)
 

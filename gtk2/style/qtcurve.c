@@ -503,7 +503,7 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
 #if !GTK_CHECK_VERSION(2, 90, 0)
             // NOTE: Dont do this for moz - as looks odd fir widgets in
             // HTML pages - arrow is shifted too much :-(
-            if (!DO_EFFECT) // || moz)
+            if (!(opts.buttonEffect != EFFECT_NONE)) // || moz)
                 x += 2;
 #endif
 
@@ -623,7 +623,7 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
         if(isSpinButton && isFixedWidget(widget) && isFakeGtk())
             x--;
 
-        if(isSpinButton && !DO_EFFECT)
+        if(isSpinButton && !(opts.buttonEffect != EFFECT_NONE))
             y+=(GTK_ARROW_UP==arrow_type ? -1 : 1);
 
         if(opts.unifySpin && isSpinButton && !opts.vArrows && GTK_ARROW_DOWN==arrow_type)
@@ -753,7 +753,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
             }
 
             if (wid == WIDGET_SPIN_UP) {
-                if (DO_EFFECT && opts.etchEntry) {
+                if (opts.buttonEffect != EFFECT_NONE && opts.etchEntry) {
                     if (!opts.unifySpinBtns)
                         drawEtch(cr, a, widget, x - 2, y, width + 2, height * 2,
                                  FALSE, ROUNDED_RIGHT, WIDGET_SPIN_UP);
@@ -771,7 +771,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 } else if (!opts.etchEntry) {
                     height++;
                 }
-            } else if (DO_EFFECT && opts.etchEntry) {
+            } else if (opts.buttonEffect != EFFECT_NONE && opts.etchEntry) {
                 QtcRect clip = {x - 2, y, width + 2, height};
                 if (!opts.unifySpinBtns)
                     drawEtch(cr, ooOrMoz ? a : &clip, widget, x - 2, y - 2,
@@ -792,7 +792,8 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
             drawBgnd(cr, &btnColors[bgnd], widget, (QtcRect*)area,
                      x + 1, y + 1, width - 2, height - 2);
             drawLightBevel(cr, style, state, (QtcRect*)area, x, y, width,
-                           height - (WIDGET_SPIN_UP==wid && DO_EFFECT ? 1 : 0),
+                           height - (WIDGET_SPIN_UP == wid &&
+                                     opts.buttonEffect != EFFECT_NONE ? 1 : 0),
                            &btnColors[bgnd], btnColors, round, wid, BORDER_FLAT,
                            DF_DO_BORDER | (sunken ? DF_SUNKEN : 0), widget);
         }
@@ -830,7 +831,8 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
             drawEntryField(cr, style, state, window, widget, (QtcRect*)area, x, y, width, height, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_SPIN);
             cairo_restore(cr);
         } else if (opts.unifySpinBtns) {
-            int offset=(DO_EFFECT && opts.etchEntry ? 1 : 0);
+            int offset = (opts.buttonEffect != EFFECT_NONE && opts.etchEntry ?
+                          1 : 0);
             if (offset) {
                 drawEtch(cr, (QtcRect*)area, widget, x, y, width, height, FALSE,
                          ROUNDED_RIGHT, WIDGET_SPIN);
@@ -1242,7 +1244,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
                 ind_width=indicator_size.width+indicator_spacing.left+indicator_spacing.right;
 
-                if(DO_EFFECT)
+                if (opts.buttonEffect != EFFECT_NONE)
                     cx--;
 
                 cy+=3;
@@ -1265,7 +1267,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                         btn.width += 3;
                     } else {
                         btn.x -= 3;
-                        if (DO_EFFECT) {
+                        if (opts.buttonEffect != EFFECT_NONE) {
                             btn.width += 3;
                         } else {
                             btn.width += 1;
@@ -1312,8 +1314,8 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                     }
                 }
 
-                if(DO_EFFECT)
-                    vx-=2;
+                if (opts.buttonEffect != EFFECT_NONE)
+                    vx -= 2;
 
                 if (!combo_entry) {
                     if (opts.comboBtn != SHADE_NONE) {
@@ -1333,7 +1335,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                             btn.width += 3;
                         } else {
                             btn.x -= 3;
-                            if (DO_EFFECT) {
+                            if (opts.buttonEffect != EFFECT_NONE) {
                                 btn.width += 3;
                             }
                         }
@@ -2520,7 +2522,7 @@ gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
         debugDisplayWidget(widget, 10);
     }
     GtkWidget *parent = widget ? gtk_widget_get_parent(widget) : NULL;
-    gboolean doEtch = DO_EFFECT;
+    gboolean doEtch = opts.buttonEffect != EFFECT_NONE;
     gboolean btn = false;
     gboolean comboButton = false;
     gboolean rev = parent && reverseLayout(parent);

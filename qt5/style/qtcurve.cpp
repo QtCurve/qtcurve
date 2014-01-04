@@ -1688,8 +1688,9 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
         colouredMouseOver(doColouredMouseOver && WIDGET_MENU_BUTTON!=w &&
                           (MO_COLORED==opts.coloredMouseOver ||
                            MO_COLORED_THICK==opts.coloredMouseOver ||
-                           (MO_GLOW==opts.coloredMouseOver && !DO_EFFECT))),
-        doEtch(doBorder && ETCH_WIDGET(w) && DO_EFFECT),
+                           (MO_GLOW==opts.coloredMouseOver &&
+                            !(opts.buttonEffect != EFFECT_NONE)))),
+        doEtch(doBorder && ETCH_WIDGET(w) && opts.buttonEffect != EFFECT_NONE),
         glowFocus(doEtch && USE_GLOW_FOCUS(option->state&State_MouseOver) && option->state&State_HasFocus &&
                   option->state&State_Enabled),
         horiz(CIRCULAR_SLIDER(w) || isHoriz(option, w, TBTN_JOINED==opts.tbarBtns)),
@@ -3057,7 +3058,7 @@ void Style::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOptionSlid
         else if(option->tickPosition & QSlider::TicksAbove)
             direction=horiz ? PE_IndicatorArrowUp : PE_IndicatorArrowLeft;
 
-        if(MO_GLOW==opts.coloredMouseOver && DO_EFFECT)
+        if (MO_GLOW==opts.coloredMouseOver && opts.buttonEffect != EFFECT_NONE)
             x++, y++;
 
         switch(direction)
@@ -3292,7 +3293,7 @@ void Style::drawSliderGroove(QPainter *p, const QRect &groove, const QRect &hand
         grv.adjust(0, dh, 0, -dh);
         opt.state|=State_Horizontal;
 
-        if(DO_EFFECT)
+        if (opts.buttonEffect != EFFECT_NONE)
             grv.adjust(0, -1, 0, 1);
     }
     else
@@ -3301,7 +3302,7 @@ void Style::drawSliderGroove(QPainter *p, const QRect &groove, const QRect &hand
         grv.adjust(dw, 0, -dw, 0);
         opt.state&=~State_Horizontal;
 
-        if(DO_EFFECT)
+        if (opts.buttonEffect != EFFECT_NONE)
             grv.adjust(-1, 0, 1, 0);
     }
 

@@ -414,7 +414,8 @@ drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
     bool doEtch =
         (flags & DF_DO_BORDER &&
          (ETCH_WIDGET(widget) || (WIDGET_COMBO_BUTTON == widget &&
-                                  opts.etchEntry)) && DO_EFFECT);
+                                  opts.etchEntry)) &&
+         opts.buttonEffect != EFFECT_NONE);
     bool glowFocus =
         (doEtch && USE_GLOW_FOCUS(GTK_STATE_PRELIGHT == state) && wid &&
          ((flags&DF_HAS_FOCUS) || gtk_widget_has_focus(wid)) &&
@@ -910,7 +911,7 @@ drawEntryCorners(cairo_t *cr, const QtcRect *area, int round, int x, int y,
     qtcCairoClipRect(cr, area);
     qtcCairoSetColor(cr, col, a);
     cairo_rectangle(cr, x + 0.5, y + 0.5, width - 1, height - 1);
-    if (DO_EFFECT && opts.etchEntry) {
+    if (opts.buttonEffect != EFFECT_NONE && opts.etchEntry) {
         cairo_rectangle(cr, x + 1.5, y + 1.5, width - 2, height - 3);
     }
     if (opts.round > ROUND_FULL) {
@@ -1306,7 +1307,7 @@ drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
                                  qtcEntryIsLastMo(widget)) &&
          qtcPalette.mouseover && GTK_APP_JAVA != qtSettings.app);
     bool highlight = highlightReal || mouseOver;
-    bool doEtch = DO_EFFECT && opts.etchEntry;
+    bool doEtch = opts.buttonEffect != EFFECT_NONE && opts.etchEntry;
     bool comboOrSpin = qtcOneOf(w, WIDGET_SPIN, WIDGET_COMBO_BUTTON);
     const GdkColor *colors = (mouseOver ? qtcPalette.mouseover : highlightReal ?
                               qtcPalette.focus : qtcPalette.background);
@@ -1650,7 +1651,7 @@ drawProgressGroove(cairo_t *cr, GtkStyle *style, GtkStateType state,
                    GdkWindow *window, GtkWidget *widget, const QtcRect *area,
                    int x, int y, int width, int height, bool isList, bool horiz)
 {
-    bool doEtch = !isList && DO_EFFECT;
+    bool doEtch = !isList && opts.buttonEffect != EFFECT_NONE;
     const GdkColor *col = &style->base[state];
     int offset = opts.borderProgress ? 1 : 0;
 
@@ -1736,7 +1737,7 @@ drawSliderGroove(cairo_t *cr, GtkStyle *style, GtkStateType state,
     int pos = (int)(((double)(horiz ? width : height) /
                      (upper - lower))  * (value - lower));
     bool inverted = gtk_range_get_inverted(GTK_RANGE(widget));
-    bool doEtch = DO_EFFECT;
+    bool doEtch = opts.buttonEffect != EFFECT_NONE;
     bool rev = (reverseLayout(widget) ||
                 (widget && reverseLayout(gtk_widget_get_parent(widget))));
     int troughSize = SLIDER_TROUGH_SIZE + (doEtch ? 2 : 0);
@@ -1844,7 +1845,7 @@ drawTriangularSlider(cairo_t *cr, GtkStyle *style, GtkStateType state,
     bool drawLight = opts.coloredMouseOver != MO_PLASTIK || !coloredMouseOver;
     int borderVal = (qtcPalette.mouseover == borderCols ? SLIDER_MO_BORDER_VAL :
                      BORDER_VAL(state == GTK_STATE_INSENSITIVE));
-    if (opts.coloredMouseOver == MO_GLOW && DO_EFFECT) {
+    if (opts.coloredMouseOver == MO_GLOW && opts.buttonEffect != EFFECT_NONE) {
         x++;
         y++;
         xo++;
@@ -1929,7 +1930,7 @@ drawTriangularSlider(cairo_t *cr, GtkStyle *style, GtkStateType state,
     double ydg = yd - 1;
     double radiusg = radius + 1;
     gboolean glowMo = (MO_GLOW == opts.coloredMouseOver &&
-                       coloredMouseOver && DO_EFFECT);
+                       coloredMouseOver && opts.buttonEffect != EFFECT_NONE);
     cairo_new_path(cr);
     if (glowMo) {
         qtcCairoSetColor(cr, &borderCols[GLOW_MO], GLOW_ALPHA(FALSE));
@@ -3371,7 +3372,7 @@ drawCheckBox(cairo_t *cr, GtkStateType state, GtkShadowType shadow,
     gboolean list = !mnu && isList(widget);
     gboolean on = shadow == GTK_SHADOW_IN;
     gboolean tri = shadow == GTK_SHADOW_ETCHED_IN;
-    gboolean doEtch = DO_EFFECT;
+    gboolean doEtch = opts.buttonEffect != EFFECT_NONE;
     GdkColor newColors[TOTAL_SHADES + 1];
     GdkColor *btnColors;
     int ind_state = ((list || (!mnu && state == GTK_STATE_INSENSITIVE)) ?
@@ -3528,7 +3529,7 @@ void drawRadioButton(cairo_t *cr, GtkStateType state, GtkShadowType shadow, GtkS
         gboolean on = shadow == GTK_SHADOW_IN;
         gboolean tri = shadow == GTK_SHADOW_ETCHED_IN;
         /* gboolean set = on || tri; */
-        gboolean doEtch = DO_EFFECT;
+        gboolean doEtch = opts.buttonEffect != EFFECT_NONE;
         int ind_state = (state == GTK_STATE_INSENSITIVE ?
                          state : GTK_STATE_NORMAL);
         int optSpace = doEtch ? opts.crSize + 2 : opts.crSize;
@@ -4131,8 +4132,8 @@ void drawDefBtnIndicator(cairo_t *cr, GtkStateType state, GdkColor *btnColors, i
 {
     if(IND_CORNER==opts.defBtnIndicator)
     {
-        int      offset=sunken ? 5 : 4,
-            etchOffset=DO_EFFECT ? 1 : 0;
+        int offset = sunken ? 5 : 4;
+        int etchOffset = opts.buttonEffect != EFFECT_NONE ? 1 : 0;
         GdkColor *cols=qtcPalette.focus ? qtcPalette.focus : qtcPalette.highlight,
             *col=&cols[GTK_STATE_ACTIVE==state ? 0 : 4];
 
@@ -4142,10 +4143,10 @@ void drawDefBtnIndicator(cairo_t *cr, GtkStateType state, GdkColor *btnColors, i
         cairo_line_to(cr, x+offset+6+etchOffset, y+offset+etchOffset);
         cairo_line_to(cr, x+offset+etchOffset, y+offset+6+etchOffset);
         cairo_fill(cr);
-    }
-    else if(IND_COLORED==opts.defBtnIndicator && (COLORED_BORDER_SIZE>2))
-    {
-        int o=COLORED_BORDER_SIZE+(DO_EFFECT ? 1 : 0); // offset needed because of etch
+    } else if (opts.defBtnIndicator == IND_COLORED && COLORED_BORDER_SIZE > 2) {
+        // offset needed because of etch
+        int o = (COLORED_BORDER_SIZE +
+                 (opts.buttonEffect != EFFECT_NONE ? 1 : 0));
 
         drawBevelGradient(cr, (QtcRect*)area, x + o, y + o, width - 2 * o,
                           height - 2 * o, &btnColors[bgnd], TRUE,

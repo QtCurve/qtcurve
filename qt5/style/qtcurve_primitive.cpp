@@ -562,7 +562,8 @@ Style::drawPrimitiveFrame(PrimitiveElement element,
                 // polished is not in the scrollview, but is when painted.
                 // So check here if it should not be etched.
                 // Also, see not in getLowerEtchCol()
-                if (DO_EFFECT && !USE_CUSTOM_ALPHAS(opts) && widget &&
+                if (opts.buttonEffect != EFFECT_NONE &&
+                    !USE_CUSTOM_ALPHAS(opts) && widget &&
                     widget->parentWidget() && !props->noEtch &&
                     inQAbstractItemView) {
                     props->noEtch = true;
@@ -571,7 +572,8 @@ Style::drawPrimitiveFrame(PrimitiveElement element,
                 // width is set to 3. ...but it we are a scrollview within
                 // a scrollview, then we dont draw sunken, therefore
                 // need to draw inner border...
-                bool doEtch = DO_EFFECT && opts.etchEntry;
+                bool doEtch = (opts.buttonEffect != EFFECT_NONE &&
+                               opts.etchEntry);
                 bool noEtchW = (doEtch && !USE_CUSTOM_ALPHAS(opts) &&
                                 props->noEtch);
                 if (doEtch && noEtchW) {
@@ -1517,7 +1519,7 @@ Style::drawPrimitiveIndicatorRadioButton(PrimitiveElement element,
         if (opts.crButton) {
             const QColor *use = checkRadioColors(option);
             QStyleOption opt(*option);
-            bool doEtch = DO_EFFECT;
+            bool doEtch = opts.buttonEffect != EFFECT_NONE;
             QRect rect(r.x(), r.y(), opts.crSize + (doEtch ? 2 : 0),
                        opts.crSize + (doEtch ? 2 : 0));
 
@@ -1550,7 +1552,8 @@ Style::drawPrimitiveIndicatorRadioButton(PrimitiveElement element,
         } else {
             bool sunken = !menu && !selectedOOMenu && (state & State_Sunken);
             bool doEtch = (!menu && r.width() >= opts.crSize + 2 &&
-                           r.height() >= opts.crSize + 2 && DO_EFFECT);
+                           r.height() >= opts.crSize + 2 &&
+                           opts.buttonEffect != EFFECT_NONE);
             bool mo = (!sunken && state & State_MouseOver &&
                        state & State_Enabled);
             bool glow = doEtch && MO_GLOW == opts.coloredMouseOver && mo;
@@ -1640,7 +1643,7 @@ Style::drawPrimitiveIndicatorCheckBox(PrimitiveElement element,
     const QPalette &palette(option->palette);
     bool menu = state & STATE_MENU;
     bool view = state & STATE_VIEW;
-    bool doEtch = (DO_EFFECT &&
+    bool doEtch = (opts.buttonEffect != EFFECT_NONE &&
                    (opts.crButton ||
                     (PE_IndicatorMenuCheckMark != element && !menu &&
                      r.width() >= opts.crSize + 2 &&
@@ -1793,8 +1796,8 @@ Style::drawPrimitiveFrameLineEdit(PrimitiveElement element,
             if (opt.state & State_Enabled && state & State_ReadOnly) {
                 opt.state ^= State_Enabled;
             }
-            if (DO_EFFECT && opts.etchEntry && APP_ARORA == theThemedApp &&
-                widget && widget->parentWidget() &&
+            if (opts.buttonEffect != EFFECT_NONE && opts.etchEntry &&
+                APP_ARORA == theThemedApp && widget && widget->parentWidget() &&
                 strcmp(widget->metaObject()->className(), "LocationBar") == 0) {
                 const QToolBar *tb = getToolBar(widget->parentWidget());
                 if (tb) {
@@ -1840,7 +1843,7 @@ Style::drawPrimitiveFrameLineEdit(PrimitiveElement element,
                 }
             }
             drawEntryField(painter, rect, widget, &opt, round, isOO,
-                           !isOO && DO_EFFECT);
+                           !isOO && opts.buttonEffect != EFFECT_NONE);
         }
     }
     return true;
@@ -1857,7 +1860,8 @@ Style::drawPrimitivePanelLineEdit(PrimitiveElement element,
     if (const QStyleOptionFrame *panel =
         qstyleoption_cast<const QStyleOptionFrame*>(option)) {
         if (panel->lineWidth > 0) {
-            QRect r2 = r.adjusted(1, 1, -1, DO_EFFECT ? -2 : -1);
+            QRect r2 = r.adjusted(1, 1, -1,
+                                  opts.buttonEffect != EFFECT_NONE ? -2 : -1);
             painter->fillPath(buildPath(r2, WIDGET_ENTRY, ROUNDED_ALL,
                                         qtcGetRadius(&opts, r2.width(),
                                                      r2.height(), WIDGET_ENTRY,

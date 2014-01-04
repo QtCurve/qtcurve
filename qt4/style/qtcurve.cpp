@@ -2962,12 +2962,12 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
         case PM_MenuVMargin:
             return 0;
         case PM_MenuButtonIndicator:
-            return (DO_EFFECT ? 10 : 9)+
+            return (opts.buttonEffect != EFFECT_NONE ? 10 : 9)+
                     (!widget || qobject_cast<const QToolButton*>(widget) ? 6 : 0);
         case PM_ButtonMargin:
-            return (DO_EFFECT
-                    ? (opts.thin&THIN_BUTTONS) ? 4 : 6
-                    : (opts.thin&THIN_BUTTONS) ? 2 : 4)+MAX_ROUND_BTN_PAD;
+            return (opts.buttonEffect != EFFECT_NONE ?
+                    (opts.thin & THIN_BUTTONS) ? 4 : 6 :
+                    (opts.thin & THIN_BUTTONS) ? 2 : 4) + MAX_ROUND_BTN_PAD;
         case PM_TabBarTabShiftVertical:
             return 2;
         case PM_TabBarTabShiftHorizontal:
@@ -2999,7 +2999,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
                 return 1;
             }
 
-            if(DO_EFFECT && opts.etchEntry &&
+            if (opts.buttonEffect != EFFECT_NONE && opts.etchEntry &&
                 (!widget || // !isFormWidget(widget) &&
                 qobject_cast<const QLineEdit*>(widget) || qobject_cast<const QAbstractScrollArea*>(widget) ||
                 widget->inherits("Q3ScrollView") /*|| isKontactPreviewPane(widget)*/))
@@ -3007,14 +3007,15 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
             else
                 return 2;
         case PM_SpinBoxFrameWidth:
-            return DO_EFFECT && opts.etchEntry ? 3 : 2;
+            return opts.buttonEffect != EFFECT_NONE && opts.etchEntry ? 3 : 2;
         case PM_IndicatorWidth:
         case PM_IndicatorHeight:
         case PM_ExclusiveIndicatorWidth:
         case PM_ExclusiveIndicatorHeight:
         case PM_CheckListControllerSize:
         case PM_CheckListButtonSize:
-            return DO_EFFECT ? opts.crSize+2 : opts.crSize;
+            return (opts.buttonEffect != EFFECT_NONE ?
+                    opts.crSize + 2 : opts.crSize);
         case PM_TabBarTabOverlap:
             return TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1;
         case PM_ProgressBarChunkWidth:
@@ -3981,7 +3982,8 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                         // For some reason, in KPackageKit, the KTextBrower when polished is not in the scrollview,
                         // but is when painted. So check here if it should not be etched.
                         // Also, see not in getLowerEtchCol()
-                        if (DO_EFFECT && !USE_CUSTOM_ALPHAS(opts) && widget &&
+                        if (opts.buttonEffect != EFFECT_NONE &&
+                            !USE_CUSTOM_ALPHAS(opts) && widget &&
                             widget->parentWidget() &&
                             !props->noEtch && inQAbstractItemView) {
                             props->noEtch = true;
@@ -3990,7 +3992,8 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                         // If we are set to have sunken scrollviews, then the frame width is set to 3.
                         // ...but it we are a scrollview within a scrollview, then we dont draw sunken, therefore
                         // need to draw inner border...
-                        bool doEtch = DO_EFFECT && opts.etchEntry;
+                        bool doEtch = (opts.buttonEffect != EFFECT_NONE &&
+                                       opts.etchEntry);
                         bool noEtchW = (doEtch &&
                                         !USE_CUSTOM_ALPHAS(opts) &&
                                         props->noEtch);
@@ -4236,7 +4239,8 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             {
                 if(panel->lineWidth > 0)
                 {
-                    QRect r2(r.adjusted(1, 1, -1, (DO_EFFECT ? -2 : -1)));
+                    QRect r2(r.adjusted(1, 1, -1, opts.buttonEffect !=
+                                        EFFECT_NONE ? -2 : -1));
                     painter->fillPath(buildPath(r2, WIDGET_ENTRY, ROUNDED_ALL, qtcGetRadius(&opts, r2.width(), r2.height(), WIDGET_ENTRY, RADIUS_INTERNAL)),
                                       palette.brush(QPalette::Base));
                     drawPrimitive(PE_FrameLineEdit, option, painter, widget);
@@ -4258,7 +4262,8 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                     if(opt.state&State_Enabled && state&State_ReadOnly)
                         opt.state^=State_Enabled;
 
-                    if(DO_EFFECT && opts.etchEntry && APP_ARORA==theThemedApp && widget &&
+                    if (opts.buttonEffect != EFFECT_NONE && opts.etchEntry &&
+                        APP_ARORA==theThemedApp && widget &&
                        widget->parentWidget() && 0==strcmp(widget->metaObject()->className(), "LocationBar"))
                     {
                         const QToolBar *tb=getToolBar(widget->parentWidget()/*, false*/);
@@ -4309,7 +4314,8 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                         }
                     }
 
-                    drawEntryField(painter, rect, widget, &opt, round, isOO, !isOO && DO_EFFECT);
+                    drawEntryField(painter, rect, widget, &opt, round, isOO,
+                                   !isOO && opts.buttonEffect != EFFECT_NONE);
                     painter->restore();
                 }
             }
@@ -4338,8 +4344,8 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
         {
             bool  menu(state&STATE_MENU),
                   view(state&STATE_VIEW),
-                  doEtch(DO_EFFECT &&
-                          (opts.crButton ||(PE_IndicatorMenuCheckMark!=element && !menu &&
+                  doEtch(opts.buttonEffect != EFFECT_NONE &&
+                         (opts.crButton || (PE_IndicatorMenuCheckMark!=element && !menu &&
                                             r.width()>=opts.crSize+2 && r.height()>=opts.crSize+2))),
                   isOO(isOOWidget(widget)),
                   selectedOOMenu(isOO && (r==QRect(0, 0, 15, 15) || r==QRect(0, 0, 14, 15)) &&  // OO.o 3.2 =14x15?
@@ -4502,7 +4508,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                 {
                     const QColor *use(checkRadioColors(option));
                     QStyleOption opt(*option);
-                    bool         doEtch(DO_EFFECT);
+                    bool         doEtch(opts.buttonEffect != EFFECT_NONE);
                     QRect        rect(r.x(), r.y(), opts.crSize+(doEtch ? 2 : 0), opts.crSize+(doEtch ? 2 : 0));
 
                     if(CR_SMALL_SIZE!=opts.crSize && menu)
@@ -4529,7 +4535,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                     bool         sunken(!menu && !selectedOOMenu && (state&State_Sunken)),
                                  doEtch(!menu
                                         && r.width()>=opts.crSize+2 && r.height()>=opts.crSize+2
-                                        && DO_EFFECT),
+                                        && opts.buttonEffect != EFFECT_NONE),
                                  mo(!sunken && state&State_MouseOver && state&State_Enabled),
                                  glow(doEtch && MO_GLOW==opts.coloredMouseOver && mo),
                                  coloredMo(MO_NONE!=opts.coloredMouseOver && !glow && mo && !sunken);
@@ -4738,7 +4744,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             if(state&STATE_DWT_BUTTON && (opts.dwtSettings&DWT_BUTTONS_AS_PER_TITLEBAR))
                 break;
 
-            bool doEtch(DO_EFFECT);
+            bool doEtch = opts.buttonEffect != EFFECT_NONE;
 
             // This fixes the "Sign in" button at mail.lycos.co.uk
             // ...basically if KHTML gices us a fully transparent background colour, then
@@ -5283,7 +5289,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     mod.rect.adjust(0, m, 0, -m);
                 }
                 drawControl(CE_ProgressBarGroove, &mod, painter, widget);
-                if(DO_EFFECT && opts.borderProgress)
+                if (opts.buttonEffect != EFFECT_NONE && opts.borderProgress)
                     mod.rect.adjust(1, 1, -1, -1);
                 drawControl(CE_ProgressBarContents, &mod, painter, widget);
                 drawControl(CE_ProgressBarLabel, &mod, painter, widget);
@@ -5781,8 +5787,9 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
             break;
         case CE_ProgressBarGroove:
         {
-            bool   doEtch(DO_EFFECT && opts.borderProgress),
-                   horiz(true);
+            bool doEtch = (opts.buttonEffect != EFFECT_NONE &&
+                           opts.borderProgress);
+            bool horiz = true;
             QColor col;
 
             if (const QStyleOptionProgressBarV2 *bar = qstyleoption_cast<const QStyleOptionProgressBarV2*>(option))
@@ -6457,7 +6464,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     if (sunken)
                         editRect.translate(shiftH, shiftV);
 
-                    int margin=comboBox->frame && widget && widget->rect().height()<(DO_EFFECT ? 22 : 20)  ? 4 : 0;
+                    int margin=comboBox->frame && widget && widget->rect().height()<(opts.buttonEffect != EFFECT_NONE ? 22 : 20)  ? 4 : 0;
                     editRect.adjust(1, -margin, -1, margin);
                     painter->setClipRect(editRect);
                     drawItemTextWithRole(painter, editRect, Qt::AlignLeft|Qt::AlignVCenter, palette,
@@ -7732,7 +7739,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                 QRect button(subControlRect(control, toolbutton, SC_ToolButton, widget)),
                       menuarea(subControlRect(control, toolbutton, SC_ToolButtonMenu, widget));
                 State bflags(toolbutton->state);
-                bool  etched(DO_EFFECT),
+                bool  etched = opts.buttonEffect != EFFECT_NONE,
                       raised=widget && (TBTN_RAISED==opts.tbarBtns || TBTN_JOINED==opts.tbarBtns),
                       horizTBar(true);
                 int   round=ROUNDED_ALL,
@@ -8164,7 +8171,8 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                       mouseOver(state&State_MouseOver),
                       upIsActive(SC_SpinBoxUp==spinBox->activeSubControls),
                       downIsActive(SC_SpinBoxDown==spinBox->activeSubControls),
-                      doEtch(DO_EFFECT && opts.etchEntry),
+                      doEtch(opts.buttonEffect != EFFECT_NONE &&
+                             opts.etchEntry),
                       isOO(isOOWidget(widget)),
                       oldUnify=opts.unifySpin; // See Krita note below...
 
@@ -9050,9 +9058,10 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                 const QColor *use(buttonColors(option));
                 bool         sunken(state&State_On), // comboBox->listBox() ? comboBox->listBox()->isShown() : false),
                              glowOverFocus(state&State_MouseOver && FULL_FOCUS &&
-                                           MO_GLOW==opts.coloredMouseOver && DO_EFFECT && !sunken && !comboBox->editable &&
+                                           MO_GLOW==opts.coloredMouseOver && opts.buttonEffect != EFFECT_NONE && !sunken && !comboBox->editable &&
                                            state&State_Enabled && state&State_HasFocus),
-                             doEffect(DO_EFFECT && (!comboBox->editable || opts.etchEntry)),
+                             doEffect(opts.buttonEffect != EFFECT_NONE &&
+                                      (!comboBox->editable || opts.etchEntry)),
                              isOO(isOOWidget(widget)),
                              isOO31(isOO);
 
@@ -9199,7 +9208,10 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                     /*state&State_KeyboardFocusChange &&*/ !comboBox->editable && FOCUS_GLOW!=opts.focus)
                 {
                     QStyleOptionFocusRect focus;
-                    bool                  listViewCombo=comboBox->frame && widget && widget->rect().height()<(DO_EFFECT ? 22 : 20);
+                    bool listViewCombo =
+                        (comboBox->frame && widget &&
+                         widget->rect().height() <
+                         (opts.buttonEffect != EFFECT_NONE ? 22 : 20));
 
                     if(FULL_FOCUS)
                         focus.rect=frame;
@@ -9434,12 +9446,12 @@ QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, con
                               (pixelMetric(PM_DefaultFrameWidth, option, widget) * 2))-MAX_ROUND_BTN_PAD,
                  textMargins = 2*(pixelMetric(PM_FocusFrameHMargin) + 1),
                  // QItemDelegate::sizeHint expands the textMargins two times, thus the 2*textMargins...
-                 other = qMax(DO_EFFECT ? 20 : 18, 2*textMargins + pixelMetric(QStyle::PM_ScrollBarExtent, option, widget));
+                 other = qMax(opts.buttonEffect != EFFECT_NONE ? 20 : 18, 2*textMargins + pixelMetric(QStyle::PM_ScrollBarExtent, option, widget));
             bool editable=combo ? combo->editable : false;
             newSize+=QSize(margin+other, margin-2);
             newSize.rheight() += ((1 - newSize.rheight()) & 1);
 
-            if(!opts.etchEntry && DO_EFFECT && editable)
+            if (!opts.etchEntry && opts.buttonEffect != EFFECT_NONE && editable)
                 newSize.rheight()-=2;
             // KWord's zoom combo clips 'Fit Page Width' without the following...
             if(editable)
@@ -9641,13 +9653,11 @@ QRect Style::subElementRect(SubElement element, const QStyleOption *option, cons
                               QCommonStyle::subElementRect(element, option, widget)).adjusted(0, 0, 1, 1);
             break;
         case SE_ProgressBarContents:
-          return opts.fillProgress
-                    ? DO_EFFECT && opts.borderProgress
-                        ? option->rect.adjusted(1, 1, -1, -1)
-                        : option->rect
-                    : DO_EFFECT && opts.borderProgress
-                        ? option->rect.adjusted(3, 3, -3, -3)
-                        : option->rect.adjusted(2, 2, -2, -2);
+            return (opts.fillProgress ? opts.buttonEffect != EFFECT_NONE &&
+                    opts.borderProgress ? option->rect.adjusted(1, 1, -1, -1) :
+                    option->rect : opts.buttonEffect != EFFECT_NONE &&
+                    opts.borderProgress ? option->rect.adjusted(3, 3, -3, -3) :
+                    option->rect.adjusted(2, 2, -2, -2));
         case SE_ProgressBarGroove:
         case SE_ProgressBarLabel:
             return option->rect;
@@ -9658,19 +9668,18 @@ QRect Style::subElementRect(SubElement element, const QStyleOption *option, cons
 //                     rect.setTop(rect.top() + 2);    // eat the top margin a little bit
             break;
         case SE_PushButtonFocusRect:
-            if(FULL_FOCUS)
-            {
-                rect=subElementRect(SE_PushButtonContents, option, widget);
-                if(DO_EFFECT)
+            if (FULL_FOCUS) {
+                rect = subElementRect(SE_PushButtonContents, option, widget);
+                if (opts.buttonEffect != EFFECT_NONE) {
                     rect.adjust(-1, -1, 1, 1);
-                else
+                } else {
                     rect.adjust(-2, -2, 2, 2);
-            }
-            else
-            {
-                rect=QCommonStyle::subElementRect(element, option, widget);
-                if(DO_EFFECT)
+                }
+            } else {
+                rect = QCommonStyle::subElementRect(element, option, widget);
+                if (opts.buttonEffect != EFFECT_NONE) {
                     rect.adjust(1, 1, -1, -1);
+                }
             }
             return rect;
         default:
@@ -9692,7 +9701,8 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
             if (const QStyleOptionComboBox *comboBox = qstyleoption_cast<const QStyleOptionComboBox*>(option))
             {
                 bool ed(comboBox->editable),
-                     doEtch((!ed || opts.etchEntry) && DO_EFFECT);
+                     doEtch((!ed || opts.etchEntry) &&
+                            opts.buttonEffect != EFFECT_NONE);
                 int  x(r.x()),
                      y(r.y()),
                      w(r.width()),
@@ -9745,7 +9755,8 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
                 bs.setHeight(r.height()>>1);
                 if(bs.height()< 8)
                     bs.setHeight(8);
-                bs.setWidth(DO_EFFECT && opts.etchEntry ? 16 : 15);
+                bs.setWidth(opts.buttonEffect != EFFECT_NONE && opts.etchEntry ?
+                            16 : 15);
                 bs=bs.expandedTo(QApplication::globalStrut());
 
                 int y(0), x(reverse ? 0 : r.width()-bs.width());
@@ -9960,7 +9971,7 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
                 if(SLIDER_TRIANGULAR==opts.sliderStyle)
                 {
                     int   tickSize(pixelMetric(PM_SliderTickmarkOffset, option, widget)),
-                          mod=MO_GLOW==opts.coloredMouseOver && DO_EFFECT ? 2 : 0;
+                          mod=MO_GLOW==opts.coloredMouseOver && opts.buttonEffect != EFFECT_NONE ? 2 : 0;
                     QRect rect(QCommonStyle::subControlRect(control, option, subControl, widget));
 
                     switch (subControl)
@@ -10837,8 +10848,10 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
                  colouredMouseOver(doColouredMouseOver && WIDGET_MENU_BUTTON!=w &&
                                        (MO_COLORED==opts.coloredMouseOver ||
                                         MO_COLORED_THICK==opts.coloredMouseOver ||
-                                              (MO_GLOW==opts.coloredMouseOver && !DO_EFFECT))),
-                 doEtch(doBorder && ETCH_WIDGET(w) && DO_EFFECT),
+                                        (MO_GLOW==opts.coloredMouseOver &&
+                                         !(opts.buttonEffect != EFFECT_NONE)))),
+                 doEtch(doBorder && ETCH_WIDGET(w) &&
+                        opts.buttonEffect != EFFECT_NONE),
                  glowFocus(doEtch && USE_GLOW_FOCUS(option->state&State_MouseOver) && option->state&State_HasFocus &&
                            option->state&State_Enabled),
                  horiz(CIRCULAR_SLIDER(w) || isHoriz(option, w, TBTN_JOINED==opts.tbarBtns)),
@@ -12220,7 +12233,7 @@ void Style::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOptionSlid
         else if(option->tickPosition & QSlider::TicksAbove)
             direction=horiz ? PE_IndicatorArrowUp : PE_IndicatorArrowLeft;
 
-        if(MO_GLOW==opts.coloredMouseOver && DO_EFFECT)
+        if(MO_GLOW==opts.coloredMouseOver && opts.buttonEffect != EFFECT_NONE)
             x++, y++;
 
         switch(direction)
@@ -12449,23 +12462,22 @@ void Style::drawSliderGroove(QPainter *p, const QRect &groove, const QRect &hand
 
     opt.state&=~(State_HasFocus|State_On|State_Sunken|State_MouseOver);
 
-    if(horiz)
-    {
-        int dh=(grv.height()-5)>>1;
+    if (horiz) {
+        int dh = (grv.height() - 5) / 2;
         grv.adjust(0, dh, 0, -dh);
-        opt.state|=State_Horizontal;
+        opt.state |= State_Horizontal;
 
-        if(DO_EFFECT)
+        if (opts.buttonEffect != EFFECT_NONE) {
             grv.adjust(0, -1, 0, 1);
-    }
-    else
-    {
-        int dw=(grv.width()-5)>>1;
+        }
+    } else {
+        int dw = (grv.width() - 5) / 2;
         grv.adjust(dw, 0, -dw, 0);
-        opt.state&=~State_Horizontal;
+        opt.state &= ~State_Horizontal;
 
-        if(DO_EFFECT)
+        if (opts.buttonEffect != EFFECT_NONE) {
             grv.adjust(-1, 0, 1, 0);
+        }
     }
 
     if(grv.height()>0 && grv.width()>0)
