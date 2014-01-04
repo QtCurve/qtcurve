@@ -37,7 +37,6 @@
 #define qtcRangeHasStepperD(W)               \
     (opts.scrollbarType != SCROLLBAR_NONE && \
      opts.scrollbarType != SCROLLBAR_NEXT)
-#define IS_PROGRESS (GTK_IS_PROGRESS_BAR(widget) || DETAIL("progressbar"))
 
 #else
 
@@ -45,7 +44,6 @@
 #define qtcRangeHasStepperB(W) (GTK_RANGE(W)->has_stepper_b)
 #define qtcRangeHasStepperC(W) (GTK_RANGE(W)->has_stepper_c)
 #define qtcRangeHasStepperD(W) (GTK_RANGE(W)->has_stepper_d)
-#define IS_PROGRESS (GTK_IS_PROGRESS(widget) || DETAIL("progressbar"))
 
 #endif
 

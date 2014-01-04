@@ -24,6 +24,7 @@
 #define __QTC_CAIRO_DRAW_H__
 
 #include "utils.h"
+#include <pango/pango.h>
 
 QTC_BEGIN_DECLS
 
@@ -56,6 +57,8 @@ void qtcCairoDot(cairo_t *cr, int x, int y, int w, int h, const GdkColor *col);
 void qtcCairoDots(cairo_t *cr, int rx, int ry, int rwidth, int rheight,
                   bool horiz, int nLines, int offset, const QtcRect *area,
                   int startOffset, const GdkColor *col1, const GdkColor *col2);
+void qtcCairoLayout(cairo_t *cr, const QtcRect *area, int x, int y,
+                    PangoLayout *layout, const GdkColor *col);
 
 QTC_END_DECLS
 

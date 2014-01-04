@@ -533,7 +533,7 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
             if (combo && GTK_STATE_ACTIVE==state)
                 state=GTK_STATE_PRELIGHT;
 
-            GdkColor *col=combo || isOnListViewHeader(widget, 0) || isOnButton(widget, 0, 0L)
+            GdkColor *col=combo || isOnListViewHeader(widget, 0) || isOnButton(widget, 0, NULL)
                                 ? &qtSettings.colors[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]
                                                     [COLOR_BUTTON_TEXT]
                                 : &style->text[ARROW_STATE(state)];
@@ -1940,81 +1940,102 @@ gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
 #define NUM_GCS 5
 
-static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state, gboolean use_text, GdkRectangle *area, GtkWidget *widget,
-                          const char *detail, int x, int y, PangoLayout *layout)
+static void
+drawLayout(cairo_t *cr, GtkStyle *style, GtkStateType state,
+           bool use_text, const QtcRect *area, int x, int y,
+           PangoLayout *layout)
 {
-    if (IS_PROGRESS) {
-        drawLayout(style, window, state, use_text,
-                   (QtcRect*)area, x, y, layout);
+    qtcCairoLayout(cr, area, x, y, layout,
+                   use_text || state == GTK_STATE_INSENSITIVE ?
+                   &style->text[state] : &style->fg[state]);
+}
+
+static void
+gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state,
+              gboolean use_text, GdkRectangle *_area, GtkWidget *widget,
+              const char *detail, int x, int y, PangoLayout *layout)
+{
+    g_return_if_fail(GTK_IS_STYLE(style));
+    g_return_if_fail(GDK_IS_DRAWABLE(window));
+    const QtcRect *area = (QtcRect*)_area;
+    cairo_t *cr = gdk_cairo_create(window);
+    if (GTK_IS_PROGRESS(widget) || DETAIL("progressbar")) {
+        drawLayout(cr, style, state, use_text, area, x, y, layout);
     } else {
         QtCurveStyle *qtcurveStyle = (QtCurveStyle*)style;
-        gboolean     isMenuItem=IS_MENU_ITEM(widget);
-        GtkMenuBar   *mb=isMenuItem ? isMenubar(widget, 0) : NULL;
-#if GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
-        gboolean     activeMb=FALSE;
-#else
-        gboolean     activeMb=mb ? GTK_MENU_SHELL(mb)->active : FALSE;
-#endif
-        gboolean     selectedText=(opts.useHighlightForMenu || opts.customMenuTextColor) && isMenuItem &&
-                                  (opts.colorMenubarMouseOver
-                                      ? GTK_STATE_PRELIGHT==state
-                                      : ((!mb || activeMb) && GTK_STATE_PRELIGHT==state)),
-                     def_but=FALSE,
-                     but=isOnButton(widget, 0, &def_but),
-                     swapColors=FALSE;
-        GdkRectangle area2;
-        GtkWidget    *parent=widget ? gtk_widget_get_parent(widget) : NULL;
+        bool isMenuItem = IS_MENU_ITEM(widget);
+        GtkMenuBar *mb = isMenuItem ? isMenubar(widget, 0) : NULL;
+        bool activeMb = mb ? GTK_MENU_SHELL(mb)->active : false;
+        bool selectedText = ((opts.useHighlightForMenu ||
+                              opts.customMenuTextColor) && isMenuItem &&
+                             (opts.colorMenubarMouseOver ?
+                              state == GTK_STATE_PRELIGHT :
+                              ((!mb || activeMb) &&
+                               state == GTK_STATE_PRELIGHT)));
+        bool def_but = false;
+        bool but = isOnButton(widget, 0, &def_but);
+        bool swapColors = false;
+        QtcRect area2;
+        GtkWidget *parent = widget ? gtk_widget_get_parent(widget) : NULL;
 
-        if(!opts.colorMenubarMouseOver && mb && !activeMb && GTK_STATE_PRELIGHT==state)
-            state=GTK_STATE_NORMAL;
+        if (!opts.colorMenubarMouseOver && mb && !activeMb &&
+            state == GTK_STATE_PRELIGHT)
+            state = GTK_STATE_NORMAL;
 
-        GdkColor      prevColors[NUM_GCS];
+        GdkColor prevColors[NUM_GCS];
 
-        if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %s %d %d %d %d %d %s  ", __FUNCTION__, pango_layout_get_text(layout), x, y, state, use_text,
-                                               IS_MENU_ITEM(widget), detail ? detail : "NULL"),
-                                        debugDisplayWidget(widget, 10);
-
-        if(DETAIL("cellrenderertext") && widget && GTK_STATE_INSENSITIVE==gtk_widget_get_state(widget))
-             state=GTK_STATE_INSENSITIVE;
-
-#ifndef READ_INACTIVE_PAL /* If we reead the inactive palette, then there is no need for the following... */
-        /* The following fixes the text in list views... if not used, when an item is selected it
-           gets the selected text color - but when the window changes focus it gets the normal
-           text color! */
-         if(DETAIL("cellrenderertext") && GTK_STATE_ACTIVE==state)
-             state=GTK_STATE_SELECTED;
-#endif
-
-        if(!isMenuItem && GTK_STATE_PRELIGHT==state)
-            state=GTK_STATE_NORMAL;
-
-#if !GTK_CHECK_VERSION(2, 90, 0)
-        if(!use_text && parent && GTK_IS_LABEL(widget) && (isOnOptionMenu(parent, 0) || (GTK_IS_BUTTON(parent) && isOnMenuItem(parent, 0))))
-            use_text=TRUE;
-#endif
-
-        /*
-           This check of 'requisition' size (and not 'allocation') seems to match better
-           with Qt4's text positioning. For example, 10pt verdana - no shift is required
-           9pt DejaVu Sans requires the shift
-        */
-        if(but && widget)
-        {
-            GtkRequisition req=qtcWidgetGetRequisition(widget);
-
-            if(req.height<qtcWidgetGetAllocation(widget).height && req.height%2)
-                y++;
+        if (qtSettings.debug == DEBUG_ALL) {
+            printf(DEBUG_PREFIX "%s %s %d %d %d %d %d %s  ", __FUNCTION__,
+                   pango_layout_get_text(layout), x, y, state, use_text,
+                   IS_MENU_ITEM(widget), detail ? detail : "NULL");
+            debugDisplayWidget(widget, 10);
         }
 
-        but= but || isOnComboBox(widget, 0);
+        if (DETAIL("cellrenderertext") && widget &&
+            gtk_widget_get_state(widget) == GTK_STATE_INSENSITIVE)
+             state = GTK_STATE_INSENSITIVE;
 
-        if(isOnListViewHeader(widget, 0))
+#ifndef READ_INACTIVE_PAL
+        /* If we reead the inactive palette, then there is no need for the
+           following... The following fixes the text in list views...
+           if not used, when an item is selected it gets the selected text
+           color - but when the window changes focus it gets the normal
+           text color! */
+         if (DETAIL("cellrenderertext") && state == GTK_STATE_ACTIVE)
+             state = GTK_STATE_SELECTED;
+#endif
+
+        if (!isMenuItem && state == GTK_STATE_PRELIGHT)
+            state = GTK_STATE_NORMAL;
+
+        if (!use_text && parent && GTK_IS_LABEL(widget) &&
+            (isOnOptionMenu(parent, 0) ||
+             (GTK_IS_BUTTON(parent) && isOnMenuItem(parent, 0)))) {
+            use_text = true;
+        }
+
+        /*
+           This check of 'requisition' size (and not 'allocation') seems to
+           match better with Qt4's text positioning. For example, 10pt verdana
+           - no shift is required 9pt DejaVu Sans requires the shift
+        */
+        if (but && widget) {
+            GtkRequisition req = qtcWidgetGetRequisition(widget);
+            if (req.height < qtcWidgetGetAllocation(widget).height &&
+                req.height % 2) {
+                y++;
+            }
+        }
+
+        but = but || isOnComboBox(widget, 0);
+
+        if (isOnListViewHeader(widget, 0))
             y--;
 
-        if(but && ((qtSettings.qt4 && GTK_STATE_INSENSITIVE==state) || (!qtSettings.qt4  && GTK_STATE_INSENSITIVE!=state)))
-        {
-            use_text=TRUE;
-            swapColors=TRUE;
+        if (but && ((qtSettings.qt4 && state == GTK_STATE_INSENSITIVE) ||
+                    (!qtSettings.qt4 && state != GTK_STATE_INSENSITIVE))) {
+            use_text = true;
+            swapColors = true;
             for (int i = 0;i < NUM_GCS;++i) {
                 prevColors[i] = style->text[i];
                 style->text[i] =
@@ -2025,41 +2046,49 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
                 state = GTK_STATE_NORMAL;
             }
         } else if (isMenuItem) {
-            gboolean activeWindow=mb && opts.shadeMenubarOnlyWhenActive && widget ? qtcWindowIsActive(gtk_widget_get_toplevel(widget)) : TRUE;
+            bool activeWindow =
+                (mb && opts.shadeMenubarOnlyWhenActive && widget ?
+                 qtcWindowIsActive(gtk_widget_get_toplevel(widget)) : true);
 
-            if((opts.shadePopupMenu && GTK_STATE_PRELIGHT==state) || (mb && (activeWindow || SHADE_WINDOW_BORDER==opts.shadeMenubars)))
-            {
-                if(SHADE_WINDOW_BORDER==opts.shadeMenubars)
-                {
-                    for (int i = 0;i < NUM_GCS;++i) {
+            if ((opts.shadePopupMenu && state == GTK_STATE_PRELIGHT) ||
+                (mb && (activeWindow ||
+                        opts.shadeMenubars == SHADE_WINDOW_BORDER))) {
+                if (opts.shadeMenubars == SHADE_WINDOW_BORDER) {
+                    for (int i = 0;i < NUM_GCS;i++) {
                         prevColors[i] = style->text[i];
                     }
-                    swapColors=TRUE;
-                    style->text[GTK_STATE_NORMAL]=*qtcurveStyle->menutext[activeWindow ? 1 : 0];
-                    use_text=TRUE;
-                }
-                else if(opts.customMenuTextColor && qtcurveStyle->menutext[0])
-                {
-                    for (int i = 0;i < NUM_GCS;++i) {
+                    swapColors = true;
+                    style->text[GTK_STATE_NORMAL] =
+                        *qtcurveStyle->menutext[activeWindow ? 1 : 0];
+                    use_text = true;
+                } else if (opts.customMenuTextColor &&
+                           qtcurveStyle->menutext[0]) {
+                    for (int i = 0;i < NUM_GCS;i++) {
                         prevColors[i] = style->text[i];
                     }
-                    swapColors=TRUE;
-                    style->text[GTK_STATE_NORMAL]=*qtcurveStyle->menutext[0];
-                    style->text[GTK_STATE_ACTIVE]=*qtcurveStyle->menutext[1];
-                    style->text[GTK_STATE_PRELIGHT]=*qtcurveStyle->menutext[0];
-                    style->text[GTK_STATE_SELECTED]=*qtcurveStyle->menutext[1];
-                    style->text[GTK_STATE_INSENSITIVE]=*qtcurveStyle->menutext[0];
-                    use_text=TRUE;
+                    swapColors = true;
+                    style->text[GTK_STATE_NORMAL] = *qtcurveStyle->menutext[0];
+                    style->text[GTK_STATE_ACTIVE] = *qtcurveStyle->menutext[1];
+                    style->text[GTK_STATE_PRELIGHT] =
+                        *qtcurveStyle->menutext[0];
+                    style->text[GTK_STATE_SELECTED] =
+                        *qtcurveStyle->menutext[1];
+                    style->text[GTK_STATE_INSENSITIVE] =
+                        *qtcurveStyle->menutext[0];
+                    use_text = true;
+                } else if (qtcOneOf(opts.shadeMenubars, SHADE_BLEND_SELECTED,
+                                    SHADE_SELECTED) ||
+                           (opts.shadeMenubars == SHADE_CUSTOM &&
+                            TOO_DARK(qtcPalette.menubar[ORIGINAL_SHADE]))) {
+                    selectedText = true;
                 }
-                else if (SHADE_BLEND_SELECTED==opts.shadeMenubars || SHADE_SELECTED==opts.shadeMenubars ||
-                         (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(qtcPalette.menubar[ORIGINAL_SHADE])))
-                    selectedText=TRUE;
             }
         }
 
-        if(parent && GTK_IS_LABEL(widget) && GTK_IS_FRAME(parent) && !isOnStatusBar(widget, 0))
-        {
-            int diff=qtcWidgetGetAllocation(widget).x-qtcWidgetGetAllocation(parent).x;
+        if (parent && GTK_IS_LABEL(widget) && GTK_IS_FRAME(parent) &&
+            !isOnStatusBar(widget, 0)) {
+            int diff = (qtcWidgetGetAllocation(widget).x -
+                        qtcWidgetGetAllocation(parent).x);
 
             if (qtcNoFrame(opts.groupBox)) {
                 x -= qtcBound(0, diff, 8);
@@ -2073,9 +2102,8 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
 #if GTK_CHECK_VERSION(2, 90, 0)
             cairo_reset_clip(cr);
 #else
-            if(area)
-            {
-                area2=*area;
+            if (area) {
+                area2 = *area;
                 if (qtcNoFrame(opts.groupBox)) {
                     area2.x -= qtcBound(0, diff, 8);
                 } else if (opts.gbLabel & GB_LBL_OUTSIDE) {
@@ -2085,18 +2113,21 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
                 } else {
                     area2.x += 5;
                 }
-                area=&area2;
+                area = &area2;
             }
 #endif
         }
 
-        if(!opts.useHighlightForMenu && (isMenuItem || mb) && GTK_STATE_INSENSITIVE!=state)
-            state=GTK_STATE_NORMAL;
+        if (!opts.useHighlightForMenu && (isMenuItem || mb) &&
+            state != GTK_STATE_INSENSITIVE)
+            state = GTK_STATE_NORMAL;
 
-        drawLayout(style, window, selectedText ? GTK_STATE_SELECTED : state, use_text || selectedText, (QtcRect*)area, x, y, layout);
+        drawLayout(cr, style, selectedText ? GTK_STATE_SELECTED : state,
+                   use_text || selectedText, area, x, y, layout);
 
-        if(opts.embolden && def_but)
-            drawLayout(style, window, selectedText ? GTK_STATE_SELECTED : state, use_text || selectedText, (QtcRect*)area, x + 1, y, layout);
+        if (opts.embolden && def_but)
+            drawLayout(cr, style, selectedText ? GTK_STATE_SELECTED : state,
+                       use_text || selectedText, area, x + 1, y, layout);
 
         if (swapColors) {
             for (int i = 0;i < 5;++i) {
@@ -2104,6 +2135,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
             }
         }
     }
+    cairo_destroy(cr);
 }
 
 static GdkPixbuf * gtkRenderIcon(GtkStyle *style, const GtkIconSource *source, GtkTextDirection direction,

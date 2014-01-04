@@ -22,6 +22,7 @@
 
 #include "draw.h"
 #include "utils_p.h"
+#include <pango/pangocairo.h>
 
 QTC_EXPORT void
 qtcCairoHLine(cairo_t *cr, int x, int y, int w, const GdkColor *col, double a)
@@ -218,4 +219,39 @@ qtcCairoDots(cairo_t *cr, int rx, int ry, int rwidth, int rheight, bool horiz,
         cairo_fill(cr);
     }
     cairo_restore(cr);
+}
+
+static void
+ge_cairo_transform_for_layout(cairo_t *cr, PangoLayout *layout, int x, int y)
+{
+    const PangoMatrix *matrix =
+        pango_context_get_matrix(pango_layout_get_context(layout));
+    if (matrix) {
+        cairo_matrix_t cairo_matrix;
+        PangoRectangle rect;
+
+        cairo_matrix_init(&cairo_matrix, matrix->xx, matrix->yx,
+                          matrix->xy, matrix->yy, matrix->x0, matrix->y0);
+        pango_layout_get_extents(layout, NULL, &rect);
+        pango_matrix_transform_rectangle(matrix, &rect);
+        pango_extents_to_pixels(&rect, NULL);
+
+        cairo_matrix.x0 += x - rect.x;
+        cairo_matrix.y0 += y - rect.y;
+
+        cairo_set_matrix(cr, &cairo_matrix);
+    } else {
+        cairo_translate(cr, x, y);
+    }
+}
+
+QTC_EXPORT void
+qtcCairoLayout(cairo_t *cr, const QtcRect *area, int x, int y,
+               PangoLayout *layout, const GdkColor *col)
+{
+    qtcCairoClipRect(cr, area);
+    cairo_set_line_width(cr, 1.0);
+    qtcCairoSetColor(cr, col);
+    ge_cairo_transform_for_layout(cr, layout, x, y);
+    pango_cairo_show_layout(cr, layout);
 }

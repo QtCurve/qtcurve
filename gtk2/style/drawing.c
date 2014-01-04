@@ -1432,9 +1432,7 @@ qtcSetProgressStripeClipping(cairo_t *cr, const QtcRect *area, int x, int y,
     default:
     case STRIPE_PLAIN: {
         QtcRect rect = {x, y, width - 2, height - 2};
-#if !GTK_CHECK_VERSION(2, 90, 0)
         qtcRectConstrain(&rect, area);
-#endif
         cairo_region_t *region = cairo_region_create_rectangle(&rect);
         if (horiz) {
             for (int stripeOffset = 0;
@@ -1442,9 +1440,7 @@ qtcSetProgressStripeClipping(cairo_t *cr, const QtcRect *area, int x, int y,
                  stripeOffset += PROGRESS_CHUNK_WIDTH * 2) {
                 QtcRect innerRect = {x + stripeOffset + animShift, y + 1,
                                      PROGRESS_CHUNK_WIDTH, height - 2};
-#if !GTK_CHECK_VERSION(2, 90, 0)
                 qtcRectConstrain(&innerRect, area);
-#endif
                 if (innerRect.width > 0 && innerRect.height > 0) {
                     cairo_region_xor_rectangle(region, &innerRect);
                 }
@@ -1467,11 +1463,9 @@ qtcSetProgressStripeClipping(cairo_t *cr, const QtcRect *area, int x, int y,
     }
     case STRIPE_DIAGONAL:
         cairo_new_path(cr);
-/* #if !GTK_CHECK_VERSION(2, 90, 0) /\* Gtk3:TODO !!! *\/ */
-/*         if (area) */
-/*             cairo_rectangle(cr, area->x, area->y, */
-/*                             area->width, area->height); */
-/* #endif */
+        /* if (area) */
+        /*     cairo_rectangle(cr, area->x, area->y, */
+        /*                     area->width, area->height); */
         if (horiz) {
             for (int stripeOffset = 0;stripeOffset < width + height + 2;
                  stripeOffset += PROGRESS_CHUNK_WIDTH * 2) {
@@ -2536,48 +2530,6 @@ qtcSetGapClip(cairo_t *cr, const QtcRect *area, GtkPositionType gapSide,
     cairo_region_xor_rectangle(region, &gapRect);
     qtcCairoClipRegion(cr, region);
     cairo_region_destroy(region);
-}
-
-static void
-ge_cairo_transform_for_layout(cairo_t *cr, PangoLayout *layout, int x, int y)
-{
-    const PangoMatrix *matrix =
-        pango_context_get_matrix(pango_layout_get_context(layout));
-    if (matrix) {
-        cairo_matrix_t cairo_matrix;
-        PangoRectangle rect;
-
-        cairo_matrix_init(&cairo_matrix, matrix->xx, matrix->yx,
-                          matrix->xy, matrix->yy, matrix->x0, matrix->y0);
-        pango_layout_get_extents(layout, NULL, &rect);
-        pango_matrix_transform_rectangle(matrix, &rect);
-        pango_extents_to_pixels(&rect, NULL);
-
-        cairo_matrix.x0 += x - rect.x;
-        cairo_matrix.y0 += y - rect.y;
-
-        cairo_set_matrix(cr, &cairo_matrix);
-    } else {
-        cairo_translate(cr, x, y);
-    }
-}
-
-void
-drawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state,
-           bool use_text, const QtcRect *area, int x, int y,
-           PangoLayout *layout)
-{
-    g_return_if_fail(GTK_IS_STYLE(style));
-    g_return_if_fail(GDK_IS_DRAWABLE(window));
-    cairo_t *cr = gdk_cairo_create(window);
-    qtcCairoClipRect(cr, area);
-    cairo_set_line_width(cr, 1.0);
-    gdk_cairo_set_source_color(cr, use_text ||
-                               state == GTK_STATE_INSENSITIVE ?
-                               &style->text[state] : &style->fg[state]);
-    ge_cairo_transform_for_layout(cr, layout, x, y);
-    pango_cairo_show_layout(cr, layout);
-    cairo_destroy(cr);
 }
 
 void

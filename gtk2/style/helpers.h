@@ -144,7 +144,7 @@ gboolean isMenuWindow(GtkWidget *w);
                                                       NULL!=gtk_frame_get_label_widget(GTK_FRAME((W)))))
 
 gboolean isInGroupBox(GtkWidget *w, int level);
-gboolean isOnButton(GtkWidget *w, int level, gboolean *def);
+bool isOnButton(GtkWidget *w, int level, bool *def);
 void optionMenuGetProps(GtkWidget *widget, GtkRequisition *indicator_size, GtkBorder *indicator_spacing);
 
 typedef enum {

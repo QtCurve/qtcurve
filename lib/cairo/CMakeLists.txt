@@ -8,7 +8,9 @@ endif()
 
 find_package(PkgConfig REQUIRED)
 unset(__pkg_config_checked_CAIRO CACHE)
-pkg_check_modules(CAIRO REQUIRED cairo)
+pkg_check_modules(CAIRO
+  REQUIRED cairo
+  REQUIRED pangocairo)
 include_directories(${CAIRO_INCLUDE_DIRS})
 set(qtcurve_cairo_LINKS qtcurve-utils ${CAIRO_LDFLAGSF} ${CAIRO_LIBRARIES})
 add_definitions("-DQTC_UTILS_INTERNAL" ${CAIRO_CFLAGS})

@@ -567,25 +567,20 @@ gboolean isInGroupBox(GtkWidget *w, int level)
     return FALSE;
 }
 
-gboolean isOnButton(GtkWidget *w, int level, gboolean *def)
+bool isOnButton(GtkWidget *w, int level, bool *def)
 {
-    if(w)
-    {
-        if((GTK_IS_BUTTON(w)
-#if !GTK_CHECK_VERSION(2, 90, 0)
-            || GTK_IS_OPTION_MENU(w)
-#endif
-            ) && (!(GTK_IS_RADIO_BUTTON(w) || GTK_IS_CHECK_BUTTON(w))))
-        {
-            if(def)
-                *def=gtk_widget_has_default(w);
-            return TRUE;
-        }
-        else if(level<3)
+    if (w) {
+        if ((GTK_IS_BUTTON(w) || GTK_IS_OPTION_MENU(w)) &&
+            (!(GTK_IS_RADIO_BUTTON(w) || GTK_IS_CHECK_BUTTON(w)))) {
+            if (def) {
+                *def = gtk_widget_has_default(w);
+            }
+            return true;
+        } else if (level < 3) {
             return isOnButton(gtk_widget_get_parent(w), level++, def);
+        }
     }
-
-    return FALSE;
+    return false;
 }
 
 static GtkRequisition defaultOptionIndicatorSize = {6, 13};
