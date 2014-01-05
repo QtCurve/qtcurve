@@ -142,8 +142,6 @@ void clearRoundedMask(GtkWidget *widget, bool isToolTip);
 void drawTreeViewLines(cairo_t *cr, const GdkColor *col, int x, int y, int h,
                        int depth, int levelIndent, int expanderSize,
                        GtkTreeView *treeView, GtkTreePath *path);
-void drawArrow(GdkWindow *window, const GdkColor *col, const QtcRect *area,
-               GtkArrowType arrow_type, int x, int y, bool small, bool fill);
 void fillTab(cairo_t *cr, GtkStyle *style, GtkWidget *widget,
              const QtcRect *area, GtkStateType state, const GdkColor *col,
              int x, int y, int width, int height, bool horiz,

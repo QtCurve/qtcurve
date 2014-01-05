@@ -467,54 +467,57 @@ static void gtkDrawHandle(GtkStyle *style, GdkWindow *window, GtkStateType state
     cairo_destroy(cr);
 }
 
-static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
-                         GtkShadowType shadow, GdkRectangle *_area,
-                         GtkWidget *widget, const char *detail,
-                         GtkArrowType arrow_type, gboolean fill, int x, int y,
-                         int width, int height)
+void
+drawArrow(GdkWindow *window, const GdkColor *col, const QtcRect *area,
+          GtkArrowType arrow_type, int x, int y, bool small, bool fill)
 {
+    cairo_t *cr = gdk_cairo_create(window);
+    qtcGtkArrow(cr, col, area, arrow_type, x, y, small, fill, opts.vArrows);
+    cairo_destroy(cr);
+}
+
+static void
+gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
+             GtkShadowType shadow, GdkRectangle *_area, GtkWidget *widget,
+             const char *detail, GtkArrowType arrow_type, gboolean fill,
+             int x, int y, int width, int height)
+{
+    g_return_if_fail(GDK_IS_DRAWABLE(window));
     QTC_UNUSED(fill);
-    if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %s  ", __FUNCTION__, state, shadow, arrow_type, x, y, width, height,
-                                           detail ? detail : "NULL"),
-                                    debugDisplayWidget(widget, 10);
-
+    if (qtSettings.debug == DEBUG_ALL) {
+        printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %s  ", __FUNCTION__,
+               state, shadow, arrow_type, x, y, width, height,
+               detail ? detail : "NULL");
+        debugDisplayWidget(widget, 10);
+    }
     QtcRect *area = (QtcRect*)_area;
+    cairo_t *cr = gdk_cairo_create(window);
 
-    if(DETAIL("arrow"))
-    {
-        gboolean onComboEntry=isOnComboEntry(widget, 0);
+    if (DETAIL("arrow")) {
+        bool onComboEntry = isOnComboEntry(widget, 0);
 
         if (isOnComboBox(widget, 0) && !onComboEntry) {
             if (state == GTK_STATE_ACTIVE)
                 state = GTK_STATE_PRELIGHT;
-            GdkColor *arrowColor =
+            const GdkColor *arrowColor =
                 MO_ARROW(false,
                          &qtSettings.colors[state == GTK_STATE_INSENSITIVE ?
                                             PAL_DISABLED : PAL_ACTIVE]
                          [COLOR_BUTTON_TEXT]);
-            /* bool moz = (isMozilla() && widget && */
-            /*             gtk_widget_get_parent(widget) && */
-            /*             gtk_widget_get_parent(widget)->parent && */
-            /*             gtk_widget_get_parent(widget)->parent->parent && */
-            /*             isFixedWidget(gtk_widget_get_parent(widget) */
-            /*                           ->parent->parent)); */
             x++;
-
-#if !GTK_CHECK_VERSION(2, 90, 0)
             // NOTE: Dont do this for moz - as looks odd fir widgets in
             // HTML pages - arrow is shifted too much :-(
-            if (!(opts.buttonEffect != EFFECT_NONE)) // || moz)
+            if (!(opts.buttonEffect != EFFECT_NONE))
                 x += 2;
-#endif
-
             if (opts.doubleGtkComboArrow) {
                 int pad = opts.vArrows ? 0 : 1;
-                drawArrow(window, arrowColor, area, GTK_ARROW_UP,
-                          x + width / 2, y + height / 2 -
-                          (LARGE_ARR_HEIGHT - pad), FALSE, TRUE);
-                drawArrow(window, arrowColor, area,  GTK_ARROW_DOWN,
-                          x + width / 2, y + height / 2 +
-                          (LARGE_ARR_HEIGHT - pad), FALSE, TRUE);
+                qtcGtkArrow(cr, arrowColor, area, GTK_ARROW_UP, x + width / 2,
+                            y + height / 2 - (LARGE_ARR_HEIGHT - pad),
+                            false, true, opts.vArrows);
+                qtcGtkArrow(cr, arrowColor, area,  GTK_ARROW_DOWN,
+                            x + width / 2,
+                            y + height / 2 + (LARGE_ARR_HEIGHT - pad),
+                            false, true, opts.vArrows);
             } else {
                 GtkWidget *parent = NULL;
                 if (!opts.gtkComboMenus &&
@@ -523,53 +526,52 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
                       !qtcComboHasFrame(parent))) {
                     x += 2;
                 }
-                drawArrow(window, arrowColor, area,  GTK_ARROW_DOWN,
-                          x + width / 2, y + height / 2, FALSE, TRUE);
+                qtcGtkArrow(cr, arrowColor, area,  GTK_ARROW_DOWN,
+                            x + width / 2, y + height / 2, false, true,
+                            opts.vArrows);
             }
         } else {
-            gboolean combo=onComboEntry || isOnCombo(widget, 0);
-            int      origState=state;
+            bool combo = onComboEntry || isOnCombo(widget, 0);
+            int origState = state;
 
-            if (combo && GTK_STATE_ACTIVE==state)
-                state=GTK_STATE_PRELIGHT;
+            if (combo && state == GTK_STATE_ACTIVE)
+                state = GTK_STATE_PRELIGHT;
 
-            GdkColor *col=combo || isOnListViewHeader(widget, 0) || isOnButton(widget, 0, NULL)
-                                ? &qtSettings.colors[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]
-                                                    [COLOR_BUTTON_TEXT]
-                                : &style->text[ARROW_STATE(state)];
-            if(onComboEntry && GTK_STATE_ACTIVE==origState && opts.unifyCombo)
-                x--, y--;
-            drawArrow(window, MO_ARROW(false, col), area, arrow_type,
-                      x + width / 2, y + height / 2, FALSE, TRUE);
+            const GdkColor *col =
+                (combo || isOnListViewHeader(widget, 0) ||
+                 isOnButton(widget, 0, NULL) ?
+                 &qtSettings.colors[state == GTK_STATE_INSENSITIVE ?
+                                    PAL_DISABLED :
+                                    PAL_ACTIVE][COLOR_BUTTON_TEXT] :
+                 &style->text[ARROW_STATE(state)]);
+            if (onComboEntry && origState == GTK_STATE_ACTIVE &&
+                opts.unifyCombo) {
+                x--;
+                y--;
+            }
+            qtcGtkArrow(cr, MO_ARROW(false, col), area, arrow_type,
+                        x + width / 2, y + height / 2,
+                        false, true, opts.vArrows);
         }
     } else {
         int isSpinButton = DETAIL("spinbutton");
-        int isMenuItem = DETAIL("menuitem");
+        bool isMenuItem = DETAIL("menuitem");
         /* int a_width = LARGE_ARR_WIDTH; */
         /* int a_height = LARGE_ARR_HEIGHT; */
-        gboolean sbar=isSbarDetail(detail),
-                 smallArrows=isSpinButton && !opts.unifySpin;
+        bool sbar = isSbarDetail(detail);
+        bool smallArrows = isSpinButton && !opts.unifySpin;
         int stepper = (sbar ? getStepper(widget, x, y, opts.sliderWidth,
                                          opts.sliderWidth) : STEPPER_NONE);
 
         sanitizeSize(window, &width, &height);
 
-#if 0
-        if(isSpinButton)
-        {
-            /*if(GTK_ARROW_UP==arrow_type)
-                y-=1;
-            else*/ if(GTK_ARROW_DOWN==arrow_type)
-                y+=1;
-        }
-#endif
         if (isSpinButton)  {
             /* if (GTK_ARROW_UP == arrow_type) */
             /*     y++; */
             /* a_height = SMALL_ARR_HEIGHT; */
             /* a_width = SMALL_ARR_WIDTH; */
-        } else if (GTK_ARROW_LEFT == arrow_type ||
-                   GTK_ARROW_RIGHT == arrow_type || DETAIL("menuitem")) {
+        } else if (qtcOneOf(arrow_type, GTK_ARROW_LEFT, GTK_ARROW_RIGHT) ||
+                   isMenuItem) {
             /* a_width = LARGE_ARR_HEIGHT; */
             /* a_height = LARGE_ARR_WIDTH; */
             if (isMozilla() && opts.vArrows /* && a_height */ &&
@@ -577,25 +579,13 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 smallArrows = true;
             }
         }
-
         x += width / 2;
         y += height / 2;
-/*
-    CPD 28/02/2008 Commented out as it messes up scrollbar button look
-
-        if(GTK_ARROW_RIGHT==arrow_type && (width-a_width)%2)
-            x++;
-
-        if(GTK_ARROW_DOWN==arrow_type && (height-a_height)%2)
-            y++;
-*/
-
-        if(GTK_STATE_ACTIVE==state && ((sbar && !opts.flatSbarButtons) || (isSpinButton && !opts.unifySpin)))
-        {
+        if (state == GTK_STATE_ACTIVE && ((sbar && !opts.flatSbarButtons) ||
+                                          (isSpinButton && !opts.unifySpin))) {
             x++;
             y++;
         }
-
         if (sbar) {
             switch (stepper) {
             case STEPPER_B:
@@ -620,41 +610,45 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
             }
         }
 
-        if(isSpinButton && isFixedWidget(widget) && isFakeGtk())
+        if (isSpinButton && isFixedWidget(widget) && isFakeGtk()) {
             x--;
-
-        if(isSpinButton && !(opts.buttonEffect != EFFECT_NONE))
-            y+=(GTK_ARROW_UP==arrow_type ? -1 : 1);
-
-        if(opts.unifySpin && isSpinButton && !opts.vArrows && GTK_ARROW_DOWN==arrow_type)
+        }
+        if (isSpinButton && !(opts.buttonEffect != EFFECT_NONE)) {
+            y += arrow_type == GTK_ARROW_UP ? -1 : 1;
+        }
+        if (opts.unifySpin && isSpinButton && !opts.vArrows &&
+            arrow_type == GTK_ARROW_DOWN) {
             y--;
-
-        if(GTK_STATE_ACTIVE==state && (sbar  || isSpinButton) && MO_GLOW==opts.coloredMouseOver)
-            state=GTK_STATE_PRELIGHT;
-
-        if(isMenuItem && GTK_ARROW_RIGHT==arrow_type && !isFakeGtk())
-            x-=2;
-
-        {
-        gboolean isMenuItem=IS_MENU_ITEM(widget);
-        GdkColor *col=isSpinButton || sbar
-                        ? &qtSettings.colors[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE][COLOR_BUTTON_TEXT]
-                        : &style->text[isMenuItem && GTK_STATE_PRELIGHT==state
-                                        ? GTK_STATE_SELECTED : ARROW_STATE(state)];
-        if(isMenuItem && GTK_STATE_PRELIGHT!=state && opts.shadePopupMenu)
-        {
-            if(SHADE_WINDOW_BORDER==opts.shadeMenubars)
-                col=&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER_TEXT];
-            else if(opts.customMenuTextColor)
-                col=&opts.customMenuNormTextColor;
-            else if (SHADE_BLEND_SELECTED==opts.shadeMenubars || SHADE_SELECTED==opts.shadeMenubars ||
-                        (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(qtcPalette.menubar[ORIGINAL_SHADE])))
-                col=&style->text[GTK_STATE_SELECTED];
         }
-
-        drawArrow(window, MO_ARROW(isMenuItem, col), area, arrow_type, x, y, smallArrows, TRUE);
+        if (state == GTK_STATE_ACTIVE && (sbar  || isSpinButton) &&
+            opts.coloredMouseOver == MO_GLOW) {
+            state = GTK_STATE_PRELIGHT;
         }
+        if (isMenuItem && arrow_type == GTK_ARROW_RIGHT && !isFakeGtk()) {
+            x -= 2;
+        }
+        const GdkColor *col =
+            (isSpinButton || sbar ?
+             &qtSettings.colors[state == GTK_STATE_INSENSITIVE ?
+                                PAL_DISABLED : PAL_ACTIVE][COLOR_BUTTON_TEXT] :
+             &style->text[isMenuItem && state == GTK_STATE_PRELIGHT ?
+                          GTK_STATE_SELECTED : ARROW_STATE(state)]);
+        if (isMenuItem && state != GTK_STATE_PRELIGHT && opts.shadePopupMenu) {
+            if (opts.shadeMenubars == SHADE_WINDOW_BORDER) {
+                col = &qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER_TEXT];
+            } else if (opts.customMenuTextColor) {
+                col = &opts.customMenuNormTextColor;
+            } else if (qtcOneOf(opts.shadeMenubars, SHADE_BLEND_SELECTED,
+                                SHADE_SELECTED) ||
+                        (opts.shadeMenubars == SHADE_CUSTOM &&
+                         TOO_DARK(qtcPalette.menubar[ORIGINAL_SHADE]))) {
+                col = &style->text[GTK_STATE_SELECTED];
+            }
+        }
+        qtcGtkArrow(cr, MO_ARROW(isMenuItem, col), area, arrow_type, x, y,
+                    smallArrows, true, opts.vArrows);
     }
+    cairo_destroy(cr);
 }
 
 static void
@@ -2144,41 +2138,44 @@ static GdkPixbuf * gtkRenderIcon(GtkStyle *style, const GtkIconSource *source, G
     return renderIcon(style, source, direction, state, size, widget, detail);
 }
 
-static void gtkDrawTab(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *_area,
-                       GtkWidget *widget, const char *detail, int x, int y, int width, int height)
+static void
+gtkDrawTab(GtkStyle *style, GdkWindow *window, GtkStateType state,
+           GtkShadowType shadow, GdkRectangle *_area, GtkWidget *widget,
+           const char *detail, int x, int y, int width, int height)
 {
+    g_return_if_fail(GDK_IS_DRAWABLE(window));
     QTC_UNUSED(style);
-    QtcRect *area = (QtcRect*)_area;
-    /* QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style; */
-    GdkColor     *arrowColor=MO_ARROW(false, &qtSettings.colors[GTK_STATE_INSENSITIVE==state
-                                                                            ? PAL_DISABLED : PAL_ACTIVE]
-                                                                   [COLOR_BUTTON_TEXT]);
-    //if(DO_EFFECT)
-    //    x--;
-    if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %s  ", __FUNCTION__, state, shadow, detail ? detail : "NULL"),
-                                    debugDisplayWidget(widget, 10);
-
-#if !GTK_CHECK_VERSION(2, 90, 0)
+    if (qtSettings.debug == DEBUG_ALL) {
+        printf(DEBUG_PREFIX "%s %d %d %s  ", __FUNCTION__, state, shadow,
+               detail ? detail : "NULL");
+        debugDisplayWidget(widget, 10);
+    }
+    const QtcRect *area = (QtcRect*)_area;
+    cairo_t *cr = gdk_cairo_create(window);
+    const GdkColor *arrowColor =
+        MO_ARROW(false, &qtSettings.colors[state == GTK_STATE_INSENSITIVE ?
+                                           PAL_DISABLED :
+                                           PAL_ACTIVE][COLOR_BUTTON_TEXT]);
     if (isActiveOptionMenu(widget)) {
         x++;
         y++;
     }
-#endif
-
     x = (reverseLayout(widget) ||
          ((widget = gtk_widget_get_parent(widget)) && reverseLayout(widget)) ?
          x + 1 : x + width / 2);
-
     if (opts.doubleGtkComboArrow) {
         int pad = opts.vArrows ? 0 : 1;
-        drawArrow(window, arrowColor, area,  GTK_ARROW_UP,
-                  x, y + height / 2 - (LARGE_ARR_HEIGHT - pad), FALSE, TRUE);
-        drawArrow(window, arrowColor, area,  GTK_ARROW_DOWN,
-                  x, y + height / 2 + (LARGE_ARR_HEIGHT - pad), FALSE, TRUE);
+        qtcGtkArrow(cr, arrowColor, area,  GTK_ARROW_UP,
+                    x, y + height / 2 - (LARGE_ARR_HEIGHT - pad),
+                    false, true, opts.vArrows);
+        qtcGtkArrow(cr, arrowColor, area,  GTK_ARROW_DOWN,
+                    x, y + height / 2 + (LARGE_ARR_HEIGHT - pad),
+                    false, true, opts.vArrows);
     } else {
-        drawArrow(window, arrowColor, area,  GTK_ARROW_DOWN,
-                  x, y + height / 2, FALSE, TRUE);
+        qtcGtkArrow(cr, arrowColor, area,  GTK_ARROW_DOWN,
+                    x, y + height / 2, false, true, opts.vArrows);
     }
+    cairo_destroy(cr);
 }
 
 static void
@@ -2894,36 +2891,42 @@ gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType state,
     cairo_destroy(cr);
 }
 
-static void gtkDrawExpander(GtkStyle *style, GdkWindow *window,
-                            GtkStateType state, GdkRectangle *_area,
-                            GtkWidget *widget, const char *detail,
-                            int x, int y, GtkExpanderStyle expander_style)
+static void
+gtkDrawExpander(GtkStyle *style, GdkWindow *window, GtkStateType state,
+                GdkRectangle *_area, GtkWidget *widget, const char *detail,
+                int x, int y, GtkExpanderStyle expander_style)
 {
+    g_return_if_fail(GDK_IS_DRAWABLE(window));
     if (qtSettings.debug == DEBUG_ALL) {
         printf(DEBUG_PREFIX "%s %d %s  ", __FUNCTION__, state,
                detail ? detail : "NULL");
         debugDisplayWidget(widget, 10);
     }
     QtcRect *area = (QtcRect*)_area;
-
-    gboolean isExpander = widget && (GTK_IS_EXPANDER(widget) || GTK_IS_TREE_VIEW(widget)),
-             fill=!isExpander || opts.coloredMouseOver || GTK_STATE_PRELIGHT!=state;
-    GdkColor *col=isExpander && opts.coloredMouseOver && GTK_STATE_PRELIGHT==state
-                    ? &qtcPalette.mouseover[ARROW_MO_SHADE]
-                    : &style->text[ARROW_STATE(state)];
+    cairo_t *cr = gdk_cairo_create(window);
+    bool isExpander = widget && (GTK_IS_EXPANDER(widget) ||
+                                 GTK_IS_TREE_VIEW(widget));
+    bool fill = (!isExpander || opts.coloredMouseOver ||
+                 state != GTK_STATE_PRELIGHT);
+    const GdkColor *col = (isExpander && opts.coloredMouseOver &&
+                           state == GTK_STATE_PRELIGHT ?
+                           &qtcPalette.mouseover[ARROW_MO_SHADE] :
+                           &style->text[ARROW_STATE(state)]);
 
     x -= LV_SIZE / 2.0 + 0.5;
     x += 2;
     y -= LV_SIZE / 2.0 + 0.5;
 
     if (expander_style == GTK_EXPANDER_COLLAPSED) {
-        drawArrow(window, col, area,
-                  reverseLayout(widget) ? GTK_ARROW_LEFT : GTK_ARROW_RIGHT,
-                  x + LARGE_ARR_WIDTH / 2, y + LARGE_ARR_HEIGHT, FALSE, fill);
+        qtcGtkArrow(cr, col, area,
+                    reverseLayout(widget) ? GTK_ARROW_LEFT : GTK_ARROW_RIGHT,
+                    x + LARGE_ARR_WIDTH / 2, y + LARGE_ARR_HEIGHT,
+                    false, fill, opts.vArrows);
     } else {
-        drawArrow(window, col, area, GTK_ARROW_DOWN,
-                  x + LARGE_ARR_WIDTH / 2, y + LARGE_ARR_HEIGHT, FALSE, fill);
+        qtcGtkArrow(cr, col, area, GTK_ARROW_DOWN, x + LARGE_ARR_WIDTH / 2,
+                    y + LARGE_ARR_HEIGHT, false, fill, opts.vArrows);
     }
+    cairo_destroy(cr);
 }
 
 static void

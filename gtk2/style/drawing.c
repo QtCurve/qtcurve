@@ -2422,16 +2422,6 @@ drawTreeViewLines(cairo_t *cr, const GdkColor *col, int x, int y, int h,
     }
 }
 
-void
-drawArrow(GdkWindow *window, const GdkColor *col, const QtcRect *area,
-          GtkArrowType arrow_type, int x, int y, bool small, bool fill)
-{
-    g_return_if_fail(GDK_IS_DRAWABLE(window));
-    cairo_t *cr = gdk_cairo_create(window);
-    qtcGtkArrow(cr, col, area, arrow_type, x, y, small, fill, opts.vArrows);
-    cairo_destroy(cr);
-}
-
 static void
 qtcSetGapClip(cairo_t *cr, const QtcRect *area, GtkPositionType gapSide,
               int gapX, int gapWidth, int x, int y, int width, int height,
