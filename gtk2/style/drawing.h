@@ -153,24 +153,42 @@ void drawSplitter(cairo_t *cr, GtkStateType state, GtkStyle *style,
 void drawSidebarButton(cairo_t *cr, GtkStateType state, GtkStyle *style,
                        const QtcRect *area, int x, int y,
                        int width, int height);
-void drawMenuItem(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget, GdkRectangle *area, int x, int y, int width, int height);
-void drawMenu(cairo_t *cr, GtkWidget *widget, GdkRectangle *area, int x, int y, int width, int height);
-void drawBoxGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow, GtkStateType state,
-                       GtkWidget *widget, GdkRectangle *area, int x, int y, int width, int height, GtkPositionType gap_side,
-                       int gapX, int gapWidth, EBorder borderProfile, gboolean isTab);
-void drawBoxGapFixes(cairo_t *cr, GtkWidget *widget, int x, int y, int width, int height, GtkPositionType gapSide, int gapX, int gapWidth);
-void drawShadowGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow, GtkStateType state,
-                          GtkWidget *widget, GdkRectangle *area, int x, int y, int width, int height, GtkPositionType gapSide,
-                          int gapX, int gapWidth);
-void drawCheckBox(cairo_t *cr, GtkStateType state, GtkShadowType shadow, GtkStyle *style, GtkWidget *widget, const char *detail,
-                         GdkRectangle *area, int x, int y, int width, int height);
-void drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget, const char *detail,
-                    GdkRectangle *area, int x, int y, int width, int height, GtkPositionType gapSide);
-void drawRadioButton(cairo_t *cr, GtkStateType state, GtkShadowType shadow, GtkStyle *style, GtkWidget *widget, const char *detail,
-                            GdkRectangle *area, int x, int y, int width, int height);
-void drawToolbarBorders(cairo_t *cr, GtkStateType state, int x, int y, int width, int height, gboolean isActiveWindowMenubar, const char *detail);
-void drawListViewHeader(cairo_t *cr, GtkStateType state, const GdkColor *btnColors, int bgnd, GdkRectangle *area, int x, int y, int width, int height);
-void drawDefBtnIndicator(cairo_t *cr, GtkStateType state, const GdkColor *btnColors, int bgnd, gboolean sunken, GdkRectangle *area, int x, int y, int width, int height);
-GdkPixbuf * renderIcon(GtkStyle *style, const GtkIconSource *source, GtkTextDirection direction,
-                              GtkStateType state, GtkIconSize size, GtkWidget *widget, const char *detail);
+void drawMenuItem(cairo_t *cr, GtkStateType state, GtkStyle *style,
+                  GtkWidget *widget, const QtcRect *area, int x, int y,
+                  int width, int height);
+void drawMenu(cairo_t *cr, GtkWidget *widget, const QtcRect *area,
+              int x, int y, int width, int height);
+void drawBoxGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow,
+                GtkStateType state, GtkWidget *widget, const QtcRect *area,
+                int x, int y, int width, int height, GtkPositionType gap_side,
+                int gapX, int gapWidth, EBorder borderProfile, bool isTab);
+void drawBoxGapFixes(cairo_t *cr, GtkWidget *widget, int x, int y,
+                     int width, int height, GtkPositionType gapSide,
+                     int gapX, int gapWidth);
+void drawShadowGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow,
+                   GtkStateType state, GtkWidget *widget, const QtcRect *area,
+                   int x, int y, int width, int height,
+                   GtkPositionType gapSide, int gapX, int gapWidth);
+void drawCheckBox(cairo_t *cr, GtkStateType state, GtkShadowType shadow,
+                  GtkStyle *style, GtkWidget *widget, const char *detail,
+                  const QtcRect *area, int x, int y, int width, int height);
+void drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style,
+             GtkWidget *widget, QtcRect *area, int x, int y,
+             int width, int height, GtkPositionType gapSide);
+void drawRadioButton(cairo_t *cr, GtkStateType state, GtkShadowType shadow,
+                     GtkStyle *style, GtkWidget *widget, const char *detail,
+                     const QtcRect *area, int x, int y, int width, int height);
+void drawToolbarBorders(cairo_t *cr, GtkStateType state, int x, int y,
+                        int width, int height, bool isActiveWindowMenubar,
+                        const char *detail);
+void drawListViewHeader(cairo_t *cr, GtkStateType state,
+                        const GdkColor *btnColors, int bgnd,
+                        const QtcRect *area, int x, int y,
+                        int width, int height);
+void drawDefBtnIndicator(cairo_t *cr, GtkStateType state,
+                         const GdkColor *btnColors, int bgnd, bool sunken,
+                         const QtcRect *area, int x, int y,
+                         int width, int height);
+GdkPixbuf *renderIcon(GtkStyle *style, const GtkIconSource *source,
+                      GtkStateType state, GtkIconSize size, GtkWidget *widget);
 #endif
