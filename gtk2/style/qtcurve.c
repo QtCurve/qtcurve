@@ -930,12 +930,17 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
             int xo=x, yo=y, wo=width, ho=height, stepper=STEPPER_NONE;
 
             /* Try and guess if this button is a toolbar button... */
-            if((WIDGET_STD_BUTTON==widgetType || WIDGET_TOGGLE_BUTTON==widgetType) && isMozillaWidget(widget) &&
-                GTK_IS_BUTTON(widget) && DETAIL("button") && ((width>22 && width<56 && height>30) || height>=32 || ((30==width || 45==width) && 30==height)))
-                widgetType=opts.coloredTbarMo ? WIDGET_TOOLBAR_BUTTON : WIDGET_UNCOLOURED_MO_BUTTON;
+            if (qtcOneOf(widgetType, WIDGET_STD_BUTTON, WIDGET_TOGGLE_BUTTON) &&
+                isMozillaWidget(widget) && GTK_IS_BUTTON(widget) &&
+                DETAIL("button") && ((width > 22 && width < 56 &&
+                                      height > 30) || height >= 32 ||
+                                     ((width == 30 || width == 45) &&
+                                      height == 30)))
+                widgetType = (opts.coloredTbarMo ? WIDGET_TOOLBAR_BUTTON :
+                              WIDGET_UNCOLOURED_MO_BUTTON);
 
-            if(ROUND_MAX==opts.round &&
-                ( (WIDGET_TOGGLE_BUTTON==widgetType && height>(opts.crSize+8) && width<(height+10)) ||
+            if (ROUND_MAX==opts.round &&
+                ((WIDGET_TOGGLE_BUTTON==widgetType && height>(opts.crSize+8) && width<(height+10)) ||
                     (GTK_APP_GIMP==qtSettings.app && WIDGET_STD_BUTTON==widgetType && WIDGET_TYPE_NAME("GimpViewableButton")) ||
                     (opts.stdSidebarButtons && WIDGET_STD_BUTTON==widgetType && widget && isSideBarBtn(widget)) ||
                     (WIDGET_STD_BUTTON==widgetType && GTK_APP_OPEN_OFFICE==qtSettings.app && isFixedWidget(widget) &&
