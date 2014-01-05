@@ -60,6 +60,37 @@ void qtcCairoDots(cairo_t *cr, int rx, int ry, int rwidth, int rheight,
 void qtcCairoLayout(cairo_t *cr, const QtcRect *area, int x, int y,
                     PangoLayout *layout, const GdkColor *col);
 
+typedef enum {
+    QTC_ARROW_UP,
+    QTC_ARROW_DOWN,
+    QTC_ARROW_LEFT,
+    QTC_ARROW_RIGHT,
+    QTC_ARROW_NONE
+} QtcArrowType;
+#define _QTC_CONVERT_ARROW(name)                \
+    case GTK_ARROW_##name:                      \
+    __res = QTC_ARROW_##name;                   \
+    break
+#define qtcArrowType(gtk_type)                  \
+    ({                                          \
+        QtcArrowType __res = QTC_ARROW_NONE;    \
+        switch (gtk_type) {                     \
+            _QTC_CONVERT_ARROW(UP);             \
+            _QTC_CONVERT_ARROW(DOWN);           \
+            _QTC_CONVERT_ARROW(LEFT);           \
+            _QTC_CONVERT_ARROW(RIGHT);          \
+        default:                                \
+            break;                              \
+        }                                       \
+        __res;                                  \
+    })
+void qtcCairoArrow(cairo_t *cr, const GdkColor *col, const QtcRect *area,
+                   QtcArrowType arrow_type, int x, int y, bool small,
+                   bool fill, bool varrow);
+#define qtcGtkArrow(cr, col, area, arrow_type, x, y, small, fill, varrow) \
+    qtcCairoArrow(cr, col, area, qtcArrowType(arrow_type), x, y, small, \
+                  fill, varrow)
+
 QTC_END_DECLS
 
 #endif

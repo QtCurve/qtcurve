@@ -2428,70 +2428,7 @@ drawArrow(GdkWindow *window, const GdkColor *col, const QtcRect *area,
 {
     g_return_if_fail(GDK_IS_DRAWABLE(window));
     cairo_t *cr = gdk_cairo_create(window);
-    if (small) {
-        switch (arrow_type) {
-        case GTK_ARROW_UP: {
-            const GdkPoint a[] = {{x + 2, y}, {x, y - 2}, {x - 2, y},
-                                  {x - 2, y + 1}, {x, y - 1}, {x + 2, y + 1}};
-            qtcCairoPolygon(cr, col, area, a, opts.vArrows ? 6 : 3, fill);
-            break;
-        }
-        case GTK_ARROW_DOWN: {
-            const GdkPoint a[] = {{x + 2, y}, {x, y + 2}, {x - 2, y},
-                                  {x - 2, y - 1}, {x, y + 1}, {x + 2, y - 1}};
-            qtcCairoPolygon(cr, col, area, a, opts.vArrows ? 6 : 3, fill);
-            break;
-        }
-        case GTK_ARROW_RIGHT: {
-            const GdkPoint a[] = {{x, y - 2}, {x + 2, y}, {x, y + 2},
-                                  {x - 1, y + 2}, {x + 1, y}, {x - 1, y - 2}};
-            qtcCairoPolygon(cr, col, area, a, opts.vArrows ? 6 : 3, fill);
-            break;
-        }
-        case GTK_ARROW_LEFT: {
-            const GdkPoint a[] = {{x, y - 2}, {x - 2, y}, {x, y + 2},
-                                  {x + 1, y + 2}, {x - 1, y}, {x + 1, y - 2}};
-            qtcCairoPolygon(cr, col, area, a, opts.vArrows ? 6 : 3, fill);
-            break;
-        }
-        default:
-            break;
-        }
-    } else {
-        /* Large arrows... */
-        switch (arrow_type) {
-        case GTK_ARROW_UP: {
-            const GdkPoint a[] = {{x + 3, y + 1}, {x, y - 2}, {x - 3, y + 1},
-                                  {x - 3, y + 2}, {x - 2, y + 2}, {x, y},
-                                  {x + 2, y + 2}, {x + 3, y + 2}};
-            qtcCairoPolygon(cr, col, area, a, opts.vArrows ? 8 : 3, fill);
-            break;
-        }
-        case GTK_ARROW_DOWN: {
-            const GdkPoint a[] = {{x + 3, y - 1}, {x, y + 2}, {x - 3, y - 1},
-                                  {x - 3, y - 2}, {x - 2, y - 2}, {x, y},
-                                  {x + 2, y - 2}, {x + 3,y - 2}};
-            qtcCairoPolygon(cr, col, area, a, opts.vArrows ? 8 : 3, fill);
-            break;
-        }
-        case GTK_ARROW_RIGHT: {
-            const GdkPoint a[] = {{x - 1, y + 3}, {x + 2, y}, {x - 1, y - 3},
-                                  {x - 2, y - 3}, {x - 2, y - 2}, {x, y},
-                                  {x - 2, y + 2}, {x - 2, y + 3}};
-            qtcCairoPolygon(cr, col, area, a, opts.vArrows ? 8 : 3, fill);
-            break;
-        }
-        case GTK_ARROW_LEFT: {
-            const GdkPoint a[] = {{x + 1, y - 3}, {x - 2, y}, {x + 1, y + 3},
-                                  {x + 2, y + 3}, {x + 2, y + 2}, {x, y},
-                                  {x + 2, y - 2}, {x + 2, y - 3}};
-            qtcCairoPolygon(cr, col, area, a, opts.vArrows ? 8 : 3, fill);
-            break;
-        }
-        default:
-            break;
-        }
-    }
+    qtcGtkArrow(cr, col, area, arrow_type, x, y, small, fill, opts.vArrows);
     cairo_destroy(cr);
 }
 
