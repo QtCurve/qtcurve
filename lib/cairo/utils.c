@@ -23,9 +23,21 @@
 #include "utils_p.h"
 #include <qtcurve-utils/number.h>
 
+QTC_EXPORT void
+qtcCairoPathPoints(cairo_t *cr, const GdkPoint *pts, int count)
+{
+    // The (0.5, 0.5) offset here is for moving the path to the center of the
+    // pixel.
+    cairo_move_to(cr, pts[0].x + 0.5, pts[0].y + 0.5);
+    for (int i = 1;i < count;i++) {
+        cairo_line_to(cr, pts[i].x + 0.5, pts[i].y + 0.5);
+    }
+}
+
 static void
 qtcCairoPathRegion(cairo_t *cr, const cairo_region_t *region)
 {
+    // Copied from gdk_cairo_region.
     int n_boxes = cairo_region_num_rectangles(region);
     QtcRect box;
     for (int i = 0;i < n_boxes;i++) {
@@ -73,6 +85,7 @@ qtcCairoPatternAddColorStop(cairo_pattern_t *pt, double offset,
 QTC_EXPORT void
 qtcRectUnion(const QtcRect *src1, const QtcRect *src2, QtcRect *dest)
 {
+    // Copied from gdk_rectangle_union
     int dest_x = qtcMin(src1->x, src2->x);
     int dest_y = qtcMin(src1->y, src2->y);
     dest->width = qtcMax(src1->x + src1->width,
@@ -86,6 +99,7 @@ qtcRectUnion(const QtcRect *src1, const QtcRect *src2, QtcRect *dest)
 QTC_EXPORT bool
 qtcRectIntersect(const QtcRect *src1, const QtcRect *src2, QtcRect *dest)
 {
+    // Copied from gdk_rectangle_intersect
     int dest_x = qtcMax(src1->x, src2->x);
     int dest_y = qtcMax(src1->y, src2->y);
     int dest_x2 = qtcMin(src1->x + src1->width, src2->x + src2->width);
@@ -104,15 +118,6 @@ qtcRectIntersect(const QtcRect *src1, const QtcRect *src2, QtcRect *dest)
         dest->height = 0;
     }
     return false;
-}
-
-QTC_EXPORT void
-qtcCairoPathPoints(cairo_t *cr, const GdkPoint *pts, int count)
-{
-    cairo_move_to(cr, pts[0].x + 0.5, pts[0].y + 0.5);
-    for (int i = 1;i < count;i++) {
-        cairo_line_to(cr, pts[i].x + 0.5, pts[i].y + 0.5);
-    }
 }
 
 QTC_EXPORT void
