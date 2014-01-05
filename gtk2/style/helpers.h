@@ -83,7 +83,7 @@
 
 void debugDisplayWidget(GtkWidget *widget, int level);
 bool haveAlternateListViewCol();
-gboolean isFixedWidget(GtkWidget *widget);
+bool isFixedWidget(GtkWidget *widget);
 QTC_ALWAYS_INLINE static inline bool
 isMozilla()
 {
@@ -101,25 +101,25 @@ isFakeGtk()
     return (isMozilla() || qtSettings.app == GTK_APP_OPEN_OFFICE ||
             qtSettings.app == GTK_APP_JAVA);
 }
-GdkColor *menuColors(gboolean active);
+GdkColor *menuColors(bool active);
 EBorder shadowToBorder(GtkShadowType shadow);
-gboolean useButtonColor(const char *detail);
+bool useButtonColor(const char *detail);
 void qtcShadeColors(GdkColor *base, GdkColor *vals);
-gboolean isSortColumn(GtkWidget *button);
+bool isSortColumn(GtkWidget *button);
 GdkColor *getCellCol(GdkColor *std, const char *detail);
-gboolean reverseLayout(GtkWidget *widget);
-gboolean isOnToolbar(GtkWidget *widget, gboolean *horiz, int level);
-gboolean isOnHandlebox(GtkWidget *widget, gboolean *horiz, int level);
-gboolean isButtonOnToolbar(GtkWidget *widget, gboolean *horiz);
-gboolean isButtonOnHandlebox(GtkWidget *widget, gboolean *horiz);
-gboolean isOnStatusBar(GtkWidget *widget, int level);
-gboolean isList(GtkWidget *widget);
-gboolean isListViewHeader(GtkWidget *widget);
+bool reverseLayout(GtkWidget *widget);
+bool isOnToolbar(GtkWidget *widget, bool *horiz, int level);
+bool isOnHandlebox(GtkWidget *widget, bool *horiz, int level);
+bool isButtonOnToolbar(GtkWidget *widget, bool *horiz);
+bool isButtonOnHandlebox(GtkWidget *widget, bool *horiz);
+bool isOnStatusBar(GtkWidget *widget, int level);
+bool isList(GtkWidget *widget);
+bool isListViewHeader(GtkWidget *widget);
 gboolean isEvolutionListViewHeader(GtkWidget *widget, const char *detail);
 gboolean isOnListViewHeader(GtkWidget *w, int level);
 gboolean isPathButton(GtkWidget *widget);
-GtkWidget * getComboEntry(GtkWidget *widget);
-GtkWidget * getComboButton(GtkWidget *widget);
+GtkWidget *getComboEntry(GtkWidget *widget);
+GtkWidget *getComboButton(GtkWidget *widget);
 gboolean isSideBarBtn(GtkWidget *widget);
 gboolean isComboBoxButton(GtkWidget *widget);
 gboolean isComboBox(GtkWidget *widget);

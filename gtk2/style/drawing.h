@@ -169,8 +169,8 @@ void drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget
 void drawRadioButton(cairo_t *cr, GtkStateType state, GtkShadowType shadow, GtkStyle *style, GtkWidget *widget, const char *detail,
                             GdkRectangle *area, int x, int y, int width, int height);
 void drawToolbarBorders(cairo_t *cr, GtkStateType state, int x, int y, int width, int height, gboolean isActiveWindowMenubar, const char *detail);
-void drawListViewHeader(cairo_t *cr, GtkStateType state, GdkColor *btnColors, int bgnd, GdkRectangle *area, int x, int y, int width, int height);
-void drawDefBtnIndicator(cairo_t *cr, GtkStateType state, GdkColor *btnColors, int bgnd, gboolean sunken, GdkRectangle *area, int x, int y, int width, int height);
+void drawListViewHeader(cairo_t *cr, GtkStateType state, const GdkColor *btnColors, int bgnd, GdkRectangle *area, int x, int y, int width, int height);
+void drawDefBtnIndicator(cairo_t *cr, GtkStateType state, const GdkColor *btnColors, int bgnd, gboolean sunken, GdkRectangle *area, int x, int y, int width, int height);
 GdkPixbuf * renderIcon(GtkStyle *style, const GtkIconSource *source, GtkTextDirection direction,
                               GtkStateType state, GtkIconSize size, GtkWidget *widget, const char *detail);
 #endif

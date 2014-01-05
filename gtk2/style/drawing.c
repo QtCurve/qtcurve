@@ -3976,7 +3976,7 @@ void drawToolbarBorders(cairo_t *cr, GtkStateType state,  int x, int y, int widt
     }
 }
 
-void drawListViewHeader(cairo_t *cr, GtkStateType state, GdkColor *btnColors, int bgnd, GdkRectangle *area, int x, int y, int width, int height)
+void drawListViewHeader(cairo_t *cr, GtkStateType state, const GdkColor *btnColors, int bgnd, GdkRectangle *area, int x, int y, int width, int height)
 {
     drawBevelGradient(cr, (QtcRect*)area, x, y, width, height, &btnColors[bgnd],
                       TRUE, GTK_STATE_ACTIVE==state || 2==bgnd || 3==bgnd,
@@ -4007,20 +4007,23 @@ void drawListViewHeader(cairo_t *cr, GtkStateType state, GdkColor *btnColors, in
 #endif
 }
 
-void drawDefBtnIndicator(cairo_t *cr, GtkStateType state, GdkColor *btnColors, int bgnd, gboolean sunken, GdkRectangle *area, int x, int y, int width, int height)
+void
+drawDefBtnIndicator(cairo_t *cr, GtkStateType state, const GdkColor *btnColors,
+                    int bgnd, gboolean sunken, GdkRectangle *area, int x, int y,
+                    int width, int height)
 {
-    if(IND_CORNER==opts.defBtnIndicator)
-    {
+    if (opts.defBtnIndicator == IND_CORNER) {
         int offset = sunken ? 5 : 4;
         int etchOffset = opts.buttonEffect != EFFECT_NONE ? 1 : 0;
-        GdkColor *cols=qtcPalette.focus ? qtcPalette.focus : qtcPalette.highlight,
-            *col=&cols[GTK_STATE_ACTIVE==state ? 0 : 4];
+        const GdkColor *cols = (qtcPalette.focus ? qtcPalette.focus :
+                                qtcPalette.highlight);
+        const GdkColor *col = &cols[state == GTK_STATE_ACTIVE ? 0 : 4];
 
         cairo_new_path(cr);
         qtcCairoSetColor(cr, col);
-        cairo_move_to(cr, x+offset+etchOffset, y+offset+etchOffset);
-        cairo_line_to(cr, x+offset+6+etchOffset, y+offset+etchOffset);
-        cairo_line_to(cr, x+offset+etchOffset, y+offset+6+etchOffset);
+        cairo_move_to(cr, x + offset + etchOffset, y + offset + etchOffset);
+        cairo_line_to(cr, x + offset + 6 + etchOffset, y + offset + etchOffset);
+        cairo_line_to(cr, x + offset + etchOffset, y + offset + 6 + etchOffset);
         cairo_fill(cr);
     } else if (opts.defBtnIndicator == IND_COLORED && COLORED_BORDER_SIZE > 2) {
         // offset needed because of etch

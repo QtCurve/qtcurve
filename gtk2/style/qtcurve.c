@@ -659,36 +659,35 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
 {
     g_return_if_fail(GTK_IS_STYLE(style));
     g_return_if_fail(GDK_IS_DRAWABLE(window));
-    gboolean sbar = isSbarDetail(detail);
-    gboolean pbar = DETAIL("bar"); //  && GTK_IS_PROGRESS_BAR(widget);
-    gboolean qtcSlider = !pbar && DETAIL("qtc-slider");
-    gboolean slider = qtcSlider || (!pbar && DETAIL("slider"));
-    gboolean hscale = !slider && DETAIL("hscale");
-    gboolean vscale = !hscale && DETAIL("vscale");
-    gboolean menubar = !vscale && DETAIL("menubar");
-    gboolean button = !menubar && DETAIL("button");
-    gboolean togglebutton = !button && DETAIL("togglebutton");
-    gboolean optionmenu = !togglebutton && DETAIL("optionmenu");
-    gboolean stepper = !optionmenu && DETAIL("stepper");
-    gboolean vscrollbar = (!optionmenu && detail &&
-                           qtcStrStartsWith(detail, "vscrollbar"));
-    gboolean hscrollbar = (!vscrollbar && detail &&
-                           qtcStrStartsWith(detail, "hscrollbar"));
-    gboolean spinUp = !hscrollbar && DETAIL("spinbutton_up");
-    gboolean spinDown = !spinUp && DETAIL("spinbutton_down");
-    gboolean menuScroll = (detail &&
-                           strstr(detail, "menu_scroll_arrow_") != NULL);
-    gboolean rev = (reverseLayout(widget) ||
-                    (widget && reverseLayout(gtk_widget_get_parent(widget))));
-    gboolean activeWindow = TRUE;
+    bool sbar = isSbarDetail(detail);
+    bool pbar = DETAIL("bar"); //  && GTK_IS_PROGRESS_BAR(widget);
+    bool qtcSlider = !pbar && DETAIL("qtc-slider");
+    bool slider = qtcSlider || (!pbar && DETAIL("slider"));
+    bool hscale = !slider && DETAIL("hscale");
+    bool vscale = !hscale && DETAIL("vscale");
+    bool menubar = !vscale && DETAIL("menubar");
+    bool button = !menubar && DETAIL("button");
+    bool togglebutton = !button && DETAIL("togglebutton");
+    bool optionmenu = !togglebutton && DETAIL("optionmenu");
+    bool stepper = !optionmenu && DETAIL("stepper");
+    bool vscrollbar = (!optionmenu && detail &&
+                       qtcStrStartsWith(detail, "vscrollbar"));
+    bool hscrollbar = (!vscrollbar && detail &&
+                       qtcStrStartsWith(detail, "hscrollbar"));
+    bool spinUp = !hscrollbar && DETAIL("spinbutton_up");
+    bool spinDown = !spinUp && DETAIL("spinbutton_down");
+    bool menuScroll = (detail && strstr(detail, "menu_scroll_arrow_") != NULL);
+    bool rev = (reverseLayout(widget) ||
+                (widget && reverseLayout(gtk_widget_get_parent(widget))));
+    bool activeWindow = true;
     GdkColor new_cols[TOTAL_SHADES + 1];
-    GdkColor *btnColors = qtcPalette.background;
+    const GdkColor *btnColors = qtcPalette.background;
     int bgnd = getFill(state, btnDown);
     int round = getRound(detail, widget, rev);
-    gboolean lvh = (isListViewHeader(widget) ||
-                    isEvolutionListViewHeader(widget, detail));
-    gboolean sunken = (btnDown || shadow == GTK_SHADOW_IN ||
-                       state == GTK_STATE_ACTIVE || bgnd == 2 || bgnd == 3);
+    bool lvh = (isListViewHeader(widget) ||
+                isEvolutionListViewHeader(widget, detail));
+    bool sunken = (btnDown || shadow == GTK_SHADOW_IN ||
+                   state == GTK_STATE_ACTIVE || bgnd == 2 || bgnd == 3);
     GtkWidget *parent = NULL;
 
     if (button && GTK_IS_TOGGLE_BUTTON(widget)) {
@@ -696,9 +695,12 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
         togglebutton = TRUE;
     }
 
-    if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %s  ", __FUNCTION__, btnDown, state, shadow, x, y, width, height,
-                                           detail ? detail : "NULL"),
-                                    debugDisplayWidget(widget, 10);
+    if (qtSettings.debug == DEBUG_ALL) {
+        printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %s  ", __FUNCTION__,
+               btnDown, state, shadow, x, y, width, height,
+               detail ? detail : "NULL");
+        debugDisplayWidget(widget, 10);
+    }
 
     // FIXME, need to update useButtonColor if the logic below changes right now
     if (useButtonColor(detail)) {
@@ -733,19 +735,16 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
     qtcCairoClipRect(cr, (QtcRect*)area);
     cairo_set_line_width(cr, 1.0);
     if (spinUp || spinDown) {
-        if (!opts.unifySpin && (!opts.unifySpinBtns || sunken
-                                /* || GTK_STATE_PRELIGHT==state*/)) {
+        if (!opts.unifySpin && (!opts.unifySpinBtns || sunken)) {
             EWidget wid = spinUp ? WIDGET_SPIN_UP : WIDGET_SPIN_DOWN;
-            QtcRect *a= (QtcRect*)area;
+            QtcRect *a = (QtcRect*)area;
             QtcRect b;
             QtcRect unified;
             bool ooOrMoz = isFakeGtk();
-
             if (!a && isFixedWidget(widget) && ooOrMoz) {
                 b = qtcRect(x, y, width, height);
                 a = &b;
             }
-
             if (wid == WIDGET_SPIN_UP) {
                 if (opts.buttonEffect != EFFECT_NONE && opts.etchEntry) {
                     if (!opts.unifySpinBtns)
@@ -758,8 +757,8 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
                 if (opts.unifySpinBtns) {
                     unified = qtcRect(x, y, width,
-                                      height -
-                                      (state == GTK_STATE_PRELIGHT ? 2 : 1));
+                                      height - (state == GTK_STATE_PRELIGHT ?
+                                                2 : 1));
                     height *= 2;
                     area = (GdkRectangle*)&unified;
                 } else if (!opts.etchEntry) {
@@ -767,10 +766,11 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 }
             } else if (opts.buttonEffect != EFFECT_NONE && opts.etchEntry) {
                 QtcRect clip = {x - 2, y, width + 2, height};
-                if (!opts.unifySpinBtns)
+                if (!opts.unifySpinBtns) {
                     drawEtch(cr, ooOrMoz ? a : &clip, widget, x - 2, y - 2,
                              width + 2, height + 2, FALSE,
                              ROUNDED_RIGHT, WIDGET_SPIN_DOWN);
+                }
                 height--;
                 width--;
                 if (opts.unifySpinBtns) {
@@ -805,24 +805,24 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
             }
         }
 
-        if(opts.unifySpin)
-        {
-            gboolean rev=reverseLayout(widget) || (widget && reverseLayout(gtk_widget_get_parent(widget))),
-                     moz=isMozillaWidget(widget);
-
-            if(!rev)
-                x-=4;
-            width+=4;
+        if (opts.unifySpin) {
+            bool rev = (reverseLayout(widget) ||
+                        (widget &&
+                         reverseLayout(gtk_widget_get_parent(widget))));
+            bool moz = isMozillaWidget(widget);
+            if (!rev) {
+                x -= 4;
+            }
+            width += 4;
 
             cairo_save(cr);
-#if !GTK_CHECK_VERSION(2, 90, 0)
-            if (moz)
-#endif
-            {
+            if (moz) {
                 QtcRect a = {x + 2, y, width - 2, height};
                 qtcCairoClipRect(cr, &a);
             }
-            drawEntryField(cr, style, state, window, widget, (QtcRect*)area, x, y, width, height, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_SPIN);
+            drawEntryField(cr, style, state, window, widget, (QtcRect*)area,
+                           x, y, width, height,
+                           rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_SPIN);
             cairo_restore(cr);
         } else if (opts.unifySpinBtns) {
             int offset = (opts.buttonEffect != EFFECT_NONE && opts.etchEntry ?
@@ -832,7 +832,8 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                          ROUNDED_RIGHT, WIDGET_SPIN);
             }
 #if GTK_CHECK_VERSION(2, 90, 0)
-            bgnd=getFill(GTK_STATE_ACTIVE==state ? GTK_STATE_NORMAL : state, FALSE);
+            bgnd = getFill(state == GTK_STATE_ACTIVE ? GTK_STATE_NORMAL : state,
+                           false);
 #endif
             drawLightBevel(cr, style, state, (QtcRect*)area, x, y + offset,
                            width - offset, height - 2 * offset,
@@ -843,70 +844,71 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                           &btnColors[QTC_STD_BORDER], (QtcRect*)area, NULL,
                           true, true, true);
         }
-
-    }
-    else if(!opts.stdSidebarButtons && (button || togglebutton) && isSideBarBtn(widget))
-        drawSidebarButton(cr, state, style, (QtcRect*)area, x, y, width, height);
-    else if(lvh)
-    {
-        if(opts.highlightScrollViews && widget)
-        {
-            GtkWidget *parent=gtk_widget_get_parent(widget);
-
-            if(parent && GTK_IS_TREE_VIEW(parent))
+    } else if (!opts.stdSidebarButtons && (button || togglebutton) &&
+               isSideBarBtn(widget)) {
+        drawSidebarButton(cr, state, style, (QtcRect*)area,
+                          x, y, width, height);
+    } else if (lvh) {
+        if (opts.highlightScrollViews && widget) {
+            GtkWidget *parent = gtk_widget_get_parent(widget);
+            if (parent && GTK_IS_TREE_VIEW(parent)) {
                 qtcScrolledWindowRegisterChild(parent);
+            }
         }
-
         drawListViewHeader(cr, state, btnColors, bgnd, area, x, y, width, height);
-    }
-    else if(isPathButton(widget))
-    {
-        if(GTK_STATE_PRELIGHT==state)
-            drawSelection(cr, style, state, (QtcRect*)area, widget, x, y, width, height, ROUNDED_ALL, FALSE, 1.0, 0);
-
-        if(opts.windowDrag>WM_DRAG_MENU_AND_TOOLBAR)
+    } else if (isPathButton(widget)) {
+        if (state == GTK_STATE_PRELIGHT) {
+            drawSelection(cr, style, state, (QtcRect*)area, widget,
+                          x, y, width, height, ROUNDED_ALL, false, 1.0, 0);
+        }
+        if (opts.windowDrag > WM_DRAG_MENU_AND_TOOLBAR) {
             qtcWMMoveSetup(widget);
-
-        if(GTK_IS_TOGGLE_BUTTON(widget))
+        }
+        if (GTK_IS_TOGGLE_BUTTON(widget)) {
             drawArrow(window, &qtcPalette.background[5], (QtcRect*)area,
                       GTK_ARROW_RIGHT, x + width - (LARGE_ARR_WIDTH / 2 + 4),
-                      y + (height - LARGE_ARR_HEIGHT / 2) / 2 + 1, FALSE, TRUE);
-    }
-    else if(detail &&( button || togglebutton || optionmenu || sbar || hscale || vscale || stepper || slider))
-    {
-        gboolean combo=0==strcmp(detail, "optionmenu") || isOnComboBox(widget, 0),
-                 combo_entry=combo && isOnComboEntry(widget, 0),
-                 horiz_tbar,
-                 tbar_button=isButtonOnToolbar(widget, &horiz_tbar),
-                 handle_button=!tbar_button && isButtonOnHandlebox(widget, &horiz_tbar);
-        int      xAdjust=0, yAdjust=0, wAdjust=0, hAdjust=0;
-        gboolean horiz=(tbar_button || handle_button) && IS_GLASS(opts.appearance) &&
-                        IS_GLASS(opts.toolbarAppearance)
-                            ? horiz_tbar
-                            : (slider && width<height) || vscrollbar || vscale || (stepper && widget && GTK_IS_VSCROLLBAR(widget))
-                                ? FALSE
-                                : TRUE,
-                    defBtn=GTK_STATE_INSENSITIVE!=state && (button || togglebutton) && widget && gtk_widget_has_default(widget);
-//        drawBgnd(cr, &btnColors[bgnd], widget, area, x, y, width, height); // CPD removed as it messes up toolbars and firefox3
-
-#if !GTK_CHECK_VERSION(2, 90, 0)
-        if(combo && !sunken && isActiveOptionMenu(widget))
-        {
-            sunken=TRUE;
-            bgnd=4;
+                      y + (height - LARGE_ARR_HEIGHT / 2) / 2 + 1, false, true);
         }
-#endif
-
-        if(tbar_button && TBTN_JOINED==opts.tbarBtns)
-        {
-            adjustToolbarButtons(widget, &xAdjust, &yAdjust, &wAdjust, &hAdjust, &round, horiz_tbar);
-            x+=xAdjust, y+=yAdjust, width+=wAdjust, height+=hAdjust;
+    } else if (detail && (button || togglebutton || optionmenu || sbar ||
+                          hscale || vscale || stepper || slider)) {
+        bool combo = (strcmp(detail, "optionmenu") == 0 ||
+                      isOnComboBox(widget, 0));
+        bool combo_entry = combo && isOnComboEntry(widget, 0);
+        bool horiz_tbar;
+        bool tbar_button = isButtonOnToolbar(widget, &horiz_tbar);
+        bool handle_button = (!tbar_button &&
+                              isButtonOnHandlebox(widget, &horiz_tbar));
+        int xAdjust = 0;
+        int yAdjust = 0;
+        int wAdjust = 0;
+        int hAdjust = 0;
+        bool horiz = ((tbar_button || handle_button) &&
+                      IS_GLASS(opts.appearance) &&
+                      IS_GLASS(opts.toolbarAppearance) ? horiz_tbar :
+                      (slider && width < height) || vscrollbar || vscale ||
+                      (stepper && widget && GTK_IS_VSCROLLBAR(widget)) ?
+                      false : true);
+        bool defBtn = (state != GTK_STATE_INSENSITIVE &&
+                       (button || togglebutton) && widget &&
+                       gtk_widget_has_default(widget));
+        if (combo && !sunken && isActiveOptionMenu(widget)) {
+            sunken = true;
+            bgnd = 4;
+        }
+        if (tbar_button && opts.tbarBtns == TBTN_JOINED) {
+            adjustToolbarButtons(widget, &xAdjust, &yAdjust, &wAdjust, &hAdjust,
+                                 &round, horiz_tbar);
+            x += xAdjust;
+            y += yAdjust;
+            width += wAdjust;
+            height += hAdjust;
         }
 
         {
             /* Yuck this is a horrible mess!!!!! */
-            gboolean glowFocus=widget && gtk_widget_has_focus(widget) && MO_GLOW==opts.coloredMouseOver && FULL_FOCUS;
-            EWidget  widgetType=isComboBoxButton(widget)
+            bool glowFocus = (widget && gtk_widget_has_focus(widget) &&
+                              opts.coloredMouseOver == MO_GLOW && FULL_FOCUS);
+            EWidget widgetType=isComboBoxButton(widget)
                                 ? WIDGET_COMBO_BUTTON
                                 : slider
                                     ? qtcSlider ? WIDGET_SLIDER : WIDGET_SB_SLIDER
@@ -1127,12 +1129,9 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 if(!mozToolbar && widget && entry && entryState!=gtk_widget_get_state(widget) && GTK_STATE_INSENSITIVE!=entryState &&
                     GTK_STATE_INSENSITIVE!=state)
                     gtk_widget_set_state(entry, state);
-            }
-            else if(opts.flatSbarButtons && WIDGET_SB_BUTTON==widgetType)
-            {
+            } else if (opts.flatSbarButtons && WIDGET_SB_BUTTON==widgetType) {
 #if !GTK_CHECK_VERSION(2, 90, 0)
-                if(isMozilla())
-                {
+                if (isMozilla()) {
                     /* This section messes up Gtk3 scrollbars with custom background - and doesnt seem to be required for Gtk2 either. remove at 1.7.1 */
                     /* Re-added in 1.7.2 as needed by Mozilla! */
                     if(opts.gtkScrollViews && qtcIsFlat(opts.sbarBgndAppearance) && 0!=opts.tabBgnd && widget && gtk_widget_get_parent(widget) && gtk_widget_get_parent(widget)->parent &&
@@ -1155,17 +1154,16 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                     }
                 }
 #endif
-            }
-            else
-            {
-                GdkColor *cols=defBtn && (IND_TINT==opts.defBtnIndicator || IND_COLORED==opts.defBtnIndicator || IND_SELECTED==opts.defBtnIndicator)
-                                ? qtcPalette.defbtn
-                                : WIDGET_COMBO_BUTTON==widgetType && qtcPalette.combobtn && GTK_STATE_INSENSITIVE!=state
-                                    ? qtcPalette.combobtn
-                                    : btnColors;
-                int      bg=(WIDGET_COMBO_BUTTON==widgetType &&
-                                (SHADE_DARKEN==opts.comboBtn ||
-                                    (SHADE_NONE!=opts.comboBtn && GTK_STATE_INSENSITIVE==state))) ||
+            } else {
+                const GdkColor *cols =
+                    (defBtn && qtcOneOf(opts.defBtnIndicator, IND_TINT,
+                                        IND_COLORED, IND_SELECTED) ?
+                     qtcPalette.defbtn : widgetType == WIDGET_COMBO_BUTTON &&
+                     qtcPalette.combobtn && state != GTK_STATE_INSENSITIVE ?
+                     qtcPalette.combobtn : btnColors);
+                int bg = (WIDGET_COMBO_BUTTON==widgetType &&
+                          (SHADE_DARKEN==opts.comboBtn ||
+                           (SHADE_NONE != opts.comboBtn && GTK_STATE_INSENSITIVE==state))) ||
                             (WIDGET_SB_SLIDER==widgetType && SHADE_DARKEN==opts.shadeSliders) ||
                             (defBtn && IND_DARKEN==opts.defBtnIndicator)
                                 ? getFill(state, btnDown, true) : bgnd;
@@ -1245,7 +1243,9 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 cheight-=6;
 
                 if (opts.comboBtn != SHADE_NONE) {
-                    GdkColor *cols = qtcPalette.combobtn && GTK_STATE_INSENSITIVE!=state ? qtcPalette.combobtn : btnColors;
+                    const GdkColor *cols = (qtcPalette.combobtn &&
+                                            state != GTK_STATE_INSENSITIVE ?
+                                            qtcPalette.combobtn : btnColors);
                     int bg = SHADE_DARKEN==opts.comboBtn || (GTK_STATE_INSENSITIVE==state && SHADE_NONE!=opts.comboBtn) ? getFill(state, btnDown, true) : bgnd;
 
                     QtcRect btn = {
@@ -1313,7 +1313,10 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
                 if (!combo_entry) {
                     if (opts.comboBtn != SHADE_NONE) {
-                        GdkColor *cols = qtcPalette.combobtn && GTK_STATE_INSENSITIVE!=state ? qtcPalette.combobtn : btnColors;
+                        const GdkColor *cols =
+                            (qtcPalette.combobtn &&
+                             state != GTK_STATE_INSENSITIVE ?
+                             qtcPalette.combobtn : btnColors);
                         int bg = SHADE_DARKEN==opts.comboBtn ||
                             (GTK_STATE_INSENSITIVE==state && SHADE_NONE!=opts.comboBtn) ? getFill(state, btnDown, true) : bgnd;
 
@@ -1356,12 +1359,8 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 }
             }
         }
-    }
-    else if(detail && (0==strcmp(detail, "buttondefault") || 0==strcmp(detail, "togglebuttondefault")))
-    {
-    }
-    else if(widget && detail && (0==strcmp(detail, "trough") || detail==strstr(detail, "trough-")))
-    {
+    } else if (detail && (0==strcmp(detail, "buttondefault") || 0==strcmp(detail, "togglebuttondefault"))) {
+    } else if(widget && detail && (0==strcmp(detail, "trough") || detail==strstr(detail, "trough-"))) {
         gboolean list=isList(widget),
                  pbar=list || GTK_IS_PROGRESS_BAR(widget),
                  scale=!pbar && GTK_IS_SCALE(widget);
@@ -1393,7 +1392,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
     {
         //if(GTK_SHADOW_NONE!=shadow)
         {
-            GdkColor    *col=menubar && (GTK_STATE_INSENSITIVE!=state || SHADE_NONE!=opts.shadeMenubars)
+            const GdkColor *col = menubar && (GTK_STATE_INSENSITIVE!=state || SHADE_NONE!=opts.shadeMenubars)
                                 ? &menuColors(activeWindow)[ORIGINAL_SHADE]
                                 : &style->bg[state];
             EAppearance app=menubar ? opts.menubarAppearance : opts.toolbarAppearance;
@@ -1457,11 +1456,9 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
 //             if(widget && IMG_NONE!=opts.bgndImage.type)
 //                 drawWindowBgnd(cr, style, area, widget, x, y, width, height);
 //        }
-    }
-    else if(DETAIL("hseparator"))
-    {
+    } else if (DETAIL("hseparator")) {
         gboolean isMenuItem=widget && GTK_IS_MENU_ITEM(widget);
-        GdkColor *cols=qtcPalette.background;
+        const GdkColor *cols=qtcPalette.background;
         int      offset=opts.menuStripe && (isMozilla() || isMenuItem) ? 20 : 0;
 
         if(offset && isFakeGtk())

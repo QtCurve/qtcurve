@@ -55,7 +55,7 @@ haveAlternateListViewCol()
 }
 
 GdkColor*
-menuColors(gboolean active)
+menuColors(bool active)
 {
     return (SHADE_WINDOW_BORDER == opts.shadeMenubars ?
             qtcPalette.wborder[active ? 1 : 0] :
@@ -80,7 +80,7 @@ shadowToBorder(GtkShadowType shadow)
     }
 }
 
-gboolean
+bool
 useButtonColor(const char *detail)
 {
     return (detail &&
@@ -117,7 +117,7 @@ qtcShadeColors(GdkColor *base, GdkColor *vals)
     vals[ORIGINAL_SHADE] = *base;
 }
 
-gboolean
+bool
 isSortColumn(GtkWidget *button)
 {
     GtkWidget *parent = NULL;
@@ -207,16 +207,16 @@ getCellCol(GdkColor *std, const char *detail)
     return &shaded;
 }
 
-gboolean
+bool
 reverseLayout(GtkWidget *widget)
 {
     if (widget)
         return gtk_widget_get_direction(widget) == GTK_TEXT_DIR_RTL;
-    return FALSE;
+    return false;
 }
 
-gboolean
-isOnToolbar(GtkWidget *widget, gboolean *horiz, int level)
+bool
+isOnToolbar(GtkWidget *widget, bool *horiz, int level)
 {
     if (widget) {
         if (GTK_IS_TOOLBAR(widget)) {
@@ -231,8 +231,8 @@ isOnToolbar(GtkWidget *widget, gboolean *horiz, int level)
     return FALSE;
 }
 
-gboolean
-isOnHandlebox(GtkWidget *widget, gboolean *horiz, int level)
+bool
+isOnHandlebox(GtkWidget *widget, bool *horiz, int level)
 {
     if (widget) {
         if (GTK_IS_HANDLE_BOX(widget)) {
@@ -250,27 +250,27 @@ isOnHandlebox(GtkWidget *widget, gboolean *horiz, int level)
     return FALSE;
 }
 
-gboolean
-isButtonOnToolbar(GtkWidget *widget, gboolean *horiz)
+bool
+isButtonOnToolbar(GtkWidget *widget, bool *horiz)
 {
     GtkWidget *parent = NULL;
     if (widget && (parent = gtk_widget_get_parent(widget)) &&
         GTK_IS_BUTTON(widget))
         return isOnToolbar(parent, horiz, 0);
-    return FALSE;
+    return false;
 }
 
-gboolean
-isButtonOnHandlebox(GtkWidget *widget, gboolean *horiz)
+bool
+isButtonOnHandlebox(GtkWidget *widget, bool *horiz)
 {
     GtkWidget *parent = NULL;
     if (widget && (parent = gtk_widget_get_parent(widget)) &&
         GTK_IS_BUTTON(widget))
         return isOnHandlebox(parent, horiz, 0);
-    return FALSE;
+    return false;
 }
 
-gboolean
+bool
 isOnStatusBar(GtkWidget *widget, int level)
 {
     GtkWidget *parent = gtk_widget_get_parent(widget);
@@ -284,7 +284,8 @@ isOnStatusBar(GtkWidget *widget, int level)
     return FALSE;
 }
 
-gboolean isList(GtkWidget *widget)
+bool
+isList(GtkWidget *widget)
 {
     return widget &&
            (GTK_IS_TREE_VIEW(widget) ||
@@ -300,7 +301,8 @@ gboolean isList(GtkWidget *widget)
             0 == strcmp(g_type_name(G_OBJECT_TYPE(widget)), "GtkSCTree"));
 }
 
-gboolean isListViewHeader(GtkWidget *widget)
+bool
+isListViewHeader(GtkWidget *widget)
 {
     GtkWidget *parent=NULL;
     return widget && GTK_IS_BUTTON(widget) && (parent=gtk_widget_get_parent(widget)) &&
@@ -841,11 +843,12 @@ gboolean isComboFrame(GtkWidget *widget)
     return !QTC_COMBO_ENTRY(widget) && GTK_IS_FRAME(widget) && (parent=gtk_widget_get_parent(widget)) && GTK_IS_COMBO_BOX(parent);
 }
 
-gboolean isFixedWidget(GtkWidget *widget)
+bool isFixedWidget(GtkWidget *widget)
 {
-    GtkWidget *parent=NULL;
-    return widget && (parent=gtk_widget_get_parent(widget)) && GTK_IS_FIXED(parent) &&
-           (parent=gtk_widget_get_parent(parent)) && GTK_IS_WINDOW(parent);
+    GtkWidget *parent = NULL;
+    return (widget && (parent = gtk_widget_get_parent(widget)) &&
+            GTK_IS_FIXED(parent) &&
+            (parent = gtk_widget_get_parent(parent)) && GTK_IS_WINDOW(parent));
 }
 
 gboolean isGimpDockable(GtkWidget *widget)
