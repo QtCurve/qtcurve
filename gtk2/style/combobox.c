@@ -119,7 +119,7 @@ qtcComboBoxStyleSet(GtkWidget *widget, GtkStyle *prev_style, void *data)
     QTC_UNUSED(data);
     QTC_UNUSED(prev_style);
     qtcComboBoxCleanup(widget);
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -128,7 +128,7 @@ qtcComboBoxDestroy(GtkWidget *widget, GdkEvent *event, void *data)
     QTC_UNUSED(data);
     QTC_UNUSED(event);
     qtcComboBoxCleanup(widget);
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -142,7 +142,7 @@ qtcComboBoxEnter(GtkWidget *widget, GdkEventMotion *event, void *data)
             gtk_widget_queue_draw(widget);
         }
     }
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -156,7 +156,7 @@ qtcComboBoxLeave(GtkWidget *widget, GdkEventMotion *event, void *data)
             gtk_widget_queue_draw(widget);
         }
     }
-    return FALSE;
+    return false;
 }
 
 static void

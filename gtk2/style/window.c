@@ -61,7 +61,7 @@ qtcWindowLookupHash(void *hash, gboolean create)
         rv = qtcNew(QtCWindow);
         rv->width = rv->height = rv->timer = 0;
         rv->widget = NULL;
-        rv->locked = FALSE;
+        rv->locked = false;
         g_hash_table_insert(qtcWindowTable, hash, rv);
         rv = g_hash_table_lookup(qtcWindowTable, hash);
     }
@@ -72,7 +72,7 @@ static void
 qtcWindowRemoveFromHash(void *hash)
 {
     if (qtcWindowTable) {
-        QtCWindow *tv = qtcWindowLookupHash(hash, FALSE);
+        QtCWindow *tv = qtcWindowLookupHash(hash, false);
         if (tv) {
             if (tv->timer)
                 g_source_remove(tv->timer);
@@ -112,7 +112,7 @@ qtcWindowStyleSet(GtkWidget *widget, GtkStyle *prev_style, void *data)
     QTC_UNUSED(prev_style);
     QTC_UNUSED(data);
     qtcWindowCleanup(widget);
-    return FALSE;
+    return false;
 }
 
 static gboolean qtcWindowToggleMenuBar(GtkWidget *widget);
@@ -150,7 +150,7 @@ qtcWindowClientEvent(GtkWidget *widget, GdkEventClient *event, void *data)
             gtk_widget_queue_draw(widget);
         }
     }
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -159,7 +159,7 @@ qtcWindowDestroy(GtkWidget *widget, GdkEvent *event, void *data)
     QTC_UNUSED(event);
     QTC_UNUSED(data);
     qtcWindowCleanup(widget);
-    return FALSE;
+    return false;
 }
 
 gboolean
@@ -218,9 +218,9 @@ qtcWindowSizeRequest(GtkWidget *widget)
             rect.width = alloc.width, rect.height = alloc.height;
         }
         gdk_window_invalidate_rect(gtk_widget_get_window(widget),
-                                   (GdkRectangle*)&rect, FALSE);
+                                   (GdkRectangle*)&rect, false);
     }
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -230,8 +230,8 @@ qtcWindowDelayedUpdate(void *user_data)
 
     if (window) {
         if (window->locked) {
-            window->locked = FALSE;
-            return TRUE;
+            window->locked = false;
+            return true;
         } else {
             g_source_remove(window->timer);
             window->timer = 0;
@@ -239,10 +239,10 @@ qtcWindowDelayedUpdate(void *user_data)
             gdk_threads_enter();
             qtcWindowSizeRequest(window->widget);
             gdk_threads_leave();
-            return FALSE;
+            return false;
         }
     }
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -260,12 +260,12 @@ qtcWindowConfigure(GtkWidget *widget, GdkEventConfigure *event, void *data)
         if (!window->timer) {
             window->timer =
                 g_timeout_add(50, (GSourceFunc)qtcWindowDelayedUpdate, window);
-            window->locked = FALSE;
+            window->locked = false;
         } else {
-            window->locked = TRUE;
+            window->locked = true;
         }
     }
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -389,9 +389,9 @@ qtcWindowToggleMenuBar(GtkWidget *widget)
 
         qtcMenuEmitSize(menuBar, size);
         qtcWindowMenuBarDBus(widget, size);
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }
 
 gboolean
@@ -406,9 +406,9 @@ qtcWindowSetStatusBarProp(GtkWidget *w)
         qtcWidgetProps(props)->statusBarSet = true;
         qtcX11SetStatusBar(wid);
         qtcX11Flush();
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -425,9 +425,9 @@ qtcWindowToggleStatusBar(GtkWidget *widget)
             gtk_widget_show(statusBar);
         }
         qtcWindowStatusBarDBus(widget, state);
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }
 
 static void
@@ -463,7 +463,7 @@ qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, void *user_data)
     // Ensure only ctrl/alt/shift/capsLock are pressed...
     if (GDK_CONTROL_MASK & event->state && GDK_MOD1_MASK & event->state &&
         !event->is_modifier && 0 == (event->state & 0xFF00)) {
-        gboolean toggled = FALSE;
+        gboolean toggled = false;
         if (opts.menubarHiding & HIDE_KEYBOARD &&
             (GDK_KEY_m == event->keyval || GDK_KEY_M == event->keyval)) {
             toggled = qtcWindowToggleMenuBar(widget);
@@ -476,7 +476,7 @@ qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, void *user_data)
             gtk_widget_queue_draw(widget);
         }
     }
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -506,7 +506,7 @@ qtcWindowMap(GtkWidget *widget, GdkEventKey *event, void *user_data)
         if(statusBar)
             qtcWindowStatusBarDBus(widget, !gtk_widget_get_visible(statusBar));
     }
-    return FALSE;
+    return false;
 }
 
 gboolean
@@ -517,7 +517,7 @@ qtcWindowSetup(GtkWidget *widget, int opacity)
         qtcWidgetProps(props)->windowHacked = true;
         if (!qtcIsFlatBgnd(opts.bgndAppearance) ||
             opts.bgndImage.type != IMG_NONE) {
-            QtCWindow *window = qtcWindowLookupHash(widget, TRUE);
+            QtCWindow *window = qtcWindowLookupHash(widget, true);
             if (window) {
                 QtcRect alloc = qtcWidgetGetAllocation(widget);
                 qtcConnectToProp(props, windowConfigure, "configure-event",
@@ -546,7 +546,7 @@ qtcWindowSetup(GtkWidget *widget, int opacity)
             opts.menubarHiding || opts.statusbarHiding)
             qtcConnectToProp(props, windowClientEvent, "client-event",
                              qtcWindowClientEvent, NULL);
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }

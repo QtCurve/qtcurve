@@ -45,10 +45,10 @@ qtcMenuEmitSize(GtkWidget *w, unsigned int size)
             qtcWidgetProps(props)->menuBarSize = size;
             qtcX11SetMenubarSize(wid, size);
             qtcX11Flush();
-            return TRUE;
+            return true;
         }
     }
-    return FALSE;
+    return false;
 }
 
 gboolean
@@ -61,7 +61,7 @@ objectIsA(const GObject *object, const char *type_name)
         }
     }
 
-    return FALSE;
+    return false;
 }
 
 /* #if !GTK_CHECK_VERSION(2, 90, 0) /\* Gtk3:TODO !!! *\/ */
@@ -95,7 +95,7 @@ qtcMenuShellButtonPress(GtkWidget *widget, GdkEventButton *event, void *data)
             GList *children =
                 gtk_container_get_children(GTK_CONTAINER(menuShell));
             GList *child = children;
-            gboolean rv = FALSE;
+            gboolean rv = false;
 
             if ((event->x_root - nx) <= 2.0) {
                 event->x_root += 2.0;
@@ -118,16 +118,16 @@ qtcMenuShellButtonPress(GtkWidget *widget, GdkEventButton *event, void *data)
                     if (menuIsSelectable(item)) {
                         if (GDK_BUTTON_PRESS == event->type) {
                             if (item != menuShell->active_menu_item) {
-                                menuShell->active = FALSE;
+                                menuShell->active = false;
                                 gtk_menu_shell_select_item(menuShell, item);
-                                menuShell->active = TRUE;
+                                menuShell->active = true;
                             } else {
-                                menuShell->active = TRUE;
+                                menuShell->active = true;
                                 gtk_menu_shell_deselect(menuShell);
-                                menuShell->active = FALSE;
+                                menuShell->active = false;
                             }
                         }
-                        rv = TRUE;
+                        rv = true;
                     }
                     break;
                 }
@@ -139,7 +139,7 @@ qtcMenuShellButtonPress(GtkWidget *widget, GdkEventButton *event, void *data)
             return rv;
         }
     }
-    return FALSE;
+    return false;
 }
 #endif
 
@@ -166,7 +166,7 @@ qtcMenuShellStyleSet(GtkWidget *widget, GtkStyle *prev_style, void *data)
     QTC_UNUSED(data);
     QTC_UNUSED(prev_style);
     qtcMenuShellCleanup(widget);
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -175,7 +175,7 @@ qtcMenuShellDestroy(GtkWidget *widget, GdkEvent *event, void *data)
     QTC_UNUSED(data);
     QTC_UNUSED(event);
     qtcMenuShellCleanup(widget);
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -218,7 +218,7 @@ qtcMenuShellMotion(GtkWidget *widget, GdkEventMotion *event, void *data)
         }
     }
 
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -253,7 +253,7 @@ qtcMenuShellLeave(GtkWidget *widget, GdkEventCrossing *event, void *data)
             g_list_free(children);
         }
     }
-    return FALSE;
+    return false;
 }
 
 void

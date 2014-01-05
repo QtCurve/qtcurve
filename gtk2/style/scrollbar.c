@@ -41,7 +41,7 @@ qtcScrollbarStyleSet(GtkWidget *widget, GtkStyle *previous_style, void *data)
     QTC_UNUSED(previous_style);
     QTC_UNUSED(data);
     qtcScrollbarCleanup(widget);
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -50,7 +50,7 @@ qtcScrollbarDestroy(GtkWidget *widget, GdkEvent *event, void *data)
     QTC_UNUSED(event);
     QTC_UNUSED(data);
     qtcScrollbarCleanup(widget);
-    return FALSE;
+    return false;
 }
 
 static GtkScrolledWindow*
@@ -78,7 +78,7 @@ qtcScrollbarValueChanged(GtkWidget *widget, GdkEventMotion *event, void *data)
             gtk_widget_queue_draw(GTK_WIDGET(sw));
         }
     }
-    return FALSE;
+    return false;
 }
 
 static void

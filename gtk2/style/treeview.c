@@ -45,7 +45,7 @@ static QtCTreeView * qtcTreeViewLookupHash(void *hash, gboolean create)
         rv = qtcNew(QtCTreeView);
         rv->path=NULL;
         rv->column=NULL;
-        rv->fullWidth=FALSE;
+        rv->fullWidth=false;
         g_hash_table_insert(qtcTreeViewTable, hash, rv);
         rv=g_hash_table_lookup(qtcTreeViewTable, hash);
     }
@@ -57,7 +57,7 @@ static void qtcTreeViewRemoveFromHash(void *hash)
 {
     if(qtcTreeViewTable)
     {
-        QtCTreeView *tv=qtcTreeViewLookupHash(hash, FALSE);
+        QtCTreeView *tv=qtcTreeViewLookupHash(hash, false);
         if(tv)
         {
             if(tv->path)
@@ -101,7 +101,7 @@ qtcTreeViewStyleSet(GtkWidget *widget, GtkStyle *prev_style, void *data)
     QTC_UNUSED(prev_style);
     QTC_UNUSED(data);
     qtcTreeViewCleanup(widget);
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -110,7 +110,7 @@ qtcTreeViewDestroy(GtkWidget *widget, GdkEvent *event, void *data)
     QTC_UNUSED(event);
     QTC_UNUSED(data);
     qtcTreeViewCleanup(widget);
-    return FALSE;
+    return false;
 }
 
 static gboolean qtcTreeViewSamePath(GtkTreePath *a, GtkTreePath *b)
@@ -122,7 +122,7 @@ static void
 qtcTreeViewUpdatePosition(GtkWidget *widget, int x, int y)
 {
     if (GTK_IS_TREE_VIEW(widget)) {
-        QtCTreeView *tv = qtcTreeViewLookupHash(widget, FALSE);
+        QtCTreeView *tv = qtcTreeViewLookupHash(widget, false);
         if (tv) {
             GtkTreeView *treeView = GTK_TREE_VIEW(widget);
             GtkTreePath *path = NULL;
@@ -194,7 +194,7 @@ qtcTreeViewUpdatePosition(GtkWidget *widget, int x, int y)
 
 gboolean qtcTreeViewIsCellHovered(GtkWidget *widget, GtkTreePath *path, GtkTreeViewColumn *column)
 {
-    QtCTreeView *tv=qtcTreeViewLookupHash(widget, FALSE);
+    QtCTreeView *tv=qtcTreeViewLookupHash(widget, false);
     return tv && (tv->fullWidth || tv->column==column) && qtcTreeViewSamePath(path, tv->path);
 }
 
@@ -206,7 +206,7 @@ qtcTreeViewMotion(GtkWidget *widget, GdkEventMotion *event, void *data)
         gtk_tree_view_get_bin_window(GTK_TREE_VIEW(widget)) == event->window) {
         qtcTreeViewUpdatePosition(widget, event->x, event->y);
     }
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -215,7 +215,7 @@ qtcTreeViewLeave(GtkWidget *widget, GdkEventMotion *event, void *data)
     QTC_UNUSED(event);
     QTC_UNUSED(data);
     if (GTK_IS_TREE_VIEW(widget)) {
-        QtCTreeView *tv = qtcTreeViewLookupHash(widget, FALSE);
+        QtCTreeView *tv = qtcTreeViewLookupHash(widget, false);
         if (tv) {
             GtkTreeView *treeView = GTK_TREE_VIEW(widget);
             QtcRect rect = {0, 0, -1, -1 };
@@ -241,7 +241,7 @@ qtcTreeViewLeave(GtkWidget *widget, GdkEventMotion *event, void *data)
                 widget, rect.x, rect.y, rect.width, rect.height);
         }
     }
-    return FALSE;
+    return false;
 }
 
 void
@@ -249,7 +249,7 @@ qtcTreeViewSetup(GtkWidget *widget)
 {
     QTC_DEF_WIDGET_PROPS(props, widget);
     if (widget && !qtcWidgetProps(props)->treeViewHacked) {
-        QtCTreeView *tv = qtcTreeViewLookupHash(widget, TRUE);
+        QtCTreeView *tv = qtcTreeViewLookupHash(widget, true);
         GtkTreeView *treeView = GTK_TREE_VIEW(widget);
         GtkWidget *parent = gtk_widget_get_parent(widget);
 
@@ -257,7 +257,7 @@ qtcTreeViewSetup(GtkWidget *widget)
             qtcWidgetProps(props)->treeViewHacked = true;
             int x, y;
 #if GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
-            tv->fullWidth = TRUE;
+            tv->fullWidth = true;
 #else
             gtk_widget_style_get(widget, "row_ending_details",
                                  &tv->fullWidth, NULL);
@@ -279,9 +279,9 @@ qtcTreeViewSetup(GtkWidget *widget)
         }
 
         if (!gtk_tree_view_get_show_expanders(treeView))
-            gtk_tree_view_set_show_expanders(treeView, TRUE);
+            gtk_tree_view_set_show_expanders(treeView, true);
         if (gtk_tree_view_get_enable_tree_lines(treeView))
-            gtk_tree_view_set_enable_tree_lines(treeView, FALSE);
+            gtk_tree_view_set_enable_tree_lines(treeView, false);
 
         if (GTK_IS_SCROLLED_WINDOW(parent) &&
             gtk_scrolled_window_get_shadow_type(GTK_SCROLLED_WINDOW(parent)) !=
@@ -301,10 +301,10 @@ qtcTreeViewCellIsLeftOfExpanderColumn(GtkTreeView *treeView,
         gtk_tree_view_get_expander_column(treeView);
 
     if (!expanderColumn || column == expanderColumn) {
-        return FALSE;
+        return false;
     } else {
-        gboolean found = FALSE;
-        gboolean isLeft = FALSE;
+        gboolean found = false;
+        gboolean isLeft = false;
 
         // get all columns
         GList *columns = gtk_tree_view_get_columns(treeView);
@@ -316,12 +316,12 @@ qtcTreeViewCellIsLeftOfExpanderColumn(GtkTreeView *treeView,
             GtkTreeViewColumn *childCol = GTK_TREE_VIEW_COLUMN(child->data);
             if (childCol == expanderColumn) {
                 if (found) {
-                    isLeft = TRUE;
+                    isLeft = true;
                 }
             } else if (found) {
                 break;
             } else if (column == childCol) {
-                found = TRUE;
+                found = true;
             }
         }
         if (columns) {

@@ -115,35 +115,35 @@ bool isButtonOnHandlebox(GtkWidget *widget, bool *horiz);
 bool isOnStatusBar(GtkWidget *widget, int level);
 bool isList(GtkWidget *widget);
 bool isListViewHeader(GtkWidget *widget);
-gboolean isEvolutionListViewHeader(GtkWidget *widget, const char *detail);
-gboolean isOnListViewHeader(GtkWidget *w, int level);
-gboolean isPathButton(GtkWidget *widget);
+bool isEvolutionListViewHeader(GtkWidget *widget, const char *detail);
+bool isOnListViewHeader(GtkWidget *w, int level);
+bool isPathButton(GtkWidget *widget);
 GtkWidget *getComboEntry(GtkWidget *widget);
 GtkWidget *getComboButton(GtkWidget *widget);
-gboolean isSideBarBtn(GtkWidget *widget);
-gboolean isComboBoxButton(GtkWidget *widget);
-gboolean isComboBox(GtkWidget *widget);
-gboolean isComboBoxEntry(GtkWidget *widget);
-gboolean isComboBoxEntryButton(GtkWidget *widget);
-gboolean isGimpCombo(GtkWidget *widget);
-gboolean isOnComboEntry(GtkWidget *w, int level);
-gboolean isOnComboBox(GtkWidget *w, int level);
-gboolean isOnCombo(GtkWidget *w, int level);
+bool isSideBarBtn(GtkWidget *widget);
+bool isComboBoxButton(GtkWidget *widget);
+bool isComboBox(GtkWidget *widget);
+bool isComboBoxEntry(GtkWidget *widget);
+bool isComboBoxEntryButton(GtkWidget *widget);
+bool isGimpCombo(GtkWidget *widget);
+bool isOnComboEntry(GtkWidget *w, int level);
+bool isOnComboBox(GtkWidget *w, int level);
+bool isOnCombo(GtkWidget *w, int level);
 #if !GTK_CHECK_VERSION(2, 90, 0)
-gboolean isOnOptionMenu(GtkWidget *w, int level);
-gboolean isActiveOptionMenu(GtkWidget *widget);
+bool isOnOptionMenu(GtkWidget *w, int level);
+bool isActiveOptionMenu(GtkWidget *widget);
 #endif
-gboolean isOnMenuItem(GtkWidget *w, int level);
-gboolean isSpinButton(GtkWidget *widget);
-gboolean isStatusBarFrame(GtkWidget *widget);
-GtkMenuBar * isMenubar(GtkWidget *w, int level);
-gboolean isMenuitem(GtkWidget *w, int level);
+bool isOnMenuItem(GtkWidget *w, int level);
+bool isSpinButton(GtkWidget *widget);
+bool isStatusBarFrame(GtkWidget *widget);
+GtkMenuBar *isMenubar(GtkWidget *w, int level);
+bool isMenuitem(GtkWidget *w, int level);
 #define IS_MENU_ITEM(WIDGET) isMenuitem(WIDGET, 0)
-gboolean isMenuWindow(GtkWidget *w);
+bool isMenuWindow(GtkWidget *w);
 #define IS_GROUP_BOX(W) ((W) && GTK_IS_FRAME((W)) && (NULL!=gtk_frame_get_label(GTK_FRAME((W))) || \
                                                       NULL!=gtk_frame_get_label_widget(GTK_FRAME((W)))))
 
-gboolean isInGroupBox(GtkWidget *w, int level);
+bool isInGroupBox(GtkWidget *w, int level);
 bool isOnButton(GtkWidget *w, int level, bool *def);
 void optionMenuGetProps(GtkWidget *widget, GtkRequisition *indicator_size, GtkBorder *indicator_spacing);
 
@@ -164,38 +164,38 @@ void sanitizeSize(GdkWindow *window, int *width, int *height);
 #endif
 EStepper getStepper(GtkWidget *widget, int x, int y, int width, int height);
 
-int getFill(GtkStateType state, gboolean set, gboolean darker);
+int getFill(GtkStateType state, bool set, bool darker);
 #define getFill(state, set, darker...)                  \
-    getFill(state, set, QTC_DEFAULT(darker, FALSE))
-gboolean isSbarDetail(const char *detail);
-gboolean isHorizontalProgressbar(GtkWidget *widget);
-gboolean isComboBoxPopupWindow(GtkWidget *widget, int level);
-gboolean isComboBoxList(GtkWidget *widget);
-gboolean isComboPopupWindow(GtkWidget *widget, int level);
-gboolean isComboList(GtkWidget *widget);
-gboolean isComboMenu(GtkWidget *widget);
-gboolean isComboFrame(GtkWidget *widget);
-gboolean isGimpDockable(GtkWidget *widget);
+    getFill(state, set, QTC_DEFAULT(darker, false))
+bool isSbarDetail(const char *detail);
+bool isHorizontalProgressbar(GtkWidget *widget);
+bool isComboBoxPopupWindow(GtkWidget *widget, int level);
+bool isComboBoxList(GtkWidget *widget);
+bool isComboPopupWindow(GtkWidget *widget, int level);
+bool isComboList(GtkWidget *widget);
+bool isComboMenu(GtkWidget *widget);
+bool isComboFrame(GtkWidget *widget);
+bool isGimpDockable(GtkWidget *widget);
 #define isMozillaWidget(widget) (isMozilla() && isFixedWidget(widget))
-GdkColor * getParentBgCol(GtkWidget *widget);
+GdkColor *getParentBgCol(GtkWidget *widget);
 int getOpacity(GtkWidget *widget);
 void setLowerEtchCol(cairo_t *cr, GtkWidget *widget);
 GdkColor shadeColor(const GdkColor *orig, double mod);
 gboolean windowEvent(GtkWidget *widget, GdkEvent *event, void *user_data);
-void adjustToolbarButtons(GtkWidget *widget, int *x, int *y, int *width, int *height, int *round, gboolean horiz);
+void adjustToolbarButtons(GtkWidget *widget, int *x, int *y, int *width, int *height, int *round, bool horiz);
 void getEntryParentBgCol(GtkWidget *widget, GdkColor *color);
-gboolean compositingActive(GtkWidget *widget);
-gboolean isRgbaWidget(GtkWidget *widget);
-void enableBlurBehind(GtkWidget *w, gboolean enable);
+bool compositingActive(GtkWidget *widget);
+bool isRgbaWidget(GtkWidget *widget);
+void enableBlurBehind(GtkWidget *w, bool enable);
 void getTopLevelSize(GdkWindow *window, int *w, int *h);
 void getTopLevelOrigin(GdkWindow *window, int *x, int *y);
-gboolean mapToTopLevel(GdkWindow *window, GtkWidget *widget, int *x, int *y, int *w, int *h); //, gboolean frame)
-int getRound(const char *detail, GtkWidget *widget, gboolean rev);
+bool mapToTopLevel(GdkWindow *window, GtkWidget *widget, int *x, int *y, int *w, int *h); //, bool frame)
+int getRound(const char *detail, GtkWidget *widget, bool rev);
 
-gboolean treeViewCellHasChildren(GtkTreeView *treeView, GtkTreePath *path);
-gboolean treeViewCellIsLast(GtkTreeView *treeView, GtkTreePath *path);
-GtkTreePath * treeViewPathParent(GtkTreeView *treeView, GtkTreePath *path);
+bool treeViewCellHasChildren(GtkTreeView *treeView, GtkTreePath *path);
+bool treeViewCellIsLast(GtkTreeView *treeView, GtkTreePath *path);
+GtkTreePath *treeViewPathParent(GtkTreeView *treeView, GtkTreePath *path);
 void generateColors();
-GdkColor * getCheckRadioCol(GtkStyle *style, GtkStateType state, gboolean mnu);
+GdkColor *getCheckRadioCol(GtkStyle *style, GtkStateType state, bool mnu);
 
 #endif

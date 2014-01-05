@@ -82,7 +82,7 @@ qtcWidgetMapStyleSet(GtkWidget *widget, GtkStyle *prev_style, void *data)
     QTC_UNUSED(prev_style);
     QTC_UNUSED(data);
     qtcWidgetMapCleanup(widget);
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -91,7 +91,7 @@ qtcWidgetMapDestroy(GtkWidget *widget, GdkEvent *event, void *user_data)
     QTC_UNUSED(event);
     QTC_UNUSED(user_data);
     qtcWidgetMapCleanup(widget);
-    return FALSE;
+    return false;
 }
 
 void qtcWidgetMapSetup(GtkWidget *from, GtkWidget *to, int map)

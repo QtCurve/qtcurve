@@ -57,7 +57,7 @@ qtcTabLookupHash(void *hash, gboolean create)
 static QtCTab*
 qtcWidgetFindTab(GtkWidget *widget)
 {
-    return GTK_IS_NOTEBOOK(widget) ? qtcTabLookupHash(widget, FALSE) : NULL;
+    return GTK_IS_NOTEBOOK(widget) ? qtcTabLookupHash(widget, false) : NULL;
 }
 
 static void
@@ -123,7 +123,7 @@ qtcTabStyleSet(GtkWidget *widget, GtkStyle *prev_style, void *data)
     QTC_UNUSED(prev_style);
     QTC_UNUSED(data);
     qtcTabCleanup(widget);
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -132,7 +132,7 @@ qtcTabDestroy(GtkWidget *widget, GdkEvent *event, void *data)
     QTC_UNUSED(event);
     QTC_UNUSED(data);
     qtcTabCleanup(widget);
-    return FALSE;
+    return false;
 }
 
 static void
@@ -165,12 +165,12 @@ qtcTabMotion(GtkWidget *widget, GdkEventMotion *event, void *data)
                 tab->rects[t].x + tab->rects[t].width > px &&
                 tab->rects[t].y + tab->rects[t].height > py) {
                 qtcSetHoveredTab(tab, widget, t);
-                return FALSE;
+                return false;
             }
         }
         qtcSetHoveredTab(tab, widget, -1);
     }
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -184,7 +184,7 @@ qtcTabLeave(GtkWidget *widget, GdkEventCrossing *event, void *data)
         prevTab->id = -1;
         gtk_widget_queue_draw(widget);
     }
-    return FALSE;
+    return false;
 }
 
 static void
@@ -209,7 +209,7 @@ static gboolean
 qtcTabChildMotion(GtkWidget *widget, GdkEventMotion *event, void *user_data)
 {
     qtcTabMotion((GtkWidget*)user_data, event, widget);
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -218,7 +218,7 @@ qtcTabChildDestroy(GtkWidget *widget, GdkEventCrossing *event, void *data)
     QTC_UNUSED(event);
     QTC_UNUSED(data);
     qtcTabUnRegisterChild(widget);
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -227,7 +227,7 @@ qtcTabChildStyleSet(GtkWidget *widget, GdkEventCrossing *event, void *data)
     QTC_UNUSED(event);
     QTC_UNUSED(data);
     qtcTabUnRegisterChild(widget);
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -236,7 +236,7 @@ qtcTabChildAdd(GtkWidget *widget, GdkEventCrossing *event, void *data)
     QTC_UNUSED(widget);
     QTC_UNUSED(event);
     qtcTabUpdateChildren((GtkWidget*)data);
-    return FALSE;
+    return false;
 }
 
 static void
@@ -288,7 +288,7 @@ qtcTabPageAdded(GtkWidget *widget, GdkEventCrossing *event, void *data)
     QTC_UNUSED(event);
     QTC_UNUSED(data);
     qtcTabUpdateChildren(widget);
-    return FALSE;
+    return false;
 }
 
 void
@@ -297,7 +297,7 @@ qtcTabSetup(GtkWidget *widget)
     QTC_DEF_WIDGET_PROPS(props, widget);
     if (widget && !qtcWidgetProps(props)->tabHacked) {
         qtcWidgetProps(props)->tabHacked = true;
-        qtcTabLookupHash(widget, TRUE);
+        qtcTabLookupHash(widget, true);
         qtcConnectToProp(props, tabDestroy, "destroy-event",
                          qtcTabDestroy, NULL);
         qtcConnectToProp(props, tabUnrealize, "unrealize", qtcTabDestroy, NULL);
@@ -319,10 +319,10 @@ qtcTabIsLabel(GtkNotebook *notebook, GtkWidget *widget)
     for (int i = 0;i < numPages;++i) {
         if (gtk_notebook_get_tab_label(
                 notebook, gtk_notebook_get_nth_page(notebook, i)) == widget) {
-            return TRUE;
+            return true;
         }
     }
-    return FALSE;
+    return false;
 }
 
 QtcRect
@@ -392,14 +392,14 @@ qtcTabHasVisibleArrows(GtkNotebook *notebook)
                 notebook, gtk_notebook_get_nth_page(notebook, i));
 #if GTK_CHECK_VERSION(2, 20, 0)
             if (label && !gtk_widget_get_mapped(label)) {
-                return TRUE;
+                return true;
             }
 #else
             if (label && !GTK_WIDGET_MAPPED(label)) {
-                return TRUE;
+                return true;
             }
 #endif
         }
     }
-    return FALSE;
+    return false;
 }

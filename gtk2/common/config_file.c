@@ -588,7 +588,7 @@ void qtcLoadBgndImage(QtCImage *img)
         {
             img->pixmap.img=0==img->width
                             ? gdk_pixbuf_new_from_file(determineFileName(img->pixmap.file), NULL)
-                            : gdk_pixbuf_new_from_file_at_scale(determineFileName(img->pixmap.file), img->width, img->height, FALSE, NULL);
+                            : gdk_pixbuf_new_from_file_at_scale(determineFileName(img->pixmap.file), img->width, img->height, false, NULL);
             if(img->pixmap.img && 0==img->width && img->pixmap.img)
             {
                 img->width=gdk_pixbuf_get_width(img->pixmap.img);

@@ -77,7 +77,7 @@ shadowDestroy(GtkWidget *widget, void *data)
         qtcDisconnectFromProp(props, shadowDestroy);
         qtcWidgetProps(props)->shadowSet = false;
     }
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -87,23 +87,23 @@ registerWidget(GtkWidget* widget)
         printf(DEBUG_PREFIX "%s %p\n", __FUNCTION__, widget);
     // check widget
     if (!(widget && GTK_IS_WINDOW(widget)))
-        return FALSE;
+        return false;
 
     QTC_DEF_WIDGET_PROPS(props, widget);
     // make sure that widget is not already registered
     if (qtcWidgetProps(props)->shadowSet)
-        return FALSE;
+        return false;
 
     // check if window is accepted
     if (!acceptWidget(widget))
-        return FALSE;
+        return false;
 
     // try install shadows
     installX11Shadows(widget);
 
     qtcWidgetProps(props)->shadowSet = true;
     qtcConnectToProp(props, shadowDestroy, "destroy", shadowDestroy, NULL);
-    return TRUE;
+    return true;
 }
 
 static gboolean
@@ -119,9 +119,9 @@ realizeHook(GSignalInvocationHint *sih, unsigned x,
         printf(DEBUG_PREFIX "%s %p\n", __FUNCTION__, widget);
 
     if (!GTK_IS_WIDGET(widget))
-        return FALSE;
+        return false;
     registerWidget(widget);
-    return TRUE;
+    return true;
 }
 
 void qtcShadowInitialize()

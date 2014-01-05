@@ -53,7 +53,7 @@ qtcEntryStyleSet(GtkWidget *widget, GtkStyle *previous_style, void *data)
     QTC_UNUSED(previous_style);
     QTC_UNUSED(data);
     qtcEntryCleanup(widget);
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -62,7 +62,7 @@ qtcEntryDestroy(GtkWidget *widget, GdkEvent *event, void *data)
     QTC_UNUSED(event);
     QTC_UNUSED(data);
     qtcEntryCleanup(widget);
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -74,7 +74,7 @@ qtcEntryEnter(GtkWidget *widget, GdkEventCrossing *event, void *data)
         qtcEntryLastMo = widget;
         gtk_widget_queue_draw(widget);
     }
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -86,7 +86,7 @@ qtcEntryLeave(GtkWidget *widget, GdkEventCrossing *event, void *data)
         qtcEntryLastMo = NULL;
         gtk_widget_queue_draw(widget);
     }
-    return FALSE;
+    return false;
 }
 
 void

@@ -177,7 +177,7 @@ qtcAnimationUpdateInfo(void *key, void *value, void *user_data)
 
     /* remove the widget from the hash table if it is not drawable */
     if (!gtk_widget_is_drawable(widget)) {
-        return TRUE;
+        return true;
     }
 
     if (GTK_IS_PROGRESS_BAR(widget)) {
@@ -185,14 +185,14 @@ qtcAnimationUpdateInfo(void *key, void *value, void *user_data)
             gtk_progress_bar_get_fraction(GTK_PROGRESS_BAR(widget));
         /* stop animation for filled/not filled progress bars */
         if (fraction <= 0.0 || fraction >= 1.0) {
-            return TRUE;
+            return true;
         }
     } else if (GTK_IS_ENTRY(widget)) {
         float fraction = gtk_entry_get_progress_fraction(GTK_ENTRY(widget));
 
         /* stop animation for filled/not filled progress bars */
         if (fraction <= 0.0 || fraction >= 1.0) {
-            return TRUE;
+            return true;
         }
     }
 
@@ -202,9 +202,9 @@ qtcAnimationUpdateInfo(void *key, void *value, void *user_data)
     if (animation_info->stop_time != 0 &&
         g_timer_elapsed(animation_info->timer,
                         NULL) > animation_info->stop_time) {
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }
 
 /* This gets called by the glib main loop every once in a while. */
@@ -220,9 +220,9 @@ qtcAnimationTimeoutHandler(void *data)
 
     if (g_hash_table_size(animated_widgets) == 0) {
         qtcAnimationStopTimer();
-        return FALSE;
+        return false;
     }
-    return TRUE;
+    return true;
 }
 
 #if 0
@@ -318,7 +318,7 @@ qtcAnimationConnectCheckbox(GtkWidget *widget)
     }
 }
 
-/* returns TRUE if the widget is animated, and FALSE otherwise */
+/* returns true if the widget is animated, and false otherwise */
 static bool
 qtcAnimationIsAnimated(GtkWidget *widget)
 {

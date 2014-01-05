@@ -50,7 +50,7 @@ qtcScrolledWindowStyleSet(GtkWidget *widget, GtkStyle *prev, void *data)
     QTC_UNUSED(prev);
     QTC_UNUSED(data);
     qtcScrolledWindowCleanup(widget);
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -59,7 +59,7 @@ qtcScrolledWindowDestroy(GtkWidget *widget, GdkEvent *event, void *data)
     QTC_UNUSED(event);
     QTC_UNUSED(data);
     qtcScrolledWindowCleanup(widget);
-    return FALSE;
+    return false;
 }
 
 static GtkWidget *qtcScrolledWindowFocus = NULL;
@@ -84,7 +84,7 @@ qtcScrolledWindowEnter(GtkWidget *widget, GdkEventMotion *event, void *data)
         qtcScrolledWindowHover = w;
         gtk_widget_queue_draw(w);
     }
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -96,7 +96,7 @@ qtcScrolledWindowLeave(GtkWidget *widget, GdkEventMotion *event, void *data)
         qtcScrolledWindowHover = NULL;
         gtk_widget_queue_draw(w);
     }
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -108,7 +108,7 @@ qtcScrolledWindowFocusIn(GtkWidget *widget, GdkEventMotion *e, void *data)
         qtcScrolledWindowFocus = w;
         gtk_widget_queue_draw(w);
     }
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -120,7 +120,7 @@ qtcScrolledWindowFocusOut(GtkWidget *widget, GdkEventMotion *e, void *data)
         qtcScrolledWindowFocus = NULL;
         gtk_widget_queue_draw(w);
     }
-    return FALSE;
+    return false;
 }
 
 static void

@@ -54,7 +54,7 @@ qtcWMMoveBtnReleaseHook(GSignalInvocationHint *a, unsigned b,
     QTC_UNUSED(d);
     if (qtcWMMoveDragWidget)
         qtcWMMoveDragEnd();
-    return TRUE;
+    return true;
 }
 
 static void
@@ -143,7 +143,7 @@ static gboolean qtcWMMoveWithinWidget(GtkWidget *widget, GdkEventButton *event)
         return allocation.x<=event->x_root && allocation.y<=event->y_root &&
             (allocation.x+allocation.width)>event->x_root &&(allocation.y+allocation.height)>event->y_root;
     }
-    return TRUE;
+    return true;
 }
 
 static gboolean qtcWMMoveIsBlackListed(GObject *object)
@@ -154,16 +154,16 @@ static gboolean qtcWMMoveIsBlackListed(GObject *object)
 
     for (int i = 0;widgets[i];i++) {
         if (objectIsA(object, widgets[i])) {
-            return TRUE;
+            return true;
         }
     }
-    return FALSE;
+    return false;
 }
 
 static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *event, gboolean inNoteBook)
 {
     // accept, by default
-    gboolean usable = TRUE;
+    gboolean usable = true;
 
     // get children and check
     GList *children = gtk_container_get_children(GTK_CONTAINER(widget)),
@@ -182,7 +182,7 @@ static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *eve
             {
                 // if widget is prelight, we don't need to check where event happen,
                 // any prelight widget indicate we can't do a move
-                usable = FALSE;
+                usable = false;
                 continue;
             }
 
@@ -223,16 +223,16 @@ static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *eve
 static gboolean qtcWMMoveUseEvent(GtkWidget *widget, GdkEventButton *event)
 {
     if(qtcWMMoveLastRejectedEvent && qtcWMMoveLastRejectedEvent==event)
-        return FALSE;
+        return false;
 
     if(!GTK_IS_CONTAINER(widget))
-        return TRUE;
+        return true;
 
     // if widget is a notebook, accept if there is no hovered tab
     if(GTK_IS_NOTEBOOK(widget))
-        return !qtcTabHasVisibleArrows(GTK_NOTEBOOK(widget)) && -1==qtcTabCurrentHoveredIndex(widget) && qtcWMMoveChildrenUseEvent(widget, event, FALSE);
+        return !qtcTabHasVisibleArrows(GTK_NOTEBOOK(widget)) && -1==qtcTabCurrentHoveredIndex(widget) && qtcWMMoveChildrenUseEvent(widget, event, false);
     else
-        return qtcWMMoveChildrenUseEvent(widget, event, FALSE);
+        return qtcWMMoveChildrenUseEvent(widget, event, false);
 }
 
 static gboolean
@@ -244,7 +244,7 @@ qtcWWMoveStartDelayedDrag(void *data)
         qtcWMMoveTrigger(qtcWMMoveDragWidget, qtcWMMoveLastX, qtcWMMoveLastY);
         gdk_threads_leave();
     }
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -256,10 +256,10 @@ qtcWMMoveIsWindowDragWidget(GtkWidget *widget, GdkEventButton *event)
         // Start timer
         qtcWMMoveStopTimer();
         qtcWMMoveTimer=g_timeout_add(qtSettings.startDragTime, (GSourceFunc)qtcWWMoveStartDelayedDrag, NULL);
-        return TRUE;
+        return true;
     }
     qtcWMMoveLastRejectedEvent=event;
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -269,9 +269,9 @@ qtcWMMoveButtonPress(GtkWidget *widget, GdkEventButton *event, void *data)
     if (GDK_BUTTON_PRESS == event->type && 1 == event->button &&
         qtcWMMoveIsWindowDragWidget(widget, event)) {
         qtcWMMoveDragWidget = widget;
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }
 
 static gboolean qtcWMMoveDragEnd()
@@ -281,10 +281,10 @@ static gboolean qtcWMMoveDragEnd()
         //gtk_grab_remove(widget);
         gdk_pointer_ungrab(CurrentTime);
         qtcWMMoveReset();
-        return TRUE;
+        return true;
     }
 
-    return FALSE;
+    return false;
 }
 
 static void qtcWMMoveCleanup(GtkWidget *widget)
@@ -308,7 +308,7 @@ qtcWMMoveStyleSet(GtkWidget *widget, GtkStyle *previous_style, void *data)
     QTC_UNUSED(previous_style);
     QTC_UNUSED(data);
     qtcWMMoveCleanup(widget);
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -317,7 +317,7 @@ qtcWMMoveDestroy(GtkWidget *widget, GdkEvent *event, void *data)
     QTC_UNUSED(event);
     QTC_UNUSED(data);
     qtcWMMoveCleanup(widget);
-    return FALSE;
+    return false;
 }
 
 static gboolean
@@ -333,11 +333,11 @@ qtcWMMoveMotion(GtkWidget *widget, GdkEventMotion *event, void *data)
             qtcWMMoveStopTimer();
 
         /* if (distance < qtSettings.startDragDist) */
-        /*     return FALSE; */
+        /*     return false; */
         qtcWMMoveTrigger(widget, event->x_root, event->y_root);
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }
 
 static gboolean

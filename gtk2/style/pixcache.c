@@ -37,7 +37,7 @@ static GdkPixbuf*
 getBlankPixbuf()
 {
     if (!_blankPixbuf) {
-        _blankPixbuf = gdk_pixbuf_new_from_inline(-1, blank16x16, TRUE, NULL);
+        _blankPixbuf = gdk_pixbuf_new_from_inline(-1, blank16x16, true, NULL);
     }
     return _blankPixbuf;
 }
@@ -92,7 +92,7 @@ static GdkPixbuf*
 pixbufCacheValueNew(const QtcPixKey *key)
 {
     GdkPixbuf *res = gdk_pixbuf_new_from_inline(-1, opts.xCheck ? check_x_on :
-                                                check_on, TRUE, NULL);
+                                                check_on, true, NULL);
     qtcAdjustPix(gdk_pixbuf_get_pixels(res), gdk_pixbuf_get_n_channels(res),
                  gdk_pixbuf_get_width(res), gdk_pixbuf_get_height(res),
                  gdk_pixbuf_get_rowstride(res),
