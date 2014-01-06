@@ -1140,7 +1140,8 @@ Style::drawPrimitiveButton(PrimitiveElement element, const QStyleOption *option,
     }
 
     isDefault = (isDefault ||
-                 (doEtch && FULL_FOCUS && MO_GLOW == opts.coloredMouseOver &&
+                 (doEtch && qtcOneOf(opts.focus, FOCUS_FULL, FOCUS_FILLED) &&
+                  opts.coloredMouseOver == MO_GLOW &&
                   opt.state & State_HasFocus && opt.state & State_Enabled));
     if (isFlat && !isDown && !(opt.state & State_MouseOver)) {
         return true;
@@ -1466,7 +1467,9 @@ Style::drawPrimitiveFrameFocusRect(PrimitiveElement element,
                                   square ? SLIGHT_INNER_RADIUS :
                                   qtcGetRadius(&opts, r2.width(),
                                                r2.height(), WIDGET_OTHER,
-                                               FULL_FOCUS ? RADIUS_EXTERNAL :
+                                               qtcOneOf(opts.focus, FOCUS_FULL,
+                                                        FOCUS_FILLED) ?
+                                               RADIUS_EXTERNAL :
                                                RADIUS_SELECTION)));
                 } else {
                     drawRect(painter, r2);

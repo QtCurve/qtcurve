@@ -591,8 +591,7 @@ typedef enum
     For menubars, we dont blend - so blend is selected, and selected is darken
     For check/radios - we dont blend, so blend is selected, and we dont allow darken
 */
-typedef enum
-{
+typedef enum {
     SHADE_NONE,
     SHADE_CUSTOM,
     SHADE_SELECTED,
@@ -601,15 +600,13 @@ typedef enum
     SHADE_WINDOW_BORDER
 } EShade;
 
-typedef enum
-{
+typedef enum {
     ECOLOR_BASE,
     ECOLOR_BACKGROUND,
     ECOLOR_DARK,
 } EColor;
 
-typedef enum
-{
+typedef enum {
     ROUND_NONE,
     ROUND_SLIGHT,
     ROUND_FULL,
@@ -617,16 +614,14 @@ typedef enum
     ROUND_MAX
 } ERound;
 
-typedef enum
-{
-    GB_LBL_BOLD     = 0x01,
-    GB_LBL_CENTRED  = 0x02,
-    GB_LBL_INSIDE   = 0x04,
-    GB_LBL_OUTSIDE  = 0x08
+typedef enum {
+    GB_LBL_BOLD = 0x01,
+    GB_LBL_CENTRED = 0x02,
+    GB_LBL_INSIDE = 0x04,
+    GB_LBL_OUTSIDE = 0x08
 } EGBLabel;
 
-typedef enum
-{
+typedef enum {
     MO_NONE,
     MO_COLORED,
     MO_COLORED_THICK,
@@ -634,8 +629,7 @@ typedef enum
     MO_GLOW
 } EMouseOver;
 
-typedef enum
-{
+typedef enum {
     STRIPE_NONE,
     STRIPE_PLAIN,
     STRIPE_DIAGONAL,
@@ -660,28 +654,23 @@ typedef enum {
     FOCUS_GLOW
 } EFocus;
 
-typedef enum
-{
+typedef enum {
     TAB_MO_TOP,
     TAB_MO_BOTTOM,
     TAB_MO_GLOW
 } ETabMo;
 
-typedef enum
-{
+typedef enum {
     GT_HORIZ,
     GT_VERT
 } EGradType;
 
-typedef enum
-{
+typedef enum {
     GLOW_NONE,
     GLOW_START,
     GLOW_MIDDLE,
     GLOW_END
 } EGlow;
-
-#define FULL_FOCUS qtcOneOf(opts.focus, FOCUS_FULL, FOCUS_FILLED)
 
 enum
 {

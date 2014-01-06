@@ -4748,7 +4748,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                             painter->setRenderHint(QPainter::Antialiasing, true);
                             painter->drawPath(buildPath(r2, WIDGET_SELECTION, ROUNDED_ALL,
                                                         square ? SLIGHT_INNER_RADIUS : qtcGetRadius(&opts, r2.width(), r2.height(), WIDGET_OTHER,
-                                                                                                 FULL_FOCUS ? RADIUS_EXTERNAL : RADIUS_SELECTION)));
+                                                                                                    qtcOneOf(opts.focus, FOCUS_FULL, FOCUS_FILLED) ? RADIUS_EXTERNAL : RADIUS_SELECTION)));
                         }
                         else
                             drawRect(painter, r2);
@@ -4803,8 +4803,11 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             if(!(opt.state&State_AutoRaise))
                 opt.state|=State_Raised;
 
-            isDefault=isDefault || (doEtch && FULL_FOCUS && MO_GLOW==opts.coloredMouseOver &&
-                                    opt.state&State_HasFocus && opt.state&State_Enabled);
+            isDefault = (isDefault ||
+                         (doEtch && opts.coloredMouseOver == MO_GLOW &&
+                          qtcOneOf(opts.focus, FOCUS_FULL, FOCUS_FILLED) &&
+                          opt.state & State_HasFocus &&
+                          opt.state & State_Enabled));
             if(isFlat && !isDown && !(opt.state&State_MouseOver))
                 return;
 
@@ -6320,12 +6323,14 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                 subopt.rect = subElementRect(SE_PushButtonContents, btn, widget);
                 drawControl(CE_PushButtonLabel, &subopt, painter, widget);
 
-                if (state&State_HasFocus &&
-                    !(state&State_MouseOver && FULL_FOCUS && MO_NONE!=opts.coloredMouseOver))
-                {
+                if (state & State_HasFocus &&
+                    !(state & State_MouseOver &&
+                      qtcOneOf(opts.focus, FOCUS_FULL, FOCUS_FILLED) &&
+                      opts.coloredMouseOver != MO_NONE)) {
                     QStyleOptionFocusRect fropt;
                     fropt.QStyleOption::operator=(*btn);
-                    fropt.rect = subElementRect(SE_PushButtonFocusRect, btn, widget);
+                    fropt.rect = subElementRect(SE_PushButtonFocusRect, btn,
+                                                widget);
                     drawPrimitive(PE_FrameFocusRect, &fropt, painter, widget);
                 }
             }
@@ -7904,20 +7909,18 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                     QStyleOptionFocusRect fr;
 
                     fr.QStyleOption::operator=(*toolbutton);
-                    if(FULL_FOCUS)
-                    {
-                        if(etched)
+                    if (qtcOneOf(opts.focus, FOCUS_FULL, FOCUS_FILLED)) {
+                        if (etched) {
                             fr.rect.adjust(1, 1, -1, -1);
-                    }
-                    else
-                    {
-                        if(FOCUS_GLOW==opts.focus)
+                        }
+                    } else {
+                        if (opts.focus == FOCUS_GLOW) {
                             fr.rect.adjust(1, 1, -1, -1);
-                        else if(etched)
+                        } else if (etched) {
                             fr.rect.adjust(4, 4, -4, -4);
-                        else
+                        } else {
                             fr.rect.adjust(3, 3, -3, -3);
-
+                        }
                         if (toolbutton->features &
                             QStyleOptionToolButton::MenuButtonPopup) {
                             fr.rect.adjust(
@@ -7926,8 +7929,11 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                                             toolbutton, widget) - 1), 0);
                         }
                     }
-                    if(!(state&State_MouseOver && FULL_FOCUS && MO_NONE!=opts.coloredMouseOver))
+                    if (!(state & State_MouseOver &&
+                          qtcOneOf(opts.focus, FOCUS_FULL, FOCUS_FILLED) &&
+                          opts.coloredMouseOver != MO_NONE)) {
                         drawPrimitive(PE_FrameFocusRect, &fr, painter, widget);
+                    }
                 }
                 QStyleOptionToolButton label = *toolbutton;
                 int fw = pixelMetric(PM_DefaultFrameWidth, option, widget);
@@ -9075,9 +9081,14 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                              field(subControlRect(CC_ComboBox, option, SC_ComboBoxEditField, widget));
                 const QColor *use(buttonColors(option));
                 bool         sunken(state&State_On), // comboBox->listBox() ? comboBox->listBox()->isShown() : false),
-                             glowOverFocus(state&State_MouseOver && FULL_FOCUS &&
-                                           MO_GLOW==opts.coloredMouseOver && opts.buttonEffect != EFFECT_NONE && !sunken && !comboBox->editable &&
-                                           state&State_Enabled && state&State_HasFocus),
+                             glowOverFocus(state & State_MouseOver &&
+                                           qtcOneOf(opts.focus, FOCUS_FULL,
+                                                    FOCUS_FILLED) &&
+                                           MO_GLOW == opts.coloredMouseOver &&
+                                           opts.buttonEffect != EFFECT_NONE &&
+                                           !sunken && !comboBox->editable &&
+                                           state & State_Enabled &&
+                                           state & State_HasFocus),
                              doEffect(opts.buttonEffect != EFFECT_NONE &&
                                       (!comboBox->editable || opts.etchEntry)),
                              isOO(isOOWidget(widget)),
@@ -9101,22 +9112,26 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                 {
                     bool glowFocus(state&State_HasFocus && state&State_Enabled && USE_GLOW_FOCUS(state&State_MouseOver));
 
-                    if(!glowOverFocus && !(opts.thin&THIN_FRAMES) && !sunken && MO_GLOW==opts.coloredMouseOver &&
-                        (((FULL_FOCUS || glowFocus) && state&State_HasFocus) || state&State_MouseOver) &&
-                       state&State_Enabled && !comboBox->editable)
-                        drawGlow(painter, r, FULL_FOCUS && state&State_HasFocus ? WIDGET_DEF_BUTTON : WIDGET_COMBO,
-                                 glowFocus ? m_focusCols : 0L);
-                    else
+                    if (!glowOverFocus && !(opts.thin & THIN_FRAMES) &&
+                        !sunken && opts.coloredMouseOver == MO_GLOW &&
+                        (((qtcOneOf(opts.focus, FOCUS_FULL, FOCUS_FILLED) ||
+                           glowFocus) && state & State_HasFocus) ||
+                         state & State_MouseOver) &&
+                        state & State_Enabled && !comboBox->editable) {
+                        drawGlow(painter, r,
+                                 qtcOneOf(opts.focus, FOCUS_FULL,
+                                          FOCUS_FILLED) &&
+                                 state & State_HasFocus ? WIDGET_DEF_BUTTON :
+                                 WIDGET_COMBO, glowFocus ? m_focusCols : 0L);
+                    } else {
                         drawEtch(painter, r, widget, WIDGET_COMBO,
-                                 !comboBox->editable && EFFECT_SHADOW==opts.buttonEffect && !sunken,
-                                 comboBox->editable && opts.square&SQUARE_ENTRY
-                                    ? opts.unifyCombo
-                                        ? ROUNDED_NONE
-                                        : reverse
-                                            ? ROUNDED_LEFT
-                                            : ROUNDED_RIGHT
-                                    : ROUNDED_ALL);
-
+                                 !comboBox->editable &&
+                                 opts.buttonEffect == EFFECT_SHADOW && !sunken,
+                                 comboBox->editable && opts.square &
+                                 SQUARE_ENTRY ? opts.unifyCombo ? ROUNDED_NONE :
+                                 reverse ? ROUNDED_LEFT :
+                                 ROUNDED_RIGHT : ROUNDED_ALL);
+                    }
                     frame.adjust(1, 1, -1, -1);
                 }
 
@@ -9231,22 +9246,19 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                          widget->rect().height() <
                          (opts.buttonEffect != EFFECT_NONE ? 22 : 20));
 
-                    if(FULL_FOCUS)
-                        focus.rect=frame;
-                    else if(opts.comboSplitter)
-                    {
-                        focus.rect=reverse
-                                    ? field.adjusted(0, -1, 1, 1)
-                                    : field.adjusted(-1, -1, 0, 1);
-
-                        if(listViewCombo)
+                    if (qtcOneOf(opts.focus, FOCUS_FULL, FOCUS_FILLED)) {
+                        focus.rect = frame;
+                    } else if (opts.comboSplitter) {
+                        focus.rect = (reverse ? field.adjusted(0, -1, 1, 1) :
+                                      field.adjusted(-1, -1, 0, 1));
+                        if (listViewCombo) {
                             focus.rect.adjust(0, -2, 0, 2);
+                        }
+                    } else if (listViewCombo) {
+                        focus.rect = frame.adjusted(1, 1, -1, -1);
+                    } else {
+                        focus.rect = frame.adjusted(3, 3, -3, -3);
                     }
-                    else if(listViewCombo)
-                        focus.rect=frame.adjusted(1, 1, -1, -1);
-                    else
-                        focus.rect=frame.adjusted(3, 3, -3, -3);
-
                     // Draw glow over top of filled focus
                     if(glowOverFocus && !(opts.thin&THIN_FRAMES))
                         drawGlow(painter, frame.adjusted(-1, -1, 1, 1), WIDGET_COMBO);
@@ -9686,7 +9698,7 @@ QRect Style::subElementRect(SubElement element, const QStyleOption *option, cons
 //                     rect.setTop(rect.top() + 2);    // eat the top margin a little bit
             break;
         case SE_PushButtonFocusRect:
-            if (FULL_FOCUS) {
+            if (qtcOneOf(opts.focus, FOCUS_FULL, FOCUS_FILLED)) {
                 rect = subElementRect(SE_PushButtonContents, option, widget);
                 if (opts.buttonEffect != EFFECT_NONE) {
                     rect.adjust(-1, -1, 1, 1);
