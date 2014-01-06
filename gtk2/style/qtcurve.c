@@ -918,7 +918,8 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
         {
             /* Yuck this is a horrible mess!!!!! */
             bool glowFocus = (widget && gtk_widget_has_focus(widget) &&
-                              opts.coloredMouseOver == MO_GLOW && FULL_FOCUS);
+                              opts.coloredMouseOver == MO_GLOW &&
+                              qtcOneOf(opts.focus, FOCUS_FULL, FOCUS_FILLED));
             EWidget widgetType=isComboBoxButton(widget)
                                 ? WIDGET_COMBO_BUTTON
                                 : slider
@@ -2564,7 +2565,8 @@ gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
     gboolean toolbarBtn = (!listViewHeader && !view &&
                            isButtonOnToolbar(widget, NULL));
 
-    if (opts.comboSplitter && !FULL_FOCUS && isComboBox(widget)) {
+    if (opts.comboSplitter &&
+        qtcNoneOf(opts.focus, FOCUS_FULL, FOCUS_FILLED) && isComboBox(widget)) {
         /* x++; */
         /* y++; */
         /* height -= 2; */
@@ -2585,7 +2587,8 @@ gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
     }
 #if !GTK_CHECK_VERSION(2, 90, 0)
     else if (GTK_IS_OPTION_MENU(widget)) {
-        if ((!opts.comboSplitter || FULL_FOCUS) && widget) {
+        if ((!opts.comboSplitter ||
+             qtcOneOf(opts.focus, FOCUS_FULL, FOCUS_FILLED)) && widget) {
             QtcRect alloc = qtcWidgetGetAllocation(widget);
             if (alloc.width > width) {
                 width = alloc.width - (doEtch ? 8 : 4);
@@ -2662,7 +2665,7 @@ gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
             else {
                 if (opts.focus == FOCUS_LINE) {
                     height--;
-                } else if (FULL_FOCUS) {
+                } else if (qtcOneOf(opts.focus, FOCUS_FULL, FOCUS_FILLED)) {
                     y--;
                     x -= 3;
                     width += 6;
@@ -2696,8 +2699,8 @@ gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
             btn = true;
         }
     }
-    if (state == GTK_STATE_PRELIGHT && FULL_FOCUS &&
-        opts.coloredMouseOver != MO_NONE && !listViewHeader &&
+    if (state == GTK_STATE_PRELIGHT && opts.coloredMouseOver != MO_NONE &&
+        qtcOneOf(opts.focus, FOCUS_FULL, FOCUS_FILLED) && !listViewHeader &&
         (btn || comboButton)) {
         return;
     }
@@ -2770,7 +2773,7 @@ gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 width -= 2;
                 height -= 3;
             }
-            if (FULL_FOCUS) {
+            if (qtcOneOf(opts.focus, FOCUS_FULL, FOCUS_FILLED)) {
                 if (btn) {
                     if (toolbarBtn) {
                         x -= 2;
@@ -2818,9 +2821,12 @@ gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
                                    opts.square & SQUARE_LISTVIEW_SELECTION) &&
                                   opts.round != ROUND_NONE ? SLIGHT_INNER_RADIUS :
                                   qtcGetRadius(&opts, width, height, WIDGET_OTHER,
-                                               FULL_FOCUS ? RADIUS_EXTERNAL :
+                                               qtcOneOf(opts.focus, FOCUS_FULL,
+                                                        FOCUS_FILLED) ?
+                                               RADIUS_EXTERNAL :
                                                RADIUS_SELECTION),
-                                  FULL_FOCUS && comboButton ?
+                                  qtcOneOf(opts.focus, FOCUS_FULL,
+                                           FOCUS_FILLED) && comboButton ?
                                   (rev ? ROUNDED_LEFT : ROUNDED_RIGHT) :
                                   ROUNDED_ALL);
             } else {

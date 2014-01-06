@@ -551,8 +551,6 @@ typedef enum {
     GLOW_END
 } EGlow;
 
-#define FULL_FOCUS qtcOneOf(opts.focus, FOCUS_FULL, FOCUS_FILLED)
-
 enum
 {
     HIDE_NONE     = 0x00,
