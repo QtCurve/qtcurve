@@ -34,7 +34,7 @@ qtcScrolledWindowCleanup(GtkWidget *widget)
         qtcDisconnectFromProp(props, scrolledWindowDestroy);
         qtcDisconnectFromProp(props, scrolledWindowUnrealize);
         qtcDisconnectFromProp(props, scrolledWindowStyleSet);
-        if (ENTRY_MO) {
+        if (opts.unifyCombo && opts.unifySpin) {
             qtcDisconnectFromProp(props, scrolledWindowEnter);
             qtcDisconnectFromProp(props, scrolledWindowLeave);
         }
@@ -137,7 +137,7 @@ qtcScrolledWindowSetupConnections(GtkWidget *widget, GtkWidget *parent)
                          "unrealize", qtcScrolledWindowDestroy, parent);
         qtcConnectToProp(props, scrolledWindowStyleSet,
                          "style-set", qtcScrolledWindowStyleSet, parent);
-        if (ENTRY_MO) {
+        if (opts.unifyCombo && opts.unifySpin) {
             qtcConnectToProp(props, scrolledWindowEnter, "enter-notify-event",
                              qtcScrolledWindowEnter, parent);
             qtcConnectToProp(props, scrolledWindowLeave, "leave-notify-event",
@@ -147,7 +147,7 @@ qtcScrolledWindowSetupConnections(GtkWidget *widget, GtkWidget *parent)
                          qtcScrolledWindowFocusIn, parent);
         qtcConnectToProp(props, scrolledWindowFocusOut, "focus-out-event",
                          qtcScrolledWindowFocusOut, parent);
-        if (parent && ENTRY_MO) {
+        if (parent && opts.unifyCombo && opts.unifySpin) {
             int x, y;
             QtcRect alloc = qtcWidgetGetAllocation(parent);
 

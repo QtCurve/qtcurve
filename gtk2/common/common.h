@@ -229,7 +229,7 @@ enum {
 #define SLIDER_MO_PLASTIK_BORDER (SHADE_SELECTED==opts.shadeSliders || SHADE_BLEND_SELECTED==opts.shadeSliders ? 2 : 1)
 #define SLIDER_MO_LEN    (SLIDER_TRIANGULAR==opts.sliderStyle ? 2 : (SHADE_SELECTED==opts.shadeSliders || SHADE_BLEND_SELECTED==opts.shadeSliders ? 4 : 3))
 #define SB_SLIDER_MO_LEN(A)                                             \
-    ((A) < 22 && !FULLLY_ROUNDED ? 2 :                                  \
+    ((A) < 22 && !(opts.round >= ROUND_FULL) ? 2 :                      \
      ((A) < 32 || qtcNoneOf(opts.shadeSliders, SHADE_SELECTED,          \
                             SHADE_BLEND_SELECTED) ? 4 : 6))
 
@@ -242,13 +242,6 @@ enum {
     (opts.coloredMouseOver == MO_GLOW ? 1 : MO_PLASTIK_DARK(W))
 #define MO_STD_LIGHT(W, S)                                              \
     (opts.coloredMouseOver == MO_GLOW ? 1 : MO_PLASTIK_LIGHT(W))
-
-#define FULLLY_ROUNDED     (opts.round>=ROUND_FULL)
-#define SLIDER_GLOW        (opts.buttonEffect != EFFECT_NONE && \
-                            MO_GLOW == opts.coloredMouseOver ? 2 : 0)
-
-#define ENTRY_MO (opts.unifyCombo && opts.unifySpin)
-
 
 #define FOCUS_ALPHA              0.08
 #define FOCUS_GLOW_LINE_ALPHA    0.5
@@ -528,8 +521,7 @@ typedef enum
     STRIPE_FADE
 } EStripe;
 
-typedef enum
-{
+typedef enum {
     SLIDER_PLAIN,
     SLIDER_ROUND,
     SLIDER_PLAIN_ROTATED,
@@ -538,11 +530,7 @@ typedef enum
     SLIDER_CIRCULAR
 } ESliderStyle;
 
-#define ROTATED_SLIDER                                                  \
-    qtcOneOf(opts.sliderStyle, SLIDER_PLAIN_ROTATED, SLIDER_ROUND_ROTATED)
-
-typedef enum
-{
+typedef enum {
     FOCUS_STANDARD,
     FOCUS_RECTANGLE,
     FOCUS_FULL,

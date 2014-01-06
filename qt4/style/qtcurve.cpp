@@ -3032,18 +3032,32 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
             // See https://github.com/QtCurve/qtcurve-qt4/issues/7
             // and https://bugs.kde.org/show_bug.cgi?id=317690
             return qtcMax(opts.sliderWidth, 20) + 1;
-        case PM_SliderThickness:
-            return (SLIDER_CIRCULAR==opts.sliderStyle
-                        ? CIRCULAR_SLIDER_SIZE+6
-                        : SLIDER_TRIANGULAR==opts.sliderStyle
-                            ? 19
-                            : (SLIDER_SIZE+(ROTATED_SLIDER ? 11 : 6)))+SLIDER_GLOW;
-        case PM_SliderControlThickness:
-            return (SLIDER_CIRCULAR==opts.sliderStyle
-                        ? CIRCULAR_SLIDER_SIZE
-                        : SLIDER_TRIANGULAR==opts.sliderStyle
-                            ? 11
-                            : (SLIDER_SIZE+(ROTATED_SLIDER ? 6 : -2)))+SLIDER_GLOW;
+        case PM_SliderThickness: {
+            int glowSize = (opts.buttonEffect != EFFECT_NONE &&
+                            opts.coloredMouseOver == MO_GLOW ? 2 : 0);
+            if (opts.sliderStyle == SLIDER_CIRCULAR) {
+                return CIRCULAR_SLIDER_SIZE + 6 + glowSize;
+            } else if (opts.sliderStyle == SLIDER_TRIANGULAR) {
+                return 19 + glowSize;
+            } else {
+                return (SLIDER_SIZE + glowSize +
+                        (qtcOneOf(opts.sliderStyle, SLIDER_PLAIN_ROTATED,
+                                  SLIDER_ROUND_ROTATED) ? 11 : 6));
+            }
+        }
+        case PM_SliderControlThickness: {
+            int glowSize = (opts.buttonEffect != EFFECT_NONE &&
+                            opts.coloredMouseOver == MO_GLOW ? 2 : 0);
+            if (opts.sliderStyle == SLIDER_CIRCULAR) {
+                return CIRCULAR_SLIDER_SIZE + glowSize;
+            } else if (opts.sliderStyle == SLIDER_TRIANGULAR) {
+                return 11 + glowSize;
+            } else {
+                return (SLIDER_SIZE + glowSize +
+                        (qtcOneOf(opts.sliderStyle, SLIDER_PLAIN_ROTATED,
+                                  SLIDER_ROUND_ROTATED) ? 6 : -2));
+            }
+        }
         case PM_SliderTickmarkOffset:
             return SLIDER_TRIANGULAR==opts.sliderStyle ? 5 : 4;
         case PM_SliderSpaceAvailable:
@@ -3058,12 +3072,19 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
                 return size;
             }
             return QCommonStyle::pixelMetric(metric, option, widget);
-        case PM_SliderLength:
-            return (SLIDER_CIRCULAR==opts.sliderStyle
-                        ? CIRCULAR_SLIDER_SIZE
-                        : SLIDER_TRIANGULAR==opts.sliderStyle
-                            ? 11
-                            : (SLIDER_SIZE+(ROTATED_SLIDER ? -2 : 6)))+SLIDER_GLOW;
+        case PM_SliderLength: {
+            int glowSize = (opts.buttonEffect != EFFECT_NONE &&
+                            opts.coloredMouseOver == MO_GLOW ? 2 : 0);
+            if (opts.sliderStyle == SLIDER_CIRCULAR) {
+                return CIRCULAR_SLIDER_SIZE + glowSize;
+            } else if (opts.sliderStyle == SLIDER_TRIANGULAR) {
+                return 11 + glowSize;
+            } else {
+                return (SLIDER_SIZE + glowSize +
+                        (qtcOneOf(opts.sliderStyle, SLIDER_PLAIN_ROTATED,
+                                  SLIDER_ROUND_ROTATED) ? -2 : 6));
+            }
+        }
         case PM_ScrollBarExtent:
             return opts.sliderWidth;
         case PM_MaximumDragDistance:
@@ -4944,8 +4965,8 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                                                 ? 6.0
                                                 : 2.0));
 
-                if(FULLLY_ROUNDED && !(state&QtC_StateKWinCompositing))
-                {
+                if (opts.round >= ROUND_FULL &&
+                    !(state & QtC_StateKWinCompositing)) {
                     QColor col(opts.windowBorder&WINDOW_BORDER_COLOR_TITLEBAR_ONLY
                                 ? backgroundColors(option)[QTC_STD_BORDER]
                                 : buttonColors(option)[QTC_STD_BORDER]);
@@ -8522,10 +8543,8 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                         painter->drawPoint(r.x()+1, r.y()+r.height()-1);
                     }
 
-                    if(round>ROUND_SLIGHT && FULLLY_ROUNDED)
-                    {
-                        if(!(state&QtC_StateKWinCompositing))
-                        {
+                    if (round > ROUND_SLIGHT && opts.round >= ROUND_FULL) {
+                        if (!(state & QtC_StateKWinCompositing)) {
                             painter->setPen(dark);
 
                             painter->drawLine(r.x()+1, r.y()+4, r.x()+1, r.y()+3);
@@ -11584,7 +11603,8 @@ void Style::drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, 
     bool         enabled(state&State_Enabled),
                  entry(WIDGET_ENTRY==w || (WIDGET_SCROLLVIEW==w && opts.highlightScrollViews)),
                  hasFocus(enabled && entry && state&State_HasFocus),
-                 hasMouseOver(enabled && entry && state&State_MouseOver && ENTRY_MO);
+                 hasMouseOver(enabled && entry && state & State_MouseOver &&
+                              opts.unifyCombo && opts.unifySpin);
     const QColor *cols(enabled && hasMouseOver && opts.coloredMouseOver && entry
                         ? m_mouseOverCols
                         : enabled && hasFocus && m_focusCols && entry
@@ -12444,14 +12464,12 @@ void Style::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOptionSlid
                 }
                 break;
         }
-
         p->restore();
-    }
-    else
-    {
-        if(ROTATED_SLIDER)
-            opt.state^=State_Horizontal;
-
+    } else {
+        if (qtcOneOf(opts.sliderStyle, SLIDER_PLAIN_ROTATED,
+                     SLIDER_ROUND_ROTATED)) {
+            opt.state ^= State_Horizontal;
+        }
         drawSbSliderHandle(p, r, &opt, true);
    }
 }

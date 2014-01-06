@@ -2420,7 +2420,8 @@ void Style::drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, 
     bool         enabled(state&State_Enabled),
         entry(WIDGET_ENTRY==w || (WIDGET_SCROLLVIEW==w && opts.highlightScrollViews)),
         hasFocus(enabled && entry && state&State_HasFocus),
-        hasMouseOver(enabled && entry && state&State_MouseOver && ENTRY_MO);
+        hasMouseOver(enabled && entry && state & State_MouseOver &&
+                     opts.unifyCombo && opts.unifySpin);
     const QColor *cols(enabled && hasMouseOver && opts.coloredMouseOver && entry
                        ? itsMouseOverCols
                        : enabled && hasFocus && itsFocusCols && entry
@@ -3268,14 +3269,12 @@ void Style::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOptionSlid
             }
             break;
         }
-
         p->restore();
-    }
-    else
-    {
-        if(ROTATED_SLIDER)
-            opt.state^=State_Horizontal;
-
+    } else {
+        if (qtcOneOf(opts.sliderStyle, SLIDER_PLAIN_ROTATED,
+                     SLIDER_ROUND_ROTATED)) {
+            opt.state ^= State_Horizontal;
+        }
         drawSbSliderHandle(p, r, &opt, true);
     }
 }

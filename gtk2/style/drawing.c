@@ -170,7 +170,8 @@ drawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state,
     bool hasFocus = (enabled && qtcPalette.focus &&
                      c_colors == qtcPalette.focus);
     bool hasMouseOver = (enabled && qtcPalette.mouseover &&
-                         c_colors == qtcPalette.mouseover && ENTRY_MO);
+                         c_colors == qtcPalette.mouseover &&
+                         opts.unifyCombo && opts.unifySpin);
     const GdkColor *colors = c_colors ? c_colors : qtcPalette.background;
     int useBorderVal = (!enabled && WIDGET_BUTTON(widget) ?
                         QTC_DISABLED_BORDER :
@@ -1303,8 +1304,8 @@ drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
         (enabled && widget && gtk_widget_has_focus(widget) &&
          qtSettings.app != GTK_APP_JAVA && qtcPalette.focus);
     bool mouseOver =
-        (ENTRY_MO && enabled && (GTK_STATE_PRELIGHT == state ||
-                                 qtcEntryIsLastMo(widget)) &&
+        (opts.unifyCombo && opts.unifySpin && enabled &&
+         (GTK_STATE_PRELIGHT == state || qtcEntryIsLastMo(widget)) &&
          qtcPalette.mouseover && GTK_APP_JAVA != qtSettings.app);
     bool highlight = highlightReal || mouseOver;
     bool doEtch = opts.buttonEffect != EFFECT_NONE && opts.etchEntry;

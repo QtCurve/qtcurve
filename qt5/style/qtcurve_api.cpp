@@ -1615,14 +1615,32 @@ Style::pixelMetric(PixelMetric metric, const QStyleOption *option,
         // See https://github.com/QtCurve/qtcurve-qt4/issues/7
         // and https://bugs.kde.org/show_bug.cgi?id=317690
         return qtcMax(opts.sliderWidth, 20) + 1;
-    case PM_SliderThickness:
-        return (opts.sliderStyle == SLIDER_CIRCULAR ? CIRCULAR_SLIDER_SIZE + 6 :
-                opts.sliderStyle == SLIDER_TRIANGULAR ? 19
-                : (SLIDER_SIZE + (ROTATED_SLIDER ? 11 : 6))) + SLIDER_GLOW;
-    case PM_SliderControlThickness:
-        return (opts.sliderStyle == SLIDER_CIRCULAR ? CIRCULAR_SLIDER_SIZE :
-                opts.sliderStyle == SLIDER_TRIANGULAR ? 11 :
-                (SLIDER_SIZE + (ROTATED_SLIDER ? 6 : -2))) + SLIDER_GLOW;
+    case PM_SliderThickness: {
+        int glowSize = (opts.buttonEffect != EFFECT_NONE &&
+                        opts.coloredMouseOver == MO_GLOW ? 2 : 0);
+        if (opts.sliderStyle == SLIDER_CIRCULAR) {
+            return CIRCULAR_SLIDER_SIZE + 6 + glowSize;
+        } else if (opts.sliderStyle == SLIDER_TRIANGULAR) {
+            return 19 + glowSize;
+        } else {
+            return (SLIDER_SIZE + glowSize +
+                    (qtcOneOf(opts.sliderStyle, SLIDER_PLAIN_ROTATED,
+                              SLIDER_ROUND_ROTATED) ? 11 : 6));
+        }
+    }
+    case PM_SliderControlThickness: {
+        int glowSize = (opts.buttonEffect != EFFECT_NONE &&
+                        opts.coloredMouseOver == MO_GLOW ? 2 : 0);
+        if (opts.sliderStyle == SLIDER_CIRCULAR) {
+            return CIRCULAR_SLIDER_SIZE + glowSize;
+        } else if (opts.sliderStyle == SLIDER_TRIANGULAR) {
+            return 11 + glowSize;
+        } else {
+            return (SLIDER_SIZE + glowSize +
+                    (qtcOneOf(opts.sliderStyle, SLIDER_PLAIN_ROTATED,
+                              SLIDER_ROUND_ROTATED) ? 6 : -2));
+        }
+    }
     case PM_SliderTickmarkOffset:
         return opts.sliderStyle == SLIDER_TRIANGULAR ? 5 : 4;
     case PM_SliderSpaceAvailable:
@@ -1637,10 +1655,19 @@ Style::pixelMetric(PixelMetric metric, const QStyleOption *option,
             return size;
         }
         return QCommonStyle::pixelMetric(metric, option, widget);
-    case PM_SliderLength:
-        return (opts.sliderStyle == SLIDER_CIRCULAR ? CIRCULAR_SLIDER_SIZE :
-                SLIDER_TRIANGULAR==opts.sliderStyle ? 11 :
-                (SLIDER_SIZE + (ROTATED_SLIDER ? -2 : 6))) + SLIDER_GLOW;
+    case PM_SliderLength: {
+        int glowSize = (opts.buttonEffect != EFFECT_NONE &&
+                        opts.coloredMouseOver == MO_GLOW ? 2 : 0);
+        if (opts.sliderStyle == SLIDER_CIRCULAR) {
+            return CIRCULAR_SLIDER_SIZE + glowSize;
+        } else if (opts.sliderStyle == SLIDER_TRIANGULAR) {
+            return 11 + glowSize;
+        } else {
+            return (SLIDER_SIZE + glowSize +
+                    (qtcOneOf(opts.sliderStyle, SLIDER_PLAIN_ROTATED,
+                              SLIDER_ROUND_ROTATED) ? -2 : 6));
+        }
+    }
     case PM_ScrollBarExtent:
         return opts.sliderWidth;
     case PM_MaximumDragDistance:
@@ -5302,10 +5329,8 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                     painter->drawPoint(r.x()+1, r.y()+r.height()-1);
                 }
 
-                if(round>ROUND_SLIGHT && FULLLY_ROUNDED)
-                {
-                    if(!(state&QtC_StateKWinCompositing))
-                    {
+                if (round > ROUND_SLIGHT && opts.round >= ROUND_FULL) {
+                    if (!(state & QtC_StateKWinCompositing)) {
                         painter->setPen(dark);
 
                         painter->drawLine(r.x()+1, r.y()+4, r.x()+1, r.y()+3);

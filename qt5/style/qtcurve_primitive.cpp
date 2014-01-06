@@ -1067,7 +1067,7 @@ Style::drawPrimitiveFrameWindow(PrimitiveElement element,
         painter->drawPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL,
                                     opts.round > ROUND_SLIGHT &&
                                     state & QtC_StateKWin ? 6.0 : 2.0));
-        if (FULLLY_ROUNDED && !(state & QtC_StateKWinCompositing)) {
+        if (opts.round >= ROUND_FULL && !(state & QtC_StateKWinCompositing)) {
             QColor col(opts.windowBorder & WINDOW_BORDER_COLOR_TITLEBAR_ONLY ?
                        backgroundColors(option)[QTC_STD_BORDER] :
                        buttonColors(option)[QTC_STD_BORDER]);

@@ -2396,20 +2396,22 @@ gboolean qtSettingsInit()
             }
 
             gboolean customSliderW=DEFAULT_SLIDER_WIDTH!=opts.sliderWidth;
+            int glowSize = (opts.buttonEffect != EFFECT_NONE &&
+                            opts.coloredMouseOver == MO_GLOW ? 2 : 0);
             int length = (SLIDER_CIRCULAR==opts.sliderStyle ?
                           CIRCULAR_SLIDER_SIZE :
                           SLIDER_TRIANGULAR == opts.sliderStyle ? 11 :
                           SLIDER_PLAIN_ROTATED == opts.sliderStyle ||
                           SLIDER_ROUND_ROTATED == opts.sliderStyle ?
                           (customSliderW ? SLIDER_SIZE - 2 : 13) :
-                          (customSliderW ? SLIDER_SIZE + 6 : 21)) + SLIDER_GLOW;
+                          (customSliderW ? SLIDER_SIZE + 6 : 21)) + glowSize;
             int width = (SLIDER_CIRCULAR == opts.sliderStyle ?
                          CIRCULAR_SLIDER_SIZE :
                          SLIDER_TRIANGULAR == opts.sliderStyle ? 18 :
                          SLIDER_PLAIN_ROTATED == opts.sliderStyle ||
                          SLIDER_ROUND_ROTATED == opts.sliderStyle ?
                          (customSliderW ? SLIDER_SIZE + 6 : 21) :
-                         (customSliderW ? SLIDER_SIZE - 2 : 13)) + SLIDER_GLOW;
+                         (customSliderW ? SLIDER_SIZE - 2 : 13)) + glowSize;
 
             constStrFormat =
                 "style \"" RC_SETTING "Sldr\" "
