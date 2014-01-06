@@ -68,8 +68,6 @@ typedef QSet<QString> Strings;
 
 #define LARGE_ARR_WIDTH  7
 #define LARGE_ARR_HEIGHT 4
-#define SMALL_ARR_WIDTH  5
-#define SMALL_ARR_HEIGHT 3
 
 #define NUM_EXTRA_SHADES 3
 
@@ -104,7 +102,6 @@ enum {
 #define BLEND_TITLEBAR     (opts.menubarAppearance==opts.titlebarAppearance && opts.menubarAppearance==opts.inactiveTitlebarAppearance && \
                            !(opts.windowBorder&WINDOW_BORDER_BLEND_TITLEBAR) && SHADE_WINDOW_BORDER==opts.shadeMenubars && opts.windowDrag)
 
-#define STD_BORDER_BR      2
 #define PBAR_BORDER        4
 #define ARROW_MO_SHADE     4
 #define LOWER_BORDER_ALPHA 0.35
@@ -118,13 +115,10 @@ enum {
 
 #define BGND_STRIPE_SHADE 0.95
 
-#define TAB_APPEARANCE(A)   (A) /* (APPEARANCE_GLASS==(A) ? APPEARANCE_GRADIENT : (A)) */
-
 #define INVERT_SHADE(A) (1.0+(1.0-(A)))
 
 #define TOOLBAR_SEP_GAP        (opts.fadeLines ? 5 : 6)
 #define FADE_SIZE              0.4
-#define ETCHED_DARK            0.95
 
 #define IS_GLASS(A) qtcOneOf(A, APPEARANCE_DULL_GLASS, APPEARANCE_SHINY_GLASS)
 #define IS_CUSTOM(A) ((A)>=APPEARANCE_CUSTOM1 && (A)<(APPEARANCE_CUSTOM1+NUM_CUSTOM_GRAD))
@@ -140,7 +134,6 @@ enum {
 #define MAX_HIGHLIGHT_FACTOR                      50
 #define MIN_HIGHLIGHT_FACTOR                     -50
 #define MENUBAR_DARK_FACTOR        TO_FACTOR(-3)
-#define INACTIVE_HIGHLIGHT_FACTOR  TO_FACTOR(20)
 #define LV_HEADER_DARK_FACTOR      TO_FACTOR(-10)
 #define DEF_POPUPMENU_LIGHT_FACTOR                 2
 #define MIN_LIGHTER_POPUP_MENU                  -100
@@ -173,10 +166,7 @@ enum {
 
 #define USE_GLOW_FOCUS(mouseOver) (FOCUS_GLOW==opts.focus && (MO_GLOW!=opts.coloredMouseOver || !(mouseOver)))
 
-#define USE_SHADED_MENU_BAR_COLORS                                      \
-    qtcOneOf(opts.shadeMenubars, SHADE_CUSTOM, SHADE_BLEND_SELECTED)
 #define MENUBAR_GLASS_SELECTED_DARK_FACTOR 0.9
-
 #define MENUITEM_FADE_SIZE 48
 
 #define NUM_SPLITTER_DASHES 21
@@ -192,10 +182,6 @@ enum {
               WIDGET_FILLED_SLIDER_TROUGH, WIDGET_MDI_WINDOW_BUTTON,    \
               WIDGET_TOOLBAR_BUTTON) ||                                 \
      ((w) == WIDGET_SLIDER && opts.coloredMouseOver == MO_GLOW))
-#define AGUA_WIDGET(w)                                                  \
-    (qtcOneOf(w, WIDGET_STD_BUTTON, WIDGET_DEF_BUTTON, WIDGET_CHECKBOX, \
-              WIDGET_RADIO_BUTTON, WIDGET_COMBO, WIDGET_COMBO_BUTTON,   \
-              WIDGET_MDI_WINDOW_BUTTON) || IS_SLIDER(w))
 
 #define SLIDER(w) qtcOneOf(w, WIDGET_SB_SLIDER, WIDGET_SLIDER)
 #define CIRCULAR_SLIDER(w) (WIDGET_SLIDER==(w) && SLIDER_CIRCULAR==opts.sliderStyle)
@@ -259,16 +245,13 @@ enum {
     (opts.coloredMouseOver == MO_GLOW ? 1 : MO_PLASTIK_LIGHT(W))
 
 #define FOCUS_ALPHA              0.08
-#define FOCUS_GLOW_LINE_ALPHA    0.5
 #define BORDER_BLEND_ALPHA(W)                                   \
     (qtcOneOf(W, WIDGET_ENTRY, WIDGET_SCROLLVIEW) ? 0.45 : 0.7)
 
 #define ETCH_TOP_ALPHA           0.055
 #define ETCH_BOTTOM_ALPHA        0.1
 // #define ETCH_RADIO_TOP_ALPHA     0.055
-// #define ETCH_RADIO_BOTTOM_ALPHA  0.80
 #define ETCH_RADIO_TOP_ALPHA     0.09
-#define ETCH_RADIO_BOTTOM_ALPHA  1.0
 
 #define RINGS_INNER_ALPHA(T) qtc_ring_alpha[IMG_PLAIN_RINGS==(T) ? 1 : 0] //(IMG_PLAIN_RINGS==opts.bgndImage.type ? 0.25 :  0.125)
 #define RINGS_OUTER_ALPHA    qtc_ring_alpha[2] //0.5
@@ -286,7 +269,6 @@ enum {
 #include <QStyle>
 typedef enum {
     QtC_Round = QStyle::PM_CustomBase,
-    QtC_TitleBarButtonAppearance,
     QtC_TitleAlignment,
     QtC_TitleBarButtons,
     QtC_TitleBarIcon,
@@ -967,9 +949,9 @@ typedef enum
 #define MIN_ROUND_FULL_SIZE     8
 #define MIN_ROUND_EXTRA_SIZE(W) (WIDGET_SPIN==(W) ? 7 : 14)
 
-#define IS_MAX_ROUND_WIDGET(A)                                          \
-    qtcOneOf(A, WIDGET_STD_BUTTON, WIDGET_DEF_BUTTON/*, WIDGET_MENU_BUTTON*/)
-#define IS_EXTRA_ROUND_WIDGET(A) \
+#define IS_MAX_ROUND_WIDGET(A)                          \
+    qtcOneOf(A, WIDGET_STD_BUTTON, WIDGET_DEF_BUTTON)
+#define IS_EXTRA_ROUND_WIDGET(A)                                        \
     qtcNoneOf(A, WIDGET_MENU_ITEM, WIDGET_TAB_FRAME, WIDGET_PBAR_TROUGH, \
               WIDGET_PROGRESSBAR, WIDGET_MDI_WINDOW, WIDGET_MDI_WINDOW_TITLE)
 

@@ -3105,8 +3105,6 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
             return opts.windowBorder;
         case QtC_CustomBgnd:
             return qtcIsCustomBgnd(&opts);
-        case QtC_TitleBarButtonAppearance:
-            return (int)opts.titlebarButtonAppearance;
         case QtC_TitleAlignment:
             switch(opts.titlebarAlignment)
             {
