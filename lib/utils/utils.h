@@ -33,6 +33,16 @@
 
 #include "macros.h"
 
+/**
+ * \file utils.h
+ * \author Yichao Yu <yyc1992@gmail.com>
+ * \brief Some generic functions and macros.
+ */
+
+/**
+ * Allocate memory and initialize it to zero.
+ * \param size size of the memory
+ */
 QTC_ALWAYS_INLINE static inline void*
 qtcAlloc0(size_t size)
 {
@@ -41,6 +51,10 @@ qtcAlloc0(size_t size)
     return p;
 }
 
+/**
+ * Free a pointer if it is not NULL.
+ * \param p the pointer to be freed.
+ */
 QTC_ALWAYS_INLINE static inline void
 qtcFree(void *p)
 {
@@ -49,12 +63,31 @@ qtcFree(void *p)
     }
 }
 
+/**
+ * Allocate memory of size \param size for a \param type.
+ * The memory is initialized to zero.
+ * \param type type pointed to by the pointer
+ * \param size size of the memory
+ * \sa qtcAlloc0
+ */
 #define qtcNewSize(type, size) ((type*)qtcAlloc0(size))
+
+/**
+ * Allocate memory for a \param type or an array of \param type.
+ * The memory is initialized to zero.
+ * \param type type pointed to by the pointer
+ * \param n (optional) elements in the array (default: 1)
+ * \sa qtcNewSize
+ */
 #define qtcNew(type, n...)                              \
     qtcNewSize(type, sizeof(type) * (QTC_DEFAULT(n, 1)))
 
 #ifdef __cplusplus
 namespace QtCurve {
+/**
+ * Turn a variable into a const reference. This is useful for range-based for
+ * loop where a non-const variable may cause unnecessary copy.
+ */
 template <class T>
 static inline const T&
 const_(const T &t)
@@ -64,6 +97,10 @@ const_(const T &t)
 }
 #endif
 
+/**
+ * Define a buffer type (struct) for \param type.
+ * \sa QTC_DEF_LOCAL_BUFF
+ */
 #define QTC_BUFF_TYPE(type)                     \
     struct {                                    \
         union {                                 \
@@ -75,6 +112,20 @@ const_(const T &t)
         const size_t static_l;                  \
     }
 
+/**
+ * \brief Define a local buffer for holding an array of \param type.
+ * \param type type of the array element.
+ * \param name name of the variable
+ * \param stack_size the maximum number of elements in the array that will be
+ *                   kept on the stack.
+ * \param size real size of the array.
+ *
+ * This macro define a buffer \param name for an array of \param type.
+ * The buffer's field p points to the address of the array.
+ * Use QTC_FREE_LOCAL_BUFF to free the buffer.
+ * \sa QTC_FREE_LOCAL_BUFF
+ * \sa QTC_RESIZE_LOCAL_BUFF
+ */
 #define QTC_DEF_LOCAL_BUFF(type, name, stack_size, size)                \
     type __##qtc_local_buff##name[stack_size];                          \
     QTC_BUFF_TYPE(type) name = {                                        \
@@ -85,6 +136,17 @@ const_(const T &t)
     };                                                                  \
     QTC_RESIZE_LOCAL_BUFF(name, size)
 
+/**
+ * \brief Resize a local buffer defined with QTC_DEF_LOCAL_BUFF for holding
+ * .      more elements.
+ * \param name name of the buffer
+ * \param size new minimum size of the array.
+ *
+ * This macro resizes a buffer \param name defined with QTC_DEF_LOCAL_BUFF for
+ * holding at least \param size elements.
+ * \sa QTC_DEF_LOCAL_BUFF
+ * \sa QTC_FREE_LOCAL_BUFF
+ */
 #define QTC_RESIZE_LOCAL_BUFF(name, size) do {                          \
         size_t __new_size = (size);                                     \
         if (__new_size <= (name).l || __new_size <= (name).static_l)    \
@@ -98,6 +160,13 @@ const_(const T &t)
         }                                                               \
     } while (0)
 
+/**
+ * \brief Free a local buffer defined with QTC_DEF_LOCAL_BUFF if necessary.
+ * \param name name of the buffer
+ *
+ * \sa QTC_DEF_LOCAL_BUFF
+ * \sa QTC_RESIZE_LOCAL_BUFF
+ */
 #define QTC_FREE_LOCAL_BUFF(name) do {          \
         if ((name).p != (name).static_p) {      \
             free((name)._p);                    \
@@ -106,6 +175,18 @@ const_(const T &t)
 
 QTC_BEGIN_DECLS
 
+/**
+ * Binary searches an sorted array of \param nmemb objects.
+ * \param key The key for the search.
+ * \param base pointer to the first element.
+ * \param nmemb number of object in the array.
+ * \param size size of each object.
+ * \param compar function to compare key with an object.
+ *
+ * \return if a matching object is found, the pointer to the object will be
+ *         returned, otherwise, a pointer to where the new object should be
+ *         inserted will be returned.
+ */
 void *qtcBSearch(const void *key, const void *base, size_t nmemb, size_t size,
                  int (*compar)(const void*, const void*));
 
