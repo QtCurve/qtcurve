@@ -2833,22 +2833,21 @@ gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
 static void
 gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType state,
-                  GdkRectangle *area, GtkWidget *widget, const char *detail,
+                  GdkRectangle *_area, GtkWidget *widget, const char *detail,
                   GdkWindowEdge edge, int x, int y, int width, int height)
 {
     g_return_if_fail(GTK_IS_STYLE(style));
     g_return_if_fail(GDK_IS_DRAWABLE(window));
+    QtcRect *area = (QtcRect*)_area;
     cairo_t *cr = qtcGdkCreateCairoClip(window, area);
     int size = SIZE_GRIP_SIZE - 2;
 
     /* Clear background */
     if (qtcIsFlatBgnd(opts.bgndAppearance) ||
-        !(widget && drawWindowBgnd(cr, style, (QtcRect*)area, window, widget,
+        !(widget && drawWindowBgnd(cr, style, area, window, widget,
                                    x, y, width, height))) {
-        /* gtk_style_apply_default_background(style, window, false, state, */
-        /*                                    area, x, y, width, height); */
         if (widget && opts.bgndImage.type != IMG_NONE) {
-            drawWindowBgnd(cr, style, (QtcRect*)area, window, widget,
+            drawWindowBgnd(cr, style, area, window, widget,
                            x, y, width, height);
         }
     }
@@ -2864,16 +2863,14 @@ gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType state,
         const GdkPoint a[] = {{x + width, y + height - size},
                               {x + width, y + height},
                               {x + width - size,  y + height}};
-        qtcCairoPolygon(cr, &qtcPalette.background[2],
-                        (QtcRect*)area, a, 3, true);
+        qtcCairoPolygon(cr, &qtcPalette.background[2], area, a, 3, true);
         break;
     }
     case GDK_WINDOW_EDGE_SOUTH_WEST: {
         const GdkPoint a[] = {{x + width - size, y + height - size},
                               {x + width, y + height},
                               {x + width - size, y + height}};
-        qtcCairoPolygon(cr, &qtcPalette.background[2],
-                        (QtcRect*)area, a, 3, true);
+        qtcCairoPolygon(cr, &qtcPalette.background[2], area, a, 3, true);
         break;
     }
     case GDK_WINDOW_EDGE_NORTH_EAST:
@@ -2881,7 +2878,7 @@ gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType state,
     case GDK_WINDOW_EDGE_NORTH_WEST:
         // TODO!!
     default:
-        parent_class->draw_resize_grip(style, window, state, area, widget,
+        parent_class->draw_resize_grip(style, window, state, _area, widget,
                                        detail, edge, x, y, width, height);
     }
     cairo_destroy(cr);

@@ -2234,7 +2234,7 @@ drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state,
     if (factor != 0) {
         col = shadeColor(&col, TO_FACTOR(factor));
     }
-    drawSelectionGradient(cr, (QtcRect*)area, x, y, width, height, round,
+    drawSelectionGradient(cr, area, x, y, width, height, round,
                           isLvSelection, alpha, &col, true);
 
     if (opts.borderSelection &&
