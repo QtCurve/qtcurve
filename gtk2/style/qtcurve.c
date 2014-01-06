@@ -334,11 +334,11 @@ gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 int round=detail && opts.round != ROUND_NONE
                                 ? forceCellStart && forceCellEnd
                                     : ROUNDED_ALL
-                                    ? forceCellStart || 0!=strstr(detail, "_start")
+                                    ? forceCellStart || strstr(detail, "_start")
                                         ? ROUNDED_LEFT
-                                        : forceCellEnd || 0!=strstr(detail, "_end")
+                                        : forceCellEnd || strstr(detail, "_end")
                                             ? ROUNDED_RIGHT
-                                            : 0!=strstr(detail, "_middle")
+                                            : strstr(detail, "_middle")
                                                 ? ROUNDED_NONE
                                                 : ROUNDED_ALL
                                 : ROUNDED_NONE;
@@ -688,7 +688,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                        qtcStrStartsWith(detail, "hscrollbar"));
     bool spinUp = !hscrollbar && DETAIL("spinbutton_up");
     bool spinDown = !spinUp && DETAIL("spinbutton_down");
-    bool menuScroll = (detail && strstr(detail, "menu_scroll_arrow_") != NULL);
+    bool menuScroll = (detail && strstr(detail, "menu_scroll_arrow_"));
     bool rev = (reverseLayout(widget) ||
                 (widget && reverseLayout(gtk_widget_get_parent(widget))));
     bool activeWindow = true;
@@ -1375,7 +1375,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
             }
         }
     } else if (detail && (0==strcmp(detail, "buttondefault") || 0==strcmp(detail, "togglebuttondefault"))) {
-    } else if(widget && detail && (0==strcmp(detail, "trough") || detail==strstr(detail, "trough-"))) {
+    } else if (widget && detail && (0==strcmp(detail, "trough") || qtcStrStartsWith(detail, "trough-"))) {
         gboolean list=isList(widget),
                  pbar=list || GTK_IS_PROGRESS_BAR(widget),
                  scale=!pbar && GTK_IS_SCALE(widget);
@@ -1702,7 +1702,7 @@ gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state,
     {
         gboolean frame=!detail || 0==strcmp(detail, "frame"),
                  scrolledWindow=DETAIL("scrolled_window"),
-                 viewport=!scrolledWindow && detail && NULL!=strstr(detail, "viewport"),
+                 viewport=!scrolledWindow && detail && strstr(detail, "viewport"),
                  drawSquare=(frame && opts.square&SQUARE_FRAME) || (!viewport && !scrolledWindow && !detail && !widget),
                  statusBar=isFakeGtk()
                             ? frame : isStatusBarFrame(widget),
@@ -3048,8 +3048,8 @@ static void qtcurve_rc_style_merge(GtkRcStyle *dest, GtkRcStyle *src)
     GtkRcStyle  copy;
     const char *typeName=src ? g_type_name(G_TYPE_FROM_INSTANCE(src)) : NULL;
     bool        destIsQtc=QTCURVE_IS_RC_STYLE(dest),
-                srcIsQtc=!src->name || src->name==strstr(src->name, RC_SETTING) ||
-                         (getAppName() && src->name==strstr(src->name, getAppName())),
+        srcIsQtc=!src->name || qtcStrStartsWith(src->name, RC_SETTING) ||
+        (getAppName() && qtcStrStartsWith(src->name, getAppName())),
                 isQtCNoteBook=0!=opts.tabBgnd && src->name && 0==strcmp(src->name, "qtcurve-notebook_bg"),
                 dontChangeColors=destIsQtc && !srcIsQtc && !isQtCNoteBook &&
                                  // Only allow GtkRcStyle and QtCurveRcStyle to change colours

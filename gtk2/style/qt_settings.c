@@ -687,7 +687,7 @@ static void readKdeGlobals(const char *rc, int rd, bool first)
             else if (SECT_TOOLBAR_STYLE==section && rd&RD_TOOLBAR_STYLE &&
                      !(found&RD_TOOLBAR_STYLE) &&
                      0==strncasecmp(line, "ToolButtonStyle=", 16)) {
-                char *eq=strstr(line, "=");
+                char *eq = strstr(line, "=");
 
                 if(eq && ++eq)
                 {
@@ -1174,8 +1174,6 @@ static char *getIconPath()
     return path;
 }
 
-#define GIMP_PLUGIN "gimpplugin"
-
 static char*
 getAppNameFromPid(int pid)
 {
@@ -1199,13 +1197,9 @@ getAppNameFromPid(int pid)
                 }
             }
             if (found_slash && pos >= 0) {
-                if (strstr(cmdline, "gimp/2.0/plug-ins")) {
-                    strcpy(app_name, GIMP_PLUGIN);
-                } else {
-                    strncpy(app_name, &cmdline[pos ? pos + 1 : 0],
-                            MAX_APP_NAME_LEN);
-                    app_name[MAX_APP_NAME_LEN] = '\0';
-                }
+                strncpy(app_name, &cmdline[pos ? pos + 1 : 0],
+                        MAX_APP_NAME_LEN);
+                app_name[MAX_APP_NAME_LEN] = '\0';
             }
         }
         close(procFile);
@@ -1223,8 +1217,6 @@ getAppName()
             name = getAppNameFromPid(getppid());
             if (!name) {
                 name = "scriptedapp";
-            } else if (name == strstr(name, "gimp")) {
-                name = GIMP_PLUGIN;
             }
         }
     }
@@ -1461,12 +1453,12 @@ static void processMozillaApp(gboolean add_btn_css, gboolean add_menu_colors, co
                         size_t len=0;
 
                         while(-1!=getline(&line, &len, userJs))
-                            if(NULL!=strstr(line, "browser.preferences.instantApply"))
+                            if(strstr(line, "browser.preferences.instantApply"))
                             {
                                 /* If instant-apply is set to true, then we cannot alter button order,
                                    as this produces sde effects (such as the preferences dialog's close
                                    button having no text! */
-                                if(NULL!=strstr(line, "true"))
+                                if(strstr(line, "true"))
                                     add_btn_css=false;
                                 alterUserJs=false;
                                 break;
@@ -1531,10 +1523,9 @@ static gboolean checkFileVersion(const char *fname, const char *versionStr, int 
 
 static gboolean isMozApp(const char *app, const char *check)
 {
-    if(0==strcmp(app, check))
+    if (strcmp(app, check) == 0) {
         return true;
-    else if(app==strstr(app, check))
-    {
+    } else if (qtcStrStartsWith(app, check)) {
         int app_len=strlen(app),
             check_len=strlen(check);
 
@@ -1665,8 +1656,7 @@ gboolean qtSettingsInit()
             char *rcFile = NULL;
             /* Is the user using a non-default QtCurve style? */
             if (qtSettings.styleName &&
-                qtSettings.styleName == strstr(qtSettings.styleName,
-                                               THEME_PREFIX)) {
+                qtcStrStartsWith(qtSettings.styleName, THEME_PREFIX)) {
                 rcFile = themeFile(getKdeHome(),
                                    qtSettings.styleName, &str_buff);
 
@@ -1749,9 +1739,7 @@ gboolean qtSettingsInit()
                     qtSettings.app=GTK_APP_OPEN_OFFICE;
                 else if(0==strcmp(qtSettings.appName, "vmplayer"))
                     qtSettings.app=GTK_APP_VMPLAYER;
-                else if(0==strcmp(qtSettings.appName, GIMP_PLUGIN))
-                    qtSettings.app=GTK_APP_GIMP_PLUGIN;
-                else if(qtSettings.appName==strstr(qtSettings.appName, "gimp"))
+                else if (qtcStrStartsWith(qtSettings.appName, "gimp"))
                     qtSettings.app=GTK_APP_GIMP;
                 else if(0==strcmp(qtSettings.appName, "java"))
                     qtSettings.app=GTK_APP_JAVA;

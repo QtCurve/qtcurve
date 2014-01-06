@@ -441,9 +441,8 @@ static bool toLvLines(const char *str, bool def)
 
 static EGradientBorder toGradientBorder(const char *str, bool *haveAlpha)
 {
-    if(str && 0!=str[0])
-    {
-        *haveAlpha=strstr(str, "-alpha") ? true : false;
+    if (str && str[0]) {
+        *haveAlpha = strstr(str, "-alpha") ? true : false;
         if(0==memcmp(str, "light", 5) || 0==memcmp(str, "true", 4))
             return GB_LIGHT;
         if(0==memcmp(str, "none", 4))
