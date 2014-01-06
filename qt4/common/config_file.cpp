@@ -1647,10 +1647,10 @@ void qtcDefaultSettings(Options *opts)
     opts->dwtSettings=DWT_BUTTONS_AS_PER_TITLEBAR|DWT_ROUND_TOP_ONLY;
     opts->menubarApps << "smplayer" << "VirtualBox";
     opts->statusbarApps << "kde";
-    opts->noMenuBgndOpacityApps << "inkscape" << "sonata" << "totem"
-                                << "vmware" << "vmplayer" << "gtk";
-    opts->noBgndOpacityApps << "smplayer" << "inkscape" << "sonata" << "totem"
-                            << "vmware" << "vmplayer";
+    opts->noMenuBgndOpacityApps << "sonata" << "totem" << "vmware"
+                                << "vmplayer" << "gtk";
+    opts->noBgndOpacityApps << "smplayer" << "sonata" << "totem" << "vmware"
+                            << "vmplayer";
     opts->noMenuStripeApps << "gtk" << "soffice.bin";
 
 #if defined CONFIG_DIALOG

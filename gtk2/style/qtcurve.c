@@ -3107,8 +3107,7 @@ static void qtcurve_style_init(QtCurveStyle *style)
 
 void qtcurve_style_register_type(GTypeModule *module)
 {
-    static const GTypeInfo object_info =
-    {
+    static const GTypeInfo object_info = {
         sizeof(QtCurveStyleClass),
         (GBaseInitFunc) NULL,
         (GBaseFinalizeFunc) NULL,
@@ -3121,10 +3120,40 @@ void qtcurve_style_register_type(GTypeModule *module)
         NULL
     };
 
-    qtcurve_type_style = g_type_module_register_type(module, GTK_TYPE_STYLE, "QtCurveStyle", &object_info, 0);
+    qtcurve_type_style =
+        g_type_module_register_type(module, GTK_TYPE_STYLE,
+                                    "QtCurveStyle", &object_info, 0);
 }
 
-static void qtcurve_rc_style_init(QtCurveRcStyle *qtcurve_rc)
+static gboolean
+qtcurve_style_set_hook(GSignalInvocationHint *ihint, unsigned argc,
+                       const GValue *argv, void *data)
+{
+    QTC_UNUSED(ihint);
+    QTC_UNUSED(argc);
+    QTC_UNUSED(data);
+    GtkWidget *widget = GTK_WIDGET(g_value_get_object(argv));
+    GdkScreen *screen = gtk_widget_get_screen(widget);
+    if (!screen) {
+        return true;
+    }
+    GdkColormap *colormap = NULL;
+    if (gtk_widget_is_toplevel(widget)) {
+        colormap = gdk_screen_get_rgba_colormap(screen);
+    } else if (GTK_IS_DRAWING_AREA(widget)) {
+        // For inkscape (and pobably flash).
+        // Inkscape's (at least the Gtk2 version) EekPreview widget
+        // uses system default colormap instead of the one for the widget
+        colormap = gdk_screen_get_default_colormap(screen);
+    }
+    if (colormap) {
+        gtk_widget_set_colormap(widget, colormap);
+    }
+    return true;
+}
+
+static void
+qtcurve_rc_style_init(QtCurveRcStyle *qtcurve_rc)
 {
     QTC_UNUSED(qtcurve_rc);
 #ifdef INCREASE_SB_SLIDER
@@ -3134,14 +3163,12 @@ static void qtcurve_rc_style_init(QtCurveRcStyle *qtcurve_rc)
         generateColors();
         if (opts.dlgOpacity < 100 || opts.bgndOpacity < 100 ||
             opts.menuBgndOpacity < 100 || qtSettings.useAlpha) {
-            GdkScreen *screen = gdk_screen_get_default();
-            GdkColormap *colormap =
-                screen ? gdk_screen_get_rgba_colormap(screen) : NULL;
-
-            if (colormap) {
-                gtk_widget_push_colormap(colormap);
-                gtk_widget_set_default_colormap(colormap);
-            }
+            // Somehow GtkWidget is not loaded yet
+            // when this function is called.
+            g_type_class_ref(GTK_TYPE_WIDGET);
+            g_signal_add_emission_hook(
+                g_signal_lookup("style-set", GTK_TYPE_WIDGET),
+                0, qtcurve_style_set_hook, NULL, NULL);
         }
     }
 }

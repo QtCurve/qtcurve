@@ -1793,10 +1793,10 @@ void qtcDefaultSettings(Options *opts)
     opts->bgndOpacity = opts->dlgOpacity = opts->menuBgndOpacity = 100;
     opts->gtkComboMenus=false;
     opts->noBgndGradientApps=NULL;
-    opts->noBgndOpacityApps=g_strsplit("inkscape,sonata,totem,vmware,vmplayer",",", -1);;
+    opts->noBgndOpacityApps=g_strsplit("sonata,totem,vmware,vmplayer",",", -1);;
     opts->noBgndImageApps=NULL;
     opts->noMenuStripeApps=g_strsplit("gtk",",", -1);
-    opts->noMenuBgndOpacityApps=g_strsplit("inkscape,sonata,totem,vmware,vmplayer,gtk",",", -1);
+    opts->noMenuBgndOpacityApps=g_strsplit("sonata,totem,vmware,vmplayer,gtk",",", -1);
 /*
     opts->setDialogButtonOrder=false;
 */
