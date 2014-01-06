@@ -168,6 +168,13 @@ qtcCairoClipWhole(cairo_t *cr, double x, double y, int w, int h,
     qtcCairoPathWhole(cr, x, y, w, h, radius, round);
     cairo_clip(cr);
 }
+#define qtcGdkCreateCairoClip(window, area, width...)           \
+    ({                                                          \
+        cairo_t *__cr = gdk_cairo_create(window);               \
+        qtcCairoClipRect(__cr, (const QtcRect*)(area));         \
+        cairo_set_line_width(__cr, QTC_DEFAULT(width, 1));      \
+        __cr;                                                   \
+    })
 
 QTC_END_DECLS
 

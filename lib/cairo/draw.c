@@ -250,7 +250,7 @@ qtcCairoLayout(cairo_t *cr, const QtcRect *area, int x, int y,
                PangoLayout *layout, const GdkColor *col)
 {
     qtcCairoClipRect(cr, area);
-    cairo_set_line_width(cr, 1.0);
+    cairo_set_line_width(cr, 1);
     qtcCairoSetColor(cr, col);
     ge_cairo_transform_for_layout(cr, layout, x, y);
     pango_cairo_show_layout(cr, layout);
