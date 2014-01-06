@@ -3137,6 +3137,17 @@ qtcurve_style_set_hook(GSignalInvocationHint *ihint, unsigned argc,
     if (!screen) {
         return true;
     }
+#if GTK_CHECK_VERSION(3, 0, 0)
+    GdkVisual *visual = NULL;
+    if (gtk_widget_is_toplevel(widget)) {
+        visual = gdk_screen_get_rgba_visual(screen);
+    } else if (GTK_IS_DRAWING_AREA(widget)) {
+        visual = gdk_screen_get_system_visual(screen);
+    }
+    if (visual) {
+        gtk_widget_set_visual(widget, visual);
+    }
+#else
     GdkColormap *colormap = NULL;
     if (gtk_widget_is_toplevel(widget)) {
         colormap = gdk_screen_get_rgba_colormap(screen);
@@ -3150,6 +3161,7 @@ qtcurve_style_set_hook(GSignalInvocationHint *ihint, unsigned argc,
     if (colormap) {
         gtk_widget_set_colormap(widget, colormap);
     }
+#endif
     return true;
 }
 
