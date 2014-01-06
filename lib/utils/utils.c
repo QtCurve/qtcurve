@@ -21,6 +21,7 @@
 
 #include "utils.h"
 #include "atomic.h"
+#include <dlfcn.h>
 
 #ifdef __QTC_ATOMIC_USE_SYNC_FETCH
 /**
@@ -141,4 +142,48 @@ QTC_EXPORT int
     QtcStrMapItem *item = bsearch(&comp_key, map->items, map->num,
                                   sizeof(QtcStrMapItem), qtcStrMapItemCompKey);
     return item ? item->val : def;
+}
+
+const char*
+_qtcGetProgName()
+{
+    static char buff[1024] = "";
+    void *hdl = dlopen(NULL, RTLD_NOW);
+    const char *name = NULL;
+    char *const *progname = NULL;
+    const char *(*progname_func)() = NULL;
+    // I do not use the procfs here since any system that has procfs (Linux)
+    // should support one of these variables/functions.
+    if (!hdl) {
+        return "";
+    } else if ((progname = dlsym(hdl, "program_invocation_short_name")) ||
+               (progname = dlsym(hdl, "program_invocation_name")) ||
+               (progname = dlsym(hdl, "__progname"))) {
+        name = *progname;
+    } else if ((progname_func = dlsym(hdl, "getprogname"))) {
+        name = progname_func();
+    }
+    if (!name) {
+        return "";
+    }
+    strncpy(buff, name, 1024);
+    buff[1023] = '\0';
+    buff[strcspn(buff, " ")] = '\0';
+    if (qtcUnlikely(name = strrchr(buff, '/'))) {
+        name++;
+        if (*name) {
+            return name;
+        }
+    }
+    return buff;
+}
+
+QTC_EXPORT const char*
+qtcGetProgName()
+{
+    static const char *name = NULL;
+    if (!name) {
+        name = _qtcGetProgName();
+    }
+    return name;
 }

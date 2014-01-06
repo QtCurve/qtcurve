@@ -167,6 +167,8 @@ int qtcStrMapSearch(const QtcStrMap *map, const char *key, int def);
 #define qtcStrMapSearch(map, key, def...)       \
     _qtcStrMapSearch(map, key, ##def, 0)
 
+const char *qtcGetProgName();
+
 QTC_END_DECLS
 
 #ifdef __cplusplus

@@ -7,7 +7,7 @@ set(qtcurve_utils_SRCS
   shadow.c
   timer.c)
 set(qtcurve_utils_LINKS
-  m rt ${LIBEXECINFO_LIBRARIES})
+  m rt dl ${LIBEXECINFO_LIBRARIES})
 
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 

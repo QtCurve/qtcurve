@@ -3049,8 +3049,8 @@ static void qtcurve_rc_style_merge(GtkRcStyle *dest, GtkRcStyle *src)
     const char *typeName=src ? g_type_name(G_TYPE_FROM_INSTANCE(src)) : NULL;
     bool        destIsQtc=QTCURVE_IS_RC_STYLE(dest),
         srcIsQtc=!src->name || qtcStrStartsWith(src->name, RC_SETTING) ||
-        (getAppName() && qtcStrStartsWith(src->name, getAppName())),
-                isQtCNoteBook=0!=opts.tabBgnd && src->name && 0==strcmp(src->name, "qtcurve-notebook_bg"),
+        qtcStrStartsWith(src->name, qtcGetProgName()),
+        isQtCNoteBook=0!=opts.tabBgnd && src->name && 0==strcmp(src->name, "qtcurve-notebook_bg"),
                 dontChangeColors=destIsQtc && !srcIsQtc && !isQtCNoteBook &&
                                  // Only allow GtkRcStyle and QtCurveRcStyle to change colours
                                  // ...this should catch most cases whre another themes gtkrc is in the

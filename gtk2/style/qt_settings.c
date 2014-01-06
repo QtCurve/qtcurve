@@ -1168,59 +1168,10 @@ static char *getIconPath()
         path[plen - 1] = '\0';
     }
 
-    if(qtSettings.debug && path)
-        printf(DEBUG_PREFIX"%s\n", path);
-
+    if (qtSettings.debug && path) {
+        printf(DEBUG_PREFIX "%s\n", path);
+    }
     return path;
-}
-
-static char*
-getAppNameFromPid(int pid)
-{
-    /* CPD: There must be an easier way than this? */
-    static char app_name[MAX_APP_NAME_LEN + 1] = "";
-    int procFile = -1;
-    char cmdline[MAX_LINE_LEN + 1];
-    sprintf(cmdline, "/proc/%d/cmdline", pid);
-
-    if ((procFile = open(cmdline, O_RDONLY)) != -1) {
-        if (read(procFile, cmdline, MAX_LINE_LEN) > 2) {
-            if (qtSettings.debug)
-                printf(DEBUG_PREFIX "Command - \"%s\"\n", cmdline);
-            int len = strlen(cmdline);
-            bool found_slash = false;
-            int pos;
-            for (pos = len - 1;pos >= 0 && cmdline[pos] && !found_slash;pos--) {
-                if (cmdline[pos] == '/') {
-                    pos++;
-                    found_slash = true;
-                }
-            }
-            if (found_slash && pos >= 0) {
-                strncpy(app_name, &cmdline[pos ? pos + 1 : 0],
-                        MAX_APP_NAME_LEN);
-                app_name[MAX_APP_NAME_LEN] = '\0';
-            }
-        }
-        close(procFile);
-    }
-    return app_name;
-}
-
-const char *
-getAppName()
-{
-    static const char *name = 0L;
-    if (!name) {
-        name = getAppNameFromPid(getpid());
-        if (strcmp(name, "perl") == 0 || strcmp(name, "python") == 0) {
-            name = getAppNameFromPid(getppid());
-            if (!name) {
-                name = "scriptedapp";
-            }
-        }
-    }
-    return name;
 }
 
 #define MAX_CSS_HOME     256
@@ -1692,7 +1643,7 @@ gboolean qtSettingsInit()
 */
 
             /* Check if we're firefox... */
-            if ((qtSettings.appName = getAppName())) {
+            if ((qtSettings.appName = qtcGetProgName())) {
                 bool firefox = (isMozApp(qtSettings.appName, "firefox") ||
                                 isMozApp(qtSettings.appName, "iceweasel") ||
                                 isMozApp(qtSettings.appName, "swiftfox") ||
