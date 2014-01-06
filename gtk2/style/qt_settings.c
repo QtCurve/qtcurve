@@ -31,11 +31,9 @@
 #include <common/config_file.h>
 #include "qt_settings.h"
 #include "helpers.h"
-#include <fcntl.h>
 #include <dirent.h>
 #include <locale.h>
 #include <gmodule.h>
-#include <ctype.h>
 
 QtCPalette qtcPalette;
 Options opts;
