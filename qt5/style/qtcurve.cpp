@@ -2777,29 +2777,28 @@ void Style::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option
 
     if(MENU_BAR!=type && APPEARANCE_FADE==opts.menuitemAppearance)
     {
-        bool            reverse=Qt::RightToLeft==option->direction;
-        QColor          trans(Qt::white);
-        QRect           r2(ROUNDED ? r.adjusted(1, 1, -1, -1) : r);
-        QRectF          rf(r2);
-        double          fadePercent=((double)MENUITEM_FADE_SIZE)/rf.width();
+        bool reverse = Qt::RightToLeft==option->direction;
+        QColor trans(Qt::white);
+        QRect r2(opts.round != ROUND_NONE ? r.adjusted(1, 1, -1, -1) : r);
+        QRectF rf(r2);
+        double fadePercent = ((double)MENUITEM_FADE_SIZE)/rf.width();
         QLinearGradient grad(r2.topLeft(), r2.topRight());
 
         trans.setAlphaF(0.0);
         grad.setColorAt(0, reverse ? trans : cols[fill]);
         grad.setColorAt(reverse ? fadePercent : 1.0-fadePercent, cols[fill]);
         grad.setColorAt(1, reverse ? cols[fill] : trans);
-        if(ROUNDED)
-        {
+        if (opts.round != ROUND_NONE) {
             p->save();
             p->setRenderHint(QPainter::Antialiasing, true);
-            p->fillPath(buildPath(rf, WIDGET_OTHER, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, 4), QBrush(grad));
+            p->fillPath(buildPath(rf, WIDGET_OTHER,
+                                  reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, 4),
+                        QBrush(grad));
             p->restore();
-        }
-        else
+        } else {
             p->fillRect(r2, QBrush(grad));
-    }
-    else if(MENU_BAR==type || opts.borderMenuitems)
-    {
+        }
+    } else if (MENU_BAR==type || opts.borderMenuitems) {
         bool stdColor(MENU_BAR!=type || (SHADE_BLEND_SELECTED!=opts.shadeMenubars && SHADE_SELECTED!=opts.shadeMenubars));
 
         QStyleOption opt(*option);
@@ -2823,15 +2822,18 @@ void Style::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option
     else
     {
         // For now dont round combos - getting weird effects with shadow/clipping in Gtk2 style :-(
-        if(/*MENU_COMBO==type || */opts.square&SQUARE_POPUP_MENUS)
-            drawBevelGradient(cols[fill], p, r, true, false, opts.menuitemAppearance, WIDGET_MENU_ITEM);
-        else
-        {
+        if (/*MENU_COMBO==type || */opts.square & SQUARE_POPUP_MENUS) {
+            drawBevelGradient(cols[fill], p, r, true, false,
+                              opts.menuitemAppearance, WIDGET_MENU_ITEM);
+        } else {
             p->save();
             p->setRenderHint(QPainter::Antialiasing, true);
-            drawBevelGradient(cols[fill], p, r, buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL,
-                                                          MENU_AND_TOOLTIP_RADIUS-(opts.round>ROUND_SLIGHT ? 1.0 : 0.5)), true, false,
-                              opts.menuitemAppearance, WIDGET_MENU_ITEM, false);
+            drawBevelGradient(
+                cols[fill], p, r,
+                buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL,
+                          (opts.round >= ROUND_FULL ? 5.0 : 2.5) -
+                          (opts.round > ROUND_SLIGHT ? 1.0 : 0.5)), true, false,
+                opts.menuitemAppearance, WIDGET_MENU_ITEM, false);
             p->restore();
         }
     }

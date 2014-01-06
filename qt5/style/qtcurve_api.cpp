@@ -880,7 +880,7 @@ void Style::unpolish(QWidget *widget)
         widget->setAttribute(Qt::WA_Hover, false);
     if (qobject_cast<QScrollBar*>(widget)) {
         widget->setAttribute(Qt::WA_Hover, false);
-        if(ROUNDED && !opts.flatSbarButtons)
+        if (opts.round != ROUND_NONE && !opts.flatSbarButtons)
             widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
     } else if (qobject_cast<QProgressBar*>(widget)) {
         if(opts.boldProgress)
@@ -1171,7 +1171,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
             QWidget *widget = qtcToWidget(object);
             QPainter p(widget);
             QRect r(widget->rect());
-            double radius=MENU_AND_TOOLTIP_RADIUS;
+            double radius = opts.round >= ROUND_FULL ? 5.0 : 2.5;
             QStyleOption opt;
             opt.init(widget);
             const QColor *use(popupMenuCols(&opt));
@@ -1447,7 +1447,7 @@ Style::pixelMetric(PixelMetric metric, const QStyleOption *option,
     prePolish(widget);
     switch((unsigned)metric) {
     case PM_ToolTipLabelFrameWidth:
-        if (ROUNDED && !(opts.square & SQUARE_TOOLTIPS))
+        if (opts.round != ROUND_NONE && !(opts.square & SQUARE_TOOLTIPS))
             return 3;
         return QCommonStyle::pixelMetric(metric, option, widget);
     case PM_MdiSubWindowFrameWidth:
@@ -4104,7 +4104,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option,
 
         painter->save();
 #ifndef SIMPLE_SCROLLBARS
-        if(ROUNDED && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons))
+        if (opts.round != ROUND_NONE && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons))
             painter->fillRect(r, palette.background().color());
 #endif
 
@@ -4134,7 +4134,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option,
                                   true, false, opts.grooveAppearance, WIDGET_TROUGH);
 
 #ifndef SIMPLE_SCROLLBARS
-            if(ROUNDED && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons))
+            if (opts.round != ROUND_NONE && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons))
             {
                 if(CE_ScrollBarAddPage==element)
                     drawBorder(painter, r.adjusted(-5, 0, 0, 0), option, ROUNDED_RIGHT, use, WIDGET_TROUGH);
@@ -4157,7 +4157,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option,
                                   false, false, opts.grooveAppearance, WIDGET_TROUGH);
 
 #ifndef SIMPLE_SCROLLBARS
-            if(ROUNDED && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons))
+            if (opts.round != ROUND_NONE && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons))
             {
                 if(CE_ScrollBarAddPage==element)
                     drawBorder(painter, r.adjusted(0, -5, 0, 0), option, ROUNDED_BOTTOM, use, WIDGET_TROUGH);
@@ -5636,7 +5636,9 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
             }
 
             // Draw trough...
-            bool  noButtons(ROUNDED && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons));
+            bool  noButtons(opts.round != ROUND_NONE &&
+                            (opts.scrollbarType == SCROLLBAR_NONE ||
+                             opts.flatSbarButtons));
             QRect s2(subpage), a2(addpage);
 
 #ifndef SIMPLE_SCROLLBARS

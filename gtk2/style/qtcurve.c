@@ -331,7 +331,7 @@ gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
             if(GTK_STATE_SELECTED==state || alpha<1.0)
             {
-                int round=detail && ROUNDED
+                int round=detail && opts.round != ROUND_NONE
                                 ? forceCellStart && forceCellEnd
                                     : ROUNDED_ALL
                                     ? forceCellStart || 0!=strstr(detail, "_start")
@@ -1572,18 +1572,21 @@ gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state,
                     clearRoundedMask(widget, false);
                 } else {
                     createRoundedMask(widget, x, y, width, height,
-                                      MENU_AND_TOOLTIP_RADIUS, false);
+                                      opts.round >= ROUND_FULL ? 5.0 : 2.5,
+                                      false);
                 }
 
                 qtcCairoClipWhole(cr, x, y, width, height,
-                                  MENU_AND_TOOLTIP_RADIUS, ROUNDED_ALL);
+                                  opts.round >= ROUND_FULL ? 5.0 : 2.5,
+                                  ROUNDED_ALL);
                 qtcCairoRect(cr, (QtcRect*)area, x, y, width, height,
                              &style->base[state]);
                 if(useAlpha)
                     cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
                 if (opts.popupBorder) {
                     qtcCairoPathWhole(cr, x + 0.5, y + 0.5, width - 1,
-                                      height - 1, MENU_AND_TOOLTIP_RADIUS - 1,
+                                      height - 1, (opts.round >= ROUND_FULL ?
+                                                   5.0 : 2.5) - 1,
                                       ROUNDED_ALL);
                     qtcCairoSetColor(cr,
                                      &qtcPalette.background[QTC_STD_BORDER]);
@@ -2709,7 +2712,7 @@ gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
         parent_class->draw_focus(style, window, state, area, widget, detail,
                                  x, y, width, height);
     } else {
-        gboolean drawRounded = ROUNDED;
+        gboolean drawRounded = opts.round != ROUND_NONE;
         GdkColor *col =
             (view && state == GTK_STATE_SELECTED ? &style->text[state] :
              &qtcPalette.focus[FOCUS_SHADE(state == GTK_STATE_SELECTED)]);
@@ -2813,7 +2816,7 @@ gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 qtcCairoPathWhole(cr, x + 0.5, y + 0.5, width - 1, height - 1,
                                   (view &&
                                    opts.square & SQUARE_LISTVIEW_SELECTION) &&
-                                  ROUNDED ? SLIGHT_INNER_RADIUS :
+                                  opts.round != ROUND_NONE ? SLIGHT_INNER_RADIUS :
                                   qtcGetRadius(&opts, width, height, WIDGET_OTHER,
                                                FULL_FOCUS ? RADIUS_EXTERNAL :
                                                RADIUS_SELECTION),

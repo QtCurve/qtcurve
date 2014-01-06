@@ -147,7 +147,7 @@ Style::drawPrimitiveIndicatorBranch(PrimitiveElement element,
             afterV = ar.y() + LV_SIZE + 4;
 #if 0
             beforeH = ar.x();
-            int lo(ROUNDED ? 2 : 0);
+            int lo = opts.round != ROUND_NONE ? 2 : 0;
 
             painter->setPen(palette.mid().color());
             painter->drawLine(ar.x() + lo, ar.y(), ar.x() + ar.width() - 1 - lo,
@@ -160,7 +160,7 @@ Style::drawPrimitiveIndicatorBranch(PrimitiveElement element,
             painter->drawLine(ar.x() + ar.width() - 1, ar.y() + lo,
                               ar.x() + ar.width() - 1,
                               ar.y() + ar.height() - 1 - lo);
-            if (ROUNDED) {
+            if (opts.round != ROUND_NONE) {
                 painter->drawPoint(ar.x() + 1, ar.y() + 1);
                 painter->drawPoint(ar.x() + 1, ar.y() + ar.height() - 2);
                 painter->drawPoint(ar.x() + ar.width() - 2, ar.y() + 1);
@@ -701,7 +701,8 @@ Style::drawPrimitivePanelTipLabel(PrimitiveElement element,
     bool rounded = !(opts.square & SQUARE_TOOLTIPS);
     QPainterPath path =
         (rounded ? buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL,
-                             MENU_AND_TOOLTIP_RADIUS) : QPainterPath());
+                             opts.round >= ROUND_FULL ? 5.0 : 2.5) :
+         QPainterPath());
     QColor col = palette.toolTipBase().color();
 
 #ifdef QTC_ENABLE_X11
@@ -1267,7 +1268,7 @@ Style::drawPrimitivePanelMenu(PrimitiveElement element,
     QTC_UNUSED(element);
     QTC_UNUSED(widget);
     const QRect &r = option->rect;
-    double radius = MENU_AND_TOOLTIP_RADIUS;
+    double radius = opts.round >= ROUND_FULL ? 5.0 : 2.5;
     const QColor *use = popupMenuCols(option);
     painter->setClipRegion(r);
     painter->setCompositionMode(QPainter::CompositionMode_Source);
@@ -1450,7 +1451,7 @@ Style::drawPrimitiveFrameFocusRect(PrimitiveElement element,
                     c.setAlphaF(FOCUS_ALPHA);
                     painter->setBrush(c);
                 }
-                if (ROUNDED) {
+                if (opts.round != ROUND_NONE) {
                     bool square((opts.square & SQUARE_LISTVIEW_SELECTION) &&
                                 (((widget &&
                                    !widget->inherits("KFilePlacesView") &&

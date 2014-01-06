@@ -2551,10 +2551,10 @@ drawToolTip(cairo_t *cr, GtkWidget *widget, const QtcRect *area,
             clearRoundedMask(widget, true);
         } else {
             createRoundedMask(widget, x, y, width, height,
-                              MENU_AND_TOOLTIP_RADIUS, true);
+                              opts.round >= ROUND_FULL ? 5.0 : 2.5, true);
         }
-        qtcCairoClipWhole(cr, x, y, width, height, MENU_AND_TOOLTIP_RADIUS,
-                          ROUNDED_ALL);
+        qtcCairoClipWhole(cr, x, y, width, height,
+                          opts.round >= ROUND_FULL ? 5.0 : 2.5, ROUNDED_ALL);
     }
     if (useAlpha) {
         cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
@@ -2725,7 +2725,7 @@ drawMenuItem(cairo_t *cr, GtkStateType state, GtkStyle *style,
             double fadePercent = 0.0;
 
             cairo_save(cr);
-            if (ROUNDED) {
+            if (opts.round != ROUND_NONE) {
                 x++;
                 y++;
                 width -= 2;
@@ -2763,7 +2763,7 @@ drawMenuItem(cairo_t *cr, GtkStateType state, GtkStyle *style,
             cairo_save(cr);
             if (roundedMenu) {
                 qtcCairoClipWhole(cr, x, y, width, height,
-                                  MENU_AND_TOOLTIP_RADIUS - 1.0, round);
+                                  (opts.round >= ROUND_FULL ? 5.0 : 2.5) - 1.0, round);
             }
             drawBevelGradient(cr, area, x, y, width, height,
                               &itemCols[fillVal], true, false,
@@ -2816,7 +2816,7 @@ drawMenu(cairo_t *cr, GtkWidget *widget, const QtcRect *area,
     }
     cairo_save(cr); // For clipping
     if (roundedMenu && !comboMenu) {
-        radius = MENU_AND_TOOLTIP_RADIUS;
+        radius = opts.round >= ROUND_FULL ? 5.0 : 2.5;
         if (useAlphaForCorners) {
             cairo_save(cr);
             cairo_rectangle(cr, x, y, width, height);

@@ -111,8 +111,6 @@ enum {
 
 #define INVERT_SHADE(A) (1.0+(1.0-(A)))
 
-#define ROUNDED (ROUND_NONE!=opts.round)
-
 #define TOOLBAR_SEP_GAP        (opts.fadeLines ? 5 : 6)
 #define FADE_SIZE              0.4
 #define ETCHED_DARK            0.95
@@ -274,9 +272,6 @@ enum {
 #define RINGS_SQUARE_RADIUS      18.0
 #define RINGS_SQUARE_LARGE_SIZE  120.0
 #define RINGS_SQUARE_SMALL_SIZE  100.0
-
-#define MENU_AND_TOOLTIP_RADIUS   (opts.round>=ROUND_FULL ? 5.0 : 3.5)
-
 #define GLOW_PROG_ALPHA 0.55
 
 typedef enum {

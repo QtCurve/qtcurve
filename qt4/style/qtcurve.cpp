@@ -2247,7 +2247,7 @@ void Style::unpolish(QWidget *widget)
         widget->setAttribute(Qt::WA_Hover, false);
     if (qobject_cast<QScrollBar*>(widget)) {
         widget->setAttribute(Qt::WA_Hover, false);
-        if (ROUNDED && !opts.flatSbarButtons) {
+        if (opts.round != ROUND_NONE && !opts.flatSbarButtons) {
             widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
         }
     } else if (qobject_cast<QProgressBar*>(widget)) {
@@ -2573,7 +2573,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 QWidget *widget = qtcToWidget(object);
                 QPainter p(widget);
                 QRect r(widget->rect());
-                double radius = MENU_AND_TOOLTIP_RADIUS;
+                double radius = opts.round >= ROUND_FULL ? 5.0 : 2.5;
                 QStyleOption opt;
                 opt.init(widget);
                 const QColor *use = popupMenuCols(&opt);
@@ -2874,7 +2874,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
     switch((unsigned)metric)
     {
         case PM_ToolTipLabelFrameWidth:
-            return !ROUNDED || opts.square&SQUARE_TOOLTIPS ? QCommonStyle::pixelMetric(metric, option, widget) : 3;
+            return !(opts.round != ROUND_NONE) || opts.square&SQUARE_TOOLTIPS ? QCommonStyle::pixelMetric(metric, option, widget) : 3;
         case PM_MdiSubWindowFrameWidth:
             return 3;
         case PM_DockWidgetTitleMargin:
@@ -3620,7 +3620,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                 afterV = ar.y() + LV_SIZE + 4;
 #if 0
                 beforeH = ar.x();
-                int lo(ROUNDED ? 2 : 0);
+                int lo = opts.round != ROUND_NONE ? 2 : 0;
 
                 painter->setPen(palette.mid().color());
                 painter->drawLine(ar.x() + lo, ar.y(),
@@ -3634,7 +3634,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                                   ar.y() + lo, ar.x() + ar.width() - 1,
                                   (ar.y() + ar.height() - 1) - lo);
 
-                if (ROUNDED) {
+                if (opts.round != ROUND_NONE) {
                     painter->drawPoint(ar.x() + 1, ar.y() + 1);
                     painter->drawPoint(ar.x() + 1, ar.y() + ar.height() - 2);
                     painter->drawPoint(ar.x() + ar.width() - 2, ar.y() + 1);
@@ -4715,8 +4715,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                             painter->setBrush(c);
                         }
 
-                        if(ROUNDED)
-                        {
+                        if (opts.round != ROUND_NONE) {
                             bool square((opts.square&SQUARE_LISTVIEW_SELECTION) &&
                                         ((/*(!widget && r.height()<=40 && r.width()>=48) || */
                                           (widget && !widget->inherits("KFilePlacesView") &&
@@ -5211,7 +5210,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
         case PE_PanelTipLabel: {
             bool haveAlpha = Utils::hasAlphaChannel(widget);
             bool rounded = !(opts.square & SQUARE_TOOLTIPS);
-            QPainterPath path=rounded ? buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, MENU_AND_TOOLTIP_RADIUS) : QPainterPath();
+            QPainterPath path = rounded ? buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, opts.round >= ROUND_FULL ? 5.0 : 2.5) : QPainterPath();
             QColor       col=palette.toolTipBase().color();
 
             #ifdef QTC_ENABLE_X11
@@ -7169,7 +7168,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
             painter->save();
 #ifndef SIMPLE_SCROLLBARS
-            if(ROUNDED && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons))
+            if (opts.round != ROUND_NONE && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons))
                 painter->fillRect(r, palette.background().color());
 #endif
 
@@ -7199,7 +7198,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                                       true, false, opts.grooveAppearance, WIDGET_TROUGH);
 
 #ifndef SIMPLE_SCROLLBARS
-                if(ROUNDED && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons))
+                if (opts.round != ROUND_NONE && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons))
                 {
                     if(CE_ScrollBarAddPage==element)
                         drawBorder(painter, r.adjusted(-5, 0, 0, 0), option, ROUNDED_RIGHT, use, WIDGET_TROUGH);
@@ -7222,7 +7221,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                                       false, false, opts.grooveAppearance, WIDGET_TROUGH);
 
 #ifndef SIMPLE_SCROLLBARS
-                if(ROUNDED && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons))
+                if (opts.round != ROUND_NONE && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons))
                 {
                     if(CE_ScrollBarAddPage==element)
                         drawBorder(painter, r.adjusted(0, -5, 0, 0), option, ROUNDED_BOTTOM, use, WIDGET_TROUGH);
@@ -8071,7 +8070,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 #if 0
                                     if(LV_OLD==opts.lvLines)
                                     {
-                                        int lo(ROUNDED ? 2 : 0);
+                                        int lo(opts.round != ROUND_NONE ? 2 : 0);
 
                                         painter->setPen(palette.mid().color());
                                         painter->drawLine(ar.x()+lo, ar.y(), (ar.x()+ar.width()-1)-lo, ar.y());
@@ -8079,8 +8078,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                                         painter->drawLine(ar.x(), ar.y()+lo, ar.x(), (ar.y()+ar.height()-1)-lo);
                                         painter->drawLine(ar.x()+ar.width()-1, ar.y()+lo, ar.x()+ar.width()-1, (ar.y()+ar.height()-1)-lo);
 
-                                        if(ROUNDED)
-                                        {
+                                        if (opts.round != ROUND_NONE) {
                                             painter->drawPoint(ar.x()+1, ar.y()+1);
                                             painter->drawPoint(ar.x()+1, ar.y()+ar.height()-2);
                                             painter->drawPoint(ar.x()+ar.width()-2, ar.y()+1);
@@ -8858,7 +8856,8 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                 }
 
                 // Draw trough...
-                bool  noButtons(ROUNDED && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons));
+                bool  noButtons(opts.round != ROUND_NONE &&
+                                (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons));
                 QRect s2(subpage), a2(addpage);
 
 #ifndef SIMPLE_SCROLLBARS
@@ -11942,22 +11941,23 @@ void Style::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option
 
     if(MENU_BAR!=type && APPEARANCE_FADE==opts.menuitemAppearance)
     {
-        bool            reverse=Qt::RightToLeft==option->direction;
-        QColor          trans(Qt::white);
-        QRect           r2(ROUNDED ? r.adjusted(1, 1, -1, -1) : r);
-        QRectF          rf(r2);
-        double          fadePercent=((double)MENUITEM_FADE_SIZE)/rf.width();
+        bool reverse = Qt::RightToLeft==option->direction;
+        QColor trans(Qt::white);
+        QRect r2(opts.round != ROUND_NONE ? r.adjusted(1, 1, -1, -1) : r);
+        QRectF rf(r2);
+        double fadePercent=((double)MENUITEM_FADE_SIZE)/rf.width();
         QLinearGradient grad(r2.topLeft(), r2.topRight());
 
         trans.setAlphaF(0.0);
         grad.setColorAt(0, reverse ? trans : cols[fill]);
         grad.setColorAt(reverse ? fadePercent : 1.0-fadePercent, cols[fill]);
         grad.setColorAt(1, reverse ? cols[fill] : trans);
-        if(ROUNDED)
-        {
+        if (opts.round != ROUND_NONE) {
             p->save();
             p->setRenderHint(QPainter::Antialiasing, true);
-            p->fillPath(buildPath(rf, WIDGET_OTHER, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, 4), QBrush(grad));
+            p->fillPath(buildPath(rf, WIDGET_OTHER,
+                                  reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, 4),
+                        QBrush(grad));
             p->restore();
         }
         else
@@ -11994,9 +11994,12 @@ void Style::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option
         {
             p->save();
             p->setRenderHint(QPainter::Antialiasing, true);
-            drawBevelGradient(cols[fill], p, r, buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL,
-                                                          MENU_AND_TOOLTIP_RADIUS-(opts.round>ROUND_SLIGHT ? 1.0 : 0.5)), true, false,
-                              opts.menuitemAppearance, WIDGET_MENU_ITEM, false);
+            drawBevelGradient(
+                cols[fill], p, r,
+                buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL,
+                          (opts.round >= ROUND_FULL ? 5.0 : 2.5) -
+                          (opts.round > ROUND_SLIGHT ? 1.0 : 0.5)), true, false,
+                opts.menuitemAppearance, WIDGET_MENU_ITEM, false);
             p->restore();
         }
     }
