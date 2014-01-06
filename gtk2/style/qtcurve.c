@@ -3141,9 +3141,10 @@ qtcurve_style_set_hook(GSignalInvocationHint *ihint, unsigned argc,
     if (gtk_widget_is_toplevel(widget)) {
         colormap = gdk_screen_get_rgba_colormap(screen);
     } else if (GTK_IS_DRAWING_AREA(widget)) {
-        // For inkscape (and pobably flash).
+        // For inkscape and flash (and probably others).
         // Inkscape's (at least the Gtk2 version) EekPreview widget
-        // uses system default colormap instead of the one for the widget
+        // uses system default colormap instead of the one for the widget.
+        // Not sure what's wrong with flash...
         colormap = gdk_screen_get_default_colormap(screen);
     }
     if (colormap) {

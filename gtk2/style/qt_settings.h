@@ -1,6 +1,6 @@
 /*****************************************************************************
  *   Copyright 2003 - 2010 Craig Drummond <craig.p.drummond@gmail.com>       *
- *   Copyright 2013 - 2013 Yichao Yu <yyc1992@gmail.com>                     *
+ *   Copyright 2013 - 2014 Yichao Yu <yyc1992@gmail.com>                     *
  *                                                                           *
  *   This program is free software; you can redistribute it and/or modify    *
  *   it under the terms of the GNU Lesser General Public License as          *
@@ -91,7 +91,6 @@ typedef enum
     GTK_APP_JAVA,
     GTK_APP_JAVA_SWT,
     GTK_APP_EVOLUTION,
-    GTK_APP_FLASH_PLUGIN,
     GTK_APP_GHB
     /*GTK_APP_GAIM*/
 } EGtkApp;

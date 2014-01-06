@@ -36,7 +36,6 @@
 #include <locale.h>
 #include <gmodule.h>
 #include <ctype.h>
-#include <dlfcn.h>
 
 QtCPalette qtcPalette;
 Options opts;
@@ -1175,61 +1174,42 @@ static char *getIconPath()
     return path;
 }
 
-#define GIMP_PLUGIN         "gimpplugin"
-#define CHROME_FLASH_PLUGIN "chrome-flashplugin"
+#define GIMP_PLUGIN "gimpplugin"
 
-static char * getAppNameFromPid(int pid)
+static char*
+getAppNameFromPid(int pid)
 {
-/* CPD: There must be an easier way than this? */
-    static char app_name[MAX_APP_NAME_LEN+1]="";
-
-    int  procFile=-1;
-    char cmdline[MAX_LINE_LEN+1];
-
+    /* CPD: There must be an easier way than this? */
+    static char app_name[MAX_APP_NAME_LEN + 1] = "";
+    int procFile = -1;
+    char cmdline[MAX_LINE_LEN + 1];
     sprintf(cmdline, "/proc/%d/cmdline", pid);
 
-    if(-1!=(procFile=open(cmdline, O_RDONLY)))
-    {
-        if(read(procFile, cmdline, MAX_LINE_LEN)>2)
-        {
-            int      len=strlen(cmdline),
-                     pos=0;
-            gboolean found_slash=false;
-
-            if(qtSettings.debug)
-                printf(DEBUG_PREFIX"Command - \"%s\"\n", cmdline);
-
-            /* Try to detect chrome's flash plugin */
-            if(/*(100!=opts.bgndOpacity || 100!=opts.dlgOpacity || 100!=opts.menuBgndOpacity) &&*/
-                NULL!=strstr(cmdline, "--type=plugin") && NULL!=strstr(cmdline, "--plugin-path=") &&
-                (NULL!=strstr(cmdline, "libflashplayer.so") || NULL!=strstr(cmdline, "libgcflashplayer.so")))
-                strcpy(app_name, CHROME_FLASH_PLUGIN);
-            else
-            {
-                for(pos=len-1; pos>=0 && cmdline[pos] && !found_slash; --pos)
-                    if('/'==cmdline[pos])
-                    {
-                        pos++;
-                        found_slash=true;
-                    }
-
-                if(!found_slash)
-                    pos=0;  /* Perhaps no / */
-                if(pos>=0)
-                {
-                    if(NULL!=strstr(cmdline, "gimp/2.0/plug-ins"))
-                        strcpy(app_name, GIMP_PLUGIN);
-                    else
-                    {
-                        strncpy(app_name, &cmdline[pos ? pos+1 : 0], MAX_APP_NAME_LEN);
-                        app_name[MAX_APP_NAME_LEN]='\0';
-                    }
+    if ((procFile = open(cmdline, O_RDONLY)) != -1) {
+        if (read(procFile, cmdline, MAX_LINE_LEN) > 2) {
+            if (qtSettings.debug)
+                printf(DEBUG_PREFIX "Command - \"%s\"\n", cmdline);
+            int len = strlen(cmdline);
+            bool found_slash = false;
+            int pos;
+            for (pos = len - 1;pos >= 0 && cmdline[pos] && !found_slash;pos--) {
+                if (cmdline[pos] == '/') {
+                    pos++;
+                    found_slash = true;
+                }
+            }
+            if (found_slash && pos >= 0) {
+                if (strstr(cmdline, "gimp/2.0/plug-ins")) {
+                    strcpy(app_name, GIMP_PLUGIN);
+                } else {
+                    strncpy(app_name, &cmdline[pos ? pos + 1 : 0],
+                            MAX_APP_NAME_LEN);
+                    app_name[MAX_APP_NAME_LEN] = '\0';
                 }
             }
         }
         close(procFile);
     }
-
     return app_name;
 }
 
@@ -1237,18 +1217,15 @@ const char *
 getAppName()
 {
     static const char *name = 0L;
-
-    if(!name)
-    {
-        name=getAppNameFromPid(getpid());
-
-        if(0==strcmp(name, "perl") || 0==strcmp(name, "python"))
-        {
-            name=getAppNameFromPid(getppid());
-            if(!name)
-                name="scriptedapp";
-            else if(name==strstr(name, "gimp"))
-                name=GIMP_PLUGIN;
+    if (!name) {
+        name = getAppNameFromPid(getpid());
+        if (strcmp(name, "perl") == 0 || strcmp(name, "python") == 0) {
+            name = getAppNameFromPid(getppid());
+            if (!name) {
+                name = "scriptedapp";
+            } else if (name == strstr(name, "gimp")) {
+                name = GIMP_PLUGIN;
+            }
         }
     }
     return name;
@@ -1606,30 +1583,6 @@ debugLevel()
     return DEBUG_NONE;
 }
 
-static inline bool
-isFlashPluginDlopen()
-{
-#ifdef RTLD_NOLOAD
-    // this is the soname of the flash plugin
-    void *hdl = dlopen("lib_plugin.so", RTLD_LAZY | RTLD_LOCAL | RTLD_NOLOAD);
-    if (hdl) {
-        dlclose(hdl);
-        return true;
-    }
-#endif
-    return false;
-}
-
-static inline bool
-isFlashPlugin()
-{
-    return (isFlashPluginDlopen() ||
-            strcmp(qtSettings.appName, CHROME_FLASH_PLUGIN) == 0 ||
-            strcmp(qtSettings.appName, "nspluginviewer") == 0 ||
-            strcmp(qtSettings.appName, "plugin-container") == 0 ||
-            strcmp(qtSettings.appName, "npviewer.bin") == 0);
-}
-
 gboolean qtSettingsInit()
 {
     if (0 == qt_refs++) {
@@ -1806,9 +1759,7 @@ gboolean qtSettingsInit()
                     qtSettings.app=GTK_APP_EVOLUTION;
                 else if(0==strcmp(qtSettings.appName, "eclipse"))
                     qtSettings.app=GTK_APP_JAVA_SWT;
-                else if (isFlashPlugin()) {
-                    qtSettings.app = GTK_APP_FLASH_PLUGIN;
-                } else if (strcmp(qtSettings.appName, "ghb") == 0) {
+                else if (strcmp(qtSettings.appName, "ghb") == 0) {
                     qtSettings.app=GTK_APP_GHB;
                 }
             }
@@ -1840,9 +1791,8 @@ gboolean qtSettingsInit()
             if(IMG_NONE!=opts.bgndImage.type && excludedApp(opts.noBgndImageApps))
                 opts.bgndImage.type=IMG_NONE;
 
-            if (qtcOneOf(qtSettings.app, GTK_APP_FLASH_PLUGIN,
-                         GTK_APP_OPEN_OFFICE, GTK_APP_JAVA, GTK_APP_JAVA_SWT) ||
-                isMozilla()) {
+            if (qtcOneOf(qtSettings.app, GTK_APP_OPEN_OFFICE, GTK_APP_JAVA,
+                         GTK_APP_JAVA_SWT) || isMozilla()) {
                 opts.bgndOpacity = opts.dlgOpacity = opts.menuBgndOpacity = 100;
                 qtSettings.useAlpha = false;
             }

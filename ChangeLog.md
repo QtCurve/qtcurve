@@ -34,6 +34,7 @@
     and Gtk3).
 23. Fix translucent background in KWin.
 24. Fix translucent background in inkscape.
+25. Enable translucent background in flash plugin.
 
 ## 1.8.17
 1. **Add Qt5 support!!**.
