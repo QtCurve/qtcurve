@@ -46,3 +46,11 @@ add_test(NAME test-default COMMAND test-default)
 add_executable(test-default-cpp test-default.cpp)
 target_link_libraries(test-default-cpp qtcurve-utils)
 add_test(NAME test-default-cpp COMMAND test-default-cpp)
+
+add_executable(test-call test-call.c)
+target_link_libraries(test-call qtcurve-utils)
+add_test(NAME test-call COMMAND test-call)
+
+add_executable(test-call-cpp test-call.cpp)
+target_link_libraries(test-call-cpp qtcurve-utils)
+add_test(NAME test-call-cpp COMMAND test-call-cpp)

@@ -281,6 +281,11 @@ qtcOneOf(T &&value, First &&first, Rest &&...rest...)
             decltype(val) __val = (val);        \
             return __val ? __val : (def);       \
         })())
+#define qtcCall(func, args...)                                          \
+    (([&]() {                                                           \
+            decltype(func) __func = (func);                             \
+            return __func ? __func(args) : decltype(__func(args))();    \
+        })())
 #else
 #define qtcOneOf(exp, args...)                                  \
     ({                                                          \
@@ -300,6 +305,11 @@ qtcOneOf(T &&value, First &&first, Rest &&...rest...)
     ({                                          \
         typeof(val) __val = (val);              \
         __val ? __val : (def);                  \
+    })
+#define qtcCall(func, args...)                                  \
+    ({                                                          \
+        typeof(func) __func = (func);                           \
+        __func ? __func(args) : (typeof(__func(args)))0;        \
     })
 #endif
 #define qtcNoneOf(args...) (!qtcOneOf(args))
