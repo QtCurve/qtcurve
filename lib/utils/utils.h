@@ -285,6 +285,9 @@ qtcOneOf(T &&value, First &&first, Rest &&...rest...)
 // Use lambda for lazy evaluation of \param args
 // C++ allows returning void expression! =) See the quote of the standard
 // (here)[http://gcc.gnu.org/ml/gcc/2006-10/msg00697.html]
+// The current c++ implementation of this macro does not support functions
+// with types that do not have accessible default constructor (including
+// references) as return type.
 #define qtcCall(func, args...)                                          \
     (([&]() {                                                           \
             decltype(func) __func = (func);                             \
@@ -310,6 +313,8 @@ qtcOneOf(T &&value, First &&first, Rest &&...rest...)
         typeof(val) __val = (val);              \
         __val ? __val : (def);                  \
     })
+// The current c implementation of this macro does not support functions
+// with non-scaler as return type.
 #define qtcCall(func, args...)                                  \
     ({                                                          \
         typeof(func) __func = (func);                           \

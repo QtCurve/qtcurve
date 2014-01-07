@@ -48,6 +48,16 @@ real_func_void()
     real_func_void_times++;
 }
 
+#ifdef __cplusplus
+// Functions with structs as return type only works for c++ (for now).
+typedef struct {
+    int i;
+    int j;
+} TestStruct;
+
+static TestStruct (*func_struct)() = NULL;
+#endif
+
 int
 main()
 {
@@ -60,5 +70,8 @@ main()
     func_void = real_func_void;
     qtcCall(func_void);
     assert(real_func_void_times == 1);
+#ifdef __cplusplus
+    qtcCall(func_struct);
+#endif
     return 0;
 }
