@@ -276,11 +276,15 @@ qtcOneOf(T &&value, First &&first, Rest &&...rest...)
     return value == first || qtcOneOf(std::forward<T>(value),
                                       std::forward<Rest>(rest)...);
 }
+// Use lambda for lazy evaluation of \param def
 #define qtcDefault(val, def)                    \
     (([&]() {                                   \
             decltype(val) __val = (val);        \
             return __val ? __val : (def);       \
         })())
+// Use lambda for lazy evaluation of \param args
+// C++ allows returning void expression! =) See the quote of the standard
+// (here)[http://gcc.gnu.org/ml/gcc/2006-10/msg00697.html]
 #define qtcCall(func, args...)                                          \
     (([&]() {                                                           \
             decltype(func) __func = (func);                             \
