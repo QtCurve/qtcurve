@@ -185,7 +185,9 @@ QTC_BEGIN_DECLS
  *
  * \return if a matching object is found, the pointer to the object will be
  *         returned, otherwise, a pointer to where the new object should be
- *         inserted will be returned.
+ *         inserted will be returned. If the key is greater than all the
+ *         elements in the array, the returned pointer will point to the end
+ *         of the list, i.e. out of the bound of the list.
  */
 void *qtcBSearch(const void *key, const void *base, size_t nmemb, size_t size,
                  int (*compar)(const void*, const void*));

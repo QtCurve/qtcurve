@@ -59,8 +59,6 @@ QTC_DEFINE_ATOMIC(Xor, ^, uint32_t)
 #undef QTC_DEFINE_ATOMIC
 
 // Return the position of the element that is greater than or equal to the key.
-// If the key is greater than all the elements in the array, the returned
-// pointer will point to the end of the list, i.e. out of the bound of the list.
 QTC_EXPORT void*
 qtcBSearch(const void *key, const void *base, size_t nmemb, size_t size,
            int (*compar)(const void*, const void*))

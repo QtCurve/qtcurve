@@ -1,4 +1,7 @@
-1. Firefox doesn't support transparent menu.
+1. Firefox doesn't support transparent menu or corner radius.
+   *Related to firefox assuming menus and popups are opaque.*
+   *Patching firefox can fix the problem, need to figure out whether it can be*
+   *monkey patched.*
 2. Partially set translucent background crashes amarok (in opengl).
    (Also affects Oxygen Transparent.)
    **Doesn't crash anymore after doing prepolish, need more tests.**
@@ -8,6 +11,7 @@
    *preview window (preview window magically looks good now).*
 4. Transparent background make chromium render incorrectly, *need to check if*
    *Oxygen-gtk's solution (set rgba on a pre-widget bases) works*.
+   *Setting rgba only on menus should work around the problem.*
 5. Cannot make QMainWindow in Qt5 transparent because of upstream bug.
    [Qt-Bug](https://bugreports.qt-project.org/browse/QTBUG-34064)
    **WORKED AROUND**. *Need more test*
@@ -16,10 +20,12 @@
    **Fixed by setting proper composition mode**.
    *TODO: need to add a better way to just use parent background. Useful*
    *especially when background images are used.*
-7. Remove most application hacks if not all.
+7. Remove most application hacks if not all. **WIP**
 8. PyQt5, Musescore and (occasionally) QtCreator seg fault on exit in a QtDBus
    destructor even when QtCurve is not linked to QtDBus.
-9. QtCurve preference background blur has some problem
-10. combobox list background no blur.
-11. QtQuickControl is a mess...
+9. QtCurve preference background blur has some problem.
+10. combobox list background no blur. *Fixed by adding the widget to the*
+    *whitelist, need to figure out whether this is the best way.*
+11. QtQuickControl is a mess... *Need improvment on Qt5 side*
 12. Plasma Kickoff (in panel) scrollbar has transparent background...
+    **Seems fixed with prepolishing.**
