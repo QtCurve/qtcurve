@@ -180,7 +180,7 @@ qtcWindowSizeRequest(GtkWidget *widget)
             IMG_NONE != opts.bgndImage.type) {
             EPixPos pos = (IMG_FILE == opts.bgndImage.type ?
                            opts.bgndImage.pos : PP_TR);
-            if (IMG_FILE == opts.bgndImage.type) {
+            if (opts.bgndImage.type == IMG_FILE) {
                 qtcLoadBgndImage(&opts.bgndImage);
             }
             switch (pos) {
@@ -191,7 +191,7 @@ qtcWindowSizeRequest(GtkWidget *widget)
             case PP_TM:
             case PP_TR:
                 rect.width = alloc.width;
-                rect.height = (IMG_FILE == opts.bgndImage.type ?
+                rect.height = (opts.bgndImage.type == IMG_FILE ?
                                opts.bgndImage.height :
                                RINGS_HEIGHT(opts.bgndImage.type)) + 1;
                 break;

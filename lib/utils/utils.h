@@ -260,6 +260,7 @@ template<typename T>
 QTC_ALWAYS_INLINE static inline bool
 qtcOneOf(T &&value)
 {
+    QTC_UNUSED(value);
     return false;
 }
 template<typename T, typename First>

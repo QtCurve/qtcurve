@@ -126,7 +126,7 @@ realizeHook(GSignalInvocationHint *sih, unsigned x,
 
 void qtcShadowInitialize()
 {
-    if (DEBUG_ALL == qtSettings.debug)
+    if (qtSettings.debug == DEBUG_ALL)
         printf(DEBUG_PREFIX "%s %d\n", __FUNCTION__, qtSettings.app);
     if (!realizeSignalId) {
         realizeSignalId = g_signal_lookup("realize", GTK_TYPE_WIDGET);
