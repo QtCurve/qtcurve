@@ -35,6 +35,7 @@
 23. Qt4: Re-enable translucent background in KWin.
 24. Gtk2: Fix translucent background in inkscape.
 25. Gtk2: Enable translucent background in flash plugin.
+26. Improve shadow gradient.
 
 ## 1.8.17
 1. **Add Qt5 support!!**.
