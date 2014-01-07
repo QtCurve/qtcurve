@@ -23,18 +23,18 @@
 17. Qt: Improve shadow of QBalloonTip
 18. Draw shadow at runtime. Prepare for more advanced shadow feature and
     configuration.
-19. Remove `QTC_GTK2_USE_CAIRO_FOR_ARROWS`. I cannot reproduce any problems
-    on my Intel card. This is also necessary for the Gtk3 port. If it was
-    really a bug of the Intel driver, it should rather be fixed there.
-20. Remove `QTC_QT4_OLD_NVIDIA_ARROW_FIX` and `QTC_QT5_OLD_NVIDIA_ARROW_FIX`.
-    They honestly only make things worse. Again, if it was really a bug of
-    the driver, it should rather be fixed there.
+19. Gtk2: Remove `QTC_GTK2_USE_CAIRO_FOR_ARROWS`. I cannot reproduce any
+    problems on my Intel card. This is also necessary for the Gtk3 port. If
+    it was really a bug of the Intel driver, it should rather be fixed there.
+20. Qt: Remove `QTC_QT4_OLD_NVIDIA_ARROW_FIX` and
+    `QTC_QT5_OLD_NVIDIA_ARROW_FIX`. They honestly only make things worse. Again,
+    if it was really a bug of the driver, it should rather be fixed there.
 21. Reorganize directories.
-22. Add `libqtcurve-cairo` for common drawing routines (Shared between Gtk2
-    and Gtk3).
-23. Fix translucent background in KWin.
-24. Fix translucent background in inkscape.
-25. Enable translucent background in flash plugin.
+22. Gtk2: Add `libqtcurve-cairo` for common drawing routines (Shared between
+    Gtk2 and Gtk3).
+23. Qt4: Re-enable translucent background in KWin.
+24. Gtk2: Fix translucent background in inkscape.
+25. Gtk2: Enable translucent background in flash plugin.
 
 ## 1.8.17
 1. **Add Qt5 support!!**.
