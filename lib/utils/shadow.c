@@ -25,9 +25,9 @@
 static void
 qtcCreateShadowGradient(float *buff, size_t size)
 {
+    const float r = size / 6.5;
     for (size_t i = 0;i < size;i++) {
-        buff[i] = 1 - sinf(M_PI * i / size / 2);
-        buff[i] *= buff[i];
+        buff[i] = qtcMax(0, expf(-i / r) - 0.0015);
     }
 }
 
