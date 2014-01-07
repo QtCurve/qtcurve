@@ -29,8 +29,8 @@
 
 QTC_BEGIN_DECLS
 
-typedef struct _GdkColor GdkColor;
-typedef struct _GdkPoint GdkPoint;
+struct _GdkPoint;
+struct _GdkColor;
 // cairo_rectangle_int_t is toooo long...
 typedef cairo_rectangle_int_t QtcRect;
 /**
@@ -46,7 +46,7 @@ typedef cairo_rectangle_int_t QtcRect;
  * Add points in \param pts to the current path of \param cr.
  * The path is shifted by (0.5, 0.5) so that it is in the middle of the pixel.
  */
-void qtcCairoPathPoints(cairo_t *cr, const GdkPoint *pts, int count);
+void qtcCairoPathPoints(cairo_t *cr, const struct _GdkPoint *pts, int count);
 
 /**
  * \param cr a cairo_t
@@ -75,7 +75,7 @@ void qtcCairoClipRect(cairo_t *cr, const QtcRect *rect);
  * Set the source of \param cr to \param col with opacity \param a
  * \sa cairo_set_source_rgba
  */
-void qtcCairoSetColor(cairo_t *cr, const GdkColor *col, double a);
+void qtcCairoSetColor(cairo_t *cr, const struct _GdkColor *col, double a);
 #define qtcCairoSetColor(cr, col, a...)                 \
     qtcCairoSetColor(cr, col, QTC_DEFAULT(a, 1))
 
@@ -91,7 +91,7 @@ void qtcCairoSetColor(cairo_t *cr, const GdkColor *col, double a);
  * \sa cairo_pattern_add_color_stop_rgba
  */
 void qtcCairoPatternAddColorStop(cairo_pattern_t *pt, double offset,
-                                 const GdkColor *col, double a);
+                                 const struct _GdkColor *col, double a);
 #define qtcCairoPatternAddColorStop(pt, offset, col, a...)              \
     qtcCairoPatternAddColorStop(pt, offset, col, QTC_DEFAULT(a, 1))
 

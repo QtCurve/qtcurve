@@ -27,6 +27,9 @@
 
 QTC_BEGIN_DECLS
 
+typedef struct _GdkColor GdkColor;
+typedef struct _GdkPoint GdkPoint;
+
 struct _GdkColor {
     uint32_t pixel;
     uint16_t red;

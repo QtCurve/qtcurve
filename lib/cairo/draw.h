@@ -29,36 +29,40 @@
 QTC_BEGIN_DECLS
 
 void qtcCairoHLine(cairo_t *cr, int x, int y, int w,
-                   const GdkColor *col, double a);
+                   const struct _GdkColor *col, double a);
 #define qtcCairoHLine(cr, x, y, w, col, a...)           \
     qtcCairoHLine(cr, x, y, w, col, QTC_DEFAULT(a, 1))
 void qtcCairoVLine(cairo_t *cr, int x, int y, int w,
-                   const GdkColor *col, double a);
+                   const struct _GdkColor *col, double a);
 #define qtcCairoVLine(cr, x, y, w, col, a...)           \
     qtcCairoVLine(cr, x, y, w, col, QTC_DEFAULT(a, 1))
-void qtcCairoPolygon(cairo_t *cr, const GdkColor *col, const QtcRect *area,
-                     const GdkPoint *points, int npoints, bool fill);
+void qtcCairoPolygon(cairo_t *cr, const struct _GdkColor *col,
+                     const QtcRect *area, const struct _GdkPoint *points,
+                     int npoints, bool fill);
 void qtcCairoRect(cairo_t *cr, const QtcRect *area, int x, int y,
-                  int width, int height, const GdkColor *col, double alpha);
+                  int width, int height, const struct _GdkColor *col,
+                  double alpha);
 #define qtcCairoRect(cr, area, x, y, width, height, col, alpha...)      \
     qtcCairoRect(cr, area, x, y, width, height, col, QTC_DEFAULT(alpha, 1))
 
 void qtcCairoFadedLine(cairo_t *cr, int x, int y, int width, int height,
                        const QtcRect *area, const QtcRect *gap, bool fadeStart,
                        bool fadeEnd, double fadeSize, bool horiz,
-                       const GdkColor *col, double alpha);
+                       const struct _GdkColor *col, double alpha);
 #define qtcCairoFadedLine(cr, x, y, width, height, area, gap, fadeStart, \
                           fadeEnd, fadeSize, horiz, col, alpha...)      \
     qtcCairoFadedLine(cr, x, y, width, height, area, gap, fadeStart,    \
                       fadeEnd, fadeSize, horiz, col, QTC_DEFAULT(alpha, 1))
 void qtcCairoStripes(cairo_t *cr, int x, int y, int w, int h,
                      bool horizontal, int stripeWidth);
-void qtcCairoDot(cairo_t *cr, int x, int y, int w, int h, const GdkColor *col);
+void qtcCairoDot(cairo_t *cr, int x, int y, int w, int h,
+                 const struct _GdkColor *col);
 void qtcCairoDots(cairo_t *cr, int rx, int ry, int rwidth, int rheight,
                   bool horiz, int nLines, int offset, const QtcRect *area,
-                  int startOffset, const GdkColor *col1, const GdkColor *col2);
+                  int startOffset, const struct _GdkColor *col1,
+                  const struct _GdkColor *col2);
 void qtcCairoLayout(cairo_t *cr, const QtcRect *area, int x, int y,
-                    PangoLayout *layout, const GdkColor *col);
+                    PangoLayout *layout, const struct _GdkColor *col);
 
 typedef enum {
     QTC_ARROW_UP,
@@ -84,9 +88,9 @@ typedef enum {
         }                                       \
         __res;                                  \
     })
-void qtcCairoArrow(cairo_t *cr, const GdkColor *col, const QtcRect *area,
-                   QtcArrowType arrow_type, int x, int y, bool small,
-                   bool fill, bool varrow);
+void qtcCairoArrow(cairo_t *cr, const struct _GdkColor *col,
+                   const QtcRect *area, QtcArrowType arrow_type, int x, int y,
+                   bool small, bool fill, bool varrow);
 #define qtcGtkArrow(cr, col, area, arrow_type, x, y, small, fill, varrow) \
     qtcCairoArrow(cr, col, area, qtcArrowType(arrow_type), x, y, small, \
                   fill, varrow)
