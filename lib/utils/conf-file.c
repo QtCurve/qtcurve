@@ -61,3 +61,25 @@ qtcConfValueSize(const QtcConfValueDesc *desc)
         return (sizeof(double) * desc->float_list_c.max_count);
     }
 }
+QTC_EXPORT void
+qtcConfValueLoad(QtcConfValue *value, const char *str,
+                 const QtcConfValueDesc *desc)
+{
+    if (qtcUnlikely(!str)) {
+        return;
+    }
+    switch (desc->type) {
+    default:
+    case QTC_CONF_STR:
+    case QTC_CONF_INT:
+    case QTC_CONF_ENUM:
+    case QTC_CONF_FLOAT:
+    case QTC_CONF_BOOL:
+    case QTC_CONF_COLOR:
+    case QTC_CONF_STR_LIST:
+    case QTC_CONF_INT_LIST:
+    case QTC_CONF_FLOAT_LIST:
+        break;
+    }
+    value->flag |= QTC_CONF_VALUE_CUSTOM;
+}
