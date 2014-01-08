@@ -103,218 +103,166 @@ bool qtcIniFileWrite(const QtcIniFile *file, const char *name);
 /**
  * Operations on QtcIniGroups in a QtcIniFile.
  **/
-QtcIniGroup *qtcIniFileFindGroupWithLen(const QtcIniFile *file,
-                                        const char *name, size_t name_len);
-QtcIniGroup *qtcIniFileAddGroupAfterWithLen(
-    QtcIniFile *file, QtcIniGroup *base, const char *name, size_t name_len,
-    bool move);
-QtcIniGroup *qtcIniFileAddGroupBeforeWithLen(
-    QtcIniFile *file, QtcIniGroup *base, const char *name, size_t name_len,
-    bool move);
+QtcIniGroup *qtcIniFileFindGroup(const QtcIniFile *file, const char *name,
+                                 size_t name_len);
+static inline QtcIniGroup*
+_qtcIniFileFindGroup(const QtcIniFile *file, const char *name)
+{
+    return qtcIniFileFindGroup(file, name, strlen(name));
+}
+#define qtcIniFileFindGroup(file, name, name_len...)                    \
+    QTC_SWITCH_(name_len, qtcIniFileFindGroup)(file, name, ##name_len)
+QtcIniGroup*
+qtcIniFileAddGroup(QtcIniFile *file, QtcIniGroup *base, const char *name,
+                   size_t name_len, bool move, bool before);
+QTC_ALWAYS_INLINE static inline QtcIniGroup*
+_qtcIniFileAddGroup(QtcIniFile *file, QtcIniGroup *base, const char *name,
+                    bool move, bool before)
+{
+    return qtcIniFileAddGroup(file, base, name, strlen(name), move, before);
+}
+#define qtcIniFileAddGroup(f, b, name, len, move, before...)            \
+    QTC_SWITCH_(before, qtcIniFileAddGroup)(f, b, name, len, move, ##before)
+
 bool qtcIniFileDeleteGroup(QtcIniFile *file, QtcIniGroup *group);
-bool qtcIniFileInsertGroupAfter(QtcIniFile *file, QtcIniGroup *base,
-                                QtcIniGroup *group, bool move);
-bool qtcIniFileInsertGroupBefore(QtcIniFile *file, QtcIniGroup *base,
-                                 QtcIniGroup *group, bool move);
+bool qtcIniFileInsertGroup(QtcIniFile *file, QtcIniGroup *base,
+                           QtcIniGroup *group, bool move, bool before);
 
 /**
  * Operations on QtcIniEntry's in a QtcIniGroup
  **/
-QtcIniEntry *qtcIniGroupFindEntryWithLen(const QtcIniGroup *group,
-                                         const char *name, size_t name_len);
-QtcIniEntry *qtcIniGroupAddEntryAfterWithLen(
-    QtcIniGroup *group, QtcIniEntry *base, const char *name, size_t name_len,
-    bool move);
-QtcIniEntry *qtcIniGroupAddEntryBeforeWithLen(
-    QtcIniGroup *group, QtcIniEntry *base, const char *name, size_t name_len,
-    bool move);
+QtcIniEntry *qtcIniGroupFindEntry(const QtcIniGroup *group, const char *name,
+                                  size_t name_len);
+static inline QtcIniEntry*
+_qtcIniGroupFindEntry(const QtcIniGroup *group, const char *name)
+{
+    return qtcIniGroupFindEntry(group, name, strlen(name));
+}
+#define qtcIniGroupFindEntry(group, name, name_len...)                  \
+    QTC_SWITCH_(name_len, qtcIniGroupFindEntry)(group, name, ##name_len)
+
+QtcIniEntry *qtcIniGroupAddEntry(QtcIniGroup *group, QtcIniEntry *base,
+                                 const char *name, size_t name_len, bool move,
+                                 bool before);
+static inline QtcIniEntry*
+_qtcIniGroupAddEntry(QtcIniGroup *group, QtcIniEntry *base, const char *name,
+                     bool move, bool before)
+{
+    return qtcIniGroupAddEntry(group, base, name, strlen(name), move, before);
+}
+#define qtcIniGroupAddEntry(g, b, name, len, move, before...)           \
+    QTC_SWITCH_(before, qtcIniGroupAddEntry)(g, b, name, len, move, ##before)
+
 bool qtcIniGroupDeleteEntry(QtcIniGroup *group, QtcIniEntry *entry);
-bool qtcIniGroupInsertEntryAfter(QtcIniGroup *group, QtcIniEntry *base,
-                                 QtcIniEntry *entry, bool move);
-bool qtcIniGroupInsertEntryBefore(QtcIniGroup *group, QtcIniEntry *base,
-                                  QtcIniEntry *entry, bool move);
+bool qtcIniGroupInsertEntry(QtcIniGroup *group, QtcIniEntry *base,
+                            QtcIniEntry *entry, bool move, bool before);
 
 /**
- * Simplified inline functions
+ * Simplified macros
  **/
-static inline QtcIniGroup*
-qtcIniFileFindGroup(const QtcIniFile *file, const char *name)
-{
-    return qtcIniFileFindGroupWithLen(file, name, strlen(name));
-}
-static inline QtcIniEntry*
-qtcIniGroupFindEntry(const QtcIniGroup *group, const char *name)
-{
-    return qtcIniGroupFindEntryWithLen(group, name, strlen(name));
-}
-static inline QtcIniGroup*
-qtcIniFileEnsureGroupWithLen(QtcIniFile *file, const char *name,
-                             size_t name_len)
-{
-    return qtcIniFileAddGroupAfterWithLen(file, NULL, name, name_len, false);
-}
-static inline QtcIniGroup*
-qtcIniFileEnsureGroup(QtcIniFile *file, const char *name)
-{
-    return qtcIniFileEnsureGroupWithLen(file, name, strlen(name));
-}
-static inline QtcIniGroup*
-qtcIniFileMoveGroupAfterWithLen(QtcIniFile *file, QtcIniGroup *base,
-                                const char *name, size_t name_len)
-{
-    return qtcIniFileAddGroupAfterWithLen(file, base, name, name_len, true);
-}
-static inline QtcIniGroup*
-qtcIniFileMoveGroupAfter(QtcIniFile *file, QtcIniGroup *base, const char *name)
-{
-    return qtcIniFileMoveGroupAfterWithLen(file, base, name, strlen(name));
-}
-static inline QtcIniGroup*
-qtcIniFileAddGroupAfter(QtcIniFile *file, QtcIniGroup *base, const char *name,
-                        bool move)
-{
-    return qtcIniFileAddGroupAfterWithLen(file, base, name, strlen(name), move);
-}
-static inline QtcIniGroup*
-qtcIniFileMoveGroupBeforeWithLen(QtcIniFile *file, QtcIniGroup *base,
-                                 const char *name, size_t name_len)
-{
-    return qtcIniFileAddGroupBeforeWithLen(file, base, name, name_len, true);
-}
-static inline QtcIniGroup*
-qtcIniFileMoveGroupBefore(QtcIniFile *file, QtcIniGroup *base, const char *name)
-{
-    return qtcIniFileMoveGroupBeforeWithLen(file, base, name, strlen(name));
-}
-static inline QtcIniGroup*
-qtcIniFileAddGroupBefore(QtcIniFile *file, QtcIniGroup *base,
-                         const char *name, bool move)
-{
-    return qtcIniFileAddGroupBeforeWithLen(file, base, name,
-                                           strlen(name), move);
-}
-static inline QtcIniEntry*
-qtcIniGroupEnsureEntryWithLen(QtcIniGroup *group, const char *name,
-                              size_t name_len)
-{
-    return qtcIniGroupAddEntryAfterWithLen(group, NULL, name, name_len, false);
-}
-static inline QtcIniEntry*
-qtcIniGroupEnsureEntry(QtcIniGroup *group, const char *name)
-{
-    return qtcIniGroupEnsureEntryWithLen(group, name, strlen(name));
-}
-static inline QtcIniEntry*
-qtcIniGroupMoveEntryAfterWithLen(QtcIniGroup *group, QtcIniEntry *base,
-                                 const char *name, size_t name_len)
-{
-    return qtcIniGroupAddEntryAfterWithLen(group, base, name, name_len, true);
-}
-static inline QtcIniEntry*
-qtcIniGroupMoveEntryAfter(QtcIniGroup *group, QtcIniEntry *base,
-                          const char *name)
-{
-    return qtcIniGroupMoveEntryAfterWithLen(group, base, name, strlen(name));
-}
-static inline QtcIniEntry*
-qtcIniGroupAddEntryAfter(QtcIniGroup *group, QtcIniEntry *base,
-                         const char *name, bool move)
-{
-    return qtcIniGroupAddEntryAfterWithLen(group, base, name,
-                                           strlen(name), move);
-}
-static inline QtcIniEntry*
-qtcIniGroupMoveEntryBeforeWithLen(QtcIniGroup *group, QtcIniEntry *base,
-                                  const char *name, size_t name_len)
-{
-    return qtcIniGroupAddEntryBeforeWithLen(group, base, name, name_len, true);
-}
-static inline QtcIniEntry*
-qtcIniGroupMoveEntryBefore(QtcIniGroup *group, QtcIniEntry *base,
-                           const char *name)
-{
-    return qtcIniGroupMoveEntryBeforeWithLen(group, base, name, strlen(name));
-}
-static inline QtcIniEntry*
-qtcIniGroupAddEntryBefore(QtcIniGroup *group, QtcIniEntry *base,
-                          const char *name, bool move)
-{
-    return qtcIniGroupAddEntryBeforeWithLen(group, base, name,
-                                            strlen(name), move);
-}
+#define qtcIniFileAddGroupAfter(args...)        \
+    qtcIniFileAddGroup(args, false)
+#define qtcIniFileAddGroupBefore(args...)       \
+    qtcIniFileAddGroup(args, true)
+#define qtcIniFileEnsureGroup(file, name...)            \
+    qtcIniFileAddGroupAfter(file, NULL, name, false)
+#define qtcIniFileMoveGroupAfter(args...)       \
+    qtcIniFileAddGroupAfter(args, true)
+#define qtcIniFileMoveGroupBefore(args...)      \
+    qtcIniFileAddGroupBefore(args, true)
+#define qtcIniFileInsertGroupAfter(args...)     \
+    qtcIniFileInsertGroup(args, false)
+#define qtcIniFileInsertGroupBefore(args...)    \
+    qtcIniFileInsertGroup(args, true)
 
-static inline QtcIniEntry*
-qtcIniEntrySetValueWithLen(QtcIniEntry *entry, const char *value, size_t len)
-{
-    entry->value = qtcSetStr(entry->value, value, len);
-    return entry;
-}
-static inline QtcIniEntry*
-qtcIniEntrySetValue(QtcIniEntry *entry, const char *value)
-{
-    entry->value = qtcSetStr(entry->value, value);
-    return entry;
-}
+#define qtcIniGroupEnsureEntry(group, name...)          \
+    qtcIniGroupAddEntryAfter(group, NULL, name, false)
+#define qtcIniGroupMoveEntryAfter(args...)      \
+    qtcIniGroupAddEntryAfter(args, true)
+#define qtcIniGroupMoveEntryBefore(args...)     \
+    qtcIniGroupAddEntryBefore(args, true)
+#define qtcIniGroupAddEntryAfter(args...)       \
+    qtcIniGroupAddEntry(args, false)
+#define qtcIniGroupAddEntryBefore(args...)      \
+    qtcIniGroupAddEntry(args, true)
+#define qtcIniGroupInsertEntryAfter(args...)    \
+    qtcIniGroupInsertEntry(args, false)
+#define qtcIniGroupInsertEntryBefore(args...)   \
+    qtcIniGroupInsertEntry(args, true)
 
+/**
+ * Get/Set value
+ **/
+#define qtcIniEntrySetValue(entry, value...) do {               \
+        QtcIniEntry *_entry = (entry);                          \
+        _entry->value = qtcSetStr(_entry->value, value);        \
+    } while (0)
 static inline const char*
-qtcIniGroupGetValueWithLen(QtcIniGroup *grp, const char *name, size_t len)
+qtcIniGroupGetValue(QtcIniGroup *grp, const char *name, size_t len)
 {
-    QtcIniEntry *ety = qtcIniGroupFindEntryWithLen(grp, name, len);
+    QtcIniEntry *ety = qtcIniGroupFindEntry(grp, name, len);
     return ety ? ety->value : NULL;
 }
 static inline const char*
-qtcIniGroupGetValue(QtcIniGroup *grp, const char *name)
+_qtcIniGroupGetValue(QtcIniGroup *grp, const char *name)
 {
-    return qtcIniGroupGetValueWithLen(grp, name, strlen(name));
+    return qtcIniGroupGetValue(grp, name, strlen(name));
 }
+#define qtcIniGroupGetValue(grp, name, len...)                  \
+    QTC_SWITCH_(len, qtcIniGroupGetValue)(grp, name, ##len)
 
 static inline char*
-qtcIniGroupDupValueWithLen(QtcIniGroup *grp, const char *name, size_t len)
+qtcIniGroupDupValue(QtcIniGroup *grp, const char *name, size_t len)
 {
-    const char *val = qtcIniGroupGetValueWithLen(grp, name, len);
+    const char *val = qtcIniGroupGetValue(grp, name, len);
     return val ? strdup(val) : NULL;
 }
 static inline char*
-qtcIniGroupDupValue(QtcIniGroup *grp, const char *name)
+_qtcIniGroupDupValue(QtcIniGroup *grp, const char *name)
 {
-    return qtcIniGroupDupValueWithLen(grp, name, strlen(name));
+    return qtcIniGroupDupValue(grp, name, strlen(name));
 }
+#define qtcIniGroupDupValue(grp, name, len...)                  \
+    QTC_SWITCH_(len, qtcIniGroupDupValue)(grp, name, ##len)
 
 static inline bool
-qtcIniGroupGetBoolWithLen(QtcIniGroup *grp, const char *name,
-                          size_t len, bool def)
+qtcIniGroupGetBool(QtcIniGroup *grp, const char *name, size_t len, bool def)
 {
-    return qtcStrToBool(qtcIniGroupGetValueWithLen(grp, name, len), def);
+    return qtcStrToBool(qtcIniGroupGetValue(grp, name, len), def);
 }
 static inline bool
-qtcIniGroupGetBool(QtcIniGroup *grp, const char *name, bool def)
+_qtcIniGroupGetBool(QtcIniGroup *grp, const char *name, bool def)
 {
     return qtcStrToBool(qtcIniGroupGetValue(grp, name), def);
 }
+#define qtcIniGroupGetBool(grp, name, len, def...)              \
+    QTC_SWITCH_(def, qtcIniGroupGetBool)(grp, name, len, ##def)
 
 static inline long
-qtcIniGroupGetIntWithLen(QtcIniGroup *grp, const char *name,
-                         size_t len, long def)
+qtcIniGroupGetInt(QtcIniGroup *grp, const char *name, size_t len, long def)
 {
-    return qtcStrToInt(qtcIniGroupGetValueWithLen(grp, name, len), def);
+    return qtcStrToInt(qtcIniGroupGetValue(grp, name, len), def);
 }
 static inline long
-qtcIniGroupGetInt(QtcIniGroup *grp, const char *name, long def)
+_qtcIniGroupGetInt(QtcIniGroup *grp, const char *name, long def)
 {
-    return qtcIniGroupGetIntWithLen(grp, name, strlen(name), def);
+    return qtcIniGroupGetInt(grp, name, strlen(name), def);
 }
+#define qtcIniGroupGetInt(grp, name, len, def...)               \
+    QTC_SWITCH_(def, qtcIniGroupGetInt)(grp, name, len, ##def)
 
 static inline double
-qtcIniGroupGetFloatWithLen(QtcIniGroup *grp, const char *name,
-                           size_t len, double def)
+qtcIniGroupGetFloat(QtcIniGroup *grp, const char *name, size_t len, double def)
 {
-    return qtcStrToFloat(qtcIniGroupGetValueWithLen(grp, name, len), def);
+    return qtcStrToFloat(qtcIniGroupGetValue(grp, name, len), def);
 }
 static inline double
-qtcIniGroupGetFloat(QtcIniGroup *grp, const char *name, double def)
+_qtcIniGroupGetFloat(QtcIniGroup *grp, const char *name, double def)
 {
-    return qtcIniGroupGetFloatWithLen(grp, name, strlen(name), def);
+    return qtcIniGroupGetFloat(grp, name, strlen(name), def);
 }
+#define qtcIniGroupGetFloat(grp, name, len, def...)                     \
+    QTC_SWITCH_(def, qtcIniGroupGetFloat)(grp, name, len, ##def)
 
 QTC_END_DECLS
 

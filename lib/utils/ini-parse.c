@@ -296,8 +296,7 @@ qtcIniFileClean(QtcIniFile *file)
 }
 
 QTC_EXPORT QtcIniGroup*
-qtcIniFileFindGroupWithLen(const QtcIniFile *file, const char *name,
-                           size_t name_len)
+qtcIniFileFindGroup(const QtcIniFile *file, const char *name, size_t name_len)
 {
     QtcIniGroup *group = NULL;
     HASH_FIND(hh, file->groups, name, name_len, group);
@@ -326,8 +325,8 @@ qtcIniFileHashNewGroup(QtcIniFile *file, const char *name, size_t name_len)
 }
 
 QTC_EXPORT QtcIniEntry*
-qtcIniGroupFindEntryWithLen(const QtcIniGroup *group, const char *name,
-                            size_t name_len)
+qtcIniGroupFindEntry(const QtcIniGroup *group, const char *name,
+                     size_t name_len)
 {
     QtcIniEntry *entry = NULL;
     HASH_FIND(hh, group->entries, name, name_len, entry);
@@ -509,7 +508,7 @@ qtcIniFileLoadFp(QtcIniFile *file, FILE *fp)
                 continue;
             }
             QtcIniGroup *new_group;
-            new_group = qtcIniFileFindGroupWithLen(file, line, name_len);
+            new_group = qtcIniFileFindGroup(file, line, name_len);
             if (!new_group) {
                 new_group = qtcIniFileHashNewGroup(file, line, name_len);
             } else {
@@ -544,7 +543,7 @@ qtcIniFileLoadFp(QtcIniFile *file, FILE *fp)
             continue;
         }
         QtcIniEntry *new_entry;
-        new_entry = qtcIniGroupFindEntryWithLen(cur_group, line, key_len);
+        new_entry = qtcIniGroupFindEntry(cur_group, line, key_len);
         if (!new_entry) {
             new_entry = qtcIniGroupHashNewEntry(cur_group, line, key_len);
         } else if (new_entry->flags & QTC_INI_ENTRY_UPDATED) {
@@ -713,7 +712,7 @@ qtcIniFileDeleteGroup(QtcIniFile *file, QtcIniGroup *group)
     return true;
 }
 
-static QtcIniGroup*
+QTC_EXPORT QtcIniGroup*
 qtcIniFileAddGroup(QtcIniFile *file, QtcIniGroup *base, const char *name,
                    size_t name_len, bool move, bool before)
 {
@@ -724,7 +723,7 @@ qtcIniFileAddGroup(QtcIniFile *file, QtcIniGroup *base, const char *name,
         return NULL;
     }
     QtcIniGroup *new_group;
-    new_group =  qtcIniFileFindGroupWithLen(file, name, name_len);
+    new_group =  qtcIniFileFindGroup(file, name, name_len);
     if (!new_group) {
         new_group = qtcIniFileHashNewGroup(file, name, name_len);
     } else if (move && !(new_group == base)) {
@@ -736,21 +735,7 @@ qtcIniFileAddGroup(QtcIniFile *file, QtcIniGroup *base, const char *name,
     return new_group;
 }
 
-QTC_EXPORT QtcIniGroup*
-qtcIniFileAddGroupAfterWithLen(QtcIniFile *file, QtcIniGroup *base,
-                               const char *name, size_t name_len, bool move)
-{
-    return qtcIniFileAddGroup(file, base, name, name_len, move, false);
-}
-
-QTC_EXPORT QtcIniGroup*
-qtcIniFileAddGroupBeforeWithLen(QtcIniFile *file, QtcIniGroup *base,
-                                const char *name, size_t name_len, bool move)
-{
-    return qtcIniFileAddGroup(file, base, name, name_len, move, true);
-}
-
-static bool
+QTC_EXPORT bool
 qtcIniFileInsertGroup(QtcIniFile *file, QtcIniGroup *base, QtcIniGroup *group,
                       bool move, bool before)
 {
@@ -774,20 +759,6 @@ qtcIniFileInsertGroup(QtcIniFile *file, QtcIniGroup *base, QtcIniGroup *group,
     }
     qtcIniFileLinkGroup(file, base, group, before);
     return true;
-}
-
-QTC_EXPORT bool
-qtcIniFileInsertGroupAfter(QtcIniFile *file, QtcIniGroup *base,
-                           QtcIniGroup *group, bool move)
-{
-    return qtcIniFileInsertGroup(file, base, group, move, false);
-}
-
-QTC_EXPORT bool
-qtcIniFileInsertGroupBefore(QtcIniFile *file, QtcIniGroup *base,
-                            QtcIniGroup *group, bool move)
-{
-    return qtcIniFileInsertGroup(file, base, group, move, true);
 }
 
 static inline bool
@@ -814,7 +785,7 @@ qtcIniGroupDeleteEntry(QtcIniGroup *group, QtcIniEntry *entry)
     return true;
 }
 
-static QtcIniEntry*
+QTC_EXPORT QtcIniEntry*
 qtcIniGroupAddEntry(QtcIniGroup *group, QtcIniEntry *base, const char *name,
                     size_t name_len, bool move, bool before)
 {
@@ -825,7 +796,7 @@ qtcIniGroupAddEntry(QtcIniGroup *group, QtcIniEntry *base, const char *name,
         return NULL;
     }
     QtcIniEntry *new_entry;
-    new_entry =  qtcIniGroupFindEntryWithLen(group, name, name_len);
+    new_entry =  qtcIniGroupFindEntry(group, name, name_len);
     if (!new_entry) {
         new_entry = qtcIniGroupHashNewEntry(group, name, name_len);
     } else if (move && !(new_entry == base)) {
@@ -837,22 +808,7 @@ qtcIniGroupAddEntry(QtcIniGroup *group, QtcIniEntry *base, const char *name,
     return new_entry;
 }
 
-QTC_EXPORT QtcIniEntry*
-qtcIniGroupAddEntryAfterWithLen(QtcIniGroup *group, QtcIniEntry *base,
-                                const char *name, size_t name_len, bool move)
-{
-    return qtcIniGroupAddEntry(group, base, name, name_len, move, false);
-}
-
-QTC_EXPORT QtcIniEntry*
-qtcIniGroupAddEntryBeforeWithLen(QtcIniGroup *group, QtcIniEntry *base,
-                                 const char *name, size_t name_len,
-                                 bool move)
-{
-    return qtcIniGroupAddEntry(group, base, name, name_len, move, true);
-}
-
-static bool
+QTC_EXPORT bool
 qtcIniGroupInsertEntry(QtcIniGroup *group, QtcIniEntry *base,
                        QtcIniEntry *entry, bool move, bool before)
 {
@@ -876,18 +832,4 @@ qtcIniGroupInsertEntry(QtcIniGroup *group, QtcIniEntry *base,
     }
     qtcIniGroupLinkEntry(group, base, entry, before);
     return true;
-}
-
-QTC_EXPORT bool
-qtcIniGroupInsertEntryAfter(QtcIniGroup *group, QtcIniEntry *base,
-                            QtcIniEntry *entry, bool move)
-{
-    return qtcIniGroupInsertEntry(group, base, entry, move, false);
-}
-
-QTC_EXPORT bool
-qtcIniGroupInsertEntryBefore(QtcIniGroup *group, QtcIniEntry *base,
-                             QtcIniEntry *entry, bool move)
-{
-    return qtcIniGroupInsertEntry(group, base, entry, move, true);
 }
