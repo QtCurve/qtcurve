@@ -284,6 +284,19 @@ qtcStrToInt(const char *str, long def)
     return res;
 }
 
+QTC_ALWAYS_INLINE static inline double
+qtcStrToFloat(const char *str, double def)
+{
+    QTC_RET_IF_FAIL(str, def);
+    str += strspn(str, " \t\b\n\f\v");
+    char *end = NULL;
+    double res = strtod(str, &end);
+    if (end == str) {
+        res = def;
+    }
+    return res;
+}
+
 QTC_ALWAYS_INLINE static inline bool
 qtcStrEndsWith(const char *str, const char *tail)
 {
