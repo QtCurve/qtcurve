@@ -92,6 +92,23 @@ qtcConfigFreeInt(QtcIniGroup **grp_cache, QtcIniEntry **ety_cache)
     qtcConfigFreeCache(grp_cache, ety_cache);
 }
 
+QTC_EXPORT double
+qtcConfigLoadFloat(const QtcIniFile *file, const char *grp, const char *name,
+                   const QtcIniGroup **grp_cache, const QtcIniEntry **ety_cache,
+                   double def)
+{
+    const QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name,
+                                                grp_cache, ety_cache);
+    QTC_RET_IF_FAIL(ety && ety->value, def);
+    return qtcStrToFloat(ety->value, def);
+}
+
+QTC_EXPORT void
+qtcConfigFreeFloat(QtcIniGroup **grp_cache, QtcIniEntry **ety_cache)
+{
+    qtcConfigFreeCache(grp_cache, ety_cache);
+}
+
 QTC_EXPORT char*
 qtcConfigLoadStr(const QtcIniFile *file, const char *grp, const char *name,
                  const QtcIniGroup **grp_cache, const QtcIniEntry **ety_cache,

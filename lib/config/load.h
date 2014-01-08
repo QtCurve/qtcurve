@@ -34,6 +34,10 @@ long qtcConfigLoadInt(const QtcIniFile *file, const char *grp,
                       const char *name, const QtcIniGroup **grp_cache,
                       const QtcIniEntry **ety_cache, long def);
 void qtcConfigFreeInt(QtcIniGroup **grp_cache, QtcIniEntry **ety_cache);
+double qtcConfigLoadFloat(const QtcIniFile *file, const char *grp,
+                          const char *name, const QtcIniGroup **grp_cache,
+                          const QtcIniEntry **ety_cache, double def);
+void qtcConfigFreeFloat(QtcIniGroup **grp_cache, QtcIniEntry **ety_cache);
 char *qtcConfigLoadStr(const QtcIniFile *file, const char *grp,
                        const char *name, const QtcIniGroup **grp_cache,
                        const QtcIniEntry **ety_cache, const char *def);
