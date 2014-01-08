@@ -323,5 +323,10 @@ qtcOneOf(T &&value, First &&first, Rest &&...rest...)
     })
 #endif
 #define qtcNoneOf(args...) (!qtcOneOf(args))
+#define QTC_RET_IF_FAIL(exp, val...) do {       \
+        if (!qtcLikely(exp)) {                  \
+            return (QTC_DEFAULT(val, (void)0)); \
+        }                                       \
+    } while (0)
 
 #endif

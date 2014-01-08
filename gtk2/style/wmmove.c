@@ -351,9 +351,7 @@ qtcWMMoveLeave(GtkWidget *widget, GdkEventMotion *event, void *data)
 
 void qtcWMMoveSetup(GtkWidget *widget)
 {
-    if (qtcUnlikely(!widget)) {
-        return;
-    }
+    QTC_RET_IF_FAIL(widget);
     GtkWidget *parent = NULL;
 
     if (GTK_IS_WINDOW(widget) &&

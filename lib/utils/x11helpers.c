@@ -105,9 +105,7 @@ qtcX11ShadowDestroy()
 QTC_EXPORT void
 qtcX11ShadowInstallWithMargin(xcb_window_t win, const int margins[4])
 {
-    if (qtcUnlikely(!win)) {
-        return;
-    }
+    QTC_RET_IF_FAIL(win);
     if (qtcUnlikely(!margins)) {
         qtcX11ShadowInstall(win);
         return;
@@ -139,9 +137,7 @@ qtcX11ShadowInstallWithMargin(xcb_window_t win, const int margins[4])
 QTC_EXPORT void
 qtcX11ShadowInstall(xcb_window_t win)
 {
-    if (qtcUnlikely(!win)) {
-        return;
-    }
+    QTC_RET_IF_FAIL(win);
     // In principle, I should check for _KDE_NET_WM_SHADOW in _NET_SUPPORTED.
     // However, it's complicated and we will gain nothing.
     Display *disp = qtcX11GetDisp();
@@ -159,9 +155,7 @@ qtcX11ShadowInstall(xcb_window_t win)
 QTC_EXPORT void
 qtcX11ShadowUninstall(xcb_window_t win)
 {
-    if (qtcUnlikely(!win)) {
-        return;
-    }
+    QTC_RET_IF_FAIL(win);
     qtcX11CallVoid(delete_property, win, qtc_x11_kde_net_wm_shadow);
     qtcX11Flush();
 }
@@ -170,9 +164,7 @@ qtcX11ShadowUninstall(xcb_window_t win)
 QTC_EXPORT void
 qtcX11MoveTrigger(xcb_window_t wid, uint32_t x, uint32_t y)
 {
-    if (qtcUnlikely(!wid)) {
-        return;
-    }
+    QTC_RET_IF_FAIL(wid);
     qtcX11FlushXlib();
     qtcX11CallVoid(ungrab_pointer, XCB_TIME_CURRENT_TIME);
     union {
@@ -203,9 +195,7 @@ QTC_EXPORT void
 qtcX11BlurTrigger(xcb_window_t wid, bool enable, unsigned prop_num,
                   const uint32_t *props)
 {
-    if (qtcUnlikely(!wid)) {
-        return;
-    }
+    QTC_RET_IF_FAIL(wid);
     Display *disp = qtcX11GetDisp();
     xcb_atom_t atom = qtc_x11_kde_net_wm_blur_behind_region;
     if (enable) {

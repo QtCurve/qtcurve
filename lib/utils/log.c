@@ -95,11 +95,8 @@ _qtcLogV(QtcLogLevel level, const char *fname, int line, const char *func,
          const char *fmt, va_list ap)
 {
     _qtcLogInit();
-    if (qtcUnlikely(level < log_level || ((int)level) < 0 ||
-                    level > QTC_LOG_FORCE)) {
-        return;
-    }
-
+    QTC_RET_IF_FAIL(level >= log_level && ((int)level) >= 0 &&
+                    level <= QTC_LOG_FORCE);
     static const char *color_codes[] = {
         [QTC_LOG_DEBUG] = "\e[01;32m",
         [QTC_LOG_INFO] = "\e[01;34m",

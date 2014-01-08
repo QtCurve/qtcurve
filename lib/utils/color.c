@@ -443,9 +443,7 @@ qtcColorFromStr(QtcColor *color, const char *str)
     color->red = 0;
     color->green = 0;
     color->blue = 0;
-    if (qtcUnlikely(!str)) {
-        return;
-    }
+    QTC_RET_IF_FAIL(str);
     str += strspn(str, " \t\b\n\f\v");
     if (str[0] == '#') {
         str++;

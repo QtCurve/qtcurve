@@ -96,8 +96,7 @@ __attribute__((hot)) static bool
 qtcEventCallback(void **cbdata)
 {
     QObject *receiver = (QObject*)cbdata[0];
-    if (qtcUnlikely(!receiver))
-        return false;
+    QTC_RET_IF_FAIL(receiver, false);
     QEvent *event = (QEvent*)cbdata[1];
     if (qtcUnlikely(event->type() == QEvent::DynamicPropertyChange)) {
         QDynamicPropertyChangeEvent *prop_event =

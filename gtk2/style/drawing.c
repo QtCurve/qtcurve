@@ -4062,8 +4062,8 @@ scaleOrRef(GdkPixbuf *src, int width, int height)
 static GdkPixbuf*
 setTransparency(const GdkPixbuf *pixbuf, double alpha_percent)
 {
-    g_return_val_if_fail(pixbuf != NULL, NULL);
-    g_return_val_if_fail(GDK_IS_PIXBUF(pixbuf), NULL);
+    QTC_RET_IF_FAIL(pixbuf != NULL, NULL);
+    QTC_RET_IF_FAIL(GDK_IS_PIXBUF(pixbuf), NULL);
     /* Returns a copy of pixbuf with it's non-completely-transparent pixels to
        have an alpha level "alpha_percent" of their original value. */
     GdkPixbuf *target = gdk_pixbuf_add_alpha (pixbuf, false, 0, 0, 0);
@@ -4101,7 +4101,7 @@ renderIcon(GtkStyle *style, const GtkIconSource *source, GtkStateType state,
      * used without a style and if so it uses this function. */
     base_pixbuf = gtk_icon_source_get_pixbuf(source);
 
-    g_return_val_if_fail(base_pixbuf != NULL, NULL);
+    QTC_RET_IF_FAIL(base_pixbuf != NULL, NULL);
 
     if (widget && gtk_widget_has_screen(widget)) {
         screen = gtk_widget_get_screen(widget);

@@ -139,11 +139,9 @@ qtcX11AtomsInit()
 QTC_EXPORT xcb_screen_t*
 (qtcX11GetScreen)(int screen_no)
 {
+    QTC_RET_IF_FAIL(qtc_xcb_conn, NULL);
     if (screen_no == -1 || screen_no == qtc_default_screen_no) {
         return qtc_default_screen;
-    }
-    if (qtcUnlikely(!qtc_xcb_conn)) {
-        return NULL;
     }
     return screen_of_display(qtc_xcb_conn, screen_no);
 }
@@ -151,9 +149,7 @@ QTC_EXPORT xcb_screen_t*
 QTC_EXPORT void
 qtcX11InitXcb(xcb_connection_t *conn, int screen_no)
 {
-    if (qtcUnlikely(qtc_xcb_conn) || !conn) {
-        return;
-    }
+    QTC_RET_IF_FAIL(!qtc_xcb_conn && conn);
     if (screen_no < 0) {
         screen_no = 0;
     }
@@ -172,9 +168,7 @@ qtcX11InitXcb(xcb_connection_t *conn, int screen_no)
 QTC_EXPORT void
 qtcX11InitXlib(Display *disp)
 {
-    if (qtcUnlikely(qtc_xcb_conn) || !disp) {
-        return;
-    }
+    QTC_RET_IF_FAIL(!qtc_xcb_conn && disp);
     qtc_disp = disp;
     qtcX11InitXcb(XGetXCBConnection(disp), DefaultScreen(disp));
 }
@@ -194,32 +188,25 @@ qtcX11GetDisp()
 QTC_EXPORT void
 qtcX11Flush()
 {
-    if (qtcLikely(qtc_xcb_conn)) {
-        xcb_flush(qtc_xcb_conn);
-    }
+    QTC_RET_IF_FAIL(qtc_xcb_conn);
+    xcb_flush(qtc_xcb_conn);
 }
 
 QTC_EXPORT uint32_t
 qtcX11GenerateId()
 {
-    if (qtcLikely(qtc_xcb_conn)) {
-        return xcb_generate_id(qtc_xcb_conn);
-    }
-    return 0;
+    QTC_RET_IF_FAIL(qtc_xcb_conn, 0);
+    return xcb_generate_id(qtc_xcb_conn);
 }
 
 QTC_EXPORT int32_t
 qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom)
 {
-    if (qtcUnlikely(!win)) {
-        return -1;
-    }
+    QTC_RET_IF_FAIL(qtc_xcb_conn && win, -1);
     int32_t res = -1;
     xcb_get_property_reply_t *reply =
         qtcX11Call(get_property, 0, win, atom, XCB_ATOM_CARDINAL, 0, 1);
-    if (!reply) {
-        return -1;
-    }
+    QTC_RET_IF_FAIL(reply, -1);
     if (xcb_get_property_value_length(reply) > 0) {
         uint32_t val = *(int32_t*)xcb_get_property_value(reply);
         if (val < 512) {
@@ -233,9 +220,7 @@ qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom)
 QTC_EXPORT void
 qtcX11MapRaised(xcb_window_t win)
 {
-    if (qtcUnlikely(!win)) {
-        return;
-    }
+    QTC_RET_IF_FAIL(qtc_xcb_conn && win);
     static const uint32_t val = XCB_STACK_MODE_ABOVE;
     qtcX11CallVoid(configure_window, win, XCB_CONFIG_WINDOW_STACK_MODE, &val);
     qtcX11CallVoid(map_window, win);
@@ -244,11 +229,10 @@ qtcX11MapRaised(xcb_window_t win)
 QTC_EXPORT bool
 qtcX11CompositingActive()
 {
+    QTC_RET_IF_FAIL(qtc_xcb_conn, false);
     xcb_get_selection_owner_reply_t *reply =
         qtcX11Call(get_selection_owner, qtc_x11_net_wm_cm_s_default);
-    if (!reply) {
-        return false;
-    }
+    QTC_RET_IF_FAIL(reply, false);
     bool res = (reply->owner != 0);
     free(reply);
     return res;
@@ -257,19 +241,12 @@ qtcX11CompositingActive()
 QTC_EXPORT bool
 qtcX11HasAlpha(xcb_window_t win)
 {
-    if (qtcUnlikely(!win)) {
-        return false;
-    }
+    QTC_RET_IF_FAIL(qtc_xcb_conn && win, false);
     if (!qtcX11CompositingActive()) {
         return false;
     }
-    if (!win) {
-        return true;
-    }
     xcb_get_geometry_reply_t *reply = qtcX11Call(get_geometry, win);
-    if (!reply) {
-        return false;
-    }
+    QTC_RET_IF_FAIL(reply, false);
     bool res = (reply->depth == 32);
     free(reply);
     return res;
@@ -278,15 +255,11 @@ qtcX11HasAlpha(xcb_window_t win)
 QTC_EXPORT bool
 qtcX11IsEmbed(xcb_window_t win)
 {
-    if (qtcUnlikely(!win)) {
-        return false;
-    }
+    QTC_RET_IF_FAIL(qtc_xcb_conn && win, false);
     xcb_get_property_reply_t *reply =
         qtcX11Call(get_property, 0, win, qtc_x11_xembed_info,
                    qtc_x11_xembed_info, 0, 1);
-    if (!reply) {
-        return false;
-    }
+    QTC_RET_IF_FAIL(reply, false);
     bool res = xcb_get_property_value_length(reply) > 0;
     free(reply);
     return res;

@@ -13333,8 +13333,7 @@ void Style::borderSizesChanged()
 static QMainWindow*
 getWindow(unsigned int xid)
 {
-    if (qtcUnlikely(!xid))
-        return NULL;
+    QTC_RET_IF_FAIL(xid, NULL);
     foreach (QWidget *widget, QApplication::topLevelWidgets()) {
         if (qobject_cast<QMainWindow*>(widget) && qtcGetWid(widget) == xid) {
             return static_cast<QMainWindow*>(widget);

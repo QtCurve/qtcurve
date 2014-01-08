@@ -62,9 +62,7 @@ QTC_EXPORT void
 qtcStrListForEach(const char *str, char delim, char escape,
                   QtcListForEachFunc func, void *data)
 {
-    if (qtcUnlikely(!str || !func)) {
-        return;
-    }
+    QTC_RET_IF_FAIL(str && func);
     QTC_DEF_STR_BUFF(str_buff, 1024, 1024);
     if (qtcUnlikely(escape == delim)) {
         escape = '\0';
@@ -133,9 +131,7 @@ qtcStrLoadList(const char *str, char delim, char escape, size_t size,
                size_t *_nele, void *buff, size_t max_len,
                QtcListEleLoader loader, void *data)
 {
-    if (qtcUnlikely(!_nele || !size || !loader || !str)) {
-        return NULL;
-    }
+    QTC_RET_IF_FAIL(_nele && size && loader && str, NULL);
     QtcStrLoadListData loader_data = {
         .size = size,
         .nele = *_nele,

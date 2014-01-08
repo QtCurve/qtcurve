@@ -108,8 +108,7 @@ _qtcX11Call(Cookie (*func)(xcb_connection_t*, Args...),
             Args2... args...)
 {
     xcb_connection_t *conn = qtcX11GetConn();
-    if (qtcUnlikely(!conn))
-        return NULL;
+    QTC_RET_IF_FAIL(conn, NULL);
     Cookie cookie = func(conn, args...);
     return reply_func(conn, cookie, 0);
 }
@@ -122,8 +121,7 @@ _qtcX11CallVoid(xcb_void_cookie_t (*func)(xcb_connection_t*, Args...),
                 Args2... args...)
 {
     xcb_connection_t *conn = qtcX11GetConn();
-    if (qtcUnlikely(!conn))
-        return xcb_void_cookie_t();
+    QTC_RET_IF_FAIL(conn, xcb_void_cookie_t());
     return func(conn, args...);
 }
 #define qtcX11CallVoid(name, args...)           \

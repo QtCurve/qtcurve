@@ -109,8 +109,8 @@ gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                GtkShadowType shadow, GdkRectangle *area, GtkWidget *widget,
                const char *detail, int x, int y, int width, int height)
 {
-    g_return_if_fail(GTK_IS_STYLE(style));
-    g_return_if_fail(GDK_IS_DRAWABLE(window));
+    QTC_RET_IF_FAIL(GTK_IS_STYLE(style));
+    QTC_RET_IF_FAIL(GDK_IS_DRAWABLE(window));
     cairo_t *cr = qtcGdkCreateCairoClip(window, area);
 
     bool isMenuOrToolTipWindow =
@@ -399,8 +399,8 @@ gtkDrawHandle(GtkStyle *style, GdkWindow *window, GtkStateType state,
               GtkOrientation orientation)
 {
     QTC_UNUSED(orientation);
-    g_return_if_fail(GTK_IS_STYLE(style));
-    g_return_if_fail(GDK_IS_WINDOW(window));
+    QTC_RET_IF_FAIL(GTK_IS_STYLE(style));
+    QTC_RET_IF_FAIL(GDK_IS_WINDOW(window));
     QtcRect *area = (QtcRect*)_area;
     bool paf = WIDGET_TYPE_NAME("PanelAppletFrame");
     cairo_t *cr = qtcGdkCreateCairoClip(window, area);
@@ -494,7 +494,7 @@ gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
              const char *detail, GtkArrowType arrow_type, gboolean fill,
              int x, int y, int width, int height)
 {
-    g_return_if_fail(GDK_IS_DRAWABLE(window));
+    QTC_RET_IF_FAIL(GDK_IS_DRAWABLE(window));
     QTC_UNUSED(fill);
     if (qtSettings.debug == DEBUG_ALL) {
         printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %s  ", __FUNCTION__,
@@ -669,8 +669,8 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
         const char *detail, int x, int y, int width, int height,
         gboolean btnDown)
 {
-    g_return_if_fail(GTK_IS_STYLE(style));
-    g_return_if_fail(GDK_IS_DRAWABLE(window));
+    QTC_RET_IF_FAIL(GTK_IS_STYLE(style));
+    QTC_RET_IF_FAIL(GDK_IS_DRAWABLE(window));
     bool sbar = isSbarDetail(detail);
     bool pbar = DETAIL("bar"); //  && GTK_IS_PROGRESS_BAR(widget);
     bool qtcSlider = !pbar && DETAIL("qtc-slider");
@@ -1537,8 +1537,8 @@ gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state,
               GtkShadowType shadow, GdkRectangle *area, GtkWidget *widget,
               const char *detail, int x, int y, int width, int height)
 {
-    g_return_if_fail(GTK_IS_STYLE(style));
-    g_return_if_fail(GDK_IS_DRAWABLE(window));
+    QTC_RET_IF_FAIL(GTK_IS_STYLE(style));
+    QTC_RET_IF_FAIL(GDK_IS_DRAWABLE(window));
     sanitizeSize(window, &width, &height);
     cairo_t *cr = qtcGdkCreateCairoClip(window, area);
     gboolean comboBoxList=isComboBoxList(widget),
@@ -1920,8 +1920,8 @@ gtkDrawCheck(GtkStyle *style, GdkWindow *window, GtkStateType state,
              GtkShadowType shadow, GdkRectangle *_area, GtkWidget *widget,
              const char *detail, int x, int y, int width, int height)
 {
-    g_return_if_fail(GTK_IS_STYLE(style));
-    g_return_if_fail(GDK_IS_DRAWABLE(window));
+    QTC_RET_IF_FAIL(GTK_IS_STYLE(style));
+    QTC_RET_IF_FAIL(GDK_IS_DRAWABLE(window));
     QtcRect *area = (QtcRect*)_area;
     cairo_t *cr = qtcGdkCreateCairoClip(window, area);
     drawCheckBox(cr, state, shadow, style, widget, detail, area,
@@ -1934,8 +1934,8 @@ gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state,
               GtkShadowType shadow, GdkRectangle *_area, GtkWidget *widget,
               const char *detail, int x, int y, int width, int height)
 {
-    g_return_if_fail(GTK_IS_STYLE(style));
-    g_return_if_fail(GDK_IS_DRAWABLE(window));
+    QTC_RET_IF_FAIL(GTK_IS_STYLE(style));
+    QTC_RET_IF_FAIL(GDK_IS_DRAWABLE(window));
     QtcRect *area = (QtcRect*)_area;
     cairo_t *cr = qtcGdkCreateCairoClip(window, area);
     drawRadioButton(cr, state, shadow, style, widget, detail, area,
@@ -1960,8 +1960,8 @@ gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state,
               gboolean use_text, GdkRectangle *_area, GtkWidget *widget,
               const char *detail, int x, int y, PangoLayout *layout)
 {
-    g_return_if_fail(GTK_IS_STYLE(style));
-    g_return_if_fail(GDK_IS_DRAWABLE(window));
+    QTC_RET_IF_FAIL(GTK_IS_STYLE(style));
+    QTC_RET_IF_FAIL(GDK_IS_DRAWABLE(window));
     const QtcRect *area = (QtcRect*)_area;
     cairo_t *cr = gdk_cairo_create(window);
     if (GTK_IS_PROGRESS(widget) || DETAIL("progressbar")) {
@@ -2158,7 +2158,7 @@ gtkDrawTab(GtkStyle *style, GdkWindow *window, GtkStateType state,
            GtkShadowType shadow, GdkRectangle *_area, GtkWidget *widget,
            const char *detail, int x, int y, int width, int height)
 {
-    g_return_if_fail(GDK_IS_DRAWABLE(window));
+    QTC_RET_IF_FAIL(GDK_IS_DRAWABLE(window));
     QTC_UNUSED(style);
     if (qtSettings.debug == DEBUG_ALL) {
         printf(DEBUG_PREFIX "%s %d %d %s  ", __FUNCTION__, state, shadow,
@@ -2200,8 +2200,8 @@ gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state,
               GtkPositionType gapSide, int gapX, int gapWidth)
 {
     QTC_UNUSED(shadow);
-    g_return_if_fail(GTK_IS_STYLE(style));
-    g_return_if_fail(GDK_IS_DRAWABLE(window));
+    QTC_RET_IF_FAIL(GTK_IS_STYLE(style));
+    QTC_RET_IF_FAIL(GDK_IS_DRAWABLE(window));
     cairo_t *cr = qtcGdkCreateCairoClip(window, area);
 
     if ((opts.thin & THIN_FRAMES) && gapX == 0) {
@@ -2229,8 +2229,8 @@ gtkDrawExtension(GtkStyle *style, GdkWindow *window, GtkStateType state,
                  const char *detail, int x, int y, int width, int height,
                  GtkPositionType gapSide)
 {
-    g_return_if_fail(GTK_IS_STYLE(style));
-    g_return_if_fail(GDK_IS_DRAWABLE(window));
+    QTC_RET_IF_FAIL(GTK_IS_STYLE(style));
+    QTC_RET_IF_FAIL(GDK_IS_DRAWABLE(window));
     if (qtSettings.debug == DEBUG_ALL) {
         printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %s  ", __FUNCTION__, state,
                shadow, gapSide, x, y, width, height, detail ? detail : "NULL");
@@ -2256,8 +2256,8 @@ gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state,
               const char *detail, int x, int y, int width, int height,
               GtkOrientation orientation)
 {
-    g_return_if_fail(GTK_IS_STYLE(style));
-    g_return_if_fail(GDK_IS_DRAWABLE(window));
+    QTC_RET_IF_FAIL(GTK_IS_STYLE(style));
+    QTC_RET_IF_FAIL(GDK_IS_DRAWABLE(window));
     gboolean scrollbar = DETAIL("slider");
     gboolean scale = DETAIL("hscale") || DETAIL("vscale");
 
@@ -2377,8 +2377,8 @@ gtkDrawShadowGap(GtkStyle *style, GdkWindow *window, GtkStateType state,
                  GtkPositionType gapSide, int gapX, int gapWidth)
 {
     QTC_UNUSED(detail);
-    g_return_if_fail(GTK_IS_STYLE(style));
-    g_return_if_fail(GDK_IS_DRAWABLE(window));
+    QTC_RET_IF_FAIL(GTK_IS_STYLE(style));
+    QTC_RET_IF_FAIL(GDK_IS_DRAWABLE(window));
     QtcRect *area = (QtcRect*)_area;
     cairo_t *cr = qtcGdkCreateCairoClip(window, area);
     sanitizeSize(window, &width, &height);
@@ -2392,8 +2392,8 @@ gtkDrawHLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
              GdkRectangle *area, GtkWidget *widget, const char *detail,
              int x1, int x2, int y)
 {
-    g_return_if_fail(GTK_IS_STYLE(style));
-    g_return_if_fail(GDK_IS_DRAWABLE(window));
+    QTC_RET_IF_FAIL(GTK_IS_STYLE(style));
+    QTC_RET_IF_FAIL(GDK_IS_DRAWABLE(window));
     gboolean tbar = DETAIL("toolbar");
     int light = 0;
     int dark = tbar ? (opts.toolbarSeparators == LINE_FLAT ? 4 : 3) : 5;
@@ -2482,8 +2482,8 @@ gtkDrawVLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
              GdkRectangle *area, GtkWidget *widget, const char *detail,
              int y1, int y2, int x)
 {
-    g_return_if_fail(GTK_IS_STYLE(style));
-    g_return_if_fail(GDK_IS_DRAWABLE(window));
+    QTC_RET_IF_FAIL(GTK_IS_STYLE(style));
+    QTC_RET_IF_FAIL(GDK_IS_DRAWABLE(window));
 
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %s  ", __FUNCTION__, state, x, y1, y2, detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 10);
@@ -2545,8 +2545,8 @@ gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
 {
     if (GTK_IS_EDITABLE(widget))
         return;
-    g_return_if_fail(GDK_IS_DRAWABLE(window));
-    g_return_if_fail(GTK_IS_STYLE(style));
+    QTC_RET_IF_FAIL(GDK_IS_DRAWABLE(window));
+    QTC_RET_IF_FAIL(GTK_IS_STYLE(style));
 
     sanitizeSize(window, &width, &height);
 
@@ -2845,8 +2845,8 @@ gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType state,
                   GdkRectangle *_area, GtkWidget *widget, const char *detail,
                   GdkWindowEdge edge, int x, int y, int width, int height)
 {
-    g_return_if_fail(GTK_IS_STYLE(style));
-    g_return_if_fail(GDK_IS_DRAWABLE(window));
+    QTC_RET_IF_FAIL(GTK_IS_STYLE(style));
+    QTC_RET_IF_FAIL(GDK_IS_DRAWABLE(window));
     QtcRect *area = (QtcRect*)_area;
     cairo_t *cr = qtcGdkCreateCairoClip(window, area);
     int size = SIZE_GRIP_SIZE - 2;
@@ -2898,7 +2898,7 @@ gtkDrawExpander(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 GdkRectangle *_area, GtkWidget *widget, const char *detail,
                 int x, int y, GtkExpanderStyle expander_style)
 {
-    g_return_if_fail(GDK_IS_DRAWABLE(window));
+    QTC_RET_IF_FAIL(GDK_IS_DRAWABLE(window));
     if (qtSettings.debug == DEBUG_ALL) {
         printf(DEBUG_PREFIX "%s %d %s  ", __FUNCTION__, state,
                detail ? detail : "NULL");
