@@ -323,6 +323,11 @@ qtcOneOf(T &&value, First &&first, Rest &&...rest...)
     })
 #endif
 #define qtcNoneOf(args...) (!qtcOneOf(args))
+
+// gcc and clang both seem find with returning void expression in c
+// (even with -ansi).
+// Not sure if this is standard but should be fine since we require gnu99
+// anyway.
 #define QTC_RET_IF_FAIL(exp, val...) do {       \
         if (!qtcLikely(exp)) {                  \
             return (QTC_DEFAULT(val, (void)0)); \
