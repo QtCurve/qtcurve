@@ -21,8 +21,8 @@
 
 #include "conf-file.h"
 
-static size_t
-_qtcConfValueSize(const QtcConfValueDesc *desc)
+QTC_EXPORT size_t
+qtcConfValueSize(const QtcConfValueDesc *desc)
 {
     switch (desc->type) {
     default:
@@ -60,10 +60,4 @@ _qtcConfValueSize(const QtcConfValueDesc *desc)
             return sizeof(double*);
         return (sizeof(double) * desc->float_list_c.max_count);
     }
-}
-
-QTC_EXPORT size_t
-qtcConfValueSize(const QtcConfValueDesc *desc)
-{
-    return qtcMax(_qtcConfValueSize(desc), sizeof(QtcConfValue));
 }

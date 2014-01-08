@@ -24,38 +24,13 @@
 
 #include "conf-desc.h"
 
-typedef union {
-    union {
-        char *_alloc;
-        char _static[0];
-    } str_val;
-    int int_val;
-    int enum_val;
-    double float_val;
-    bool bool_val;
-    QtcColor color_val;
-    struct {
-        int len;
-        union {
-            char **_vals;
-            char *_buff1[0];
-            char _buff2[0];
-        };
-    } str_list_val;
-    struct {
-        int len;
-        union {
-            int *_vals;
-            int _buff[0];
-        };
-    } int_list_val;
-    struct {
-        int len;
-        union {
-            double *_vals;
-            double _buff[0];
-        };
-    } float_list_val;
+typedef enum {
+    QTC_CONF_VALUE_CUSTOM = (1 << 0),
+} QtcConfValueFlag;
+
+typedef struct {
+    QtcConfValueFlag flag;
+    void *_data[0];
 } QtcConfValue;
 
 QTC_BEGIN_DECLS
@@ -64,12 +39,12 @@ size_t qtcConfValueSize(const QtcConfValueDesc *desc);
 static inline QtcConfValue*
 qtcConfValueNew(const QtcConfValueDesc *desc)
 {
-    return qtcNewSize(QtcConfValue, qtcConfValueSize(desc));
+    return qtcNewSize(QtcConfValue,
+                      offsetof(QtcConfValue, _data) + qtcConfValueSize(desc));
 }
 void qtcConfValueLoad(QtcConfValue *value, const char *str,
                       const QtcConfValueDesc *desc);
 void qtcConfValueDone(QtcConfValue *value, const QtcConfValueDesc *desc);
-void qtcConfValueFree(QtcConfValue *value);
 
 QTC_END_DECLS
 
