@@ -74,8 +74,10 @@ qtcWindowRemoveFromHash(void *hash)
     if (qtcWindowTable) {
         QtCWindow *tv = qtcWindowLookupHash(hash, false);
         if (tv) {
-            if (tv->timer)
+            if (tv->timer) {
                 g_source_remove(tv->timer);
+                g_object_unref(G_OBJECT(tv->widget));
+            }
             g_hash_table_remove(qtcWindowTable, hash);
         }
     }
@@ -239,6 +241,7 @@ qtcWindowDelayedUpdate(void *user_data)
             gdk_threads_enter();
             qtcWindowSizeRequest(window->widget);
             gdk_threads_leave();
+            g_object_unref(G_OBJECT(window->widget));
             return false;
         }
     }
@@ -258,8 +261,9 @@ qtcWindowConfigure(GtkWidget *widget, GdkEventConfigure *event, void *data)
 
         // schedule delayed timeOut
         if (!window->timer) {
+            g_object_ref(G_OBJECT(window->widget));
             window->timer =
-                g_timeout_add(50, (GSourceFunc)qtcWindowDelayedUpdate, window);
+                g_timeout_add(50, qtcWindowDelayedUpdate, window);
             window->locked = false;
         } else {
             window->locked = true;
