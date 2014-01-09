@@ -20,6 +20,8 @@
  *****************************************************************************/
 
 #include "load.h"
+#include <qtcurve-utils/log.h>
+#include <qtcurve-utils/number.h>
 
 static const QtcIniEntry*
 qtcConfigFindEntry(const QtcIniFile *file, const char *grp, const char *name,
@@ -47,7 +49,7 @@ qtcConfigFindEntry(const QtcIniFile *file, const char *grp, const char *name,
     return ini_ety;
 }
 
-static void
+QTC_EXPORT void
 qtcConfigFreeCache(QtcIniGroup **grp_cache, QtcIniEntry **ety_cache)
 {
     if (ety_cache && *ety_cache) {
@@ -69,63 +71,99 @@ qtcConfigLoadBool(const QtcIniFile *file, const char *grp, const char *name,
     return qtcStrToBool(ety->value, def);
 }
 
-QTC_EXPORT void
-qtcConfigFreeBool(QtcIniGroup **grp_cache, QtcIniEntry **ety_cache)
+static void
+_checkIntDef(const char *grp, const char *name,
+             const QtcConfIntConstrain *c, long *def)
 {
-    qtcConfigFreeCache(grp_cache, ety_cache);
+    if (!c) {
+        return;
+    }
+    if (qtcUnlikely(c->min > *def || c->max < *def)) {
+        qtcWarn("Illegal default value %ld for option %s/%s.\n",
+                *def, grp, name);
+        *def = qtcBound(c->min, *def, c->max);
+    }
 }
 
 QTC_EXPORT long
 qtcConfigLoadInt(const QtcIniFile *file, const char *grp, const char *name,
                  const QtcIniGroup **grp_cache, const QtcIniEntry **ety_cache,
-                 long def)
+                 const QtcConfIntConstrain *c, long def)
 {
     const QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name,
                                                 grp_cache, ety_cache);
+    _checkIntDef(grp, name, c, &def);
     QTC_RET_IF_FAIL(ety && ety->value, def);
-    return qtcStrToInt(ety->value, def);
+    return qtcBound(c->min, qtcStrToInt(ety->value, def), c->max);
 }
 
-QTC_EXPORT void
-qtcConfigFreeInt(QtcIniGroup **grp_cache, QtcIniEntry **ety_cache)
+static void
+_checkFloatDef(const char *grp, const char *name,
+               const QtcConfFloatConstrain *c, double *def)
 {
-    qtcConfigFreeCache(grp_cache, ety_cache);
+    if (!c) {
+        return;
+    }
+    if (qtcUnlikely(c->min > *def || c->max < *def)) {
+        qtcWarn("Illegal default value %lf for option %s/%s.\n",
+                *def, grp, name);
+        *def = qtcBound(c->min, *def, c->max);
+    }
 }
 
 QTC_EXPORT double
 qtcConfigLoadFloat(const QtcIniFile *file, const char *grp, const char *name,
                    const QtcIniGroup **grp_cache, const QtcIniEntry **ety_cache,
-                   double def)
+                   const QtcConfFloatConstrain *c, double def)
 {
     const QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name,
                                                 grp_cache, ety_cache);
+    _checkFloatDef(grp, name, c, &def);
     QTC_RET_IF_FAIL(ety && ety->value, def);
-    return qtcStrToFloat(ety->value, def);
+    return qtcBound(c->min, qtcStrToFloat(ety->value, def), c->max);
 }
 
-QTC_EXPORT void
-qtcConfigFreeFloat(QtcIniGroup **grp_cache, QtcIniEntry **ety_cache)
+static char*
+_setStrN(char *dest, const char *src, size_t max_len)
 {
-    qtcConfigFreeCache(grp_cache, ety_cache);
+    if (max_len) {
+        return qtcSetStr(dest, src);
+    } else {
+        return qtcSetStr(dest, src, qtcMin(strlen(src), max_len));
+    }
 }
 
 QTC_EXPORT char*
 qtcConfigLoadStr(const QtcIniFile *file, const char *grp, const char *name,
                  const QtcIniGroup **grp_cache, const QtcIniEntry **ety_cache,
-                 const char *def)
+                 const QtcConfStrConstrain *c, const char *def,
+                 char *buff, bool is_static)
 {
+    unsigned max_len = c && c->max_len ? max_len : 0;
     if (!def) {
         def = "";
+    } else if (max_len) {
+        if (max_len < strlen(def)) {
+            qtcWarn("Illegal default value %s for option %s/%s.\n",
+                    def, grp, name);
+        }
     }
     const QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name,
                                                 grp_cache, ety_cache);
-    QTC_RET_IF_FAIL(ety && ety->value, strdup(def));
-    return strdup(ety->value);
+    if (is_static) {
+        strncpy(buff, ety && ety->value ? ety->value : def, max_len);
+        buff[max_len] = '\0';
+        return buff;
+    } else {
+        QTC_RET_IF_FAIL(ety && ety->value, _setStrN(buff, def, max_len));
+        return _setStrN(buff, ety->value, max_len);
+    }
 }
 
 QTC_EXPORT void
-qtcConfigFreeStr(QtcIniGroup **grp_cache, QtcIniEntry **ety_cache, char *val)
+qtcConfigFreeStr(char *val, bool is_static)
 {
-    qtcFree(val);
-    qtcConfigFreeCache(grp_cache, ety_cache);
+    if (!is_static) {
+        qtcFree(val);
+    }
 }

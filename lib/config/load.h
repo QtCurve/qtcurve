@@ -26,23 +26,82 @@
 
 QTC_BEGIN_DECLS
 
+// General
+void qtcConfigFreeCache(QtcIniGroup **grp_cache, QtcIniEntry **ety_cache);
+
+// Bool
 bool qtcConfigLoadBool(const QtcIniFile *file, const char *grp,
                        const char *name, const QtcIniGroup **grp_cache,
                        const QtcIniEntry **ety_cache, bool def);
-void qtcConfigFreeBool(QtcIniGroup **grp_cache, QtcIniEntry **ety_cache);
+
+// Int
+typedef struct {
+    long min;
+    long max;
+} QtcConfIntConstrain;
+
 long qtcConfigLoadInt(const QtcIniFile *file, const char *grp,
                       const char *name, const QtcIniGroup **grp_cache,
-                      const QtcIniEntry **ety_cache, long def);
-void qtcConfigFreeInt(QtcIniGroup **grp_cache, QtcIniEntry **ety_cache);
+                      const QtcIniEntry **ety_cache,
+                      const QtcConfIntConstrain *c, long def);
+
+// Float
+typedef struct {
+    double min;
+    double max;
+} QtcConfFloatConstrain;
+
 double qtcConfigLoadFloat(const QtcIniFile *file, const char *grp,
                           const char *name, const QtcIniGroup **grp_cache,
-                          const QtcIniEntry **ety_cache, double def);
-void qtcConfigFreeFloat(QtcIniGroup **grp_cache, QtcIniEntry **ety_cache);
+                          const QtcIniEntry **ety_cache,
+                          const QtcConfFloatConstrain *c, double def);
+
+// String
+typedef struct {
+    unsigned max_len;
+} QtcConfStrConstrain;
+
 char *qtcConfigLoadStr(const QtcIniFile *file, const char *grp,
                        const char *name, const QtcIniGroup **grp_cache,
-                       const QtcIniEntry **ety_cache, const char *def);
-void qtcConfigFreeStr(QtcIniGroup **grp_cache, QtcIniEntry **ety_cache,
-                      char *val);
+                       const QtcIniEntry **ety_cache,
+                       const QtcConfStrConstrain *c, const char *def,
+                       char *buff, bool is_static);
+void qtcConfigFreeStr(char *val, bool is_static);
+
+typedef struct {
+    char *id;
+    char *name;
+    char *enum_name;
+} QtcConfEnumDesc;
+
+typedef struct {
+    unsigned num;
+    QtcConfEnumDesc *descs;
+    char *enum_type;
+} QtcConfEnumConstrain;
+
+typedef struct {
+    unsigned max_strlen;
+
+    unsigned min_count;
+    unsigned max_count;
+} QtcConfStrListConstrain;
+
+typedef struct {
+    long min_val;
+    long max_val;
+
+    unsigned min_count;
+    unsigned max_count;
+} QtcConfIntListConstrain;
+
+typedef struct {
+    double min_val;
+    double max_val;
+
+    unsigned min_count;
+    unsigned max_count;
+} QtcConfFloatListConstrain;
 
 QTC_END_DECLS
 
