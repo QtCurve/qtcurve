@@ -19,7 +19,7 @@
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
 
-#include <qtcurve-utils/utils.h>
+#include <qtcurve-utils/map.h>
 #include <assert.h>
 #include <ctype.h>
 
@@ -62,15 +62,15 @@
 static int
 search_map(const char *str)
 {
-    QTC_DECL_STR_MAP_AUTO(auto_map, true, STRINGS);
-    return qtcStrMapSearch(&auto_map, str, -1);
+    QTC_DEF_ENUM_AUTO(auto_map, true, STRINGS);
+    return qtcEnumSearch(&auto_map, str, -1);
 }
 
 static int
 search_case_map(const char *str)
 {
-    QTC_DECL_STR_MAP_AUTO(auto_map, false, CASE_STRINGS);
-    return qtcStrMapSearch(&auto_map, str, -1);
+    QTC_DEF_ENUM_AUTO(auto_map, false, CASE_STRINGS);
+    return qtcEnumSearch(&auto_map, str, -1);
 }
 
 int

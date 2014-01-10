@@ -22,6 +22,7 @@
 #include <config.h>
 #include "log.h"
 #include "strs.h"
+#include "map.h"
 #include <unistd.h>
 #include <stdarg.h>
 
@@ -40,11 +41,11 @@ _qtcCheckLogLevelReal()
         log_level = QTC_LOG_DEBUG;
         return;
     }
-    QTC_DECL_STR_MAP(level_map, false, {"debug", QTC_LOG_DEBUG},
-                     {"info", QTC_LOG_INFO}, {"warning", QTC_LOG_WARN},
-                     {"warn", QTC_LOG_WARN}, {"error", QTC_LOG_ERROR});
-    log_level = qtcStrMapSearch(&level_map, getenv("QTCURVE_LEVEL"),
-                                QTC_LOG_ERROR);
+    QTC_DEF_ENUM(level_map, false, {"debug", QTC_LOG_DEBUG},
+                 {"info", QTC_LOG_INFO}, {"warning", QTC_LOG_WARN},
+                 {"warn", QTC_LOG_WARN}, {"error", QTC_LOG_ERROR});
+    log_level = qtcEnumSearch(&level_map, getenv("QTCURVE_LEVEL"),
+                              QTC_LOG_ERROR);
     if (qtcStrToBool(env_debug, true) && log_level <= QTC_LOG_DEBUG) {
         log_level = QTC_LOG_INFO;
     }

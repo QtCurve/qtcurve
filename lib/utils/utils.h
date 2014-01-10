@@ -192,65 +192,6 @@ QTC_BEGIN_DECLS
  */
 void *qtcBSearch(const void *key, const void *base, size_t nmemb, size_t size,
                  int (*compar)(const void*, const void*));
-
-typedef struct {
-    const char *key;
-    int val;
-} QtcStrMapItem;
-
-typedef struct {
-    unsigned num;
-    QtcStrMapItem *items;
-    bool auto_val;
-    bool inited;
-    bool case_sensitive;
-} QtcStrMap;
-
-void qtcStrMapInit(QtcStrMap *map);
-#define QTC_DECL_STR_MAP(map, case_sense, items...)      \
-    static QtcStrMapItem __##map##_items[] = {items};    \
-    static QtcStrMap map = {                             \
-        sizeof(__##map##_items) / sizeof(QtcStrMapItem), \
-        __##map##_items,                                 \
-        false,                                           \
-        false,                                           \
-        case_sense,                                      \
-    };                                                   \
-    if (!map.inited) {                                   \
-        qtcStrMapInit(&map);                             \
-    }
-
-static inline void
-qtcStrMapInitKeys(QtcStrMap *map, const char **keys)
-{
-    if (map->inited) {
-        return;
-    }
-    for (unsigned i = 0;i < map->num;i++) {
-        map->items[i].key = keys[i];
-    }
-    qtcStrMapInit(map);
-}
-
-#define QTC_DECL_STR_MAP_AUTO(map, case_sense, keys...)           \
-    static const char *__##map##_keys[] = {keys};                 \
-    static QtcStrMapItem __##map##_items[sizeof(__##map##_keys) / \
-                                         sizeof(const char*)];    \
-    static QtcStrMap map = {                                      \
-        sizeof(__##map##_keys) / sizeof(const char*),             \
-        __##map##_items,                                          \
-        true,                                                     \
-        false,                                                    \
-        case_sense,                                               \
-    };                                                            \
-    qtcStrMapInitKeys(&map, __##map##_keys);
-
-int qtcStrMapSearch(const QtcStrMap *map, const char *key, int def);
-#define _qtcStrMapSearch(map, key, def, ...)    \
-    (qtcStrMapSearch)(map, key, def)
-#define qtcStrMapSearch(map, key, def...)       \
-    _qtcStrMapSearch(map, key, ##def, 0)
-
 const char *qtcGetProgName();
 
 QTC_END_DECLS

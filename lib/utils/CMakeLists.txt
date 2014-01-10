@@ -5,7 +5,8 @@ set(qtcurve_utils_SRCS
   utils.c
   strs.c
   shadow.c
-  timer.c)
+  timer.c
+  map.c)
 set(qtcurve_utils_LINKS
   m rt dl ${LIBEXECINFO_LIBRARIES})
 

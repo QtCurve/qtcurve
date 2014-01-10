@@ -81,65 +81,6 @@ qtcBSearch(const void *key, const void *base, size_t nmemb, size_t size,
     return (void*)(((const char*)base) + (l * size));
 }
 
-static int
-qtcStrMapItemCompare(const void *_left, const void *_right, void *_map)
-{
-    const QtcStrMapItem *left = (const QtcStrMapItem*)_left;
-    const QtcStrMapItem *right = (const QtcStrMapItem*)_right;
-    QtcStrMap *map = (QtcStrMap*)_map;
-    if (map->case_sensitive) {
-        return strcmp(left->key, right->key);
-    } else {
-        return strcasecmp(left->key, right->key);
-    }
-}
-
-QTC_EXPORT void
-qtcStrMapInit(QtcStrMap *map)
-{
-    QTC_RET_IF_FAIL(map && !map->inited && map->items);
-    if (map->auto_val) {
-        for (unsigned i = 0;i < map->num;i++) {
-            map->items[i].val = i;
-        }
-    }
-    qsort_r(map->items, map->num, sizeof(QtcStrMapItem),
-            qtcStrMapItemCompare, map);
-    map->inited = true;
-}
-
-typedef struct {
-    const char *key;
-    bool case_sensitive;
-} QtcStrMapCompKey;
-
-static int
-qtcStrMapItemCompKey(const void *_key, const void *_item)
-{
-    const QtcStrMapCompKey *key = (const QtcStrMapCompKey*)_key;
-    const QtcStrMapItem *item = (const QtcStrMapItem*)_item;
-    if (key->case_sensitive) {
-        return strcmp(key->key, item->key);
-    } else {
-        return strcasecmp(key->key, item->key);
-    }
-}
-
-QTC_EXPORT int
-(qtcStrMapSearch)(const QtcStrMap *map, const char *key, int def)
-{
-    if (!key || !map) {
-        return def;
-    }
-    QtcStrMapCompKey comp_key = {
-        .key = key,
-        .case_sensitive = map->case_sensitive
-    };
-    QtcStrMapItem *item = bsearch(&comp_key, map->items, map->num,
-                                  sizeof(QtcStrMapItem), qtcStrMapItemCompKey);
-    return item ? item->val : def;
-}
-
 const char*
 _qtcGetProgName()
 {
