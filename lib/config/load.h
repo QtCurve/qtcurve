@@ -23,6 +23,7 @@
 #define __QTC_CONFIG_LOAD_H__
 
 #include <qtcurve-utils/ini-parse.h>
+#include <qtcurve-utils/map.h>
 
 QTC_BEGIN_DECLS
 
@@ -68,18 +69,18 @@ char *qtcConfigLoadStr(const QtcIniFile *file, const char *grp,
                        char *buff, bool is_static);
 void qtcConfigFreeStr(char *val, bool is_static);
 
-typedef struct {
-    char *id;
-    char *name;
-    char *enum_name;
-} QtcConfEnumDesc;
-
+// Enum
 typedef struct {
     unsigned num;
-    QtcConfEnumDesc *descs;
-    char *enum_type;
+    QtcEnumItem *items;
 } QtcConfEnumConstrain;
 
+unsigned qtcConfigLoadEnum(const QtcIniFile *file, const char *grp,
+                           const char *name, const QtcIniGroup **grp_cache,
+                           const QtcIniEntry **ety_cache,
+                           const QtcConfEnumConstrain *c, unsigned def);
+
+// String List
 typedef struct {
     unsigned max_strlen;
 
@@ -87,6 +88,7 @@ typedef struct {
     unsigned max_count;
 } QtcConfStrListConstrain;
 
+// Int List
 typedef struct {
     long min_val;
     long max_val;

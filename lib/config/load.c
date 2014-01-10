@@ -167,3 +167,21 @@ qtcConfigFreeStr(char *val, bool is_static)
         qtcFree(val);
     }
 }
+
+QTC_EXPORT unsigned
+qtcConfigLoadEnum(const QtcIniFile *file, const char *grp, const char *name,
+                  const QtcIniGroup **grp_cache, const QtcIniEntry **ety_cache,
+                  const QtcConfEnumConstrain *c, unsigned def)
+{
+    const QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name,
+                                                grp_cache, ety_cache);
+    QTC_RET_IF_FAIL(ety && ety->value && c && c->num && c->items, def);
+    const QtcStrMap map = {
+        .items = c->items,
+        .num = c->num,
+        .size = sizeof(QtcEnumItem),
+        .inited = true,
+        .case_sensitive = false,
+    };
+    return qtcEnumSearch(&map, ety->value, def);
+}
