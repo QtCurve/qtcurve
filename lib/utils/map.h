@@ -80,12 +80,15 @@ _qtcEnumInitKeys(QtcStrMap *map, const char **keys)
     _qtcEnumInitKeys(&map, __##map##_keys)
 
 QTC_ALWAYS_INLINE static inline unsigned
-qtcEnumSearch(const QtcStrMap *map, const char *key, unsigned def)
+qtcEnumSearch(const QtcStrMap *map, const char *key, unsigned def, bool *is_def)
 {
     QtcEnumItem *item = (QtcEnumItem*)qtcStrMapSearch(map, key);
+    qtcAssign(is_def, !item);
     return item ? item->val : def;
 }
-#define qtcEnumSearch(map, key, def...)                         \
-    qtcEnumSearch(map, key, (unsigned)(QTC_DEFAULT(def, 0)))
+#define _qtcEnumSearch(map, key, def, is_def, ...)              \
+    qtcEnumSearch(map, key, (unsigned)(def), (bool*)is_def)
+#define qtcEnumSearch(map, key, def...)         \
+    _qtcEnumSearch(map, key, ##def, 0, 0)
 
 #endif
