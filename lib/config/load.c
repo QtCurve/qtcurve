@@ -74,12 +74,16 @@ _qtcConfigFreeEntryCaches(unsigned num, QtcIniEntry ***caches)
 QTC_EXPORT bool
 qtcConfigLoadBool(const QtcIniFile *file, const char *grp, const char *name,
                   const QtcIniGroup **grp_cache, const QtcIniEntry **ety_cache,
-                  bool def)
+                  bool def, bool *is_def)
 {
     const QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name,
                                                 grp_cache, ety_cache);
-    QTC_RET_IF_FAIL(ety && ety->value, def);
-    return qtcStrToBool(ety->value, def);
+    if (ety && ety->value) {
+        qtcAssign(is_def, false);
+        return qtcStrToBool(ety->value, def);
+    }
+    qtcAssign(is_def, true);
+    return def;
 }
 
 static void

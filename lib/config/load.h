@@ -45,7 +45,7 @@ void _qtcConfigFreeEntryCaches(unsigned num, QtcIniEntry ***caches);
 // Bool
 bool qtcConfigLoadBool(const QtcIniFile *file, const char *grp,
                        const char *name, const QtcIniGroup **grp_cache,
-                       const QtcIniEntry **ety_cache, bool def);
+                       const QtcIniEntry **ety_cache, bool def, bool *is_def);
 
 // Int
 typedef struct {
