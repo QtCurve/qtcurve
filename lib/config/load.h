@@ -22,8 +22,8 @@
 #ifndef __QTC_CONFIG_LOAD_H__
 #define __QTC_CONFIG_LOAD_H__
 
+#include "option.h"
 #include <qtcurve-utils/ini-parse.h>
-#include <qtcurve-utils/map.h>
 
 QTC_BEGIN_DECLS
 
@@ -42,83 +42,29 @@ void _qtcConfigFreeEntryCaches(unsigned num, QtcIniEntry ***caches);
         _qtcConfigFreeEntryCaches(__num, __caches);                     \
     } while (0)
 
-// Bool
 bool qtcConfigLoadBool(const QtcIniFile *file, const char *grp,
                        const char *name, const QtcIniGroup **grp_cache,
                        const QtcIniEntry **ety_cache, bool def, bool *is_def);
-
-// Int
-typedef struct {
-    long min;
-    long max;
-} QtcConfIntConstrain;
-
 long qtcConfigLoadInt(const QtcIniFile *file, const char *grp,
                       const char *name, const QtcIniGroup **grp_cache,
                       const QtcIniEntry **ety_cache,
                       const QtcConfIntConstrain *c, long def, bool *is_def);
-
-// Float
-typedef struct {
-    double min;
-    double max;
-} QtcConfFloatConstrain;
-
 double qtcConfigLoadFloat(const QtcIniFile *file, const char *grp,
                           const char *name, const QtcIniGroup **grp_cache,
                           const QtcIniEntry **ety_cache,
                           const QtcConfFloatConstrain *c,
                           double def, bool *is_def);
-
-// String
-typedef struct {
-    unsigned max_len;
-} QtcConfStrConstrain;
-
 char *qtcConfigLoadStr(const QtcIniFile *file, const char *grp,
                        const char *name, const QtcIniGroup **grp_cache,
                        const QtcIniEntry **ety_cache,
                        const QtcConfStrConstrain *c, const char *def,
                        char *buff, bool is_static, bool *is_def);
 void qtcConfigFreeStr(char *val, bool is_static);
-
-// Enum
-typedef struct {
-    unsigned num;
-    QtcEnumItem *items;
-} QtcConfEnumConstrain;
-
 unsigned qtcConfigLoadEnum(const QtcIniFile *file, const char *grp,
                            const char *name, const QtcIniGroup **grp_cache,
                            const QtcIniEntry **ety_cache,
                            const QtcConfEnumConstrain *c,
                            unsigned def, bool *is_def);
-
-// String List
-typedef struct {
-    unsigned max_strlen;
-
-    unsigned min_count;
-    unsigned max_count;
-} QtcConfStrListConstrain;
-
-// Int List
-typedef struct {
-    long min_val;
-    long max_val;
-
-    unsigned min_count;
-    unsigned max_count;
-} QtcConfIntListConstrain;
-
-// Float List
-typedef struct {
-    double min_val;
-    double max_val;
-
-    unsigned min_count;
-    unsigned max_count;
-} QtcConfFloatListConstrain;
 
 QTC_END_DECLS
 

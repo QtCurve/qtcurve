@@ -90,9 +90,6 @@ static void
 _checkIntDef(const char *grp, const char *name,
              const QtcConfIntConstrain *c, long *def)
 {
-    if (!c) {
-        return;
-    }
     if (qtcUnlikely(c->min > *def || c->max < *def)) {
         qtcWarn("Illegal default value %ld for option %s/%s.\n",
                 *def, grp, name);
@@ -107,7 +104,9 @@ qtcConfigLoadInt(const QtcIniFile *file, const char *grp, const char *name,
 {
     const QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name,
                                                 grp_cache, ety_cache);
-    _checkIntDef(grp, name, c, &def);
+    if (c) {
+        _checkIntDef(grp, name, c, &def);
+    }
     if (!ety || !ety->value) {
         qtcAssign(is_def, true);
         return def;
@@ -119,9 +118,6 @@ static void
 _checkFloatDef(const char *grp, const char *name,
                const QtcConfFloatConstrain *c, double *def)
 {
-    if (!c) {
-        return;
-    }
     if (qtcUnlikely(c->min > *def || c->max < *def)) {
         qtcWarn("Illegal default value %lf for option %s/%s.\n",
                 *def, grp, name);
@@ -136,7 +132,9 @@ qtcConfigLoadFloat(const QtcIniFile *file, const char *grp, const char *name,
 {
     const QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name,
                                                 grp_cache, ety_cache);
-    _checkFloatDef(grp, name, c, &def);
+    if (c) {
+        _checkFloatDef(grp, name, c, &def);
+    }
     if (!ety || !ety->value) {
         qtcAssign(is_def, true);
         return def;
