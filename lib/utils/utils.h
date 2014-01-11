@@ -263,6 +263,12 @@ qtcOneOf(T &&value, First &&first, Rest &&...rest...)
         __func ? __func(args) : (typeof(__func(args)))0;        \
     })
 #endif
+#define qtcAssign(addr, exp) do {               \
+        typeof(addr) __addr = (addr);           \
+        if (__addr) {                           \
+            *__addr = (exp);                    \
+        }                                       \
+    } while(0)
 #define qtcNoneOf(args...) (!qtcOneOf(args))
 
 // gcc and clang both seem find with returning void expression in c
