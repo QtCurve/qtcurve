@@ -91,7 +91,8 @@ typedef struct {
 unsigned qtcConfigLoadEnum(const QtcIniFile *file, const char *grp,
                            const char *name, const QtcIniGroup **grp_cache,
                            const QtcIniEntry **ety_cache,
-                           const QtcConfEnumConstrain *c, unsigned def);
+                           const QtcConfEnumConstrain *c,
+                           unsigned def, bool *is_def);
 
 // String List
 typedef struct {

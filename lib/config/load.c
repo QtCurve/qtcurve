@@ -193,11 +193,14 @@ qtcConfigFreeStr(char *val, bool is_static)
 QTC_EXPORT unsigned
 qtcConfigLoadEnum(const QtcIniFile *file, const char *grp, const char *name,
                   const QtcIniGroup **grp_cache, const QtcIniEntry **ety_cache,
-                  const QtcConfEnumConstrain *c, unsigned def)
+                  const QtcConfEnumConstrain *c, unsigned def, bool *is_def)
 {
     const QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name,
                                                 grp_cache, ety_cache);
-    QTC_RET_IF_FAIL(ety && ety->value && c && c->num && c->items, def);
+    if (!ety && ety->value && c && c->num && c->items) {
+        qtcAssign(is_def, true);
+        return def;
+    }
     const QtcStrMap map = {
         .items = c->items,
         .num = c->num,
@@ -205,5 +208,5 @@ qtcConfigLoadEnum(const QtcIniFile *file, const char *grp, const char *name,
         .inited = true,
         .case_sensitive = false,
     };
-    return qtcEnumSearch(&map, ety->value, def);
+    return qtcEnumSearch(&map, ety->value, def, is_def);
 }
