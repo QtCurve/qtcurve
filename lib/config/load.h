@@ -27,21 +27,6 @@
 
 QTC_BEGIN_DECLS
 
-// General
-void _qtcConfigFreeGroupCaches(unsigned num, QtcIniGroup ***caches);
-#define qtcConfigFreeGroupCaches(caches) do {                           \
-        QtcIniGroup **__caches[] = {caches};                            \
-        unsigned __num = sizeof(__caches) / sizeof(__caches[0]);        \
-        _qtcConfigFreeGroupCaches(__num, __caches);                     \
-    } while (0)
-
-void _qtcConfigFreeEntryCaches(unsigned num, QtcIniEntry ***caches);
-#define qtcConfigFreeEntryCaches(caches) do {                           \
-        QtcIniEntry **__caches[] = {caches};                            \
-        unsigned __num = sizeof(__caches) / sizeof(__caches[0]);        \
-        _qtcConfigFreeEntryCaches(__num, __caches);                     \
-    } while (0)
-
 bool qtcConfigLoadBool(QtcIniFile *file, const char *grp,
                        const char *name, QtcIniGroup **grp_cache,
                        QtcIniEntry **ety_cache, bool def, bool *is_def);

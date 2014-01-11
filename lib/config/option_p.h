@@ -23,10 +23,13 @@
 #define __QTC_CONFIG_OPTION_P_H__
 
 #include "option.h"
-#include <qtcurve-utils/ini-parse.h>
+
+QTC_BEGIN_DECLS
 
 QtcIniEntry *qtcConfigFindEntry(QtcIniFile *file, const char *grp,
                                 const char *ety, QtcIniGroup **grp_cache,
                                 QtcIniEntry **ety_cache, bool write);
+
+QTC_END_DECLS
 
 #endif

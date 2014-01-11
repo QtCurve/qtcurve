@@ -24,28 +24,6 @@
 #include <qtcurve-utils/log.h>
 #include <qtcurve-utils/number.h>
 
-QTC_EXPORT void
-_qtcConfigFreeGroupCaches(unsigned num, QtcIniGroup ***caches)
-{
-    for (unsigned i = 0;i < num;i++) {
-        if (caches[i] && *caches[i]) {
-            qtcIniGroupUnref(*caches[i]);
-            *caches[i] = NULL;
-        }
-    }
-}
-
-QTC_EXPORT void
-_qtcConfigFreeEntryCaches(unsigned num, QtcIniEntry ***caches)
-{
-    for (unsigned i = 0;i < num;i++) {
-        if (caches[i] && *caches[i]) {
-            qtcIniEntryUnref(*caches[i]);
-            *caches[i] = NULL;
-        }
-    }
-}
-
 QTC_EXPORT bool
 qtcConfigLoadBool(QtcIniFile *file, const char *grp, const char *name,
                   QtcIniGroup **grp_cache, QtcIniEntry **ety_cache, bool def,

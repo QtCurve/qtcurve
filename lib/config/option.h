@@ -23,6 +23,7 @@
 #define __QTC_CONFIG_OPTION_H__
 
 #include <qtcurve-utils/map.h>
+#include <qtcurve-utils/ini-parse.h>
 
 // Int
 typedef struct {
@@ -72,5 +73,24 @@ typedef struct {
     unsigned min_count;
     unsigned max_count;
 } QtcConfFloatListConstrain;
+
+QTC_BEGIN_DECLS
+
+// General
+void _qtcConfigFreeGroupCaches(unsigned num, QtcIniGroup ***caches);
+#define qtcConfigFreeGroupCaches(caches) do {                           \
+        QtcIniGroup **__caches[] = {caches};                            \
+        unsigned __num = sizeof(__caches) / sizeof(__caches[0]);        \
+        _qtcConfigFreeGroupCaches(__num, __caches);                     \
+    } while (0)
+
+void _qtcConfigFreeEntryCaches(unsigned num, QtcIniEntry ***caches);
+#define qtcConfigFreeEntryCaches(caches) do {                           \
+        QtcIniEntry **__caches[] = {caches};                            \
+        unsigned __num = sizeof(__caches) / sizeof(__caches[0]);        \
+        _qtcConfigFreeEntryCaches(__num, __caches);                     \
+    } while (0)
+
+QTC_END_DECLS
 
 #endif

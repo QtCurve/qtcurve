@@ -84,3 +84,25 @@ qtcConfigFindEntry(QtcIniFile *file, const char *grp, const char *ety,
     return qtcConfigGroupFindEntry(
         qtcConfigFindGroup(file, grp, grp_cache, write), ety, ety_cache, write);
 }
+
+QTC_EXPORT void
+_qtcConfigFreeGroupCaches(unsigned num, QtcIniGroup ***caches)
+{
+    for (unsigned i = 0;i < num;i++) {
+        if (caches[i] && *caches[i]) {
+            qtcIniGroupUnref(*caches[i]);
+            *caches[i] = NULL;
+        }
+    }
+}
+
+QTC_EXPORT void
+_qtcConfigFreeEntryCaches(unsigned num, QtcIniEntry ***caches)
+{
+    for (unsigned i = 0;i < num;i++) {
+        if (caches[i] && *caches[i]) {
+            qtcIniEntryUnref(*caches[i]);
+            *caches[i] = NULL;
+        }
+    }
+}
