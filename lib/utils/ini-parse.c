@@ -234,8 +234,7 @@ qtcIniGroupRef(QtcIniGroup *group)
  * Remove a group from a file and decrease the ref count by 1.
  **/
 static void
-qtcIniFileHashRemoveGroup(QtcIniFile *file,
-                                     QtcIniGroup *group)
+qtcIniFileHashRemoveGroup(QtcIniFile *file, QtcIniGroup *group)
 {
     HASH_DEL(file->groups, group);
     group->prev = NULL;
@@ -596,7 +595,7 @@ _checkSingleLine(const char *str)
         return 0;
     size_t len = strcspn(str, "\n");
     if (str[len])
-        qtcError("Not a single line, ignore.");
+        qtcError(_("Not a single line, ignore."));
     return len;
 }
 
@@ -607,7 +606,7 @@ _checkEntryKey(const char *str)
         return 0;
     size_t len = strcspn(str, "=\n");
     if (str[len]) {
-        qtcError("Not a valid key, skip.");
+        qtcError(_("Not a valid key, skip."));
         return 0;
     }
     switch (str[len - 1]) {
@@ -616,7 +615,7 @@ _checkEntryKey(const char *str)
     case '\t':
     case '\f':
     case '\v':
-        qtcError("Not a valid key, skip.");
+        qtcError(_("Not a valid key, skip."));
         return 0;
     }
     return len;
@@ -644,7 +643,7 @@ _checkGroupName(const char *str)
         return 0;
     size_t len = strcspn(str, "[]\n");
     if (str[len]) {
-        qtcError("Not a valid group name, skip.");
+        qtcError(_("Not a valid group name, skip."));
         return 0;
     }
     return len;
@@ -719,7 +718,7 @@ qtcIniFileAddGroup(QtcIniFile *file, QtcIniGroup *base, const char *name,
     if (!base) {
         base = file->last;
     } else if (!_qtcIniFileHasGroup(file, base)) {
-        qtcError("The given group doesn't belong to the given file.");
+        qtcError(_("The given group doesn't belong to the given file."));
         return NULL;
     }
     QtcIniGroup *new_group;
@@ -744,13 +743,13 @@ qtcIniFileInsertGroup(QtcIniFile *file, QtcIniGroup *base, QtcIniGroup *group,
     if (!base) {
         base = file->last;
     } else if (!_qtcIniFileHasGroup(file, base)) {
-        qtcError("The given group doesn't belong to the given file.");
+        qtcError(_("The given group doesn't belong to the given file."));
         return false;
     }
     if (!group->hh.tbl) {
         qtcIniFileHashAdd(file, group, strlen(group->name));
     } else if (!_qtcIniFileHasGroup(file, group)) {
-        qtcError("The given group belongs to another file.");
+        qtcError(_("The given group belongs to another file."));
         return false;
     } else if (!move || group == base) {
         return true;
@@ -792,7 +791,7 @@ qtcIniGroupAddEntry(QtcIniGroup *group, QtcIniEntry *base, const char *name,
     if (!base) {
         base = group->last;
     } else if (!_qtcIniGroupHasEntry(group, base)) {
-        qtcError("The given entry doesn't belong to the given group.");
+        qtcError(_("The given entry doesn't belong to the given group."));
         return NULL;
     }
     QtcIniEntry *new_entry;
@@ -817,13 +816,13 @@ qtcIniGroupInsertEntry(QtcIniGroup *group, QtcIniEntry *base,
     if (!base) {
         base = group->last;
     } else if (!_qtcIniGroupHasEntry(group, base)) {
-        qtcError("The given entry doesn't belong to the given group.");
+        qtcError(_("The given entry doesn't belong to the given group."));
         return false;
     }
     if (!entry->hh.tbl) {
         qtcIniGroupHashAdd(group, entry, strlen(entry->name));
     } else if (!_qtcIniGroupHasEntry(group, entry)) {
-        qtcError("The given entry belongs to another group.");
+        qtcError(_("The given entry belongs to another group."));
         return false;
     } else if (!move || entry == base) {
         return true;

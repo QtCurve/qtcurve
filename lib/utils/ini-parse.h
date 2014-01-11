@@ -124,6 +124,7 @@ _qtcIniFileAddGroup(QtcIniFile *file, QtcIniGroup *base, const char *name,
 #define qtcIniFileAddGroup(f, b, name, len, move, before...)            \
     QTC_SWITCH_(before, qtcIniFileAddGroup)(f, b, name, len, move, ##before)
 
+bool qtcIniFileHasGroup(QtcIniFile *file, QtcIniGroup *group);
 bool qtcIniFileDeleteGroup(QtcIniFile *file, QtcIniGroup *group);
 bool qtcIniFileInsertGroup(QtcIniFile *file, QtcIniGroup *base,
                            QtcIniGroup *group, bool move, bool before);
@@ -153,6 +154,7 @@ _qtcIniGroupAddEntry(QtcIniGroup *group, QtcIniEntry *base, const char *name,
 #define qtcIniGroupAddEntry(g, b, name, len, move, before...)           \
     QTC_SWITCH_(before, qtcIniGroupAddEntry)(g, b, name, len, move, ##before)
 
+bool qtcIniGroupHasEntry(QtcIniGroup *group, QtcIniEntry *entry);
 bool qtcIniGroupDeleteEntry(QtcIniGroup *group, QtcIniEntry *entry);
 bool qtcIniGroupInsertEntry(QtcIniGroup *group, QtcIniEntry *base,
                             QtcIniEntry *entry, bool move, bool before);
