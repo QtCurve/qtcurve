@@ -79,7 +79,7 @@ char *qtcConfigLoadStr(const QtcIniFile *file, const char *grp,
                        const char *name, const QtcIniGroup **grp_cache,
                        const QtcIniEntry **ety_cache,
                        const QtcConfStrConstrain *c, const char *def,
-                       char *buff, bool is_static);
+                       char *buff, bool is_static, bool *is_def);
 void qtcConfigFreeStr(char *val, bool is_static);
 
 // Enum

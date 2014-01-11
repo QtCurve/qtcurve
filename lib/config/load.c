@@ -158,7 +158,7 @@ QTC_EXPORT char*
 qtcConfigLoadStr(const QtcIniFile *file, const char *grp, const char *name,
                  const QtcIniGroup **grp_cache, const QtcIniEntry **ety_cache,
                  const QtcConfStrConstrain *c, const char *def,
-                 char *buff, bool is_static)
+                 char *buff, bool is_static, bool *is_def)
 {
     unsigned max_len = c && c->max_len ? max_len : 0;
     if (!def) {
@@ -171,6 +171,7 @@ qtcConfigLoadStr(const QtcIniFile *file, const char *grp, const char *name,
     }
     const QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name,
                                                 grp_cache, ety_cache);
+    qtcAssign(is_def, !(ety && ety->value));
     if (is_static) {
         strncpy(buff, ety && ety->value ? ety->value : def, max_len);
         buff[max_len] = '\0';
