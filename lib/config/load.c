@@ -20,34 +20,9 @@
  *****************************************************************************/
 
 #include "load.h"
+#include "option_p.h"
 #include <qtcurve-utils/log.h>
 #include <qtcurve-utils/number.h>
-
-static const QtcIniEntry*
-qtcConfigFindEntry(const QtcIniFile *file, const char *grp, const char *name,
-                   const QtcIniGroup **grp_cache, const QtcIniEntry **ety_cache)
-{
-    QTC_RET_IF_FAIL(file, NULL);
-    if (ety_cache && *ety_cache) {
-        return *ety_cache;
-    }
-    const QtcIniGroup *ini_grp = NULL;
-    if (grp_cache && *grp_cache) {
-        ini_grp = *grp_cache;
-    } else {
-        ini_grp = qtcIniFileFindGroup(file, grp);
-        QTC_RET_IF_FAIL(ini_grp, NULL);
-        if (grp_cache) {
-            *grp_cache = qtcIniGroupRef((QtcIniGroup*)ini_grp);
-        }
-    }
-    QtcIniEntry *ini_ety = qtcIniGroupFindEntry(ini_grp, name);
-    QTC_RET_IF_FAIL(ini_ety, NULL);
-    if (ety_cache) {
-        *ety_cache = qtcIniEntryRef(ini_ety);
-    }
-    return ini_ety;
-}
 
 QTC_EXPORT void
 _qtcConfigFreeGroupCaches(unsigned num, QtcIniGroup ***caches)
@@ -72,12 +47,12 @@ _qtcConfigFreeEntryCaches(unsigned num, QtcIniEntry ***caches)
 }
 
 QTC_EXPORT bool
-qtcConfigLoadBool(const QtcIniFile *file, const char *grp, const char *name,
-                  const QtcIniGroup **grp_cache, const QtcIniEntry **ety_cache,
-                  bool def, bool *is_def)
+qtcConfigLoadBool(QtcIniFile *file, const char *grp, const char *name,
+                  QtcIniGroup **grp_cache, QtcIniEntry **ety_cache, bool def,
+                  bool *is_def)
 {
-    const QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name,
-                                                grp_cache, ety_cache);
+    QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name, grp_cache,
+                                          ety_cache, false);
     if (ety && ety->value) {
         qtcAssign(is_def, false);
         return qtcStrToBool(ety->value, def);
@@ -98,12 +73,12 @@ _checkIntDef(const char *grp, const char *name,
 }
 
 QTC_EXPORT long
-qtcConfigLoadInt(const QtcIniFile *file, const char *grp, const char *name,
-                 const QtcIniGroup **grp_cache, const QtcIniEntry **ety_cache,
+qtcConfigLoadInt(QtcIniFile *file, const char *grp, const char *name,
+                 QtcIniGroup **grp_cache, QtcIniEntry **ety_cache,
                  const QtcConfIntConstrain *c, long def, bool *is_def)
 {
-    const QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name,
-                                                grp_cache, ety_cache);
+    QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name, grp_cache,
+                                          ety_cache, false);
     if (c) {
         _checkIntDef(grp, name, c, &def);
     }
@@ -126,12 +101,12 @@ _checkFloatDef(const char *grp, const char *name,
 }
 
 QTC_EXPORT double
-qtcConfigLoadFloat(const QtcIniFile *file, const char *grp, const char *name,
-                   const QtcIniGroup **grp_cache, const QtcIniEntry **ety_cache,
+qtcConfigLoadFloat(QtcIniFile *file, const char *grp, const char *name,
+                   QtcIniGroup **grp_cache, QtcIniEntry **ety_cache,
                    const QtcConfFloatConstrain *c, double def, bool *is_def)
 {
-    const QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name,
-                                                grp_cache, ety_cache);
+    QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name, grp_cache,
+                                          ety_cache, false);
     if (c) {
         _checkFloatDef(grp, name, c, &def);
     }
@@ -153,8 +128,8 @@ _setStrN(char *dest, const char *src, size_t max_len)
 }
 
 QTC_EXPORT char*
-qtcConfigLoadStr(const QtcIniFile *file, const char *grp, const char *name,
-                 const QtcIniGroup **grp_cache, const QtcIniEntry **ety_cache,
+qtcConfigLoadStr(QtcIniFile *file, const char *grp, const char *name,
+                 QtcIniGroup **grp_cache, QtcIniEntry **ety_cache,
                  const QtcConfStrConstrain *c, const char *def,
                  char *buff, bool is_static, bool *is_def)
 {
@@ -164,8 +139,8 @@ qtcConfigLoadStr(const QtcIniFile *file, const char *grp, const char *name,
     } else if (max_len && max_len < strlen(def)) {
         qtcWarn("Illegal default value %s for option %s/%s.\n", def, grp, name);
     }
-    const QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name,
-                                                grp_cache, ety_cache);
+    QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name, grp_cache,
+                                          ety_cache, false);
     qtcAssign(is_def, !(ety && ety->value));
     if (is_static) {
         strncpy(buff, ety && ety->value ? ety->value : def, max_len);
@@ -186,12 +161,12 @@ qtcConfigFreeStr(char *val, bool is_static)
 }
 
 QTC_EXPORT unsigned
-qtcConfigLoadEnum(const QtcIniFile *file, const char *grp, const char *name,
-                  const QtcIniGroup **grp_cache, const QtcIniEntry **ety_cache,
+qtcConfigLoadEnum(QtcIniFile *file, const char *grp, const char *name,
+                  QtcIniGroup **grp_cache, QtcIniEntry **ety_cache,
                   const QtcConfEnumConstrain *c, unsigned def, bool *is_def)
 {
-    const QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name,
-                                                grp_cache, ety_cache);
+    QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name, grp_cache,
+                                          ety_cache, false);
     if (!(ety && ety->value && c && c->num && c->items)) {
         qtcAssign(is_def, true);
         return def;

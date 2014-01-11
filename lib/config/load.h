@@ -42,27 +42,27 @@ void _qtcConfigFreeEntryCaches(unsigned num, QtcIniEntry ***caches);
         _qtcConfigFreeEntryCaches(__num, __caches);                     \
     } while (0)
 
-bool qtcConfigLoadBool(const QtcIniFile *file, const char *grp,
-                       const char *name, const QtcIniGroup **grp_cache,
-                       const QtcIniEntry **ety_cache, bool def, bool *is_def);
-long qtcConfigLoadInt(const QtcIniFile *file, const char *grp,
-                      const char *name, const QtcIniGroup **grp_cache,
-                      const QtcIniEntry **ety_cache,
+bool qtcConfigLoadBool(QtcIniFile *file, const char *grp,
+                       const char *name, QtcIniGroup **grp_cache,
+                       QtcIniEntry **ety_cache, bool def, bool *is_def);
+long qtcConfigLoadInt(QtcIniFile *file, const char *grp,
+                      const char *name, QtcIniGroup **grp_cache,
+                      QtcIniEntry **ety_cache,
                       const QtcConfIntConstrain *c, long def, bool *is_def);
-double qtcConfigLoadFloat(const QtcIniFile *file, const char *grp,
-                          const char *name, const QtcIniGroup **grp_cache,
-                          const QtcIniEntry **ety_cache,
+double qtcConfigLoadFloat(QtcIniFile *file, const char *grp,
+                          const char *name, QtcIniGroup **grp_cache,
+                          QtcIniEntry **ety_cache,
                           const QtcConfFloatConstrain *c,
                           double def, bool *is_def);
-char *qtcConfigLoadStr(const QtcIniFile *file, const char *grp,
-                       const char *name, const QtcIniGroup **grp_cache,
-                       const QtcIniEntry **ety_cache,
+char *qtcConfigLoadStr(QtcIniFile *file, const char *grp,
+                       const char *name, QtcIniGroup **grp_cache,
+                       QtcIniEntry **ety_cache,
                        const QtcConfStrConstrain *c, const char *def,
                        char *buff, bool is_static, bool *is_def);
 void qtcConfigFreeStr(char *val, bool is_static);
-unsigned qtcConfigLoadEnum(const QtcIniFile *file, const char *grp,
-                           const char *name, const QtcIniGroup **grp_cache,
-                           const QtcIniEntry **ety_cache,
+unsigned qtcConfigLoadEnum(QtcIniFile *file, const char *grp,
+                           const char *name, QtcIniGroup **grp_cache,
+                           QtcIniEntry **ety_cache,
                            const QtcConfEnumConstrain *c,
                            unsigned def, bool *is_def);
 

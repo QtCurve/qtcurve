@@ -1,5 +1,6 @@
 set(qtcurve_config_SRCS
-  load.c)
+  load.c
+  option.c)
 set(qtcurve_config_LINKS qtcurve-utils)
 add_definitions("-DQTC_UTILS_INTERNAL")
 
