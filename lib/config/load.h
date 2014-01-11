@@ -56,7 +56,7 @@ typedef struct {
 long qtcConfigLoadInt(const QtcIniFile *file, const char *grp,
                       const char *name, const QtcIniGroup **grp_cache,
                       const QtcIniEntry **ety_cache,
-                      const QtcConfIntConstrain *c, long def);
+                      const QtcConfIntConstrain *c, long def, bool *is_def);
 
 // Float
 typedef struct {
@@ -67,7 +67,8 @@ typedef struct {
 double qtcConfigLoadFloat(const QtcIniFile *file, const char *grp,
                           const char *name, const QtcIniGroup **grp_cache,
                           const QtcIniEntry **ety_cache,
-                          const QtcConfFloatConstrain *c, double def);
+                          const QtcConfFloatConstrain *c,
+                          double def, bool *is_def);
 
 // String
 typedef struct {

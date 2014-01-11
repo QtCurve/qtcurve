@@ -103,13 +103,16 @@ _checkIntDef(const char *grp, const char *name,
 QTC_EXPORT long
 qtcConfigLoadInt(const QtcIniFile *file, const char *grp, const char *name,
                  const QtcIniGroup **grp_cache, const QtcIniEntry **ety_cache,
-                 const QtcConfIntConstrain *c, long def)
+                 const QtcConfIntConstrain *c, long def, bool *is_def)
 {
     const QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name,
                                                 grp_cache, ety_cache);
     _checkIntDef(grp, name, c, &def);
-    QTC_RET_IF_FAIL(ety && ety->value, def);
-    return qtcBound(c->min, qtcStrToInt(ety->value, def), c->max);
+    if (!ety || !ety->value) {
+        qtcAssign(is_def, true);
+        return def;
+    }
+    return qtcBound(c->min, qtcStrToInt(ety->value, def, is_def), c->max);
 }
 
 static void
@@ -129,13 +132,16 @@ _checkFloatDef(const char *grp, const char *name,
 QTC_EXPORT double
 qtcConfigLoadFloat(const QtcIniFile *file, const char *grp, const char *name,
                    const QtcIniGroup **grp_cache, const QtcIniEntry **ety_cache,
-                   const QtcConfFloatConstrain *c, double def)
+                   const QtcConfFloatConstrain *c, double def, bool *is_def)
 {
     const QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name,
                                                 grp_cache, ety_cache);
     _checkFloatDef(grp, name, c, &def);
-    QTC_RET_IF_FAIL(ety && ety->value, def);
-    return qtcBound(c->min, qtcStrToFloat(ety->value, def), c->max);
+    if (!ety || !ety->value) {
+        qtcAssign(is_def, true);
+        return def;
+    }
+    return qtcBound(c->min, qtcStrToFloat(ety->value, def, is_def), c->max);
 }
 
 static char*
