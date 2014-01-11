@@ -272,30 +272,46 @@ qtcStrToBool(const char *str, bool def)
 }
 
 QTC_ALWAYS_INLINE static inline long
-qtcStrToInt(const char *str, long def)
+qtcStrToInt(const char *str, long def, bool *is_def)
 {
-    QTC_RET_IF_FAIL(str, def);
+    if (!str) {
+        qtcAssign(is_def, true);
+        return def;
+    }
     str += strspn(str, " \t\b\n\f\v");
     char *end = NULL;
     long res = strtol(str, &end, 0);
     if (end == str) {
+        qtcAssign(is_def, true);
         res = def;
+    } else {
+        qtcAssign(is_def, false);
     }
     return res;
 }
+#define qtcStrToInt(str, def, is_def...)                \
+    qtcStrToInt(str, def, (QTC_DEFAULT(is_def, NULL)))
 
 QTC_ALWAYS_INLINE static inline double
-qtcStrToFloat(const char *str, double def)
+qtcStrToFloat(const char *str, double def, bool *is_def)
 {
-    QTC_RET_IF_FAIL(str, def);
+    if (!str) {
+        qtcAssign(is_def, true);
+        return def;
+    }
     str += strspn(str, " \t\b\n\f\v");
     char *end = NULL;
     double res = strtod(str, &end);
     if (end == str) {
+        qtcAssign(is_def, true);
         res = def;
+    } else {
+        qtcAssign(is_def, false);
     }
     return res;
 }
+#define qtcStrToFloat(str, def, is_def...)                      \
+    qtcStrToFloat(str, def, (QTC_DEFAULT(is_def, NULL)))
 
 QTC_ALWAYS_INLINE static inline bool
 qtcStrEndsWith(const char *str, const char *tail)
