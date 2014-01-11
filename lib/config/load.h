@@ -28,7 +28,19 @@
 QTC_BEGIN_DECLS
 
 // General
-void qtcConfigFreeCache(QtcIniGroup **grp_cache, QtcIniEntry **ety_cache);
+void _qtcConfigFreeGroupCaches(unsigned num, QtcIniGroup ***caches);
+#define qtcConfigFreeGroupCaches(caches) do {                           \
+        QtcIniGroup **__caches[] = {caches};                            \
+        unsigned __num = sizeof(__caches) / sizeof(__caches[0]);        \
+        _qtcConfigFreeGroupCaches(__num, __caches);                     \
+    } while (0)
+
+void _qtcConfigFreeEntryCaches(unsigned num, QtcIniEntry ***caches);
+#define qtcConfigFreeEntryCaches(caches) do {                           \
+        QtcIniEntry **__caches[] = {caches};                            \
+        unsigned __num = sizeof(__caches) / sizeof(__caches[0]);        \
+        _qtcConfigFreeEntryCaches(__num, __caches);                     \
+    } while (0)
 
 // Bool
 bool qtcConfigLoadBool(const QtcIniFile *file, const char *grp,
@@ -97,6 +109,7 @@ typedef struct {
     unsigned max_count;
 } QtcConfIntListConstrain;
 
+// Float List
 typedef struct {
     double min_val;
     double max_val;
