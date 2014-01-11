@@ -163,11 +163,8 @@ qtcConfigLoadStr(const QtcIniFile *file, const char *grp, const char *name,
     unsigned max_len = c && c->max_len ? max_len : 0;
     if (!def) {
         def = "";
-    } else if (max_len) {
-        if (max_len < strlen(def)) {
-            qtcWarn("Illegal default value %s for option %s/%s.\n",
-                    def, grp, name);
-        }
+    } else if (max_len && max_len < strlen(def)) {
+        qtcWarn("Illegal default value %s for option %s/%s.\n", def, grp, name);
     }
     const QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name,
                                                 grp_cache, ety_cache);
@@ -197,7 +194,7 @@ qtcConfigLoadEnum(const QtcIniFile *file, const char *grp, const char *name,
 {
     const QtcIniEntry *ety = qtcConfigFindEntry(file, grp, name,
                                                 grp_cache, ety_cache);
-    if (!ety && ety->value && c && c->num && c->items) {
+    if (!(ety && ety->value && c && c->num && c->items)) {
         qtcAssign(is_def, true);
         return def;
     }
@@ -206,7 +203,7 @@ qtcConfigLoadEnum(const QtcIniFile *file, const char *grp, const char *name,
         .num = c->num,
         .size = sizeof(QtcEnumItem),
         .inited = true,
-        .case_sensitive = false,
+        .case_sensitive = false
     };
     return qtcEnumSearch(&map, ety->value, def, is_def);
 }
