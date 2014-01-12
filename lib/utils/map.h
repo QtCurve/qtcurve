@@ -24,6 +24,8 @@
 
 #include "utils.h"
 
+QTC_BEGIN_DECLS
+
 typedef struct {
     void *items;
     const unsigned num;
@@ -90,5 +92,7 @@ qtcEnumSearch(const QtcStrMap *map, const char *key, unsigned def, bool *is_def)
     qtcEnumSearch(map, key, (unsigned)(def), (bool*)is_def)
 #define qtcEnumSearch(map, key, def...)         \
     _qtcEnumSearch(map, key, ##def, 0, 0)
+
+QTC_END_DECLS
 
 #endif
