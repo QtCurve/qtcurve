@@ -35,6 +35,11 @@
 #include <locale.h>
 #include <gmodule.h>
 
+#include <sys/wait.h>
+#include <unistd.h>
+#include <spawn.h>
+#include <poll.h>
+
 QtCPalette qtcPalette;
 Options opts;
 
@@ -54,7 +59,9 @@ getKdeHome()
     static char *kdeHome = NULL;
 
     if (!kdeHome) {
-        if (runCommand("kde4-config --expandvars --localprefix", &kdeHome)) {
+        char *args[] = { "--expandvars", "--localprefix", NULL };
+
+        if (runCommand("kde4-config", args, &kdeHome)) {
             int len = strlen(kdeHome);
 
             if (len > 1 && kdeHome[len - 1] == '\n') {
@@ -979,8 +986,10 @@ static const char * kdeIconsPrefix()
     static const char *kdeIcons = NULL;
 
     if (!kdeIcons) {
+        char *args[] = { "--expandvars", "--install", "icon", NULL };
         char *res = NULL;
-        if (runCommand("kde4-config --expandvars --install icon", &res)) {
+
+        if (runCommand("kde4-config", args, &res)) {
             int len = strlen(res);
             if (len > 1 && res[len - 1]=='\n') {
                 res[len - 1]='\0';
@@ -2442,21 +2451,87 @@ void qtSettingsSetColors(GtkStyle *style, GtkRcStyle *rc_style)
     SET_COLOR(style, rc_style, fg, GTK_RC_FG, GTK_STATE_PRELIGHT, COLOR_WINDOW_TEXT)
 }
 
-bool runCommand(const char* cmd, char** result)
+bool runCommand(const char *cmd, char *const argv[], char** result)
 {
-    FILE *fp = popen(cmd, "r");
-    if (fp) {
-        gulong bufSize = 512;
-        size_t currentOffset = 0;
-        *result = (char*)(malloc(bufSize));
-        while(fgets(*result + currentOffset, bufSize - currentOffset, fp) &&
-              (*result)[strlen(*result) - 1] != '\n') {
-            currentOffset = bufSize - 1;
-            bufSize *= 2;
-            *result = (char*)(realloc(*result, bufSize));
-        }
-        pclose(fp);
-        return true;
+    extern char **environ;
+
+    struct pollfd pfd;
+    posix_spawn_file_actions_t action;
+    pid_t pid;
+    size_t buf_size = 512;
+    off_t offset;
+    ssize_t nread;
+    char *output;
+    int p_stdout[2];
+    int status;
+    int rc;
+
+    output = (char*)(malloc(buf_size));
+    if (output == NULL) {
+        return false;
     }
+    memset(output, '\0', buf_size);
+
+    rc = pipe(p_stdout);
+    if (rc < 0) {
+        goto error;
+    }
+
+    posix_spawn_file_actions_init(&action);
+    posix_spawn_file_actions_adddup2(&action, p_stdout[1], 1);
+    posix_spawn_file_actions_adddup2(&action, 2, 2);
+
+    if (cmd[0] == '/') {
+        rc = posix_spawn(&pid, cmd, &action, NULL, argv, environ);
+    } else {
+        rc = posix_spawnp(&pid, cmd, &action, NULL, argv, environ);
+    }
+    if (rc != 0) {
+        goto error;
+    }
+
+    rc = waitpid(pid, &status, 0);
+    if (rc == -1 || status != 0) {
+        goto error;
+    }
+
+    pfd.fd = p_stdout[0];
+    pfd.events = POLLIN;
+
+    rc = poll(&pfd, 1, 500);
+    if (rc <= 0 || !(pfd.revents & POLLIN)) {
+        goto error;
+    }
+
+    for (nread = read(p_stdout[0], output, buf_size);
+         nread > 0 && output[strlen(output) - 1] != '\n';
+         nread = read(p_stdout[0], output + offset, buf_size - offset))
+    {
+        char *tmp;
+
+        offset = buf_size - 1;
+        buf_size *= 2;
+
+        tmp = (char*)(realloc(output, buf_size));
+        if (tmp == NULL) {
+            goto error;
+        }
+        memset(tmp + offset, '\0', buf_size - offset);
+        output = tmp;
+    }
+
+    close(p_stdout[0]);
+    close(p_stdout[1]);
+    posix_spawn_file_actions_destroy(&action);
+
+    *result = output;
+
+    return true;
+error:
+    free(output);
+    close(p_stdout[0]);
+    close(p_stdout[1]);
+    posix_spawn_file_actions_destroy(&action);
+
     return false;
 }
