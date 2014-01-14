@@ -176,6 +176,6 @@ extern QtData     qtSettings;
 
 gboolean qtSettingsInit();
 void qtSettingsSetColors(GtkStyle *style, GtkRcStyle *rc_style);
-bool runCommand(const char* cmd, char** result);
+bool runCommand(const char *cmd, char *const argv[], char** result);
 
 #endif
