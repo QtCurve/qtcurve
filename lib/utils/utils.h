@@ -41,6 +41,11 @@
  */
 
 /**
+ * Generic call back function.
+ */
+typedef void (*QtcCallback)(void*);
+
+/**
  * Allocate memory and initialize it to zero.
  * \param size size of the memory
  */
