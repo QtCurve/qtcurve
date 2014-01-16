@@ -30,12 +30,11 @@ QTC_BEGIN_DECLS
 #define PRTime PRIu64
 uint64_t qtcGetTime();
 uint64_t qtcGetElapse(uint64_t prev);
-#define qtcGetElapse(prev...)                   \
-    qtcGetElapse(QTC_DEFAULT(prev, 0))
-#define qtcPrintTime(time)                      \
-    qtcForceLog("Time: %" PRTime "\n", time)
-#define qtcPrintElapse(prev...)                 \
-    qtcPrintTime(qtcGetElapse(prev))
+void qtcTic();
+uint64_t qtcToc();
+#define qtcPrintTime(time) qtcForceLog("Time: %" PRTime "\n", time)
+#define qtcPrintElapse(prev) qtcPrintTime(qtcGetElapse(prev))
+#define qtcPrintToc() qtcPrintTime(qtcToc())
 
 QTC_END_DECLS
 

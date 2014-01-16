@@ -9,7 +9,7 @@ set(qtcurve_utils_SRCS
   map.c
   fd_utils.c)
 set(qtcurve_utils_LINKS
-  m rt dl ${LIBEXECINFO_LIBRARIES})
+  m rt dl ${LIBEXECINFO_LIBRARIES} pthread)
 
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
@@ -25,7 +25,7 @@ if(QTC_ENABLE_X11)
   add_definitions(${QTC_X11_CFLAGS})
 endif()
 
-add_definitions("-DQTC_UTILS_INTERNAL")
+add_definitions("-DQTC_UTILS_INTERNAL -pthread")
 
 add_library(qtcurve-utils SHARED
   ${qtcurve_utils_SRCS})
