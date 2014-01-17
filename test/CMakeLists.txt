@@ -54,3 +54,11 @@ add_test(NAME test-call COMMAND test-call)
 add_executable(test-call-cpp test-call.cpp)
 target_link_libraries(test-call-cpp qtcurve-utils)
 add_test(NAME test-call-cpp COMMAND test-call-cpp)
+
+add_executable(test-process test-process.c)
+target_link_libraries(test-process qtcurve-utils)
+add_test(NAME test-process COMMAND test-process)
+
+add_executable(test-popen test-popen.c)
+target_link_libraries(test-popen qtcurve-utils)
+add_test(NAME test-popen COMMAND test-popen)
