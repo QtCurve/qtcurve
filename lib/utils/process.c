@@ -30,8 +30,6 @@
 #include <errno.h>
 #include <poll.h>
 
-#include "log.h"
-
 QTC_EXPORT bool
 qtcForkBackground(QtcCallback cb, void *data, QtcCallback fail_cb)
 {
@@ -95,10 +93,10 @@ qtcSpawnFailCb(void *_data)
 }
 
 QTC_EXPORT bool
-qtcSpawn(const char *file, char *const *argv, QtcCallback cb, void *cb_data,
-         QtcCallback fail_cb)
+qtcSpawn(const char *file, const char *const *argv, QtcCallback cb,
+         void *cb_data, QtcCallback fail_cb)
 {
-    QtcSpawnData data = {file, argv, cb, cb_data, fail_cb};
+    QtcSpawnData data = {file, (char *const*)argv, cb, cb_data, fail_cb};
     return qtcForkBackground(qtcSpawnCb, &data, qtcSpawnFailCb);
 }
 
@@ -163,7 +161,8 @@ qtcPopenFailCb(void *_data)
 }
 
 QTC_EXPORT bool
-qtcPopen(const char *file, char *const *argv, unsigned fd_num, QtcPopenFD *fds)
+qtcPopen(const char *file, const char *const *argv,
+         unsigned fd_num, QtcPopenFD *fds)
 {
     if (qtcUnlikely(!fds || !fd_num)) {
         return qtcSpawn(file, argv, NULL, NULL);
@@ -252,7 +251,7 @@ qtcPopenPollCheckTimeout(uint64_t start, int timeout, int *new_timeout)
 }
 
 QTC_EXPORT bool
-qtcPopenBuff(const char *file, char *const argv[],
+qtcPopenBuff(const char *file, const char *const argv[],
              unsigned buff_num, QtcPopenBuff *buffs, int timeout)
 {
     if (qtcUnlikely(!buffs || !buff_num)) {

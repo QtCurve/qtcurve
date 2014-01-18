@@ -22,6 +22,7 @@
 #include "config.h"
 
 #include <qtcurve-utils/dirs.h>
+#include <qtcurve-utils/process.h>
 
 #include "qtcurveconfig.h"
 #include <kwinconfig/qtcurvekwinconfig.h>
@@ -445,35 +446,30 @@ static QString readEnvPath(const char *env)
 
    return path ? QFile::decodeName(path) : QString::null;
 }
-static QString kdeHome(bool kde3)
+
+static QString
+kdeHome(bool kde3)
 {
     static QString kdeHome[2];
 
     // Execute kde-config to ascertain users KDEHOME
-    if(kdeHome[kde3 ? 0 : 1].isEmpty())
-    {
-        FILE *fpipe;
-
-        if ((fpipe = (FILE*)popen(kde3 ? "kde-config --localprefix" : "kde4-config --localprefix", "r")))
-        {
-            char line[1024];
-
-            while(fgets(line, sizeof line, fpipe))
-            {
-                kdeHome[kde3 ? 0 : 1]=QFile::decodeName(line).replace("\n", "");
-                break;
-            }
-            pclose(fpipe);
+    if (kdeHome[kde3 ? 0 : 1].isEmpty()) {
+        size_t len = 0;
+        const char *kde_config = kde3 ? "kde-config" : "kde4-config";
+        const char *const argv[] = {kde_config, "--localprefix", NULL};
+        char *res = qtcPopenStdout(kde_config, argv, 300, &len);
+        if (res) {
+            res[len] = '\0';
+            kdeHome[kde3 ? 0 : 1] = QFile::decodeName(res).replace("\n", "");
+            free(res);
         }
     }
 
     // Try env vars...
-    if(kdeHome[kde3 ? 0 : 1].isEmpty())
-    {
-        kdeHome[kde3 ? 0 : 1]=readEnvPath(getuid() ? "KDEHOME" : "KDEROOTHOME");
-        if (kdeHome[kde3 ? 0 : 1].isEmpty())
-        {
-            QDir    homeDir(QDir::homePath());
+    if (kdeHome[kde3 ? 0 : 1].isEmpty()) {
+        kdeHome[kde3 ? 0 : 1] = readEnvPath(getuid() ? "KDEHOME" : "KDEROOTHOME");
+        if (kdeHome[kde3 ? 0 : 1].isEmpty()) {
+            QDir homeDir(QDir::homePath());
             QString kdeConfDir("/.kde");
             if (!kde3 && homeDir.exists(".kde4"))
                 kdeConfDir = QString("/.kde4");

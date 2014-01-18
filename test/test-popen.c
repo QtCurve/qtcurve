@@ -67,7 +67,7 @@ mainProcess(int argc, char **argv)
         }
     };
     alarm(1);
-    qtcPopen(argv[0], (char*[]){argv[0], buff1, buff2, NULL},
+    qtcPopen(argv[0], (const char* const[]){argv[0], buff1, buff2, NULL},
              sizeof(fds) / sizeof(fds[0]), fds);
     write(fds[0].replace, buff1, sizeof(buff1));
     shutdown(fds[0].replace, SHUT_RDWR);

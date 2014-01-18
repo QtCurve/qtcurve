@@ -26,6 +26,7 @@
 #include <qtcurve-utils/log.h>
 #include <qtcurve-utils/dirs.h>
 #include <qtcurve-utils/strs.h>
+#include <qtcurve-utils/process.h>
 
 #include <common/common.h>
 #include <common/config_file.h>
@@ -52,35 +53,30 @@ static char*
 getKdeHome()
 {
     static char *kdeHome = NULL;
-
     if (!kdeHome) {
-        if (runCommand("kde4-config --expandvars --localprefix", &kdeHome)) {
-            int len = strlen(kdeHome);
-
+        size_t len = 0;
+        kdeHome = qtcPopenStdout(
+            "kde4-config", (const char *const[]){"kde4-config", "--expandvars",
+                    "--localprefix", NULL}, 300, &len);
+        if (kdeHome) {
             if (len > 1 && kdeHome[len - 1] == '\n') {
                 kdeHome[len - 1] = '\0';
+            } else {
+                kdeHome[len] = '\0';
             }
         } else {
-            kdeHome = NULL;
-        }
-    }
-
-    if (!kdeHome) {
-        char *env = getenv(getuid() ? "KDEHOME" : "KDEROOTHOME");
-
-        if (env) {
-            kdeHome = env;
-        } else {
-            static char kdeHomeStr[MAX_CONFIG_FILENAME_LEN + 1];
-            const char *home = qtcGetHome();
-
-            if (strlen(home) < (MAX_CONFIG_FILENAME_LEN - 5)) {
-                sprintf(kdeHomeStr, "%s/.kde", home);
-                kdeHome = kdeHomeStr;
+            kdeHome = getenv(getuid() ? "KDEHOME" : "KDEROOTHOME");
+            if (!kdeHome) {
+                // FIXME
+                static char kdeHomeStr[MAX_CONFIG_FILENAME_LEN + 1];
+                const char *home = qtcGetHome();
+                if (strlen(home) < (MAX_CONFIG_FILENAME_LEN - 5)) {
+                    sprintf(kdeHomeStr, "%s/.kde", home);
+                    kdeHome = kdeHomeStr;
+                }
             }
         }
     }
-
     return kdeHome;
 }
 
@@ -972,18 +968,22 @@ static void readKdeGlobals(const char *rc, int rd, bool first)
         setFont(&fonts[FONT_TOOLBAR], FONT_TOOLBAR);
 }
 
-static int qt_refs=0;
+static int qt_refs = 0;
 
-static const char * kdeIconsPrefix()
+static const char*
+kdeIconsPrefix()
 {
     static const char *kdeIcons = NULL;
-
     if (!kdeIcons) {
-        char *res = NULL;
-        if (runCommand("kde4-config --expandvars --install icon", &res)) {
-            int len = strlen(res);
+        size_t len = 0;
+        char *res = qtcPopenStdout("kde4-config", (const char * const[]){
+                "kde4-config", "--expandvars", "--install", "icon", NULL},
+            300, &len);
+        if (res) {
             if (len > 1 && res[len - 1]=='\n') {
                 res[len - 1]='\0';
+            } else {
+                res[len] = '\0';
             }
             kdeIcons = res;
         } else {
@@ -2440,23 +2440,4 @@ void qtSettingsSetColors(GtkStyle *style, GtkRcStyle *rc_style)
 //         SET_COLOR(style, rc_style, fg, GTK_RC_FG, GTK_STATE_INSENSITIVE, COLOR_MID)
     SET_COLOR(style, rc_style, fg, GTK_RC_FG, GTK_STATE_ACTIVE, COLOR_WINDOW_TEXT)
     SET_COLOR(style, rc_style, fg, GTK_RC_FG, GTK_STATE_PRELIGHT, COLOR_WINDOW_TEXT)
-}
-
-bool runCommand(const char* cmd, char** result)
-{
-    FILE *fp = popen(cmd, "r");
-    if (fp) {
-        gulong bufSize = 512;
-        size_t currentOffset = 0;
-        *result = (char*)(malloc(bufSize));
-        while(fgets(*result + currentOffset, bufSize - currentOffset, fp) &&
-              (*result)[strlen(*result) - 1] != '\n') {
-            currentOffset = bufSize - 1;
-            bufSize *= 2;
-            *result = (char*)(realloc(*result, bufSize));
-        }
-        pclose(fp);
-        return true;
-    }
-    return false;
 }

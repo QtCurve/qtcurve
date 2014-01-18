@@ -29,7 +29,7 @@ QTC_BEGIN_DECLS
 bool qtcForkBackground(QtcCallback cb, void *data, QtcCallback fail_cb);
 #define qtcForkBackground(cb, data, fail_cb...)                 \
     qtcForkBackground(cb, data, QTC_DEFAULT(fail_cb, NULL))
-bool qtcSpawn(const char *file, char *const *argv,
+bool qtcSpawn(const char *file, const char *const *argv,
               QtcCallback cb, void *cb_data, QtcCallback fail_cb);
 #define qtcSpawn(file, argv, cb, cb_data, fail_cb...)                   \
     qtcSpawn(file, argv, cb, cb_data, QTC_DEFAULT(fail_cb, NULL))
@@ -44,7 +44,7 @@ typedef struct {
     int replace;
     QtcPopenFDMode mode;
 } QtcPopenFD;
-bool qtcPopen(const char *file, char *const *argv,
+bool qtcPopen(const char *file, const char *const *argv,
               unsigned fd_num, QtcPopenFD *fds);
 typedef struct {
     int orig;
@@ -52,9 +52,18 @@ typedef struct {
     char *buff;
     size_t len;
 } QtcPopenBuff;
-bool qtcPopenBuff(const char *file, char *const argv[],
-                  unsigned buff_num, QtcPopenBuff *buffs,
-                  int timeout);
+bool qtcPopenBuff(const char *file, const char *const *argv, unsigned buff_num,
+                  QtcPopenBuff *buffs, int timeout);
+QTC_ALWAYS_INLINE static inline char*
+qtcPopenStdout(const char *file, const char *const *argv,
+               int timeout, size_t *len)
+{
+    QtcPopenBuff popen_buff = {1, QTC_POPEN_READ, NULL, 0};
+    bool res = qtcPopenBuff(file, argv, 1, &popen_buff, timeout);
+    QTC_RET_IF_FAIL(res, NULL);
+    qtcAssign(len, popen_buff.len);
+    return popen_buff.buff;
+}
 
 QTC_END_DECLS
 

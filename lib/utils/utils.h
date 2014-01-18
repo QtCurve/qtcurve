@@ -240,6 +240,12 @@ qtcOneOf(T &&value, First &&first, Rest &&...rest...)
             decltype(func) __func = (func);                             \
             return __func ? __func(args) : decltype(__func(args))();    \
         })())
+#define qtcAssign(addr, exp) do {               \
+        decltype(addr) __addr = (addr);           \
+        if (__addr) {                           \
+            *__addr = (exp);                    \
+        }                                       \
+    } while(0)
 #else
 #define qtcOneOf(exp, args...)                                  \
     ({                                                          \
@@ -267,13 +273,13 @@ qtcOneOf(T &&value, First &&first, Rest &&...rest...)
         typeof(func) __func = (func);                           \
         __func ? __func(args) : (typeof(__func(args)))0;        \
     })
-#endif
 #define qtcAssign(addr, exp) do {               \
         typeof(addr) __addr = (addr);           \
         if (__addr) {                           \
             *__addr = (exp);                    \
         }                                       \
     } while(0)
+#endif
 #define qtcNoneOf(args...) (!qtcOneOf(args))
 
 // gcc and clang both seem find with returning void expression in c
