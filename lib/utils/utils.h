@@ -203,13 +203,6 @@ QTC_END_DECLS
 
 #ifdef __cplusplus
 #include <utility>
-template<typename T>
-QTC_ALWAYS_INLINE static inline bool
-qtcOneOf(T &&value)
-{
-    QTC_UNUSED(value);
-    return false;
-}
 template<typename T, typename First>
 QTC_ALWAYS_INLINE static inline bool
 qtcOneOf(T &&value, First &&first)
@@ -226,7 +219,7 @@ qtcOneOf(T &&value, First &&first, Rest &&...rest...)
 // Use lambda for lazy evaluation of \param def
 #define qtcDefault(val, def)                    \
     (([&]() {                                   \
-            decltype(val) __val = (val);        \
+            auto __val = (val);                 \
             return __val ? __val : (def);       \
         })())
 // Use lambda for lazy evaluation of \param args
@@ -237,11 +230,11 @@ qtcOneOf(T &&value, First &&first, Rest &&...rest...)
 // references) as return type.
 #define qtcCall(func, args...)                                          \
     (([&]() {                                                           \
-            decltype(func) __func = (func);                             \
+            auto __func = (func);                                       \
             return __func ? __func(args) : decltype(__func(args))();    \
         })())
 #define qtcAssign(addr, exp) do {               \
-        decltype(addr) __addr = (addr);           \
+        auto __addr = (addr);                   \
         if (__addr) {                           \
             *__addr = (exp);                    \
         }                                       \
