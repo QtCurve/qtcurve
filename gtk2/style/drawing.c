@@ -1197,98 +1197,103 @@ bool drawWindowBgnd(cairo_t *cr, GtkStyle *style, const QtcRect *area,
         return true;
     }
     if (!isFixedWidget(widget) && !isGimpDockable(widget)) {
-        int wx=0, wy=0, wh, ww;
-
-        if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d  ", __FUNCTION__, x, y, width, height), debugDisplayWidget(widget, 20);
+        int wx = 0;
+        int wy = 0;
+        int wh = 0;
+        int ww = 0;
 
         if (!mapToTopLevel(window, widget, &wx, &wy, &ww, &wh)) {
             return false;
-        } else {
-            GtkWidget *topLevel = gtk_widget_get_toplevel(widget);
-            int opacity = (!topLevel || !GTK_IS_DIALOG(topLevel) ?
-                           opts.bgndOpacity : opts.dlgOpacity);
-            int xmod=0, ymod=0, wmod=0, hmod=0;
-            double alpha=1.0;
-            bool useAlpha = (opacity < 100 && isRgbaWidget(topLevel) &&
-                             compositingActive(topLevel));
-            bool flatBgnd = qtcIsFlatBgnd(opts.bgndAppearance);
-            const GdkColor *col = NULL;
-            GtkStyle *topStyle = gtk_widget_get_style(topLevel);
-
-            if (topStyle) {
-                col = &topStyle->bg[GTK_STATE_NORMAL];
-            } else {
-                col = getParentBgCol(widget);
-                if (!col) {
-                    col = &style->bg[GTK_STATE_NORMAL];
-                }
-            }
-
-            if (!flatBgnd || BGND_IMG_ON_BORDER) {
-                WindowBorders borders = qtcGetWindowBorderSize(false);
-                xmod = borders.sides;
-                ymod = borders.titleHeight;
-                wmod = 2*borders.sides;
-                hmod = borders.titleHeight + borders.bottom;
-                wy += ymod;
-                wx += xmod;
-                wh += hmod;
-                ww+=wmod;
-            }
-
-            QtcRect clip = {x, y, width, height};
-            cairo_save(cr);
-            qtcCairoClipRect(cr, &clip);
-
-            if (useAlpha) {
-                alpha = opacity / 100.0;
-                cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
-            }
-
-            if (flatBgnd) {
-                qtcCairoRect(cr, area, -wx, -wy, ww, wh, col, alpha);
-            } else if (opts.bgndAppearance == APPEARANCE_STRIPED) {
-                drawStripedBgnd(cr, -wx, -wy, ww, wh, col, alpha);
-            } else if (opts.bgndAppearance == APPEARANCE_FILE) {
-                cairo_save(cr);
-                cairo_translate(cr, -wx, -wy);
-                drawBgndImage(cr, 0, 0, ww, wh, true);
-                cairo_restore(cr);
-            } else {
-                drawBevelGradient(cr, area, -wx, -wy, ww, wh + 1, col,
-                                  opts.bgndGrad == GT_HORIZ, false,
-                                  opts.bgndAppearance, WIDGET_OTHER, alpha);
-
-                if(GT_HORIZ == opts.bgndGrad &&
-                   GB_SHINE == qtcGetGradient(opts.bgndAppearance,
-                                              &opts)->border) {
-                    int size = qtcMin(BGND_SHINE_SIZE, qtcMin(wh * 2, ww));
-                    double alpha = qtcShineAlpha(col);
-                    cairo_pattern_t *pat=NULL;
-
-                    size/=BGND_SHINE_STEPS;
-                    size*=BGND_SHINE_STEPS;
-                    pat=cairo_pattern_create_radial((ww/2.0)-wx, -wy, 0, (ww/2.0)-wx, -wy, size/2.0);
-                    cairo_pattern_add_color_stop_rgba(pat, 0, 1, 1, 1, alpha);
-                    cairo_pattern_add_color_stop_rgba(pat, 0.5, 1, 1, 1, alpha*0.625);
-                    cairo_pattern_add_color_stop_rgba(pat, 0.75, 1, 1, 1, alpha*0.175);
-                    cairo_pattern_add_color_stop_rgba(pat, CAIRO_GRAD_END, 1, 1, 1, 0.0);
-                    cairo_set_source(cr, pat);
-                    cairo_rectangle(cr, ((ww-size)/2.0)-wx, -wy, size, size);
-                    cairo_fill(cr);
-                    cairo_pattern_destroy(pat);
-                }
-            }
-            if(useAlpha)
-                cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
-
-            if(!BGND_IMG_ON_BORDER)
-                ww-=wmod+1, wh-=hmod, wx-=xmod, wy-=ymod;
-
-            drawBgndRings(cr, -wx, -wy, ww, wh, true);
-            cairo_restore(cr);
-            return true;
         }
+        GtkWidget *topLevel = gtk_widget_get_toplevel(widget);
+        int opacity = (!topLevel || !GTK_IS_DIALOG(topLevel) ?
+                       opts.bgndOpacity : opts.dlgOpacity);
+        int xmod = 0;
+        int ymod = 0;
+        int wmod = 0;
+        int hmod = 0;
+        double alpha = 1.0;
+        bool useAlpha = (opacity < 100 && isRgbaWidget(topLevel) &&
+                         compositingActive(topLevel));
+        bool flatBgnd = qtcIsFlatBgnd(opts.bgndAppearance);
+        const GdkColor *col = NULL;
+        GtkStyle *topStyle = gtk_widget_get_style(topLevel);
+
+        if (topStyle) {
+            col = &topStyle->bg[GTK_STATE_NORMAL];
+        } else {
+            col = getParentBgCol(widget);
+            if (!col) {
+                col = &style->bg[GTK_STATE_NORMAL];
+            }
+        }
+        if (!flatBgnd || BGND_IMG_ON_BORDER) {
+            WindowBorders borders = qtcGetWindowBorderSize(false);
+            xmod = borders.sides;
+            ymod = borders.titleHeight;
+            wmod = 2 * borders.sides;
+            hmod = borders.titleHeight + borders.bottom;
+            wy += ymod;
+            wx += xmod;
+            wh += hmod;
+            ww += wmod;
+        }
+        QtcRect clip = {x, y, width, height};
+        cairo_save(cr);
+        qtcCairoClipRect(cr, &clip);
+        if (useAlpha) {
+            alpha = opacity / 100.0;
+            cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+        }
+        if (flatBgnd) {
+            qtcCairoRect(cr, area, -wx, -wy, ww, wh, col, alpha);
+        } else if (opts.bgndAppearance == APPEARANCE_STRIPED) {
+            drawStripedBgnd(cr, -wx, -wy, ww, wh, col, alpha);
+        } else if (opts.bgndAppearance == APPEARANCE_FILE) {
+            cairo_save(cr);
+            cairo_translate(cr, -wx, -wy);
+            drawBgndImage(cr, 0, 0, ww, wh, true);
+            cairo_restore(cr);
+        } else {
+            drawBevelGradient(cr, area, -wx, -wy, ww, wh + 1, col,
+                              opts.bgndGrad == GT_HORIZ, false,
+                              opts.bgndAppearance, WIDGET_OTHER, alpha);
+            if (opts.bgndGrad == GT_HORIZ &&
+                qtcGetGradient(opts.bgndAppearance,
+                               &opts)->border == GB_SHINE) {
+                int size = qtcMin(BGND_SHINE_SIZE, qtcMin(wh * 2, ww));
+                double alpha = qtcShineAlpha(col);
+                cairo_pattern_t *pat = NULL;
+
+                size /= BGND_SHINE_STEPS;
+                size *= BGND_SHINE_STEPS;
+                pat = cairo_pattern_create_radial(
+                    ww / 2.0 - wx, -wy, 0, ww / 2.0 - wx, -wy, size / 2.0);
+                cairo_pattern_add_color_stop_rgba(pat, 0, 1, 1, 1, alpha);
+                cairo_pattern_add_color_stop_rgba(pat, 0.5, 1, 1, 1,
+                                                  alpha * 0.625);
+                cairo_pattern_add_color_stop_rgba(pat, 0.75, 1, 1, 1,
+                                                  alpha * 0.175);
+                cairo_pattern_add_color_stop_rgba(pat, CAIRO_GRAD_END,
+                                                  1, 1, 1, 0.0);
+                cairo_set_source(cr, pat);
+                cairo_rectangle(cr, (ww - size) / 2.0 - wx, -wy, size, size);
+                cairo_fill(cr);
+                cairo_pattern_destroy(pat);
+            }
+        }
+        if (useAlpha) {
+            cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
+        }
+        if (!BGND_IMG_ON_BORDER) {
+            ww -= wmod + 1;
+            wh -= hmod;
+            wx -= xmod;
+            wy -= ymod;
+        }
+        drawBgndRings(cr, -wx, -wy, ww, wh, true);
+        cairo_restore(cr);
+        return true;
     }
     return false;
 }

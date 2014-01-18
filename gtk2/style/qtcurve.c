@@ -365,15 +365,18 @@ gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
     } else if (DETAIL("tooltip")) {
         drawToolTip(cr, widget, (QtcRect*)area, x, y, width, height);
     } else if (DETAIL("icon_view_item")) {
-        drawSelection(cr, style, state, (QtcRect*)area, widget, x, y, width, height, ROUNDED_ALL, false, 1.0, 0);
-    } else if(GTK_STATE_SELECTED!=state && qtcIsCustomBgnd(&opts) && DETAIL("eventbox"))
+        drawSelection(cr, style, state, (QtcRect*)area, widget, x, y,
+                      width, height, ROUNDED_ALL, false, 1.0, 0);
+    } else if (state != GTK_STATE_SELECTED &&
+               qtcIsCustomBgnd(&opts) && DETAIL("eventbox")) {
         drawWindowBgnd(cr, style, NULL, window, widget, x, y, width, height);
-    else if(!(GTK_APP_JAVA==qtSettings.app && widget && GTK_IS_LABEL(widget)))
-    {
-        if(GTK_STATE_PRELIGHT==state && !opts.crHighlight && 0==strcmp(detail, "checkbutton"))
-            ;
-        else
-            parent_class->draw_flat_box(style, window, state, shadow, area, widget, detail, x, y, width, height);
+    } else if (!(qtSettings.app == GTK_APP_JAVA && widget &&
+                 GTK_IS_LABEL(widget))) {
+        if (state != GTK_STATE_PRELIGHT || opts.crHighlight ||
+            strcmp(detail, "checkbutton") != 0) {
+            parent_class->draw_flat_box(style, window, state, shadow, area,
+                                        widget, detail, x, y, width, height);
+        }
 
         /* For SWT (e.g. eclipse) apps. For some reason these only seem to allow a ythickness of at max 2 - but
            for etching we need 3. So we fake this by drawing the 3rd lines here...*/

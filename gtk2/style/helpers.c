@@ -870,22 +870,21 @@ bool isGimpDockable(GtkWidget *widget)
     return false;
 }
 
-GdkColor * getParentBgCol(GtkWidget *widget)
+GdkColor*
+getParentBgCol(GtkWidget *widget)
 {
-    if(GTK_IS_SCROLLBAR(widget))
-        widget=gtk_widget_get_parent(widget);
-
-    if(widget)
-    {
-        widget=gtk_widget_get_parent(widget);
-        while(widget && GTK_IS_BOX(widget))
-            widget=gtk_widget_get_parent(widget);
+    if (GTK_IS_SCROLLBAR(widget)) {
+        widget = gtk_widget_get_parent(widget);
+    }
+    if (widget) {
+        widget = gtk_widget_get_parent(widget);
+        while (widget && GTK_IS_BOX(widget)) {
+            widget = gtk_widget_get_parent(widget);
+        }
     }
 
-    GtkStyle *style=widget ? gtk_widget_get_style(widget) : NULL;
-    return style
-               ? &(style->bg[gtk_widget_get_state(widget)])
-               : NULL;
+    GtkStyle *style = widget ? gtk_widget_get_style(widget) : NULL;
+    return style ? &(style->bg[gtk_widget_get_state(widget)]) : NULL;
 }
 
 int
