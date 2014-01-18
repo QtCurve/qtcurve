@@ -36,6 +36,7 @@ qtcSendFD(int sock, int fd)
         struct cmsghdr cmsghdr;
         char control[CMSG_SPACE(sizeof(int))];
     } cmsgu;
+    memset(&cmsgu, 0, sizeof(cmsgu));
     struct msghdr msg = {
         .msg_name = NULL,
         .msg_namelen = 0,
@@ -65,6 +66,7 @@ qtcRecvFD(int sock)
         struct cmsghdr cmsghdr;
         char control[CMSG_SPACE(sizeof(int))];
     } cmsgu;
+    memset(&cmsgu, 0, sizeof(cmsgu));
     struct msghdr msg = {
         .msg_name = NULL,
         .msg_namelen = 0,

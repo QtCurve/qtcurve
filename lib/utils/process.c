@@ -21,6 +21,7 @@
 
 #include "process.h"
 #include "fd_utils.h"
+#include "timer.h"
 #include <unistd.h>
 #include <wait.h>
 #include <sys/stat.h>
@@ -28,6 +29,8 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <poll.h>
+
+#include "log.h"
 
 QTC_EXPORT bool
 qtcForkBackground(QtcCallback cb, void *data, QtcCallback fail_cb)
@@ -187,13 +190,170 @@ qtcPopen(const char *file, char *const *argv, unsigned fd_num, QtcPopenFD *fds)
         if ((fds[i].replace = qtcRecvFD(socket_fds[1])) < 0) {
             res = false;
             for (unsigned j = 0;j < i;j++) {
-                shutdown(fds[i].replace, SHUT_RDWR);
-                close(fds[i].replace);
+                if (fds[i].replace) {
+                    shutdown(fds[i].replace, SHUT_RDWR);
+                    close(fds[i].replace);
+                }
             }
             break;
+        }
+        if (!(fds[i].mode & (QTC_POPEN_READ | QTC_POPEN_WRITE))) {
+            close(fds[i].replace);
+            fds[i].replace = -1;
+            continue;
         }
     }
     shutdown(socket_fds[1], SHUT_RDWR);
     close(socket_fds[1]);
     return res;
+}
+
+static bool
+qtcPopenReadBuff(QtcPopenBuff *buffs)
+{
+    buffs->buff = realloc(buffs->buff, buffs->len + 1024);
+    ssize_t len = read(buffs->orig, buffs->buff + buffs->len, 1024);
+    if (len == 0 || (len == -1 && qtcNoneOf(errno, EAGAIN, EINTR,
+                                            EWOULDBLOCK))) {
+        return false;
+    } else if (len > 0) {
+        buffs->len += len;
+    }
+    return true;
+}
+
+static bool
+qtcPopenWriteBuff(QtcPopenBuff *buffs)
+{
+    ssize_t len = write(buffs->orig, buffs->buff, buffs->len);
+    if (len == 0 || (len == -1 && qtcNoneOf(errno, EAGAIN, EINTR,
+                                            EWOULDBLOCK))) {
+        return false;
+    } else if (len > 0) {
+        buffs->buff += len;
+        buffs->len -= len;
+    }
+    return true;
+}
+
+static bool
+qtcPopenPollCheckTimeout(uint64_t start, int timeout, int *new_timeout)
+{
+    if (timeout < 0) {
+        *new_timeout = -1;
+        return true;
+    }
+    int elapse = qtcGetElapse(start) / 1000000;
+    if (elapse > timeout) {
+        return false;
+    }
+    *new_timeout = timeout - elapse;
+    return true;
+}
+
+QTC_EXPORT bool
+qtcPopenBuff(const char *file, char *const argv[],
+             unsigned buff_num, QtcPopenBuff *buffs, int timeout)
+{
+    if (qtcUnlikely(!buffs || !buff_num)) {
+        return qtcSpawn(file, argv, NULL, NULL);
+    }
+    bool need_poll = false;
+    for (unsigned i = 0;i < buff_num;i++) {
+        QTC_RET_IF_FAIL(buffs[i].orig >= 0, false);
+        QTC_RET_IF_FAIL(!(buffs[i].mode & QTC_POPEN_READ &&
+                          buffs[i].mode & QTC_POPEN_WRITE), false);
+        if (buffs[i].mode & QTC_POPEN_READ ||
+            buffs[i].mode & QTC_POPEN_WRITE) {
+            need_poll = true;
+        }
+    }
+    QTC_DEF_LOCAL_BUFF(QtcPopenFD, fds, 16, buff_num);
+    for (unsigned i = 0;i < buff_num;i++) {
+        fds.p[i].orig = buffs[i].orig;
+        fds.p[i].replace = -1;
+        fds.p[i].mode = buffs[i].mode;
+    }
+    bool res = qtcPopen(file, argv, buff_num, fds.p);
+    if (!res) {
+        QTC_FREE_LOCAL_BUFF(fds);
+        return false;
+    }
+    for (unsigned i = 0;i < buff_num;i++) {
+        buffs[i].orig = fds.p[i].replace;
+        if (fds.p[i].replace >= 0) {
+            qtcFDSetNonBlock(fds.p[i].replace, true);
+            qtcFDSetCloexec(fds.p[i].replace, true);
+        }
+    }
+    QTC_FREE_LOCAL_BUFF(fds);
+    if (!need_poll) {
+        return true;
+    }
+    QTC_DEF_LOCAL_BUFF(struct pollfd, poll_fds, 16, buff_num);
+    QTC_DEF_LOCAL_BUFF(int, indexes, 16, buff_num);
+    unsigned poll_fd_num = 0;
+    for (unsigned i = 0;i < buff_num;i++) {
+        if (!(buffs[i].mode & (QTC_POPEN_READ | QTC_POPEN_WRITE))) {
+            close(buffs[i].orig);
+            continue;
+        }
+        indexes.p[poll_fd_num] = i;
+        struct pollfd *cur_fd = &poll_fds.p[poll_fd_num];
+        cur_fd->fd = buffs[i].orig;
+        cur_fd->events = (buffs[i].mode & QTC_POPEN_READ) ? POLLIN : POLLOUT;
+        poll_fd_num++;
+    }
+    uint64_t start_time = qtcGetTime();
+    int poll_timeout = timeout;
+    while (true) {
+        int ret = poll(poll_fds.p, poll_fd_num, poll_timeout);
+        if (ret == -1) {
+            if (errno == EINTR) {
+                if (!qtcPopenPollCheckTimeout(start_time, timeout,
+                                              &poll_timeout)) {
+                    break;
+                }
+                continue;
+            }
+            break;
+        } else if (ret == 0) {
+            break;
+        }
+        for (unsigned i = 0;i < poll_fd_num;i++) {
+            struct pollfd *cur_fd = &poll_fds.p[i];
+            if (cur_fd->revents & POLLIN) {
+                if (!qtcPopenReadBuff(&buffs[indexes.p[i]])) {
+                    cur_fd->events &= ~POLLIN;
+                }
+            } else if (cur_fd->revents & POLLOUT) {
+                if (!qtcPopenWriteBuff(&buffs[indexes.p[i]])) {
+                    cur_fd->events &= ~POLLOUT;
+                }
+            }
+            if (cur_fd->revents & (POLLERR | POLLHUP | POLLNVAL) ||
+                !(cur_fd->events & (POLLIN | POLLOUT))) {
+                shutdown(cur_fd->fd, SHUT_RDWR);
+                close(cur_fd->fd);
+                poll_fd_num--;
+                memmove(cur_fd, cur_fd + 1,
+                        (poll_fd_num - i) * sizeof(struct pollfd));
+                memmove(indexes.p + i, indexes.p + i + 1,
+                        (poll_fd_num - i) * sizeof(int));
+                i--;
+            }
+        }
+        if (poll_fd_num <= 0 || !qtcPopenPollCheckTimeout(start_time, timeout,
+                                                          &poll_timeout)) {
+            break;
+        }
+    }
+    for (unsigned i = 0;i < poll_fd_num;i++) {
+        struct pollfd *cur_fd = &poll_fds.p[i];
+        shutdown(cur_fd->fd, SHUT_RDWR);
+        close(cur_fd->fd);
+    }
+    QTC_FREE_LOCAL_BUFF(indexes);
+    QTC_FREE_LOCAL_BUFF(poll_fds);
+    return true;
 }

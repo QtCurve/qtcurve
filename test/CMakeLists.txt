@@ -62,3 +62,7 @@ add_test(NAME test-process COMMAND test-process)
 add_executable(test-popen test-popen.c)
 target_link_libraries(test-popen qtcurve-utils)
 add_test(NAME test-popen COMMAND test-popen)
+
+add_executable(test-popen-buff test-popen-buff.c)
+target_link_libraries(test-popen-buff qtcurve-utils)
+add_test(NAME test-popen-buff COMMAND test-popen-buff)

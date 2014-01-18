@@ -19,43 +19,71 @@
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
 
-#ifndef _QTC_UTILS_PROCESS_H_
-#define _QTC_UTILS_PROCESS_H_
+#include <qtcurve-utils/process.h>
+#include <qtcurve-utils/log.h>
+#include <assert.h>
+#include <unistd.h>
+#include <time.h>
+#include <sys/socket.h>
 
-#include "utils.h"
+static char buff1[1024];
+static char buff2[1024];
 
-QTC_BEGIN_DECLS
+static void
+fillBuffer(char *buff, size_t size)
+{
+    for (unsigned i = 0;i < size - 1;i++) {
+        while (!buff[i]) {
+            buff[i] = random();
+        }
+    }
+    buff[size - 1] = '\0';
+}
 
-bool qtcForkBackground(QtcCallback cb, void *data, QtcCallback fail_cb);
-#define qtcForkBackground(cb, data, fail_cb...)                 \
-    qtcForkBackground(cb, data, QTC_DEFAULT(fail_cb, NULL))
-bool qtcSpawn(const char *file, char *const *argv,
-              QtcCallback cb, void *cb_data, QtcCallback fail_cb);
-#define qtcSpawn(file, argv, cb, cb_data, fail_cb...)                   \
-    qtcSpawn(file, argv, cb, cb_data, QTC_DEFAULT(fail_cb, NULL))
-typedef enum {
-    QTC_POPEN_NONE = 0,
-    QTC_POPEN_READ = 1 << 0,
-    QTC_POPEN_WRITE = 1 << 1,
-    QTC_POPEN_RDWR = QTC_POPEN_READ | QTC_POPEN_WRITE
-} QtcPopenFDMode;
-typedef struct {
-    int orig;
-    int replace;
-    QtcPopenFDMode mode;
-} QtcPopenFD;
-bool qtcPopen(const char *file, char *const *argv,
-              unsigned fd_num, QtcPopenFD *fds);
-typedef struct {
-    int orig;
-    QtcPopenFDMode mode;
-    char *buff;
-    size_t len;
-} QtcPopenBuff;
-bool qtcPopenBuff(const char *file, char *const argv[],
-                  unsigned buff_num, QtcPopenBuff *buffs,
-                  int timeout);
+static void
+subProcess(int argc, char **argv)
+{
+    QTC_UNUSED(argc);
+    char buff3[1024] = {0};
+    read(0, buff3, sizeof(buff3));
+    assert(memcmp(argv[1], buff3, sizeof(buff3)) == 0);
+    write(1, argv[2], strlen(argv[2]) + 1);
+}
 
-QTC_END_DECLS
+static void
+mainProcess(int argc, char **argv)
+{
+    QTC_UNUSED(argc);
+    srandom(time(NULL));
+    fillBuffer(buff1, sizeof(buff1));
+    fillBuffer(buff2, sizeof(buff2));
+    QtcPopenBuff popen_buffs[] = {{
+            .orig = 0,
+            .mode = QTC_POPEN_WRITE,
+            .buff = buff1,
+            .len = sizeof(buff1)
+        }, {
+            .orig = 1,
+            .mode = QTC_POPEN_READ,
+            .buff = malloc(10),
+            .len = 0
+        }
+    };
+    alarm(1);
+    qtcPopenBuff(argv[0], (char*[]){argv[0], buff1, buff2, NULL},
+                 sizeof(popen_buffs) / sizeof(popen_buffs[0]), popen_buffs, 100);
+    assert(popen_buffs[1].len == sizeof(buff2));
+    assert(memcmp(buff2, popen_buffs[1].buff, sizeof(buff2)) == 0);
+    free(popen_buffs[1].buff);
+}
 
-#endif
+int
+main(int argc, char **argv)
+{
+    if (argv[1]) {
+        subProcess(argc, argv);
+    } else {
+        mainProcess(argc, argv);
+    }
+    return 0;
+}
