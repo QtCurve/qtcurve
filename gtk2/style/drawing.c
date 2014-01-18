@@ -1187,9 +1187,10 @@ drawStripedBgnd(cairo_t *cr, int x, int y, int w, int h,
 */
 }
 
-bool drawWindowBgnd(cairo_t *cr, GtkStyle *style, const QtcRect *area,
-                    GdkWindow *window, GtkWidget *widget,
-                    int x, int y, int width, int height)
+bool
+drawWindowBgnd(cairo_t *cr, GtkStyle *style, const QtcRect *area,
+               GdkWindow *window, GtkWidget *widget, int x, int y,
+               int width, int height)
 {
     GtkWidget *parent = NULL;
     if (widget && (parent = gtk_widget_get_parent(widget)) &&
@@ -1216,16 +1217,22 @@ bool drawWindowBgnd(cairo_t *cr, GtkStyle *style, const QtcRect *area,
         bool useAlpha = (opacity < 100 && isRgbaWidget(topLevel) &&
                          compositingActive(topLevel));
         bool flatBgnd = qtcIsFlatBgnd(opts.bgndAppearance);
-        const GdkColor *col = NULL;
-        GtkStyle *topStyle = gtk_widget_get_style(topLevel);
 
-        if (topStyle) {
-            col = &topStyle->bg[GTK_STATE_NORMAL];
-        } else {
-            col = getParentBgCol(widget);
-            if (!col) {
-                col = &style->bg[GTK_STATE_NORMAL];
-            }
+        // Determine the color to use here
+        // In commit 87404dba2447c8cba1c70bde72434c67642a7e7c:
+        //     When drawing background gradients, use the background colour of
+        //     the top-level widget's style.
+        // the order was set to Toplevel -> Parent -> Global style.
+        // This cause wrong color to be used in chomium.
+        // The current order is Parent -> Toplevel -> Global style.
+        // Keep this order unless other problems are found.
+        // It may also be a good idea to figure out what is the original color
+        // and make the color of choice here consistent with that.
+        // (at least for chromium)
+        const GdkColor *col = getParentBgCol(widget);
+        if (!col) {
+            col = &qtcDefault(gtk_widget_get_style(topLevel),
+                              style)->bg[GTK_STATE_NORMAL];
         }
         if (!flatBgnd || BGND_IMG_ON_BORDER) {
             WindowBorders borders = qtcGetWindowBorderSize(false);
