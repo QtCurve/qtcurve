@@ -209,8 +209,9 @@ getCellCol(GdkColor *std, const char *detail)
 bool
 reverseLayout(GtkWidget *widget)
 {
-    if (widget)
+    if (widget) {
         return gtk_widget_get_direction(widget) == GTK_TEXT_DIR_RTL;
+    }
     return false;
 }
 
@@ -219,9 +220,7 @@ isOnToolbar(GtkWidget *widget, bool *horiz, int level)
 {
     if (widget) {
         if (GTK_IS_TOOLBAR(widget)) {
-            if (horiz) {
-                *horiz = qtcWidgetIsHorizontal(widget);
-            }
+            qtcAssign(horiz, qtcWidgetIsHorizontal(widget));
             return true;
         } else if (level < 4) {
             return isOnToolbar(gtk_widget_get_parent(widget), horiz, level + 1);
@@ -235,11 +234,9 @@ isOnHandlebox(GtkWidget *widget, bool *horiz, int level)
 {
     if (widget) {
         if (GTK_IS_HANDLE_BOX(widget)) {
-            if (horiz) {
-                *horiz = qtcOneOf(gtk_handle_box_get_handle_position(
-                                      GTK_HANDLE_BOX(widget)),
-                                  GTK_POS_LEFT, GTK_POS_RIGHT);
-            }
+            qtcAssign(horiz, qtcOneOf(gtk_handle_box_get_handle_position(
+                                          GTK_HANDLE_BOX(widget)),
+                                      GTK_POS_LEFT, GTK_POS_RIGHT));
             return true;
         } else if (level < 4) {
             return isOnHandlebox(gtk_widget_get_parent(widget), horiz,
@@ -254,8 +251,9 @@ isButtonOnToolbar(GtkWidget *widget, bool *horiz)
 {
     GtkWidget *parent = NULL;
     if (widget && (parent = gtk_widget_get_parent(widget)) &&
-        GTK_IS_BUTTON(widget))
+        GTK_IS_BUTTON(widget)) {
         return isOnToolbar(parent, horiz, 0);
+    }
     return false;
 }
 
@@ -264,8 +262,9 @@ isButtonOnHandlebox(GtkWidget *widget, bool *horiz)
 {
     GtkWidget *parent = NULL;
     if (widget && (parent = gtk_widget_get_parent(widget)) &&
-        GTK_IS_BUTTON(widget))
+        GTK_IS_BUTTON(widget)) {
         return isOnHandlebox(parent, horiz, 0);
+    }
     return false;
 }
 
@@ -286,12 +285,9 @@ isOnStatusBar(GtkWidget *widget, int level)
 bool
 isList(GtkWidget *widget)
 {
-    return widget &&
-           (GTK_IS_TREE_VIEW(widget) ||
+    return widget && (GTK_IS_TREE_VIEW(widget) ||
 #if !GTK_CHECK_VERSION(2, 90, 0)
-            GTK_IS_CLIST(widget) ||
-            GTK_IS_LIST(widget) ||
-
+            GTK_IS_CLIST(widget) || GTK_IS_LIST(widget) ||
 #ifdef GTK_ENABLE_BROKEN
             GTK_IS_TREE(widget) ||
 #endif
@@ -303,7 +299,7 @@ isList(GtkWidget *widget)
 bool
 isListViewHeader(GtkWidget *widget)
 {
-    GtkWidget *parent=NULL;
+    GtkWidget *parent = NULL;
     return widget && GTK_IS_BUTTON(widget) && (parent=gtk_widget_get_parent(widget)) &&
            (isList(parent) ||
             (GTK_APP_GIMP == qtSettings.app && GTK_IS_BOX(parent) &&
@@ -323,12 +319,12 @@ isEvolutionListViewHeader(GtkWidget *widget, const char *detail)
 
 bool isOnListViewHeader(GtkWidget *w, int level)
 {
-    if(w)
-    {
-        if(isListViewHeader(w))
+    if (w) {
+        if (isListViewHeader(w)) {
             return true;
-        else if(level<4)
-            return isOnListViewHeader(gtk_widget_get_parent(w), ++level);
+        } else if (level < 4) {
+            return isOnListViewHeader(gtk_widget_get_parent(w), level + 1);
+        }
     }
     return false;
 }
@@ -435,26 +431,28 @@ bool isGimpCombo(GtkWidget *widget)
            0 == strcmp(g_type_name(G_OBJECT_TYPE(parent)), "GimpEnumComboBox");
 }
 
-bool isOnComboEntry(GtkWidget *w, int level)
+bool
+isOnComboEntry(GtkWidget *w, int level)
 {
-    if(w)
-    {
-        if(QTC_COMBO_ENTRY(w))
+    if (w) {
+        if (QTC_COMBO_ENTRY(w)) {
             return true;
-        else if(level<4)
-            return isOnComboEntry(gtk_widget_get_parent(w), ++level);
+        } else if (level < 4) {
+            return isOnComboEntry(gtk_widget_get_parent(w), level + 1);
+        }
     }
     return false;
 }
 
-bool isOnComboBox(GtkWidget *w, int level)
+bool
+isOnComboBox(GtkWidget *w, int level)
 {
-    if(w)
-    {
-        if(GTK_IS_COMBO_BOX(w))
+    if (w) {
+        if (GTK_IS_COMBO_BOX(w)) {
             return true;
-        else if(level<4)
-            return isOnComboBox(gtk_widget_get_parent(w), ++level);
+        } else if (level < 4) {
+            return isOnComboBox(gtk_widget_get_parent(w), level + 1);
+        }
     }
     return false;
 }
@@ -465,8 +463,8 @@ isOnCombo(GtkWidget *w, int level)
     if (w) {
         if (QTC_IS_COMBO(w)) {
             return true;
-        } else if(level < 4) {
-            return isOnCombo(gtk_widget_get_parent(w), ++level);
+        } else if (level < 4) {
+            return isOnCombo(gtk_widget_get_parent(w), level + 1);
         }
     }
     return false;
@@ -476,21 +474,23 @@ isOnCombo(GtkWidget *w, int level)
 bool isOnOptionMenu(GtkWidget *w, int level)
 {
     if (w) {
-        if(GTK_IS_OPTION_MENU(w))
+        if (GTK_IS_OPTION_MENU(w)) {
             return true;
-        else if(level<4)
-            return isOnOptionMenu(gtk_widget_get_parent(w), ++level);
+        } else if (level < 4) {
+            return isOnOptionMenu(gtk_widget_get_parent(w), level + 1);
+        }
     }
     return false;
 }
 
 bool isActiveOptionMenu(GtkWidget *widget)
 {
-    if(GTK_IS_OPTION_MENU(widget))
-    {
-        GtkWidget *menu=gtk_option_menu_get_menu(GTK_OPTION_MENU(widget));
-        if(menu && gtk_widget_get_visible(menu) && gtk_widget_get_realized(menu))
+    if (GTK_IS_OPTION_MENU(widget)) {
+        GtkWidget *menu = gtk_option_menu_get_menu(GTK_OPTION_MENU(widget));
+        if(menu && gtk_widget_get_visible(menu) &&
+           gtk_widget_get_realized(menu)) {
             return true;
+        }
     }
     return false;
 }
@@ -1362,33 +1362,31 @@ void generateColors()
             break;
     }
 
-    switch(opts.defBtnIndicator)
-    {
-        case IND_TINT:
-        {
-            GdkColor col=tint(&qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE],
-                            &qtcPalette.highlight[ORIGINAL_SHADE], DEF_BNT_TINT);
+    switch (opts.defBtnIndicator) {
+    case IND_TINT: {
+        GdkColor col = tint(&qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE],
+                            &qtcPalette.highlight[ORIGINAL_SHADE],
+                            DEF_BNT_TINT);
+        qtcPalette.defbtn = qtcNew(GdkColor, TOTAL_SHADES + 1);
+        qtcShadeColors(&col, qtcPalette.defbtn);
+        break;
+    }
+    case IND_GLOW:
+    case IND_SELECTED:
+        qtcPalette.defbtn = qtcPalette.highlight;
+        break;
+    default:
+        break;
+    case IND_COLORED:
+        if (opts.shadeSliders == SHADE_BLEND_SELECTED) {
+            qtcPalette.defbtn = qtcPalette.slider;
+        } else {
+            GdkColor mid =
+                midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
+                         &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]);
             qtcPalette.defbtn = qtcNew(GdkColor, TOTAL_SHADES + 1);
-            qtcShadeColors(&col, qtcPalette.defbtn);
-            break;
+            qtcShadeColors(&mid, qtcPalette.defbtn);
         }
-        case IND_GLOW:
-        case IND_SELECTED:
-            qtcPalette.defbtn=qtcPalette.highlight;
-            break;
-        default:
-            break;
-        case IND_COLORED:
-            if(SHADE_BLEND_SELECTED == opts.shadeSliders)
-                qtcPalette.defbtn=qtcPalette.slider;
-            else
-            {
-                GdkColor mid=midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
-                                      &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]);
-
-                qtcPalette.defbtn = qtcNew(GdkColor, TOTAL_SHADES + 1);
-                qtcShadeColors(&mid, qtcPalette.defbtn);
-            }
     }
 
     if (opts.coloredMouseOver) {
@@ -1397,17 +1395,18 @@ void generateColors()
                        qtcPalette.mouseover);
     }
 
-    switch(opts.shadeCheckRadio)
-    {
-        default:
-            qtcPalette.check_radio=&qtSettings.colors[PAL_ACTIVE][opts.crButton ? COLOR_BUTTON_TEXT : COLOR_TEXT];
-            break;
-        case SHADE_BLEND_SELECTED:
-        case SHADE_SELECTED:
-            qtcPalette.check_radio=&qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED];
-            break;
-        case SHADE_CUSTOM:
-            qtcPalette.check_radio=&opts.customCheckRadioColor;
+    switch (opts.shadeCheckRadio) {
+    default:
+        qtcPalette.check_radio =
+            &qtSettings.colors[PAL_ACTIVE][opts.crButton ?
+                                           COLOR_BUTTON_TEXT : COLOR_TEXT];
+        break;
+    case SHADE_BLEND_SELECTED:
+    case SHADE_SELECTED:
+        qtcPalette.check_radio = &qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED];
+        break;
+    case SHADE_CUSTOM:
+        qtcPalette.check_radio = &opts.customCheckRadioColor;
     }
 
     {
@@ -1459,28 +1458,28 @@ void generateColors()
         }
     }
 
-    switch(opts.menuStripe)
-    {
-        default:
-        case SHADE_NONE:
-            opts.customMenuStripeColor=qtcPalette.background[ORIGINAL_SHADE];
-            break;
-        case SHADE_DARKEN:
-            opts.customMenuStripeColor =
-                (opts.lighterPopupMenuBgnd || opts.shadePopupMenu ?
-                 qtcPalette.menu[ORIGINAL_SHADE] :
-                 qtcPalette.background[MENU_STRIPE_SHADE]);
-            break;
-        case SHADE_CUSTOM:
-            break;
-        case SHADE_BLEND_SELECTED:
-            opts.customMenuStripeColor=midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
-                                                opts.lighterPopupMenuBgnd || opts.shadePopupMenu
-                                                    ? &qtcPalette.menu[ORIGINAL_SHADE]
-                                                    : &qtcPalette.background[ORIGINAL_SHADE]);
-            break;
-        case SHADE_SELECTED:
-            opts.customMenuStripeColor=qtcPalette.highlight[MENU_STRIPE_SHADE];
+    switch (opts.menuStripe) {
+    default:
+    case SHADE_NONE:
+        opts.customMenuStripeColor = qtcPalette.background[ORIGINAL_SHADE];
+        break;
+    case SHADE_DARKEN:
+        opts.customMenuStripeColor =
+            (opts.lighterPopupMenuBgnd || opts.shadePopupMenu ?
+             qtcPalette.menu[ORIGINAL_SHADE] :
+             qtcPalette.background[MENU_STRIPE_SHADE]);
+        break;
+    case SHADE_CUSTOM:
+        break;
+    case SHADE_BLEND_SELECTED:
+        opts.customMenuStripeColor =
+            midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
+                     opts.lighterPopupMenuBgnd || opts.shadePopupMenu ?
+                     &qtcPalette.menu[ORIGINAL_SHADE] :
+                     &qtcPalette.background[ORIGINAL_SHADE]);
+        break;
+    case SHADE_SELECTED:
+        opts.customMenuStripeColor = qtcPalette.highlight[MENU_STRIPE_SHADE];
     }
 
     qtcPalette.selectedcr = NULL;
@@ -1599,7 +1598,7 @@ GdkColor*
 getCheckRadioCol(GtkStyle *style, GtkStateType state, bool mnu)
 {
     return (!qtSettings.qt4 && mnu ? &style->text[state] :
-            GTK_STATE_INSENSITIVE == state ?
+            state == GTK_STATE_INSENSITIVE ?
             &qtSettings.colors[PAL_DISABLED][opts.crButton ? COLOR_BUTTON_TEXT :
                                              COLOR_TEXT] :
             qtcPalette.check_radio);
