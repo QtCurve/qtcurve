@@ -68,6 +68,7 @@ void qtcX11MapRaised(xcb_window_t win);
 bool qtcX11CompositingActive();
 bool qtcX11HasAlpha(xcb_window_t win);
 bool qtcX11IsEmbed(xcb_window_t win);
+// void *qtcX11RgbaVisual(unsigned long *colormap, int *map_entries, int screen);
 
 QTC_END_DECLS
 

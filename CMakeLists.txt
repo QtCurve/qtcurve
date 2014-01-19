@@ -78,6 +78,7 @@ macro(qtc_check_x11)
     return()
   endif()
   unset(__pkg_config_checked_QTC_X11 CACHE)
+  # pkg_check_modules(QTC_X11 xcb x11-xcb xrender)
   pkg_check_modules(QTC_X11 xcb x11-xcb)
   if(NOT QTC_X11_FOUND)
     message(WARNING

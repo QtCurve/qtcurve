@@ -26,6 +26,8 @@
 #include "log.h"
 
 #include <X11/Xlib-xcb.h>
+/* #include <X11/Xutil.h> */
+/* #include <X11/extensions/Xrender.h> */
 
 static Display *qtc_disp = NULL;
 static xcb_connection_t *qtc_xcb_conn = NULL;
@@ -264,3 +266,38 @@ qtcX11IsEmbed(xcb_window_t win)
     free(reply);
     return res;
 }
+
+#if 0
+QTC_EXPORT void*
+qtcX11RgbaVisual(unsigned long *colormap, int *map_entries, int screen)
+{
+    QTC_RET_IF_FAIL(qtc_disp, NULL);
+    if (screen < 0) {
+        screen = qtc_default_screen_no;
+    }
+    // Copied from Qt4
+    Visual *argbVisual = NULL;
+    int nvi;
+    XVisualInfo templ;
+    templ.screen = screen;
+    templ.depth = 32;
+    templ.class = TrueColor;
+    XVisualInfo *xvi = XGetVisualInfo(qtc_disp, VisualScreenMask |
+                                      VisualDepthMask | VisualClassMask,
+                                      &templ, &nvi);
+    for (int idx = 0; idx < nvi; ++idx) {
+        XRenderPictFormat *format = XRenderFindVisualFormat(qtc_disp,
+                                                            xvi[idx].visual);
+        if (format->type == PictTypeDirect && format->direct.alphaMask) {
+            argbVisual = xvi[idx].visual;
+            break;
+        }
+    }
+    XFree(xvi);
+    QTC_RET_IF_FAIL(argbVisual, NULL);
+    qtcAssign(colormap, XCreateColormap(qtc_disp, RootWindow(qtc_disp, screen),
+                                        argbVisual, AllocNone));
+    qtcAssign(map_entries, argbVisual->map_entries);
+    return argbVisual;
+}
+#endif

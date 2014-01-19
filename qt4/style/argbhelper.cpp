@@ -66,7 +66,24 @@ QtcX11Info::fixVisual()
 inline void
 QtcX11Info::setRgba()
 {
+#if 1
     setX11Data(getInfo(rgbaDummy())->x11data);
+#else
+    // It seems that VirtualBox is doing something special to Qt so that
+    // a TranslucentBackground Widget will NOT have a related 32bit window.
+    // The following code enables translucent background in Virtualbox by
+    // setting rgba visual on the widget anyway. However, this breaks
+    // the display of the virtual machine. Since Gammaray does not work either
+    // on VirtualBox, it is hard to figure out what is wrong and which are
+    // the widgets need to be blacklist. Disable the code for now unless a
+    // workaround is found.
+    QX11InfoData *xd = getX11Data(true);
+    xd->visual = qtcX11RgbaVisual(&xd->colormap, &xd->cells, xd->screen);
+    xd->depth = 32;
+    xd->defaultVisual = false;
+    xd->defaultColormap = false;
+    setX11Data(xd);
+#endif
 }
 
 inline QWidget*
