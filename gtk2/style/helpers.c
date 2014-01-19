@@ -1095,15 +1095,10 @@ void
 getTopLevelSize(GdkWindow *window, int *w, int *h)
 {
     if (!(window && GDK_IS_WINDOW(window))) {
-        if (w) {
-            *w = -1;
-        }
-        if (h) {
-            *h = -1;
-        }
+        qtcAssign(w, -1);
+        qtcAssign(h, -1);
     } else {
         GdkWindow *topLevel = gdk_window_get_toplevel(window);
-
         if (topLevel) {
             gdk_drawable_get_size(topLevel, w, h);
         } else {
@@ -1112,132 +1107,94 @@ getTopLevelSize(GdkWindow *window, int *w, int *h)
     }
 }
 
-// void getTopLevelFrameSize(GdkWindow *window, int *w, int *h)
-// {
-//     if(!(window && GDK_IS_WINDOW(window)))
-//     {
-//         if(w)
-//             *w = -1;
-//         if(h)
-//             *h = -1;
-//     }
-//     else
-//     {
-//         GdkWindow *topLevel=gdk_window_get_toplevel(window);
-//
-//         if(topLevel)
-//         {
-//             GdkRectangle rect = {0, 0, -1, -1};
-//
-//             gdk_window_get_frame_extents(topLevel, &rect);
-//             if(w)
-//                 *w = rect.width;
-//             if(h)
-//                 *h = rect.height;
-//         }
-//     }
-// }
-
-void getTopLevelOrigin(GdkWindow *window, int *x, int *y)
+void
+getTopLevelOrigin(GdkWindow *window, int *x, int *y)
 {
-    if(x)
-        *x = 0;
-    if(y)
-        *y = 0;
-    if(window)
-    {
-        while(window && GDK_IS_WINDOW(window) && gdk_window_get_window_type(window) != GDK_WINDOW_TOPLEVEL &&
-              gdk_window_get_window_type(window) != GDK_WINDOW_TEMP)
-        {
+    qtcAssign(x, 0);
+    qtcAssign(y, 0);
+    if (window) {
+        while(window && GDK_IS_WINDOW(window) &&
+              gdk_window_get_window_type(window) != GDK_WINDOW_TOPLEVEL &&
+              gdk_window_get_window_type(window) != GDK_WINDOW_TEMP) {
             int xloc;
             int yloc;
             gdk_window_get_position(window, &xloc, &yloc);
-            if(x)
-                *x += xloc;
-            if(y)
-                *y += yloc;
+            qtcAssign(x, *x + xloc);
+            qtcAssign(y, *y + yloc);
             window = gdk_window_get_parent(window);
         }
     }
 }
 
-bool mapToTopLevel(GdkWindow *window, GtkWidget *widget, int *x, int *y, int *w, int *h) //, bool frame)
+bool
+mapToTopLevel(GdkWindow *window, GtkWidget *widget,
+              int *x, int *y, int *w, int *h)
 {
     // always initialize arguments (to invalid values)
-    if(x) *x=0;
-    if(y) *y=0;
-    if(w) *w = -1;
-    if(h) *h = -1;
-
-    if(!(window && GDK_IS_WINDOW(window)))
-    {
-        if(widget)
-        {
-            int xlocal, ylocal;
-
-            // this is an alternative way to get widget position with respect to top level window
-            // and top level window size. This is used in case the GdkWindow passed as argument is
-            // actually a 'non window' drawable
+    qtcAssign(x, 0);
+    qtcAssign(y, 0);
+    int _w;
+    int _h;
+    w = qtcDefault(w, &_w);
+    h = qtcDefault(h, &_h);
+    *w = -1;
+    *h = -1;
+    if (!(window && GDK_IS_WINDOW(window))) {
+        if (widget) {
+            int xlocal;
+            int ylocal;
+            // this is an alternative way to get widget position with respect to
+            // top level window and top level window size. This is used in case
+            // the GdkWindow passed as argument is actually a 'non window'
+            // drawable
             window = gtk_widget_get_parent_window(widget);
-//             if(frame)
-//                getTopLevelFrameSize(window, w, h);
-//             else
-                getTopLevelSize(window, w, h);
+            getTopLevelSize(window, w, h);
+            if (gtk_widget_translate_coordinates(
+                    widget, gtk_widget_get_toplevel(widget), 0, 0,
+                    &xlocal, &ylocal)) {
+                qtcAssign(x, xlocal);
+                qtcAssign(y, ylocal);
+                return *w > 0 && *h > 0;
+            }
+        }
+    } else {
+        // get window size and height
+        getTopLevelSize(window, w, h);
+        getTopLevelOrigin(window, x, y);
+        return *w > 0 && *h > 0;
+    }
+    return false;
+}
 
-            if(gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &xlocal, &ylocal))
-            {
-
-                if(x) *x=xlocal;
-                if(y) *y=ylocal;
-                return ((!w) || *w > 0) && ((!h) || *h>0);
+bool
+treeViewCellHasChildren(GtkTreeView *treeView, GtkTreePath *path)
+{
+    // check treeview and path
+    if (treeView && path) {
+        GtkTreeModel *model = gtk_tree_view_get_model(treeView);
+        if (model) {
+            GtkTreeIter iter;
+            if (gtk_tree_model_get_iter(model, &iter, path)) {
+                return gtk_tree_model_iter_has_child(model, &iter);
             }
         }
     }
-    else
-    {
-        // get window size and height
-//         if(frame)
-//            getTopLevelFrameSize(window, w, h);
-//         else
-            getTopLevelSize(window, w, h);
-        getTopLevelOrigin( window, x, y );
-        return ((!w) || *w > 0) && ((!h) || *h>0);
-    }
-
     return false;
 }
 
-bool treeViewCellHasChildren(GtkTreeView *treeView, GtkTreePath *path)
+bool
+treeViewCellIsLast(GtkTreeView *treeView, GtkTreePath *path)
 {
     // check treeview and path
-    if(treeView && path)
-    {
-        GtkTreeModel *model=gtk_tree_view_get_model(treeView);
-        if(model)
-        {
+    if (treeView && path) {
+        GtkTreeModel *model = gtk_tree_view_get_model(treeView);
+        if (model) {
             GtkTreeIter iter;
-            if(gtk_tree_model_get_iter(model, &iter, path))
-                return gtk_tree_model_iter_has_child(model, &iter);
-        }
-    }
-
-    return false;
-}
-
-bool treeViewCellIsLast(GtkTreeView *treeView, GtkTreePath *path)
-{
-    // check treeview and path
-    if(treeView && path)
-    {
-        GtkTreeModel *model=gtk_tree_view_get_model(treeView);
-        if(model)
-        {
-            GtkTreeIter iter;
-            if(gtk_tree_model_get_iter(model, &iter, path))
+            if (gtk_tree_model_get_iter(model, &iter, path)) {
                 return !gtk_tree_model_iter_next(model, &iter);
+            }
         }
     }
-
     return false;
 }
 
