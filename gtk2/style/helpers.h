@@ -104,7 +104,7 @@ isFakeGtk()
 GdkColor *menuColors(bool active);
 EBorder shadowToBorder(GtkShadowType shadow);
 bool useButtonColor(const char *detail);
-void qtcShadeColors(GdkColor *base, GdkColor *vals);
+void qtcShadeColors(const GdkColor *base, GdkColor *vals);
 bool isSortColumn(GtkWidget *button);
 GdkColor *getCellCol(GdkColor *std, const char *detail);
 bool reverseLayout(GtkWidget *widget);

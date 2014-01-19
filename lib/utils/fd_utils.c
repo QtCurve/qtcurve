@@ -46,7 +46,7 @@ qtcSendFD(int sock, int fd)
         .msg_controllen = sizeof(cmsgu.control)
     };
     struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg);
-    cmsg->cmsg_len = CMSG_LEN(sizeof (int));
+    cmsg->cmsg_len = CMSG_LEN(sizeof(int));
     cmsg->cmsg_level = SOL_SOCKET;
     cmsg->cmsg_type = SCM_RIGHTS;
     memcpy(CMSG_DATA(cmsg), &fd, sizeof(int));
@@ -90,8 +90,9 @@ qtcFDSetCloexec(int fd, bool cloexec)
 {
     long flags;
     flags = fcntl(fd, F_GETFD, 0);
-    if (flags == -1)
+    if (flags == -1) {
         return false;
+    }
     if (cloexec) {
         flags |= FD_CLOEXEC;
     } else {
@@ -105,8 +106,9 @@ qtcFDSetNonBlock(int fd, bool nonblock)
 {
     long flags;
     flags = fcntl(fd, F_GETFL, 0);
-    if (flags == -1)
+    if (flags == -1) {
         return false;
+    }
     if (nonblock) {
         nonblock |= O_NONBLOCK;
     } else {

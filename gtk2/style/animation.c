@@ -149,7 +149,7 @@ qtcAnimationAdd(const GtkWidget *widget, double stop_time)
                                   qtcAnimationDestroyInfoAndWeakUnref);
     }
 
-    value = g_new(AnimationInfo, 1);
+    value = qtcNew(AnimationInfo);
 
     value->widget = (GtkWidget*)widget;
     value->timer = g_timer_new();
@@ -304,7 +304,7 @@ qtcAnimationConnectCheckbox(GtkWidget *widget)
     if (GTK_IS_CHECK_BUTTON(widget)) {
         if (!g_slist_find_custom(connected_widgets, widget,
                                  qtcAnimationFindSignalInfo)) {
-            SignalInfo *signal_info = g_new(SignalInfo, 1);
+            SignalInfo *signal_info = qtcNew(SignalInfo);
 
             signal_info->widget = widget;
             signal_info->handler_id =
