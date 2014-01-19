@@ -1157,33 +1157,6 @@ drawStripedBgnd(cairo_t *cr, int x, int y, int w, int h,
     cairo_rectangle(cr, x, y, w, h);
     cairo_fill(cr);
     cairo_pattern_destroy(pat);
-/*
-  TODO: Use image? Would this speed up drawing???
-  static cairo_surface_t *bgndStripedImage=NULL;
-  static GdkColor        bgndStripedImageColor;
-  static cairo_surface_t *menuBgndStripedImage=NULL;
-  static GdkColor        menuBgndStripedImageColor;
-
-  bool            useWindow=isWindow || (bgndStripedImage && *col==bgndStripedImageColor));
-  GdkColor        *imgCol=useWindow ? &bgndStripedImageColor : &menuBgndStripedImageColor;
-  cairo_surface_t **img=useWindow ? &bgndStripedImage : &menuBgndStripedImage;
-
-  if(!(*img) || *imgCol!=*col)
-  {
-  static const inst constSize=64;
-
-  GdkColor col2;
-  cairo_t  *ci;
-
-  qtcShade(&opts, col, &col2, BGND_STRIPE_SHADE);
-
-  if(!(*img)
-  *img=cairo_image_surface_create(CAIRO_FORMAT_ARGB32, constSize, constSize);
-  ci=cairo_create(crImg);
-  }
-  cairo_set_source_surface(cr, *img, width-imgWidth, y+1);
-  cairo_paint(cr);
-*/
 }
 
 bool

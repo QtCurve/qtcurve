@@ -1027,22 +1027,19 @@ adjustToolbarButtons(GtkWidget *widget, int *x, int *y,
     }
 }
 
-void getEntryParentBgCol(GtkWidget *widget, GdkColor *color)
+void
+getEntryParentBgCol(GtkWidget *widget, GdkColor *color)
 {
-    GtkWidget *parent=NULL;
-    GtkStyle  *style=NULL;
+    GtkWidget *parent = NULL;
+    GtkStyle *style = NULL;
 
-    if (!widget)
-    {
-        color->red=color->green=color->blue = 65535;
+    if (!widget) {
+        color->red = color->green = color->blue = 65535;
         return;
     }
-
     parent = gtk_widget_get_parent(widget);
-
-    while (parent && (!gtk_widget_get_has_window(parent)))
-    {
-        GtkStyle *style=NULL;
+    while (parent && !gtk_widget_get_has_window(parent)) {
+        GtkStyle *style = NULL;
         if (opts.tabBgnd && GTK_IS_NOTEBOOK(parent) &&
             (style = gtk_widget_get_style(parent))) {
             qtcShade(&(style->bg[GTK_STATE_NORMAL]), color,
@@ -1051,14 +1048,12 @@ void getEntryParentBgCol(GtkWidget *widget, GdkColor *color)
         }
         parent = gtk_widget_get_parent(parent);
     }
-
-    if (!parent)
+    if (!parent) {
         parent = widget;
-
-    style=gtk_widget_get_style(parent);
-
-    if(style)
+    }
+    if ((style = gtk_widget_get_style(parent))) {
         *color = style->bg[gtk_widget_get_state(parent)];
+    }
 }
 
 bool
@@ -1069,26 +1064,12 @@ compositingActive(GtkWidget *widget)
     return screen && gdk_screen_is_composited(screen);
 }
 
-bool isRgbaWidget(GtkWidget *widget)
+bool
+isRgbaWidget(GtkWidget *widget)
 {
     if (widget) {
         GdkVisual *visual = gtk_widget_get_visual(widget);
-#if GTK_CHECK_VERSION(2, 90, 0)
-        uint32_t redMask;
-        uint32_t greenMask;
-        uint32_t blueMask;
-
-        gdk_visual_get_red_pixel_details(visual, &redMask, NULL, NULL);
-        gdk_visual_get_green_pixel_details(visual, &greenMask, NULL, NULL);
-        gdk_visual_get_blue_pixel_details(visual, &blueMask, NULL, NULL);
-
-        return (gdk_visual_get_depth(visual) == 32 && redMask == 0xff0000 &&
-                greenMask == 0x00ff00 && blueMask == 0x0000ff);
-#else
-        return (visual->depth == 32 && visual->red_mask == 0xff0000 &&
-                visual->green_mask == 0x00ff00 &&
-                visual->blue_mask == 0x0000ff);
-#endif
+        return gdk_visual_get_depth(visual) == 32;
     }
     return false;
 }

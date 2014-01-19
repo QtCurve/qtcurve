@@ -139,7 +139,6 @@ ShadowHelper::installX11Shadows(QWidget *widget)
             int margins[4] = {0, 0, 0, 0};
             // KWin's shadows margin order is top, right, bottom, left..
             margins[atTop ? 0 : 2] = margin;
-            // TODO: no enough rounded corner
             qtcX11ShadowInstall(wid, margins);
         } else {
             qtcX11ShadowInstall(wid);
