@@ -160,63 +160,64 @@ static gboolean qtcWMMoveIsBlackListed(GObject *object)
     return false;
 }
 
-static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *event, gboolean inNoteBook)
+static gboolean
+qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *event,
+                          gboolean inNoteBook)
 {
     // accept, by default
-    gboolean usable = true;
+    bool usable = true;
 
     // get children and check
-    GList *children = gtk_container_get_children(GTK_CONTAINER(widget)),
-        *child;
-
-    for(child = g_list_first(children); child && usable; child = g_list_next(child))
-    {
+    GList *children = gtk_container_get_children(GTK_CONTAINER(widget));
+    for (GList *child = children;child && usable;child = g_list_next(child)) {
         // cast child to GtkWidget
-        if(GTK_IS_WIDGET(child->data))
-        {
-            GtkWidget *childWidget=GTK_WIDGET(child->data);
-            GdkWindow *window=NULL;
+        if (GTK_IS_WIDGET(child->data)) {
+            GtkWidget *childWidget = GTK_WIDGET(child->data);
+            GdkWindow *window = NULL;
 
             // check widget state and type
-            if(GTK_STATE_PRELIGHT==gtk_widget_get_state(childWidget))
-            {
-                // if widget is prelight, we don't need to check where event happen,
-                // any prelight widget indicate we can't do a move
+            if (gtk_widget_get_state(childWidget) == GTK_STATE_PRELIGHT) {
+                // if widget is prelight, we don't need to check where event
+                // happen, any prelight widget indicate we can't do a move
                 usable = false;
                 continue;
             }
 
             window = gtk_widget_get_window(childWidget);
-            if(!(window && gdk_window_is_visible(window)))
+            if (!(window && gdk_window_is_visible(window)))
                 continue;
 
-            if(GTK_IS_NOTEBOOK(childWidget))
+            if (GTK_IS_NOTEBOOK(childWidget))
                 inNoteBook = true;
 
             if(!(event && qtcWMMoveWithinWidget(childWidget, event)))
                 continue;
 
             // check special cases for which grab should not be enabled
-            if(
-                (qtcWMMoveIsBlackListed(G_OBJECT(childWidget))) ||
-                (GTK_IS_NOTEBOOK(widget) && qtcTabIsLabel(GTK_NOTEBOOK(widget), childWidget)) ||
-                (GTK_IS_BUTTON(childWidget) && gtk_widget_get_state(childWidget) != GTK_STATE_INSENSITIVE) ||
-                (gtk_widget_get_events(childWidget) & (GDK_BUTTON_PRESS_MASK|GDK_BUTTON_RELEASE_MASK)) ||
-                (GTK_IS_MENU_ITEM(childWidget)) ||
-                (GTK_IS_SCROLLED_WINDOW(childWidget) && (!inNoteBook || gtk_widget_is_focus(childWidget))))
-            {
+            if((qtcWMMoveIsBlackListed(G_OBJECT(childWidget))) ||
+               (GTK_IS_NOTEBOOK(widget) && qtcTabIsLabel(GTK_NOTEBOOK(widget),
+                                                         childWidget)) ||
+               (GTK_IS_BUTTON(childWidget) &&
+                gtk_widget_get_state(childWidget) != GTK_STATE_INSENSITIVE) ||
+               (gtk_widget_get_events(childWidget) &
+                (GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK)) ||
+               (GTK_IS_MENU_ITEM(childWidget)) ||
+               (GTK_IS_SCROLLED_WINDOW(childWidget) &&
+                (!inNoteBook || gtk_widget_is_focus(childWidget)))) {
                 usable = false;
             }
 
-            // if child is a container and event has been accepted so far, also check it, recursively
-            if(usable && GTK_IS_CONTAINER(childWidget))
-                usable = qtcWMMoveChildrenUseEvent(childWidget, event, inNoteBook);
+            // if child is a container and event has been accepted so far,
+            // also check it, recursively
+            if (usable && GTK_IS_CONTAINER(childWidget)) {
+                usable = qtcWMMoveChildrenUseEvent(childWidget, event,
+                                                   inNoteBook);
+            }
         }
     }
-
-    if(children)
+    if (children) {
         g_list_free(children);
-
+    }
     return usable;
 }
 

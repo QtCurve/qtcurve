@@ -254,11 +254,10 @@ qtcTabRegisterChild(GtkWidget *notebook, GtkWidget *widget)
         qtcConnectToProp(props, tabChildLeave, "leave-notify-event",
                          qtcTabChildMotion, notebook);
         if (GTK_IS_CONTAINER(widget)) {
-            GList *children = gtk_container_get_children(GTK_CONTAINER(widget));
             qtcConnectToProp(props, tabChildAdd, "add",
                              qtcTabChildAdd, notebook);
-            for (GList *child = g_list_first(children);child;
-                 child = g_list_next(child)) {
+            GList *children = gtk_container_get_children(GTK_CONTAINER(widget));
+            for (GList *child = children;child;child = g_list_next(child)) {
                 qtcTabRegisterChild(notebook, GTK_WIDGET(child->data));
             }
             if (children) {
@@ -334,11 +333,13 @@ qtcTabGetTabbarRect(GtkNotebook *notebook)
     unsigned int borderWidth;
     int pageIndex;
     GtkWidget *page;
+    GList *children = NULL;
     // check tab visibility
     if (!(gtk_notebook_get_show_tabs(notebook) &&
-          gtk_container_get_children(GTK_CONTAINER(notebook)))) {
+          (children = gtk_container_get_children(GTK_CONTAINER(notebook))))) {
         return empty;
     }
+    g_list_free(children);
     // get full rect
     rect = qtcWidgetGetAllocation(GTK_WIDGET(notebook));
 

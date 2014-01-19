@@ -303,13 +303,11 @@ qtcTreeViewCellIsLeftOfExpanderColumn(GtkTreeView *treeView,
     if (!expanderColumn || column == expanderColumn) {
         return false;
     } else {
-        gboolean found = false;
-        gboolean isLeft = false;
-
+        bool found = false;
+        bool isLeft = false;
         // get all columns
         GList *columns = gtk_tree_view_get_columns(treeView);
-        for (GList *child = g_list_first(columns);child;
-             child = g_list_next(child)) {
+        for (GList *child = columns;child;child = g_list_next(child)) {
             if (!GTK_IS_TREE_VIEW_COLUMN(child->data)) {
                 continue;
             }

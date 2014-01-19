@@ -103,7 +103,7 @@ useButtonColor(const char *detail)
 void
 qtcShadeColors(GdkColor *base, GdkColor *vals)
 {
-    gboolean useCustom = USE_CUSTOM_SHADES(opts);
+    bool useCustom = USE_CUSTOM_SHADES(opts);
     double hl = TO_FACTOR(opts.highlightFactor);
 
     for (int i = 0;i < QTC_NUM_STD_SHADES;i++) {
@@ -129,8 +129,7 @@ isSortColumn(GtkWidget *button)
 
         if (box && GTK_IS_BOX(box)) {
             GList *children = gtk_container_get_children(GTK_CONTAINER(box));
-            gboolean found = false;
-
+            bool found = false;
             for (GList *child = children;child && !found;
                  child = g_list_next(child)) {
                 if (GTK_IS_ARROW(child->data)) {
@@ -141,15 +140,14 @@ isSortColumn(GtkWidget *button)
                     }
                 }
             }
-
-            if (children)
+            if (children) {
                 g_list_free(children);
+            }
             return found;
         }
 #else
         GtkWidget *sort = NULL;
         GList *columns = gtk_tree_view_get_columns(GTK_TREE_VIEW(parent));
-
         for (GList *column = columns;column && !sort && sort != button;
              column = g_list_next(column)) {
             if (GTK_IS_TREE_VIEW_COLUMN(column->data)) {
@@ -160,8 +158,9 @@ isSortColumn(GtkWidget *button)
             }
         }
 
-        if (columns)
+        if (columns) {
             g_list_free(columns);
+        }
         return sort == button;
 #endif
     }
@@ -348,41 +347,37 @@ isPathButton(GtkWidget *widget)
 //             (gtk_widget_get_parent(widget)->parent && GTK_IS_BOX(gtk_widget_get_parent(widget)) && GTK_IS_NOTEBOOK(gtk_widget_get_parent(widget)->parent)));
 // }
 
-GtkWidget * getComboEntry(GtkWidget *widget)
+GtkWidget*
+getComboEntry(GtkWidget *widget)
 {
-    GList     *children = gtk_container_get_children(GTK_CONTAINER(widget)),
-              *child    = children;
-    GtkWidget *rv       = NULL;
-
-    for(; child && !rv; child=child->next)
-    {
-        GtkWidget *boxChild=(GtkWidget *)child->data;
-
-        if(GTK_IS_ENTRY(boxChild))
-            rv=(GtkWidget *)boxChild;
+    GList *children = gtk_container_get_children(GTK_CONTAINER(widget));
+    GtkWidget *rv = NULL;
+    for (GList *child = children;child && !rv;child = child->next) {
+        GtkWidget *boxChild = (GtkWidget *)child->data;
+        if (GTK_IS_ENTRY(boxChild)) {
+            rv = (GtkWidget*)boxChild;
+        }
     }
-
-    if(children)
+    if (children) {
         g_list_free(children);
+    }
     return rv;
 }
 
-GtkWidget * getComboButton(GtkWidget *widget)
+GtkWidget*
+getComboButton(GtkWidget *widget)
 {
-    GList     *children = gtk_container_get_children(GTK_CONTAINER(widget)),
-              *child    = children;
-    GtkWidget *rv       = NULL;
-
-    for(; child && !rv; child=child->next)
-    {
-        GtkWidget *boxChild=(GtkWidget *)child->data;
-
-        if(GTK_IS_BUTTON(boxChild))
-            rv=(GtkWidget *)boxChild;
+    GList *children = gtk_container_get_children(GTK_CONTAINER(widget));
+    GtkWidget *rv = NULL;
+    for (GList *child = children;child && !rv;child = child->next) {
+        GtkWidget *boxChild = (GtkWidget*)child->data;
+        if (GTK_IS_BUTTON(boxChild)) {
+            rv = (GtkWidget*)boxChild;
+        }
     }
-
-    if(children)
+    if (children) {
         g_list_free(children);
+    }
     return rv;
 }
 
@@ -945,7 +940,9 @@ windowEvent(GtkWidget *widget, GdkEvent *event, void *user_data)
     return false;
 }
 
-void adjustToolbarButtons(GtkWidget *widget, int *x, int *y, int *width, int *height, int *round, bool horiz)
+void
+adjustToolbarButtons(GtkWidget *widget, int *x, int *y,
+                     int *width, int *height, int *round, bool horiz)
 {
     GtkToolbar *toolbar = NULL;
     GtkToolItem *toolitem = NULL;
@@ -960,55 +957,72 @@ void adjustToolbarButtons(GtkWidget *widget, int *x, int *y, int *width, int *he
         w = gtk_widget_get_parent(w);
     }
 
-    if(toolbar && toolitem)
-    {
-        int num=gtk_toolbar_get_n_items(toolbar);
+    if (toolbar && toolitem) {
+        int num = gtk_toolbar_get_n_items(toolbar);
+        if (num > 1) {
+            int index = gtk_toolbar_get_item_index(toolbar, toolitem);
+            GtkToolItem *prev =
+                (index ? gtk_toolbar_get_nth_item(toolbar, index - 1) : NULL);
+            GtkToolItem *next =
+                (index < num - 1 ?
+                 gtk_toolbar_get_nth_item(toolbar, index + 1) : NULL);
+            GtkWidget *parent = NULL;
+            bool roundLeft = !prev || !GTK_IS_TOOL_BUTTON(prev);
+            bool roundRight = !next || !GTK_IS_TOOL_BUTTON(next);
+            bool isMenuButton =
+                (widget && GTK_IS_BUTTON(widget) &&
+                 (parent = gtk_widget_get_parent(widget)) &&
+                 GTK_IS_BOX(parent) &&
+                 (parent = gtk_widget_get_parent(parent)) &&
+                 GTK_IS_MENU_TOOL_BUTTON(parent));
+            bool isArrowButton = isMenuButton && GTK_IS_TOGGLE_BUTTON(widget);
+            int *pos = horiz ? x : y;
+            int *size = horiz ? width : height;
 
-        if(num>1)
-        {
-            int index=gtk_toolbar_get_item_index(toolbar, toolitem);
-            GtkToolItem *prev=index ? gtk_toolbar_get_nth_item(toolbar, index-1) : NULL,
-                        *next=index<(num-1) ? gtk_toolbar_get_nth_item(toolbar, index+1) : NULL;
-            GtkWidget   *parent=NULL;
-            gboolean    roundLeft=!prev || !GTK_IS_TOOL_BUTTON(prev),
-                        roundRight=!next || !GTK_IS_TOOL_BUTTON(next),
-                        isMenuButton=widget && GTK_IS_BUTTON(widget) &&
-                                     (parent=gtk_widget_get_parent(widget)) && GTK_IS_BOX(parent) &&
-                                     (parent=gtk_widget_get_parent(parent)) && GTK_IS_MENU_TOOL_BUTTON(parent),
-                        isArrowButton=isMenuButton && GTK_IS_TOGGLE_BUTTON(widget);
-            int         *pos=horiz ? x : y,
-                        *size=horiz ? width : height;
-
-            if(isArrowButton)
-            {
-                if(roundLeft && roundRight)
-                    *round=horiz ? ROUNDED_RIGHT : ROUNDED_BOTTOM, *pos-=4, *size+=4;
-                else if(roundLeft)
-                    *round=ROUNDED_NONE, *pos-=4, *size+=8;
-                else if(roundRight)
-                    *round=horiz ? ROUNDED_RIGHT : ROUNDED_BOTTOM, *pos-=4, *size+=4;
-                else
-                    *round=ROUNDED_NONE, *pos-=4, *size+=8;
+            if (isArrowButton) {
+                *pos -= 4;
+                if (roundLeft && roundRight) {
+                    *round = horiz ? ROUNDED_RIGHT : ROUNDED_BOTTOM;
+                    *size += 4;
+                } else if (roundLeft) {
+                    *round = ROUNDED_NONE;
+                    *size += 8;
+                } else if (roundRight) {
+                    *round = horiz ? ROUNDED_RIGHT : ROUNDED_BOTTOM;
+                    *size += 4;
+                } else {
+                    *round = ROUNDED_NONE;
+                    *size += 8;
+                }
+            } else if (isMenuButton) {
+                if (roundLeft && roundRight) {
+                    *round = horiz ? ROUNDED_LEFT : ROUNDED_TOP;
+                    *size += 4;
+                } else if (roundLeft) {
+                    *round = horiz ? ROUNDED_LEFT : ROUNDED_TOP;
+                    *size += 4;
+                } else if(roundRight) {
+                    *round = ROUNDED_NONE;
+                    *pos -= 4;
+                    *size += 8;
+                } else {
+                    *round = ROUNDED_NONE;
+                    *pos -= 4;
+                    *size += 8;
+                }
+            } else if (roundLeft && roundRight) {
+            } else if (roundLeft) {
+                *round = horiz ? ROUNDED_LEFT : ROUNDED_TOP;
+                *size += 4;
+            } else if (roundRight) {
+                *round = horiz ? ROUNDED_RIGHT : ROUNDED_BOTTOM;
+                *pos -= 4;
+                *size += 4;
+            } else {
+                *round = ROUNDED_NONE;
+                *pos -= 4;
+                *size += 8;
             }
-            else if(isMenuButton)
-            {
-                if(roundLeft && roundRight)
-                    *round=horiz ? ROUNDED_LEFT : ROUNDED_TOP, *size+=4;
-                else if(roundLeft)
-                    *round=horiz ? ROUNDED_LEFT : ROUNDED_TOP, *size+=4;
-                else if(roundRight)
-                    *round=ROUNDED_NONE, *pos-=4, *size+=8;
-                else
-                    *round=ROUNDED_NONE, *pos-=4, *size+=8;
-            }
-            else if(roundLeft && roundRight)
-                ;
-            else if(roundLeft)
-                *round=horiz ? ROUNDED_LEFT : ROUNDED_TOP, *size+=4;
-            else if(roundRight)
-                *round=horiz ? ROUNDED_RIGHT : ROUNDED_BOTTOM, *pos-=4, *size+=4;
-            else
-                *round=ROUNDED_NONE, *pos-=4, *size+=8;
         }
     }
 }

@@ -287,9 +287,7 @@ qtcWindowGetMenuBar(GtkWidget *parent, int level)
         /* && gtk_widget_get_realized(parent)*/) {
         GtkWidget *rv = NULL;
         GList *children = gtk_container_get_children(GTK_CONTAINER(parent));
-        GList *child = children;
-
-        for (;child && !rv;child = child->next) {
+        for (GList *child = children;child && !rv;child = child->next) {
             GtkWidget *boxChild = (GtkWidget*)child->data;
 
             if (GTK_IS_MENU_BAR(boxChild)) {
@@ -299,8 +297,9 @@ qtcWindowGetMenuBar(GtkWidget *parent, int level)
             }
         }
 
-        if (children)
+        if (children) {
             g_list_free(children);
+        }
         return rv;
     }
     return NULL;
@@ -313,9 +312,7 @@ qtcWindowGetStatusBar(GtkWidget *parent, int level)
         /* && gtk_widget_get_realized(parent)*/) {
         GtkWidget *rv = NULL;
         GList *children = gtk_container_get_children(GTK_CONTAINER(parent));
-        GList *child = children;
-
-        for(;child && !rv;child = child->next) {
+        for(GList *child = children;child && !rv;child = child->next) {
             GtkWidget *boxChild = (GtkWidget*)child->data;
 
             if (GTK_IS_STATUSBAR(boxChild)) {
@@ -421,7 +418,7 @@ qtcWindowToggleStatusBar(GtkWidget *widget)
     GtkWidget *statusBar = qtcWindowGetStatusBar(widget, 0);
 
     if (statusBar) {
-        gboolean state=gtk_widget_get_visible(statusBar);
+        bool state = gtk_widget_get_visible(statusBar);
         qtcSetStatusBarHidden(qtSettings.appName, state);
         if (state) {
             gtk_widget_hide(statusBar);
@@ -467,7 +464,7 @@ qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, void *user_data)
     // Ensure only ctrl/alt/shift/capsLock are pressed...
     if (GDK_CONTROL_MASK & event->state && GDK_MOD1_MASK & event->state &&
         !event->is_modifier && 0 == (event->state & 0xFF00)) {
-        gboolean toggled = false;
+        bool toggled = false;
         if (opts.menubarHiding & HIDE_KEYBOARD &&
             (GDK_KEY_m == event->keyval || GDK_KEY_M == event->keyval)) {
             toggled = qtcWindowToggleMenuBar(widget);

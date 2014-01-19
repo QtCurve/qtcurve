@@ -40,16 +40,13 @@ static void
 qtcComboBoxClearBgndColor(GtkWidget *widget)
 {
     GList *children = gtk_container_get_children(GTK_CONTAINER(widget));
-
     for (GList *child = children;child;child = child->next) {
         GtkWidget *boxChild = (GtkWidget*)child->data;
-
         if (GTK_IS_CELL_VIEW(boxChild) &&
             qtcComboBoxCellViewHasBgnd(boxChild)) {
             gtk_cell_view_set_background_color(GTK_CELL_VIEW(boxChild), 0L);
         }
     }
-
     if (children) {
         g_list_free(children);
     }
@@ -201,7 +198,6 @@ qtcComboBoxSetup(GtkWidget *frame, GtkWidget *combo)
                                      combo);
                 }
             }
-
             if (children) {
                 g_list_free(children);
             }

@@ -46,7 +46,7 @@ typedef struct {
 
 typedef struct {
     GtkWidget *widget;
-    gulong handler_id;
+    unsigned long handler_id;
 } SignalInfo;
 
 static GSList *connected_widgets = NULL;

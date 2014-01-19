@@ -87,12 +87,6 @@ qtcMenuShellButtonPress(GtkWidget *widget, GdkEventButton *event, void *data)
         int nx, ny;
         gdk_window_get_origin(gtk_widget_get_window(widget), &nx, &ny);
         if ((event->x_root - nx) <= 2.0 || (event->y_root - ny) <= 2.0) {
-            GtkMenuShell *menuShell = GTK_MENU_SHELL(widget);
-            GList *children =
-                gtk_container_get_children(GTK_CONTAINER(menuShell));
-            GList *child = children;
-            gboolean rv = false;
-
             if ((event->x_root - nx) <= 2.0) {
                 event->x_root += 2.0;
             }
@@ -100,19 +94,21 @@ qtcMenuShellButtonPress(GtkWidget *widget, GdkEventButton *event, void *data)
                 event->y_root += 2.0;
             }
 
-            while (child && !rv) {
+            GtkMenuShell *menuShell = GTK_MENU_SHELL(widget);
+            GList *children =
+                gtk_container_get_children(GTK_CONTAINER(menuShell));
+            bool rv = false;
+            for (GList *child = children;child;child = child->next) {
                 GtkWidget *item = child->data;
                 QtcRect alloc = qtcWidgetGetAllocation(item);
-
                 int cx = alloc.x + nx;
                 int cy = alloc.y + ny;
                 int cw = alloc.width;
                 int ch = alloc.height;
-
                 if (cx <= event->x_root && cy <= event->y_root &&
                     (cx + cw) > event->x_root && (cy + ch) > event->y_root) {
                     if (menuIsSelectable(item)) {
-                        if (GDK_BUTTON_PRESS == event->type) {
+                        if (event->type == GDK_BUTTON_PRESS) {
                             if (item != menuShell->active_menu_item) {
                                 menuShell->active = false;
                                 gtk_menu_shell_select_item(menuShell, item);
@@ -127,7 +123,6 @@ qtcMenuShellButtonPress(GtkWidget *widget, GdkEventButton *event, void *data)
                     }
                     break;
                 }
-                child = child->next;
             }
             if (children) {
                 g_list_free(children);
@@ -188,8 +183,7 @@ qtcMenuShellMotion(GtkWidget *widget, GdkEventMotion *event, void *data)
 
         if (GTK_IS_CONTAINER(widget)) {
             GList *children = gtk_container_get_children(GTK_CONTAINER(widget));
-            for (GList *child = g_list_first(children);child;
-                 child = g_list_next(child)) {
+            for (GList *child = children;child;child = g_list_next(child)) {
                 if ((child->data) && GTK_IS_WIDGET(child->data) &&
                     (gtk_widget_get_state(GTK_WIDGET(child->data)) !=
                      GTK_STATE_INSENSITIVE)) {
@@ -207,7 +201,6 @@ qtcMenuShellMotion(GtkWidget *widget, GdkEventMotion *event, void *data)
                     }
                 }
             }
-
             if (children) {
                 g_list_free(children);
             }
@@ -224,8 +217,7 @@ qtcMenuShellLeave(GtkWidget *widget, GdkEventCrossing *event, void *data)
     QTC_UNUSED(event);
     if (GTK_IS_MENU_SHELL(widget) && GTK_IS_CONTAINER(widget)) {
         GList *children = gtk_container_get_children(GTK_CONTAINER(widget));
-        for (GList *child = g_list_first(children);child;
-             child = g_list_next(child)) {
+        for (GList *child = children;child;child = g_list_next(child)) {
             if ((child->data) && GTK_IS_MENU_ITEM(child->data) &&
                 (gtk_widget_get_state(GTK_WIDGET(child->data)) !=
                  GTK_STATE_INSENSITIVE)) {

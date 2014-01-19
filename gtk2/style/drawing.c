@@ -2876,12 +2876,10 @@ drawMenu(cairo_t *cr, GtkWidget *widget, const QtcRect *area,
             GtkMenuShell *menuShell = GTK_MENU_SHELL(widget);
             GList *children =
                 gtk_container_get_children(GTK_CONTAINER(menuShell));
-
             for (GList *child = children;child;child = child->next) {
                 if (GTK_IS_IMAGE_MENU_ITEM(child->data)) {
                     GtkImageMenuItem *item = GTK_IMAGE_MENU_ITEM(child->data);
                     stripeWidth = 21;
-
                     if (!gtk_image_menu_item_get_image(item) ||
                         (GTK_IS_IMAGE(gtk_image_menu_item_get_image(item)) &&
                         gtk_image_get_storage_type(
