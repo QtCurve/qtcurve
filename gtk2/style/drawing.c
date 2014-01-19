@@ -110,9 +110,8 @@ drawBevelGradient(cairo_t *cr, const QtcRect *area, int x, int y,
             GdkColor col;
             double pos = botTab ? 1.0 - grad->stops[i].pos : grad->stops[i].pos;
 
-            if (/*sel && */(topTab || botTab) && i == grad->numStops - 1) {
-                if (sel /*&& qtcIsCustomBgnd(&opts)*/ && 0 == opts.tabBgnd &&
-                    !isMozilla()) {
+            if ((topTab || botTab) && i == grad->numStops - 1) {
+                if (sel && opts.tabBgnd == 0 && !isMozilla()) {
                     alpha = 0.0;
                 }
                 col = *base;

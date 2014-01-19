@@ -1,5 +1,5 @@
 /*****************************************************************************
- *   Copyright 2013 - 2014 Yichao Yu <yyc1992@gmail.com>                     *
+ *   Copyright 2014 - 2014 Yichao Yu <yyc1992@gmail.com>                     *
  *                                                                           *
  *   This program is free software; you can redistribute it and/or modify    *
  *   it under the terms of the GNU Lesser General Public License as          *
@@ -19,36 +19,32 @@
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
 
-#include "argbhelper.h"
-#include <qtcurve-utils/qtutils.h>
+#ifndef __ARGBHELPER_H__
+#define __ARGBHELPER_H__
 
-#include <QWindow>
-#include "private/qwidget_p.h"
+#include <QX11Info>
+#include <qtcurve-utils/utils.h>
+
+class QWidget;
 
 namespace QtCurve {
-__attribute__((hot)) void
-addAlphaChannel(QWidget *widget)
-{
-    QTC_RET_IF_FAIL(!qtcGetWid(widget));
-    // Set this for better efficiency for now
-    widget->setAutoFillBackground(false);
-    QWindow *window = widget->windowHandle();
-    QWidgetPrivate *widgetPrivate =
-        static_cast<QWidgetPrivate*>(QObjectPrivate::get(widget));
-    widgetPrivate->updateIsOpaque();
-    if (!window) {
-        widgetPrivate->createTLExtra();
-        widgetPrivate->createTLSysExtra();
-        window = widget->windowHandle();
-    }
-    if (window) {
-        // Maybe we can register event filters and/or listen for signals
-        // like parent change or screen change on the QWidgetWindow
-        // so that we have a better change to update the alpha info
-        QSurfaceFormat format = window->format();
-        format.setAlphaBufferSize(8);
-        window->setFormat(format);
-    }
-}
+// TODO, turn this into a complete helper class.
+//     The QtcX11Info struct and the <QX11Info> include are in the header file
+//     only for QtcX11Info::creatingDummy. Should move to argbhelper.cpp once
+//     the real helper class is done.
+
+// Access protected functions.
+struct QtcX11Info: public QX11Info {
+    static bool creatingDummy;
+    static QtcX11Info *getInfo(const QWidget *w);
+    QWidget *rgbaDummy();
+    void fixVisual();
+    void setRgba();
+};
+
+void fixVisual(QWidget *widget);
+void addAlphaChannel(QWidget *widget);
 
 }
+
+#endif

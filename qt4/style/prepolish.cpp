@@ -23,84 +23,11 @@
 #include <qtcurve-utils/qtprops.h>
 
 #include "qtcurve_p.h"
+#include "argbhelper.h"
 
-#include <QX11Info>
-#include <QApplication>
-#include <QDesktopWidget>
 #include <QMenu>
 
-// Copied from qt_x11_p.h.
-// This is not part of the public API but should be stable enough to use
-// because it had never changed since the first git commit of Qt.
-struct QX11InfoData {
-    uint ref;
-    int screen;
-    int dpiX;
-    int dpiY;
-    int depth;
-    int cells;
-    unsigned long colormap;
-    void *visual;
-    bool defaultColormap;
-    bool defaultVisual;
-    int subpixel;
-};
-
 namespace QtCurve {
-
-// Access protected functions.
-struct QtcX11Info: public QX11Info {
-    static bool creatingDummy;
-    static QtcX11Info *getInfo(const QWidget *w);
-    QWidget *rgbaDummy();
-    void fixVisual();
-    void setRgba();
-};
-bool QtcX11Info::creatingDummy = false;
-
-inline QtcX11Info*
-QtcX11Info::getInfo(const QWidget *w)
-{
-    return static_cast<QtcX11Info*>(const_cast<QX11Info*>(&w->x11Info()));
-}
-
-// Qt uses XCreateSimpleWindow when defaultVisual and defaultColormap
-// are true. This confuses QGLWidget when recreating window caused by
-// reparenting to a widget with different depth, result in a mismatch
-// in x11info and native window.
-inline void
-QtcX11Info::fixVisual()
-{
-    if (qtcUnlikely(!x11data))
-        setX11Data(getX11Data(true));
-    x11data->defaultVisual = false;
-    x11data->defaultColormap = false;
-}
-
-inline QWidget*
-QtcX11Info::rgbaDummy()
-{
-    static QWidget **dummies = NULL;
-    int scrno = screen();
-    if (qtcUnlikely(!dummies || !dummies[scrno])) {
-        creatingDummy = true;
-        QDesktopWidget *desktop = qApp->desktop();
-        if (qtcUnlikely(!dummies))
-            dummies = qtcNew(QWidget*, desktop->screenCount());
-        dummies[scrno] = new QWidget(desktop->screen(scrno));
-        dummies[scrno]->setAttribute(Qt::WA_TranslucentBackground);
-        dummies[scrno]->setAttribute(Qt::WA_WState_Polished);
-        dummies[scrno]->winId();
-        creatingDummy = false;
-    }
-    return dummies[scrno];
-}
-
-inline void
-QtcX11Info::setRgba()
-{
-    setX11Data(getInfo(rgbaDummy())->x11data);
-}
 
 __attribute__((hot)) void
 Style::prePolish(QWidget *widget) const
@@ -108,10 +35,9 @@ Style::prePolish(QWidget *widget) const
     if (!widget || QtcX11Info::creatingDummy)
         return;
 
-    QtcX11Info *x11Info = QtcX11Info::getInfo(widget);
     QtcQWidgetProps props(widget);
     // Don't use XCreateSimpleWindow
-    x11Info->fixVisual();
+    fixVisual(widget);
     // HACK:
     // Modify X11Info of toplevel widgets before they create native windows.
     // This way we won't interfere with widgets that set this property
@@ -127,7 +53,7 @@ Style::prePolish(QWidget *widget) const
     // because it is treated differently in Qt) (NOTE2: gl widget will not work
     // straightforwardly when reparenting to a 32bit window due to a bug in
     // Qt4, which causes a 24bit x11info and 32bit gl window to be created
-    // The x11Info->fixVisual() above should work around it, too lazy to
+    // The fixVisual() above should work around it, too lazy to
     // report upstream..... :-P).
 
     // TODO:
@@ -170,7 +96,7 @@ Style::prePolish(QWidget *widget) const
              (qobject_cast<QMenu*>(widget) ||
               widget->inherits("QComboBoxPrivateContainer")))) {
             props->prePolished = true;
-            x11Info->setRgba();
+            addAlphaChannel(widget);
             // Set this for better efficiency for now
             widget->setAutoFillBackground(false);
         }
