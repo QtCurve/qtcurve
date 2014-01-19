@@ -49,6 +49,8 @@ Style::drawPrimitiveIndicatorTabClose(PrimitiveElement element,
                                       QPainter *painter,
                                       const QWidget *widget) const
 {
+    QTC_UNUSED(element);
+    QTC_UNUSED(widget);
 #ifdef QTC_QT5_ENABLE_KDE
     int size = pixelMetric(QStyle::PM_SmallIconSize);
     State state = option->state;
@@ -64,10 +66,8 @@ Style::drawPrimitiveIndicatorTabClose(PrimitiveElement element,
                                                 QIcon::On : QIcon::Off));
     return true;
 #else
-    QTC_UNUSED(element);
     QTC_UNUSED(option);
     QTC_UNUSED(painter);
-    QTC_UNUSED(widget);
     return false;
 #endif
 }
@@ -795,10 +795,10 @@ Style::drawPrimitivePanelItemViewItem(PrimitiveElement element,
         return true;
     }
     if (hasCustomBackground) {
-        const QPointF prevOrigin = painter->brushOrigin();
+        painter->save();
         painter->setBrushOrigin(r.topLeft());
         painter->fillRect(r, v4Opt->backgroundBrush);
-        painter->setBrushOrigin(prevOrigin);
+        painter->restore();
     }
     if (state & State_Selected || hover) {
         if (!widget) {

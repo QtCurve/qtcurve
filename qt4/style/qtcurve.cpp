@@ -3813,8 +3813,9 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
 
                 painter->setPen(col);
                 painter->drawLine(c.x()-l, c.y(), c.x()+l, c.y());
-                if(!down)
-                    painter->drawLine(c.x(), c.y()-l, c.x(), c.y()+l);
+                if (!down) {
+                    painter->drawLine(c.x(), c.y() - l, c.x(), c.y() + l);
+                }
             }
             break;
         }
@@ -5101,13 +5102,11 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             if (!hover && !(state&State_Selected) && !hasCustomBackground)
                 break;
 
-            if(hasCustomBackground)
-            {
-                const QPointF prevOrigin(painter->brushOrigin());
-
+            if (hasCustomBackground) {
+                painter->save();
                 painter->setBrushOrigin(r.topLeft());
                 painter->fillRect(r, v4Opt->backgroundBrush);
-                painter->setBrushOrigin(prevOrigin);
+                painter->restore();
             }
 
             if(state&State_Selected || hover)
@@ -9022,8 +9021,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                     // the slider...
                     painter->setClipping(false);
 #ifdef INCREASE_SB_SLIDER
-                    if(!opts.flatSbarButtons)
-                    {
+                    if (!opts.flatSbarButtons) {
                         if(atMax)
                             switch(opts.scrollbarType)
                             {
@@ -11285,68 +11283,69 @@ Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r,
             }
         }
 
-        if(path.isEmpty())
-            p->drawTiledPixmap(r, APPEARANCE_STRIPED==app || APPEARANCE_FILE==app || scaledSize==pix.size()
-                                    ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
-        else
-        {
-            const QPointF prevOrigin(p->brushOrigin());
+        if (path.isEmpty()) {
+            p->drawTiledPixmap(r, qtcOneOf(app, APPEARANCE_STRIPED,
+                                           APPEARANCE_FILE) ||
+                               scaledSize == pix.size() ? pix :
+                               pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
+        } else {
+            p->save();
             p->setBrushOrigin(r.x(), r.y());
-            p->fillPath(path,
-                        QBrush(APPEARANCE_STRIPED==app || APPEARANCE_FILE==app || scaledSize==pix.size()
-                                ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio)));
-            p->setBrushOrigin(prevOrigin);
+            p->fillPath(path, QBrush(qtcOneOf(app, APPEARANCE_STRIPED,
+                                              APPEARANCE_FILE) ||
+                                     scaledSize == pix.size() ? pix :
+                                     pix.scaled(scaledSize,
+                                                Qt::IgnoreAspectRatio)));
+            p->save();
         }
 
-        if(isWindow && APPEARANCE_STRIPED!=app && APPEARANCE_FILE!=app && GT_HORIZ==grad && GB_SHINE==qtcGetGradient(app, &opts)->border)
-        {
-            int size=qMin(BGND_SHINE_SIZE, qMin(r.height()*2, r.width()));
-
+        if (isWindow && qtcNoneOf(app, APPEARANCE_STRIPED, APPEARANCE_FILE) &&
+            grad == GT_HORIZ &&
+            qtcGetGradient(app, &opts)->border == GB_SHINE) {
+            int size = qMin(BGND_SHINE_SIZE, qMin(r.height() * 2, r.width()));
             QString key;
             key.sprintf("qtc-radial-%x", size/BGND_SHINE_STEPS);
-
-            if(!m_usePixmapCache || !QPixmapCache::find(key, pix))
-            {
-                size/=BGND_SHINE_STEPS;
-                size*=BGND_SHINE_STEPS;
-                pix=QPixmap(size, size/2);
+            if (!m_usePixmapCache || !QPixmapCache::find(key, pix)) {
+                size /= BGND_SHINE_STEPS;
+                size *= BGND_SHINE_STEPS;
+                pix = QPixmap(size, size / 2);
                 pix.fill(Qt::transparent);
-                QRadialGradient gradient(QPointF(pix.width()/2.0, 0), pix.width()/2.0, QPointF(pix.width()/2.0, 0));
-                QColor          c(Qt::white);
-                double          alpha(qtcShineAlpha(&col));
+                QRadialGradient gradient(QPointF(pix.width() / 2.0, 0),
+                                         pix.width() / 2.0,
+                                         QPointF(pix.width() / 2.0, 0));
+                QColor c(Qt::white);
+                double alpha = qtcShineAlpha(&col);
 
                 c.setAlphaF(alpha);
                 gradient.setColorAt(0, c);
-                c.setAlphaF(alpha*0.625);
+                c.setAlphaF(alpha * 0.625);
                 gradient.setColorAt(0.5, c);
-                c.setAlphaF(alpha*0.175);
+                c.setAlphaF(alpha * 0.175);
                 gradient.setColorAt(0.75, c);
                 c.setAlphaF(0);
                 gradient.setColorAt(1, c);
                 QPainter pixPainter(&pix);
-                pixPainter.fillRect(QRect(0, 0, pix.width(), pix.height()), gradient);
+                pixPainter.fillRect(QRect(0, 0, pix.width(), pix.height()),
+                                    gradient);
                 pixPainter.end();
-                if(m_usePixmapCache)
+                if (m_usePixmapCache) {
                     QPixmapCache::insert(key, pix);
+                }
             }
-
-            p->drawPixmap(r.x()+((r.width()-pix.width())/2), r.y(), pix);
+            p->drawPixmap(r.x() + (r.width() - pix.width()) / 2, r.y(), pix);
         }
-    }
-    else
-    {
+    } else {
         QColor col(bgnd);
-
-        if(100!=opacity)
-            col.setAlphaF(opacity/100.0);
-        if(path.isEmpty())
+        if (opacity != 100) {
+            col.setAlphaF(opacity / 100.0);
+        }
+        if (path.isEmpty()) {
             p->fillRect(r, col);
-        else
-        {
-            const QPointF prevOrigin(p->brushOrigin());
+        } else {
+            p->save();
             p->setBrushOrigin(r.x(), r.y());
             p->fillPath(path, col);
-            p->setBrushOrigin(prevOrigin);
+            p->restore();
         }
     }
 }
@@ -11460,7 +11459,9 @@ void Style::drawBackgroundImage(QPainter *p, bool isWindow, const QRect &r) cons
     }
 }
 
-void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType type) const
+void
+Style::drawBackground(QPainter *p, const QWidget *widget,
+                      BackgroundType type) const
 {
     bool isWindow(BGND_MENU != type);
     bool previewMdi(isWindow && m_isPreview &&
@@ -11472,7 +11473,7 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
     QRect imgRect = bgndRect;
     QtcQWidgetProps props(widget);
 
-    if (100 != opacity && !(qobject_cast<const QMdiSubWindow*>(widget) ||
+    if (opacity != 100 && !(qobject_cast<const QMdiSubWindow*>(widget) ||
                             Utils::hasAlphaChannel(window))) {
         opacity = 100;
     }
@@ -12150,8 +12151,8 @@ void Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe,
         return;
     }
     a.translate(r.x() + r.width() / 2, r.y() + r.height() / 2);
-    p->save();
     col.setAlpha(255);
+    p->save();
     p->setPen(col);
     p->setBrush(col);
 #if (QT_VERSION >= QT_VERSION_CHECK(4, 8, 5))
@@ -12170,10 +12171,12 @@ void Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe,
     p->restore();
 }
 
-void Style::drawSbSliderHandle(QPainter *p, const QRect &rOrig, const QStyleOption *option, bool slider) const
+void
+Style::drawSbSliderHandle(QPainter *p, const QRect &rOrig,
+                          const QStyleOption *option, bool slider) const
 {
     QStyleOption opt(*option);
-    QRect        r(rOrig);
+    QRect r = rOrig;
 
     if(opt.state&(State_Sunken|State_On))
         opt.state|=State_MouseOver;

@@ -2051,111 +2051,117 @@ QPixmap Style::drawStripes(const QColor &color, int opacity) const
     return pix;
 }
 
-void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int opacity, BackgroundType type, EAppearance app,
-                           const QPainterPath &path) const
+void
+Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r,
+                      int opacity, BackgroundType type, EAppearance app,
+                      const QPainterPath &path) const
 {
-    bool isWindow(BGND_MENU!=type);
+    bool isWindow = type != BGND_MENU;
 
-    if(!qtcIsFlatBgnd(app))
-    {
+    if (!qtcIsFlatBgnd(app)) {
         static const int constPixmapWidth  = 16;
         static const int constPixmapHeight = 512;
 
-        QColor    col(bgnd);
-        QPixmap   pix;
-        QSize     scaledSize;
-        EGradType grad=isWindow ? opts.bgndGrad : opts.menuBgndGrad;
+        QColor col(bgnd);
+        QPixmap pix;
+        QSize scaledSize;
+        EGradType grad = isWindow ? opts.bgndGrad : opts.menuBgndGrad;
 
-        if(APPEARANCE_STRIPED==app)
-            pix=drawStripes(col, opacity);
-        else if(APPEARANCE_FILE==app)
-            pix=isWindow ? opts.bgndPixmap.img : opts.menuBgndPixmap.img;
-        else
-        {
+        if (app == APPEARANCE_STRIPED) {
+            pix = drawStripes(col, opacity);
+        } else if (app == APPEARANCE_FILE) {
+            pix = isWindow ? opts.bgndPixmap.img : opts.menuBgndPixmap.img;
+        } else {
             QString key;
+            scaledSize = QSize(grad == GT_HORIZ ? constPixmapWidth : r.width(),
+                               grad == GT_HORIZ ? r.height() :
+                               constPixmapWidth);
 
-            scaledSize=QSize(GT_HORIZ==grad ? constPixmapWidth : r.width(), GT_HORIZ==grad ? r.height() : constPixmapWidth);
-
-            if(100!=opacity)
-                col.setAlphaF(opacity/100.0);
+            if (opacity != 100)
+                col.setAlphaF(opacity / 100.0);
 
             key.sprintf("qtc-bgnd-%x-%d-%d", col.rgba(), grad, app);
-            if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
-            {
-                pix=QPixmap(QSize(GT_HORIZ==grad ? constPixmapWidth : constPixmapHeight, GT_HORIZ==grad ? constPixmapHeight : constPixmapWidth));
+            if (!itsUsePixmapCache || !QPixmapCache::find(key, pix)) {
+                pix = QPixmap(QSize(grad == GT_HORIZ ? constPixmapWidth :
+                                    constPixmapHeight, grad == GT_HORIZ ?
+                                    constPixmapHeight : constPixmapWidth));
                 pix.fill(Qt::transparent);
 
                 QPainter pixPainter(&pix);
-
-                drawBevelGradientReal(col, &pixPainter, QRect(0, 0, pix.width(), pix.height()), GT_HORIZ==grad, false, app, WIDGET_OTHER);
+                drawBevelGradientReal(col, &pixPainter,
+                                      QRect(0, 0, pix.width(), pix.height()),
+                                      grad == GT_HORIZ, false, app,
+                                      WIDGET_OTHER);
                 pixPainter.end();
-                if(itsUsePixmapCache)
+                if (itsUsePixmapCache) {
                     QPixmapCache::insert(key, pix);
+                }
             }
         }
 
-        if(path.isEmpty())
-            p->drawTiledPixmap(r, APPEARANCE_STRIPED==app || APPEARANCE_FILE==app || scaledSize==pix.size()
-                               ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
-        else
-        {
-            const QPointF prevOrigin(p->brushOrigin());
+        if (path.isEmpty()) {
+            p->drawTiledPixmap(r, qtcOneOf(app, APPEARANCE_STRIPED,
+                                           APPEARANCE_FILE) ||
+                               scaledSize == pix.size() ? pix :
+                               pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
+        } else {
+            p->save();
             p->setBrushOrigin(r.x(), r.y());
             p->fillPath(path,
-                        QBrush(APPEARANCE_STRIPED==app || APPEARANCE_FILE==app || scaledSize==pix.size()
-                               ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio)));
-            p->setBrushOrigin(prevOrigin);
+                        QBrush(qtcOneOf(app, APPEARANCE_STRIPED,
+                                        APPEARANCE_FILE) ||
+                               scaledSize == pix.size() ? pix :
+                               pix.scaled(scaledSize, Qt::IgnoreAspectRatio)));
+            p->restore();
         }
 
-        if(isWindow && APPEARANCE_STRIPED!=app && APPEARANCE_FILE!=app && GT_HORIZ==grad && GB_SHINE==qtcGetGradient(app, &opts)->border)
-        {
-            int size=qMin(BGND_SHINE_SIZE, qMin(r.height()*2, r.width()));
-
+        if (isWindow && qtcNoneOf(app, APPEARANCE_STRIPED, APPEARANCE_FILE) &&
+            grad == GT_HORIZ &&
+            qtcGetGradient(app, &opts)->border == GB_SHINE) {
+            int size = qMin(BGND_SHINE_SIZE, qMin(r.height() * 2, r.width()));
             QString key;
-            key.sprintf("qtc-radial-%x", size/BGND_SHINE_STEPS);
-
-            if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
-            {
-                size/=BGND_SHINE_STEPS;
-                size*=BGND_SHINE_STEPS;
-                pix=QPixmap(size, size/2);
+            key.sprintf("qtc-radial-%x", size / BGND_SHINE_STEPS);
+            if (!itsUsePixmapCache || !QPixmapCache::find(key, pix)) {
+                size /= BGND_SHINE_STEPS;
+                size *= BGND_SHINE_STEPS;
+                pix = QPixmap(size, size / 2);
                 pix.fill(Qt::transparent);
-                QRadialGradient gradient(QPointF(pix.width()/2.0, 0), pix.width()/2.0, QPointF(pix.width()/2.0, 0));
-                QColor          c(Qt::white);
-                double          alpha(qtcShineAlpha(&col));
+                QRadialGradient gradient(QPointF(pix.width() / 2.0, 0),
+                                         pix.width() / 2.0,
+                                         QPointF(pix.width() / 2.0, 0));
+                QColor c(Qt::white);
+                double alpha = qtcShineAlpha(&col);
 
                 c.setAlphaF(alpha);
                 gradient.setColorAt(0, c);
-                c.setAlphaF(alpha*0.625);
+                c.setAlphaF(alpha * 0.625);
                 gradient.setColorAt(0.5, c);
-                c.setAlphaF(alpha*0.175);
+                c.setAlphaF(alpha * 0.175);
                 gradient.setColorAt(0.75, c);
                 c.setAlphaF(0);
                 gradient.setColorAt(1, c);
                 QPainter pixPainter(&pix);
-                pixPainter.fillRect(QRect(0, 0, pix.width(), pix.height()), gradient);
+                pixPainter.fillRect(QRect(0, 0, pix.width(), pix.height()),
+                                    gradient);
                 pixPainter.end();
-                if(itsUsePixmapCache)
+                if (itsUsePixmapCache) {
                     QPixmapCache::insert(key, pix);
+                }
             }
-
-            p->drawPixmap(r.x()+((r.width()-pix.width())/2), r.y(), pix);
+            p->drawPixmap(r.x() + ((r.width() - pix.width()) / 2), r.y(), pix);
         }
-    }
-    else
-    {
+    } else {
         QColor col(bgnd);
-
-        if(100!=opacity)
-            col.setAlphaF(opacity/100.0);
-        if(path.isEmpty())
+        if (opacity != 100) {
+            col.setAlphaF(opacity / 100.0);
+        }
+        if (path.isEmpty()) {
             p->fillRect(r, col);
-        else
-        {
-            const QPointF prevOrigin(p->brushOrigin());
+        } else {
+            p->save();
             p->setBrushOrigin(r.x(), r.y());
             p->fillPath(path, col);
-            p->setBrushOrigin(prevOrigin);
+            p->restore();
         }
     }
 }
@@ -2269,19 +2275,21 @@ void Style::drawBackgroundImage(QPainter *p, bool isWindow, const QRect &r) cons
     }
 }
 
-void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType type) const
+void
+Style::drawBackground(QPainter *p, const QWidget *widget,
+                      BackgroundType type) const
 {
-    bool isWindow(BGND_MENU != type);
-    bool previewMdi(isWindow && itsIsPreview &&
-                    qobject_cast<const QMdiSubWindow*>(widget));
+    bool isWindow = type != BGND_MENU;
+    bool previewMdi = (isWindow && itsIsPreview &&
+                       qobject_cast<const QMdiSubWindow*>(widget));
     const QWidget *window = itsIsPreview ? widget : widget->window();
-    int opacity = (BGND_MENU == type ? opts.menuBgndOpacity :
-                   BGND_DIALOG == type ? opts.dlgOpacity : opts.bgndOpacity);
-    QRect bgndRect(widget->rect());
-    QRect imgRect(bgndRect);
+    int opacity = (type == BGND_MENU ? opts.menuBgndOpacity :
+                   type == BGND_DIALOG ? opts.dlgOpacity : opts.bgndOpacity);
+    QRect bgndRect = widget->rect();
+    QRect imgRect = bgndRect;
     QtcQWidgetProps props(widget);
 
-    if (100 != opacity && !(qobject_cast<const QMdiSubWindow*>(widget) ||
+    if (opacity != 100 && !(qobject_cast<const QMdiSubWindow*>(widget) ||
                             Utils::hasAlphaChannel(window))) {
         opacity = 100;
     }
@@ -2292,126 +2300,140 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
     p->setClipRegion(widget->rect(), Qt::IntersectClip);
 
     if (isWindow) {
-        if(!previewMdi)
-        {
-            WindowBorders borders=qtcGetWindowBorderSize(false);
-            bgndRect.adjust(-borders.sides, -borders.titleHeight, borders.sides, borders.bottom);
+        if (!previewMdi) {
+            WindowBorders borders = qtcGetWindowBorderSize(false);
+            bgndRect.adjust(-borders.sides, -borders.titleHeight,
+                            borders.sides, borders.bottom);
+        } else {
+            bgndRect.adjust(0, -pixelMetric(PM_TitleBarHeight,
+                                            0L, widget), 0, 0);
         }
-        else
-        {
-            bgndRect.adjust(0, -pixelMetric(PM_TitleBarHeight, 0L, widget), 0, 0);
+        if (BGND_IMG_ON_BORDER) {
+            imgRect = bgndRect;
         }
-        if(BGND_IMG_ON_BORDER)
-            imgRect=bgndRect;
     }
 
-    drawBackground(p, isWindow ? window->palette().window().color() : popupMenuCols()[ORIGINAL_SHADE], bgndRect, opacity, type,
-                   BGND_MENU!=type ? opts.bgndAppearance : opts.menuBgndAppearance);
+    drawBackground(p, (isWindow ? window->palette().window().color() :
+                       popupMenuCols()[ORIGINAL_SHADE]), bgndRect, opacity,
+                   type, (type != BGND_MENU ? opts.bgndAppearance :
+                          opts.menuBgndAppearance));
     drawBackgroundImage(p, isWindow, imgRect);
 }
 
-QPainterPath Style::buildPath(const QRectF &r, EWidget w, int round, double radius) const
+QPainterPath
+Style::buildPath(const QRectF &r, EWidget w, int round, double radius) const
 {
     QPainterPath path;
 
-    if(WIDGET_RADIO_BUTTON==w || WIDGET_DIAL==w ||
-       (WIDGET_MDI_WINDOW_BUTTON==w && opts.titlebarButtons&TITLEBAR_BUTTON_ROUND) ||
-       CIRCULAR_SLIDER(w))
-    {
+    if (qtcOneOf(w, WIDGET_RADIO_BUTTON, WIDGET_DIAL) ||
+        (w == WIDGET_MDI_WINDOW_BUTTON &&
+         opts.titlebarButtons & TITLEBAR_BUTTON_ROUND) || CIRCULAR_SLIDER(w)) {
         path.addEllipse(r);
         return path;
     }
 
-    if(ROUND_NONE==opts.round || (radius<0.01))
-        round=ROUNDED_NONE;
-
-    double       diameter(radius*2);
-
-    if (WIDGET_MDI_WINDOW_TITLE!=w && round&CORNER_BR)
-        path.moveTo(r.x()+r.width(), r.y()+r.height()-radius);
-    else
-        path.moveTo(r.x()+r.width(), r.y()+r.height());
-
-    if (round&CORNER_TR)
-        path.arcTo(r.x()+r.width()-diameter, r.y(), diameter, diameter, 0, 90);
-    else
-        path.lineTo(r.x()+r.width(), r.y());
-
-    if (round&CORNER_TL)
-        path.arcTo(r.x(), r.y(), diameter, diameter, 90, 90);
-    else
-        path.lineTo(r.x(), r.y());
-
-    if (WIDGET_MDI_WINDOW_TITLE!=w && round&CORNER_BL)
-        path.arcTo(r.x(), r.y()+r.height()-diameter, diameter, diameter, 180, 90);
-    else
-        path.lineTo(r.x(), r.y()+r.height());
-
-    if(WIDGET_MDI_WINDOW_TITLE!=w)
-    {
-        if (round&CORNER_BR)
-            path.arcTo(r.x()+r.width()-diameter, r.y()+r.height()-diameter, diameter, diameter, 270, 90);
-        else
-            path.lineTo(r.x()+r.width(), r.y()+r.height());
+    if (opts.round == ROUND_NONE || radius < 0.01) {
+        round = ROUNDED_NONE;
     }
 
+    double diameter = radius * 2;
+
+    if (w != WIDGET_MDI_WINDOW_TITLE && round & CORNER_BR) {
+        path.moveTo(r.x() + r.width(), r.y() + r.height() - radius);
+    } else {
+        path.moveTo(r.x() + r.width(), r.y() + r.height());
+    }
+    if (round & CORNER_TR) {
+        path.arcTo(r.x() + r.width() - diameter, r.y(),
+                   diameter, diameter, 0, 90);
+    } else {
+        path.lineTo(r.x() + r.width(), r.y());
+    }
+    if (round & CORNER_TL) {
+        path.arcTo(r.x(), r.y(), diameter, diameter, 90, 90);
+    } else {
+        path.lineTo(r.x(), r.y());
+    }
+    if (w != WIDGET_MDI_WINDOW_TITLE && round & CORNER_BL) {
+        path.arcTo(r.x(), r.y() + r.height() - diameter,
+                   diameter, diameter, 180, 90);
+    } else {
+        path.lineTo(r.x(), r.y() + r.height());
+    }
+
+    if (w != WIDGET_MDI_WINDOW_TITLE) {
+        if (round & CORNER_BR) {
+            path.arcTo(r.x() + r.width() - diameter,
+                       r.y() + r.height() - diameter,
+                       diameter, diameter, 270, 90);
+        } else {
+            path.lineTo(r.x() + r.width(), r.y() + r.height());
+        }
+    }
     return path;
 }
 
-QPainterPath Style::buildPath(const QRect &r, EWidget w, int round, double radius) const
+QPainterPath
+Style::buildPath(const QRect &r, EWidget w, int round, double radius) const
 {
-    return buildPath(QRectF(r.x()+0.5, r.y()+0.5, r.width()-1, r.height()-1), w, round, radius);
+    return buildPath(QRectF(r.x() + 0.5, r.y() + 0.5,
+                            r.width() - 1, r.height() - 1), w, round, radius);
 }
 
-void Style::buildSplitPath(const QRect &r, int round, double radius, QPainterPath &tl, QPainterPath &br) const
+void
+Style::buildSplitPath(const QRect &r, int round, double radius,
+                      QPainterPath &tl, QPainterPath &br) const
 {
-    double xd(r.x()+0.5),
-        yd(r.y()+0.5),
-        diameter(radius*2);
-    bool   rounded=diameter>0.0;
-    int    width(r.width()-1),
-        height(r.height()-1);
+    double xd = r.x() + 0.5;
+    double yd = r.y() + 0.5;
+    double diameter = radius * 2;
+    bool rounded = diameter > 0.0;
+    int width = r.width() - 1;
+    int height = r.height() - 1;
 
-    if (rounded && round&CORNER_TR)
-    {
-        tl.arcMoveTo(xd+width-diameter, yd, diameter, diameter, 45);
-        tl.arcTo(xd+width-diameter, yd, diameter, diameter, 45, 45);
-        if(width>diameter)
-            tl.lineTo(xd+width-diameter, yd);
+    if (rounded && round & CORNER_TR) {
+        tl.arcMoveTo(xd + width - diameter, yd, diameter, diameter, 45);
+        tl.arcTo(xd + width - diameter, yd, diameter, diameter, 45, 45);
+        if (width > diameter) {
+            tl.lineTo(xd + width - diameter, yd);
+        }
+    } else {
+        tl.moveTo(xd + width, yd);
     }
-    else
-        tl.moveTo(xd+width, yd);
 
-    if (rounded && round&CORNER_TL)
+    if (rounded && round & CORNER_TL) {
         tl.arcTo(xd, yd, diameter, diameter, 90, 90);
-    else
+    } else {
         tl.lineTo(xd, yd);
-
-    if (rounded && round&CORNER_BL)
-    {
-        tl.arcTo(xd, yd+height-diameter, diameter, diameter, 180, 45);
-        br.arcMoveTo(xd, yd+height-diameter, diameter, diameter, 180+45);
-        br.arcTo(xd, yd+height-diameter, diameter, diameter, 180+45, 45);
-    }
-    else
-    {
-        tl.lineTo(xd, yd+height);
-        br.moveTo(xd, yd+height);
     }
 
-    if (rounded && round&CORNER_BR)
-        br.arcTo(xd+width-diameter, yd+height-diameter, diameter, diameter, 270, 90);
-    else
-        br.lineTo(xd+width, yd+height);
+    if (rounded && round & CORNER_BL) {
+        tl.arcTo(xd, yd + height - diameter, diameter, diameter, 180, 45);
+        br.arcMoveTo(xd, yd + height - diameter, diameter, diameter, 180 + 45);
+        br.arcTo(xd, yd + height - diameter, diameter, diameter, 180 + 45, 45);
+    } else {
+        tl.lineTo(xd, yd + height);
+        br.moveTo(xd, yd + height);
+    }
 
-    if (rounded && round&CORNER_TR)
-        br.arcTo(xd+width-diameter, yd, diameter, diameter, 0, 45);
-    else
-        br.lineTo(xd+width, yd);
+    if (rounded && round & CORNER_BR) {
+        br.arcTo(xd + width - diameter, yd + height - diameter, diameter,
+                 diameter, 270, 90);
+    } else {
+        br.lineTo(xd + width, yd + height);
+    }
+
+    if (rounded && round & CORNER_TR) {
+        br.arcTo(xd + width - diameter, yd, diameter, diameter, 0, 45);
+    } else {
+        br.lineTo(xd + width, yd);
+    }
 }
 
-void Style::drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, int round, const QColor *custom, EWidget w,
-                       EBorder borderProfile, bool doBlend, int borderVal) const
+void
+Style::drawBorder(QPainter *p, const QRect &r, const QStyleOption *option,
+                  int round, const QColor *custom, EWidget w,
+                  EBorder borderProfile, bool doBlend, int borderVal) const
 {
     if(ROUND_NONE==opts.round)
         round=ROUNDED_NONE;

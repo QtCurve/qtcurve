@@ -59,11 +59,10 @@
 #include "shadowhelper.h"
 #include "config.h"
 
-static GtkStyleClass *parent_class=NULL;
+static GtkStyleClass *parent_class = NULL;
 
 #ifdef INCREASE_SB_SLIDER
-typedef struct
-{
+typedef struct {
     GtkStyle *style;
 #if GTK_CHECK_VERSION(2, 90, 0)
     cairo_t *cr;
