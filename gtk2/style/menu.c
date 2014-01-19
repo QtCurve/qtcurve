@@ -64,13 +64,9 @@ objectIsA(const GObject *object, const char *type_name)
     return false;
 }
 
-/* #if !GTK_CHECK_VERSION(2, 90, 0) /\* Gtk3:TODO !!! *\/ */
 #define EXTEND_MENUBAR_ITEM_HACK
-/* #endif */
 
 #ifdef EXTEND_MENUBAR_ITEM_HACK
-static const int constMenuAdjust = 2;
-
 static gboolean
 menuIsSelectable(GtkWidget *menu)
 {
