@@ -51,13 +51,10 @@ set(qtcurve_SRCS
 if(QTC_ENABLE_X11)
   set(qtcurve_SRCS
     ${qtcurve_SRCS}
-    macmenu.cpp
-    shadowhelper.cpp)
+    ${qtcurve_X11_SRCS})
   set(qtcurve_MOC_HDRS
     ${qtcurve_MOC_HDRS}
-    macmenu.h
-    macmenu-dbus.h
-    shadowhelper.h)
+    ${qtcurve_X11_MOC_HDRS})
 endif()
 
 add_definitions(-DQT_PLUGIN)
@@ -90,7 +87,6 @@ endif()
 target_link_libraries(qtcurve-qt4
   ${QTC_KDE_LIBS}
   ${QTC_KFILEDIALOG_LIBS}
-  ${QTC_QT4_XCB_LINK_LIBS}
   ${QT_QTGUI_LIBRARY}
   ${QT_QTCORE_LIBRARY}
   ${QT_QTSVG_LIBRARY}

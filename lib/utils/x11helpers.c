@@ -22,6 +22,7 @@
 #include "x11shadow_p.h"
 #include "x11wmmove.h"
 #include "x11blur.h"
+#include "x11qtc.h"
 #include "log.h"
 #include "number.h"
 #include "shadow_p.h"
@@ -215,4 +216,36 @@ qtcX11BlurTrigger(xcb_window_t wid, bool enable, unsigned prop_num,
         qtcX11CallVoid(delete_property, wid, atom);
     }
     qtcX11Flush();
+}
+
+static inline void
+qtcX11SetShortProp(xcb_window_t win, xcb_atom_t atom, unsigned short prop)
+{
+    qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, win,
+                   atom, XCB_ATOM_CARDINAL, 16, 1, &prop);
+}
+
+QTC_EXPORT void
+qtcX11SetMenubarSize(xcb_window_t win, unsigned short s)
+{
+    qtcX11SetShortProp(win, qtc_x11_qtc_menubar_size, s);
+}
+
+QTC_EXPORT void
+qtcX11SetStatusBar(xcb_window_t win)
+{
+    qtcX11SetShortProp(win, qtc_x11_qtc_statusbar, 1);
+}
+
+QTC_EXPORT void
+qtcX11SetOpacity(xcb_window_t win, unsigned short o)
+{
+    qtcX11SetShortProp(win, qtc_x11_qtc_opacity, o);
+}
+
+QTC_EXPORT void
+qtcX11SetBgnd(xcb_window_t win, uint32_t prop)
+{
+    qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, win,
+                   qtc_x11_qtc_bgnd, XCB_ATOM_CARDINAL, 32, 1, &prop);
 }

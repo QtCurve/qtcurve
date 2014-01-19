@@ -24,36 +24,13 @@
 
 #include "x11utils.h"
 
-static inline void
-qtcX11SetShortProp(xcb_window_t win, xcb_atom_t atom, unsigned short prop)
-{
-    qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, win,
-                   atom, XCB_ATOM_CARDINAL, 16, 1, &prop);
-}
+QTC_BEGIN_DECLS
 
-static inline void
-qtcX11SetMenubarSize(xcb_window_t win, unsigned short s)
-{
-    qtcX11SetShortProp(win, qtc_x11_qtc_menubar_size, s);
-}
+void qtcX11SetMenubarSize(xcb_window_t win, unsigned short s);
+void qtcX11SetStatusBar(xcb_window_t win);
+void qtcX11SetOpacity(xcb_window_t win, unsigned short o);
+void qtcX11SetBgnd(xcb_window_t win, uint32_t prop);
 
-static inline void
-qtcX11SetStatusBar(xcb_window_t win)
-{
-    qtcX11SetShortProp(win, qtc_x11_qtc_statusbar, 1);
-}
-
-static inline void
-qtcX11SetOpacity(xcb_window_t win, unsigned short o)
-{
-    qtcX11SetShortProp(win, qtc_x11_qtc_opacity, o);
-}
-
-static inline void
-qtcX11SetBgnd(xcb_window_t win, uint32_t prop)
-{
-    qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, win,
-                   qtc_x11_qtc_bgnd, XCB_ATOM_CARDINAL, 32, 1, &prop);
-}
+QTC_END_DECLS
 
 #endif

@@ -24,14 +24,6 @@ if(ENABLE_QT5)
   add_definitions(-DQTC_UTILS_QT5 -DQT_DISABLE_DEPRECATED_BEFORE=0x050100
     ${QTC_QT5_DEFS})
   include_directories(${QTC_QT5_INCLUDES})
-
-  if(QTC_ENABLE_X11)
-    include_directories(${QTC_X11_INCLUDE_DIRS})
-    add_definitions(${QTC_X11_CFLAGS})
-    set(QTC_QT5_XCB_LINK_LIBS ${QTC_X11_LIBRARIES})
-  else()
-    set(QTC_QT5_XCB_LINK_LIBS)
-  endif()
 endif()
 
 add_subdirectory(common)
