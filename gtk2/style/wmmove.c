@@ -141,7 +141,7 @@ static gboolean qtcWMMoveWithinWidget(GtkWidget *widget, GdkEventButton *event)
         }
 
         return allocation.x<=event->x_root && allocation.y<=event->y_root &&
-            (allocation.x+allocation.width)>event->x_root &&(allocation.y+allocation.height)>event->y_root;
+            (allocation.x+allocation.width)>event->x_root && (allocation.y+allocation.height)>event->y_root;
     }
     return true;
 }

@@ -879,7 +879,7 @@ getParentBgCol(GtkWidget *widget)
     }
 
     GtkStyle *style = widget ? gtk_widget_get_style(widget) : NULL;
-    return style ? &(style->bg[gtk_widget_get_state(widget)]) : NULL;
+    return style ? &style->bg[gtk_widget_get_state(widget)] : NULL;
 }
 
 int
@@ -1042,8 +1042,8 @@ getEntryParentBgCol(GtkWidget *widget, GdkColor *color)
         GtkStyle *style = NULL;
         if (opts.tabBgnd && GTK_IS_NOTEBOOK(parent) &&
             (style = gtk_widget_get_style(parent))) {
-            qtcShade(&(style->bg[GTK_STATE_NORMAL]), color,
-                      TO_FACTOR(opts.tabBgnd), opts.shading);
+            qtcShade(&style->bg[GTK_STATE_NORMAL], color,
+                     TO_FACTOR(opts.tabBgnd), opts.shading);
             return;
         }
         parent = gtk_widget_get_parent(parent);

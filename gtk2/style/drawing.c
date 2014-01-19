@@ -1798,7 +1798,7 @@ drawTriangularSlider(cairo_t *cr, GtkStyle *style, GtkStateType state,
         if (state == GTK_STATE_INSENSITIVE) {
             btnColors = qtcPalette.background;
         } else if (QT_CUSTOM_COLOR_BUTTON(style)) {
-            qtcShadeColors(&(style->bg[state]), newColors);
+            qtcShadeColors(&style->bg[state], newColors);
             btnColors = newColors;
         } else {
             GtkWidget *widget = NULL; /* Keep SET_BTN_COLS happy */
@@ -2357,7 +2357,7 @@ drawTreeViewLines(cairo_t *cr, const GdkColor *col, int x, int y, int h,
         }
         qtcCairoSetColor(cr, col);
         for(int i = 0;i < depth;++i) {
-            bool isLastCell = ((useBitMask ? isLastMask&(1 << i) :
+            bool isLastCell = ((useBitMask ? isLastMask & (1 << i) :
                                 isLast->data[i]) ? true : false);
             bool last = i == depth - 1;
             double xCenter = xStart;
@@ -3275,7 +3275,7 @@ drawCheckBox(cairo_t *cr, GtkStateType state, GtkShadowType shadow,
     if (opts.crColor && state != GTK_STATE_INSENSITIVE && (on || tri)) {
         btnColors = qtcPalette.selectedcr;
     } else if (!mnu && !list && QT_CUSTOM_COLOR_BUTTON(style)) {
-        qtcShadeColors(&(style->bg[state]), newColors);
+        qtcShadeColors(&style->bg[state], newColors);
         btnColors = newColors;
     } else {
         btnColors = qtcPalette.button[state == GTK_STATE_INSENSITIVE ?
@@ -3427,7 +3427,7 @@ drawRadioButton(cairo_t *cr, GtkStateType state, GtkShadowType shadow,
         if (opts.crColor && state != GTK_STATE_INSENSITIVE && (on || tri)) {
             btnColors = qtcPalette.selectedcr;
         } else if (!mnu && !list && QT_CUSTOM_COLOR_BUTTON(style)) {
-            qtcShadeColors(&(style->bg[state]), newColors);
+            qtcShadeColors(&style->bg[state], newColors);
             btnColors = newColors;
         } else {
             btnColors = qtcPalette.button[state == GTK_STATE_INSENSITIVE ?
@@ -3570,8 +3570,8 @@ drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget,
     int sizeAdjust = ((!active || mozTab) &&
                       opts.tabMouseOver == TAB_MO_GLOW ? 1 : 0);
     int tabIndex = -1;
-    const GdkColor *col = (active ? &(style->bg[GTK_STATE_NORMAL]) :
-                           &(qtcPalette.background[2]));
+    const GdkColor *col = (active ? &style->bg[GTK_STATE_NORMAL] :
+                           &qtcPalette.background[2]);
     const GdkColor *selCol1 = &qtcPalette.highlight[0];
     QtcRect clipArea;
     EBorder borderProfile = (active || opts.borderInactiveTab ? opts.borderTab ?

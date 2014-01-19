@@ -1,6 +1,6 @@
 /*****************************************************************************
  *   Copyright 2003 - 2010 Craig Drummond <craig.p.drummond@gmail.com>       *
- *   Copyright 2013 - 2013 Yichao Yu <yyc1992@gmail.com>                     *
+ *   Copyright 2013 - 2014 Yichao Yu <yyc1992@gmail.com>                     *
  *                                                                           *
  *   This program is free software; you can redistribute it and/or modify    *
  *   it under the terms of the GNU Lesser General Public License as          *
@@ -698,9 +698,9 @@ static void readDoubleList(QtCConfig &cfg, const char *key, double *list, int co
 #define CFG_READ_COLOR(ENTRY) do {                      \
         QString sVal(cfg.readEntry(#ENTRY));            \
         if (sVal.isEmpty()) {                           \
-            opts->ENTRY=def->ENTRY;                     \
+            opts->ENTRY = def->ENTRY;                   \
         } else {                                        \
-            qtcSetRgb(&(opts->ENTRY), TO_LATIN1(sVal)); \
+            qtcSetRgb(&opts->ENTRY, TO_LATIN1(sVal));   \
         }                                               \
     } while (0)
 
@@ -712,7 +712,7 @@ static void readDoubleList(QtCConfig &cfg, const char *key, double *list, int co
         opts->ENTRY.width = opts->ENTRY.height = 0;                     \
         opts->ENTRY.onBorder = false;                                   \
         opts->ENTRY.pos = PP_TR;                                        \
-        if (IMG_FILE == opts->ENTRY.type) {                             \
+        if (opts->ENTRY.type == IMG_FILE) {                             \
             QString file(cfg.readEntry(#ENTRY ".file"));                \
             if (!file.isEmpty()) {                                      \
                 opts->ENTRY.pixmap.file = file;                         \
@@ -723,7 +723,7 @@ static void readDoubleList(QtCConfig &cfg, const char *key, double *list, int co
                 opts->ENTRY.pos = (EPixPos)readNumEntry(cfg, #ENTRY ".pos", \
                                                         (int)PP_TR);    \
             } else {                                                    \
-                opts->ENTRY.type=IMG_NONE;                              \
+                opts->ENTRY.type = IMG_NONE;                            \
             }                                                           \
         }                                                               \
     } while (0)
@@ -1216,12 +1216,12 @@ bool qtcReadConfig(const QString &file, Options *opts, Options *defOpts, bool ch
                 CFG_READ_EFFECT(tbarBtnEffect);
             }
             CFG_READ_APPEARANCE_PIXMAP(bgndAppearance, APP_ALLOW_STRIPED,
-                                       &(opts->bgndPixmap), checkImages);
+                                       &opts->bgndPixmap, checkImages);
             CFG_READ_GRAD_TYPE(bgndGrad);
             CFG_READ_GRAD_TYPE(menuBgndGrad);
             CFG_READ_INT_BOOL(lighterPopupMenuBgnd, def->lighterPopupMenuBgnd);
             CFG_READ_APPEARANCE_PIXMAP(menuBgndAppearance, APP_ALLOW_STRIPED,
-                                       &(opts->menuBgndPixmap), checkImages);
+                                       &opts->menuBgndPixmap, checkImages);
 
             if(APPEARANCE_FLAT==opts->menuBgndAppearance && 0==opts->lighterPopupMenuBgnd && opts->version<qtcMakeVersion(1, 7))
                 opts->menuBgndAppearance=APPEARANCE_RAISED;
@@ -1483,10 +1483,10 @@ void qtcDefaultSettings(Options *opts)
 {
     /* Set hard-coded defaults... */
     // Setup titlebar gradients...
-    qtcSetupGradient(&(opts->customGradient[APPEARANCE_CUSTOM1]), GB_3D,
-                     3,0.0,1.2,0.5,1.0,1.0,1.0);
-    qtcSetupGradient(&(opts->customGradient[APPEARANCE_CUSTOM2]), GB_3D,
-                     3,0.0,0.9,0.5,1.0,1.0,1.0);
+    qtcSetupGradient(&opts->customGradient[APPEARANCE_CUSTOM1], GB_3D, 3,
+                     0.0, 1.2, 0.5, 1.0, 1.0, 1.0);
+    qtcSetupGradient(&opts->customGradient[APPEARANCE_CUSTOM2], GB_3D, 3,
+                     0.0, 0.9, 0.5, 1.0, 1.0, 1.0);
     opts->customShades[0]=1.16;
     opts->customShades[1]=1.07;
     opts->customShades[2]=0.9;

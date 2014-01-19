@@ -1631,14 +1631,17 @@ gboolean qtSettingsInit()
             if(!opts.gtkComboMenus && FOCUS_GLOW!=opts.focus)
                 opts.gtkComboMenus=true;
 
-/*
-            if(opts.inactiveHighlight)
-                generateMidColor(&(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]),
-                                &(qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED]),
-                                &qtSettings.inactiveSelectCol, INACTIVE_HIGHLIGHT_FACTOR);
-            else
-                qtSettings.inactiveSelectCol=qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED];
-*/
+#if 0
+            if (opts.inactiveHighlight) {
+                generateMidColor(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW],
+                                 &qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED],
+                                 &qtSettings.inactiveSelectCol,
+                                 INACTIVE_HIGHLIGHT_FACTOR);
+            } else {
+                qtSettings.inactiveSelectCol =
+                    qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED];
+            }
+#endif
 
             /* Check if we're firefox... */
             if ((qtSettings.appName = qtcGetProgName())) {

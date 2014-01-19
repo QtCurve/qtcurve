@@ -737,9 +737,9 @@ readDoubleList(GHashTable *cfg, const char *key, double *list, int count)
 #define CFG_READ_COLOR(ENTRY) do {                        \
         const char *str = readStringEntry(cfg, #ENTRY);   \
         if (str && 0 != str[0]) {                         \
-            qtcSetRgb(&(opts->ENTRY), str);               \
+            qtcSetRgb(&opts->ENTRY, str);                 \
         } else {                                          \
-            opts->ENTRY=def->ENTRY;                       \
+            opts->ENTRY = def->ENTRY;                     \
         }                                                 \
     } while (0)
 
@@ -1318,12 +1318,12 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                 CFG_READ_EFFECT(tbarBtnEffect);
             }
             CFG_READ_APPEARANCE_PIXMAP(bgndAppearance, APP_ALLOW_STRIPED,
-                                       &(opts->bgndPixmap), checkImages);
+                                       &opts->bgndPixmap, checkImages);
             CFG_READ_GRAD_TYPE(bgndGrad);
             CFG_READ_GRAD_TYPE(menuBgndGrad);
             CFG_READ_INT_BOOL(lighterPopupMenuBgnd, def->lighterPopupMenuBgnd);
             CFG_READ_APPEARANCE_PIXMAP(menuBgndAppearance, APP_ALLOW_STRIPED,
-                                       &(opts->menuBgndPixmap), checkImages);
+                                       &opts->menuBgndPixmap, checkImages);
 
             if(APPEARANCE_FLAT==opts->menuBgndAppearance && 0==opts->lighterPopupMenuBgnd && opts->version<qtcMakeVersion(1, 7))
                 opts->menuBgndAppearance=APPEARANCE_RAISED;

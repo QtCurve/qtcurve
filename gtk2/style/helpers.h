@@ -28,7 +28,7 @@
 #include "qt_settings.h"
 #include <qtcurve-cairo/utils.h>
 
-#define DETAIL(xx)    ((detail) &&(!strcmp(xx, detail)))
+#define DETAIL(xx) ((detail) && (!strcmp(xx, detail)))
 #define DETAILHAS(xx) ((detail) && (strstr(detail, xx)))
 
 #ifndef GTK_IS_COMBO_BOX_ENTRY

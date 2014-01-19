@@ -721,7 +721,7 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
         if (slider | hscale | vscale | sbar && state == GTK_STATE_INSENSITIVE) {
             btnColors = qtcPalette.background;
         } else if (QT_CUSTOM_COLOR_BUTTON(style)) {
-            qtcShadeColors(&(style->bg[state]), new_cols);
+            qtcShadeColors(&style->bg[state], new_cols);
             btnColors = new_cols;
         } else {
             SET_BTN_COLS(slider, hscale | vscale, lvh, state);
@@ -1457,8 +1457,8 @@ drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                      x, y, width, height);
     } else if(DETAIL("menu")) {
         drawMenu(cr, widget, (QtcRect*)area, x, y, width, height);
-    } else if (detail &&(!strcmp(detail, "paned") ||
-                         !strcmp(detail + 1, "paned"))) {
+    } else if (detail && (!strcmp(detail, "paned") ||
+                          !strcmp(detail + 1, "paned"))) {
         gtkDrawHandle(style, window, state, shadow, area, widget, detail,
                       x, y, width, height,
                       *detail == 'h' ? GTK_ORIENTATION_VERTICAL :
@@ -1616,7 +1616,7 @@ gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
         if(QT_CUSTOM_COLOR_BUTTON(style))
         {
-            qtcShadeColors(&(style->bg[state]), newColors);
+            qtcShadeColors(&style->bg[state], newColors);
             btnColors=newColors;
         }
         else
@@ -2289,7 +2289,7 @@ gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 btnColors=qtcPalette.background;
             else if(QT_CUSTOM_COLOR_BUTTON(style))
             {
-                qtcShadeColors(&(style->bg[state]), newColors);
+                qtcShadeColors(&style->bg[state], newColors);
                 btnColors=newColors;
             }
             else
