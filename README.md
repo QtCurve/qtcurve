@@ -105,15 +105,6 @@ recommanded to turn on in distribution packages.
 
     (Default: `Off`)
 
-## Tips for compiling with `clang`/`clang++`
-As of clang version 3.3, `clang++` does not seem to be compatible with the c++
-standard library headers shipped with gcc in c++0x mode. If you have problems
-compiling the Qt4/Qt5 themes with `clang++`, one possible solution is to use
-`libc++` instead of `libstdc++`. The following command should configure
-CMake to use `clang`/`clang++` and `libc++` correctly,
-
-    CC=clang CXX=clang++ CPP=clang++ CXXFLAGS="${CXXFLAGS} -stdlib=libc++" LDFLAGS="${LDFLAGS} -lc++abi" cmake .. <other compile options...>
-
 # Additional Features
 ## XBar/MacMenu
 The XBar support was copied directly from Bespin. The relevant files are named
