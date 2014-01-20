@@ -23,6 +23,7 @@
 #include "x11wmmove.h"
 #include "x11blur.h"
 #include "x11qtc.h"
+#include "x11wrap.h"
 #include "log.h"
 #include "number.h"
 #include "shadow_p.h"
@@ -129,8 +130,8 @@ qtcX11ShadowInstallWithMargin(xcb_window_t win, const int margins[4])
         for (int i = 0;i < 4;i++) {
             shadow_data[i + 8] -= margins[i];
         }
-        qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, win,
-                       atom, XCB_ATOM_CARDINAL, 32, 12, shadow_data);
+        qtcX11ChangeProperty(XCB_PROP_MODE_REPLACE, win, atom,
+                             XCB_ATOM_CARDINAL, 32, 12, shadow_data);
         qtcX11Flush();
     }
 }
@@ -147,8 +148,8 @@ qtcX11ShadowInstall(xcb_window_t win)
         XChangeProperty(disp, win, atom, XA_CARDINAL, 32, PropModeReplace,
                         (unsigned char*)shadow_data_xlib, 12);
     } else {
-        qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, win,
-                       atom, XCB_ATOM_CARDINAL, 32, 12, shadow_data_xcb);
+        qtcX11ChangeProperty(XCB_PROP_MODE_REPLACE, win, atom,
+                             XCB_ATOM_CARDINAL, 32, 12, shadow_data_xcb);
         qtcX11Flush();
     }
 }
@@ -185,9 +186,9 @@ qtcX11MoveTrigger(xcb_window_t wid, uint32_t x, uint32_t y)
     xev->data.data32[1] = y;
     xev->data.data32[2] = 8; // NET::Move
     xev->data.data32[3] = XCB_KEY_BUT_MASK_BUTTON_1;
-    qtcX11CallVoid(send_event, false, qtcX11RootWindow(),
-                   XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY |
-                   XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT, (const char*)xev);
+    qtcX11SendEvent(false, qtcX11RootWindow(),
+                    XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY |
+                    XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT, xev);
     qtcX11Flush();
 }
 
@@ -209,8 +210,8 @@ qtcX11BlurTrigger(xcb_window_t wid, bool enable, unsigned prop_num,
                             (unsigned char*)xlib_props.p, prop_num);
             QTC_FREE_LOCAL_BUFF(xlib_props);
         } else {
-            qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, wid, atom,
-                           XCB_ATOM_CARDINAL, 32, prop_num, props);
+            qtcX11ChangeProperty(XCB_PROP_MODE_REPLACE, wid, atom,
+                                 XCB_ATOM_CARDINAL, 32, prop_num, props);
         }
     } else {
         qtcX11CallVoid(delete_property, wid, atom);
@@ -221,8 +222,8 @@ qtcX11BlurTrigger(xcb_window_t wid, bool enable, unsigned prop_num,
 static inline void
 qtcX11SetShortProp(xcb_window_t win, xcb_atom_t atom, unsigned short prop)
 {
-    qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, win,
-                   atom, XCB_ATOM_CARDINAL, 16, 1, &prop);
+    qtcX11ChangeProperty(XCB_PROP_MODE_REPLACE, win, atom,
+                         XCB_ATOM_CARDINAL, 16, 1, &prop);
 }
 
 QTC_EXPORT void
@@ -246,6 +247,6 @@ qtcX11SetOpacity(xcb_window_t win, unsigned short o)
 QTC_EXPORT void
 qtcX11SetBgnd(xcb_window_t win, uint32_t prop)
 {
-    qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, win,
-                   qtc_x11_qtc_bgnd, XCB_ATOM_CARDINAL, 32, 1, &prop);
+    qtcX11ChangeProperty(XCB_PROP_MODE_REPLACE, win, qtc_x11_qtc_bgnd,
+                         XCB_ATOM_CARDINAL, 32, 1, &prop);
 }

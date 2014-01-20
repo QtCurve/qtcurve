@@ -22,6 +22,7 @@
 // TODO multi screen?
 
 #include "x11utils.h"
+#include "x11wrap.h"
 #include "x11shadow_p.h"
 #include "log.h"
 
@@ -207,7 +208,7 @@ qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom)
     QTC_RET_IF_FAIL(qtc_xcb_conn && win, -1);
     int32_t res = -1;
     xcb_get_property_reply_t *reply =
-        qtcX11Call(get_property, 0, win, atom, XCB_ATOM_CARDINAL, 0, 1);
+        qtcX11GetProperty(0, win, atom, XCB_ATOM_CARDINAL, 0, 1);
     QTC_RET_IF_FAIL(reply, -1);
     if (xcb_get_property_value_length(reply) > 0) {
         uint32_t val = *(int32_t*)xcb_get_property_value(reply);
@@ -259,8 +260,8 @@ qtcX11IsEmbed(xcb_window_t win)
 {
     QTC_RET_IF_FAIL(qtc_xcb_conn && win, false);
     xcb_get_property_reply_t *reply =
-        qtcX11Call(get_property, 0, win, qtc_x11_xembed_info,
-                   qtc_x11_xembed_info, 0, 1);
+        qtcX11GetProperty(0, win, qtc_x11_xembed_info,
+                          qtc_x11_xembed_info, 0, 1);
     QTC_RET_IF_FAIL(reply, false);
     bool res = xcb_get_property_value_length(reply) > 0;
     free(reply);

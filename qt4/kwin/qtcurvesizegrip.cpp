@@ -48,7 +48,7 @@
 // IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
 
-#include <qtcurve-utils/x11utils.h>
+#include <qtcurve-utils/x11wrap.h>
 
 #include "qtcurvesizegrip.h"
 #include "qtcurvebutton.h"
@@ -121,16 +121,17 @@ QtCurveSizeGrip::embed()
     } else if (window_id) {
         WId current = window_id;
         while (true) {
-            auto reply = qtcX11Call(query_tree, current);
+            auto reply = qtcX11QueryTree(current);
             if (reply && reply->parent && reply->parent != reply->root &&
                 reply->parent != current) {
                 current = reply->parent;
             } else {
+                qtcFree(reply);
                 break;
             }
-            qtcFree(reply);
+            free(reply);
         }
-        qtcX11CallVoid(reparent_window, winId(), current, 0, 0);
+        qtcX11ReparentWindow(winId(), current, 0, 0);
         qtcX11Flush();
     } else {
         hide();

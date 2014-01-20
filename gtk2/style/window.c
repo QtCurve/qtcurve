@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #include <qtcurve-utils/x11qtc.h>
+#include <qtcurve-utils/x11wrap.h>
 #include <qtcurve-utils/gtkprops.h>
 #include <qtcurve-utils/log.h>
 #include <qtcurve-cairo/utils.h>
@@ -451,9 +452,8 @@ qtcWindowSetProperties(GtkWidget *w, unsigned short opacity)
     prop |= (((toQtColor(bgnd->red) & 0xFF) << 24) |
              ((toQtColor(bgnd->green) & 0xFF) << 16) |
              ((toQtColor(bgnd->blue) & 0xFF) << 8));
-    qtcX11CallVoid(change_property, XCB_PROP_MODE_REPLACE, wid,
-                   qtc_x11_qtc_bgnd, XCB_ATOM_CARDINAL, 32, 1,
-                   (unsigned char*)&prop);
+    qtcX11ChangeProperty(XCB_PROP_MODE_REPLACE, wid, qtc_x11_qtc_bgnd,
+                         XCB_ATOM_CARDINAL, 32, 1, &prop);
     qtcX11Flush();
 }
 

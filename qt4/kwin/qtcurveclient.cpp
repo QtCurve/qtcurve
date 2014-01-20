@@ -27,7 +27,7 @@
   Copyright (C) 2001 Rik Hemsley (rikkus) <rik@kde.org>
  */
 
-#include <qtcurve-utils/x11utils.h>
+#include <qtcurve-utils/x11wrap.h>
 #include <qtcurve-utils/log.h>
 
 #define DRAW_INTO_PIXMAPS
@@ -110,14 +110,14 @@ int getOpacityProperty(WId wId)
 
 void getBgndSettings(WId wId, EAppearance &app, QColor &col)
 {
-    auto reply = qtcX11Call(get_property, 0, wId, qtc_x11_qtc_bgnd,
-                            XCB_ATOM_CARDINAL, 0, 1);
+    auto reply = qtcX11GetProperty(0, wId, qtc_x11_qtc_bgnd,
+                                   XCB_ATOM_CARDINAL, 0, 1);
     if (!reply) {
         return;
     }
-    if (xcb_get_property_value_length(reply) > 0) {
-        uint32_t val = *(int32_t*)xcb_get_property_value(reply);
-        app = (EAppearance)(val&0xFF);
+    if (qtcX11GetPropertyValueLength(reply) > 0) {
+        uint32_t val = *(int32_t*)qtcX11GetPropertyValue(reply);
+        app = (EAppearance)(val & 0xFF);
         col.setRgb((val & 0xFF000000) >> 24, (val & 0x00FF0000) >> 16,
                    (val & 0x0000FF00) >> 8);
     }
@@ -1547,8 +1547,7 @@ void QtCurveClient::informAppOfBorderSizeChanges()
     xev->window = windowId();
     xev->type = qtc_x11_qtc_titlebar_size;
     xev->data.data32[0] = 0;
-    qtcX11CallVoid(send_event, false, windowId(), XCB_EVENT_MASK_NO_EVENT,
-                   (const char*)xev);
+    qtcX11SendEvent(false, windowId(), XCB_EVENT_MASK_NO_EVENT, xev);
     qtcX11Flush();
 }
 
@@ -1566,8 +1565,7 @@ void QtCurveClient::informAppOfActiveChange()
         xev->window = windowId();
         xev->type = qtc_x11_qtc_active_window;
         xev->data.data32[0] = isActive() ? 1 : 0;
-        qtcX11CallVoid(send_event, false, windowId(), XCB_EVENT_MASK_NO_EVENT,
-                       (const char*)xev);
+        qtcX11SendEvent(false, windowId(), XCB_EVENT_MASK_NO_EVENT, xev);
         qtcX11Flush();
     }
 }
@@ -1588,8 +1586,7 @@ void QtCurveClient::sendToggleToApp(bool menubar)
         xev->type = (menubar ? qtc_x11_qtc_toggle_menubar :
                      qtc_x11_qtc_toggle_statusbar);
         xev->data.data32[0] = 0;
-        qtcX11CallVoid(send_event, false, windowId(), XCB_EVENT_MASK_NO_EVENT,
-                       (const char*)xev);
+        qtcX11SendEvent(false, windowId(), XCB_EVENT_MASK_NO_EVENT, xev);
         qtcX11Flush();
         if (menubar) {
             Handler()->emitToggleMenuBar(windowId());

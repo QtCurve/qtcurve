@@ -31,9 +31,9 @@
 #include <QSvgRenderer>
 #include <QPainter>
 
-#define CONFIG_FILE               "stylerc"
-#define OLD_CONFIG_FILE           "qtcurvestylerc"
-#define VERSION_KEY               "version"
+#define CONFIG_FILE "stylerc"
+#define OLD_CONFIG_FILE "qtcurvestylerc"
+#define VERSION_KEY "version"
 
 #define TO_LATIN1(A) A.toLatin1().constData()
 static QString
@@ -46,13 +46,12 @@ determineFileName(const QString &file)
 
 static int c2h(char ch)
 {
-    return (ch>='0' && ch<='9') ? ch-'0' :
-           (ch>='a' && ch<='f') ? 10+(ch-'a') :
-           (ch>='A' && ch<='F') ? 10+(ch-'A') :
-           0;
+    return ((ch >= '0' && ch <= '9') ? ch - '0' :
+            (ch >= 'a' && ch <= 'f') ? 10 + (ch - 'a') :
+            (ch >= 'A' && ch <= 'F') ? 10 + (ch - 'A') : 0);
 }
 
-#define ATOH(str) ((c2h(*str)<<4)+c2h(*(str+1)))
+#define ATOH(str) ((c2h(*str) << 4) + c2h(*(str + 1)))
 
 void
 qtcSetRgb(QColor *col, const char *str)
@@ -71,14 +70,14 @@ loadImage(const QString &file, QtCPixmap *pixmap)
 {
     // Need to store filename for config dialog!
     QString f(determineFileName(file));
-    pixmap->file=f;
+    pixmap->file = f;
     return pixmap->img.load(f);
 }
 
-static EDefBtnIndicator toInd(const char *str, EDefBtnIndicator def)
+static EDefBtnIndicator
+toInd(const char *str, EDefBtnIndicator def)
 {
-    if(str && 0!=str[0])
-    {
+    if (str && str[0]) {
         if(0==memcmp(str, "fontcolor", 9) || 0==memcmp(str, "border", 6))
             return IND_FONT_COLOR;
         if(0==memcmp(str, "none", 4))
@@ -96,14 +95,13 @@ static EDefBtnIndicator toInd(const char *str, EDefBtnIndicator def)
         if(0==memcmp(str, "origselected", 12))
             return IND_SELECTED;
     }
-
     return def;
 }
 
-static ELine toLine(const char *str, ELine def)
+static ELine
+toLine(const char *str, ELine def)
 {
-    if(str && 0!=str[0])
-    {
+    if (str && str[0]) {
         if(0==memcmp(str, "dashes", 6))
             return LINE_DASHES;
         if(0==memcmp(str, "none", 4))
@@ -120,10 +118,10 @@ static ELine toLine(const char *str, ELine def)
     return def;
 }
 
-static ETBarBorder toTBarBorder(const char *str, ETBarBorder def)
+static ETBarBorder
+toTBarBorder(const char *str, ETBarBorder def)
 {
-    if(str && 0!=str[0])
-    {
+    if (str && str[0]) {
         if(0==memcmp(str, "dark", 4))
             return 0==memcmp(&str[4], "-all", 4) ? TB_DARK_ALL : TB_DARK;
         if(0==memcmp(str, "none", 4))
@@ -134,10 +132,10 @@ static ETBarBorder toTBarBorder(const char *str, ETBarBorder def)
     return def;
 }
 
-static EMouseOver toMouseOver(const char *str, EMouseOver def)
+static EMouseOver
+toMouseOver(const char *str, EMouseOver def)
 {
-    if(str && 0!=str[0])
-    {
+    if (str && str[0]) {
         if(0==memcmp(str, "true", 4) || 0==memcmp(str, "colored", 7))
             return MO_COLORED;
         if(0==memcmp(str, "thickcolored", 12))
@@ -152,10 +150,11 @@ static EMouseOver toMouseOver(const char *str, EMouseOver def)
     return def;
 }
 
-static EAppearance toAppearance(const char *str, EAppearance def, EAppAllow allow, QtCPixmap *pix, bool checkImage)
+static EAppearance
+toAppearance(const char *str, EAppearance def, EAppAllow allow,
+             QtCPixmap *pix, bool checkImage)
 {
-    if(str && 0!=str[0])
-    {
+    if (str && str[0]) {
         if(0==memcmp(str, "flat", 4))
             return APPEARANCE_FLAT;
         if(0==memcmp(str, "raised", 6))
@@ -205,8 +204,7 @@ static EShade
 toShade(const char *str, bool allowMenu, EShade def,
         bool menuShade, QColor *col)
 {
-    if(str && 0!=str[0])
-    {
+    if (str && str[0]) {
         /* true/false is from 0.25... */
         if((!menuShade && 0==memcmp(str, "true", 4)) || 0==memcmp(str, "selected", 8))
             return SHADE_BLEND_SELECTED;
@@ -231,10 +229,10 @@ toShade(const char *str, bool allowMenu, EShade def,
 }
 
 /* Prior to 0.42 round was a bool - so need to read 'false' as 'none' */
-static ERound toRound(const char *str, ERound def)
+static ERound
+toRound(const char *str, ERound def)
 {
-    if(str && 0!=str[0])
-    {
+    if (str && str[0]) {
         if(0==memcmp(str, "none", 4) || 0==memcmp(str, "false", 5))
             return ROUND_NONE;
         if(0==memcmp(str, "slight", 6))
@@ -246,14 +244,13 @@ static ERound toRound(const char *str, ERound def)
         if(0==memcmp(str, "max", 3))
             return ROUND_MAX;
     }
-
     return def;
 }
 
-static EScrollbar toScrollbar(const char *str, EScrollbar def)
+static EScrollbar
+toScrollbar(const char *str, EScrollbar def)
 {
-    if(str && 0!=str[0])
-    {
+    if (str && str[0]) {
         if(0==memcmp(str, "kde", 3))
             return SCROLLBAR_KDE;
         if(0==memcmp(str, "windows", 7))
@@ -269,10 +266,10 @@ static EScrollbar toScrollbar(const char *str, EScrollbar def)
     return def;
 }
 
-static EFrame toFrame(const char *str, EFrame def)
+static EFrame
+toFrame(const char *str, EFrame def)
 {
-    if(str && 0!=str[0])
-    {
+    if (str && str[0]) {
         if(0==memcmp(str, "none", 4))
             return FRAME_NONE;
         if(0==memcmp(str, "plain", 5))
@@ -288,10 +285,10 @@ static EFrame toFrame(const char *str, EFrame def)
     return def;
 }
 
-static EEffect toEffect(const char *str, EEffect def)
+static EEffect
+toEffect(const char *str, EEffect def)
 {
-    if(str && 0!=str[0])
-    {
+    if (str && str[0]) {
         if(0==memcmp(str, "none", 4))
             return EFFECT_NONE;
         if(0==memcmp(str, "shadow", 6))
@@ -303,10 +300,10 @@ static EEffect toEffect(const char *str, EEffect def)
     return def;
 }
 
-static EShading toShading(const char *str, EShading def)
+static EShading
+toShading(const char *str, EShading def)
 {
-    if(str && 0!=str[0])
-    {
+    if (str && str[0]) {
         if(0==memcmp(str, "simple", 6))
             return SHADING_SIMPLE;
         if(0==memcmp(str, "hsl", 3))
@@ -320,10 +317,10 @@ static EShading toShading(const char *str, EShading def)
     return def;
 }
 
-static EStripe toStripe(const char *str, EStripe def)
+static EStripe
+toStripe(const char *str, EStripe def)
 {
-    if(str && 0!=str[0])
-    {
+    if (str && str[0]) {
         if(0==memcmp(str, "plain", 5) || 0==memcmp(str, "true", 4))
             return STRIPE_PLAIN;
         if(0==memcmp(str, "none", 4) || 0==memcmp(str, "false", 5))
