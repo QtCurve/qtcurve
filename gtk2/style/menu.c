@@ -44,7 +44,6 @@ qtcMenuEmitSize(GtkWidget *w, unsigned int size)
             }
             qtcWidgetProps(props)->menuBarSize = size;
             qtcX11SetMenubarSize(wid, size);
-            qtcX11Flush();
             return true;
         }
     }

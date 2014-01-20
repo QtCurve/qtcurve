@@ -27,7 +27,6 @@
 #ifdef QTC_ENABLE_X11
 #  include <QApplication>
 #  include <QX11Info>
-#  include <qtcurve-utils/x11utils.h>
 #  include <qtcurve-utils/x11shadow.h>
 #  include <qtcurve-utils/x11blur.h>
 #endif

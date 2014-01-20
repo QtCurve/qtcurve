@@ -1,6 +1,6 @@
 /*****************************************************************************
  *   Copyright 2010 Craig Drummond <craig.p.drummond@gmail.com>              *
- *   Copyright 2013 - 2013 Yichao Yu <yyc1992@gmail.com>                     *
+ *   Copyright 2013 - 2014 Yichao Yu <yyc1992@gmail.com>                     *
  *                                                                           *
  *   This program is free software; you can redistribute it and/or modify    *
  *   it under the terms of the GNU Lesser General Public License as          *
@@ -49,6 +49,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <qtcurve-utils/x11wrap.h>
+#include <qtcurve-utils/x11utils.h>
 
 #include "qtcurvesizegrip.h"
 #include "qtcurvebutton.h"

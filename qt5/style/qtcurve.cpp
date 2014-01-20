@@ -4297,7 +4297,6 @@ void Style::emitMenuSize(QWidget *w, unsigned short size, bool force)
         if (oldSize != size) {
             w->setProperty(constMenuSizeProperty, size);
             qtcX11SetMenubarSize(wid, size);
-            qtcX11Flush();
             if(!itsDBus)
                 itsDBus = new QDBusInterface("org.kde.kwin", "/QtCurve",
                                              "org.kde.QtCurve");

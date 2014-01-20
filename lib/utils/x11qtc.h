@@ -22,10 +22,11 @@
 #ifndef _QTC_UTILS_X11QTC_H_
 #define _QTC_UTILS_X11QTC_H_
 
-#include "x11utils.h"
+#include "x11base.h"
 
 QTC_BEGIN_DECLS
 
+int32_t qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom);
 void qtcX11SetMenubarSize(xcb_window_t win, unsigned short s);
 void qtcX11SetStatusBar(xcb_window_t win);
 void qtcX11SetOpacity(xcb_window_t win, unsigned short o);

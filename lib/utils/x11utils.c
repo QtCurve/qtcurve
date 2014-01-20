@@ -1,5 +1,5 @@
 /*****************************************************************************
- *   Copyright 2013 - 2013 Yichao Yu <yyc1992@gmail.com>                     *
+ *   Copyright 2013 - 2014 Yichao Yu <yyc1992@gmail.com>                     *
  *                                                                           *
  *   This program is free software; you can redistribute it and/or modify    *
  *   it under the terms of the GNU Lesser General Public License as          *
@@ -21,20 +21,20 @@
 
 // TODO multi screen?
 
-#include "x11utils.h"
+#include "x11utils_p.h"
 #include "x11wrap.h"
 #include "x11shadow_p.h"
 #include "log.h"
 
 #include <X11/Xlib-xcb.h>
-/* #include <X11/Xutil.h> */
-/* #include <X11/extensions/Xrender.h> */
+// #include <X11/Xutil.h>
+// #include <X11/extensions/Xrender.h>
 
-static Display *qtc_disp = NULL;
-static xcb_connection_t *qtc_xcb_conn = NULL;
-static int qtc_default_screen_no = -1;
-static xcb_window_t qtc_root_window = {0};
-static xcb_screen_t *qtc_default_screen = NULL;
+Display *qtc_disp = NULL;
+xcb_connection_t *qtc_xcb_conn = NULL;
+int qtc_default_screen_no = -1;
+xcb_window_t qtc_root_window = {0};
+xcb_screen_t *qtc_default_screen = NULL;
 static char wm_cm_s_atom_name[100] = "_NET_WM_CM_S";
 
 QTC_EXPORT xcb_atom_t qtc_x11_net_wm_moveresize;
@@ -75,21 +75,19 @@ static const struct {
 };
 #define QTC_X11_ATOM_N (sizeof(qtc_x11_atoms) / sizeof(qtc_x11_atoms[0]))
 
+QTC_EXPORT bool
+qtcX11Enabled()
+{
+    return true;
+}
+
 QTC_EXPORT xcb_window_t
-(qtcX11RootWindow)(int scrn_no)
+qtcX11RootWindow(int scrn_no)
 {
     if (scrn_no < 0 || scrn_no == qtc_default_screen_no) {
         return qtc_root_window;
     }
-    return qtcX11GetScreen()->root;
-}
-
-QTC_EXPORT void
-qtcX11FlushXlib()
-{
-    if (qtc_disp) {
-        XFlush(qtc_disp);
-    }
+    return qtcX11GetScreen(scrn_no)->root;
 }
 
 QTC_EXPORT int
@@ -140,7 +138,7 @@ qtcX11AtomsInit()
 }
 
 QTC_EXPORT xcb_screen_t*
-(qtcX11GetScreen)(int screen_no)
+qtcX11GetScreen(int screen_no)
 {
     QTC_RET_IF_FAIL(qtc_xcb_conn, NULL);
     if (screen_no == -1 || screen_no == qtc_default_screen_no) {
@@ -186,38 +184,6 @@ QTC_EXPORT Display*
 qtcX11GetDisp()
 {
     return qtc_disp;
-}
-
-QTC_EXPORT void
-qtcX11Flush()
-{
-    QTC_RET_IF_FAIL(qtc_xcb_conn);
-    xcb_flush(qtc_xcb_conn);
-}
-
-QTC_EXPORT uint32_t
-qtcX11GenerateId()
-{
-    QTC_RET_IF_FAIL(qtc_xcb_conn, 0);
-    return xcb_generate_id(qtc_xcb_conn);
-}
-
-QTC_EXPORT int32_t
-qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom)
-{
-    QTC_RET_IF_FAIL(qtc_xcb_conn && win, -1);
-    int32_t res = -1;
-    xcb_get_property_reply_t *reply =
-        qtcX11GetProperty(0, win, atom, XCB_ATOM_CARDINAL, 0, 1);
-    QTC_RET_IF_FAIL(reply, -1);
-    if (xcb_get_property_value_length(reply) > 0) {
-        uint32_t val = *(int32_t*)xcb_get_property_value(reply);
-        if (val < 512) {
-            res = val;
-        }
-    }
-    free(reply);
-    return res;
 }
 
 QTC_EXPORT void

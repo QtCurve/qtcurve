@@ -20,6 +20,29 @@
  *****************************************************************************/
 
 #include "x11wrap.h"
+#include "x11utils_p.h"
+#include <X11/Xlib.h>
+
+QTC_EXPORT void
+qtcX11FlushXlib()
+{
+    QTC_RET_IF_FAIL(qtc_disp);
+    XFlush(qtc_disp);
+}
+
+QTC_EXPORT void
+qtcX11Flush()
+{
+    QTC_RET_IF_FAIL(qtc_xcb_conn);
+    xcb_flush(qtc_xcb_conn);
+}
+
+QTC_EXPORT uint32_t
+qtcX11GenerateId()
+{
+    QTC_RET_IF_FAIL(qtc_xcb_conn, 0);
+    return xcb_generate_id(qtc_xcb_conn);
+}
 
 QTC_EXPORT void
 qtcX11ChangeProperty(uint8_t mode, xcb_window_t win, xcb_atom_t prop,

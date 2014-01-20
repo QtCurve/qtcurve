@@ -407,7 +407,6 @@ qtcWindowSetStatusBarProp(GtkWidget *w)
 
         qtcWidgetProps(props)->statusBarSet = true;
         qtcX11SetStatusBar(wid);
-        qtcX11Flush();
         return true;
     }
     return false;
@@ -446,9 +445,9 @@ qtcWindowSetProperties(GtkWidget *w, unsigned short opacity)
     xcb_window_t wid =
         GDK_WINDOW_XID(gtk_widget_get_window(GTK_WIDGET(topLevel)));
 
-    if (opacity != 100)
+    if (opacity != 100) {
         qtcX11SetOpacity(wid, opacity);
-
+    }
     prop |= (((toQtColor(bgnd->red) & 0xFF) << 24) |
              ((toQtColor(bgnd->green) & 0xFF) << 16) |
              ((toQtColor(bgnd->blue) & 0xFF) << 8));

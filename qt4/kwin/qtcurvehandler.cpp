@@ -1,6 +1,6 @@
 /*****************************************************************************
  *   Copyright 2007 - 2010 Craig Drummond <craig.p.drummond@gmail.com>       *
- *   Copyright 2013 - 2013 Yichao Yu <yyc1992@gmail.com>                     *
+ *   Copyright 2013 - 2014 Yichao Yu <yyc1992@gmail.com>                     *
  *                                                                           *
  *   This program is free software; you can redistribute it and/or modify    *
  *   it under the terms of the GNU Lesser General Public License as          *
@@ -57,7 +57,7 @@
 #include <common/common.h>
 
 #include <QX11Info>
-#include <qtcurve-utils/x11utils.h>
+#include <qtcurve-utils/x11base.h>
 #include <qtcurve-utils/dirs.h>
 
 static time_t getTimeStamp(const QString &item)

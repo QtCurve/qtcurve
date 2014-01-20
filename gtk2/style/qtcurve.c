@@ -25,7 +25,7 @@
 #include <qtcurve-utils/color.h>
 #include <qtcurve-utils/strs.h>
 #include <qtcurve-utils/gtkprops.h>
-#include <qtcurve-utils/x11utils.h>
+#include <qtcurve-utils/x11base.h>
 #include <qtcurve-cairo/draw.h>
 
 #include <gmodule.h>

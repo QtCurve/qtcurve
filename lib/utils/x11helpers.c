@@ -1,5 +1,5 @@
 /*****************************************************************************
- *   Copyright 2013 - 2013 Yichao Yu <yyc1992@gmail.com>                     *
+ *   Copyright 2013 - 2014 Yichao Yu <yyc1992@gmail.com>                     *
  *                                                                           *
  *   This program is free software; you can redistribute it and/or modify    *
  *   it under the terms of the GNU Lesser General Public License as          *
@@ -24,6 +24,7 @@
 #include "x11blur.h"
 #include "x11qtc.h"
 #include "x11wrap.h"
+#include "x11utils_p.h"
 #include "log.h"
 #include "number.h"
 #include "shadow_p.h"
@@ -54,7 +55,7 @@ qtcX11ShadowCreatePixmap(const QtcImage *data)
     xcb_pixmap_t pixmap = qtcX11GenerateId();
 
     // create X11 pixmap
-    qtcX11CallVoid(create_pixmap, 32, pixmap, qtcX11RootWindow(),
+    qtcX11CallVoid(create_pixmap, 32, pixmap, qtc_root_window,
                    data->width, data->height);
     xcb_gcontext_t cid = qtcX11GenerateId();
     qtcX11CallVoid(create_gc, cid, pixmap, 0, (const uint32_t*)0);
@@ -94,9 +95,7 @@ qtcX11ShadowInit()
 void
 qtcX11ShadowDestroy()
 {
-    if (!qtcX11GetConn()) {
-        return;
-    }
+    QTC_RET_IF_FAIL(qtc_xcb_conn);
     for (unsigned int i = 0;
          i < sizeof(shadow_xpixmaps) / sizeof(shadow_xpixmaps[0]);i++) {
         qtcX11CallVoid(free_pixmap, shadow_xpixmaps[i]);
@@ -114,16 +113,15 @@ qtcX11ShadowInstallWithMargin(xcb_window_t win, const int margins[4])
     }
     // In principle, I should check for _KDE_NET_WM_SHADOW in _NET_SUPPORTED.
     // However, it's complicated and we will gain nothing.
-    Display *disp = qtcX11GetDisp();
     xcb_atom_t atom = qtc_x11_kde_net_wm_shadow;
-    if (disp) {
+    if (qtc_disp) {
         unsigned long shadow_data[8 + 4];
         memcpy(shadow_data, shadow_data_xlib, 12 * sizeof(unsigned long));
         for (int i = 0;i < 4;i++) {
             shadow_data[i + 8] -= margins[i];
         }
-        XChangeProperty(disp, win, atom, XA_CARDINAL, 32, PropModeReplace,
-                        (unsigned char*)shadow_data, 12);
+        XChangeProperty(qtc_disp, win, atom, XA_CARDINAL, 32,
+                        PropModeReplace, (unsigned char*)shadow_data, 12);
     } else {
         uint32_t shadow_data[8 + 4];
         memcpy(shadow_data, shadow_data_xcb, 12 * sizeof(uint32_t));
@@ -142,10 +140,9 @@ qtcX11ShadowInstall(xcb_window_t win)
     QTC_RET_IF_FAIL(win);
     // In principle, I should check for _KDE_NET_WM_SHADOW in _NET_SUPPORTED.
     // However, it's complicated and we will gain nothing.
-    Display *disp = qtcX11GetDisp();
     xcb_atom_t atom = qtc_x11_kde_net_wm_shadow;
-    if (disp) {
-        XChangeProperty(disp, win, atom, XA_CARDINAL, 32, PropModeReplace,
+    if (qtc_disp) {
+        XChangeProperty(qtc_disp, win, atom, XA_CARDINAL, 32, PropModeReplace,
                         (unsigned char*)shadow_data_xlib, 12);
     } else {
         qtcX11ChangeProperty(XCB_PROP_MODE_REPLACE, win, atom,
@@ -186,7 +183,7 @@ qtcX11MoveTrigger(xcb_window_t wid, uint32_t x, uint32_t y)
     xev->data.data32[1] = y;
     xev->data.data32[2] = 8; // NET::Move
     xev->data.data32[3] = XCB_KEY_BUT_MASK_BUTTON_1;
-    qtcX11SendEvent(false, qtcX11RootWindow(),
+    qtcX11SendEvent(false, qtc_root_window,
                     XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY |
                     XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT, xev);
     qtcX11Flush();
@@ -198,16 +195,16 @@ qtcX11BlurTrigger(xcb_window_t wid, bool enable, unsigned prop_num,
                   const uint32_t *props)
 {
     QTC_RET_IF_FAIL(wid);
-    Display *disp = qtcX11GetDisp();
     xcb_atom_t atom = qtc_x11_kde_net_wm_blur_behind_region;
     if (enable) {
-        if (disp) {
+        if (qtc_disp) {
             QTC_DEF_LOCAL_BUFF(unsigned long, xlib_props, 256, prop_num);
             for (unsigned i = 0;i < prop_num;i++) {
                 xlib_props.p[i] = props[i];
             }
-            XChangeProperty(disp, wid, atom, XA_CARDINAL, 32, PropModeReplace,
-                            (unsigned char*)xlib_props.p, prop_num);
+            XChangeProperty(qtc_disp, wid, atom, XA_CARDINAL, 32,
+                            PropModeReplace, (unsigned char*)xlib_props.p,
+                            prop_num);
             QTC_FREE_LOCAL_BUFF(xlib_props);
         } else {
             qtcX11ChangeProperty(XCB_PROP_MODE_REPLACE, wid, atom,
@@ -219,11 +216,30 @@ qtcX11BlurTrigger(xcb_window_t wid, bool enable, unsigned prop_num,
     qtcX11Flush();
 }
 
+QTC_EXPORT int32_t
+qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom)
+{
+    QTC_RET_IF_FAIL(qtc_xcb_conn && win, -1);
+    int32_t res = -1;
+    xcb_get_property_reply_t *reply =
+        qtcX11GetProperty(0, win, atom, XCB_ATOM_CARDINAL, 0, 1);
+    QTC_RET_IF_FAIL(reply, -1);
+    if (xcb_get_property_value_length(reply) > 0) {
+        uint32_t val = *(int32_t*)xcb_get_property_value(reply);
+        if (val < 512) {
+            res = val;
+        }
+    }
+    free(reply);
+    return res;
+}
+
 static inline void
 qtcX11SetShortProp(xcb_window_t win, xcb_atom_t atom, unsigned short prop)
 {
     qtcX11ChangeProperty(XCB_PROP_MODE_REPLACE, win, atom,
                          XCB_ATOM_CARDINAL, 16, 1, &prop);
+    qtcX11Flush();
 }
 
 QTC_EXPORT void
@@ -249,4 +265,5 @@ qtcX11SetBgnd(xcb_window_t win, uint32_t prop)
 {
     qtcX11ChangeProperty(XCB_PROP_MODE_REPLACE, win, qtc_x11_qtc_bgnd,
                          XCB_ATOM_CARDINAL, 32, 1, &prop);
+    qtcX11Flush();
 }

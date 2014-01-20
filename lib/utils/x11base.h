@@ -19,18 +19,42 @@
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
 
-#ifndef _QTC_UTILS_X11UTILS_H_
-#define _QTC_UTILS_X11UTILS_H_
+#ifndef _QTC_UTILS_X11BASE_H_
+#define _QTC_UTILS_X11BASE_H_
 
-#include "x11base.h"
+#include <xcb/xcb.h>
+#include "utils.h"
 
 QTC_BEGIN_DECLS
 
-void qtcX11MapRaised(xcb_window_t win);
-bool qtcX11CompositingActive();
-bool qtcX11HasAlpha(xcb_window_t win);
-bool qtcX11IsEmbed(xcb_window_t win);
-// void *qtcX11RgbaVisual(unsigned long *colormap, int *map_entries, int screen);
+extern xcb_atom_t qtc_x11_net_wm_moveresize;
+extern xcb_atom_t qtc_x11_net_wm_cm_s_default;
+extern xcb_atom_t qtc_x11_kde_net_wm_skip_shadow;
+extern xcb_atom_t qtc_x11_kde_net_wm_force_shadow;
+extern xcb_atom_t qtc_x11_kde_net_wm_shadow;
+extern xcb_atom_t qtc_x11_kde_net_wm_blur_behind_region;
+extern xcb_atom_t qtc_x11_qtc_menubar_size;
+extern xcb_atom_t qtc_x11_qtc_statusbar;
+extern xcb_atom_t qtc_x11_qtc_titlebar_size;
+extern xcb_atom_t qtc_x11_qtc_active_window;
+extern xcb_atom_t qtc_x11_qtc_toggle_menubar;
+extern xcb_atom_t qtc_x11_qtc_toggle_statusbar;
+extern xcb_atom_t qtc_x11_qtc_opacity;
+extern xcb_atom_t qtc_x11_qtc_bgnd;
+
+typedef struct _XDisplay Display;
+
+bool qtcX11Enabled();
+void qtcX11InitXcb(xcb_connection_t *conn, int screen_no);
+void qtcX11InitXlib(Display *disp);
+xcb_connection_t *qtcX11GetConn();
+Display *qtcX11GetDisp();
+int qtcX11DefaultScreenNo();
+xcb_screen_t *qtcX11DefaultScreen();
+xcb_screen_t *qtcX11GetScreen(int scrn_no);
+#define qtcX11GetScreen(scrn_no...) qtcX11GetScreen(QTC_DEFAULT(scrn_no, -1))
+xcb_window_t qtcX11RootWindow(int scrn_no);
+#define qtcX11RootWindow(scrn_no...) qtcX11RootWindow(QTC_DEFAULT(scrn_no, -1))
 
 QTC_END_DECLS
 

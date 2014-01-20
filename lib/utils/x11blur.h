@@ -22,7 +22,7 @@
 #ifndef _QTC_UTILS_X11BLUR_H_
 #define _QTC_UTILS_X11BLUR_H_
 
-#include "x11utils.h"
+#include "x11base.h"
 
 QTC_BEGIN_DECLS
 

@@ -22,10 +22,13 @@
 #ifndef _QTC_UTILS_X11WRAP_H_
 #define _QTC_UTILS_X11WRAP_H_
 
-#include "x11utils.h"
+#include "x11base.h"
 
 QTC_BEGIN_DECLS
 
+void qtcX11Flush();
+void qtcX11FlushXlib();
+uint32_t qtcX11GenerateId();
 void qtcX11ChangeProperty(uint8_t mode, xcb_window_t win, xcb_atom_t prop,
                           xcb_atom_t type, uint8_t format, uint32_t len,
                           const void *data);
