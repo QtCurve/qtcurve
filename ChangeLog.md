@@ -37,6 +37,7 @@
 25. Gtk2: Enable translucent background in flash plugin.
 26. Improve shadow gradient.
 27. Fix chromium background color when non-custom color is used.
+28. Only link to X11 libraries in `libqtcurve-utils.so`.
 
 ## 1.8.17
 1. **Add Qt5 support!!**.

@@ -28,9 +28,8 @@
 
 4. `QTC_ENABLE_X11`:
 
-    Enable X11 support. Require `xcb`, `xlib-xcb`. Will cause all shared
-    libraries to link to `libxcb`, and `libqtcurve-utils.so` will also
-    link to `libX11-xcb` and `libX11`.
+    Enable X11 support. Require `xcb`, `xlib-xcb`. Will cause
+    `libqtcurve-utils.so` to link to `libxcb`, `libX11-xcb` and `libX11`.
 
     (Default: `On`)
 
