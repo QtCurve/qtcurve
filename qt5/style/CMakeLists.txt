@@ -27,6 +27,10 @@ if(NOT ENABLE_QT5)
   return()
 endif()
 
+if(QTC_QT5_ENABLE_QTQUICK2)
+  add_definitions(-DQTC_QT5_ENABLE_QTQUICK2=1)
+endif()
+
 set(qtcurve_style_common_SRCS
   ../common/common.cpp
   ../common/config_file.cpp)

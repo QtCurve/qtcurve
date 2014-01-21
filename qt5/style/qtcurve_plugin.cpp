@@ -34,13 +34,55 @@
 #  include <QX11Info>
 #endif
 
-#include <QQuickWindow>
-#include <QQuickItem>
+#ifdef QTC_QT5_ENABLE_QTQUICK2
+#  include <QQuickWindow>
+#  include <QQuickItem>
+#endif
 #include <QDebug>
 
 namespace QtCurve {
 
 static bool inited = false;
+
+__attribute__((hot)) static void
+qtcPolishQuickControl(QObject *obj)
+{
+#ifdef QTC_QT5_ENABLE_QTQUICK2
+    if (QQuickWindow *window = qobject_cast<QQuickWindow*>(obj)) {
+        // QtQuickControl support
+        // This is still VERY experimental.
+        // Need a lot more testing and refactoring.
+        if (Style *style = qtcGetStyle(qApp)) {
+            if (window->inherits("QQuickPopupWindow")) {
+                if (window->inherits("QQuickMenuPopupWindow")) {
+                    window->setColor(QColor(0, 0, 0, 0));
+                }
+                qtcX11ShadowInstall(window->winId());
+            } else {
+                QColor color = window->color();
+                int opacity = style->options().bgndOpacity;
+                if (color.alpha() == 255 && opacity != 100) {
+                    qreal opacityF = opacity / 100.0;
+                    window->setColor(QColor::fromRgbF(color.redF() * opacityF,
+                                                      color.greenF() * opacityF,
+                                                      color.blueF() * opacityF,
+                                                      opacityF));
+                    qtcX11BlurTrigger(window->winId(), true, 0, NULL);
+                }
+            }
+        }
+    } else if (QQuickItem *item = qobject_cast<QQuickItem*>(obj)) {
+        if (QQuickWindow *window = item->window()) {
+            if (qtcGetStyle(qApp)) {
+                window->setColor(QColor(0, 0, 0, 0));
+                qtcX11BlurTrigger(window->winId(), true, 0, NULL);
+            }
+        }
+    }
+#else
+    QTC_UNUSED(obj);
+#endif
+}
 
 __attribute__((hot)) static bool
 qtcEventCallback(void **cbdata)
@@ -64,37 +106,8 @@ qtcEventCallback(void **cbdata)
     } else if (widget && event->type() == QEvent::UpdateRequest) {
         QtcQWidgetProps props(widget);
         props->opacity = 100;
-    } else if (QQuickWindow *window = qobject_cast<QQuickWindow*>(receiver)) {
-        // QtQuickControl support
-        // This is still VERY experimental.
-        // Need a lot more testing and refactoring.
-        if (Style *style = qtcGetStyle(qApp)) {
-            if (window->inherits("QQuickPopupWindow")) {
-                if (window->inherits("QQuickMenuPopupWindow")) {
-                    window->setColor(QColor(0, 0, 0, 0));
-                }
-                qtcX11ShadowInstall(window->winId());
-            } else {
-                QColor color = window->color();
-                int opacity = style->options().bgndOpacity;
-                if (color.alpha() == 255 && opacity != 100) {
-                    qreal opacityF = opacity / 100.0;
-                    window->setColor(QColor::fromRgbF(color.redF() * opacityF,
-                                                      color.greenF() * opacityF,
-                                                      color.blueF() * opacityF,
-                                                      opacityF));
-                    qtcX11BlurTrigger(window->winId(), true, 0, NULL);
-                }
-            }
-        }
-    } else if (QQuickItem *item = qobject_cast<QQuickItem*>(receiver)) {
-        QQuickWindow *window = item->window();
-        if (!window)
-            return false;
-        if (qtcGetStyle(qApp)) {
-            window->setColor(QColor(0, 0, 0, 0));
-            qtcX11BlurTrigger(window->winId(), true, 0, NULL);
-        }
+    } else {
+        qtcPolishQuickControl(receiver);
     }
     return false;
 }
@@ -103,7 +116,7 @@ QStyle*
 StylePlugin::create(const QString &key)
 {
     init();
-    return "qtcurve" == key.toLower() ? new Style : 0;
+    return key.toLower() == "qtcurve" ? new Style : 0;
 }
 
 void
@@ -114,7 +127,9 @@ StylePlugin::init()
     inited = true;
     QInternal::registerCallback(QInternal::EventNotifyCallback,
                                 qtcEventCallback);
+#ifdef QTC_QT5_ENABLE_QTQUICK2
     QQuickWindow::setDefaultAlphaBuffer(true);
+#endif
 #ifdef Qt5X11Extras_FOUND
     if (qApp->platformName() == "xcb") {
         qtcX11InitXcb(QX11Info::connection(), QX11Info::appScreen());
