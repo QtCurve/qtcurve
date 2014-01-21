@@ -1,6 +1,6 @@
 /*****************************************************************************
  *   Copyright 2007 - 2010 Craig Drummond <craig.p.drummond@gmail.com>       *
- *   Copyright 2013 - 2013 Yichao Yu <yyc1992@gmail.com>                     *
+ *   Copyright 2013 - 2014 Yichao Yu <yyc1992@gmail.com>                     *
  *                                                                           *
  *   This program is free software; you can redistribute it and/or modify    *
  *   it under the terms of the GNU Lesser General Public License as          *
@@ -104,11 +104,9 @@ isOOWidget(const QWidget *widget)
 bool blendOOMenuHighlight(const QPalette &pal, const QColor &highlight);
 bool isNoEtchWidget(const QWidget *widget);
 
-#ifdef QTC_ENABLE_X11
 void setOpacityProp(QWidget *w, unsigned short opacity);
 void setBgndProp(QWidget *w, EAppearance app, bool haveBgndImage);
 void setSbProp(QWidget *w);
-#endif
 
 static inline QList<QStatusBar*>
 getStatusBars(QWidget *w)

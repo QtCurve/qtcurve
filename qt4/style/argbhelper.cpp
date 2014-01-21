@@ -44,6 +44,7 @@ struct QX11InfoData {
 namespace QtCurve {
 bool QtcX11Info::creatingDummy = false;
 
+#ifdef Q_WS_X11
 inline QtcX11Info*
 QtcX11Info::getInfo(const QWidget *w)
 {
@@ -117,5 +118,18 @@ addAlphaChannel(QWidget *widget)
 {
     QtcX11Info::getInfo(widget)->setRgba();
 }
+#else
+void
+fixVisual(QWidget *widget)
+{
+    QTC_UNUSED(widget);
+}
+
+void
+addAlphaChannel(QWidget *widget)
+{
+    QTC_UNUSED(widget);
+}
+#endif
 
 }

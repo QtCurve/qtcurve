@@ -705,11 +705,9 @@ Style::drawPrimitivePanelTipLabel(PrimitiveElement element,
          QPainterPath());
     QColor col = palette.toolTipBase().color();
 
-#ifdef QTC_ENABLE_X11
     if (widget && widget->window()) {
         itsShadowHelper->registerWidget(widget->window());
     }
-#endif
     if (rounded) {
         painter->setRenderHint(QPainter::Antialiasing, true);
     }

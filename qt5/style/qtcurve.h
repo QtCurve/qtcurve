@@ -55,9 +55,7 @@ namespace QtCurve {
 class WindowManager;
 class BlurHelper;
 class ShortcutHandler;
-#ifdef QTC_ENABLE_X11
 class ShadowHelper;
-#endif
 
 class Style: public QCommonStyle {
     Q_OBJECT
@@ -373,11 +371,9 @@ private:
     void setDecorationColors();
     void applyKdeSettings(bool pal);
 #endif
-#ifdef QTC_ENABLE_X11
     bool isWindowDragWidget(QObject *o);
     void emitMenuSize(QWidget *w, unsigned short size, bool force=false);
     void emitStatusBarState(QStatusBar *sb);
-#endif
     const QColor&
     MOArrow(QFlags<State> state, const QPalette &palette, bool mo,
             QPalette::ColorRole rol) const
@@ -568,10 +564,8 @@ private:
     mutable QList<int> itsMdiButtons[2]; // 0=left, 1=right
     mutable int itsTitlebarHeight;
 
-#ifdef QTC_ENABLE_X11
     QDBusInterface *itsDBus;
     QtCurve::ShadowHelper *itsShadowHelper;
-#endif
     mutable QScrollBar *itsSViewSBar;
     mutable QMap<QWidget*, QSet<QWidget*> > itsSViewContainers;
 #ifdef QTC_QT5_ENABLE_KDE

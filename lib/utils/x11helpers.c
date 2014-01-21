@@ -19,15 +19,20 @@
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
 
+#include "config.h"
+
 #include "x11shadow_p.h"
 #include "x11wmmove.h"
 #include "x11blur.h"
 #include "x11qtc.h"
 #include "x11wrap.h"
-#include "x11utils_p.h"
+
+#ifdef QTC_ENABLE_X11
+
 #include "log.h"
 #include "number.h"
 #include "shadow_p.h"
+#include "x11utils_p.h"
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 
@@ -267,3 +272,81 @@ qtcX11SetBgnd(xcb_window_t win, uint32_t prop)
                          XCB_ATOM_CARDINAL, 32, 1, &prop);
     qtcX11Flush();
 }
+
+#else
+
+QTC_EXPORT void
+qtcX11ShadowInstallWithMargin(xcb_window_t win, const int margins[4])
+{
+    QTC_UNUSED(win);
+    QTC_UNUSED(margins);
+}
+
+QTC_EXPORT void
+qtcX11ShadowInstall(xcb_window_t win)
+{
+    QTC_UNUSED(win);
+}
+
+QTC_EXPORT void
+qtcX11ShadowUninstall(xcb_window_t win)
+{
+    QTC_UNUSED(win);
+}
+
+// WM Move
+QTC_EXPORT void
+qtcX11MoveTrigger(xcb_window_t wid, uint32_t x, uint32_t y)
+{
+    QTC_UNUSED(wid);
+    QTC_UNUSED(x);
+    QTC_UNUSED(y);
+}
+
+// Blur
+QTC_EXPORT void
+qtcX11BlurTrigger(xcb_window_t wid, bool enable, unsigned prop_num,
+                  const uint32_t *props)
+{
+    QTC_UNUSED(wid);
+    QTC_UNUSED(enable);
+    QTC_UNUSED(prop_num);
+    QTC_UNUSED(props);
+}
+
+QTC_EXPORT int32_t
+qtcX11GetShortProp(xcb_window_t win, xcb_atom_t atom)
+{
+    QTC_UNUSED(win);
+    QTC_UNUSED(atom);
+    return -1;
+}
+
+QTC_EXPORT void
+qtcX11SetMenubarSize(xcb_window_t win, unsigned short s)
+{
+    QTC_UNUSED(win);
+    QTC_UNUSED(s);
+}
+
+QTC_EXPORT void
+qtcX11SetStatusBar(xcb_window_t win)
+{
+    QTC_UNUSED(win);
+}
+
+QTC_EXPORT void
+qtcX11SetOpacity(xcb_window_t win, unsigned short o)
+{
+    QTC_UNUSED(win);
+    QTC_UNUSED(o);
+}
+
+QTC_EXPORT void
+qtcX11SetBgnd(xcb_window_t win, uint32_t prop)
+{
+    QTC_UNUSED(win);
+    QTC_UNUSED(prop);
+}
+
+#endif

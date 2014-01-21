@@ -1,6 +1,6 @@
 /*****************************************************************************
  *   Copyright 2010 Craig Drummond <craig.p.drummond@gmail.com>              *
- *   Copyright 2013 - 2013 Yichao Yu <yyc1992@gmail.com>                     *
+ *   Copyright 2013 - 2014 Yichao Yu <yyc1992@gmail.com>                     *
  *                                                                           *
  *   This program is free software; you can redistribute it and/or modify    *
  *   it under the terms of the GNU Lesser General Public License as          *
@@ -85,20 +85,14 @@
 #  include <KGlobalSettings>
 #endif
 
-#ifdef QTC_ENABLE_X11
-#  include <qtcurve-utils/x11wmmove.h>
-#endif
+#include <qtcurve-utils/x11wmmove.h>
 
 namespace QtCurve {
 //_____________________________________________________________
 WindowManager::WindowManager( QObject* parent ):
     QObject( parent ),
     _enabled( true ),
-#ifdef QTC_ENABLE_X11
-    _useWMMoveResize(true),
-#else
-    _useWMMoveResize(false),
-#endif
+    _useWMMoveResize(qtcX11Enabled()),
     _dragMode( WM_DRAG_NONE ),
 #ifndef QTC_QT5_ENABLE_KDE
     _dragDistance( QApplication::startDragDistance() ),
@@ -635,10 +629,8 @@ void WindowManager::startDrag(QWidget* widget, const QPoint &position)
 
     // ungrab pointer
     if (useWMMoveResize()) {
-#ifdef QTC_ENABLE_X11
         qtcX11MoveTrigger(widget->window()->internalWinId(),
                           position.x(), position.y());
-#endif
     }
 
     if(!useWMMoveResize()) {

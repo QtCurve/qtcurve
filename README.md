@@ -22,7 +22,7 @@
 
 3. `ENABLE_GTK2`:
 
-    Building QtCurve Gtk2 theme. Require `QTC_ENABLE_X11`.
+    Building QtCurve Gtk2 theme.
 
     (Default: `On`)
 
@@ -30,6 +30,11 @@
 
     Enable X11 support. Require `xcb`, `xlib-xcb`. Will cause
     `libqtcurve-utils.so` to link to `libxcb`, `libX11-xcb` and `libX11`.
+
+    NOTE: this options will not affect any modules/libraries other than
+    `libqtcurve-utils.so`. `libqtcurve-utils.so` with/without the option
+    are API and ABI compatible although some functions will be NO-OP with
+    X11 disabled.
 
     (Default: `On`)
 
@@ -48,7 +53,7 @@
 7. `QTC_QT4_ENABLE_KWIN`:
 
     Compile QtCurve qt4 kwin style. This will only have effect when KDE support
-    is turned on. Also require `QTC_ENABLE_X11`.
+    is turned on. Also require a X11 build of Qt4 and `libxcb` headers.
 
     (Default: `On` if kwin header is found and KDE support is on,
     `Off` otherwise)

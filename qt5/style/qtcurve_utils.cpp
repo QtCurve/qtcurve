@@ -54,12 +54,10 @@
 #include <QPixmapCache>
 #include <QTextStream>
 
-#ifdef QTC_ENABLE_X11
-#  include "shadowhelper.h"
-#  include <qtcurve-utils/x11qtc.h>
-#  include <qtcurve-utils/qtutils.h>
-#  include <sys/time.h>
-#endif
+#include "shadowhelper.h"
+#include <qtcurve-utils/x11qtc.h>
+#include <qtcurve-utils/qtutils.h>
+#include <sys/time.h>
 
 namespace QtCurve {
 
@@ -96,8 +94,6 @@ bool isNoEtchWidget(const QWidget *widget)
     return (w && isA(w, "KHTMLView")) || (widget && isInQAbstractItemView(widget->parentWidget()));
 }
 
-#ifdef QTC_ENABLE_X11
-
 void setOpacityProp(QWidget *w, unsigned short opacity)
 {
     if (WId wid = qtcGetWid(w->window())) {
@@ -130,8 +126,6 @@ void setSbProp(QWidget *w)
         }
     }
 }
-
-#endif
 
 void
 setBold(QWidget *widget)

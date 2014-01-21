@@ -22,13 +22,16 @@
 #include "qtcurve_plugin.h"
 #include "qtcurve.h"
 
-#include <qtcurve-utils/qtprops.h>
+#include "config-qt5.h"
 
-#ifdef QTC_ENABLE_X11
-#  include <QApplication>
+#include <qtcurve-utils/qtprops.h>
+#include <qtcurve-utils/x11shadow.h>
+#include <qtcurve-utils/x11blur.h>
+
+#include <QApplication>
+
+#ifdef Qt5X11Extras_FOUND
 #  include <QX11Info>
-#  include <qtcurve-utils/x11shadow.h>
-#  include <qtcurve-utils/x11blur.h>
 #endif
 
 #include <QQuickWindow>
@@ -70,9 +73,7 @@ qtcEventCallback(void **cbdata)
                 if (window->inherits("QQuickMenuPopupWindow")) {
                     window->setColor(QColor(0, 0, 0, 0));
                 }
-#ifdef QTC_ENABLE_X11
                 qtcX11ShadowInstall(window->winId());
-#endif
             } else {
                 QColor color = window->color();
                 int opacity = style->options().bgndOpacity;
@@ -82,9 +83,7 @@ qtcEventCallback(void **cbdata)
                                                       color.greenF() * opacityF,
                                                       color.blueF() * opacityF,
                                                       opacityF));
-#ifdef QTC_ENABLE_X11
                     qtcX11BlurTrigger(window->winId(), true, 0, NULL);
-#endif
                 }
             }
         }
@@ -94,9 +93,7 @@ qtcEventCallback(void **cbdata)
             return false;
         if (qtcGetStyle(qApp)) {
             window->setColor(QColor(0, 0, 0, 0));
-#ifdef QTC_ENABLE_X11
             qtcX11BlurTrigger(window->winId(), true, 0, NULL);
-#endif
         }
     }
     return false;
@@ -118,7 +115,7 @@ StylePlugin::init()
     QInternal::registerCallback(QInternal::EventNotifyCallback,
                                 qtcEventCallback);
     QQuickWindow::setDefaultAlphaBuffer(true);
-#ifdef QTC_ENABLE_X11
+#ifdef Qt5X11Extras_FOUND
     if (qApp->platformName() == "xcb") {
         qtcX11InitXcb(QX11Info::connection(), QX11Info::appScreen());
     }

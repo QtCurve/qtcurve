@@ -23,10 +23,8 @@
 #include "qtcurve_p.h"
 #include <qtcurve-utils/qtprops.h>
 
-#ifdef QTC_ENABLE_X11
-#  include <QDBusConnection>
-#  include <QDBusInterface>
-#endif
+#include <QDBusConnection>
+#include <QDBusInterface>
 #include "windowmanager.h"
 #include "blurhelper.h"
 #include "shortcuthandler.h"
@@ -69,11 +67,9 @@
 #include <QPixmapCache>
 #include <QTextStream>
 
-#ifdef QTC_ENABLE_X11
-#  include "shadowhelper.h"
-#  include <qtcurve-utils/x11qtc.h>
-#  include <sys/time.h>
-#endif
+#include "shadowhelper.h"
+#include <qtcurve-utils/x11qtc.h>
+#include <sys/time.h>
 
 #ifdef QTC_QT5_ENABLE_KDE
 #include <KDE/KApplication>
@@ -339,10 +335,8 @@ Style::Style() :
     itsTitlebarHeight(0),
     // itsPos(-1, -1),
     // itsHoverWidget(0L),
-#ifdef QTC_ENABLE_X11
     itsDBus(0),
     itsShadowHelper(new ShadowHelper(this)),
-#endif
     itsSViewSBar(0L),
     itsWindowManager(new WindowManager(this)),
     itsBlurHelper(new BlurHelper(this)),
@@ -395,7 +389,6 @@ void Style::init(bool initial)
     } else {
         qtcReadConfig(QString(), &opts);
 
-#ifdef QTC_ENABLE_X11
         if (initial) {
             QDBusConnection::sessionBus().connect(
                 QString(), "/KGlobalSettings", "org.kde.KGlobalSettings",
@@ -421,7 +414,6 @@ void Style::init(bool initial)
                         this, SLOT(toggleStatusBar(unsigned int)));
             }
         }
-#endif
     }
 
     opts.contrast=QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", DEFAULT_CONTRAST).toInt();
@@ -687,11 +679,9 @@ void Style::init(bool initial)
 Style::~Style()
 {
     freeColors();
-#ifdef QTC_ENABLE_X11
     if (itsDBus) {
         delete itsDBus;
     }
-#endif
 }
 
 void Style::freeColor(QSet<QColor *> &freedColors, QColor **cols)
@@ -4144,7 +4134,6 @@ void Style::borderSizesChanged()
 #endif
 }
 
-#ifdef QTC_ENABLE_X11
 static QMainWindow*
 getWindow(unsigned int xid)
 {
@@ -4167,12 +4156,10 @@ diffTime(struct timeval *lastTime)
     *lastTime = now;
     return diff.tv_sec > 0 || diff.tv_usec > 500000;
 }
-#endif
 
 void
 Style::toggleMenuBar(unsigned int xid)
 {
-#ifdef QTC_ENABLE_X11
     static unsigned int lastXid = 0;
     static struct timeval lastTime = {0, 0};
 
@@ -4183,15 +4170,11 @@ Style::toggleMenuBar(unsigned int xid)
         }
     }
     lastXid = xid;
-#else
-    Q_UNUSED(xid);
-#endif
 }
 
 void
 Style::toggleStatusBar(unsigned int xid)
 {
-#ifdef QTC_ENABLE_X11
     static unsigned int lastXid = 0;
     static struct timeval lastTime = {0, 0};
 
@@ -4202,18 +4185,13 @@ Style::toggleStatusBar(unsigned int xid)
         }
     }
     lastXid = xid;
-#else
-    Q_UNUSED(xid);
-#endif
 }
 
 void Style::compositingToggled()
 {
-#ifdef QTC_ENABLE_X11
     for (QWidget *widget: QApplication::topLevelWidgets()) {
         widget->update();
     }
-#endif
 }
 
 void Style::toggleMenuBar(QMainWindow *window)
@@ -4253,9 +4231,7 @@ void Style::toggleStatusBar(QMainWindow *window)
         {
             act->trigger();
             triggeredAction=true;
-#ifdef QTC_ENABLE_X11
             //emitStatusBarState(true); // TODO: ???
-#endif
         }
     }
 #endif
@@ -4269,14 +4245,11 @@ void Style::toggleStatusBar(QMainWindow *window)
             for (QStatusBar *statusBar: const_(sb)) {
                 statusBar->setHidden(statusBar->isVisible());
             }
-#ifdef QTC_ENABLE_X11
             emitStatusBarState(sb.first());
-#endif
         }
     }
 }
 
-#ifdef QTC_ENABLE_X11
 void Style::emitMenuSize(QWidget *w, unsigned short size, bool force)
 {
     if (WId wid = qtcGetWid(w->window())) {
@@ -4317,6 +4290,4 @@ void Style::emitStatusBarState(QStatusBar *sb)
                       sb->isVisible());
     }
 }
-
-#endif
 }

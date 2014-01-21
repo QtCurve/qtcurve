@@ -19,7 +19,11 @@
  *   see <http://www.gnu.org/licenses/>.                                     *
  *****************************************************************************/
 
+#include "config.h"
 #include "x11wrap.h"
+
+#ifdef QTC_ENABLE_X11
+
 #include "x11utils_p.h"
 #include <X11/Xlib.h>
 
@@ -91,3 +95,91 @@ qtcX11GetPropertyValueLength(const xcb_get_property_reply_t *reply)
 {
     return xcb_get_property_value_length(reply);
 }
+
+#else
+
+QTC_EXPORT void
+qtcX11FlushXlib()
+{
+}
+
+QTC_EXPORT void
+qtcX11Flush()
+{
+}
+
+QTC_EXPORT uint32_t
+qtcX11GenerateId()
+{
+    return 0;
+}
+
+QTC_EXPORT void
+qtcX11ChangeProperty(uint8_t mode, xcb_window_t win, xcb_atom_t prop,
+                     xcb_atom_t type, uint8_t format, uint32_t len,
+                     const void *data)
+{
+    QTC_UNUSED(mode);
+    QTC_UNUSED(win);
+    QTC_UNUSED(prop);
+    QTC_UNUSED(type);
+    QTC_UNUSED(format);
+    QTC_UNUSED(len);
+    QTC_UNUSED(data);
+}
+
+QTC_EXPORT xcb_query_tree_reply_t*
+qtcX11QueryTree(xcb_window_t win)
+{
+    QTC_UNUSED(win);
+    return NULL;
+}
+
+QTC_EXPORT void
+qtcX11ReparentWindow(xcb_window_t win, xcb_window_t parent,
+                     int16_t x, int16_t y)
+{
+    QTC_UNUSED(win);
+    QTC_UNUSED(parent);
+    QTC_UNUSED(x);
+    QTC_UNUSED(y);
+}
+
+QTC_EXPORT void
+qtcX11SendEvent(uint8_t propagate, xcb_window_t destination,
+                uint32_t event_mask, const void *event)
+{
+    QTC_UNUSED(propagate);
+    QTC_UNUSED(destination);
+    QTC_UNUSED(event_mask);
+    QTC_UNUSED(event);
+}
+
+QTC_EXPORT xcb_get_property_reply_t*
+qtcX11GetProperty(uint8_t del, xcb_window_t win, xcb_atom_t prop,
+                  xcb_atom_t type, uint32_t offset, uint32_t len)
+{
+    QTC_UNUSED(del);
+    QTC_UNUSED(win);
+    QTC_UNUSED(prop);
+    QTC_UNUSED(type);
+    QTC_UNUSED(offset);
+    QTC_UNUSED(len);
+    return NULL;
+}
+
+QTC_EXPORT void*
+qtcX11GetPropertyValue(const xcb_get_property_reply_t *reply)
+{
+    QTC_UNUSED(reply);
+    return NULL;
+}
+
+QTC_EXPORT int
+qtcX11GetPropertyValueLength(const xcb_get_property_reply_t *reply)
+{
+    QTC_UNUSED(reply);
+    return 0;
+}
+
+#endif

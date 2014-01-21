@@ -1,6 +1,6 @@
 /*****************************************************************************
  *   Copyright 2010 Craig Drummond <craig.p.drummond@gmail.com>              *
- *   Copyright 2013 - 2013 Yichao Yu <yyc1992@gmail.com>                     *
+ *   Copyright 2013 - 2014 Yichao Yu <yyc1992@gmail.com>                     *
  *                                                                           *
  *   This program is free software; you can redistribute it and/or modify    *
  *   it under the terms of the GNU Lesser General Public License as          *
@@ -61,9 +61,7 @@
 #include <QToolBar>
 
 #include <qtcurve-utils/qtutils.h>
-#ifdef QTC_ENABLE_X11
-#  include <qtcurve-utils/x11blur.h>
-#endif
+#include <qtcurve-utils/x11blur.h>
 
 namespace QtCurve {
 BlurHelper::BlurHelper(QObject *parent):
@@ -173,7 +171,7 @@ BlurHelper::trimBlurRegion(QWidget *parent, QWidget *widget,
 void
 BlurHelper::update(QWidget *widget) const
 {
-#ifdef QTC_ENABLE_X11
+    QTC_RET_IF_FAIL(qtcX11GetConn());
     // Do not create native window if there isn't one yet.
     WId wid = qtcGetWid(widget);
     if (!wid) {
@@ -193,18 +191,12 @@ BlurHelper::update(QWidget *widget) const
     if (widget->isVisible()) {
         widget->update();
     }
-#else
-    QTC_UNUSED(widget);
-#endif
 }
 
 void
 BlurHelper::clear(WId wid) const
 {
-#ifdef QTC_ENABLE_X11
+    QTC_RET_IF_FAIL(qtcX11GetConn());
     qtcX11BlurTrigger(wid, false, 0, 0);
-#else
-    QTC_UNUSED(wid);
-#endif
 }
 }

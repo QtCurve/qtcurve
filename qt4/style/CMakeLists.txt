@@ -6,24 +6,21 @@ set(qtcurve_SRCS
   prepolish.cpp
   utils.cpp
   shortcuthandler.cpp
-  argbhelper.cpp)
+  argbhelper.cpp
+  macmenu.cpp
+  shadowhelper.cpp)
 set(qtcurve_MOC_HDRS
   qtcurve.h
   qtcurve_plugin.h
   windowmanager.h
   blurhelper.h
   shortcuthandler.h
-  argbhelper.h)
-set(qtcurve_X11_SRCS
-  macmenu.cpp
-  shadowhelper.cpp)
-set(qtcurve_X11_MOC_HDRS
+  argbhelper.h
   macmenu.h
   macmenu-dbus.h
   shadowhelper.h)
 
-translate_add_sources(${qtcurve_SRCS} ${qtcurve_MOC_HDRS}
-  ${qtcurve_X11_SRCS} ${qtcurve_X11_MOC_HDRS})
+translate_add_sources(${qtcurve_SRCS} ${qtcurve_MOC_HDRS})
 
 if(NOT ENABLE_QT4)
   return()
@@ -47,15 +44,6 @@ endforeach()
 set(qtcurve_SRCS
   ${qtcurve_SRCS}
   ${qtcurve_style_common_SRCS})
-
-if(QTC_ENABLE_X11)
-  set(qtcurve_SRCS
-    ${qtcurve_SRCS}
-    ${qtcurve_X11_SRCS})
-  set(qtcurve_MOC_HDRS
-    ${qtcurve_MOC_HDRS}
-    ${qtcurve_X11_MOC_HDRS})
-endif()
 
 add_definitions(-DQT_PLUGIN)
 include_directories("${CMAKE_CURRENT_BINARY_DIR}"
@@ -90,11 +78,8 @@ target_link_libraries(qtcurve-qt4
   ${QT_QTGUI_LIBRARY}
   ${QT_QTCORE_LIBRARY}
   ${QT_QTSVG_LIBRARY}
+  ${QT_QTDBUS_LIBRARY}
   qtcurve-utils)
-
-if(QTC_ENABLE_X11)
-  target_link_libraries(qtcurve-qt4 ${QT_QTDBUS_LIBRARY})
-endif()
 
 if(QTC_QT4_ENABLE_KDE)
   install(TARGETS qtcurve-qt4 DESTINATION ${QTCURVE_STYLE_DIR})

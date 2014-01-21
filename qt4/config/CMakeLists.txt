@@ -56,7 +56,6 @@ set_target_properties(kstyle_qtcurve_config_kde4 PROPERTIES
 target_link_libraries(kstyle_qtcurve_config_kde4
   ${KDE4_KDEUI_LIBS} ${KDE4_KIO_LIBS}
   ${KDE4_KDECORE_LIBS} ${QT_QTGUI_LIBRARY}
-  ${QTC_QT4_XCB_LINK_LIBS}
   qtcurve-utils)
 install(TARGETS kstyle_qtcurve_config_kde4
   DESTINATION "${PLUGIN_INSTALL_DIR}")

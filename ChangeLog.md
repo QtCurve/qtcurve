@@ -38,6 +38,9 @@
 26. Improve shadow gradient.
 27. Fix chromium background color when non-custom color is used.
 28. Only link to X11 libraries in `libqtcurve-utils.so`.
+29. `QTC_ENABLE_X11` have not effect on any modules other than
+    `libqtcurve-utils.so` also making `libqtcurve-utils.so` API and ABI
+    compatible with and without X11 enabled.
 
 ## 1.8.17
 1. **Add Qt5 support!!**.

@@ -21,11 +21,24 @@
 
 // TODO multi screen?
 
-#include "x11utils_p.h"
-#include "x11wrap.h"
-#include "x11shadow_p.h"
-#include "log.h"
+#include "config.h"
+#include "x11utils.h"
 
+QTC_EXPORT xcb_atom_t qtc_x11_qtc_menubar_size;
+QTC_EXPORT xcb_atom_t qtc_x11_qtc_statusbar;
+QTC_EXPORT xcb_atom_t qtc_x11_qtc_titlebar_size;
+QTC_EXPORT xcb_atom_t qtc_x11_qtc_active_window;
+QTC_EXPORT xcb_atom_t qtc_x11_qtc_toggle_menubar;
+QTC_EXPORT xcb_atom_t qtc_x11_qtc_toggle_statusbar;
+QTC_EXPORT xcb_atom_t qtc_x11_qtc_opacity;
+QTC_EXPORT xcb_atom_t qtc_x11_qtc_bgnd;
+
+#ifdef QTC_ENABLE_X11
+
+#include "x11shadow_p.h"
+#include "x11wrap.h"
+#include "log.h"
+#include "x11utils_p.h"
 #include <X11/Xlib-xcb.h>
 // #include <X11/Xutil.h>
 // #include <X11/extensions/Xrender.h>
@@ -41,14 +54,6 @@ xcb_atom_t qtc_x11_net_wm_moveresize;
 xcb_atom_t qtc_x11_net_wm_cm_s_default;
 xcb_atom_t qtc_x11_kde_net_wm_shadow;
 xcb_atom_t qtc_x11_kde_net_wm_blur_behind_region;
-QTC_EXPORT xcb_atom_t qtc_x11_qtc_menubar_size;
-QTC_EXPORT xcb_atom_t qtc_x11_qtc_statusbar;
-QTC_EXPORT xcb_atom_t qtc_x11_qtc_titlebar_size;
-QTC_EXPORT xcb_atom_t qtc_x11_qtc_active_window;
-QTC_EXPORT xcb_atom_t qtc_x11_qtc_toggle_menubar;
-QTC_EXPORT xcb_atom_t qtc_x11_qtc_toggle_statusbar;
-QTC_EXPORT xcb_atom_t qtc_x11_qtc_opacity;
-QTC_EXPORT xcb_atom_t qtc_x11_qtc_bgnd;
 static xcb_atom_t qtc_x11_xembed_info;
 
 static const struct {
@@ -263,4 +268,102 @@ qtcX11RgbaVisual(unsigned long *colormap, int *map_entries, int screen)
     qtcAssign(map_entries, argbVisual->map_entries);
     return argbVisual;
 }
+#endif
+
+#else
+
+QTC_EXPORT bool
+qtcX11Enabled()
+{
+    return false;
+}
+
+QTC_EXPORT xcb_window_t
+qtcX11RootWindow(int scrn_no)
+{
+    QTC_UNUSED(scrn_no);
+    return 0;
+}
+
+QTC_EXPORT int
+qtcX11DefaultScreenNo()
+{
+    return -1;
+}
+
+QTC_EXPORT xcb_screen_t*
+qtcX11DefaultScreen()
+{
+    return NULL;
+}
+
+QTC_EXPORT xcb_screen_t*
+qtcX11GetScreen(int screen_no)
+{
+    QTC_UNUSED(screen_no);
+    return NULL;
+}
+
+QTC_EXPORT void
+qtcX11InitXcb(xcb_connection_t *conn, int screen_no)
+{
+    QTC_UNUSED(conn);
+    QTC_UNUSED(screen_no);
+}
+
+QTC_EXPORT void
+qtcX11InitXlib(Display *disp)
+{
+    QTC_UNUSED(disp);
+}
+
+QTC_EXPORT xcb_connection_t*
+qtcX11GetConn()
+{
+    return NULL;
+}
+
+QTC_EXPORT Display*
+qtcX11GetDisp()
+{
+    return NULL;
+}
+
+QTC_EXPORT void
+qtcX11MapRaised(xcb_window_t win)
+{
+    QTC_UNUSED(win);
+}
+
+QTC_EXPORT bool
+qtcX11CompositingActive()
+{
+    return false;
+}
+
+QTC_EXPORT bool
+qtcX11HasAlpha(xcb_window_t win)
+{
+    QTC_UNUSED(win);
+    return false;
+}
+
+QTC_EXPORT bool
+qtcX11IsEmbed(xcb_window_t win)
+{
+    QTC_UNUSED(win);
+    return false;
+}
+
+#if 0
+QTC_EXPORT void*
+qtcX11RgbaVisual(unsigned long *colormap, int *map_entries, int screen)
+{
+    QTC_UNUSED(colormap);
+    QTC_UNUSED(map_entries);
+    QTC_UNUSED(screen);
+    return NULL;
+}
+#endif
+
 #endif

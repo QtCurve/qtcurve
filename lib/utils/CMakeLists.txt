@@ -8,23 +8,19 @@ set(qtcurve_utils_SRCS
   timer.c
   map.c
   fd_utils.c
-  process.c)
+  process.c
+  x11utils.c
+  x11helpers.c
+  x11wrap.c)
 set(qtcurve_utils_LINKS
   m rt dl ${LIBEXECINFO_LIBRARIES} pthread)
 
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
 if(QTC_ENABLE_X11)
-  set(qtcurve_utils_SRCS
-    ${qtcurve_utils_SRCS}
-    x11utils.c
-    x11helpers.c
-    x11wrap.c)
   set(qtcurve_utils_LINKS
     ${qtcurve_utils_LINKS}
     ${QTC_X11_LIBRARIES})
-  include_directories(${QTC_X11_INCLUDE_DIRS})
-  add_definitions(${QTC_X11_CFLAGS})
 endif()
 
 add_definitions("-DQTC_UTILS_INTERNAL -pthread")

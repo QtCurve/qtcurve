@@ -9,7 +9,8 @@ set(qtcurve_SRCS
   blurhelper.cpp
   utils.cpp
   shortcuthandler.cpp
-  argbhelper.cpp)
+  argbhelper.cpp
+  shadowhelper.cpp)
 set(qtcurve_MOC_HDRS
   qtcurve.h
   qtcurve_p.h
@@ -17,14 +18,10 @@ set(qtcurve_MOC_HDRS
   windowmanager.h
   blurhelper.h
   shortcuthandler.h
-  argbhelper.h)
-set(qtcurve_X11_SRCS
-  shadowhelper.cpp)
-set(qtcurve_X11_MOC_HDRS
+  argbhelper.h
   shadowhelper.h)
 
-translate_add_sources(${qtcurve_SRCS} ${qtcurve_MOC_HDRS}
-  ${qtcurve_X11_SRCS} ${qtcurve_X11_MOC_HDRS})
+translate_add_sources(${qtcurve_SRCS} ${qtcurve_MOC_HDRS})
 
 if(NOT ENABLE_QT5)
   return()
@@ -46,11 +43,6 @@ foreach(pngname check_on check_x_on dialog_error dialog_information
 endforeach()
 
 set(qtcurve_SRCS ${qtcurve_SRCS} ${qtcurve_style_common_SRCS})
-
-if(QTC_ENABLE_X11)
-  set(qtcurve_SRCS ${qtcurve_X11_SRCS} ${qtcurve_SRCS})
-  set(qtcurve_MOC_HDRS ${qtcurve_X11_MOC_HDRS} ${qtcurve_MOC_HDRS})
-endif()
 
 add_definitions(-DQT_PLUGIN)
 include_directories(

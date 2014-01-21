@@ -1,6 +1,6 @@
 /*****************************************************************************
  *   Copyright 2007 - 2010 Craig Drummond <craig.p.drummond@gmail.com>       *
- *   Copyright 2013 - 2013 Yichao Yu <yyc1992@gmail.com>                     *
+ *   Copyright 2013 - 2014 Yichao Yu <yyc1992@gmail.com>                     *
  *                                                                           *
  *   This program is free software; you can redistribute it and/or modify    *
  *   it under the terms of the GNU Lesser General Public License as          *
@@ -21,14 +21,15 @@
  *****************************************************************************/
 
 #include "config.h"
-#ifdef QTC_ENABLE_X11
-#  include <QX11Info>
-#  include <qtcurve-utils/x11utils.h>
-#endif
+#include <qtcurve-utils/x11utils.h>
 #include <qtcurve-utils/log.h>
 
 #include "utils.h"
 #include <QDir>
+
+#ifdef Q_WS_X11
+#  include <QX11Info>
+#endif
 
 #ifndef QTC_QT4_ENABLE_KDE
 #  undef KDE_IS_VERSION
@@ -45,11 +46,7 @@ bool
 compositingActive()
 {
 #if !defined QTC_QT4_ENABLE_KDE || !KDE_IS_VERSION(4, 4, 0)
-#ifdef QTC_ENABLE_X11
     return qtcX11CompositingActive();
-#else
-    return false;
-#endif
 #else // QTC_QT4_ENABLE_KDE
     return KWindowSystem::compositingActive();
 #endif // QTC_QT4_ENABLE_KDE
@@ -58,12 +55,10 @@ compositingActive()
 bool
 hasAlphaChannel(const QWidget *widget)
 {
-    if (!widget)
-        return false;
-#ifdef QTC_ENABLE_X11
+    QTC_RET_IF_FAIL(widget, false);
+#ifdef Q_WS_X11
     return widget->x11Info().depth() == 32;
 #else
-    QTC_UNUSED(widget);
     return compositingActive();
 #endif
 }

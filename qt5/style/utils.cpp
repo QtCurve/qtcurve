@@ -1,6 +1,6 @@
 /*****************************************************************************
  *   Copyright 2007 - 2010 Craig Drummond <craig.p.drummond@gmail.com>       *
- *   Copyright 2013 - 2013 Yichao Yu <yyc1992@gmail.com>                     *
+ *   Copyright 2013 - 2014 Yichao Yu <yyc1992@gmail.com>                     *
  *                                                                           *
  *   This program is free software; you can redistribute it and/or modify    *
  *   it under the terms of the GNU Lesser General Public License as          *
@@ -22,12 +22,10 @@
 
 #include <qtcurve-utils/log.h>
 #include "utils.h"
-#ifdef QTC_ENABLE_X11
-#  include <qtcurve-utils/x11utils.h>
-#  include <qtcurve-utils/qtutils.h>
-#  include <QApplication>
-#  include <QDesktopWidget>
-#endif
+#include <qtcurve-utils/x11utils.h>
+#include <qtcurve-utils/qtutils.h>
+#include <QApplication>
+#include <QDesktopWidget>
 #include <QWindow>
 
 #ifdef QTC_QT5_ENABLE_KDE
@@ -42,17 +40,12 @@ bool
 compositingActive()
 {
 #ifndef QTC_QT5_ENABLE_KDE
-#ifdef QTC_ENABLE_X11
     return qtcX11CompositingActive();
-#else // QTC_ENABLE_X11
-    return false;
-#endif // QTC_ENABLE_X11
 #else
     return KWindowSystem::compositingActive();
 #endif
 }
 
-#ifdef QTC_ENABLE_X11
 static inline WId
 findWid(const QWidget *w)
 {
@@ -64,7 +57,6 @@ findWid(const QWidget *w)
     } while ((w = w->parentWidget()));
     return (WId)0;
 }
-#endif
 
 static QWindow*
 findWindowHandle(const QWidget *w)
@@ -86,11 +78,9 @@ hasAlphaChannel(const QWidget *widget)
     if (QWindow *window = findWindowHandle(widget)) {
         return window->format().alphaBufferSize() > 0;
     }
-#ifdef QTC_ENABLE_X11
     if (WId wid = findWid(widget)) {
         return qtcX11HasAlpha(wid);
     }
-#endif
     return compositingActive();
 }
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
  *   Copyright 2007 - 2010 Craig Drummond <craig.p.drummond@gmail.com>       *
- *   Copyright 2013 - 2013 Yichao Yu <yyc1992@gmail.com>                     *
+ *   Copyright 2013 - 2014 Yichao Yu <yyc1992@gmail.com>                     *
  *                                                                           *
  *   This program is free software; you can redistribute it and/or modify    *
  *   it under the terms of the GNU Lesser General Public License as          *
@@ -36,9 +36,8 @@
 typedef qulonglong QtcKey;
 #include <common/common.h>
 
-#ifdef QTC_ENABLE_X11
-#  include <QDBusInterface>
-#endif
+// TODO maybe we should have QTC_QT4_DBUS_FOUND?
+#include <QDBusInterface>
 
 #ifdef QTC_QT4_ENABLE_KDE
 #  include <KDE/KComponentData>
@@ -58,9 +57,7 @@ namespace QtCurve {
 class WindowManager;
 class BlurHelper;
 class ShortcutHandler;
-#ifdef QTC_ENABLE_X11
 class ShadowHelper;
-#endif
 
 class Style: public QCommonStyle {
     Q_OBJECT
@@ -374,11 +371,9 @@ private:
     void setDecorationColors();
     void applyKdeSettings(bool pal);
 #endif
-#ifdef QTC_ENABLE_X11
     bool isWindowDragWidget(QObject *o);
     void emitMenuSize(QWidget *w, unsigned short size, bool force=false);
     void emitStatusBarState(QStatusBar *sb);
-#endif
     const QColor&
     MOArrow(QFlags<State> state, const QPalette &palette, bool mo,
             QPalette::ColorRole rol) const
@@ -452,10 +447,8 @@ private:
     // Required for Q3Header hover...
     QPoint m_pos;
     QWidget *m_hoverWidget;
-#ifdef QTC_ENABLE_X11
     QDBusInterface *m_dBus;
     QtCurve::ShadowHelper *m_shadowHelper;
-#endif
     mutable QScrollBar *m_sViewSBar;
     mutable QMap<QWidget*, QSet<QWidget*> > m_sViewContainers;
 #ifdef QTC_QT4_ENABLE_KDE

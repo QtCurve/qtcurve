@@ -1,6 +1,6 @@
 /*****************************************************************************
  *   Copyright 2010 Craig Drummond <craig.p.drummond@gmail.com>              *
- *   Copyright 2013 - 2013 Yichao Yu <yyc1992@gmail.com>                     *
+ *   Copyright 2013 - 2014 Yichao Yu <yyc1992@gmail.com>                     *
  *                                                                           *
  *   This program is free software; you can redistribute it and/or modify    *
  *   it under the terms of the GNU Lesser General Public License as          *
@@ -84,36 +84,29 @@
 #  include <KGlobalSettings>
 #endif
 
-#ifdef QTC_ENABLE_X11
-#  include <qtcurve-utils/x11wmmove.h>
-#endif
+#include <qtcurve-utils/x11wmmove.h>
 
 namespace QtCurve {
-    //_____________________________________________________________
-    WindowManager::WindowManager( QObject* parent ):
-        QObject( parent ),
-        _enabled( true ),
-#ifdef QTC_ENABLE_X11
-        _useWMMoveResize( true ),
-#else
-        _useWMMoveResize( false ),
-#endif
-        _dragMode( WM_DRAG_NONE ),
+WindowManager::WindowManager(QObject *parent):
+    QObject( parent),
+    _enabled(true),
+    _useWMMoveResize(qtcX11Enabled()),
+    _dragMode(WM_DRAG_NONE),
 #ifdef QTC_QT4_ENABLE_KDE
-        _dragDistance(KGlobalSettings::dndEventDelay()),
+    _dragDistance(KGlobalSettings::dndEventDelay()),
 #else
-        _dragDistance(QApplication::startDragDistance()),
+    _dragDistance(QApplication::startDragDistance()),
 #endif
-        _dragDelay( QApplication::startDragTime() ),
-        _dragAboutToStart( false ),
-        _dragInProgress( false ),
-        _locked( false ),
-        _cursorOverride( false )
-    {
-        // install application wise event filter
-        _appEventFilter = new AppEventFilter(this);
-        qApp->installEventFilter(_appEventFilter);
-    }
+    _dragDelay(QApplication::startDragTime()),
+    _dragAboutToStart(false),
+    _dragInProgress(false),
+    _locked(false),
+    _cursorOverride(false)
+{
+    // install application wise event filter
+    _appEventFilter = new AppEventFilter(this);
+    qApp->installEventFilter(_appEventFilter);
+}
 
     //_____________________________________________________________
     void WindowManager::initialize( int windowDrag, const QStringList &whiteList, const QStringList &blackList )
@@ -640,12 +633,8 @@ WindowManager::startDrag(QWidget *widget, const QPoint &position)
     }
     // ungrab pointer
     if (useWMMoveResize()) {
-#ifdef QTC_ENABLE_X11
         qtcX11MoveTrigger(widget->window()->internalWinId(),
                           position.x(), position.y());
-#else
-        QTC_UNUSED(position);
-#endif
     }
     if (!useWMMoveResize()) {
         if (!_cursorOverride) {
@@ -656,19 +645,18 @@ WindowManager::startDrag(QWidget *widget, const QPoint &position)
     _dragInProgress = true;
     return;
 }
-    //____________________________________________________________
-    bool WindowManager::isDockWidgetTitle( const QWidget* widget ) const
-    {
 
-        if( !widget ) return false;
-        if( const QDockWidget* dockWidget = qobject_cast<const QDockWidget*>( widget->parent() ) )
-        {
-
+bool
+WindowManager::isDockWidgetTitle(const QWidget *widget) const
+{
+    QTC_RET_IF_FAIL(widget, false);
+    if (const QDockWidget *dockWidget =
+        qobject_cast<const QDockWidget*>(widget->parent())) {
             return widget == dockWidget->titleBarWidget();
-
-        } else return false;
-
+    } else {
+        return false;
     }
+}
 
     //____________________________________________________________
     bool WindowManager::AppEventFilter::eventFilter( QObject* object, QEvent* event )

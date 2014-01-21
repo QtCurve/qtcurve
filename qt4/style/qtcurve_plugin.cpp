@@ -25,10 +25,10 @@
 #include "config.h"
 
 #include <qtcurve-utils/qtprops.h>
+#include <qtcurve-utils/x11base.h>
 
-#ifdef QTC_ENABLE_X11
+#ifdef Q_WS_X11
 #  include <QX11Info>
-#  include <qtcurve-utils/x11base.h>
 #endif
 
 namespace QtCurve {
@@ -128,7 +128,7 @@ StylePlugin::init()
     inited = true;
     QInternal::registerCallback(QInternal::EventNotifyCallback,
                                 qtcEventCallback);
-#ifdef QTC_ENABLE_X11
+#ifdef Q_WS_X11
     qtcX11InitXlib(QX11Info::display());
 #endif
 }
