@@ -31,6 +31,10 @@ extern xcb_connection_t *qtc_xcb_conn;
 extern int qtc_default_screen_no;
 extern xcb_window_t qtc_root_window;
 extern xcb_screen_t *qtc_default_screen;
+extern xcb_atom_t qtc_x11_kde_net_wm_blur_behind_region;
+extern xcb_atom_t qtc_x11_kde_net_wm_shadow;
+extern xcb_atom_t qtc_x11_net_wm_moveresize;
+extern xcb_atom_t qtc_x11_net_wm_cm_s_default;
 
 QTC_END_DECLS
 

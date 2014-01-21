@@ -37,12 +37,10 @@ xcb_window_t qtc_root_window = {0};
 xcb_screen_t *qtc_default_screen = NULL;
 static char wm_cm_s_atom_name[100] = "_NET_WM_CM_S";
 
-QTC_EXPORT xcb_atom_t qtc_x11_net_wm_moveresize;
-QTC_EXPORT xcb_atom_t qtc_x11_net_wm_cm_s_default;
-QTC_EXPORT xcb_atom_t qtc_x11_kde_net_wm_skip_shadow;
-QTC_EXPORT xcb_atom_t qtc_x11_kde_net_wm_force_shadow;
-QTC_EXPORT xcb_atom_t qtc_x11_kde_net_wm_shadow;
-QTC_EXPORT xcb_atom_t qtc_x11_kde_net_wm_blur_behind_region;
+xcb_atom_t qtc_x11_net_wm_moveresize;
+xcb_atom_t qtc_x11_net_wm_cm_s_default;
+xcb_atom_t qtc_x11_kde_net_wm_shadow;
+xcb_atom_t qtc_x11_kde_net_wm_blur_behind_region;
 QTC_EXPORT xcb_atom_t qtc_x11_qtc_menubar_size;
 QTC_EXPORT xcb_atom_t qtc_x11_qtc_statusbar;
 QTC_EXPORT xcb_atom_t qtc_x11_qtc_titlebar_size;
@@ -59,8 +57,6 @@ static const struct {
 } qtc_x11_atoms[] = {
     {&qtc_x11_net_wm_moveresize, "_NET_WM_MOVERESIZE"},
     {&qtc_x11_net_wm_cm_s_default, wm_cm_s_atom_name},
-    {&qtc_x11_kde_net_wm_skip_shadow, "_KDE_NET_WM_SKIP_SHADOW"},
-    {&qtc_x11_kde_net_wm_force_shadow, "_KDE_NET_WM_FORCE_SHADOW"},
     {&qtc_x11_kde_net_wm_shadow, "_KDE_NET_WM_SHADOW"},
     {&qtc_x11_kde_net_wm_blur_behind_region, "_KDE_NET_WM_BLUR_BEHIND_REGION"},
     {&qtc_x11_qtc_menubar_size, "_QTCURVE_MENUBAR_SIZE_"},

@@ -27,12 +27,6 @@
 
 QTC_BEGIN_DECLS
 
-extern xcb_atom_t qtc_x11_net_wm_moveresize;
-extern xcb_atom_t qtc_x11_net_wm_cm_s_default;
-extern xcb_atom_t qtc_x11_kde_net_wm_skip_shadow;
-extern xcb_atom_t qtc_x11_kde_net_wm_force_shadow;
-extern xcb_atom_t qtc_x11_kde_net_wm_shadow;
-extern xcb_atom_t qtc_x11_kde_net_wm_blur_behind_region;
 extern xcb_atom_t qtc_x11_qtc_menubar_size;
 extern xcb_atom_t qtc_x11_qtc_statusbar;
 extern xcb_atom_t qtc_x11_qtc_titlebar_size;
