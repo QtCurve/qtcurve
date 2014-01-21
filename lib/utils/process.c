@@ -30,6 +30,16 @@
 #include <errno.h>
 #include <poll.h>
 
+static bool
+qtcSignalHandlerSet(int sig)
+{
+    struct sigaction oact;
+    QTC_RET_IF_FAIL(sigaction(sig, NULL, &oact) == 0, false);
+    void *handler = ((oact.sa_flags & SA_SIGINFO) ? (void*)oact.sa_handler :
+                     (void*)oact.sa_sigaction);
+    return qtcNoneOf(handler, SIG_DFL, SIG_IGN);
+}
+
 QTC_EXPORT bool
 qtcForkBackground(QtcCallback cb, void *data, QtcCallback fail_cb)
 {
@@ -38,11 +48,10 @@ qtcForkBackground(QtcCallback cb, void *data, QtcCallback fail_cb)
     // a signal handler registered for SIGCHLD and the child process exit
     // inside waitpid()/wait(), it will be run after the process state is
     // cleared and would therefore block if it call wait() (or waitpid(-1))
-    // and if there are other child processes. As a workaround we use vfork()
-    // to block the parent until direct child exit so that waitpid() will always
-    // be called after the process exit and would never hang because of signal
-    // handler. See (the RATIONALE section of) wait(3P) for more detail.
-    pid_t child = vfork();
+    // and if there are other child processes. As a workaround we only call
+    // waitpid() if the main program did not set up any signal handlers for
+    // SIGCHLD. See (the RATIONALE section of) wait(3P) for more detail.
+    pid_t child = fork();
     if (child < 0) {
         return false;
     } else if (child == 0) {
@@ -60,6 +69,14 @@ qtcForkBackground(QtcCallback cb, void *data, QtcCallback fail_cb)
         return true;
     } else {
         /* parent */
+        if (qtcSignalHandlerSet(SIGCHLD)) {
+            // If we create a child process, the signal handler will recieve
+            // the signal anyway (and there is no way to only block SIGCHLD
+            // only for our child process). Since the signal handler may
+            // hang and should already take care of getting rid of
+            // zombie processes, we do not call waitpid in this case....
+            return true;
+        }
         // If SIGCHLD is ignored, waitpid will return -1 with errno
         // set to ECHILD, treat this as success (good enough for our purpose
         // and not likely to fail anyway...)

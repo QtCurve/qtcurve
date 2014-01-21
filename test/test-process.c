@@ -23,6 +23,8 @@
 #include <assert.h>
 #include <unistd.h>
 #include <time.h>
+#include <signal.h>
+#include <sys/wait.h>
 
 int pipe_fds[2];
 long num;
@@ -34,6 +36,13 @@ forkCb(void *data)
     write(pipe_fds[1], &num, sizeof(num));
 }
 
+static void
+sigchld_handler(int signum)
+{
+    QTC_UNUSED(signum);
+    wait(NULL);
+}
+
 int
 main()
 {
@@ -41,9 +50,22 @@ main()
     assert(res == 0);
     srandom(time(NULL));
     num = random();
+
+    struct sigaction sa;
+    memset(&sa, 0, sizeof(struct sigaction));
+    sa.sa_handler = sigchld_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART;
+    sigaction(SIGCHLD, &sa, NULL);
+
+    if (fork() == 0) {
+        sleep(4);
+        return 0;
+    }
+
+    alarm(1);
     bool fork_res = qtcForkBackground(forkCb, NULL);
     assert(fork_res);
-    alarm(1);
     long num_sent = 0;
     ssize_t read_res = read(pipe_fds[0], &num_sent, sizeof(num_sent));
     assert(read_res == sizeof(num_sent));
