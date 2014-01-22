@@ -1,4 +1,4 @@
-## 1.8.18 (WIP)
+## 1.8.18 (RC)
 1. Gtk2: Remove mozilla version detection.
 2. Gtk2: Remove `QTC_GTK2_OLD_MOZILLA`.
 3. Remove `xcb-image` dependency. It is never used.
@@ -36,11 +36,15 @@
 24. Gtk2: Fix translucent background in inkscape.
 25. Gtk2: Enable translucent background in flash plugin.
 26. Improve shadow gradient.
-27. Fix chromium background color when non-custom color is used.
+27. Gtk2: Fix chromium background color when non-custom color is used.
 28. Only link to X11 libraries in `libqtcurve-utils.so`.
 29. `QTC_ENABLE_X11` have not effect on any modules other than
     `libqtcurve-utils.so` also making `libqtcurve-utils.so` API and ABI
     compatible with and without X11 enabled.
+30. Gtk2: Workaround buggy signal handler in applications.
+    [QtCurve-Bug](https://github.com/QtCurve/qtcurve/issues/41)
+    [EasyTag-Bug](https://bugzilla.gnome.org/show_bug.cgi?id=721943)
+31. Qt5: Disable QtQuickControl support by default.
 
 ## 1.8.17
 1. **Add Qt5 support!!**.
