@@ -379,10 +379,7 @@ typedef struct {
     QPixmap   img;
 } QtCPixmap;
 
-#define BGND_IMG_ON_BORDER (IMG_FILE==opts.bgndImage.type && opts.bgndImage.onBorder)
-
-typedef enum
-{
+typedef enum {
     PP_TL,
     PP_TM,
     PP_TR,

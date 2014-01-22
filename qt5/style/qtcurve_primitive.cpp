@@ -272,14 +272,14 @@ Style::drawPrimitiveIndicatorArrow(PrimitiveElement element,
                                    const QWidget *widget) const
 {
     State state = option->state;
-    QRect r = option->rect;
     const QPalette &palette = option->palette;
     if (state == State_None) {
         state |= State_Enabled;
     }
     if (state == (State_Enabled | QtC_StateKWin)) {
-        drawArrow(painter, r, element, Qt::color1, false, true);
+        drawArrow(painter, option->rect, element, Qt::color1, false, true);
     } else {
+        QRect r = option->rect;
         QColor col = MOArrow(state, palette, QPalette::Text);
         if (state & (State_Sunken | State_On) &&
             !(widget &&
@@ -413,28 +413,28 @@ Style::drawPrimitiveFrameGroupBox(PrimitiveElement element,
     if (opts.groupBox == FRAME_NONE) {
         return true;
     }
-    bool reverse = option->direction == Qt::RightToLeft;
-    QRect r = option->rect;
     if (const QStyleOptionFrame *_frame =
         qstyleoption_cast<const QStyleOptionFrame*>(option)) {
+        bool reverse = option->direction == Qt::RightToLeft;
         QStyleOptionFrame frame(*_frame);
         if (frame.features & QStyleOptionFrame::Flat ||
             opts.groupBox == FRAME_LINE) {
+            const QRect &r = option->rect;
             drawFadedLine(painter, QRect(r.x(), r.y(), r.width(), 1),
                           backgroundColors(option)[QTC_STD_BORDER],
                           opts.gbLabel & GB_LBL_CENTRED || reverse,
                           opts.gbLabel & GB_LBL_CENTRED || !reverse, true);
         } else {
+            QRect r = option->rect;
             if (opts.gbLabel & GB_LBL_OUTSIDE) {
                 r.adjust(0, 2, 0, 0);
             }
-            if (opts.groupBox == FRAME_SHADED ||
-                opts.groupBox == FRAME_FADED) {
+            if (qtcOneOf(opts.groupBox, FRAME_SHADED, FRAME_FADED)) {
                 int round = (opts.square & SQUARE_FRAME ?
                              ROUNDED_NONE : ROUNDED_ALL);
                 QPainterPath path =
                     buildPath(r, WIDGET_FRAME, round,
-                              ROUNDED_ALL == round ?
+                              round == ROUNDED_ALL ?
                               qtcGetRadius(&opts, r.width(), r.height(),
                                            WIDGET_FRAME,
                                            RADIUS_EXTERNAL) : 0.0);
@@ -444,7 +444,7 @@ Style::drawPrimitiveFrameGroupBox(PrimitiveElement element,
                     QColor col = opts.gbFactor < 0 ? Qt::black : Qt::white;
 
                     col.setAlphaF(TO_ALPHA(opts.gbFactor));
-                    if (FRAME_SHADED == opts.groupBox) {
+                    if (opts.groupBox == FRAME_SHADED) {
                         painter->fillPath(path, col);
                     } else {
                         QLinearGradient grad(r.topLeft(), r.bottomLeft());
@@ -523,8 +523,8 @@ Style::drawPrimitiveFrame(PrimitiveElement element,
             fo && fo->lineWidth == 1) {
             painter->setPen(backgroundColors(option)[QTC_STD_BORDER]);
             drawRect(painter, r);
-        } else if ((state == QtC_StateKWin ||
-                    state == (QtC_StateKWin | State_Active)) && fo &&
+        } else if (qtcOneOf(state, QtC_StateKWin,
+                            QtC_StateKWin | State_Active) && fo &&
                    fo->lineWidth == 1 && fo->midLineWidth == 1) {
             QColor border;
             if (fo->version == TBAR_BORDER_VERSION_HACK + 2) {
@@ -747,7 +747,8 @@ Style::drawPrimitiveQtcBackground(PrimitiveElement element,
             if (bgnd->app != APPEARANCE_FLAT) {
                 painter->setClipRect(bgnd->rect, Qt::IntersectClip);
                 drawBackgroundImage(painter, true,
-                                    BGND_IMG_ON_BORDER ? bgnd->rect :
+                                    (opts.bgndImage.type == IMG_FILE &&
+                                     opts.bgndImage.onBorder) ? bgnd->rect :
                                     bgnd->widgetRect);
             }
         }
@@ -809,12 +810,11 @@ Style::drawPrimitivePanelItemViewItem(PrimitiveElement element,
                         v4Opt->backgroundBrush.color() :
                         palette.color(cg, QPalette::Highlight));
         bool square = ((opts.square & SQUARE_LISTVIEW_SELECTION) &&
-                       ( /*(!widget && r.height()<=40 && r.width()>=48) || */
-                           (widget && !widget->inherits("KFilePlacesView") &&
-                            (qobject_cast<const QTreeView*>(widget) ||
-                             (qobject_cast<const QListView*>(widget) &&
-                              ((const QListView*)widget)->viewMode() !=
-                              QListView::IconMode)))));
+                       ((widget && !widget->inherits("KFilePlacesView") &&
+                         (qobject_cast<const QTreeView*>(widget) ||
+                          (qobject_cast<const QListView*>(widget) &&
+                           ((const QListView*)widget)->viewMode() !=
+                           QListView::IconMode)))));
         bool modAlpha = (!(state & State_Active) &&
                          itsInactiveChangeSelectionColor);
         if (hover && !hasCustomBackground) {
@@ -1090,7 +1090,7 @@ bool
 Style::drawPrimitiveButton(PrimitiveElement element, const QStyleOption *option,
                            QPainter *painter, const QWidget *widget) const
 {
-    QRect r = option->rect;
+    const QRect &r = option->rect;
     State state = option->state;
     if (state & STATE_DWT_BUTTON &&
         (opts.dwtSettings & DWT_BUTTONS_AS_PER_TITLEBAR)) {
@@ -1246,9 +1246,9 @@ Style::drawPrimitiveButton(PrimitiveElement element, const QStyleOption *option,
         }
         case IND_COLORED: {
             int offset = COLORED_BORDER_SIZE + (doEtch ? 1 : 0);
-            QRect r2 = r.adjusted(offset, offset, -offset, -offset);
-            drawBevelGradient(getFill(&opt, use), painter, r2, true,
-                              state & (State_On | State_Sunken),
+            drawBevelGradient(getFill(&opt, use), painter,
+                              r.adjusted(offset, offset, -offset, -offset),
+                              true, state & (State_On | State_Sunken),
                               opts.appearance, WIDGET_STD_BUTTON);
         }
         default:
@@ -1306,7 +1306,7 @@ Style::drawPrimitivePanelMenu(PrimitiveElement element,
             APPEARANCE_FLAT != opts.menuBgndAppearance) {
             QRect ri(r.adjusted(1, 1, -1, -1));
             painter->setPen(use[0]);
-            if (GB_LIGHT == border) {
+            if (border == GB_LIGHT) {
                 if (opts.square & SQUARE_POPUP_MENUS) {
                     drawRect(painter, ri);
                 } else {
@@ -1314,7 +1314,7 @@ Style::drawPrimitivePanelMenu(PrimitiveElement element,
                                                 radius - 1.0));
                 }
             } else if (opts.square & SQUARE_POPUP_MENUS) {
-                if (GB_3D != border) {
+                if (border != GB_3D) {
                     painter->drawLine(ri.x(), ri.y(), ri.x() + ri.width() - 1,
                                       ri.y());
                     painter->drawLine(ri.x(), ri.y(), ri.x(),
@@ -1331,7 +1331,7 @@ Style::drawPrimitivePanelMenu(PrimitiveElement element,
                 QPainterPath tl;
                 QPainterPath br;
                 buildSplitPath(ri, ROUNDED_ALL, radius - 1.0, tl, br);
-                if (GB_3D != border) {
+                if (border != GB_3D) {
                     painter->drawPath(tl);
                 }
                 painter->setPen(use[FRAME_DARK_SHADOW]);
@@ -1654,9 +1654,9 @@ Style::drawPrimitiveIndicatorCheckBox(PrimitiveElement element,
     bool selectedOOMenu = (isOO && (r == QRect(0, 0, 15, 15) ||
                                     r == QRect(0, 0, 14, 15)) &&
                            // OO.o 3.2 =14x15?
-                           (state == (State_Sunken | State_Enabled) ||
-                            state == (State_Sunken | State_Enabled |
-                                      State_Selected)));
+                           qtcOneOf(state, State_Sunken | State_Enabled,
+                                    State_Sunken | State_Enabled |
+                                    State_Selected));
     int crSize = opts.crSize + (doEtch ? 2 : 0);
     QRect rect(r.x(), r.y() + (view ? -1 : 0), crSize, crSize);
 
@@ -1857,7 +1857,7 @@ Style::drawPrimitivePanelLineEdit(PrimitiveElement element,
                                   const QWidget *widget) const
 {
     QTC_UNUSED(element);
-    QRect r = option->rect;
+    const QRect &r = option->rect;
     const QPalette &palette(option->palette);
     if (const QStyleOptionFrame *panel =
         qstyleoption_cast<const QStyleOptionFrame*>(option)) {

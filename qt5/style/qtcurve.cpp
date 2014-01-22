@@ -2298,7 +2298,7 @@ Style::drawBackground(QPainter *p, const QWidget *widget,
             bgndRect.adjust(0, -pixelMetric(PM_TitleBarHeight,
                                             0L, widget), 0, 0);
         }
-        if (BGND_IMG_ON_BORDER) {
+        if (opts.bgndImage.type == IMG_FILE && opts.bgndImage.onBorder) {
             imgRect = bgndRect;
         }
     }

@@ -1206,7 +1206,8 @@ drawWindowBgnd(cairo_t *cr, GtkStyle *style, const QtcRect *area,
             col = &qtcDefault(gtk_widget_get_style(topLevel),
                               style)->bg[GTK_STATE_NORMAL];
         }
-        if (!flatBgnd || BGND_IMG_ON_BORDER) {
+        if (!flatBgnd || (opts.bgndImage.type == IMG_FILE &&
+                          opts.bgndImage.onBorder)) {
             WindowBorders borders = qtcGetWindowBorderSize(false);
             xmod = borders.sides;
             ymod = borders.titleHeight;
@@ -1264,7 +1265,7 @@ drawWindowBgnd(cairo_t *cr, GtkStyle *style, const QtcRect *area,
         if (useAlpha) {
             cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
         }
-        if (!BGND_IMG_ON_BORDER) {
+        if (!(opts.bgndImage.type == IMG_FILE && opts.bgndImage.onBorder)) {
             ww -= wmod + 1;
             wh -= hmod;
             wx -= xmod;
