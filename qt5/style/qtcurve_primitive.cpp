@@ -79,23 +79,53 @@ Style::drawPrimitiveWidget(PrimitiveElement element,
                            const QWidget *widget) const
 {
     QTC_UNUSED(element);
-    QTC_UNUSED(option);
-    // TODO handle NULL
-    if (widget && widget->testAttribute(Qt::WA_StyledBackground) &&
-        ((!widget->testAttribute(Qt::WA_NoSystemBackground) &&
-          (qtcIsDialog(widget) || qtcIsWindow(widget))) ||
-         qobject_cast<const QMdiSubWindow*>(widget))) {
-        bool isDialog = qtcIsDialog(widget);
-        if (qtcIsCustomBgnd(&opts) || itsIsPreview ||
-            (isDialog && opts.dlgOpacity != 100) ||
-            (!isDialog && opts.bgndOpacity != 100)) {
-            if (!(widget && qobject_cast<const QMdiSubWindow*>(widget))) {
-                painter->setCompositionMode(QPainter::CompositionMode_Source);
-            }
-            drawBackground(painter, widget,
-                           isDialog ? BGND_DIALOG : BGND_WINDOW);
-        }
+    bool isDialog = qtcIsDialog(widget);
+    bool isSubWindow = (widget && qobject_cast<const QMdiSubWindow*>(widget));
+    if (widget && (widget->testAttribute(Qt::WA_NoSystemBackground) ||
+                   !widget->testAttribute(Qt::WA_StyledBackground) ||
+                   !(isDialog || qtcIsWindow(widget) || isSubWindow))) {
+        // A few widgets (e.g. QDesignerWidget and Gammaray::OverlayWidget)
+        // calls this function but we don't want to draw background for them.
+        // Filter the ones we don't want to draw here.
+        // TODO?: QtQuick2
+        return true;
     }
+    // TODO handle QtQuick2 better once there is update from upstream
+    // The following is copied from Style::drawBackground in order to handle
+    // widget == NULL, it should probably be merged back at some point.
+    if (!isSubWindow) {
+        painter->setCompositionMode(QPainter::CompositionMode_Source);
+    }
+    bool previewMdi = itsIsPreview && isSubWindow;
+    const QWidget *window = widget;
+    if (!itsIsPreview && widget) {
+        window = widget->window();
+    }
+    int opacity = isDialog ? opts.dlgOpacity : opts.bgndOpacity;
+    // Check if we are drawing on a 32-bits window, Note that we don't need
+    // this check for QMdiSubWindow since we don't draw through the window.
+    if (opacity != 100 &&
+        !(isSubWindow || (widget && Utils::hasAlphaChannel(window)))) {
+        opacity = 100;
+    }
+    if (widget) {
+        QtcQWidgetProps(widget)->opacity = opacity;
+    }
+    QRect bgndRect = option->rect;
+    painter->setClipRegion(option->rect, Qt::IntersectClip);
+
+    if (!previewMdi) {
+        WindowBorders borders = qtcGetWindowBorderSize(false);
+        bgndRect.adjust(-borders.sides, -borders.titleHeight,
+                        borders.sides, borders.bottom);
+    } else {
+        bgndRect.adjust(0, -pixelMetric(PM_TitleBarHeight, 0, widget), 0, 0);
+    }
+    drawBackground(painter, option->palette.window().color(), bgndRect,
+                   opacity, isDialog ? BGND_DIALOG : BGND_WINDOW,
+                   opts.bgndAppearance);
+    drawBackgroundImage(painter, true, opts.bgndImage.type == IMG_FILE &&
+                        opts.bgndImage.onBorder ? bgndRect : option->rect);
     return true;
 }
 
