@@ -1,5 +1,5 @@
 /*****************************************************************************
- *   Copyright 2013 - 2013 Yichao Yu <yyc1992@gmail.com>                     *
+ *   Copyright 2013 - 2014 Yichao Yu <yyc1992@gmail.com>                     *
  *                                                                           *
  *   This program is free software; you can redistribute it and/or modify    *
  *   it under the terms of the GNU Lesser General Public License as          *
@@ -27,7 +27,7 @@ qtcCreateShadowGradient(float *buff, size_t size)
 {
     const float r = size / 6.5;
     for (size_t i = 0;i < size;i++) {
-        buff[i] = qtcMax(0, expf(-i / r) - 0.0015);
+        buff[i] = qtcMax(0, expf(-(i / r)) - 0.0015);
     }
 }
 
