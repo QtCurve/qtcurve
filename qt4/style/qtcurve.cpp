@@ -11312,19 +11312,14 @@ Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r,
     }
 }
 
-void Style::drawBackgroundImage(QPainter *p, bool isWindow, const QRect &r) const
+void
+Style::drawBackgroundImage(QPainter *p, bool isWindow, const QRect &r) const
 {
-    QtCImage &img=isWindow || (opts.bgndImage.type==opts.menuBgndImage.type &&
-                              (IMG_FILE!=opts.bgndImage.type ||
-                                (opts.bgndImage.height==opts.bgndImage.height &&
-                                 opts.bgndImage.width==opts.bgndImage.width &&
-                                 opts.bgndImage.pixmap.file==opts.menuBgndImage.pixmap.file)))
-                    ? opts.bgndImage : opts.menuBgndImage;
-    int      imgWidth=IMG_FILE==img.type ? img.width : RINGS_WIDTH(img.type),
-             imgHeight=IMG_FILE==img.type ? img.height : RINGS_HEIGHT(img.type);
+    QtCImage &img = isWindow ? opts.bgndImage : opts.menuBgndImage;
+    int imgWidth = img.type == IMG_FILE ? img.width : RINGS_WIDTH(img.type);
+    int imgHeight = img.type == IMG_FILE ? img.height : RINGS_HEIGHT(img.type);
 
-    switch(img.type)
-    {
+    switch (img.type) {
         case IMG_NONE:
             break;
         case IMG_FILE:

@@ -2156,64 +2156,69 @@ Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r,
     }
 }
 
-void Style::drawBackgroundImage(QPainter *p, bool isWindow, const QRect &r) const
+void
+Style::drawBackgroundImage(QPainter *p, bool isWindow, const QRect &r) const
 {
-    QtCImage &img=isWindow || (opts.bgndImage.type==opts.menuBgndImage.type &&
-                               (IMG_FILE!=opts.bgndImage.type ||
-                                (opts.bgndImage.height==opts.bgndImage.height &&
-                                 opts.bgndImage.width==opts.bgndImage.width &&
-                                 opts.bgndImage.pixmap.file==opts.menuBgndImage.pixmap.file)))
-        ? opts.bgndImage : opts.menuBgndImage;
-    int      imgWidth=IMG_FILE==img.type ? img.width : RINGS_WIDTH(img.type),
-        imgHeight=IMG_FILE==img.type ? img.height : RINGS_HEIGHT(img.type);
+    QtCImage &img = isWindow ? opts.bgndImage : opts.menuBgndImage;
+    int imgWidth = img.type == IMG_FILE ? img.width : RINGS_WIDTH(img.type);
+    int imgHeight = img.type == IMG_FILE ? img.height : RINGS_HEIGHT(img.type);
 
-    switch(img.type)
-    {
+    switch (img.type) {
     case IMG_NONE:
         break;
     case IMG_FILE:
         qtcLoadBgndImage(&img);
-        if(!img.pixmap.img.isNull())
-        {
-            switch(img.pos)
-            {
+        if (!img.pixmap.img.isNull()) {
+            switch (img.pos) {
             case PP_TL:
                 p->drawPixmap(r.x(), r.y(), img.pixmap.img);
                 break;
             case PP_TM:
-                p->drawPixmap(r.x()+((r.width()-img.pixmap.img.width())/2), r.y(), img.pixmap.img);
+                p->drawPixmap(r.x() + (r.width() - img.pixmap.img.width()) / 2,
+                              r.y(), img.pixmap.img);
                 break;
             default:
             case PP_TR:
-                p->drawPixmap(r.right()-img.pixmap.img.width(), r.y(), img.pixmap.img);
+                p->drawPixmap(r.right() - img.pixmap.img.width(), r.y(),
+                              img.pixmap.img);
                 break;
             case PP_BL:
-                p->drawPixmap(r.x(), r.bottom()-img.pixmap.img.height(), img.pixmap.img);
+                p->drawPixmap(r.x(), r.bottom() - img.pixmap.img.height(),
+                              img.pixmap.img);
                 break;
             case PP_BM:
-                p->drawPixmap(r.x()+((r.width()-img.pixmap.img.width())/2), r.bottom()-img.pixmap.img.height(), img.pixmap.img);
+                p->drawPixmap(r.x() + (r.width() - img.pixmap.img.width()) / 2,
+                              r.bottom() - img.pixmap.img.height(),
+                              img.pixmap.img);
                 break;
             case PP_BR:
-                p->drawPixmap(r.right()-img.pixmap.img.width(), r.bottom()-img.pixmap.img.height(), img.pixmap.img);
+                p->drawPixmap(r.right() - img.pixmap.img.width(),
+                              r.bottom() - img.pixmap.img.height(),
+                              img.pixmap.img);
                 break;
             case PP_LM:
-                p->drawPixmap(r.left(), r.y()+((r.height()-img.pixmap.img.height())/2), img.pixmap.img);
+                p->drawPixmap(r.left(), r.y() + (r.height() -
+                                                 img.pixmap.img.height()) / 2,
+                              img.pixmap.img);
                 break;
             case PP_RM:
-                p->drawPixmap(r.right()-img.pixmap.img.width(), r.y()+((r.height()-img.pixmap.img.height())/2), img.pixmap.img);
+                p->drawPixmap(r.right() - img.pixmap.img.width(),
+                              r.y() + (r.height() -
+                                       img.pixmap.img.height()) / 2,
+                              img.pixmap.img);
                 break;
             case PP_CENTRED:
-                p->drawPixmap(r.x()+((r.width()-img.pixmap.img.width())/2),
-                              r.y()+((r.height()-img.pixmap.img.height())/2),
+                p->drawPixmap(r.x() + (r.width() - img.pixmap.img.width()) / 2,
+                              r.y() + (r.height() -
+                                       img.pixmap.img.height()) / 2,
                               img.pixmap.img);
             }
         }
         break;
     case IMG_PLAIN_RINGS:
     case IMG_BORDERED_RINGS:
-        if(img.pixmap.img.isNull())
-        {
-            img.pixmap.img=QPixmap(imgWidth, imgHeight);
+        if (img.pixmap.img.isNull()) {
+            img.pixmap.img = QPixmap(imgWidth, imgHeight);
             img.pixmap.img.fill(Qt::transparent);
             QPainter pixPainter(&img.pixmap.img);
 
@@ -2231,36 +2236,58 @@ void Style::drawBackgroundImage(QPainter *p, bool isWindow, const QRect &r) cons
             drawBgndRing(pixPainter, 310, 220, 80, 0, isWindow);
             pixPainter.end();
         }
-        p->drawPixmap(r.right()-img.pixmap.img.width(), r.y()+1, img.pixmap.img);
+        p->drawPixmap(r.right() - img.pixmap.img.width(),
+                      r.y() + 1, img.pixmap.img);
         break;
     case IMG_SQUARE_RINGS:
-        if(img.pixmap.img.isNull())
-        {
-            img.pixmap.img=QPixmap(imgWidth, imgHeight);
+        if (img.pixmap.img.isNull()) {
+            img.pixmap.img = QPixmap(imgWidth, imgHeight);
             img.pixmap.img.fill(Qt::transparent);
             QPainter pixPainter(&img.pixmap.img);
-            QColor   col(Qt::white);
-            double   halfWidth=RINGS_SQUARE_LINE_WIDTH/2.0;
+            QColor col(Qt::white);
+            double halfWidth = RINGS_SQUARE_LINE_WIDTH / 2.0;
 
             col.setAlphaF(RINGS_SQUARE_SMALL_ALPHA);
             pixPainter.setRenderHint(QPainter::Antialiasing);
-            pixPainter.setPen(QPen(col, RINGS_SQUARE_LINE_WIDTH, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
-            pixPainter.drawPath(buildPath(QRectF(halfWidth+0.5, halfWidth+0.5,
-                                                 RINGS_SQUARE_SMALL_SIZE, RINGS_SQUARE_SMALL_SIZE),
-                                          WIDGET_OTHER, ROUNDED_ALL, RINGS_SQUARE_RADIUS));
-            pixPainter.drawPath(buildPath(QRectF(halfWidth+0.5+(imgWidth-(RINGS_SQUARE_SMALL_SIZE+RINGS_SQUARE_LINE_WIDTH)),
-                                                 halfWidth+0.5+(imgHeight-(RINGS_SQUARE_SMALL_SIZE+RINGS_SQUARE_LINE_WIDTH)),
-                                                 RINGS_SQUARE_SMALL_SIZE, RINGS_SQUARE_SMALL_SIZE),
-                                          WIDGET_OTHER, ROUNDED_ALL, RINGS_SQUARE_RADIUS));
+            pixPainter.setPen(QPen(col, RINGS_SQUARE_LINE_WIDTH, Qt::SolidLine,
+                                   Qt::SquareCap, Qt::RoundJoin));
+            pixPainter.drawPath(buildPath(QRectF(halfWidth + 0.5,
+                                                 halfWidth + 0.5,
+                                                 RINGS_SQUARE_SMALL_SIZE,
+                                                 RINGS_SQUARE_SMALL_SIZE),
+                                          WIDGET_OTHER, ROUNDED_ALL,
+                                          RINGS_SQUARE_RADIUS));
+            pixPainter.drawPath(buildPath(QRectF(halfWidth + 0.5 +
+                                                 (imgWidth -
+                                                  (RINGS_SQUARE_SMALL_SIZE +
+                                                   RINGS_SQUARE_LINE_WIDTH)),
+                                                 halfWidth + 0.5 +
+                                                 (imgHeight -
+                                                  (RINGS_SQUARE_SMALL_SIZE +
+                                                   RINGS_SQUARE_LINE_WIDTH)),
+                                                 RINGS_SQUARE_SMALL_SIZE,
+                                                 RINGS_SQUARE_SMALL_SIZE),
+                                          WIDGET_OTHER, ROUNDED_ALL,
+                                          RINGS_SQUARE_RADIUS));
             col.setAlphaF(RINGS_SQUARE_LARGE_ALPHA);
-            pixPainter.setPen(QPen(col, RINGS_SQUARE_LINE_WIDTH, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
-            pixPainter.drawPath(buildPath(QRectF(halfWidth+0.5+((imgWidth-RINGS_SQUARE_LARGE_SIZE-RINGS_SQUARE_LINE_WIDTH)/2.0),
-                                                 halfWidth+0.5+((imgHeight-RINGS_SQUARE_LARGE_SIZE-RINGS_SQUARE_LINE_WIDTH)/2.0),
-                                                 RINGS_SQUARE_LARGE_SIZE, RINGS_SQUARE_LARGE_SIZE),
-                                          WIDGET_OTHER, ROUNDED_ALL, RINGS_SQUARE_RADIUS));
+            pixPainter.setPen(QPen(col, RINGS_SQUARE_LINE_WIDTH, Qt::SolidLine,
+                                   Qt::SquareCap, Qt::RoundJoin));
+            pixPainter.drawPath(buildPath(QRectF(halfWidth + 0.5 +
+                                                 (imgWidth -
+                                                  RINGS_SQUARE_LARGE_SIZE -
+                                                  RINGS_SQUARE_LINE_WIDTH) / 2.0,
+                                                 halfWidth + 0.5 +
+                                                 (imgHeight -
+                                                  RINGS_SQUARE_LARGE_SIZE -
+                                                  RINGS_SQUARE_LINE_WIDTH) / 2.0,
+                                                 RINGS_SQUARE_LARGE_SIZE,
+                                                 RINGS_SQUARE_LARGE_SIZE),
+                                          WIDGET_OTHER, ROUNDED_ALL,
+                                          RINGS_SQUARE_RADIUS));
             pixPainter.end();
         }
-        p->drawPixmap(r.right()-img.pixmap.img.width(), r.y()+1, img.pixmap.img);
+        p->drawPixmap(r.right() - img.pixmap.img.width(),
+                      r.y() + 1, img.pixmap.img);
         break;
     }
 }
