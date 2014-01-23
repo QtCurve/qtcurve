@@ -40,7 +40,7 @@ public:
     virtual ~ShortcutHandler();
 
     bool hasSeenAlt(const QWidget *widget) const;
-    bool isAltDown() const { return itsAltDown; }
+    bool isAltDown() const { return m_altDown; }
     bool showShortcut(const QWidget *widget) const;
 
 protected:
@@ -48,10 +48,10 @@ protected:
     bool eventFilter(QObject *watched, QEvent *event);
 
 private:
-    bool itsAltDown;
-    QSet<QWidget*> itsSeenAlt,
-        itsUpdated;
-    QList<QWidget*> itsOpenMenus;
+    bool m_altDown;
+    QSet<QWidget*> m_seenAlt;
+    QSet<QWidget*> m_updated;
+    QList<QWidget*> m_openMenus;
 
     void widgetDestroyed(QObject *o);
 };

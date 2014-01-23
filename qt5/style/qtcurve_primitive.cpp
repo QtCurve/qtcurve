@@ -221,8 +221,7 @@ Style::drawPrimitiveIndicatorBranch(PrimitiveElement element,
                            widget && qobject_cast<const QTreeView*>(widget) ?
                            ((QTreeView*)widget)->indentation() : 20);
 
-    if (opts.lvLines
-        /*&& (LV_OLD==opts.lvLines || (r.x()>=constStep && constStep>0))*/) {
+    if (opts.lvLines) {
         painter->setPen(palette.mid().color());
         if (state & State_Item) {
             if (reverse) {
@@ -793,7 +792,7 @@ Style::drawPrimitivePanelItemViewItem(PrimitiveElement element,
     bool reverse = option->direction == Qt::RightToLeft;
     bool hover = (state & State_MouseOver && state & State_Enabled &&
                   (!view ||
-                   QAbstractItemView::NoSelection != view->selectionMode()));
+                   view->selectionMode() != QAbstractItemView::NoSelection));
     bool hasCustomBackground = (v4Opt->backgroundBrush.style() != Qt::NoBrush &&
                                 !(option->state & State_Selected));
     bool hasSolidBackground =
@@ -945,8 +944,7 @@ Style::drawPrimitiveFrameTabWidget(PrimitiveElement element,
             const QTabWidget *tw = (const QTabWidget*)widget;
             if (tw->count() > 0 &&
                 ((const QtcTabWidget*)widget)->tabsVisible()) {
-                if (!reverse && /*qtcIsCustomBgnd(&opts) && */
-                    opts.tabBgnd == 0) {
+                if (!reverse && opts.tabBgnd == 0) {
                     // Does not work for reverse :-(
                     QRect tabRect =
                         ((const QtcTabWidget*)widget)->currentTabRect();
@@ -1319,7 +1317,7 @@ Style::drawPrimitivePanelMenu(PrimitiveElement element,
             painter->drawPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL, radius));
         }
         if (qtcUseBorder(border) &&
-            APPEARANCE_FLAT != opts.menuBgndAppearance) {
+            opts.menuBgndAppearance != APPEARANCE_FLAT) {
             QRect ri(r.adjusted(1, 1, -1, -1));
             painter->setPen(use[0]);
             if (border == GB_LIGHT) {
@@ -1560,7 +1558,7 @@ Style::drawPrimitiveIndicatorRadioButton(PrimitiveElement element,
                 x++;
                 y++;
             }
-            if (CR_SMALL_SIZE != opts.crSize && menu) {
+            if (opts.crSize != CR_SMALL_SIZE && menu) {
                 y -= 2;
             }
             drawLightBevel(painter, rect, &opt, widget, ROUNDED_ALL,
@@ -1610,7 +1608,7 @@ Style::drawPrimitiveIndicatorRadioButton(PrimitiveElement element,
             }
             painter->setBrush(Qt::NoBrush);
             if (!doneShadow && doEtch &&
-                (glow || EFFECT_NONE != opts.buttonEffect || sunken)) {
+                (glow || opts.buttonEffect != EFFECT_NONE || sunken)) {
                 QColor topCol = glow ? itsMouseOverCols[GLOW_MO] : Qt::black;
                 if (!glow) {
                     topCol.setAlphaF(ETCH_RADIO_TOP_ALPHA);
@@ -2018,10 +2016,8 @@ Style::drawPrimitiveFrameTabBarBase(PrimitiveElement element,
     QTC_UNUSED(element);
     bool reverse = option->direction == Qt::RightToLeft;
     if (auto tbb = qtcStyleCast<QStyleOptionTabBarBase>(option)) {
-        if (tbb->shape != QTabBar::RoundedNorth &&
-            tbb->shape != QTabBar::RoundedWest &&
-            tbb->shape != QTabBar::RoundedSouth &&
-            tbb->shape != QTabBar::RoundedEast) {
+        if (qtcNoneOf(tbb->shape, QTabBar::RoundedNorth, QTabBar::RoundedWest,
+                      QTabBar::RoundedSouth, QTabBar::RoundedEast)) {
             return false;
         } else {
             static const int constSidePad = 16 * 2;

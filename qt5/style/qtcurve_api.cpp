@@ -184,10 +184,9 @@ void Style::polish(QPalette &palette)
     if(contrast<0 || contrast>10)
         contrast=DEFAULT_CONTRAST;
 
-    if(contrast!=opts.contrast)
-    {
-        opts.contrast=contrast;
-        newContrast=true;
+    if (contrast != opts.contrast) {
+        opts.contrast = contrast;
+        newContrast = true;
     }
 
     bool newHighlight(newContrast ||
@@ -198,44 +197,49 @@ void Style::polish(QPalette &palette)
                   itsButtonCols[ORIGINAL_SHADE]!=palette.color(QPalette::Active, QPalette::Button)),
         newSlider(itsSliderCols && itsHighlightCols!=itsSliderCols && SHADE_BLEND_SELECTED == opts.shadeSliders &&
                   (newButton || newHighlight)),
-        newDefBtn(itsDefBtnCols && (IND_COLORED!=opts.defBtnIndicator || SHADE_BLEND_SELECTED!=opts.shadeSliders) &&
-                  IND_SELECTED!=opts.defBtnIndicator && IND_GLOW!=opts.defBtnIndicator &&
+        newDefBtn(itsDefBtnCols &&
+                  (opts.defBtnIndicator != IND_COLORED ||
+                   opts.shadeSliders != SHADE_BLEND_SELECTED) &&
+                  qtcNoneOf(opts.defBtnIndicator, IND_SELECTED, IND_GLOW) &&
                   (newContrast || newButton || newHighlight)),
-        newComboBtn(itsComboBtnCols && itsHighlightCols!=itsComboBtnCols && itsSliderCols!=itsComboBtnCols &&
-                    SHADE_BLEND_SELECTED == opts.comboBtn &&
+        newComboBtn(itsComboBtnCols &&
+                    qtcNoneOf(itsComboBtnCols, itsHighlightCols,
+                              itsSliderCols) &&
+                    opts.comboBtn == SHADE_BLEND_SELECTED &&
                     (newButton || newHighlight)),
-        newSortedLv(itsSortedLvColors && ( (SHADE_BLEND_SELECTED == opts.sortedLv && itsDefBtnCols!=itsSortedLvColors &&
+        newSortedLv(itsSortedLvColors && ((SHADE_BLEND_SELECTED == opts.sortedLv && itsDefBtnCols!=itsSortedLvColors &&
                                             itsSliderCols!=itsSortedLvColors && itsComboBtnCols!=itsSortedLvColors) ||
                                            SHADE_DARKEN == opts.sortedLv) &&
                     (newContrast || (opts.lvButton ? newButton : newGray))),
-        newCheckRadioSelCols(itsCheckRadioSelCols && ( (SHADE_BLEND_SELECTED == opts.crColor && itsDefBtnCols!=itsCheckRadioSelCols &&
-                                                        itsSliderCols!=itsCheckRadioSelCols && itsComboBtnCols!=itsCheckRadioSelCols &&
-                                                        itsSortedLvColors!=itsCheckRadioSelCols) ||
-                                                       SHADE_DARKEN == opts.crColor) &&
+        newCheckRadioSelCols(itsCheckRadioSelCols && ((SHADE_BLEND_SELECTED == opts.crColor && itsDefBtnCols!=itsCheckRadioSelCols &&
+                                                       itsSliderCols!=itsCheckRadioSelCols && itsComboBtnCols!=itsCheckRadioSelCols &&
+                                                       itsSortedLvColors!=itsCheckRadioSelCols) ||
+                                                      SHADE_DARKEN == opts.crColor) &&
                              (newContrast || newButton)),
         newProgressCols(itsProgressCols && SHADE_BLEND_SELECTED == opts.progressColor &&
                         itsSliderCols!=itsProgressCols && itsComboBtnCols!=itsProgressCols &&
                         itsSortedLvColors!=itsProgressCols && itsCheckRadioSelCols!=itsProgressCols && (newContrast || newButton));
 
-    if(newGray)
-    {
+    if (newGray) {
         shadeColors(palette.color(QPalette::Active, QPalette::Background), itsBackgroundCols);
-        if(IMG_PLAIN_RINGS == opts.bgndImage.type || IMG_BORDERED_RINGS == opts.bgndImage.type ||
-           IMG_SQUARE_RINGS == opts.bgndImage.type ||
-           IMG_PLAIN_RINGS == opts.menuBgndImage.type || IMG_BORDERED_RINGS == opts.menuBgndImage.type ||
-           IMG_SQUARE_RINGS == opts.menuBgndImage.type)
-        {
+        if (qtcOneOf(opts.bgndImage.type, IMG_PLAIN_RINGS, IMG_BORDERED_RINGS,
+                     IMG_SQUARE_RINGS) ||
+            qtcOneOf(opts.menuBgndImage.type, IMG_PLAIN_RINGS,
+                     IMG_BORDERED_RINGS, IMG_SQUARE_RINGS)) {
             qtcCalcRingAlphas(&itsBackgroundCols[ORIGINAL_SHADE]);
-            if(itsUsePixmapCache)
+            if (itsUsePixmapCache) {
                 QPixmapCache::clear();
+            }
         }
     }
 
-    if(newButton)
-        shadeColors(palette.color(QPalette::Active, QPalette::Button), itsButtonCols);
+    if (newButton)
+        shadeColors(palette.color(QPalette::Active, QPalette::Button),
+                    itsButtonCols);
 
-    if(newHighlight)
-        shadeColors(palette.color(QPalette::Active, QPalette::Highlight), itsHighlightCols);
+    if (newHighlight)
+        shadeColors(palette.color(QPalette::Active, QPalette::Highlight),
+                    itsHighlightCols);
 
 // Dont set these here, they will be updated in setDecorationColors()...
 //     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Highlight), itsFocusCols);
@@ -244,102 +248,128 @@ void Style::polish(QPalette &palette)
 
     setMenuColors(palette.color(QPalette::Active, QPalette::Background));
 
-    if(newSlider)
-        shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE], itsButtonCols[ORIGINAL_SHADE]), itsSliderCols);
+    if (newSlider) {
+        shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
+                             itsButtonCols[ORIGINAL_SHADE]), itsSliderCols);
+    }
 
-    if(newDefBtn)
-    {
-        if(IND_TINT == opts.defBtnIndicator)
+    if (newDefBtn) {
+        if (opts.defBtnIndicator == IND_TINT) {
             shadeColors(tint(itsButtonCols[ORIGINAL_SHADE],
-                             itsHighlightCols[ORIGINAL_SHADE], DEF_BNT_TINT), itsDefBtnCols);
-        else if(IND_GLOW!=opts.defBtnIndicator)
+                             itsHighlightCols[ORIGINAL_SHADE],
+                             DEF_BNT_TINT), itsDefBtnCols);
+        } else if (opts.defBtnIndicator != IND_GLOW) {
             shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
                                  itsButtonCols[ORIGINAL_SHADE]), itsDefBtnCols);
+        }
     }
 
-    if(newComboBtn)
-        shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE], itsButtonCols[ORIGINAL_SHADE]), itsComboBtnCols);
-
-    if(newSortedLv)
-    {
-        if(SHADE_BLEND_SELECTED == opts.sortedLv)
-            shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
-                                 opts.lvButton ? itsButtonCols[ORIGINAL_SHADE] : itsBackgroundCols[ORIGINAL_SHADE]), itsSortedLvColors);
-        else
-            shadeColors(shade(opts.lvButton ? itsButtonCols[ORIGINAL_SHADE] : itsBackgroundCols[ORIGINAL_SHADE], LV_HEADER_DARK_FACTOR),
-                        itsSortedLvColors);
-    }
-
-    if(itsSidebarButtonsCols && SHADE_BLEND_SELECTED!=opts.shadeSliders &&
-       IND_COLORED!=opts.defBtnIndicator)
+    if (newComboBtn) {
         shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
-                             itsButtonCols[ORIGINAL_SHADE]), itsSidebarButtonsCols);
+                             itsButtonCols[ORIGINAL_SHADE]), itsComboBtnCols);
+    }
+    if (newSortedLv) {
+        if (opts.sortedLv == SHADE_BLEND_SELECTED) {
+            shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
+                                 opts.lvButton ? itsButtonCols[ORIGINAL_SHADE] :
+                                 itsBackgroundCols[ORIGINAL_SHADE]),
+                        itsSortedLvColors);
+        } else {
+            shadeColors(shade(opts.lvButton ? itsButtonCols[ORIGINAL_SHADE] :
+                              itsBackgroundCols[ORIGINAL_SHADE],
+                              LV_HEADER_DARK_FACTOR), itsSortedLvColors);
+        }
+    }
 
-    switch(opts.shadeCheckRadio)
-    {
+    if (itsSidebarButtonsCols && opts.shadeSliders != SHADE_BLEND_SELECTED &&
+        opts.defBtnIndicator != IND_COLORED) {
+        shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
+                             itsButtonCols[ORIGINAL_SHADE]),
+                    itsSidebarButtonsCols);
+    }
+
+    switch (opts.shadeCheckRadio) {
     default:
-        itsCheckRadioCol=palette.color(QPalette::Active, opts.crButton ? QPalette::ButtonText : QPalette::Text);
+        itsCheckRadioCol = palette.color(QPalette::Active,
+                                         opts.crButton ? QPalette::ButtonText :
+                                         QPalette::Text);
         break;
     case SHADE_BLEND_SELECTED:
     case SHADE_SELECTED:
-        itsCheckRadioCol=palette.color(QPalette::Active, QPalette::Highlight);
+        itsCheckRadioCol = palette.color(QPalette::Active, QPalette::Highlight);
         break;
     case SHADE_CUSTOM:
-        itsCheckRadioCol=opts.customCheckRadioColor;
+        itsCheckRadioCol = opts.customCheckRadioColor;
     }
 
-    if(newCheckRadioSelCols)
-    {
-        if(SHADE_BLEND_SELECTED == opts.crColor)
-            shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE], itsButtonCols[ORIGINAL_SHADE]), itsCheckRadioSelCols);
-        else
-            shadeColors(shade(itsButtonCols[ORIGINAL_SHADE], LV_HEADER_DARK_FACTOR), itsCheckRadioSelCols);
-    }
-
-    if(newProgressCols)
-        shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE], itsBackgroundCols[ORIGINAL_SHADE]), itsProgressCols);
-
-    if(APP_OPENOFFICE == theThemedApp && opts.useHighlightForMenu && (newGray || newHighlight))
-    {
-        if(blendOOMenuHighlight(palette, itsHighlightCols[ORIGINAL_SHADE]))
-        {
-            if(!itsOOMenuCols)
-                itsOOMenuCols=new QColor [TOTAL_SHADES+1];
-            shadeColors(tint(popupMenuCols()[ORIGINAL_SHADE], itsHighlightCols[ORIGINAL_SHADE], 0.5), itsOOMenuCols);
+    if (newCheckRadioSelCols) {
+        if (opts.crColor == SHADE_BLEND_SELECTED) {
+            shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
+                                 itsButtonCols[ORIGINAL_SHADE]),
+                        itsCheckRadioSelCols);
+        } else {
+            shadeColors(shade(itsButtonCols[ORIGINAL_SHADE],
+                              LV_HEADER_DARK_FACTOR), itsCheckRadioSelCols);
         }
-        else if(itsOOMenuCols)
-        {
-            delete [] itsOOMenuCols;
-            itsOOMenuCols=0L;
+    }
+    if (newProgressCols) {
+        shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
+                             itsBackgroundCols[ORIGINAL_SHADE]),
+                    itsProgressCols);
+    }
+    if (theThemedApp == APP_OPENOFFICE && opts.useHighlightForMenu &&
+        (newGray || newHighlight)) {
+        if (blendOOMenuHighlight(palette, itsHighlightCols[ORIGINAL_SHADE])) {
+            if (!itsOOMenuCols) {
+                itsOOMenuCols = new QColor[TOTAL_SHADES + 1];
+            }
+            shadeColors(tint(popupMenuCols()[ORIGINAL_SHADE],
+                             itsHighlightCols[ORIGINAL_SHADE], 0.5),
+                        itsOOMenuCols);
+        } else if (itsOOMenuCols) {
+            delete []itsOOMenuCols;
+            itsOOMenuCols = 0L;
         }
     }
 
     palette.setColor(QPalette::Active, QPalette::Light, itsBackgroundCols[0]);
-    palette.setColor(QPalette::Active, QPalette::Dark, itsBackgroundCols[QTC_STD_BORDER]);
+    palette.setColor(QPalette::Active, QPalette::Dark,
+                     itsBackgroundCols[QTC_STD_BORDER]);
     palette.setColor(QPalette::Inactive, QPalette::Light, itsBackgroundCols[0]);
-    palette.setColor(QPalette::Inactive, QPalette::Dark, itsBackgroundCols[QTC_STD_BORDER]);
-    palette.setColor(QPalette::Inactive, QPalette::WindowText, palette.color(QPalette::Active, QPalette::WindowText));
+    palette.setColor(QPalette::Inactive, QPalette::Dark,
+                     itsBackgroundCols[QTC_STD_BORDER]);
+    palette.setColor(QPalette::Inactive, QPalette::WindowText,
+                     palette.color(QPalette::Active, QPalette::WindowText));
     palette.setColor(QPalette::Disabled, QPalette::Light, itsBackgroundCols[0]);
-    palette.setColor(QPalette::Disabled, QPalette::Dark, itsBackgroundCols[QTC_STD_BORDER]);
+    palette.setColor(QPalette::Disabled, QPalette::Dark,
+                     itsBackgroundCols[QTC_STD_BORDER]);
 
-    palette.setColor(QPalette::Disabled, QPalette::Base, palette.color(QPalette::Active, QPalette::Background));
-    palette.setColor(QPalette::Disabled, QPalette::Background, palette.color(QPalette::Active, QPalette::Background));
+    palette.setColor(QPalette::Disabled, QPalette::Base,
+                     palette.color(QPalette::Active, QPalette::Background));
+    palette.setColor(QPalette::Disabled, QPalette::Background,
+                     palette.color(QPalette::Active, QPalette::Background));
 
     // Fix KDE4's palette...
-    if(palette.color(QPalette::Active, QPalette::Highlight)!=palette.color(QPalette::Inactive, QPalette::Highlight))
-        itsInactiveChangeSelectionColor=true;
-
-    for(int i=QPalette::WindowText; i<QPalette::NColorRoles; ++i)
-        //if(i!=QPalette::Highlight && i!=QPalette::HighlightedText)
-        palette.setColor(QPalette::Inactive, (QPalette::ColorRole)i, palette.color(QPalette::Active, (QPalette::ColorRole)i));
+    if (palette.color(QPalette::Active, QPalette::Highlight) !=
+        palette.color(QPalette::Inactive, QPalette::Highlight)) {
+        itsInactiveChangeSelectionColor = true;
+    }
+    for (int i = QPalette::WindowText;i < QPalette::NColorRoles;i++) {
+        // if (i != QPalette::Highlight && i != QPalette::HighlightedText)
+        palette.setColor(QPalette::Inactive, (QPalette::ColorRole)i,
+                         palette.color(QPalette::Active,
+                                       (QPalette::ColorRole)i));
+    }
 
     // Force this to be re-generated!
-    if(SHADE_BLEND_SELECTED == opts.menuStripe)
-        opts.customMenuStripeColor=Qt::black;
+    if (opts.menuStripe == SHADE_BLEND_SELECTED) {
+        opts.customMenuStripeColor = Qt::black;
+    }
 #ifdef QTC_QT5_ENABLE_KDE
     // Only set palette here...
-    if(kapp)
+    if (kapp) {
         setDecorationColors();
+    }
 #endif
 }
 
@@ -354,8 +384,8 @@ void Style::polish(QWidget *widget)
     QtcQWidgetProps qtcProps(widget);
     bool enableMouseOver(opts.highlightFactor || opts.coloredMouseOver);
 
-    if (EFFECT_NONE != opts.buttonEffect &&
-        !USE_CUSTOM_ALPHAS(opts) && isNoEtchWidget(widget)) {
+    if (opts.buttonEffect != EFFECT_NONE && !USE_CUSTOM_ALPHAS(opts) &&
+        isNoEtchWidget(widget)) {
         qtcProps->noEtch = true;
     }
 
@@ -398,9 +428,9 @@ void Style::polish(QWidget *widget)
         default:
             break;
         }
-        if (qobject_cast<QSlider*>(widget))
+        if (qobject_cast<QSlider*>(widget)) {
             widget->setBackgroundRole(QPalette::NoRole);
-
+        }
         if (widget->autoFillBackground() && widget->parentWidget() &&
             widget->parentWidget()->objectName() == "qt_scrollarea_viewport" &&
             qtcCheckType0<QAbstractScrollArea>(
@@ -411,10 +441,9 @@ void Style::polish(QWidget *widget)
             widget->setAutoFillBackground(false);
         }
     }
-
-    if (qobject_cast<QMdiSubWindow*>(widget))
+    if (qobject_cast<QMdiSubWindow*>(widget)) {
         widget->setAttribute(Qt::WA_StyledBackground);
-
+    }
     if (opts.menubarHiding && qobject_cast<QMainWindow*>(widget) &&
         static_cast<QMainWindow*>(widget)->menuWidget()) {
         widget->installEventFilter(this);
@@ -2037,10 +2066,10 @@ void Style::drawControl(ControlElement element, const QStyleOption *option,
                         QPainter *painter, const QWidget *widget) const
 {
     prePolish(widget);
-    QRect r(option->rect);
+    QRect r = option->rect;
     const State &state = option->state;
     const QPalette &palette = option->palette;
-    bool reverse = Qt::RightToLeft==option->direction;
+    bool reverse = option->direction == Qt::RightToLeft;
 
     switch ((unsigned)element) {
     case CE_QtC_SetOptions:
@@ -5992,25 +6021,27 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
     }
 }
 
-void Style::drawItemText(QPainter *painter, const QRect &rect, int flags, const QPalette &pal, bool enabled, const QString &text,
-                         QPalette::ColorRole textRole) const
+void
+Style::drawItemText(QPainter *painter, const QRect &rect, int flags,
+                    const QPalette &pal, bool enabled, const QString &text,
+                    QPalette::ColorRole textRole) const
 {
-    if(QPalette::ButtonText==textRole && !opts.stdSidebarButtons)
-    {
-        const QAbstractButton *button=getButton(NULL, painter);
-
-        if(button && isMultiTabBarTab(button) && button->isChecked())
-        {
+    if (textRole == QPalette::ButtonText && !opts.stdSidebarButtons) {
+        const QAbstractButton *button = getButton(NULL, painter);
+        if (button && isMultiTabBarTab(button) && button->isChecked()) {
             QPalette p(pal);
-
-            if(itsInactiveChangeSelectionColor && QPalette::Inactive==p.currentColorGroup())
+            if (itsInactiveChangeSelectionColor &&
+                p.currentColorGroup() == QPalette::Inactive) {
                 p.setCurrentColorGroup(QPalette::Active);
-            QCommonStyle::drawItemText(painter, rect, flags, p, enabled, text, QPalette::HighlightedText);
+            }
+            QCommonStyle::drawItemText(painter, rect, flags, p, enabled,
+                                       text, QPalette::HighlightedText);
             return;
         }
     }
 
-    QCommonStyle::drawItemText(painter, rect, flags, pal, enabled, text, textRole);
+    QCommonStyle::drawItemText(painter, rect, flags, pal,
+                               enabled, text, textRole);
 }
 
 QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &size, const QWidget *widget) const

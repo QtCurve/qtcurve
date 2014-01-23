@@ -1212,10 +1212,8 @@ bool QtCurveClient::eventFilter(QObject *o, QEvent *e)
 //     }
 
 #if KDE_IS_VERSION(4, 3, 85) && !KDE_IS_VERSION(4, 8, 80)
-    if(Handler()->grouping())
-    {
-        if(QtCurveButton *btn = qobject_cast<QtCurveButton*>(o))
-        {
+    if (Handler()->grouping()) {
+        if (QtCurveButton *btn = qobject_cast<QtCurveButton*>(o)) {
             if(QEvent::MouseButtonPress==e->type())
                 return true; // No-op
             else if(QEvent::MouseButtonRelease==e->type())

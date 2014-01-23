@@ -41,7 +41,7 @@ public:
     bool
     isAltDown() const
     {
-        return itsAltDown;
+        return m_altDown;
     }
     bool showShortcut(const QWidget *widget) const;
 
@@ -56,10 +56,10 @@ protected:
 
 private:
 
-    bool itsAltDown;
-    QSet<QWidget*> itsSeenAlt;
-    QSet<QWidget*> itsUpdated;
-    QList<QWidget*> itsOpenMenus;
+    bool m_altDown;
+    QSet<QWidget*> m_seenAlt;
+    QSet<QWidget*> m_updated;
+    QList<QWidget*> m_openMenus;
 };
 }
 

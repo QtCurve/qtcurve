@@ -29,7 +29,7 @@
 
 namespace QtCurve {
 ShortcutHandler::ShortcutHandler(QObject *parent) : QObject(parent),
-                                                    itsAltDown(false)
+                                                    m_altDown(false)
 {
 }
 
@@ -43,36 +43,36 @@ bool ShortcutHandler::hasSeenAlt(const QWidget *widget) const
         return false;
 
     if (qobject_cast<const QMenu*>(widget)) {
-        return itsOpenMenus.count() && itsOpenMenus.last()==widget;
+        return m_openMenus.count() && m_openMenus.last()==widget;
         // const QWidget *w = widget;
         // while (w) {
-        //     if (itsSeenAlt.contains((QWidget*)w))
+        //     if (m_seenAlt.contains((QWidget*)w))
         //         return true;
         //     w = w->parentWidget();
         // }
     } else {
-        return (itsOpenMenus.isEmpty() &&
-                itsSeenAlt.contains((QWidget*)(widget->window())));
+        return (m_openMenus.isEmpty() &&
+                m_seenAlt.contains((QWidget*)(widget->window())));
     }
     return false;
 }
 
 bool ShortcutHandler::showShortcut(const QWidget *widget) const
 {
-    return itsAltDown && hasSeenAlt(widget);
+    return m_altDown && hasSeenAlt(widget);
 }
 
 void ShortcutHandler::widgetDestroyed(QObject *o)
 {
-    itsUpdated.remove(static_cast<QWidget *>(o));
-    itsOpenMenus.removeAll(static_cast<QWidget *>(o));
+    m_updated.remove(static_cast<QWidget *>(o));
+    m_openMenus.removeAll(static_cast<QWidget *>(o));
 }
 
 void ShortcutHandler::updateWidget(QWidget *w)
 {
-    if(!itsUpdated.contains(w))
+    if(!m_updated.contains(w))
     {
-        itsUpdated.insert(w);
+        m_updated.insert(w);
         w->update();
         connect(w, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
     }
@@ -87,17 +87,17 @@ bool ShortcutHandler::eventFilter(QObject *o, QEvent *e)
     switch (e->type()) {
     case QEvent::KeyPress:
         if (Qt::Key_Alt == static_cast<QKeyEvent*>(e)->key()) {
-            itsAltDown = true;
+            m_altDown = true;
             if (qobject_cast<QMenu*>(widget)) {
-                itsSeenAlt.insert(widget);
+                m_seenAlt.insert(widget);
                 updateWidget(widget);
                 if (widget->parentWidget() &&
                     widget->parentWidget()->window()) {
-                    itsSeenAlt.insert(widget->parentWidget()->window());
+                    m_seenAlt.insert(widget->parentWidget()->window());
                 }
             } else {
                 widget = widget->window();
-                itsSeenAlt.insert(widget);
+                m_seenAlt.insert(widget);
                 QList<QWidget*> l = widget->findChildren<QWidget*>();
                 for (int pos = 0;pos < l.size();++pos) {
                     QWidget *w = l.at(pos);
@@ -117,21 +117,21 @@ bool ShortcutHandler::eventFilter(QObject *o, QEvent *e)
     case QEvent::KeyRelease:
         if (QEvent::WindowDeactivate == e->type() ||
             Qt::Key_Alt == static_cast<QKeyEvent*>(e)->key()) {
-            itsAltDown = false;
-            foreach (QWidget *widget, itsUpdated) {
+            m_altDown = false;
+            foreach (QWidget *widget, m_updated) {
                 widget->update();
             }
-            if (!itsUpdated.contains(widget))
+            if (!m_updated.contains(widget))
                 widget->update();
-            itsSeenAlt.clear();
-            itsUpdated.clear();
+            m_seenAlt.clear();
+            m_updated.clear();
         }
         break;
     case QEvent::Show:
         if (qobject_cast<QMenu*>(widget)) {
-            QWidget *prev = itsOpenMenus.count() ? itsOpenMenus.last() : 0L;
-            itsOpenMenus.append(widget);
-            if (itsAltDown && prev)
+            QWidget *prev = m_openMenus.count() ? m_openMenus.last() : 0L;
+            m_openMenus.append(widget);
+            if (m_altDown && prev)
                 prev->update();
             connect(widget, SIGNAL(destroyed(QObject*)),
                     this, SLOT(widgetDestroyed(QObject*)));
@@ -139,12 +139,12 @@ bool ShortcutHandler::eventFilter(QObject *o, QEvent *e)
         break;
     case QEvent::Hide:
         if (qobject_cast<QMenu*>(widget)) {
-            itsSeenAlt.remove(widget);
-            itsUpdated.remove(widget);
-            itsOpenMenus.removeAll(widget);
-            if (itsAltDown) {
-                if (itsOpenMenus.count()) {
-                    itsOpenMenus.last()->update();
+            m_seenAlt.remove(widget);
+            m_updated.remove(widget);
+            m_openMenus.removeAll(widget);
+            if (m_altDown) {
+                if (m_openMenus.count()) {
+                    m_openMenus.last()->update();
                 } else if (widget->parentWidget() &&
                            widget->parentWidget()->window())
                     widget->parentWidget()->window()->update();
@@ -153,13 +153,13 @@ bool ShortcutHandler::eventFilter(QObject *o, QEvent *e)
         break;
     case QEvent::Close:
         // Reset widget when closing
-        itsSeenAlt.remove(widget);
-        itsUpdated.remove(widget);
-        itsSeenAlt.remove(widget->window());
-        itsOpenMenus.removeAll(widget);
-        if (itsAltDown) {
-            if (itsOpenMenus.count()) {
-                itsOpenMenus.last()->update();
+        m_seenAlt.remove(widget);
+        m_updated.remove(widget);
+        m_seenAlt.remove(widget->window());
+        m_openMenus.removeAll(widget);
+        if (m_altDown) {
+            if (m_openMenus.count()) {
+                m_openMenus.last()->update();
             } else if (widget->parentWidget() &&
                        widget->parentWidget()->window())
                 widget->parentWidget()->window()->update();
