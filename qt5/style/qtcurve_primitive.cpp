@@ -96,9 +96,9 @@ Style::drawPrimitiveWidget(PrimitiveElement element,
     if (!isSubWindow) {
         painter->setCompositionMode(QPainter::CompositionMode_Source);
     }
-    bool previewMdi = itsIsPreview && isSubWindow;
+    bool previewMdi = m_isPreview && isSubWindow;
     const QWidget *window = widget;
-    if (!itsIsPreview && widget) {
+    if (!m_isPreview && widget) {
         window = widget->window();
     }
     int opacity = isDialog ? opts.dlgOpacity : opts.bgndOpacity;
@@ -397,34 +397,34 @@ Style::drawPrimitiveIndicatorToolBarSeparator(PrimitiveElement element,
             int x = r.x() + (r.width() - 2) / 2;
             drawFadedLine(painter, QRect(x, r.y() + TOOLBAR_SEP_GAP, 1,
                                          r.height() - TOOLBAR_SEP_GAP * 2),
-                          itsBackgroundCols[opts.toolbarSeparators ==
+                          m_backgroundCols[opts.toolbarSeparators ==
                                             LINE_SUNKEN ? 3 : 4],
                           true, true, false);
 
             if (opts.toolbarSeparators == LINE_SUNKEN) {
                 drawFadedLine(painter, QRect(x + 1, r.y() + 6, 1,
                                              r.height() - 12),
-                              itsBackgroundCols[0], true, true, false);
+                              m_backgroundCols[0], true, true, false);
             }
         } else {
             int y = r.y() + (r.height() - 2) / 2;
             drawFadedLine(painter, QRect(r.x() + TOOLBAR_SEP_GAP, y,
                                          r.width() - TOOLBAR_SEP_GAP * 2, 1),
-                          itsBackgroundCols[opts.toolbarSeparators ==
+                          m_backgroundCols[opts.toolbarSeparators ==
                                             LINE_SUNKEN ? 3 : 4],
                           true, true, true);
             if (opts.toolbarSeparators == LINE_SUNKEN) {
                 drawFadedLine(painter,
                               QRect(r.x() + TOOLBAR_SEP_GAP, y + 1,
                                     r.width() - TOOLBAR_SEP_GAP * 2, 1),
-                              itsBackgroundCols[0], true, true, true);
+                              m_backgroundCols[0], true, true, true);
             }
         }
         break;
     default:
     case LINE_DOTS:
         drawDots(painter, r, !(state & State_Horizontal), 1, 5,
-                 itsBackgroundCols, 0, 5);
+                 m_backgroundCols, 0, 5);
     }
     return true;
 }
@@ -534,7 +534,7 @@ Style::drawPrimitiveFrame(PrimitiveElement element,
             drawPrimitive(PE_FrameMenu, option, painter, widget);
         } else if (opts.square & SQUARE_POPUP_MENUS) {
             const QColor *use = (theThemedApp == APP_KRUNNER ?
-                                 itsBackgroundCols : backgroundColors(option));
+                                 m_backgroundCols : backgroundColors(option));
             painter->setPen(use[QTC_STD_BORDER]);
             drawRect(painter, r);
             painter->setPen(palette.base().color());
@@ -685,7 +685,7 @@ Style::drawPrimitivePanelMenuBar(PrimitiveElement element,
         qobject_cast<const QMainWindow*>(widget->parentWidget())) {
         drawMenuOrToolBarBackground(widget, painter, r, option);
         if (opts.toolbarBorders != TB_NONE) {
-            const QColor *use = (itsActive ? itsMenubarCols :
+            const QColor *use = (m_active ? m_menubarCols :
                                  backgroundColors(option));
             bool dark = qtcOneOf(opts.toolbarBorders, TB_DARK, TB_DARK_ALL);
             if (qtcOneOf(opts.toolbarBorders, TB_DARK_ALL, TB_LIGHT_ALL)) {
@@ -728,7 +728,7 @@ Style::drawPrimitivePanelTipLabel(PrimitiveElement element,
     QColor col = palette.toolTipBase().color();
 
     if (widget && widget->window()) {
-        itsShadowHelper->registerWidget(widget->window());
+        m_shadowHelper->registerWidget(widget->window());
     }
     if (rounded) {
         painter->setRenderHint(QPainter::Antialiasing, true);
@@ -835,7 +835,7 @@ Style::drawPrimitivePanelItemViewItem(PrimitiveElement element,
                            ((const QListView*)widget)->viewMode() !=
                            QListView::IconMode)))));
         bool modAlpha = (!(state & State_Active) &&
-                         itsInactiveChangeSelectionColor);
+                         m_inactiveChangeSelectionColor);
         if (hover && !hasCustomBackground) {
             if (!(state & State_Selected)) {
                 color.setAlphaF(theThemedApp == APP_PLASMA && !widget ?
@@ -856,7 +856,7 @@ Style::drawPrimitivePanelItemViewItem(PrimitiveElement element,
             QPixmap pix;
             QString key;
             key.sprintf("qtc-sel-%x-%x", r.height(), color.rgba());
-            if (!itsUsePixmapCache || !QPixmapCache::find(key, pix)) {
+            if (!m_usePixmapCache || !QPixmapCache::find(key, pix)) {
                 pix = QPixmap(QSize(24, r.height()));
                 pix.fill(Qt::transparent);
                 QPainter pixPainter(&pix);
@@ -876,7 +876,7 @@ Style::drawPrimitivePanelItemViewItem(PrimitiveElement element,
                                                   ROUNDED_ALL, radius));
                 }
                 pixPainter.end();
-                if (itsUsePixmapCache) {
+                if (m_usePixmapCache) {
                     QPixmapCache::insert(key, pix);
                 }
             }
@@ -1033,7 +1033,7 @@ Style::drawPrimitiveFrameWindow(PrimitiveElement element,
     State state = option->state;
     const QPalette &palette(option->palette);
     bool colTbarOnly = opts.windowBorder & WINDOW_BORDER_COLOR_TITLEBAR_ONLY;
-    bool fillBgnd = (!(state & QtC_StateKWin) && !itsIsPreview &&
+    bool fillBgnd = (!(state & QtC_StateKWin) && !m_isPreview &&
                      !qtcIsFlatBgnd(opts.bgndAppearance));
     const QColor *bgndCols =
         (colTbarOnly || fillBgnd ?
@@ -1165,16 +1165,16 @@ Style::drawPrimitiveButton(PrimitiveElement element, const QStyleOption *option,
     }
     if (isDefault && state & State_Enabled &&
         qtcOneOf(opts.defBtnIndicator, IND_TINT, IND_SELECTED)) {
-        use = itsDefBtnCols;
+        use = m_defBtnCols;
     } else if (state & STATE_DWT_BUTTON && widget &&
                opts.titlebarButtons & TITLEBAR_BUTTON_COLOR &&
                coloredMdiButtons(state & State_Active,
                                  state & State_MouseOver) &&
                !(opts.titlebarButtons & TITLEBAR_BUTTON_COLOR_SYMBOL)) {
         if (constDwtClose == widget->objectName()) {
-            use = itsTitleBarButtonsCols[TITLEBAR_CLOSE];
+            use = m_titleBarButtonsCols[TITLEBAR_CLOSE];
         } else if (constDwtFloat == widget->objectName()) {
-            use = itsTitleBarButtonsCols[TITLEBAR_MAX];
+            use = m_titleBarButtonsCols[TITLEBAR_MAX];
         } else if (widget->parentWidget() &&
                    widget->parentWidget()->parentWidget() &&
                    widget->parentWidget()->inherits("KoDockWidgetTitleBar") &&
@@ -1202,14 +1202,14 @@ Style::drawPrimitiveButton(PrimitiveElement element, const QStyleOption *option,
                 subElementRect(
                     QStyle::SE_DockWidgetCloseButton, &dwOpt,
                     widget->parentWidget()->parentWidget()) == geom) {
-                use = itsTitleBarButtonsCols[TITLEBAR_CLOSE];
+                use = m_titleBarButtonsCols[TITLEBAR_CLOSE];
             } else if (dwOpt.floatable &&
                        subElementRect(
                            QStyle::SE_DockWidgetFloatButton, &dwOpt,
                            widget->parentWidget()->parentWidget()) == geom) {
-                use = itsTitleBarButtonsCols[TITLEBAR_MAX];
+                use = m_titleBarButtonsCols[TITLEBAR_MAX];
             } else {
-                use = itsTitleBarButtonsCols[TITLEBAR_SHADE];
+                use = m_titleBarButtonsCols[TITLEBAR_SHADE];
             }
         }
     }
@@ -1224,11 +1224,11 @@ Style::drawPrimitiveButton(PrimitiveElement element, const QStyleOption *option,
     }
 
     drawLightBevel(painter, r, &opt, widget, ROUNDED_ALL,
-                   coloredDef ? itsDefBtnCols[MO_DEF_BTN] :
+                   coloredDef ? m_defBtnCols[MO_DEF_BTN] :
                    getFill(&opt, use, false,
                            isDefault && state & State_Enabled &&
                            opts.defBtnIndicator == IND_DARKEN),
-                   coloredDef ? itsDefBtnCols : use, true,
+                   coloredDef ? m_defBtnCols : use, true,
                    isKWin || state & STATE_DWT_BUTTON ?
                    WIDGET_MDI_WINDOW_BUTTON :
                    isOnListView ? WIDGET_NO_ETCH_BTN :
@@ -1245,7 +1245,7 @@ Style::drawPrimitiveButton(PrimitiveElement element, const QStyleOption *option,
             int etchOffset = doEtch ? 1 : 0;
             double xd = r.x() + 0.5;
             double yd = r.y() + 0.5;
-            const QColor *cols = itsFocusCols ? itsFocusCols : itsHighlightCols;
+            const QColor *cols = m_focusCols ? m_focusCols : m_highlightCols;
 
             path.moveTo(xd + offset + etchOffset, yd + offset + etchOffset);
             path.lineTo(xd + offset + 6 + etchOffset, yd + offset + etchOffset);
@@ -1443,7 +1443,7 @@ Style::drawPrimitiveFrameFocusRect(PrimitiveElement element,
             }
             QColor c(view && state & State_Selected ?
                      palette.highlightedText().color() :
-                     itsFocusCols[FOCUS_SHADE(state & State_Selected)]);
+                     m_focusCols[FOCUS_SHADE(state & State_Selected)]);
 
             if (qtcOneOf(opts.focus, FOCUS_LINE, FOCUS_GLOW)) {
                 if (!(state & State_Horizontal) && widget &&
@@ -1609,7 +1609,7 @@ Style::drawPrimitiveIndicatorRadioButton(PrimitiveElement element,
             painter->setBrush(Qt::NoBrush);
             if (!doneShadow && doEtch &&
                 (glow || opts.buttonEffect != EFFECT_NONE || sunken)) {
-                QColor topCol = glow ? itsMouseOverCols[GLOW_MO] : Qt::black;
+                QColor topCol = glow ? m_mouseOverCols[GLOW_MO] : Qt::black;
                 if (!glow) {
                     topCol.setAlphaF(ETCH_RADIO_TOP_ALPHA);
                 }
