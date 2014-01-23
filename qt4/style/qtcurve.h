@@ -448,15 +448,15 @@ private:
     QPoint m_pos;
     QWidget *m_hoverWidget;
     QDBusInterface *m_dBus;
-    QtCurve::ShadowHelper *m_shadowHelper;
+    ShadowHelper *m_shadowHelper;
     mutable QScrollBar *m_sViewSBar;
     mutable QMap<QWidget*, QSet<QWidget*> > m_sViewContainers;
 #ifdef QTC_QT4_ENABLE_KDE
     KComponentData m_componentData;
 #endif
-    QtCurve::WindowManager *m_windowManager;
-    QtCurve::BlurHelper *m_blurHelper;
-    QtCurve::ShortcutHandler *m_shortcutHandler;
+    WindowManager *m_windowManager;
+    BlurHelper *m_blurHelper;
+    ShortcutHandler *m_shortcutHandler;
 #ifdef QTC_QT4_STYLE_SUPPORT
     QString m_name;
 #endif

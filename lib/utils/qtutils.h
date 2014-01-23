@@ -26,6 +26,9 @@
 #include <QtGlobal>
 #include <QWidget>
 #include <config.h>
+#include <QStyleOption>
+
+namespace QtCurve {
 
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0) && defined QTC_QT4_ENABLE_KDE) || \
     (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && defined QTC_QT5_ENABLE_KDE)
@@ -137,6 +140,22 @@ qtcGetBalloonMargin(QWidget *widget, bool *atTop)
         *atTop = false;
         return bottomMargin - topMargin;
     }
+}
+
+template<typename T, typename T2>
+QTC_ALWAYS_INLINE static inline const T*
+qtcStyleCast(const T2 *opt)
+{
+    return qstyleoption_cast<const T*>(opt);
+}
+
+template<typename T, typename T2>
+QTC_ALWAYS_INLINE static inline T*
+qtcStyleCast(T2 *opt)
+{
+    return qstyleoption_cast<T*>(opt);
+}
+
 }
 
 #endif

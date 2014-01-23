@@ -27,6 +27,8 @@
 #include <QVariant>
 #include <QMdiSubWindow>
 
+namespace QtCurve {
+
 struct _QtcQWidgetProps {
     _QtcQWidgetProps():
         opacity(100),
@@ -52,7 +54,6 @@ struct _QtcQWidgetProps {
     // CPD:TODO WebKit?
     bool noEtch: 1;
 };
-Q_DECLARE_METATYPE(QSharedPointer<_QtcQWidgetProps>)
 
 #define QTC_PROP_NAME "_q__QTCURVE_WIDGET_PROPERTIES__"
 
@@ -105,5 +106,9 @@ qtcGetOpacity(const QWidget *widget)
     }
     return 100;
 }
+
+}
+
+Q_DECLARE_METATYPE(QSharedPointer<QtCurve::_QtcQWidgetProps>)
 
 #endif

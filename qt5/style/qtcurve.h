@@ -565,15 +565,15 @@ private:
     mutable int itsTitlebarHeight;
 
     QDBusInterface *itsDBus;
-    QtCurve::ShadowHelper *itsShadowHelper;
+    ShadowHelper *itsShadowHelper;
     mutable QScrollBar *itsSViewSBar;
     mutable QMap<QWidget*, QSet<QWidget*> > itsSViewContainers;
 #ifdef QTC_QT5_ENABLE_KDE
     KComponentData itsComponentData;
 #endif
-    QtCurve::WindowManager *itsWindowManager;
-    QtCurve::BlurHelper *itsBlurHelper;
-    QtCurve::ShortcutHandler *itsShortcutHandler;
+    WindowManager *itsWindowManager;
+    BlurHelper *itsBlurHelper;
+    ShortcutHandler *itsShortcutHandler;
 };
 }
 

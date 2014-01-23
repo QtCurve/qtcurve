@@ -33,9 +33,9 @@
 #include "check_x_on-png.h"
 
 #ifndef QTC_QT5_ENABLE_KDE
-#include "dialog_error-png.h"
-#include "dialog_warning-png.h"
-#include "dialog_information-png.h"
+#  include "dialog_error-png.h"
+#  include "dialog_warning-png.h"
+#  include "dialog_information-png.h"
 #endif
 
 #include <QFormLayout>
@@ -93,7 +93,6 @@
 #include <KDE/KMenu>
 #include <KDE/KAboutApplicationDialog>
 #include <KDE/KIcon>
-
 #endif
 
 #include <qtcurve-utils/color.h>
@@ -210,10 +209,14 @@ kdeHome()
 }
 #endif
 
-static bool isHoriz(const QStyleOption *option, EWidget w, bool joinedTBar)
+static bool
+isHoriz(const QStyleOption *option, EWidget w, bool joinedTBar)
 {
-    return option->state&QStyle::State_Horizontal ||
-        (WIDGET_BUTTON(w) && (!joinedTBar || (WIDGET_TOOLBAR_BUTTON!=w && WIDGET_NO_ETCH_BTN!=w && WIDGET_MENU_BUTTON!=w)));
+    return (option->state & QStyle::State_Horizontal ||
+            (WIDGET_BUTTON(w) &&
+             (!joinedTBar || qtcNoneOf(w, WIDGET_TOOLBAR_BUTTON,
+                                       WIDGET_NO_ETCH_BTN,
+                                       WIDGET_MENU_BUTTON))));
 }
 
 static bool
@@ -243,15 +246,15 @@ isOnToolbar(const QWidget *widget)
   ------------
   56
 */
-enum ECacheType
-{
+enum ECacheType {
     CACHE_STD,
     CACHE_PBAR,
     CACHE_TAB_TOP,
     CACHE_TAB_BOT
 };
 
-static QtcKey createKey(qulonglong size, const QColor &color, bool horiz, int app, EWidget w)
+static QtcKey
+createKey(qulonglong size, const QColor &color, bool horiz, int app, EWidget w)
 {
     ECacheType type=WIDGET_TAB_TOP==w
         ? CACHE_TAB_TOP
@@ -270,7 +273,7 @@ static QtcKey createKey(qulonglong size, const QColor &color, bool horiz, int ap
 
 static QtcKey createKey(const QColor &color, EPixmap p)
 {
-    return 1+
+    return 1 +
         ((color.rgb()&RGB_MASK)<<1)+
         (((qulonglong)(p&0x1F))<<33)+
         (((qulonglong)1)<<38);
@@ -343,13 +346,13 @@ Style::Style() :
     itsShortcutHandler(new ShortcutHandler(this))
 {
     const char *env = getenv(QTCURVE_PREVIEW_CONFIG);
-    if (env && 0 == strcmp(env, QTCURVE_PREVIEW_CONFIG)) {
+    if (env && strcmp(env, QTCURVE_PREVIEW_CONFIG) == 0) {
         // To enable preview of QtCurve settings, the style config module will set QTCURVE_PREVIEW_CONFIG
         // and use CE_QtC_SetOptions to set options. If this is set, we do not use the QPixmapCache as it
         // will interfere with that of the kcm's widgets!
         itsIsPreview=PREVIEW_MDI;
         itsUsePixmapCache=false;
-    } else if(env && 0==strcmp(env, QTCURVE_PREVIEW_CONFIG_FULL)) {
+    } else if(env && strcmp(env, QTCURVE_PREVIEW_CONFIG_FULL) == 0) {
         // As above, but preview is in window - so can use opacity settings!
         itsIsPreview=PREVIEW_WINDOW;
         itsUsePixmapCache=false;
@@ -384,8 +387,9 @@ void Style::init(bool initial)
 #endif
 
     if (itsIsPreview) {
-        if(PREVIEW_WINDOW!=itsIsPreview)
-            opts.bgndOpacity=opts.dlgOpacity=opts.menuBgndOpacity=100;
+        if (itsIsPreview != PREVIEW_WINDOW) {
+            opts.bgndOpacity = opts.dlgOpacity = opts.menuBgndOpacity = 100;
+        }
     } else {
         qtcReadConfig(QString(), &opts);
 
@@ -446,13 +450,13 @@ void Style::init(bool initial)
         break;
     case SHADE_BLEND_SELECTED:
     case SHADE_CUSTOM:
-        if(!itsSliderCols)
-            itsSliderCols=new QColor [TOTAL_SHADES+1];
-        shadeColors(SHADE_BLEND_SELECTED==opts.shadeSliders
-                    ? midColor(itsHighlightCols[ORIGINAL_SHADE],
-                               itsButtonCols[ORIGINAL_SHADE])
-                    : opts.customSlidersColor,
-                    itsSliderCols);
+        if (!itsSliderCols) {
+            itsSliderCols = new QColor[TOTAL_SHADES + 1];
+        }
+        shadeColors(opts.shadeSliders == SHADE_BLEND_SELECTED ?
+                    midColor(itsHighlightCols[ORIGINAL_SHADE],
+                             itsButtonCols[ORIGINAL_SHADE]) :
+                    opts.customSlidersColor, itsSliderCols);
     }
 
     switch(opts.defBtnIndicator)
@@ -470,11 +474,10 @@ void Style::init(bool initial)
     default:
         break;
     case IND_COLORED:
-        if(SHADE_BLEND_SELECTED==opts.shadeSliders)
-            itsDefBtnCols=itsSliderCols;
-        else
-        {
-            itsDefBtnCols=new QColor [TOTAL_SHADES+1];
+        if (opts.shadeSliders == SHADE_BLEND_SELECTED) {
+            itsDefBtnCols = itsSliderCols;
+        } else {
+            itsDefBtnCols = new QColor[TOTAL_SHADES + 1];
             shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
                                  itsButtonCols[ORIGINAL_SHADE]), itsDefBtnCols);
         }
@@ -489,31 +492,30 @@ void Style::init(bool initial)
         itsComboBtnCols=itsHighlightCols;
         break;
     case SHADE_BLEND_SELECTED:
-        if(opts.shadeSliders==SHADE_BLEND_SELECTED)
-        {
-            itsComboBtnCols=itsSliderCols;
+        if (opts.shadeSliders == SHADE_BLEND_SELECTED) {
+            itsComboBtnCols = itsSliderCols;
             break;
         }
     case SHADE_CUSTOM:
-        if(opts.shadeSliders==SHADE_CUSTOM && opts.customSlidersColor==opts.customComboBtnColor)
-        {
-            itsComboBtnCols=itsSliderCols;
+        if (opts.shadeSliders == SHADE_CUSTOM &&
+            opts.customSlidersColor == opts.customComboBtnColor) {
+            itsComboBtnCols = itsSliderCols;
             break;
         }
-        if(!itsComboBtnCols)
-            itsComboBtnCols=new QColor [TOTAL_SHADES+1];
-        shadeColors(SHADE_BLEND_SELECTED==opts.comboBtn
-                    ? midColor(itsHighlightCols[ORIGINAL_SHADE],
-                               itsButtonCols[ORIGINAL_SHADE])
-                    : opts.customComboBtnColor,
-                    itsComboBtnCols);
+        if (!itsComboBtnCols) {
+            itsComboBtnCols = new QColor[TOTAL_SHADES + 1];
+        }
+        shadeColors(opts.comboBtn == SHADE_BLEND_SELECTED ?
+                    midColor(itsHighlightCols[ORIGINAL_SHADE],
+                             itsButtonCols[ORIGINAL_SHADE]) :
+                    opts.customComboBtnColor, itsComboBtnCols);
     }
 
-    switch(opts.sortedLv)
-    {
+    switch (opts.sortedLv) {
     case SHADE_DARKEN:
-        if(!itsSortedLvColors)
-            itsSortedLvColors=new QColor [TOTAL_SHADES+1];
+        if (!itsSortedLvColors) {
+            itsSortedLvColors = new QColor[TOTAL_SHADES + 1];
+        }
         shadeColors(shade(opts.lvButton ? itsButtonCols[ORIGINAL_SHADE] : itsBackgroundCols[ORIGINAL_SHADE], LV_HEADER_DARK_FACTOR), itsSortedLvColors);
         break;
     default:
@@ -523,49 +525,48 @@ void Style::init(bool initial)
         itsSortedLvColors=itsHighlightCols;
         break;
     case SHADE_BLEND_SELECTED:
-        if(SHADE_BLEND_SELECTED==opts.shadeSliders)
-        {
-            itsSortedLvColors=itsSliderCols;
+        if (opts.shadeSliders == SHADE_BLEND_SELECTED) {
+            itsSortedLvColors = itsSliderCols;
             break;
-        }
-        else if(SHADE_BLEND_SELECTED==opts.comboBtn)
-        {
-            itsSortedLvColors=itsComboBtnCols;
+        } else if (opts.comboBtn == SHADE_BLEND_SELECTED) {
+            itsSortedLvColors = itsComboBtnCols;
             break;
         }
     case SHADE_CUSTOM:
-        if(opts.shadeSliders==SHADE_CUSTOM && opts.customSlidersColor==opts.customSortedLvColor)
-        {
-            itsSortedLvColors=itsSliderCols;
+        if (opts.shadeSliders == SHADE_CUSTOM &&
+            opts.customSlidersColor == opts.customSortedLvColor) {
+            itsSortedLvColors = itsSliderCols;
             break;
         }
-        if(opts.comboBtn==SHADE_CUSTOM && opts.customComboBtnColor==opts.customSortedLvColor)
-        {
-            itsSortedLvColors=itsComboBtnCols;
+        if (opts.comboBtn == SHADE_CUSTOM &&
+            opts.customComboBtnColor == opts.customSortedLvColor) {
+            itsSortedLvColors = itsComboBtnCols;
             break;
         }
-        if(!itsSortedLvColors)
-            itsSortedLvColors=new QColor [TOTAL_SHADES+1];
-        shadeColors(SHADE_BLEND_SELECTED==opts.sortedLv
-                    ? midColor(itsHighlightCols[ORIGINAL_SHADE],
-                               (opts.lvButton ? itsButtonCols[ORIGINAL_SHADE] : itsBackgroundCols[ORIGINAL_SHADE]))
-                    : opts.customSortedLvColor,
-                    itsSortedLvColors);
+        if (!itsSortedLvColors) {
+            itsSortedLvColors = new QColor[TOTAL_SHADES + 1];
+        }
+        shadeColors(opts.sortedLv == SHADE_BLEND_SELECTED ?
+                    midColor(itsHighlightCols[ORIGINAL_SHADE],
+                             (opts.lvButton ? itsButtonCols[ORIGINAL_SHADE] :
+                              itsBackgroundCols[ORIGINAL_SHADE])) :
+                    opts.customSortedLvColor, itsSortedLvColors);
     }
 
-    switch(opts.crColor)
-    {
+    switch (opts.crColor) {
     default:
     case SHADE_NONE:
-        itsCheckRadioSelCols=itsButtonCols;
+        itsCheckRadioSelCols = itsButtonCols;
         break;
     case SHADE_DARKEN:
-        if(!itsCheckRadioSelCols)
-            itsCheckRadioSelCols=new QColor [TOTAL_SHADES+1];
-        shadeColors(shade(itsButtonCols[ORIGINAL_SHADE], LV_HEADER_DARK_FACTOR), itsCheckRadioSelCols);
+        if (!itsCheckRadioSelCols) {
+            itsCheckRadioSelCols = new QColor[TOTAL_SHADES + 1];
+        }
+        shadeColors(shade(itsButtonCols[ORIGINAL_SHADE], LV_HEADER_DARK_FACTOR),
+                    itsCheckRadioSelCols);
         break;
     case SHADE_SELECTED:
-        itsCheckRadioSelCols=itsHighlightCols;
+        itsCheckRadioSelCols = itsHighlightCols;
         break;
     case SHADE_CUSTOM:
         if(SHADE_CUSTOM==opts.shadeSliders && opts.customSlidersColor==opts.customCrBgndColor)
@@ -660,13 +661,16 @@ void Style::init(bool initial)
     else
         opts.titlebarButtons&=~TITLEBAR_BUTTON_COLOR;
 
-    if(IMG_PLAIN_RINGS==opts.bgndImage.type || IMG_BORDERED_RINGS==opts.bgndImage.type ||
-       IMG_SQUARE_RINGS==opts.bgndImage.type ||
-       IMG_PLAIN_RINGS==opts.menuBgndImage.type || IMG_BORDERED_RINGS==opts.menuBgndImage.type ||
-       IMG_SQUARE_RINGS==opts.menuBgndImage.type)
+    if (qtcOneOf(opts.bgndImage.type, IMG_PLAIN_RINGS, IMG_BORDERED_RINGS,
+                 IMG_SQUARE_RINGS) ||
+        qtcOneOf(opts.menuBgndImage.type, IMG_PLAIN_RINGS, IMG_BORDERED_RINGS,
+                 IMG_SQUARE_RINGS)) {
         qtcCalcRingAlphas(&itsBackgroundCols[ORIGINAL_SHADE]);
+    }
 
-    itsBlurHelper->setEnabled(100!=opts.bgndOpacity || 100!=opts.dlgOpacity || 100!=opts.menuBgndOpacity);
+    itsBlurHelper->setEnabled(opts.bgndOpacity != 100 ||
+                              opts.dlgOpacity != 100 ||
+                              opts.menuBgndOpacity != 100);
 
 #ifdef QTC_QT5_ENABLE_KDE
     // We need to set the decoration colours for the preview now...
@@ -695,8 +699,7 @@ void Style::freeColor(QSet<QColor *> &freedColors, QColor **cols)
        *cols!=itsButtonCols &&
        *cols!=itsColoredButtonCols &&
        *cols!=itsColoredBackgroundCols &&
-       *cols!=itsColoredHighlightCols)
-    {
+       *cols!=itsColoredHighlightCols) {
         freedColors.insert(*cols);
         delete [] *cols;
     }
@@ -845,15 +848,17 @@ void Style::polishScrollArea(QAbstractScrollArea *scrollArea, bool isKFilePlaces
 
     // get viewport and check background role
     QWidget *viewport(scrollArea->viewport());
-    if(!(viewport && QPalette::Window==viewport->backgroundRole()) && !isKFilePlacesView)
+    if(!(viewport && viewport->backgroundRole() == QPalette::Window) &&
+       !isKFilePlacesView) {
         return;
+    }
 
     // change viewport autoFill background.
     // do the same for children if the background role is QPalette::Window
     viewport->setAutoFillBackground(false);
     for (QWidget *child: viewport->findChildren<QWidget*>()) {
         if (child->parent() == viewport &&
-            QPalette::Window == child->backgroundRole()) {
+            child->backgroundRole() == QPalette::Window) {
             child->setAutoFillBackground(false);
         }
     }
@@ -879,8 +884,8 @@ QIcon Style::standardIcon(StandardPixmap pix, const QStyleOption *option,
         QPainter painter(&pm);
 
         drawIcon(&painter, Qt::color1, QRect(0, 0, pm.width(), pm.height()),
-                 false, pix2Icon(pix), SP_TitleBarShadeButton == pix ||
-                 SP_TitleBarUnshadeButton == pix);
+                 false, pix2Icon(pix), qtcOneOf(pix, SP_TitleBarShadeButton,
+                                                SP_TitleBarUnshadeButton));
         return QIcon(pm);
     }
     case SP_ToolBarHorizontalExtensionButton:
@@ -977,9 +982,11 @@ QIcon Style::standardIcon(StandardPixmap pix, const QStyleOption *option,
         return KIcon("application-x-zerosize");
     // case SP_FileLinkIcon:
     case SP_FileDialogStart:
-        return KIcon(Qt::RightToLeft==QApplication::layoutDirection() ? "go-edn" : "go-first");
+        return KIcon(QApplication::layoutDirection() == Qt::RightToLeft ?
+                     "go-edn" : "go-first");
     case SP_FileDialogEnd:
-        return KIcon(Qt::RightToLeft==QApplication::layoutDirection() ? "go-first" : "go-end");
+        return KIcon(QApplication::layoutDirection() == Qt::RightToLeft ?
+                     "go-first" : "go-end");
     case SP_FileDialogToParent:
         return KIcon("go-up");
     case SP_FileDialogNewFolder:
@@ -993,7 +1000,8 @@ QIcon Style::standardIcon(StandardPixmap pix, const QStyleOption *option,
     case SP_FileDialogListView:
         return KIcon("view-list-icons");
     case SP_FileDialogBack:
-        return KIcon(Qt::RightToLeft==QApplication::layoutDirection() ? "go-next" : "go-previous");
+        return KIcon(QApplication::layoutDirection() == Qt::RightToLeft ?
+                     "go-next" : "go-previous");
     case SP_DialogOkButton:
         return KIcon("dialog-ok");
     case SP_DialogCancelButton:
@@ -1025,9 +1033,11 @@ QIcon Style::standardIcon(StandardPixmap pix, const QStyleOption *option,
     case SP_ArrowRight:
         return KIcon("arrow-right");
     case SP_ArrowBack:
-        return KIcon(Qt::RightToLeft==QApplication::layoutDirection() ? "go-next" : "go-previous");
+        return KIcon(QApplication::layoutDirection() == Qt::RightToLeft ?
+                     "go-next" : "go-previous");
     case SP_ArrowForward:
-        return KIcon(Qt::RightToLeft==QApplication::layoutDirection() ? "go-previous" : "go-next");
+        return KIcon(QApplication::layoutDirection() == Qt::RightToLeft ?
+                     "go-previous" : "go-next");
     case SP_DirHomeIcon:
         return KIcon("user-home");
     // case SP_CommandLink:
@@ -1107,34 +1117,31 @@ void Style::drawSideBarButton(QPainter *painter, const QRect &r, const QStyleOpt
     else
         painter->fillRect(r2, palette.background().color());
 
-    if(opt.state&State_MouseOver && opts.coloredMouseOver)
-    {
-        r2=r;
-        if(MO_PLASTIK==opts.coloredMouseOver)
-            if(horiz)
+    if (opt.state & State_MouseOver && opts.coloredMouseOver) {
+        r2 = r;
+        if (opts.coloredMouseOver == MO_PLASTIK) {
+            if (horiz) {
                 r2.adjust(0, 1, 0, -1);
-            else
+            } else {
                 r2.adjust(1, 0, -1, 0);
-        else
+            }
+        } else {
             r2.adjust(1, 1, -1, -1);
-
-        if(MO_GLOW==opts.coloredMouseOver)
-        {
+        }
+        if (opts.coloredMouseOver == MO_GLOW) {
             QColor col(itsMouseOverCols[opt.state&State_On ? 0 : 1]);
 
             col.setAlphaF(GLOW_ALPHA(false));
             painter->setPen(col);
             drawRect(painter, r);
-            col=itsMouseOverCols[opt.state&State_On ? 4 : 3];
+            col = itsMouseOverCols[opt.state&State_On ? 4 : 3];
             col.setAlphaF(0.8);
             painter->setPen(col);
             drawRect(painter, r2);
-        }
-        else
-        {
+        } else {
             painter->setPen(itsMouseOverCols[opt.state&State_On ? 0 : 1]);
 
-            if(horiz || MO_PLASTIK!=opts.coloredMouseOver)
+            if (horiz || MO_PLASTIK!=opts.coloredMouseOver)
             {
                 painter->drawLine(r.x(), r.y(), r.x()+r.width()-1, r.y());
                 painter->drawLine(r2.x(), r2.y(), r2.x()+r2.width()-1, r2.y());
@@ -1206,7 +1213,7 @@ void Style::drawLines(QPainter *p, const QRect &r, bool horiz, int nLines, int o
 {
     int  space((nLines*2)+(LINE_DASHES!=type ? (nLines-1) : 0)),
         step(LINE_DASHES!=type ? 3 : 2),
-        etchedDisp(LINE_SUNKEN==type ? 1 : 0),
+        etchedDisp(type == LINE_SUNKEN ? 1 : 0),
         x(horiz ? r.x() : r.x()+((r.width()-space)>>1)),
         y(horiz ? r.y()+((r.height()-space)>>1) : r.y()),
         x2(r.x()+r.width()-1),
@@ -1378,56 +1385,58 @@ void Style::drawProgressBevelGradient(QPainter *p, const QRect &origRect, const 
     p->save();
     p->setClipRect(origRect, Qt::IntersectClip);
     p->drawTiledPixmap(fillRect, *pix);
-    if(STRIPE_FADE==opts.stripedProgress && fillRect.width()>4 && fillRect.height()>4)
+    if (opts.stripedProgress == STRIPE_FADE && fillRect.width() > 4 &&
+        fillRect.height() > 4) {
         addStripes(p, QPainterPath(), fillRect, !vertical);
+    }
     p->restore();
 
-    if(!inCache)
+    if (!inCache) {
         delete pix;
+    }
 }
 
-void Style::drawBevelGradient(const QColor &base, QPainter *p, const QRect &origRect, const QPainterPath &path,
-                              bool horiz, bool sel, EAppearance bevApp, EWidget w, bool useCache) const
+void
+Style::drawBevelGradient(const QColor &base, QPainter *p, const QRect &origRect,
+                         const QPainterPath &path, bool horiz, bool sel,
+                         EAppearance bevApp, EWidget w, bool useCache) const
 {
-    if(origRect.width()<1 || origRect.height()<1)
+    if (origRect.width() < 1 || origRect.height() < 1) {
         return;
-
-    if(qtcIsFlat(bevApp))
-    {
-        if((WIDGET_TAB_TOP!=w && WIDGET_TAB_BOT!=w) || !qtcIsCustomBgnd(&opts) || opts.tabBgnd || !sel)
-        {
-            if(path.isEmpty())
-                p->fillRect(origRect, base);
-            else
-                p->fillPath(path, base);
-        }
     }
-    else
-    {
-        bool        tab(WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w),
-            selected(tab ? false : sel);
-        EAppearance app(selected
-                        ? opts.sunkenAppearance
-                        : WIDGET_LISTVIEW_HEADER==w && APPEARANCE_BEVELLED==bevApp
-                        ? APPEARANCE_LV_BEVELLED
-                        : APPEARANCE_BEVELLED!=bevApp || WIDGET_BUTTON(w) || WIDGET_LISTVIEW_HEADER==w ||
-                        WIDGET_TROUGH==w || WIDGET_NO_ETCH_BTN==w || WIDGET_MENU_BUTTON==w
-                        ? bevApp
-                        : APPEARANCE_GRADIENT);
+    if (qtcIsFlat(bevApp)) {
+        if (qtcNoneOf(w, WIDGET_TAB_TOP, WIDGET_TAB_BOT) ||
+            !qtcIsCustomBgnd(&opts) || opts.tabBgnd || !sel) {
+            if (path.isEmpty()) {
+                p->fillRect(origRect, base);
+            } else {
+                p->fillPath(path, base);
+            }
+        }
+    } else {
+        bool tab = qtcOneOf(w, WIDGET_TAB_TOP, WIDGET_TAB_BOT);
+        bool selected = tab ? false : sel;
+        EAppearance app =
+            (selected ? opts.sunkenAppearance :
+             w == WIDGET_LISTVIEW_HEADER && bevApp == APPEARANCE_BEVELLED ?
+             APPEARANCE_LV_BEVELLED : bevApp != APPEARANCE_BEVELLED ||
+             WIDGET_BUTTON(w) ||
+             qtcOneOf(w, WIDGET_LISTVIEW_HEADER, WIDGET_TROUGH,
+                      WIDGET_NO_ETCH_BTN, WIDGET_MENU_BUTTON) ? bevApp :
+             APPEARANCE_GRADIENT);
 
-        if(WIDGET_PROGRESSBAR==w || !useCache)
+        if (w == WIDGET_PROGRESSBAR || !useCache) {
             drawBevelGradientReal(base, p, origRect, path, horiz, sel, app, w);
-        else
-        {
-            QRect   r(0, 0, horiz ? PIXMAP_DIMENSION : origRect.width(),
-                      horiz ? origRect.height() : PIXMAP_DIMENSION);
-            QtcKey  key(createKey(horiz ? r.height() : r.width(), base, horiz, app, w));
+        } else {
+            QRect r(0, 0, horiz ? PIXMAP_DIMENSION : origRect.width(),
+                    horiz ? origRect.height() : PIXMAP_DIMENSION);
+            QtcKey key(createKey(horiz ? r.height() : r.width(),
+                                 base, horiz, app, w));
             QPixmap *pix(itsPixmapCache.object(key));
-            bool    inCache(true);
+            bool inCache(true);
 
-            if(!pix)
-            {
-                pix=new QPixmap(r.width(), r.height());
+            if (!pix) {
+                pix = new QPixmap(r.width(), r.height());
                 pix->fill(Qt::transparent);
 
                 QPainter pixPainter(pix);
@@ -1437,10 +1446,11 @@ void Style::drawBevelGradient(const QColor &base, QPainter *p, const QRect &orig
 
                 int cost(pix->width()*pix->height()*(pix->depth()/8));
 
-                if(cost<itsPixmapCache.maxCost())
+                if (cost < itsPixmapCache.maxCost()) {
                     itsPixmapCache.insert(key, pix, cost);
-                else
-                    inCache=false;
+                } else {
+                    inCache = false;
+                }
             }
 
             if(!path.isEmpty())
@@ -1458,63 +1468,63 @@ void Style::drawBevelGradient(const QColor &base, QPainter *p, const QRect &orig
     }
 }
 
-void Style::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &r, const QPainterPath &path,
-                                  bool horiz, bool sel, EAppearance app, EWidget w) const
+void
+Style::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &r,
+                             const QPainterPath &path, bool horiz, bool sel,
+                             EAppearance app, EWidget w) const
 {
-    bool                             topTab(WIDGET_TAB_TOP==w),
-        botTab(WIDGET_TAB_BOT==w),
-        dwt(qtcIsCustomBgnd(&opts) && WIDGET_DOCK_WIDGET_TITLE==w),
-        titleBar(opts.windowBorder&WINDOW_BORDER_BLEND_TITLEBAR &&
-                 (WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w ||
-                  (opts.dwtSettings&DWT_COLOR_AS_PER_TITLEBAR &&
-                   WIDGET_DOCK_WIDGET_TITLE==w && !dwt))),
-        reverse(Qt::RightToLeft==QApplication::layoutDirection());
-    const Gradient                   *grad=qtcGetGradient(app, &opts);
-    QLinearGradient                  g(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
-    GradientStopCont::const_iterator it(grad->stops.begin()),
-        end(grad->stops.end());
-    int                              numStops(grad->stops.size());
+    bool topTab = w == WIDGET_TAB_TOP;
+    bool botTab = w == WIDGET_TAB_BOT;
+    bool dwt = qtcIsCustomBgnd(&opts) && w == WIDGET_DOCK_WIDGET_TITLE;
+    bool titleBar = (opts.windowBorder & WINDOW_BORDER_BLEND_TITLEBAR &&
+                     (qtcOneOf(w, WIDGET_MDI_WINDOW, WIDGET_MDI_WINDOW_TITLE) ||
+                      (opts.dwtSettings & DWT_COLOR_AS_PER_TITLEBAR &&
+                       w == WIDGET_DOCK_WIDGET_TITLE && !dwt)));
+    bool reverse = Qt::RightToLeft == QApplication::layoutDirection();
+    const Gradient *grad = qtcGetGradient(app, &opts);
+    QLinearGradient g(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
+    GradientStopCont::const_iterator it(grad->stops.begin());
+    GradientStopCont::const_iterator end(grad->stops.end());
+    int numStops(grad->stops.size());
 
-    for(int i=0; it!=end; ++it, ++i)
-    {
+    for (int i = 0;it != end;++it, ++i) {
         QColor col;
 
-        if(/*sel && */(topTab || botTab || dwt || titleBar) && i==numStops-1)
-        {
-            if(titleBar)
-            {
-                col=itsBackgroundCols[ORIGINAL_SHADE];
-                //if(APPEARANCE_STRIPED==opts.bgndAppearance)
+        if ((topTab || botTab || dwt || titleBar) && i == numStops-1) {
+            if (titleBar) {
+                col = itsBackgroundCols[ORIGINAL_SHADE];
                 col.setAlphaF(0.0);
-            }
-            else
-            {
-                col=base;
-                if((sel /*&& qtcIsCustomBgnd(&opts)*/ && 0==opts.tabBgnd && !reverse) || dwt)
+            } else {
+                col = base;
+                if ((sel && opts.tabBgnd == 0 && !reverse) || dwt) {
                     col.setAlphaF(0.0);
+                }
             }
+        } else {
+            shade(base, &col, botTab && opts.invertBotTab ?
+                  qMax(INVERT_SHADE((*it).val), 0.9) : (*it).val);
         }
-        else
-            shade(base, &col, botTab && opts.invertBotTab ? qMax(INVERT_SHADE((*it).val), 0.9) : (*it).val);
-        if(WIDGET_TOOLTIP!=w && (*it).alpha<1.0)
-            col.setAlphaF(col.alphaF()*(*it).alpha);
-        g.setColorAt(botTab ? 1.0-(*it).pos : (*it).pos, col);
+        if (w != WIDGET_TOOLTIP && (*it).alpha < 1.0) {
+            col.setAlphaF(col.alphaF() * (*it).alpha);
+        }
+        g.setColorAt(botTab ? 1.0 - (*it).pos : (*it).pos, col);
     }
 
-    if(APPEARANCE_AGUA==app && !(topTab || botTab || dwt) && (horiz ? r.height() : r.width())>AGUA_MAX)
-    {
+    if (app == APPEARANCE_AGUA && !(topTab || botTab || dwt) &&
+        (horiz ? r.height() : r.width()) > AGUA_MAX) {
         QColor col;
-        double pos=AGUA_MAX/((horiz ? r.height() : r.width())*2.0);
+        double pos = AGUA_MAX/((horiz ? r.height() : r.width())*2.0);
         shade(base, &col, AGUA_MID_SHADE);
         g.setColorAt(pos, col);
         g.setColorAt(1.0-pos, col);
     }
 
     //p->fillRect(r, base);
-    if(path.isEmpty())
+    if (path.isEmpty()) {
         p->fillRect(r, QBrush(g));
-    else
+    } else {
         p->fillPath(path, QBrush(g));
+    }
 }
 
 void Style::drawSunkenBevel(QPainter *p, const QRect &r, const QColor &col) const
@@ -3015,12 +3025,14 @@ void Style::drawSbSliderHandle(QPainter *p, const QRect &rOrig, const QStyleOpti
     if(r.width()>r.height())
         opt.state|=State_Horizontal;
 
-    opt.state&=~(State_Sunken|State_On);
-    opt.state|=State_Raised;
+    opt.state &= ~(State_Sunken | State_On);
+    opt.state |= State_Raised;
 
-    if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider *>(option))
-        if(slider->minimum==slider->maximum)
-            opt.state&=~(State_MouseOver|State_Enabled);
+    if (auto slider = qtcStyleCast<QStyleOptionSlider>(option)) {
+        if (slider->minimum == slider->maximum) {
+            opt.state &= ~(State_MouseOver | State_Enabled);
+        }
+    }
 
     int          min(MIN_SLIDER_SIZE(opts.sliderThumbs));
     const QColor *use(sliderColors(&opt));
@@ -3074,25 +3086,25 @@ void Style::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOptionSlid
     if(!(option->activeSubControls&SC_SliderHandle) || !(opt.state&State_Enabled))
         opt.state&=~State_MouseOver;
 
-    if(SLIDER_TRIANGULAR==opts.sliderStyle)
-    {
-        if(r.width()>r.height())
-            opt.state|=State_Horizontal;
-        opt.state&=~(State_Sunken|State_On);
-
-        opt.state|=State_Raised;
-
-        const QColor     *use(sliderColors(&opt)),
-            *border(opt.state&State_MouseOver && (MO_GLOW==opts.coloredMouseOver ||
-                                                  MO_COLORED==opts.coloredMouseOver)
-                    ? itsMouseOverCols : use);
-        const QColor     &fill(getFill(&opt, use, false, SHADE_DARKEN==opts.shadeSliders));
-        int              x(r.x()),
-            y(r.y());
-        PrimitiveElement direction(horiz ? PE_IndicatorArrowDown : PE_IndicatorArrowRight);
-        QPolygon         clipRegion;
-        bool             drawLight(MO_PLASTIK!=opts.coloredMouseOver || !(opt.state&State_MouseOver));
-        int              size(SLIDER_TRIANGULAR==opts.sliderStyle ? 15 : 13),
+    if (opts.sliderStyle == SLIDER_TRIANGULAR) {
+        if (r.width() > r.height()) {
+            opt.state |= State_Horizontal;
+        }
+        opt.state &= ~(State_Sunken | State_On);
+        opt.state |= State_Raised;
+        const QColor *use = sliderColors(&opt);
+        const QColor *border = (opt.state & State_MouseOver &&
+                                qtcOneOf(opts.coloredMouseOver, MO_GLOW,
+                                         MO_COLORED) ? itsMouseOverCols : use);
+        const QColor &fill(getFill(&opt, use, false,
+                                   opts.shadeSliders == SHADE_DARKEN));
+        int x = r.x();
+        int y = r.y();
+        PrimitiveElement direction(horiz ? PE_IndicatorArrowDown :
+                                   PE_IndicatorArrowRight);
+        QPolygon clipRegion;
+        bool drawLight(MO_PLASTIK!=opts.coloredMouseOver || !(opt.state&State_MouseOver));
+        int size(SLIDER_TRIANGULAR==opts.sliderStyle ? 15 : 13),
             borderVal(itsMouseOverCols==border ? SLIDER_MO_BORDER_VAL : BORDER_VAL(opt.state&State_Enabled));
 
         if(option->tickPosition & QSlider::TicksBelow)
@@ -3674,16 +3686,16 @@ void Style::setMenuTextColors(QWidget *widget, bool isMenuBar) const
         }
 
         widget->setPalette(pal);
-    }
-    else if(opts.customMenuTextColor || SHADE_BLEND_SELECTED==opts.shadeMenubars ||
-            SHADE_SELECTED==opts.shadeMenubars ||
-            (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(itsMenubarCols[ORIGINAL_SHADE])))
-    {
+    } else if (opts.customMenuTextColor ||
+               qtcOneOf(opts.shadeMenubars, SHADE_BLEND_SELECTED,
+                        SHADE_SELECTED) ||
+               (opts.shadeMenubars == SHADE_CUSTOM &&
+                TOO_DARK(itsMenubarCols[ORIGINAL_SHADE]))) {
         QPalette pal(widget->palette());
 
-        pal.setBrush(QPalette::Active, QPalette::Foreground, opts.customMenuTextColor
-                     ? opts.customMenuNormTextColor
-                     : pal.highlightedText().color());
+        pal.setBrush(QPalette::Active, QPalette::Foreground,
+                     opts.customMenuTextColor ? opts.customMenuNormTextColor :
+                     pal.highlightedText().color());
         pal.setBrush(QPalette::Active, QPalette::Text, pal.brush(QPalette::Active, QPalette::Foreground));
 
         if(isMenuBar && !opts.shadeMenubarOnlyWhenActive)
@@ -3883,10 +3895,8 @@ QPixmap * Style::getPixmap(const QColor col, EPixmap p, double shade) const
     QtcKey  key(createKey(col, p));
     QPixmap *pix=itsPixmapCache.object(key);
 
-    if(!pix)
-    {
-        if(PIX_DOT==p)
-        {
+    if (!pix) {
+        if (p == PIX_DOT) {
             pix=new QPixmap(5, 5);
             pix->fill(Qt::transparent);
 
@@ -4027,29 +4037,29 @@ QColor Style::getLowerEtchCol(const QWidget *widget) const
     return col;
 }
 
-int Style::getFrameRound(const QWidget *widget) const
+int
+Style::getFrameRound(const QWidget *widget) const
 {
-    if(opts.square&SQUARE_FRAME)
+    if (opts.square & SQUARE_FRAME) {
         return ROUNDED_NONE;
+    }
+    const QWidget *window = widget ? widget->window() : NULL;
 
-    const QWidget *window=widget ? widget->window() : 0L;
-
-    if(window)
-    {
-        QRect widgetRect(widget->rect()),
-            windowRect(window->rect());
-
-        if(widgetRect==windowRect)
+    if (window) {
+        if (widget->rect() == window->rect()) {
             return ROUNDED_NONE;
+        }
     }
 
-    if((opts.square&SQUARE_ENTRY) && widget && qobject_cast<const QLabel *>(widget))
+    if ((opts.square & SQUARE_ENTRY) && widget &&
+        qobject_cast<const QLabel*>(widget)) {
         return ROUNDED_NONE;
-
+    }
     return ROUNDED_ALL;
 }
 
-void Style::widgetDestroyed(QObject *o)
+void
+Style::widgetDestroyed(QObject *o)
 {
     QWidget *w = static_cast<QWidget*>(o);
     if (theThemedApp == APP_KONTACT) {
@@ -4081,11 +4091,14 @@ void Style::setupKde4()
     }
 }
 
-void Style::setDecorationColors()
+void
+Style::setDecorationColors()
 {
     KColorScheme kcs(QPalette::Active);
-    if(opts.coloredMouseOver)
-        shadeColors(kcs.decoration(KColorScheme::HoverColor).color(), itsMouseOverCols);
+    if (opts.coloredMouseOver) {
+        shadeColors(kcs.decoration(KColorScheme::HoverColor).color(),
+                    itsMouseOverCols);
+    }
     shadeColors(kcs.decoration(KColorScheme::FocusColor).color(), itsFocusCols);
 }
 

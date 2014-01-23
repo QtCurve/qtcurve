@@ -46,7 +46,7 @@ static MacMenu *instance = 0;
 bool
 FullscreenWatcher::eventFilter(QObject *o, QEvent *ev)
 {
-    QWidget *window = qtcToWidget(o);
+    QWidget *window = QtCurve::qtcToWidget(o);
     if (!(window && ev->type() == QEvent::WindowStateChange))
         return false;
     if (window->windowState() & Qt::WindowFullScreen)

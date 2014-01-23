@@ -285,8 +285,7 @@ Style::drawPrimitiveIndicatorHeaderArrow(PrimitiveElement element,
     QTC_UNUSED(widget);
     State state = option->state;
     const QPalette &palette = option->palette;
-    if (const QStyleOptionHeader *header =
-        qstyleoption_cast<const QStyleOptionHeader*>(option)) {
+    if (auto header = qtcStyleCast<QStyleOptionHeader>(option)) {
         drawArrow(painter, option->rect,
                   header->sortIndicator & QStyleOptionHeader::SortUp ?
                   PE_IndicatorArrowUp : PE_IndicatorArrowDown,
@@ -441,8 +440,7 @@ Style::drawPrimitiveFrameGroupBox(PrimitiveElement element,
     if (opts.groupBox == FRAME_NONE) {
         return true;
     }
-    if (const QStyleOptionFrame *_frame =
-        qstyleoption_cast<const QStyleOptionFrame*>(option)) {
+    if (auto _frame = qtcStyleCast<QStyleOptionFrame>(option)) {
         bool reverse = option->direction == Qt::RightToLeft;
         QStyleOptionFrame frame(*_frame);
         if (frame.features & QStyleOptionFrame::Flat ||
@@ -544,8 +542,7 @@ Style::drawPrimitiveFrame(PrimitiveElement element,
             drawRect(painter, r.adjusted(1, 1, -1, -1));
         }
     } else {
-        const QStyleOptionFrame *fo =
-            qstyleoption_cast<const QStyleOptionFrame*>(option);
+        auto fo = qtcStyleCast<QStyleOptionFrame>(option);
         if (theThemedApp == APP_K3B &&
             !(state & (State_Sunken | State_Raised)) &&
             fo && fo->lineWidth == 1) {
@@ -760,8 +757,7 @@ Style::drawPrimitiveQtcBackground(PrimitiveElement element,
     const QRect &r = option->rect;
     const QPalette &palette(option->palette);
     State state = option->state;
-    if (const BgndOption *bgnd =
-        qstyleoption_cast<const BgndOption*>(option)) {
+    if (auto bgnd = qtcStyleCast<BgndOption>(option)) {
         if (state & QtC_StateKWin) {
             QColor col(palette.brush(QPalette::Window).color());
             int opacity(col.alphaF() * 100);
@@ -789,10 +785,8 @@ Style::drawPrimitivePanelItemViewItem(PrimitiveElement element,
                                       const QWidget *widget) const
 {
     QTC_UNUSED(element);
-    const QStyleOptionViewItemV4 *v4Opt =
-        qstyleoption_cast<const QStyleOptionViewItemV4*>(option);
-    const QAbstractItemView *view =
-        qobject_cast<const QAbstractItemView*>(widget);
+    auto v4Opt = qtcStyleCast<QStyleOptionViewItemV4>(option);
+    auto view = qobject_cast<const QAbstractItemView*>(widget);
     QRect r = option->rect;
     const QPalette &palette(option->palette);
     State state = option->state;
@@ -933,8 +927,7 @@ Style::drawPrimitiveFrameTabWidget(PrimitiveElement element,
     bool reverse = option->direction == Qt::RightToLeft;
     int round = opts.square & SQUARE_TAB_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
 
-    if (const QStyleOptionTabWidgetFrame *twf =
-        qstyleoption_cast<const QStyleOptionTabWidgetFrame*>(option)) {
+    if (auto twf = qtcStyleCast<QStyleOptionTabWidgetFrame>(option)) {
         if ((opts.round || opts.tabBgnd == 0) &&
             widget && qobject_cast<const QTabWidget*>(widget)) {
             struct QtcTabWidget: public QTabWidget {
@@ -1148,8 +1141,7 @@ Style::drawPrimitiveButton(PrimitiveElement element, const QStyleOption *option,
     if (element == PE_PanelButtonBevel) {
         opt.state |= State_Enabled;
     }
-    if (const QStyleOptionButton *button =
-        qstyleoption_cast<const QStyleOptionButton*>(option)) {
+    if (auto button = qtcStyleCast<QStyleOptionButton>(option)) {
         isDefault = ((button->features & QStyleOptionButton::DefaultButton) &&
                      (button->state & State_Enabled));
         isFlat = button->features & QStyleOptionButton::Flat;
@@ -1376,8 +1368,7 @@ Style::drawPrimitiveFrameFocusRect(PrimitiveElement element,
     const QRect &r = option->rect;
     State state = option->state;
     const QPalette &palette(option->palette);
-    if (const QStyleOptionFocusRect *focusFrame =
-        qstyleoption_cast<const QStyleOptionFocusRect*>(option)) {
+    if (auto focusFrame = qtcStyleCast<QStyleOptionFocusRect>(option)) {
         if (!(focusFrame->state & State_KeyboardFocusChange) ||
             (widget && widget->inherits("QComboBoxListView"))) {
             return true;
@@ -1810,8 +1801,7 @@ Style::drawPrimitiveFrameLineEdit(PrimitiveElement element,
     const QRect &r = option->rect;
     State state = option->state;
     const QPalette &palette(option->palette);
-    if (const QStyleOptionFrame *lineEdit =
-        qstyleoption_cast<const QStyleOptionFrame*>(option)) {
+    if (auto lineEdit = qtcStyleCast<QStyleOptionFrame>(option)) {
         if ((lineEdit->lineWidth > 0 || isOOWidget(widget)) &&
             !(widget &&
               (qobject_cast<const QComboBox*>(widget->parentWidget()) ||
@@ -1882,8 +1872,7 @@ Style::drawPrimitivePanelLineEdit(PrimitiveElement element,
     QTC_UNUSED(element);
     const QRect &r = option->rect;
     const QPalette &palette(option->palette);
-    if (const QStyleOptionFrame *panel =
-        qstyleoption_cast<const QStyleOptionFrame*>(option)) {
+    if (auto panel = qtcStyleCast<QStyleOptionFrame>(option)) {
         if (panel->lineWidth > 0) {
             QRect r2 = r.adjusted(1, 1, -1,
                                   opts.buttonEffect != EFFECT_NONE ? -2 : -1);
@@ -2028,8 +2017,7 @@ Style::drawPrimitiveFrameTabBarBase(PrimitiveElement element,
 {
     QTC_UNUSED(element);
     bool reverse = option->direction == Qt::RightToLeft;
-    if (const QStyleOptionTabBarBase *tbb =
-        qstyleoption_cast<const QStyleOptionTabBarBase*>(option)) {
+    if (auto tbb = qtcStyleCast<QStyleOptionTabBarBase>(option)) {
         if (tbb->shape != QTabBar::RoundedNorth &&
             tbb->shape != QTabBar::RoundedWest &&
             tbb->shape != QTabBar::RoundedSouth &&
