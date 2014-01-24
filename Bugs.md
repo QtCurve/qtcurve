@@ -29,4 +29,7 @@
 11. QtQuickControl is a mess... *Need improvment on Qt5 side*
 12. Plasma Kickoff (in panel) scrollbar has transparent background...
     **Seems fixed with prepolishing.**
-13. KPartplugin window does not have styled background.
+13. KPartsplugin window does not have styled background.
+    *KParsPlugin messes arround with some widget properties and flags*
+    *Also, different browsers seem to create plugin windows with*
+    *different depth.*

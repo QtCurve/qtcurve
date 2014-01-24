@@ -11,6 +11,7 @@ set(qtcurve_SRCS
   shadowhelper.cpp)
 set(qtcurve_MOC_HDRS
   qtcurve.h
+  qtcurve_p.h
   qtcurve_plugin.h
   windowmanager.h
   blurhelper.h

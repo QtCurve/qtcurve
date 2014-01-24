@@ -93,9 +93,9 @@ Style::polish(QApplication *app)
 {
     // appName = getFile(app->arguments()[0]);
 
-    if ("kwin" == appName) {
+    if (appName == "kwin") {
         theThemedApp = APP_KWIN;
-    } else if ("systemsettings" == appName) {
+    } else if (appName == "systemsettings") {
         theThemedApp = APP_SYSTEMSETTINGS;
     } else if ("plasma" == appName || appName.startsWith("plasma-")) {
         theThemedApp = APP_PLASMA;
@@ -153,8 +153,8 @@ Style::polish(QApplication *app)
 
         if(opts.useHighlightForMenu && blendOOMenuHighlight(QApplication::palette(), m_highlightCols[ORIGINAL_SHADE]))
         {
-            m_oOMenuCols=new QColor [TOTAL_SHADES+1];
-            shadeColors(tint(popupMenuCols()[ORIGINAL_SHADE], m_highlightCols[ORIGINAL_SHADE], 0.5), m_oOMenuCols);
+            m_ooMenuCols=new QColor [TOTAL_SHADES+1];
+            shadeColors(tint(popupMenuCols()[ORIGINAL_SHADE], m_highlightCols[ORIGINAL_SHADE], 0.5), m_ooMenuCols);
         }
         opts.menubarHiding=opts.statusbarHiding=HIDE_NONE;
         opts.square|=SQUARE_POPUP_MENUS|SQUARE_TOOLTIPS;
@@ -320,15 +320,15 @@ void Style::polish(QPalette &palette)
     if (theThemedApp == APP_OPENOFFICE && opts.useHighlightForMenu &&
         (newGray || newHighlight)) {
         if (blendOOMenuHighlight(palette, m_highlightCols[ORIGINAL_SHADE])) {
-            if (!m_oOMenuCols) {
-                m_oOMenuCols = new QColor[TOTAL_SHADES + 1];
+            if (!m_ooMenuCols) {
+                m_ooMenuCols = new QColor[TOTAL_SHADES + 1];
             }
             shadeColors(tint(popupMenuCols()[ORIGINAL_SHADE],
                              m_highlightCols[ORIGINAL_SHADE], 0.5),
-                        m_oOMenuCols);
-        } else if (m_oOMenuCols) {
-            delete []m_oOMenuCols;
-            m_oOMenuCols = 0L;
+                        m_ooMenuCols);
+        } else if (m_ooMenuCols) {
+            delete []m_ooMenuCols;
+            m_ooMenuCols = 0L;
         }
     }
 
@@ -408,8 +408,8 @@ void Style::polish(QWidget *widget)
 
     // Sometimes get background errors with QToolBox (e.g. in Bespin config),
     // and setting WA_StyledBackground seems to fix this,..
-    if (qtcIsCustomBgnd(&opts) || FRAME_SHADED == opts.groupBox ||
-        FRAME_FADED == opts.groupBox) {
+    if (qtcIsCustomBgnd(&opts) ||
+        qtcOneOf(opts.groupBox, FRAME_SHADED, FRAME_FADED)) {
         switch (widget->windowType()) {
         case Qt::Window:
         case Qt::Sheet:
@@ -433,10 +433,8 @@ void Style::polish(QWidget *widget)
         }
         if (widget->autoFillBackground() && widget->parentWidget() &&
             widget->parentWidget()->objectName() == "qt_scrollarea_viewport" &&
-            qtcCheckType0<QAbstractScrollArea>(
-                widget->parentWidget()->parentWidget()) &&
-            qtcCheckType0<QToolBox>(
-                widget->parentWidget()->parentWidget()->parentWidget())) {
+            qtcCheckType<QAbstractScrollArea>(qtcGetParent<2>(widget)) &&
+            qtcCheckType<QToolBox>(qtcGetParent<3>(widget))) {
             widget->parentWidget()->setAutoFillBackground(false);
             widget->setAutoFillBackground(false);
         }
@@ -487,17 +485,14 @@ void Style::polish(QWidget *widget)
            //255==viewport->palette().color(itemView->viewport()->backgroundRole()).alpha() && // KFilePlacesView
            !widget->inherits("KFilePlacesView") &&
            // Exclude non-editable combo popup...
-           !(opts.gtkComboMenus &&
-             widget->inherits("QComboBoxListView") &&
-             widget->parentWidget() &&
-             qtcCheckType0<QComboBox>(widget->parentWidget()->parentWidget()) &&
-             !static_cast<QComboBox*>(widget->parentWidget()
-                                      ->parentWidget())->isEditable()) &&
+           !(opts.gtkComboMenus && widget->inherits("QComboBoxListView") &&
+             qtcCheckType<QComboBox>(qtcGetParent<2>(widget)) &&
+             !static_cast<QComboBox*>(qtcGetParent<2>(widget))->isEditable()) &&
            // Exclude KAboutDialog...
-           !qtcCheckKDEType0(getParent(widget, 5), KAboutApplicationDialog) &&
+           !qtcCheckKDEType(qtcGetParent<5>(widget), KAboutApplicationDialog) &&
            (qobject_cast<QTreeView*>(widget) ||
             (qobject_cast<QListView*>(widget) &&
-             QListView::IconMode != ((QListView*)widget)->viewMode())))
+             ((QListView*)widget)->viewMode() != QListView::IconMode)))
             itemView->setAlternatingRowColors(true);
     }
 
@@ -573,17 +568,16 @@ void Style::polish(QWidget *widget)
         setMenuTextColors(widget, true);
     } else if(qobject_cast<QLabel*>(widget)) {
         widget->installEventFilter(this);
-        if (WM_DRAG_ALL == opts.windowDrag &&
+        if (opts.windowDrag == WM_DRAG_ALL &&
             ((QLabel*)widget)->textInteractionFlags()
             .testFlag(Qt::TextSelectableByMouse) &&
-            qtcCheckType0<QFrame>(widget->parentWidget()) &&
-            qtcCheckKDEType0(widget->parentWidget()->parentWidget(),
-                             KTitleWidget))
+            qtcCheckType<QFrame>(widget->parentWidget()) &&
+            qtcCheckKDEType(qtcGetParent<2>(widget), KTitleWidget))
             ((QLabel*)widget)->setTextInteractionFlags(
                 ((QLabel*)widget)->textInteractionFlags() &
                 ~Qt::TextSelectableByMouse);
-    } else if(/*!opts.gtkScrollViews && */qobject_cast<QAbstractScrollArea*>(widget)) {
-        if(qtcIsCustomBgnd(&opts))
+    } else if (qobject_cast<QAbstractScrollArea*>(widget)) {
+        if (qtcIsCustomBgnd(&opts))
             polishScrollArea(static_cast<QAbstractScrollArea *>(widget));
         if (!opts.gtkScrollViews && (((QFrame*)widget)->frameWidth() > 0)) {
             widget->installEventFilter(this);
@@ -600,14 +594,14 @@ void Style::polish(QWidget *widget)
                         this, &Style::widgetDestroyed);
             }
         }
-    } else if(qobject_cast<QDialog*>(widget) &&
-              widget->inherits("QPrintPropertiesDialog") &&
-              widget->parentWidget() && widget->parentWidget()->window() &&
-              widget->window() && widget->window()->windowTitle().isEmpty() &&
-              !widget->parentWidget()->window()->windowTitle().isEmpty()) {
+    } else if (qobject_cast<QDialog*>(widget) &&
+               widget->inherits("QPrintPropertiesDialog") &&
+               widget->parentWidget() && widget->parentWidget()->window() &&
+               widget->window() && widget->window()->windowTitle().isEmpty() &&
+               !widget->parentWidget()->window()->windowTitle().isEmpty()) {
         widget->window()->setWindowTitle(widget->parentWidget()->window()
                                          ->windowTitle());
-    } else if(widget->inherits("QWhatsThat")) {
+    } else if (widget->inherits("QWhatsThat")) {
         QPalette pal(widget->palette());
         QColor   shadow(pal.shadow().color());
 
@@ -615,13 +609,9 @@ void Style::polish(QWidget *widget)
         pal.setColor(QPalette::Shadow, shadow);
         widget->setPalette(pal);
         widget->setMask(QRegion(widget->rect().adjusted(0, 0, -6, -6))+QRegion(widget->rect().adjusted(6, 6, 0, 0)));
-    } else if(qobject_cast<QDockWidget*>(widget) &&
-            widget->parentWidget() &&
-            widget->parentWidget()->parentWidget() &&
-            widget->parentWidget()->parentWidget()->parentWidget() &&
-            qobject_cast<QSplitter *>(widget->parentWidget()) &&
-            widget->parentWidget()->parentWidget()->inherits("KFileWidget") /*&&
-                                                                              widget->parentWidget()->parentWidget()->parentWidget()->inherits("KFileDialog")*/)
+    } else if (qobject_cast<QDockWidget*>(widget) &&
+               qtcCheckType<QSplitter>(widget->parentWidget()) &&
+               qtcCheckType(qtcGetParent<2>(widget), "KFileWidget"))
         ((QDockWidget*)widget)->setTitleBarWidget(new QtCurveDockWidgetTitleBar(widget));
 
     if (widget->inherits("QTipLabel") && !qtcIsFlat(opts.tooltipAppearance)) {
@@ -641,7 +631,7 @@ void Style::polish(QWidget *widget)
             //else if (QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
             widget->installEventFilter(this);
 
-            if (qtcCheckKDEType0(widget->parent(), KTitleWidget)) {
+            if (qtcCheckKDEType(widget->parent(), KTitleWidget)) {
                 if (qtcIsCustomBgnd(&opts)) {
                     frame->setAutoFillBackground(false);
                 } else {
@@ -653,11 +643,10 @@ void Style::polish(QWidget *widget)
                 }
             }
 
-            QWidget *p=0L;
-
-            if(opts.gtkComboMenus && widget->parentWidget() && (p=widget->parentWidget()->parentWidget()) &&
-               qobject_cast<QComboBox *>(p) && !((QComboBox *)(p))->isEditable())
-            {
+            QComboBox *p = NULL;
+            if (opts.gtkComboMenus &&
+                (p = qtcObjCast<QComboBox>(qtcGetParent<2>(widget))) &&
+                !p->isEditable()) {
                 QPalette pal(widget->palette());
                 QColor   col(popupMenuCols()[ORIGINAL_SHADE]);
 
@@ -753,12 +742,10 @@ void Style::polish(QWidget *widget)
     }
 
     if (theThemedApp == APP_SYSTEMSETTINGS &&
-        widget && widget->parentWidget() &&
-        widget->parentWidget()->parentWidget() &&
+        qobject_cast<QTabWidget*>(qtcGetParent<2>(widget)) &&
         qobject_cast<QFrame*>(widget) &&
-        ((QFrame *)widget)->frameShape() != QFrame::NoFrame &&
-        qobject_cast<QFrame*>(widget->parentWidget()) &&
-        qobject_cast<QTabWidget*>(widget->parentWidget()->parentWidget())) {
+        ((QFrame*)widget)->frameShape() != QFrame::NoFrame &&
+        qobject_cast<QFrame*>(widget->parentWidget())) {
         ((QFrame*)widget)->setFrameShape(QFrame::NoFrame);
     }
 
@@ -775,7 +762,7 @@ void Style::polish(QWidget *widget)
 
     if ((theThemedApp == APP_K3B &&
          widget->inherits("K3b::ThemedHeader") &&
-         qobject_cast<QFrame *>(widget)) ||
+         qobject_cast<QFrame*>(widget)) ||
         widget->inherits("KColorPatch")) {
         ((QFrame*)widget)->setLineWidth(0);
         ((QFrame*)widget)->setFrameShape(QFrame::NoFrame);
@@ -800,12 +787,9 @@ void Style::polish(QWidget *widget)
 
 #ifdef QTC_QT5_ENABLE_KDE
     // Make file selection button in QPrintDialog appear more KUrlRequester like...
-    if (qobject_cast<QToolButton*>(widget) &&
-        widget->parentWidget() &&
-        widget->parentWidget()->parentWidget() &&
-        widget->parentWidget()->parentWidget()->parentWidget() &&
+    if (qtcCheckType<QPrintDialog>(qtcGetParent<3>(widget)) &&
+        qobject_cast<QToolButton*>(widget) &&
         qobject_cast<QGroupBox*>(widget->parentWidget()) &&
-        qobject_cast<QPrintDialog*>(widget->parentWidget()->parentWidget()->parentWidget()) &&
         static_cast<QToolButton*>(widget)->text() == QLatin1String("...")) {
         static_cast<QToolButton*>(widget)->setIcon(KIcon("document-open"));
         static_cast<QToolButton*>(widget)->setAutoRaise(false);
@@ -924,16 +908,13 @@ void Style::unpolish(QWidget *widget)
                 }
             }
         }
-    } else if(qobject_cast<QDockWidget *>(widget) &&
-            ((QDockWidget *)widget)->titleBarWidget() &&
-              dynamic_cast<QtCurveDockWidgetTitleBar *>(((QDockWidget *)widget)->titleBarWidget()) &&
-            widget->parentWidget() &&
-            widget->parentWidget()->parentWidget() &&
-            widget->parentWidget()->parentWidget()->parentWidget() &&
-            qobject_cast<QSplitter *>(widget->parentWidget()) &&
-            widget->parentWidget()->parentWidget()->inherits("KFileWidget") /*&&
-                                                                              widget->parentWidget()->parentWidget()->parentWidget()->inherits("KFileDialog")*/)
-    {
+    } else if (qobject_cast<QDockWidget *>(widget) &&
+               ((QDockWidget*)widget)->titleBarWidget() &&
+               qobject_cast<QtCurveDockWidgetTitleBar*>(
+                   ((QDockWidget*)widget)->titleBarWidget()) &&
+               qtcCheckType<QSplitter>(widget->parentWidget()) &&
+               qtcGetParent<3>(widget) &&
+               qtcCheckType(qtcGetParent<2>(widget), "KFileWidget")) {
         delete ((QDockWidget *)widget)->titleBarWidget();
         ((QDockWidget*)widget)->setTitleBarWidget(0L);
     } else if (opts.boldProgress && "CE_CapacityBar"==widget->objectName()) {
@@ -947,7 +928,7 @@ void Style::unpolish(QWidget *widget)
 
     if (!widget->isWindow())
         if (QFrame *frame = qobject_cast<QFrame *>(widget)) {
-            if (qtcCheckKDEType0(widget->parent(), KTitleWidget)) {
+            if (qtcCheckKDEType(widget->parent(), KTitleWidget)) {
                 if(qtcIsCustomBgnd(&opts)) {
                     frame->setAutoFillBackground(true);
                 } else {
@@ -960,11 +941,12 @@ void Style::unpolish(QWidget *widget)
                 }
             }
 
-            QWidget *p=0L;
-
-            if(opts.gtkComboMenus && widget->parentWidget() && (p=widget->parentWidget()->parentWidget()) &&
-               qobject_cast<QComboBox *>(p) && !((QComboBox *)(p))->isEditable())
+            QComboBox *p = NULL;
+            if (opts.gtkComboMenus &&
+                (p = qtcObjCast<QComboBox>(qtcGetParent<2>(widget))) &&
+                !p->isEditable()) {
                 widget->setPalette(QApplication::palette());
+            }
         }
 
     if (qobject_cast<QMenu*>(widget)) {
@@ -1326,8 +1308,8 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 m_timer.start();
                 m_progressBarAnimateTimer = startTimer(1000 / constProgressBarFps);
             }
-        } else if(!(opts.square & SQUARE_POPUP_MENUS) &&
-                  object->inherits("QComboBoxPrivateContainer")) {
+        } else if (!(opts.square & SQUARE_POPUP_MENUS) &&
+                   object->inherits("QComboBoxPrivateContainer")) {
             QWidget *widget = static_cast<QWidget*>(object);
             if (Utils::hasAlphaChannel(widget)) {
                 widget->clearMask();
@@ -1560,12 +1542,12 @@ Style::pixelMetric(PixelMetric metric, const QStyleOption *option,
     case PM_ButtonDefaultIndicator:
         return 0;
     case PM_DefaultFrameWidth:
-        if ((/*!opts.popupBorder || */opts.gtkComboMenus) && widget &&
-            widget->inherits("QComboBoxPrivateContainer"))
+        if (opts.gtkComboMenus &&
+            qtcCheckType(widget,"QComboBoxPrivateContainer")) {
             return (opts.gtkComboMenus ?
                     (opts.borderMenuitems ||
                      !(opts.square & SQUARE_POPUP_MENUS) ? 2 : 1) : 0);
-
+        }
         if ((!opts.gtkScrollViews || (opts.square & SQUARE_SCROLLVIEW)) &&
             isKateView(widget))
             return (opts.square&SQUARE_SCROLLVIEW) ? 1 : 0;
@@ -1726,13 +1708,13 @@ Style::pixelMetric(PixelMetric metric, const QStyleOption *option,
         // when KTabBar is positioning the close button and it asks for these
         // options, it only passes in a QStyleOption  not a QStyleOptionTab
     case PM_TabBarBaseHeight:
-        if (qtcCheckKDEType0(widget, KTabBar) &&
+        if (qtcCheckKDEType(widget, KTabBar) &&
             !qtcStyleCast<QStyleOptionTab>(option)) {
             return 10;
         }
         return QCommonStyle::pixelMetric(metric, option, widget);
     case PM_TabBarBaseOverlap:
-        if (qtcCheckKDEType0(widget, KTabBar) &&
+        if (qtcCheckKDEType(widget, KTabBar) &&
             !qtcStyleCast<QStyleOptionTab>(option)) {
             return 0;
         }
@@ -1887,8 +1869,8 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
         return 1; // opts.menubarMouseOver ? 1 : 0;
     case SH_ScrollView_FrameOnlyAroundContents:
         return (widget && widget->isWindow() ? false :
-                opts.gtkScrollViews &&
-                (!widget || !widget->inherits("QComboBoxListView")));
+                opts.gtkScrollViews && !qtcCheckType(widget,
+                                                     "QComboBoxListView"));
     case SH_ComboBox_Popup:
         if (opts.gtkComboMenus) {
             if (auto cmb = qtcStyleCast<QStyleOptionComboBox>(option)) {
@@ -2104,9 +2086,9 @@ void Style::drawControl(ControlElement element, const QStyleOption *option,
         if (auto bar = qtcStyleCast<QStyleOptionProgressBar>(option)) {
             QStyleOptionProgressBar mod = *bar;
 
-            if (mod.rect.height() > 16 && widget->parentWidget() &&
-               (qobject_cast<const QStatusBar*>(widget->parentWidget()) ||
-                widget->parentWidget()->inherits("DolphinStatusBar"))) {
+            if (mod.rect.height() > 16 &&
+                (qtcCheckType<QStatusBar>(widget->parentWidget()) ||
+                 qtcCheckType(widget->parentWidget(), "DolphinStatusBar"))) {
                 int m = (mod.rect.height() - 16) / 2;
                 mod.rect.adjust(0, m, 0, -m);
             }
@@ -2382,7 +2364,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option,
     case CE_DockWidgetTitle:
         if (auto dwOpt = qtcStyleCast<QStyleOptionDockWidget>(option)) {
             bool verticalTitleBar = dwOpt->verticalTitleBar;
-            bool isKOffice = widget && widget->inherits("KoDockWidgetTitleBar");
+            bool isKOffice = qtcCheckType(widget, "KoDockWidgetTitleBar");
             QRect fillRect = r;
 
             // This fixes the look of KOffice's dock widget titlebars...
@@ -2947,7 +2929,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option,
                              opts.useHighlightForMenu &&
                              (opts.colorMenubarMouseOver || down ||
                               theThemedApp == APP_OPENOFFICE) ?
-                             (m_oOMenuCols ? m_oOMenuCols :
+                             (m_ooMenuCols ? m_ooMenuCols :
                               m_highlightCols) : m_backgroundCols);
 
             if (!pix.isNull()) {
@@ -3057,7 +3039,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option,
                              /*comboMenu ? MENU_COMBO : */MENU_POPUP,
                              ROUNDED_ALL,
                              opts.useHighlightForMenu ?
-                             (m_oOMenuCols ? m_oOMenuCols :
+                             (m_ooMenuCols ? m_ooMenuCols :
                               m_highlightCols) : use);
 
             if (comboMenu) {
@@ -3152,7 +3134,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option,
 
             painter->setPen(dis ? palette.text().color() :
                             selected && opts.useHighlightForMenu &&
-                            !m_oOMenuCols ? palette.highlightedText().color() :
+                            !m_ooMenuCols ? palette.highlightedText().color() :
                             palette.foreground().color());
 
             int x;
@@ -3208,7 +3190,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option,
                                                          QRect(xpos, menuItem->rect.top() + menuItem->rect.height() / 2 - dim / 2, dim, dim)));
 
                 drawArrow(painter, vSubMenuRect, arrow,
-                          opts.useHighlightForMenu && state&State_Enabled && state&State_Selected && !m_oOMenuCols
+                          opts.useHighlightForMenu && state&State_Enabled && state&State_Selected && !m_ooMenuCols
                           ? palette.highlightedText().color()
                           : palette.text().color());
             }
@@ -4527,23 +4509,23 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
             int widthAdjust(0),
                 heightAdjust(0);
 
-            if (widget)
-            {
-                if((opts.dwtSettings&DWT_BUTTONS_AS_PER_TITLEBAR) &&
-                   (widget->inherits("QDockWidgetTitleButton") ||
-                    (widget->parentWidget() && widget->parentWidget()->inherits("KoDockWidgetTitleBar"))))
-                {
-                    ETitleBarButtons btn=TITLEBAR_CLOSE;
-                    Icon             icon=ICN_CLOSE;
+            if (widget) {
+                if ((opts.dwtSettings & DWT_BUTTONS_AS_PER_TITLEBAR) &&
+                    (widget->inherits("QDockWidgetTitleButton") ||
+                     qtcCheckType(qtcGetParent(widget),
+                                  "KoDockWidgetTitleBar"))) {
+                    ETitleBarButtons btn = TITLEBAR_CLOSE;
+                    Icon icon = ICN_CLOSE;
 
-                    if(constDwtFloat==widget->objectName())
-                        btn=TITLEBAR_MAX, icon=ICN_RESTORE;
-                    else if(constDwtClose!=widget->objectName() &&
-                            widget->parentWidget() && widget->parentWidget()->parentWidget() &&
-                            widget->parentWidget()->inherits("KoDockWidgetTitleBar") &&
-                            qobject_cast<QDockWidget *>(widget->parentWidget()->parentWidget()))
-                    {
-                        QDockWidget *dw = (QDockWidget*)widget->parentWidget()->parentWidget();
+                    if (constDwtFloat == widget->objectName()) {
+                        btn = TITLEBAR_MAX;
+                        icon = ICN_RESTORE;
+                    } else if (constDwtClose != widget->objectName() &&
+                               qtcCheckType(qtcGetParent(widget),
+                                            "KoDockWidgetTitleBar") &&
+                               qtcCheckType<QDockWidget>(
+                                   qtcGetParent<2>(widget))) {
+                        QDockWidget *dw = (QDockWidget*)qtcGetParent<2>(widget);
                         QWidget *koDw = widget->parentWidget();
                         int fw = dw->isFloating()
                             ? pixelMetric(QStyle::PM_DockWidgetFrameWidth, 0, dw)
@@ -4661,14 +4643,19 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                     break;
                 }
 
-                // Amarok's toolbars (the one just above the collection list) are much thinner then normal,
-                // and QToolBarExtension does not seem to take this into account - so adjust the size here...
-                if(widget->inherits("QToolBarExtension") && widget->parentWidget())
-                {
-                    if(r.height()>widget->parentWidget()->rect().height())
-                        heightAdjust=(r.height()-widget->parentWidget()->rect().height())+2;
-                    if(r.width()>widget->parentWidget()->rect().width())
-                        widthAdjust=(r.width()-widget->parentWidget()->rect().width())+2;
+                // Amarok's toolbars (the one just above the collection list)
+                // are much thinner then normal, and QToolBarExtension does not
+                // seem to take this into account - so adjust the size here...
+                QWidget *parent = qtcGetParent(widget);
+                if (widget->inherits("QToolBarExtension") && parent) {
+                    if (r.height() > parent->rect().height()) {
+                        heightAdjust = (r.height() -
+                                        parent->rect().height()) + 2;
+                    }
+                    if (r.width() > parent->rect().width()) {
+                        widthAdjust = (r.width() -
+                                       parent->rect().width()) + 2;
+                    }
                 }
             }
             QRect button(subControlRect(control, toolbutton, SC_ToolButton, widget)),
@@ -5641,18 +5628,15 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 
             painter->save();
 
-            bool needsBaseBgnd=(opts.thinSbarGroove || opts.flatSbarButtons) &&
-                widget && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
-                (widget->parentWidget()->parentWidget()->inherits("QComboBoxListView")/* ||
-                                                                                         !opts.gtkScrollViews && widget->parentWidget()->parentWidget()->inherits("QAbstractScrollArea")*/);
-
-            if(needsBaseBgnd)
+            if ((opts.thinSbarGroove || opts.flatSbarButtons) &&
+                qtcCheckType(qtcGetParent<2>(widget), "QComboBoxListView")) {
                 painter->fillRect(r, palette.brush(QPalette::Base));
-            else if(opts.thinSbarGroove && APP_ARORA==theThemedApp && widget && widget->inherits("WebView"))
+            } else if (opts.thinSbarGroove && theThemedApp == APP_ARORA &&
+                       qtcCheckType(widget, "WebView")) {
                 painter->fillRect(r, m_backgroundCols[ORIGINAL_SHADE]);
-
-            if(!opts.gtkScrollViews ||
-               (opts.flatSbarButtons && !qtcIsFlat(opts.sbarBgndAppearance)/* && SCROLLBAR_NONE!=opts.scrollbarType*/))
+            }
+            if (!opts.gtkScrollViews ||
+                (opts.flatSbarButtons && !qtcIsFlat(opts.sbarBgndAppearance)))
                 drawBevelGradientReal(palette.brush(QPalette::Background).color(), painter, r, horiz, false,
                                       opts.sbarBgndAppearance, WIDGET_SB_BGND);
 
@@ -6066,17 +6050,15 @@ QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, con
 
         if (auto btn = qtcStyleCast<QStyleOptionButton>(option)) {
             if (!opts.stdBtnSizes) {
-                bool dialogButton=
-                    // Cant rely on AutoDefaultButton - as VirtualBox does not set this!!!
-                    // btn->features&QStyleOptionButton::AutoDefaultButton &&
-                    widget && widget->parentWidget() &&
-                    (qobject_cast<const QDialogButtonBox *>(widget->parentWidget()) || widget->parentWidget()->inherits("KFileWidget"));
-
-                if(dialogButton)
-                {
-                    int iconHeight=btn->icon.isNull() ? btn->iconSize.height() : 16;
-                    if(size.height()<iconHeight+2)
-                        newSize.setHeight(iconHeight+2);
+                // Cant rely on AutoDefaultButton
+                //   - as VirtualBox does not set this!!!
+                if (qtcCheckType<QDialogButtonBox>(qtcGetParent(widget)) ||
+                    qtcCheckType(qtcGetParent(widget), "KFileWidget")) {
+                    int iconHeight = (btn->icon.isNull() ?
+                                      btn->iconSize.height() : 16);
+                    if (size.height() < iconHeight + 2) {
+                        newSize.setHeight(iconHeight + 2);
+                    }
                 }
             }
 

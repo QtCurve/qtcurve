@@ -24,6 +24,7 @@
 #define __QTCURVE_P_H__
 
 #include <qtcurve-utils/log.h>
+#include <qtcurve-utils/qtutils.h>
 #include "qtcurve.h"
 #include <QPainter>
 #include <QPushButton>
@@ -197,14 +198,6 @@ isMultiTabBarTab(const QAbstractButton *button)
                        button->inherits("Sublime::IdealToolButton")));
 }
 
-static inline QWidget*
-getParent(QWidget *w, int level)
-{
-    for (int i = 0;i < level && w;++i)
-        w = w->parentWidget();
-    return w;
-}
-
 static inline int
 toHint(int sc)
 {
@@ -233,7 +226,8 @@ void setBold(QWidget *widget);
 void unSetBold(QWidget *widget);
 QWidget *scrollViewFrame(QWidget *widget);
 
-class QtCurveDockWidgetTitleBar : public QWidget {
+class QtCurveDockWidgetTitleBar: public QWidget {
+    Q_OBJECT
 public:
     QtCurveDockWidgetTitleBar(QWidget* parent) : QWidget(parent) {}
     virtual ~QtCurveDockWidgetTitleBar() {}
@@ -253,20 +247,17 @@ const QAbstractButton *getButton(const QWidget *w, const QPainter *p);
 static inline bool
 isKateView(const QWidget *widget)
 {
-    return (widget && widget->parentWidget() &&
-            qobject_cast<const QFrame*>(widget) &&
-            widget->parentWidget()->inherits("KateView"));
+    return (qtcCheckType<QFrame>(widget) &&
+            qtcCheckType(qtcGetParent(widget), "KateView"));
 }
 
 static inline bool
 isKontactPreviewPane(const QWidget *widget)
 {
-    return (APP_KONTACT == theThemedApp &&
-            widget && widget->parentWidget() &&
-            widget->parentWidget()->parentWidget() &&
-            widget->inherits("KHBox") &&
-            qobject_cast<const QSplitter*>(widget->parentWidget()) &&
-            widget->parentWidget()->parentWidget()->inherits("KMReaderWin"));
+    return (theThemedApp == APP_KONTACT &&
+            qtcCheckType(widget, "KHBox") &&
+            qtcCheckType<QSplitter>(qtcGetParent(widget)) &&
+            qtcCheckType(qtcGetParent<2>(widget), "KMReaderWin"));
 }
 
 static inline QColor

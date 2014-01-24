@@ -535,7 +535,7 @@ private:
         *m_comboBtnCols,
         *m_checkRadioSelCols,
         *m_sortedLvColors,
-        *m_oOMenuCols,
+        *m_ooMenuCols,
         *m_progressCols,
         m_buttonCols[TOTAL_SHADES + 1],
         m_checkRadioCol;

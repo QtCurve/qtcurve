@@ -76,25 +76,30 @@ blendOOMenuHighlight(const QPalette &pal, const QColor &highlight)
 
 bool isNoEtchWidget(const QWidget *widget)
 {
-    if (APP_KRUNNER==theThemedApp)
+    if (theThemedApp == APP_KRUNNER) {
         return true;
-
-    if (APP_PLASMA==theThemedApp) {
+    }
+    if (theThemedApp == APP_PLASMA) {
         const QWidget *top = widget->window();
 
-        return !top || (!qobject_cast<const QDialog *>(top) && !qobject_cast<const QMainWindow *>(top));
+        return !top || (!qobject_cast<const QDialog*>(top) &&
+                        !qobject_cast<const QMainWindow*>(top));
     }
 
-    if(widget && widget->inherits("QWebView"))
+    if (widget && widget->inherits("QWebView")) {
         return true;
+    }
+    // KHTML:  widget -> QWidget -> QWidget -> KHTMLView
+    const QObject *w = (widget && widget->parent() &&
+                        widget->parent()->parent() ?
+                        widget->parent()->parent()->parent() : 0L);
 
-    // KHTML:  widget -> QWidget       -> QWidget    -> KHTMLView
-    const QObject *w=widget && widget->parent() && widget->parent()->parent() ? widget->parent()->parent()->parent() : 0L;
-
-    return (w && isA(w, "KHTMLView")) || (widget && isInQAbstractItemView(widget->parentWidget()));
+    return ((w && isA(w, "KHTMLView")) ||
+            (widget && isInQAbstractItemView(widget->parentWidget())));
 }
 
-void setOpacityProp(QWidget *w, unsigned short opacity)
+void
+setOpacityProp(QWidget *w, unsigned short opacity)
 {
     if (WId wid = qtcGetWid(w->window())) {
         qtcX11SetOpacity(wid, opacity);

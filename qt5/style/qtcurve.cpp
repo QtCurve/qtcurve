@@ -320,7 +320,7 @@ Style::Style() :
     m_comboBtnCols(0L),
     m_checkRadioSelCols(0L),
     m_sortedLvColors(0L),
-    m_oOMenuCols(0L),
+    m_ooMenuCols(0L),
     m_progressCols(0L),
     m_saveMenuBarStatus(false),
     m_usePixmapCache(true),
@@ -722,16 +722,15 @@ void Style::freeColors()
     freeColor(freedColors, &m_defBtnCols);
     freeColor(freedColors, &m_sliderCols);
 
-    if(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR)
-        for(int i=0; i<NUM_TITLEBAR_BUTTONS; ++i)
-        {
-            delete [] m_titleBarButtonsCols[i];
-            m_titleBarButtonsCols[i]=0L;
+    if (opts.titlebarButtons & TITLEBAR_BUTTON_COLOR) {
+        for (int i = 0;i < NUM_TITLEBAR_BUTTONS;i++) {
+            delete []m_titleBarButtonsCols[i];
+            m_titleBarButtonsCols[i] = 0L;
         }
-    if(m_oOMenuCols)
-    {
-        delete [] m_oOMenuCols;
-        m_oOMenuCols=0L;
+    }
+    if (m_ooMenuCols) {
+        delete []m_ooMenuCols;
+        m_ooMenuCols = 0L;
     }
 }
 

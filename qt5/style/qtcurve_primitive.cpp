@@ -526,9 +526,9 @@ Style::drawPrimitiveFrame(PrimitiveElement element,
     if (isOOWidget(widget) && r.height() < 22) {
         return true;
     }
-    if (widget && qtcCheckKDEType0(widget->parent(), KTitleWidget)) {
+    if (widget && qtcCheckKDEType(widget->parent(), KTitleWidget)) {
         return true;
-    } else if (widget && qtcCheckType0<QComboBox>(widget->parent())) {
+    } else if (widget && qtcCheckType<QComboBox>(widget->parent())) {
         if (opts.gtkComboMenus &&
             !((QComboBox*)(widget->parent()))->isEditable()) {
             drawPrimitive(PE_FrameMenu, option, painter, widget);
@@ -1175,13 +1175,9 @@ Style::drawPrimitiveButton(PrimitiveElement element, const QStyleOption *option,
             use = m_titleBarButtonsCols[TITLEBAR_CLOSE];
         } else if (constDwtFloat == widget->objectName()) {
             use = m_titleBarButtonsCols[TITLEBAR_MAX];
-        } else if (widget->parentWidget() &&
-                   widget->parentWidget()->parentWidget() &&
-                   widget->parentWidget()->inherits("KoDockWidgetTitleBar") &&
-                   qobject_cast<QDockWidget*>(widget->parentWidget()
-                                              ->parentWidget())) {
-            QDockWidget *dw =
-                (QDockWidget*)widget->parentWidget()->parentWidget();
+        } else if (qtcCheckType<QDockWidget>(qtcGetParent<2>(widget)) &&
+                   widget->parentWidget()->inherits("KoDockWidgetTitleBar")) {
+            QDockWidget *dw = (QDockWidget*)qtcGetParent<2>(widget);
             QWidget *koDw = widget->parentWidget();
             int fw = (dw->isFloating() ?
                       pixelMetric(QStyle::PM_DockWidgetFrameWidth, 0, dw) : 0);
@@ -1199,14 +1195,12 @@ Style::drawPrimitiveButton(PrimitiveElement element, const QStyleOption *option,
                                 QDockWidget::DockWidgetFloatable) ==
                                QDockWidget::DockWidgetFloatable);
             if (dwOpt.closable &&
-                subElementRect(
-                    QStyle::SE_DockWidgetCloseButton, &dwOpt,
-                    widget->parentWidget()->parentWidget()) == geom) {
+                subElementRect(QStyle::SE_DockWidgetCloseButton, &dwOpt,
+                               qtcGetParent<2>(widget)) == geom) {
                 use = m_titleBarButtonsCols[TITLEBAR_CLOSE];
             } else if (dwOpt.floatable &&
-                       subElementRect(
-                           QStyle::SE_DockWidgetFloatButton, &dwOpt,
-                           widget->parentWidget()->parentWidget()) == geom) {
+                       subElementRect(QStyle::SE_DockWidgetFloatButton, &dwOpt,
+                                      qtcGetParent<2>(widget)) == geom) {
                 use = m_titleBarButtonsCols[TITLEBAR_MAX];
             } else {
                 use = m_titleBarButtonsCols[TITLEBAR_SHADE];
@@ -2047,12 +2041,9 @@ Style::drawPrimitiveFrameTabBarBase(PrimitiveElement element,
             bool fadeState = true;
             bool fadeEnd = true;
             // Dont fade start/end of tabbar in KDevelop's menubar
-            if (theThemedApp == APP_KDEVELOP && widget &&
-                widget->parentWidget() &&
-                widget->parentWidget()->parentWidget() &&
-                qobject_cast<const QTabBar*>(widget) &&
-                qobject_cast<const QMenuBar*>(
-                    widget->parentWidget()->parentWidget())) {
+            if (theThemedApp == APP_KDEVELOP &&
+                qtcCheckType<QMenuBar>(qtcGetParent<2>(widget)) &&
+                qobject_cast<const QTabBar*>(widget)) {
                 fadeState = fadeEnd = false;
             }
             drawFadedLine(painter, QRect(topLine.p1(), topLine.p2()),

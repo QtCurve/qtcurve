@@ -38,25 +38,35 @@ namespace QtCurve {
 #endif
 
 #define qtcCheckKDEType(obj, type) (qtcCheckKDETypeFull(obj, type, #type))
-#define qtcCheckKDEType0(obj, type) (qtcCheckKDETypeFull0(obj, type, #type))
+
+template<typename T, typename T2>
+QTC_ALWAYS_INLINE static inline const T*
+qtcObjCast(const T2 *obj)
+{
+    return obj ? qobject_cast<const T*>(obj) : NULL;
+}
+template<typename T, typename T2>
+QTC_ALWAYS_INLINE static inline T*
+qtcObjCast(T2 *obj)
+{
+    return obj ? qobject_cast<T*>(obj) : NULL;
+}
 
 template <class T, class T2> static inline bool
-qtcCheckType0(T2 *obj)
+qtcCheckType(T2 *obj)
 {
-    return obj && qobject_cast<const T*>(obj);
+    return qtcObjCast<T>(obj);
 }
 template <class T2> static inline bool
-qtcCheckType0(T2 *obj, const char *name)
+qtcCheckType(T2 *obj, const char *name)
 {
     return obj && obj->inherits(name);
 }
 
 #if _QTC_QT_ENABLE_KDE
-#define qtcCheckKDETypeFull(obj, type, name) (qobject_cast<const type*>(obj))
-#define qtcCheckKDETypeFull0(obj, type, name) (qtcCheckType0<type>(obj))
+#define qtcCheckKDETypeFull(obj, type, name) (qtcCheckType<type>(obj))
 #else
-#define qtcCheckKDETypeFull(obj, type, name) (obj->inherits(name))
-#define qtcCheckKDETypeFull0(obj, type, name) (qtcCheckType0(obj, name))
+#define qtcCheckKDETypeFull(obj, type, name) (qtcCheckType(obj, name))
 #endif
 
 QTC_ALWAYS_INLINE static inline WId
@@ -154,6 +164,47 @@ QTC_ALWAYS_INLINE static inline T*
 qtcStyleCast(T2 *opt)
 {
     return qstyleoption_cast<T*>(opt);
+}
+
+template<unsigned level>
+QTC_ALWAYS_INLINE static inline QWidget*
+qtcGetParent(const QWidget *w)
+{
+    if (const QWidget *parent = qtcGetParent<level - 1>(w)) {
+        return parent->parentWidget();
+    }
+    return NULL;
+}
+
+template<>
+inline QWidget*
+qtcGetParent<0>(const QWidget *w)
+{
+    return const_cast<QWidget*>(w);
+}
+
+template<unsigned level>
+QTC_ALWAYS_INLINE static inline QObject*
+qtcGetParent(const QObject *o)
+{
+    if (const QObject *parent = qtcGetParent<level - 1>(o)) {
+        return parent->parent();
+    }
+    return NULL;
+}
+
+template<>
+inline QObject*
+qtcGetParent<0>(const QObject *o)
+{
+    return const_cast<QObject*>(o);
+}
+
+template<typename T>
+QTC_ALWAYS_INLINE static inline T*
+qtcGetParent(const T *w)
+{
+    return qtcGetParent<1>(w);
 }
 
 }

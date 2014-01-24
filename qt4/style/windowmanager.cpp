@@ -521,15 +521,15 @@ WindowManager::WindowManager(QObject *parent):
         /* following checks are relevant only for WD_FULL mode */
 
         // tabbar. Make sure no tab is under the cursor
-        if( QTabBar* tabBar = qobject_cast<QTabBar*>( widget ) )
-        { return tabBar->tabAt( position ) == -1; }
+        if (QTabBar *tabBar = qobject_cast<QTabBar*>(widget)) {
+            return tabBar->tabAt(position) == -1;
+        }
 
         /*
         check groupboxes
         prevent drag if unchecking grouboxes
         */
-        if( QGroupBox *groupBox = qobject_cast<QGroupBox*>( widget ) )
-        {
+        if (QGroupBox *groupBox = qobject_cast<QGroupBox*>(widget)) {
             // non checkable group boxes are always ok
             if( !groupBox->isCheckable() ) return true;
 
