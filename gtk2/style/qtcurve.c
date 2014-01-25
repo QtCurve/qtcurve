@@ -3176,8 +3176,7 @@ qtcurve_rc_style_init(QtCurveRcStyle *qtcurve_rc)
 #endif
     if (qtSettingsInit()) {
         generateColors();
-        if (opts.dlgOpacity < 100 || opts.bgndOpacity < 100 ||
-            opts.menuBgndOpacity < 100 || qtSettings.useAlpha) {
+        if (qtSettings.useAlpha) {
             // Somehow GtkWidget is not loaded yet
             // when this function is called.
             g_type_class_ref(GTK_TYPE_WIDGET);

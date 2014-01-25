@@ -1562,8 +1562,12 @@ gboolean qtSettingsInit()
             }
 
             qtSettings.qt4 = false;
-            qtSettings.useAlpha=opts.bgndOpacity<100 || opts.dlgOpacity<100 || opts.menuBgndOpacity<100 ||
-                                !(opts.square&SQUARE_POPUP_MENUS) || !(opts.square&SQUARE_TOOLTIPS);
+            // TODO: blacklist logic
+            qtSettings.useAlpha =
+                (opts.bgndOpacity < 100 || opts.dlgOpacity < 100 ||
+                 opts.menuBgndOpacity < 100 ||
+                 !(opts.square & SQUARE_POPUP_MENUS) ||
+                 !(opts.square & SQUARE_TOOLTIPS));
 
             lastRead=now;
 
