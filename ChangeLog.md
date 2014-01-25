@@ -1,4 +1,4 @@
-## 1.8.18 (RC)
+## 1.8.18
 1. Gtk2: Remove mozilla version detection.
 2. Gtk2: Remove `QTC_GTK2_OLD_MOZILLA`.
 3. Remove `xcb-image` dependency. It is never used.
