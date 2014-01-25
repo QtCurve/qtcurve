@@ -1554,8 +1554,7 @@ void Style::polish(QPalette &palette)
 void
 Style::polish(QWidget *widget)
 {
-    // TODO:
-    //      Reorganize this polish function
+    // TODO Reorganize this polish function
     if (!widget)
         return;
 
@@ -1631,8 +1630,9 @@ Style::polish(QWidget *widget)
     // Figuring out what's wrong.
     // Check what oxygen does to QMdiSubWindow
     // Check Qt5 version
-    if (qobject_cast<QMdiSubWindow*>(widget))
+    if (qobject_cast<QMdiSubWindow*>(widget)) {
         widget->setAttribute(Qt::WA_StyledBackground);
+    }
 
     if (opts.menubarHiding && qobject_cast<QMainWindow*>(widget) &&
         static_cast<QMainWindow*>(widget)->menuWidget()) {

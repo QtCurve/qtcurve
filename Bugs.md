@@ -33,3 +33,5 @@
     *KParsPlugin messes arround with some widget properties and flags*
     *Also, different browsers seem to create plugin windows with*
     *different depth.*
+14. QMdiSubWindow is filled with solid color when the background is not set to
+    flat. *May related to the previous problem (Event Filter?)*
