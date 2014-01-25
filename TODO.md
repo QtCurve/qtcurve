@@ -31,3 +31,5 @@
 10. Test prepolish. See if we can remove the recreating window trick all together.
 
 11. QPainter composition mode.
+
+12. Change cursor shape while draging the window in empty area.
