@@ -3532,9 +3532,10 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                 (!isDialog && opts.bgndOpacity != 100)) {
                 painter->save();
                 // Blur and shadow here?
-                if (!(widget && qobject_cast<const QMdiSubWindow*>(widget)))
+                if (!(widget && qobject_cast<const QMdiSubWindow*>(widget))) {
                     painter->setCompositionMode(
                         QPainter::CompositionMode_Source);
+                }
                 drawBackground(painter, widget,
                                isDialog ? BGND_DIALOG : BGND_WINDOW);
                 painter->restore();
@@ -10466,24 +10467,23 @@ void Style::drawProgressBevelGradient(QPainter *p, const QRect &origRect, const 
         delete pix;
 }
 
-void Style::drawBevelGradient(const QColor &base, QPainter *p, const QRect &origRect, const QPainterPath &path,
-                              bool horiz, bool sel, EAppearance bevApp, EWidget w, bool useCache) const
+void
+Style::drawBevelGradient(const QColor &base, QPainter *p, const QRect &origRect,
+                         const QPainterPath &path, bool horiz, bool sel,
+                         EAppearance bevApp, EWidget w, bool useCache) const
 {
-    if(origRect.width()<1 || origRect.height()<1)
+    if (origRect.width() < 1 || origRect.height() < 1)
         return;
 
-    if(qtcIsFlat(bevApp))
-    {
-        if((WIDGET_TAB_TOP!=w && WIDGET_TAB_BOT!=w) || !qtcIsCustomBgnd(&opts) || opts.tabBgnd || !sel)
-        {
-            if(path.isEmpty())
+    if (qtcIsFlat(bevApp)) {
+        if (qtcNoneOf(w, WIDGET_TAB_TOP, WIDGET_TAB_BOT) ||
+            !qtcIsCustomBgnd(&opts) || opts.tabBgnd || !sel) {
+            if (path.isEmpty())
                 p->fillRect(origRect, base);
             else
                 p->fillPath(path, base);
         }
-    }
-    else
-    {
+    } else {
         bool        tab(WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w),
                     selected(tab ? false : sel);
         EAppearance app(selected
@@ -12434,7 +12434,7 @@ Style::drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p,
 
     EAppearance app = menu ? opts.menubarAppearance : opts.toolbarAppearance;
     if (!qtcIsCustomBgnd(&opts) || !qtcIsFlat(app) ||
-        (menu && SHADE_NONE != opts.shadeMenubars)) {
+        (menu && opts.shadeMenubars != SHADE_NONE)) {
         p->save();
 #if 0
         // Revert for now
@@ -12444,7 +12444,7 @@ Style::drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p,
 #endif
         QRect rx(r);
         QColor col(menu && (option->state & State_Enabled ||
-                            SHADE_NONE != opts.shadeMenubars) ?
+                            opts.shadeMenubars != SHADE_NONE) ?
                    menuColors(option, m_active)[ORIGINAL_SHADE] :
                    option->palette.background().color());
         int opacity = qtcGetOpacity(widget ? widget : getWidget(p));
@@ -12479,12 +12479,11 @@ Style::drawHandleMarkers(QPainter *p, const QRect &rx,
     // the whole toolbar seems to be active :-(
     QStyleOption opt(*option);
 
-    opt.state&=~State_MouseOver;
+    opt.state &= ~State_MouseOver;
 
     const QColor *border(borderColors(&opt, m_backgroundCols));
 
-    switch(handles)
-    {
+    switch (handles) {
         case LINE_NONE:
             break;
         case LINE_1DOT:

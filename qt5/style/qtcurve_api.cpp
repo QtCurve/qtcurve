@@ -2295,18 +2295,15 @@ void Style::drawControl(ControlElement element, const QStyleOption *option,
                 painter->save();
                 drawMenuOrToolBarBackground(
                     widget, painter, r, option, false,
-                    toolbar->toolBarArea == Qt::NoToolBarArea ||
-                    toolbar->toolBarArea == Qt::BottomToolBarArea ||
-                    toolbar->toolBarArea == Qt::TopToolBarArea);
-                if (TB_NONE != opts.toolbarBorders) {
-                    const QColor *use = /*PE_PanelMenuBar == pe && m_active ?
-                                          m_menubarCols : */
-                        backgroundColors(option);
-                    bool dark = (opts.toolbarBorders == TB_DARK ||
-                                 opts.toolbarBorders == TB_DARK_ALL);
+                    qtcOneOf(toolbar->toolBarArea, Qt::NoToolBarArea,
+                             Qt::BottomToolBarArea, Qt::TopToolBarArea));
+                if (opts.toolbarBorders != TB_NONE) {
+                    const QColor *use = backgroundColors(option);
+                    bool dark = qtcOneOf(opts.toolbarBorders,
+                                         TB_DARK, TB_DARK_ALL);
 
-                    if (opts.toolbarBorders == TB_DARK_ALL ||
-                        opts.toolbarBorders == TB_LIGHT_ALL) {
+                    if (qtcOneOf(opts.toolbarBorders,
+                                 TB_DARK_ALL, TB_LIGHT_ALL)) {
                         painter->setPen(use[0]);
                         painter->drawLine(r.x(), r.y(),
                                           r.x() + r.width() - 1, r.y());
