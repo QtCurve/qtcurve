@@ -53,28 +53,27 @@ static char*
 getKdeHome()
 {
     static char *kdeHome = NULL;
+    if (kdeHome) {
+        return kdeHome;
+    }
+    size_t len = 0;
+    kdeHome = qtcPopenStdout(
+        "kde4-config", (const char *const[]){"kde4-config", "--expandvars",
+                "--localprefix", NULL}, 300, &len);
+    if (kdeHome && kdeHome[strspn(kdeHome, " \t\b\n\f\v")]) {
+        if (kdeHome[len - 1] == '\n') {
+            kdeHome[len - 1] = '\0';
+        }
+        return kdeHome;
+    }
+    kdeHome = getenv(getuid() ? "KDEHOME" : "KDEROOTHOME");
     if (!kdeHome) {
-        size_t len = 0;
-        kdeHome = qtcPopenStdout(
-            "kde4-config", (const char *const[]){"kde4-config", "--expandvars",
-                    "--localprefix", NULL}, 300, &len);
-        if (kdeHome) {
-            if (len > 1 && kdeHome[len - 1] == '\n') {
-                kdeHome[len - 1] = '\0';
-            } else {
-                kdeHome[len] = '\0';
-            }
-        } else {
-            kdeHome = getenv(getuid() ? "KDEHOME" : "KDEROOTHOME");
-            if (!kdeHome) {
-                // FIXME
-                static char kdeHomeStr[MAX_CONFIG_FILENAME_LEN + 1];
-                const char *home = qtcGetHome();
-                if (strlen(home) < (MAX_CONFIG_FILENAME_LEN - 5)) {
-                    sprintf(kdeHomeStr, "%s/.kde", home);
-                    kdeHome = kdeHomeStr;
-                }
-            }
+        // FIXME
+        static char kdeHomeStr[MAX_CONFIG_FILENAME_LEN + 1];
+        const char *home = qtcGetHome();
+        if (strlen(home) < (MAX_CONFIG_FILENAME_LEN - 5)) {
+            sprintf(kdeHomeStr, "%s/.kde", home);
+            kdeHome = kdeHomeStr;
         }
     }
     return kdeHome;
@@ -974,24 +973,22 @@ static const char*
 kdeIconsPrefix()
 {
     static const char *kdeIcons = NULL;
-    if (!kdeIcons) {
-        size_t len = 0;
-        char *res = qtcPopenStdout("kde4-config", (const char * const[]){
-                "kde4-config", "--expandvars", "--install", "icon", NULL},
-            300, &len);
-        if (res) {
-            if (len > 1 && res[len - 1]=='\n') {
-                res[len - 1]='\0';
-            } else {
-                res[len] = '\0';
-            }
-            kdeIcons = res;
-        } else {
-            kdeIcons = (QTC_KDE4_ICONS_PREFIX &&
-                        strlen(QTC_KDE4_ICONS_PREFIX) > 2 ?
-                        QTC_KDE4_ICONS_PREFIX : DEFAULT_ICON_PREFIX);
-        }
+    if (kdeIcons) {
+        return kdeIcons;
     }
+    size_t len = 0;
+    char *res = qtcPopenStdout("kde4-config", (const char * const[]){
+            "kde4-config", "--expandvars", "--install", "icon", NULL},
+        300, &len);
+    if (res && res[strspn(res, " \t\b\n\f\v")]) {
+        if (res[len - 1]=='\n') {
+            res[len - 1]='\0';
+        }
+        kdeIcons = res;
+        return kdeIcons;
+    }
+    kdeIcons = (QTC_KDE4_ICONS_PREFIX && strlen(QTC_KDE4_ICONS_PREFIX) > 2 ?
+                QTC_KDE4_ICONS_PREFIX : DEFAULT_ICON_PREFIX);
     return kdeIcons;
 }
 

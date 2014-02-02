@@ -60,8 +60,13 @@ qtcPopenStdout(const char *file, const char *const *argv,
 {
     QtcPopenBuff popen_buff = {1, QTC_POPEN_READ, NULL, 0};
     bool res = qtcPopenBuff(file, argv, 1, &popen_buff, timeout);
-    QTC_RET_IF_FAIL(res, NULL);
     qtcAssign(len, popen_buff.len);
+    QTC_RET_IF_FAIL(res, NULL);
+    if (!popen_buff.len) {
+        qtcFree(popen_buff.buff);
+        return NULL;
+    }
+    popen_buff.buff[popen_buff.len] = '\0';
     return popen_buff.buff;
 }
 
