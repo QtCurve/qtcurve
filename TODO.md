@@ -33,3 +33,5 @@
 11. QPainter composition mode.
 
 12. Change cursor shape while draging the window in empty area.
+
+13. Separate drawing routines (for both gtk and qt) and add tests for them.

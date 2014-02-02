@@ -1,3 +1,8 @@
+## (WIP)
+1. Fix shadow color
+   [QtCurve-Bug](https://github.com/QtCurve/qtcurve/issues/54)
+2. Revert toolbar background
+
 ## 1.8.18
 1. Gtk2: Remove mozilla version detection.
 2. Gtk2: Remove `QTC_GTK2_OLD_MOZILLA`.
