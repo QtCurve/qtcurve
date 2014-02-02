@@ -3398,7 +3398,12 @@ Style::drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p,
     if (!qtcIsCustomBgnd(&opts) || !qtcIsFlat(app) ||
         (menu && opts.shadeMenubars != SHADE_NONE)) {
         p->save();
+#if 0
+        // Revert for now
+        // This is necessary for correct opacity on the menubar but may
+        // break transparent gradient.
         p->setCompositionMode(QPainter::CompositionMode_Source);
+#endif
         QRect rx(r);
         QColor col(menu && (option->state & State_Enabled ||
                             opts.shadeMenubars != SHADE_NONE) ?
