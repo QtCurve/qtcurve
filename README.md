@@ -158,6 +158,19 @@ Usage:
 
     QTCURVE_CONFIG_FILE=~/testfile kcalc
 
+# Compiler versions requirement
+QtCurve requires the GNU dialect of ISO C99 and ISO C++11 (which means the
+compilers have to support `-std=gnu99` and `-std=c++0x` command line option).
+`g++>=4.7` and `clang++>=3.3` are fully supported. C compiler for any
+reasonable version of gcc and clang should all work well.
+
+For g++ older than 4.7, you need `-Doverride=` in the `CXXFLAGS` since it
+does not support the override keyword in c++11. The trick should work down to
+g++ 4.4 for the Qt4 style and 4.6 for the Qt5 stle.
+
+clang++ 3.3 is not compatible with the stdc++ header shipped with gcc 4.7 so
+libc++ is required when compiling with clang++ 3.3.
+
 # License
 QtCurve `1.8.17` and earlier was licensed under GPLv2+. It was relicensed under
 LGPLv2.1+ on Nov. 14th 2013 in order to avoid confusion for moving into
