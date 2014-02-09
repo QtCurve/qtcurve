@@ -124,6 +124,9 @@ Style::drawPrimitiveWidget(PrimitiveElement element,
     drawBackground(painter, option->palette.window().color(), bgndRect,
                    opacity, isDialog ? BGND_DIALOG : BGND_WINDOW,
                    opts.bgndAppearance);
+    // FIXME, workaround only, the non transparent part of the image will have
+    // a different overall opacity.
+    painter->setCompositionMode(QPainter::CompositionMode_SourceOver);
     drawBackgroundImage(painter, true, opts.bgndImage.type == IMG_FILE &&
                         opts.bgndImage.onBorder ? bgndRect : option->rect);
     return true;
@@ -1297,6 +1300,9 @@ Style::drawPrimitivePanelMenu(PrimitiveElement element,
     }
     drawBackground(painter, popupMenuCols()[ORIGINAL_SHADE], r,
                    opts.menuBgndOpacity, BGND_MENU, opts.menuBgndAppearance);
+    // FIXME, workaround only, the non transparent part of the image will have
+    // a different overall opacity.
+    painter->setCompositionMode(QPainter::CompositionMode_SourceOver);
     drawBackgroundImage(painter, false, r);
     // TODO: draw border in other functions.
     if (opts.popupBorder) {

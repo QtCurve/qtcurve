@@ -11380,7 +11380,12 @@ Style::drawBackground(QPainter *p, const QWidget *widget,
                    popupMenuCols()[ORIGINAL_SHADE], bgndRect, opacity, type,
                    type != BGND_MENU ? opts.bgndAppearance :
                    opts.menuBgndAppearance);
+    // FIXME, workaround only, the non transparent part of the image will have
+    // a different overall opacity.
+    p->save();
+    p->setCompositionMode(QPainter::CompositionMode_SourceOver);
     drawBackgroundImage(p, isWindow, imgRect);
+    p->restore();
 }
 
 QPainterPath Style::buildPath(const QRectF &r, EWidget w, int round, double radius) const

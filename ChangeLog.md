@@ -2,6 +2,7 @@
 1. Fix shadow color
    [QtCurve-Bug](https://github.com/QtCurve/qtcurve/issues/54)
 2. Revert toolbar background
+3. Workaround background image drawing.
 
 ## 1.8.18
 1. Gtk2: Remove mozilla version detection.
