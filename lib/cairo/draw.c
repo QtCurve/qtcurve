@@ -27,21 +27,25 @@
 QTC_EXPORT void
 qtcCairoHLine(cairo_t *cr, int x, int y, int w, const GdkColor *col, double a)
 {
+    cairo_save(cr);
     cairo_new_path(cr);
     qtcCairoSetColor(cr, col, a);
     cairo_move_to(cr, x, y + 0.5);
     cairo_line_to(cr, x + w, y + 0.5);
     cairo_stroke(cr);
+    cairo_restore(cr);
 }
 
 QTC_EXPORT void
 qtcCairoVLine(cairo_t *cr, int x, int y, int h, const GdkColor *col, double a)
 {
+    cairo_save(cr);
     cairo_new_path(cr);
     qtcCairoSetColor(cr, col, a);
     cairo_move_to(cr, x + 0.5, y);
     cairo_line_to(cr, x + 0.5, y + h);
     cairo_stroke(cr);
+    cairo_restore(cr);
 }
 
 QTC_EXPORT void
@@ -84,8 +88,8 @@ qtcCairoFadedLine(cairo_t *cr, int x, int y, int width, int height,
     cairo_pattern_t *pt =
         cairo_pattern_create_linear(rx, ry, horiz ? rx + width - 1 : rx + 1,
                                     horiz ? ry + 1 : ry + height - 1);
-    cairo_save(cr);
 
+    cairo_save(cr);
     if (gap) {
         QtcRect r = {x, y, width, height};
         cairo_region_t *region =
@@ -119,16 +123,18 @@ qtcCairoStripes(cairo_t *cr, int x, int y, int w, int h,
 {
     int endx = horizontal ? stripeWidth : 0;
     int endy = horizontal ? 0 : stripeWidth;
-
     cairo_pattern_t *pat =
         cairo_pattern_create_linear(x, y, x + endx, y + endy);
-
     cairo_pattern_add_color_stop_rgba(pat, 0.0, 1.0, 1.0, 1.0, 0.0);
     cairo_pattern_add_color_stop_rgba(pat, 1, 1.0, 1.0, 1.0, 0.15);
     cairo_pattern_set_extend(pat, CAIRO_EXTEND_REFLECT);
+
+    cairo_save(cr);
     cairo_set_source(cr, pat);
     cairo_rectangle(cr, x, y, w, h);
     cairo_fill(cr);
+    cairo_restore(cr);
+
     cairo_pattern_destroy(pat);
 }
 
@@ -146,6 +152,7 @@ qtcCairoDot(cairo_t *cr, int x, int y, int w, int h, const GdkColor *col)
     cairo_pattern_add_color_stop_rgba(p2, 1, 1, 1, 1, 0.9);
     cairo_pattern_add_color_stop_rgba(p2, 0, 1, 1, 1, 0.7);
 
+    cairo_save(cr);
     cairo_new_path(cr);
     cairo_arc(cr, dx + 2.5, dy + 2.5, 2.5, 0, 2 * M_PI);
     cairo_clip(cr);
@@ -159,6 +166,8 @@ qtcCairoDot(cairo_t *cr, int x, int y, int w, int h, const GdkColor *col)
     cairo_set_source(cr, p2);
     cairo_rectangle(cr, dx + 1, dy + 1, 4, 4);
     cairo_fill(cr);
+    cairo_restore(cr);
+
     cairo_pattern_destroy(p1);
     cairo_pattern_destroy(p2);
 }
