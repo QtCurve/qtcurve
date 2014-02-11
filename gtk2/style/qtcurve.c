@@ -2132,9 +2132,10 @@ gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state,
         drawLayout(cr, style, selectedText ? GTK_STATE_SELECTED : state,
                    use_text || selectedText, area, x, y, layout);
 
-        if (opts.embolden && def_but)
+        if (opts.embolden && def_but) {
             drawLayout(cr, style, selectedText ? GTK_STATE_SELECTED : state,
                        use_text || selectedText, area, x + 1, y, layout);
+        }
 
         if (swapColors) {
             for (int i = 0;i < 5;++i) {

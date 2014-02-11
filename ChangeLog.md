@@ -2,7 +2,11 @@
 1. Fix shadow color
    [QtCurve-Bug](https://github.com/QtCurve/qtcurve/issues/54)
 2. Revert toolbar background
+   [QtCurve-Bug](https://github.com/QtCurve/qtcurve/issues/52)
 3. Workaround background image drawing.
+   [QtCurve-Bug](https://github.com/QtCurve/qtcurve/issues/49)
+4. Fix text emboldening in gtk2.
+   [QtCurve-Bug](https://github.com/QtCurve/qtcurve/issues/58)
 
 ## 1.8.18
 1. Gtk2: Remove mozilla version detection.
