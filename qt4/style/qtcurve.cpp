@@ -4811,7 +4811,11 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                                      etchOffset(doEtch ? 1 : 0);
                         double       xd(r.x()+0.5),
                                      yd(r.y()+0.5);
-                        const QColor *cols(m_focusCols ? m_focusCols : m_highlightCols);
+                        const QColor *cols = m_focusCols;
+                        // Was:
+                        // const QColor *cols = (m_focusCols ? m_focusCols :
+                        //                       m_highlightCols);
+                        // which is always m_focusCols
 
                         path.moveTo(xd+offset+etchOffset, yd+offset+etchOffset);
                         path.lineTo(xd+offset+6+etchOffset, yd+offset+etchOffset);
@@ -11500,13 +11504,12 @@ void Style::drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, 
                  hasFocus(enabled && entry && state&State_HasFocus),
                  hasMouseOver(enabled && entry && state & State_MouseOver &&
                               opts.unifyCombo && opts.unifySpin);
-    const QColor *cols(enabled && hasMouseOver && opts.coloredMouseOver && entry
-                        ? m_mouseOverCols
-                        : enabled && hasFocus && m_focusCols && entry
-                              ? m_focusCols
-                              : custom
-                                ? custom
-                                : APP_KRUNNER==theThemedApp ? m_backgroundCols : backgroundColors(option));
+    const QColor *cols(enabled && hasMouseOver && opts.coloredMouseOver &&
+                       entry ? m_mouseOverCols : enabled &&
+                       // && m_focusCols // (always true)
+                       hasFocus && entry ?
+                       m_focusCols : custom ? custom :
+                       APP_KRUNNER==theThemedApp ? m_backgroundCols : backgroundColors(option));
     QColor       border(WIDGET_DEF_BUTTON==w && IND_FONT_COLOR==opts.defBtnIndicator && enabled
                           ? option->palette.buttonText().color()
                           : cols[WIDGET_PROGRESSBAR==w
@@ -11630,7 +11633,7 @@ void Style::drawMdiControl(QPainter *p, const QStyleOptionTitleBar *titleBar, Su
                                     ? m_titleBarButtonsCols[btn][ORIGINAL_SHADE]
                                     : SC_TitleBarCloseButton==sc && hover && !sunken && !(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR)
                                         ? CLOSE_COLOR
-                                        : SC_TitleBarCloseButton!=sc && hover && !sunken && m_mouseOverCols &&
+                                        : SC_TitleBarCloseButton!=sc && hover && !sunken &&
                                           !(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR) &&
                                           opts.titlebarButtons&TITLEBAR_BUTTON_USE_HOVER_COLOR
                                             ? m_mouseOverCols[ORIGINAL_SHADE]

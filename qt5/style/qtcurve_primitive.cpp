@@ -1242,7 +1242,7 @@ Style::drawPrimitiveButton(PrimitiveElement element, const QStyleOption *option,
             int etchOffset = doEtch ? 1 : 0;
             double xd = r.x() + 0.5;
             double yd = r.y() + 0.5;
-            const QColor *cols = m_focusCols ? m_focusCols : m_highlightCols;
+            const QColor *cols = m_focusCols;
 
             path.moveTo(xd + offset + etchOffset, yd + offset + etchOffset);
             path.lineTo(xd + offset + 6 + etchOffset, yd + offset + etchOffset);

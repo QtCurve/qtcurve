@@ -427,7 +427,8 @@ void Style::init(bool initial)
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Button), m_buttonCols);
 
     // Set defaults for Hover and Focus, these will be changed when KDE4 palette is applied...
-    shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Highlight), m_focusCols);
+    shadeColors(QApplication::palette().color(QPalette::Active,
+                                              QPalette::Highlight), m_focusCols);
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Highlight), m_mouseOverCols);
 // Dont setup KDE4 fonts/colours here - seems to mess things up when using proxy styles.
 // See http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=638629
@@ -2475,7 +2476,7 @@ Style::drawBorder(QPainter *p, const QRect &r, const QStyleOption *option,
                      opts.unifyCombo && opts.unifySpin);
     const QColor *cols(enabled && hasMouseOver && opts.coloredMouseOver && entry
                        ? m_mouseOverCols
-                       : enabled && hasFocus && m_focusCols && entry
+                       : enabled && hasFocus && entry
                        ? m_focusCols
                        : custom
                        ? custom
@@ -2603,7 +2604,7 @@ void Style::drawMdiControl(QPainter *p, const QStyleOptionTitleBar *titleBar, Su
             ? m_titleBarButtonsCols[btn][ORIGINAL_SHADE]
             : SC_TitleBarCloseButton==sc && hover && !sunken && !(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR)
             ? CLOSE_COLOR
-            : SC_TitleBarCloseButton!=sc && hover && !sunken && m_mouseOverCols &&
+            : SC_TitleBarCloseButton!=sc && hover && !sunken &&
             !(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR) &&
             opts.titlebarButtons&TITLEBAR_BUTTON_USE_HOVER_COLOR
             ? m_mouseOverCols[ORIGINAL_SHADE]
