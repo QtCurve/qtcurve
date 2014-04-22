@@ -56,6 +56,7 @@ qtcCairoPolygon(cairo_t *cr, const GdkColor *col, const QtcRect *area,
     cairo_set_line_width(cr, 1);
     qtcCairoClipRect(cr, area);
     qtcCairoSetColor(cr, col);
+    cairo_set_antialias(cr, CAIRO_ANTIALIAS_NONE);
     qtcCairoPathPoints(cr, points, npoints);
     cairo_close_path(cr);
     cairo_stroke_preserve(cr);
