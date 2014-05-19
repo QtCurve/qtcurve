@@ -67,25 +67,6 @@
 
 #include <QDebug>
 
-extern QString (*qt_filedialog_existing_directory_hook)(
-    QWidget *parent, const QString &caption, const QString &dir,
-    QFileDialog::Options options);
-
-extern QString (*qt_filedialog_open_filename_hook)(
-    QWidget *parent, const QString &caption, const QString &dir,
-    const QString &filter, QString *selectedFilter,
-    QFileDialog::Options options);
-
-extern QStringList (*qt_filedialog_open_filenames_hook)(
-    QWidget * parent, const QString &caption, const QString &dir,
-    const QString &filter, QString *selectedFilter,
-    QFileDialog::Options options);
-
-extern QString (*qt_filedialog_save_filename_hook)(
-    QWidget *parent, const QString &caption, const QString &dir,
-    const QString &filter, QString *selectedFilter,
-    QFileDialog::Options options);
-
 namespace QtCurve {
 
 void
@@ -161,13 +142,6 @@ Style::polish(QApplication *app)
         if(!qtcIsFlatBgnd(opts.menuBgndAppearance) && 0 == opts.lighterPopupMenuBgnd)
             opts.lighterPopupMenuBgnd=1; // shade so that we dont have 3d-ish borders...
         opts.menuBgndAppearance = APPEARANCE_FLAT;
-    }
-
-    if (opts.useQtFileDialogApps.contains(appName)) {
-        qt_filedialog_existing_directory_hook = 0L;
-        qt_filedialog_open_filename_hook = 0L;
-        qt_filedialog_open_filenames_hook = 0L;
-        qt_filedialog_save_filename_hook = 0L;
     }
 
     QCommonStyle::polish(app);
