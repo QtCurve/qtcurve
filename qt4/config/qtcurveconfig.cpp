@@ -711,6 +711,7 @@ static void insertFocusEntries(QComboBox *combo)
     combo->insertItem(FOCUS_FILLED, i18n("Highlight color, and fill"));
     combo->insertItem(FOCUS_LINE, i18n("Line drawn with highlight color"));
     combo->insertItem(FOCUS_GLOW, i18n("Glow"));
+    combo->insertItem(FOCUS_NONE, i18n("Nothing"));
 }
 
 static void insertGradBorderEntries(QComboBox *combo)

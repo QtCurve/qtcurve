@@ -386,6 +386,8 @@ static EFocus toFocus(const char *str, EFocus def)
             return FOCUS_LINE;
         if(0==memcmp(str, "glow", 4))
             return FOCUS_GLOW;
+        if(0==memcmp(str, "none", 4))
+            return FOCUS_NONE;
     }
 
     return def;
@@ -1985,6 +1987,8 @@ static const char *toStr(EFocus f)
             return "line";
         case FOCUS_GLOW:
             return "glow";
+        case FOCUS_NONE:
+            return "none";
     }
 }
 
