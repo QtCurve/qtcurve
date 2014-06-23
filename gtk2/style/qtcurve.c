@@ -2546,6 +2546,9 @@ gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
              GdkRectangle *area, GtkWidget *widget, const char *detail,
              int x, int y, int width, int height)
 {
+    if (opts.focus == FOCUS_NONE) {
+            return;
+        }
     if (GTK_IS_EDITABLE(widget))
         return;
     QTC_RET_IF_FAIL(GDK_IS_DRAWABLE(window));

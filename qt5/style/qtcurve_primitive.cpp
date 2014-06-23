@@ -1366,6 +1366,10 @@ Style::drawPrimitiveFrameFocusRect(PrimitiveElement element,
     const QRect &r = option->rect;
     State state = option->state;
     const QPalette &palette(option->palette);
+
+    if (FOCUS_NONE==opts.focus)
+        return true;
+
     if (auto focusFrame = qtcStyleCast<QStyleOptionFocusRect>(option)) {
         if (!(focusFrame->state & State_KeyboardFocusChange) ||
             (widget && widget->inherits("QComboBoxListView"))) {
