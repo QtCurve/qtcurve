@@ -2980,8 +2980,7 @@ Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe,
     else
         a.setPoints(opts.vArrows ? 8 : 3,  3+m,1+m,  0,-2,  -(3+m),1+m,    -(3+m),2+m,  -(2+m),2+m, 0,0,  2+m,2+m, 3+m,2+m);
 
-    switch(pe)
-    {
+    switch (pe) {
     case PE_IndicatorArrowUp:
         if(m)
             r.adjust(0, -m, 0, -m);
@@ -3005,6 +3004,11 @@ Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe,
     col.setAlpha(255);
     p->setPen(col);
     p->setBrush(col);
+    // Qt5 changes how coordinates is calculate for non-AA drawing.
+    // use QPainter::Qt4CompatiblePainting for now.
+    // A better solution should be shifting the coordinates by 0.5
+    // or maybe use QPainterPath
+    p->setRenderHint(QPainter::Qt4CompatiblePainting, true);
     // Qt >= 4.8.5 has problem drawing polygons correctly. Enabling
     // antialiasing can work arround the problem although it will also make
     // the arrow blurry.
