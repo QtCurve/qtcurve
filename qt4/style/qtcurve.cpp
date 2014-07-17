@@ -10735,13 +10735,17 @@ void Style::drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *opti
     }
 }
 
-void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOption *option, const QWidget *widget, int round,
-                               const QColor &fill, const QColor *custom, bool doBorder, EWidget w, bool useCache, ERound realRound,
-                               bool onToolbar) const
+void
+Style::drawLightBevelReal(QPainter *p, const QRect &rOrig,
+                          const QStyleOption *option, const QWidget *widget,
+                          int round, const QColor &fill, const QColor *custom,
+                          bool doBorder, EWidget w, bool useCache,
+                          ERound realRound, bool onToolbar) const
 {
-    EAppearance  app(qtcWidgetApp(onToolbar ? WIDGET_TOOLBAR_BUTTON : w, &opts, option->state&State_Active));
-    QRect        r(rOrig);
-    bool         bevelledButton((WIDGET_BUTTON(w) || WIDGET_NO_ETCH_BTN==w || WIDGET_MENU_BUTTON==w) && APPEARANCE_BEVELLED==app),
+    EAppearance app = qtcWidgetApp(onToolbar ? WIDGET_TOOLBAR_BUTTON : w,
+                                   &opts, option->state & State_Active);
+    QRect r(rOrig);
+    bool bevelledButton = ((WIDGET_BUTTON(w) || WIDGET_NO_ETCH_BTN==w || WIDGET_MENU_BUTTON==w) && APPEARANCE_BEVELLED==app),
                  sunken(option->state &(/*State_Down | */State_On | State_Sunken)),
                  flatWidget((WIDGET_MDI_WINDOW_BUTTON==w &&
                               (opts.round==ROUND_MAX || opts.titlebarButtons&TITLEBAR_BUTTON_ROUND)) ||
@@ -10777,20 +10781,20 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
 
     p->save();
 
-    if(doEtch)
+    if (doEtch)
         r.adjust(1, 1, -1, -1);
 
-    if(WIDGET_TROUGH==w && !opts.borderSbarGroove)
+    if (w == WIDGET_TROUGH && !opts.borderSbarGroove)
         doBorder=false;
 
     p->setRenderHint(QPainter::Antialiasing, true);
 
-    if(r.width()>0 && r.height()>0)
-    {
-        if(WIDGET_PROGRESSBAR==w && STRIPE_NONE!=opts.stripedProgress)
-            drawProgressBevelGradient(p, opts.borderProgress ? r.adjusted(1, 1, -1, -1) : r, option, horiz, app, custom);
-        else
-        {
+    if (r.width() > 0 && r.height() > 0) {
+        if (w == WIDGET_PROGRESSBAR && opts.stripedProgress != STRIPE_NONE) {
+            drawProgressBevelGradient(p, opts.borderProgress ?
+                                      r.adjusted(1, 1, -1, -1) : r,
+                                      option, horiz, app, custom);
+        } else {
             drawBevelGradient(fill, p, WIDGET_PROGRESSBAR==w && opts.borderProgress ? r.adjusted(1, 1, -1, -1) : r,
                               doBorder
                                 ? buildPath(r, w, round, qtcGetRadius(&opts, r.width()-2, r.height()-2, w, RADIUS_INTERNAL))

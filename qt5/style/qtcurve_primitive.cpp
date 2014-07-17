@@ -1542,7 +1542,7 @@ Style::drawPrimitiveIndicatorRadioButton(PrimitiveElement element,
             QRect rect(r.x(), r.y(), opts.crSize + (doEtch ? 2 : 0),
                        opts.crSize + (doEtch ? 2 : 0));
 
-            if (CR_SMALL_SIZE != opts.crSize && menu) {
+            if (opts.crSize != CR_SMALL_SIZE && menu) {
                 rect.adjust(0, -1, 0, -1);
                 y++;
             }

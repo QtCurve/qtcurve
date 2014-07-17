@@ -1549,117 +1549,134 @@ void Style::drawSunkenBevel(QPainter *p, const QRect &r, const QColor &col) cons
     p->restore();
 }
 
-void Style::drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *option, const QWidget *widget, int round, const QColor &fill,
-                           const QColor *custom, bool doBorder, EWidget w) const
+void
+Style::drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *option,
+                      const QWidget *widget, int round, const QColor &fill,
+                      const QColor *custom, bool doBorder, EWidget w) const
 {
-    bool onToolbar=APPEARANCE_NONE!=opts.tbarBtnAppearance && (WIDGET_TOOLBAR_BUTTON==w || (WIDGET_BUTTON(w) && isOnToolbar(widget)));
+    bool onToolbar = (opts.tbarBtnAppearance != APPEARANCE_NONE &&
+                      (w == WIDGET_TOOLBAR_BUTTON ||
+                       (WIDGET_BUTTON(w) && isOnToolbar(widget))));
 
-    if(WIDGET_PROGRESSBAR==w || WIDGET_SB_BUTTON==w || (WIDGET_SPIN==w && !opts.unifySpin)/* || !m_usePixmapCache*/)
-        drawLightBevelReal(p, r, option, widget, round, fill, custom, doBorder, w, true, opts.round, onToolbar);
-    else
-    {
+    if (qtcOneOf(w, WIDGET_PROGRESSBAR, WIDGET_SB_BUTTON) ||
+        (w == WIDGET_SPIN && !opts.unifySpin)/* || !m_usePixmapCache*/) {
+        drawLightBevelReal(p, r, option, widget, round, fill, custom,
+                           doBorder, w, true, opts.round, onToolbar);
+    } else {
         static const int constMaxCachePixmap = 128;
 
-        int    endSize=0,
-            middleSize=8;
-        bool   horiz(CIRCULAR_SLIDER(w) || isHoriz(option, w, TBTN_JOINED==opts.tbarBtns)),
-            circular( (WIDGET_MDI_WINDOW_BUTTON==w && (opts.titlebarButtons&TITLEBAR_BUTTON_ROUND)) ||
-                      WIDGET_RADIO_BUTTON==w || WIDGET_DIAL==w || CIRCULAR_SLIDER(w));
-        double radius=0;
-        ERound realRound=qtcGetWidgetRound(&opts, r.width(), r.height(), w);
+        int endSize = 0;
+        int middleSize = 8;
+        bool horiz = (CIRCULAR_SLIDER(w) ||
+                      isHoriz(option, w, opts.tbarBtns == TBTN_JOINED));
+        bool circular = ((w == WIDGET_MDI_WINDOW_BUTTON &&
+                          (opts.titlebarButtons & TITLEBAR_BUTTON_ROUND)) ||
+                         qtcOneOf(w, WIDGET_RADIO_BUTTON, WIDGET_DIAL) ||
+                         CIRCULAR_SLIDER(w));
+        double radius = 0;
+        ERound realRound = qtcGetWidgetRound(&opts, r.width(), r.height(), w);
 
-        if(!circular)
-        {
-            switch(realRound)
-            {
+        if (!circular) {
+            switch (realRound) {
             case ROUND_SLIGHT:
             case ROUND_NONE:
             case ROUND_FULL:
-                endSize=SLIDER(w) && MO_PLASTIK==opts.coloredMouseOver && option->state&State_MouseOver ? 9 : 5;
+                endSize = (SLIDER(w) && opts.coloredMouseOver == MO_PLASTIK &&
+                           option->state&State_MouseOver ? 9 : 5);
                 break;
             case ROUND_EXTRA:
-                endSize=7;
+                endSize = 7;
                 break;
             case ROUND_MAX:
-            {
-                radius=qtcGetRadius(&opts, r.width(), r.height(), w, RADIUS_ETCH);
-                endSize=SLIDER(w)
-                    ? qMax((opts.sliderWidth/2)+1, (int)(radius+1.5))
-                    : (int)(radius+2.5);
-                middleSize=(MIN_ROUND_MAX_WIDTH-(endSize*2))+4;
-                if(middleSize<4)
-                    middleSize=4;
+                radius = qtcGetRadius(&opts, r.width(), r.height(),
+                                      w, RADIUS_ETCH);
+                endSize = (SLIDER(w) ? qMax((opts.sliderWidth / 2) + 1,
+                                            int(radius + 1.5)) :
+                           int(radius + 2.5));
+                middleSize = MIN_ROUND_MAX_WIDTH - (endSize * 2) + 4;
+                if (middleSize < 4)
+                    middleSize = 4;
                 break;
-            }
             }
         }
 
-        int size((2*endSize)+middleSize);
+        int size = 2 * endSize + middleSize;
 
-        if(size>constMaxCachePixmap)
-            drawLightBevelReal(p, r, option, widget, round, fill, custom, doBorder, w, true, realRound, onToolbar);
-        else
-        {
+        if (size > constMaxCachePixmap) {
+            drawLightBevelReal(p, r, option, widget, round, fill, custom,
+                               doBorder, w, true, realRound, onToolbar);
+        } else {
             QString key;
-            bool    small(circular || (horiz ? r.width() : r.height())<(2*endSize));
+            bool small(circular || (horiz ? r.width() : r.height())<(2*endSize));
             QPixmap pix;
-            QSize   pixSize(small ? QSize(r.width(), r.height()) : QSize(horiz ? size : r.width(), horiz ? r.height() : size));
-            uint    state(option->state&(State_Raised|State_Sunken|State_On|State_Horizontal|State_HasFocus|State_MouseOver|
+            QSize pixSize(small ? QSize(r.width(), r.height()) : QSize(horiz ? size : r.width(), horiz ? r.height() : size));
+            uint state(option->state&(State_Raised|State_Sunken|State_On|State_Horizontal|State_HasFocus|State_MouseOver|
                                          (WIDGET_MDI_WINDOW_BUTTON==w ? State_Active : State_None)));
 
-            key.sprintf("qtc-%x-%x-%x-%x-%x-%x-%x-%x-%x", w, onToolbar ? 1 : 0, round, (int)realRound, pixSize.width(), pixSize.height(),
+            key.sprintf("qtc-%x-%x-%x-%x-%x-%x-%x-%x-%x", w, onToolbar ? 1 : 0,
+                        round, (int)realRound, pixSize.width(), pixSize.height(),
                         state, fill.rgba(), (int)(radius*100));
-            if(!m_usePixmapCache || !QPixmapCache::find(key, pix))
-            {
-                pix=QPixmap(pixSize);
+            if (!m_usePixmapCache || !QPixmapCache::find(key, pix)) {
+                pix = QPixmap(pixSize);
                 pix.fill(Qt::transparent);
 
                 QPainter pixPainter(&pix);
-                ERound   oldRound=opts.round;
-                opts.round=realRound;
-                drawLightBevelReal(&pixPainter, QRect(0, 0, pix.width(), pix.height()), option, widget, round, fill, custom,
-                                   doBorder, w, false, realRound, onToolbar);
-                opts.round=oldRound;
+                ERound oldRound = opts.round;
+                opts.round = realRound;
+                drawLightBevelReal(&pixPainter, QRect(0, 0, pix.width(),
+                                                      pix.height()), option,
+                                   widget, round, fill, custom, doBorder, w,
+                                   false, realRound, onToolbar);
+                opts.round = oldRound;
                 pixPainter.end();
 
-                if(m_usePixmapCache)
+                if (m_usePixmapCache) {
                     QPixmapCache::insert(key, pix);
+                }
             }
 
-            if(small)
+            if (small) {
                 p->drawPixmap(r.topLeft(), pix);
-            else if(horiz)
-            {
+            } else if (horiz) {
                 int middle(qMin(r.width()-(2*endSize), middleSize));
                 if(middle>0)
                     p->drawTiledPixmap(r.x()+endSize, r.y(), r.width()-(2*endSize), pix.height(), pix.copy(endSize, 0, middle, pix.height()));
                 p->drawPixmap(r.x(), r.y(), pix.copy(0, 0, endSize, pix.height()));
                 p->drawPixmap(r.x()+r.width()-endSize, r.y(), pix.copy(pix.width()-endSize, 0, endSize, pix.height()));
-            }
-            else
-            {
+            } else {
                 int middle(qMin(r.height()-(2*endSize), middleSize));
-                if(middle>0)
-                    p->drawTiledPixmap(r.x(), r.y()+endSize, pix.width(), r.height()-(2*endSize),
-                                       pix.copy(0, endSize, pix.width(), middle));
-                p->drawPixmap(r.x(), r.y(), pix.copy(0, 0, pix.width(), endSize));
-                p->drawPixmap(r.x(), r.y()+r.height()-endSize, pix.copy(0, pix.height()-endSize, pix.width(), endSize));
+                if (middle > 0) {
+                    p->drawTiledPixmap(r.x(), r.y() + endSize, pix.width(),
+                                       r.height() - 2 * endSize,
+                                       pix.copy(0, endSize,
+                                                pix.width(), middle));
+                }
+                p->drawPixmap(r.x(), r.y(),
+                              pix.copy(0, 0, pix.width(), endSize));
+                p->drawPixmap(r.x(), r.y() + r.height() - endSize,
+                              pix.copy(0, pix.height() - endSize, pix.width(),
+                                       endSize));
             }
 
-            if(WIDGET_SB_SLIDER==w && opts.stripedSbar)
-            {
+            if (w == WIDGET_SB_SLIDER && opts.stripedSbar) {
                 QRect rx(r.adjusted(1, 1, -1, -1));
-                addStripes(p, buildPath(rx, WIDGET_SB_SLIDER, realRound, qtcGetRadius(&opts, rx.width()-1, rx.height()-1, WIDGET_SB_SLIDER,
-                                                                                      RADIUS_INTERNAL)),
+                addStripes(p, buildPath(rx, WIDGET_SB_SLIDER, realRound,
+                                        qtcGetRadius(&opts, rx.width() - 1,
+                                                     rx.height() - 1,
+                                                     WIDGET_SB_SLIDER,
+                                                     RADIUS_INTERNAL)),
                            rx, horiz);
             }
         }
     }
 }
 
-void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOption *option, const QWidget *widget, int round,
-                               const QColor &fill, const QColor *custom, bool doBorder, EWidget w, bool useCache, ERound realRound,
-                               bool onToolbar) const
+void
+Style::drawLightBevelReal(QPainter *p, const QRect &rOrig,
+                          const QStyleOption *option, const QWidget *widget,
+                          int round, const QColor &fill, const QColor *custom,
+                          bool doBorder, EWidget w, bool useCache,
+                          ERound realRound, bool onToolbar) const
 {
     EAppearance  app(qtcWidgetApp(onToolbar ? WIDGET_TOOLBAR_BUTTON : w, &opts, option->state&State_Active));
     QRect        r(rOrig);
@@ -1698,20 +1715,20 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
 
     p->save();
 
-    if(doEtch)
+    if (doEtch)
         r.adjust(1, 1, -1, -1);
 
-    if(WIDGET_TROUGH==w && !opts.borderSbarGroove)
-        doBorder=false;
+    if (WIDGET_TROUGH == w && !opts.borderSbarGroove)
+        doBorder = false;
 
     p->setRenderHint(QPainter::Antialiasing, true);
 
-    if(r.width()>0 && r.height()>0)
-    {
-        if(WIDGET_PROGRESSBAR==w && STRIPE_NONE!=opts.stripedProgress)
-            drawProgressBevelGradient(p, opts.borderProgress ? r.adjusted(1, 1, -1, -1) : r, option, horiz, app, custom);
-        else
-        {
+    if (r.width() > 0 && r.height() > 0) {
+        if (w == WIDGET_PROGRESSBAR && opts.stripedProgress != STRIPE_NONE) {
+            drawProgressBevelGradient(p, opts.borderProgress ?
+                                      r.adjusted(1, 1, -1, -1) : r,
+                                      option, horiz, app, custom);
+        } else {
             drawBevelGradient(fill, p, WIDGET_PROGRESSBAR==w && opts.borderProgress ? r.adjusted(1, 1, -1, -1) : r,
                               doBorder
                               ? buildPath(r, w, round, qtcGetRadius(&opts, r.width()-2, r.height()-2, w, RADIUS_INTERNAL))
@@ -3566,11 +3583,12 @@ const QColor * Style::popupMenuCols(const QStyleOption *option) const
             m_popupMenuCols : backgroundColors(option));
 }
 
-const QColor * Style::checkRadioColors(const QStyleOption *option) const
+const QColor*
+Style::checkRadioColors(const QStyleOption *option) const
 {
-    return opts.crColor && option && option->state&State_Enabled && (option->state&State_On || option->state&State_NoChange)
-        ? m_checkRadioSelCols
-        : buttonColors(option);
+    return (opts.crColor && option && option->state & State_Enabled &&
+            (option->state & State_On || option->state & State_NoChange)
+            ? m_checkRadioSelCols : buttonColors(option));
 }
 
 const QColor * Style::sliderColors(const QStyleOption *option) const
