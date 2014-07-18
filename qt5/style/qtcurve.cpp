@@ -1721,7 +1721,7 @@ Style::drawLightBevelReal(QPainter *p, const QRect &rOrig,
     if (WIDGET_TROUGH == w && !opts.borderSbarGroove)
         doBorder = false;
 
-    p->setRenderHint(QPainter::Antialiasing, true);
+    // p->setRenderHint(QPainter::Antialiasing, true);
 
     if (r.width() > 0 && r.height() > 0) {
         if (w == WIDGET_PROGRESSBAR && opts.stripedProgress != STRIPE_NONE) {
