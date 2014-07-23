@@ -6,6 +6,8 @@ The new repo URLs are:
 
 * read-write: git@git.kde.org:qtcurve
 
+* web: https://projects.kde.org/projects/playground/base/qtcurve/repository or http://quickgit.kde.org/?p=qtcurve.git
+
 You can rewrite your existing clonedir/.git/config to use the new URLs (or
 use the 'git remote ...' family of commands) and continue to use your
 existing clones.
