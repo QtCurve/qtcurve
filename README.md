@@ -13,4 +13,5 @@ existing clones.
 More at: https://community.kde.org/Sysadmin/GitKdeOrgManual
 
 Merge requests via http://git.reviewboard.kde.org/
+
 Bugs/wishes via http://bugs.kde.org
