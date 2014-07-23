@@ -1,2 +1,0 @@
-#!/bin/sh
-exec @quoted_command_line@
