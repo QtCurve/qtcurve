@@ -6,7 +6,7 @@ The new repo URLs are:
 
 * read-write: git@git.kde.org:qtcurve
 
-You can rewrite your existing <clone>/.git/config to use the new URLs (or
+You can rewrite your existing clonedir/.git/config to use the new URLs (or
 use the 'git remote ...' family of commands) and continue to use your
 existing clones.
 
